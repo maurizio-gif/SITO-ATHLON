@@ -1,0 +1,1096 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const PG = 'https://athlon.perfectgym.com/ClientPortal2';
+
+const plans = [
+  {
+    id: 'smart',
+    badge: 'Essenziale',
+    name: 'Smart',
+    desc: "Sala pesi, nuoto libero e allenamenti online. L'essenziale per allenarti ogni giorno.",
+    activities: ['Gym Floor', 'Nuoto Libero Assistito', 'Athlon TV'],
+    options: [
+      {
+        label: 'Annuale — Pagamento mensile',
+        note: 'Rinnovo automatico annuale · disdetta via email',
+        savings: 'Risparmio €138 vs Flex',
+        amount: '75',
+        period: '€/mese',
+        href: `${PG}/Registration/Start?clubID=1&PaymentPlanId=263`,
+      },
+      {
+        label: 'Annuale — Pagamento unico',
+        note: 'Rinnovo automatico annuale · disdetta via email',
+        savings: 'Risparmio €438 vs Flex annuo',
+        amount: '750',
+        period: '€/anno',
+        href: `${PG}/Registration/Start?clubID=1&PaymentPlanId=264`,
+      },
+      {
+        label: 'Mensile Flex',
+        note: 'Minimo 1 mese · disdetta via App in qualsiasi momento',
+        amount: '99',
+        period: '€/mese',
+        href: `${PG}/Registration/Start?clubID=1&PaymentPlanId=254`,
+      },
+    ],
+  },
+  {
+    id: 'premium',
+    badge: 'Consigliato · Accesso completo',
+    name: 'Premium',
+    desc: 'Tutto il club in un abbonamento: palestra, piscina, corsi, reformer e online.',
+    activities: [
+      'Gym Floor',
+      'Corsi Fitness',
+      'Group Reformer',
+      'Aqua Fitness',
+      'Scuola Nuoto Adulti',
+      'Nuoto Libero Assistito',
+      'Corso Gestanti',
+      'Athlon TV',
+    ],
+    options: [
+      {
+        label: 'Annuale — Pagamento mensile',
+        note: 'Rinnovo automatico annuale · disdetta via email',
+        savings: 'Risparmio €288 vs Flex',
+        amount: '95',
+        period: '€/mese',
+        href: `${PG}/Registration/Start?clubID=1&PaymentPlanId=252`,
+      },
+      {
+        label: 'Annuale — Pagamento unico',
+        note: 'Rinnovo automatico annuale · disdetta via email',
+        savings: 'Risparmio €488 vs Flex annuo',
+        amount: '950',
+        period: '€/anno',
+        href: `${PG}/Registration/Start?clubID=1&PaymentPlanId=249`,
+      },
+      {
+        label: 'Mensile Flex',
+        promo: true,
+        note: 'Minimo 1 mese · disdetta via App in qualsiasi momento',
+        amount: '119',
+        period: '€/mese',
+        href: `${PG}/Registration/Start?clubID=1&PaymentPlanId=253`,
+      },
+    ],
+  },
+];
+
+const singoli = [
+  { name: 'Gym Floor', note: 'Accesso 90 minuti', price: '€20' },
+  { name: 'Corso Fitness', note: '85+ corsi tra cui scegliere', price: '€22' },
+  { name: 'Aqua Fitness', note: 'Aqua Gym, Hydrobike, Gestanti', price: '€22' },
+  { name: 'Nuoto Libero Assistito', note: 'Sessione 60 minuti', price: '€20' },
+  { name: 'Scuola Nuoto Adulti', note: 'Base, Intermedio, Avanzato', price: '€22' },
+  { name: 'Group Reformer', note: 'Gruppi da 10 con istruttore', price: '€25' },
+];
+
+const ptPackages = [
+  { label: '2 sedute al mese', price: '€80' },
+  { label: '4 sedute al mese', price: '€140' },
+  { label: '8 sedute al mese', price: '€280' },
+];
+
+const faqs = [
+  {
+    q: 'Come posso pagare?',
+    a: 'Accettiamo addebito su carta di credito/debito e addebito diretto su conto corrente (IBAN). <a href="https://wiki.athlonroma.it/wikiathlon/generali/metodo-di-pagamento/" target="_blank" rel="noopener">Tutti i dettagli qui →</a>',
+  },
+  {
+    q: 'Ho bisogno del certificato medico?',
+    a: 'Sì, è richiesto il certificato di idoneità alla pratica sportiva non agonistica. Va inviato a <a href="mailto:staff@athlonroma.it">staff@athlonroma.it</a> entro 2 settimane dalla prima lezione. <a href="https://wiki.athlonroma.it/wikiathlon/generali/certificato-medico/" target="_blank" rel="noopener">Info qui →</a>',
+  },
+  {
+    q: 'Come si prenota una lezione?',
+    a: "Tutte le prenotazioni si fanno dall'app Athlon Club o dal portale web. Puoi prenotare fino a 3 giorni prima della lezione. <a href=\"https://wiki.athlonroma.it/wikiathlon/generali/prenotazioni/\" target=\"_blank\" rel=\"noopener\">Guida completa →</a>",
+  },
+  {
+    q: "Posso sospendere l'abbonamento?",
+    a: 'Sì, le sospensioni sono illimitate al costo di €15 al mese. Partono dal primo giorno del mese e vanno richieste almeno 10 giorni prima. <a href="https://wiki.athlonroma.it/wikiathlon/adulti/sospensione/" target="_blank" rel="noopener">Come fare →</a>',
+  },
+  {
+    q: 'Come disdico il rinnovo automatico?',
+    a: '<strong>Mensile Flex:</strong> direttamente dall\'area riservata → Abbonamenti → Disdici rinnovo automatico.<br /><strong>Annuale:</strong> via email a staff@athlonroma.it almeno 10 giorni prima del rinnovo.',
+  },
+  {
+    q: 'Cosa succede in caso di infortunio?',
+    a: 'È possibile sospendere l\'abbonamento presentando documentazione medica di una struttura sanitaria nazionale. Richiesta via email a staff@athlonroma.it, sospensione minima 2 mesi.',
+  },
+];
+
+const trust = [
+  'Iscrizione online immediata',
+  'Sospensioni illimitate',
+  'Accesso da mobile via App',
+  'Staff disponibile 6:00–22:00',
+];
+---
+
+<Layout
+  title="Abbonamenti Palestra e Piscina a Roma Talenti | Athlon Club"
+  description="Scegli il tuo abbonamento Athlon Club: piani Smart e Premium, accessi singoli, personal training e Guest Pass da 7 giorni. Iscrizione online immediata."
+>
+  <!-- HERO -->
+  <section class="ab-hero">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Benvenuto nel club</span>
+      <h1 class="ab-hero__title" data-anim="reveal">
+        Scegli il<br />tuo accesso.<br /><em>Inizia oggi.</em>
+      </h1>
+      <p class="ab-hero__sub" data-anim="from-left" data-anim-delay="90">
+        Hai già scoperto Athlon. Ora è semplice: <strong>scegli il piano</strong> che fa per te e iscriviti
+        online in pochi minuti.
+      </p>
+    </div>
+    <div class="ab-trust">
+      <div class="container ab-trust__inner">
+        {trust.map((t) => (<span class="ab-trust__item">{t}</span>))}
+      </div>
+    </div>
+  </section>
+
+  <!-- PIANI -->
+  <section class="ab-sec">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Abbonamenti adulti</span>
+      <h2 class="ab-sec__title" data-anim="reveal">Smart o Premium</h2>
+      <p class="ab-sec__sub">Due piani, tre modalità di pagamento ciascuno. Stesso club, accessi diversi.</p>
+
+      <div class="plans">
+        {plans.map((p, i) => (
+          <article class:list={['plan', p.id]} data-anim="scale" data-anim-delay={String(i * 100)}>
+            <div class="plan__head">
+              <span class="plan__badge">{p.badge}</span>
+              <h3 class="plan__name">{p.name}</h3>
+              <p class="plan__desc">{p.desc}</p>
+            </div>
+
+            <div class="plan__activities">
+              <span class="plan__activities-title">Attività incluse</span>
+              <ul>
+                {p.activities.map((a) => (<li>{a}</li>))}
+              </ul>
+            </div>
+
+            <div class="plan__options">
+              {p.options.map((o) => (
+                <div class="plan__option">
+                  <div class="plan__option-head">
+                    <div>
+                      <span class="plan__option-label">
+                        {o.label}
+                        {o.promo && <span class="plan__promo">Promo</span>}
+                      </span>
+                      <p class="plan__option-note">{o.note}</p>
+                      {o.savings && <span class="plan__savings">{o.savings}</span>}
+                    </div>
+                    <div class="plan__price">
+                      <span class="plan__amount">{o.amount}</span>
+                      <span class="plan__period">{o.period}</span>
+                    </div>
+                  </div>
+                  <a href={o.href} class="plan__cta">Scegli questo piano →</a>
+                </div>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <p class="ab-note">
+        <strong>Quota di attivazione:</strong> €50 una tantum, per tutti i piani. Include il badge di accesso e
+        l'attivazione dell'account. Non è richiesta in caso di rinnovo. · <strong>Sospensioni:</strong>
+        illimitate, €15/mese · <strong>Certificato medico:</strong> non agonistico, entro 2 settimane dalla
+        prima lezione.
+      </p>
+    </div>
+  </section>
+
+  <!-- GUEST PASS -->
+  <section class="ab-sec ab-sec--alt">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Non sei ancora sicuro?</span>
+      <h2 class="ab-sec__title" data-anim="reveal">Prova prima.</h2>
+      <p class="ab-sec__sub">Una settimana per scoprire tutto il club, senza impegno.</p>
+
+      <div class="guest" data-anim="scale">
+        <div class="guest__main">
+          <span class="guest__pre">Guest Pass — 7 giorni</span>
+          <p class="guest__price">19 <span>€</span></p>
+          <p class="guest__body">
+            Accesso completo a tutte le attività per 1 settimana. Solo per chi non ha mai avuto un abbonamento
+            Athlon dal 2021.
+          </p>
+        </div>
+        <div class="guest__actions">
+          <button class="guest__code" type="button" data-copy-code="GOLD7">Codice: GOLD7 · copia</button>
+          <a href={`${PG}/#/Registration`} class="btn btn-primary">Attiva il Guest Pass →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACCESSI SINGOLI -->
+  <section class="ab-sec">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Senza abbonamento</span>
+      <h2 class="ab-sec__title" data-anim="reveal">Accessi singoli</h2>
+      <p class="ab-sec__sub">
+        Prenota e paga una lezione o un accesso alla volta. Badge di accesso €5 (una tantum).
+      </p>
+
+      <ul class="singoli">
+        {singoli.map((s) => (
+          <li class="singolo">
+            <div>
+              <span class="singolo__name">{s.name}</span>
+              <span class="singolo__note">{s.note}</span>
+            </div>
+            <span class="singolo__price">{s.price}</span>
+          </li>
+        ))}
+      </ul>
+
+      <a href={`${PG}/#/Classes/1/List`} class="btn btn-primary ab-block-cta">Prenota una lezione →</a>
+    </div>
+  </section>
+
+  <!-- PERSONAL TRAINING -->
+  <section class="ab-sec ab-sec--alt">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Allenamento individuale</span>
+      <h2 class="ab-sec__title" data-anim="reveal">Personal Training</h2>
+      <p class="ab-sec__sub">
+        Aggiuntivo ad un abbonamento attivo. Seduta singola disponibile anche per esterni.
+      </p>
+
+      <ul class="singoli">
+        {ptPackages.map((p) => (
+          <li class="singolo">
+            <span class="singolo__name">{p.label}</span>
+            <span class="singolo__price">{p.price}</span>
+          </li>
+        ))}
+      </ul>
+
+      <p class="ab-pt-note">
+        Seduta singola: <strong>€45</strong> per iscritti · <strong>€55</strong> per esterni
+      </p>
+      <a href={`${PG}/#/PersonalTraining?clubId=1&trainerId=null`} class="btn btn-outline-dark">
+        Prenota una seduta →
+      </a>
+    </div>
+  </section>
+
+  <!-- VIRTUAL TOUR -->
+  <section class="ab-sec ab-sec--dark">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Ancora qualche dubbio?</span>
+      <h2 class="ab-sec__title" data-anim="reveal">Guarda prima di decidere.</h2>
+      <p class="ab-sec__sub">Esplora gli spazi in autonomia e scarica il planning delle attività.</p>
+
+      <span class="ab-tour-label">Virtual Tour 360°</span>
+      <div class="ab-tour" data-anim="scale">
+        <iframe
+          src="https://my.mpskin.com/it/tour/dwg8pjdrkh?play=1"
+          title="Virtual tour 360° Athlon Club"
+          allowfullscreen
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+      <p class="ab-tour-caption">
+        3.300 mq · Sala Pesi · Piscine · Reformer Studio · Training Experience
+      </p>
+
+      <div class="planning">
+        <div>
+          <p class="planning__title">Planning attività 2025/26</p>
+          <p class="planning__note">200+ ore settimanali · aggiornato mensile</p>
+        </div>
+        <a href="https://planning.athlonroma.it/" target="_blank" rel="noopener" class="btn btn-primary">
+          Scarica ↓
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="ab-sec">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Domande frequenti</span>
+      <h2 class="ab-sec__title" data-anim="reveal">FAQ</h2>
+
+      <div class="faq">
+        {faqs.map((f) => (
+          <div class="faq__item" data-faq-item>
+            <button class="faq__q" type="button" aria-expanded="false" data-faq-trigger>
+              <span>{f.q}</span>
+              <span class="faq__icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq__a"><div class="faq__a-inner" set:html={f.a} /></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTATTI -->
+  <section class="ab-sec ab-sec--alt">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Dove e quando</span>
+      <h2 class="ab-sec__title" data-anim="reveal">Vieni a trovarci</h2>
+      <p class="ab-address"><strong>Via Ugo Ojetti 134</strong> · 00137 Roma</p>
+      <p class="ab-hours">
+        Lun–Ven: 6:00 – 22:00<br />Sabato: 8:00 – 20:00<br />Domenica: 9:30 – 13:00
+      </p>
+      <a href="/contatti" class="btn btn-outline-dark">Parla con il nostro staff →</a>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // Copy the guest-pass code, with the button itself confirming the result.
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-code]').forEach((btn) => {
+    const code = btn.dataset.copyCode || '';
+    const original = btn.textContent;
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(code);
+        btn.textContent = `${code} · copiato ✓`;
+        btn.classList.add('copied');
+      } catch {
+        // Clipboard can be blocked (permissions, insecure context) — say so
+        // rather than silently pretending it worked.
+        btn.textContent = `${code} · copia a mano`;
+      }
+      window.setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  });
+
+  // FAQ accordion — one open at a time.
+  const items = Array.from(document.querySelectorAll<HTMLElement>('[data-faq-item]'));
+  items.forEach((item) => {
+    const trigger = item.querySelector<HTMLButtonElement>('[data-faq-trigger]');
+    trigger?.addEventListener('click', () => {
+      const willOpen = !item.classList.contains('open');
+      items.forEach((other) => {
+        other.classList.remove('open');
+        other.querySelector('[data-faq-trigger]')?.setAttribute('aria-expanded', 'false');
+      });
+      if (willOpen) {
+        item.classList.add('open');
+        trigger.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+</script>
+
+<style>
+  /* ---- Hero ---- */
+  .ab-hero {
+    position: relative;
+    background: var(--color-dark);
+    color: var(--color-white);
+    padding-top: var(--space-section-lg);
+    overflow: hidden;
+  }
+
+  .ab-hero::after {
+    content: 'ATHLON';
+    position: absolute;
+    right: -20px;
+    bottom: 40px;
+    font-family: var(--font-heading);
+    font-size: clamp(120px, 20vw, 260px);
+    line-height: 0.8;
+    color: rgba(255, 255, 255, 0.03);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .ab-hero .container {
+    position: relative;
+    z-index: 1;
+    padding-bottom: var(--space-section-md);
+  }
+
+  .ab-hero__title {
+    font-size: var(--text-4xl);
+    line-height: var(--leading-4xl);
+    letter-spacing: var(--tracking-4xl);
+    margin: 14px 0 22px;
+    padding: 0.08em 0 0.06em;
+  }
+
+  .ab-hero__title em {
+    font-style: normal;
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  .ab-hero__sub {
+    max-width: 32rem;
+    font-size: var(--text-md);
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  .ab-hero__sub strong {
+    color: var(--color-white);
+    font-weight: 600;
+  }
+
+  .ab-trust {
+    position: relative;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--border-dark);
+  }
+
+  .ab-trust__inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .ab-trust__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .ab-trust__item::before {
+    content: '✓';
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  /* ---- Sections ---- */
+  .ab-sec {
+    padding: var(--space-section-lg) 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ab-sec--alt {
+    background: var(--color-cream);
+    border-bottom: none;
+  }
+
+  .ab-sec--dark {
+    background: var(--color-dark);
+    color: var(--color-white);
+    border-bottom: none;
+  }
+
+  .ab-sec__title {
+    font-size: var(--text-2xl);
+    letter-spacing: var(--tracking-2xl);
+    margin: 10px 0 8px;
+  }
+
+  .ab-sec__sub {
+    max-width: 46rem;
+    color: var(--text-muted);
+    margin-bottom: 36px;
+  }
+
+  .ab-sec--dark .ab-sec__sub {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  /* ---- Plans ---- */
+  .plans {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+
+  .plan {
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .plan.smart {
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .plan.premium {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .plan__head {
+    padding: 28px 28px 20px;
+  }
+
+  .plan__badge {
+    display: inline-block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+  }
+
+  .plan.smart .plan__badge {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .plan.premium .plan__badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .plan__name {
+    font-size: clamp(2.4rem, 4vw, 3.2rem);
+    line-height: 0.95;
+    margin-bottom: 10px;
+  }
+
+  .plan__desc {
+    margin: 0;
+    font-size: var(--text-sm);
+  }
+
+  .plan.smart .plan__desc {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .plan.premium .plan__desc {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .plan__activities {
+    padding: 0 28px 20px;
+  }
+
+  .plan__activities-title {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .plan.smart .plan__activities-title {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .plan.premium .plan__activities-title {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .plan__activities ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .plan__activities li {
+    font-size: var(--text-xs);
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 999px;
+  }
+
+  .plan.smart .plan__activities li {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .plan.premium .plan__activities li {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--color-white);
+  }
+
+  .plan__option {
+    padding: 20px 28px;
+    border-top: 1px solid;
+  }
+
+  .plan.smart .plan__option {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .plan.premium .plan__option {
+    border-color: rgba(255, 255, 255, 0.22);
+  }
+
+  .plan__option-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .plan__option-label {
+    display: block;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .plan.smart .plan__option-label {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .plan.premium .plan__option-label {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .plan__promo {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--color-white);
+    color: var(--color-primary);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+
+  .plan__option-note {
+    margin: 0;
+    font-size: var(--text-xs);
+    line-height: 1.5;
+  }
+
+  .plan.smart .plan__option-note {
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  .plan.premium .plan__option-note {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .plan__savings {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .plan.smart .plan__savings {
+    color: #6fcf97;
+    background: rgba(111, 207, 151, 0.12);
+  }
+
+  .plan.premium .plan__savings {
+    color: var(--color-white);
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  .plan__price {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .plan__amount {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .plan__period {
+    font-size: var(--text-xs);
+  }
+
+  .plan.smart .plan__period {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .plan.premium .plan__period {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .plan__cta {
+    display: block;
+    margin-top: 16px;
+    padding: 13px 18px;
+    border-radius: 999px;
+    text-align: center;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
+  }
+
+  .plan.smart .plan__cta {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .plan.smart .plan__cta:hover {
+    background: var(--color-white);
+    color: var(--color-dark);
+  }
+
+  .plan.premium .plan__cta {
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .plan.premium .plan__cta:hover {
+    background: var(--color-white);
+    color: var(--color-primary);
+  }
+
+  .plan__cta:active {
+    transform: scale(0.98);
+    transition-duration: var(--dur-press);
+  }
+
+  .ab-note {
+    margin-top: 28px;
+    padding: 18px 20px;
+    border-radius: 14px;
+    background: rgba(39, 36, 35, 0.05);
+    font-size: var(--text-xs);
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  .ab-note strong {
+    color: var(--color-dark);
+  }
+
+  /* ---- Guest pass ---- */
+  .guest {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 32px;
+    background: var(--color-dark);
+    color: var(--color-white);
+    border-radius: var(--radius);
+    padding: 36px 32px;
+  }
+
+  .guest__pre {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin-bottom: 12px;
+  }
+
+  .guest__price {
+    font-family: var(--font-heading);
+    font-size: clamp(3rem, 6vw, 4rem);
+    line-height: 1;
+    margin: 0 0 10px;
+  }
+
+  .guest__price span {
+    font-size: 0.4em;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .guest__body {
+    max-width: 42ch;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .guest__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .guest__code {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
+  }
+
+  .guest__code:hover {
+    background: rgba(255, 255, 255, 0.18);
+    color: var(--color-white);
+  }
+
+  .guest__code.copied {
+    background: rgba(111, 207, 151, 0.2);
+    color: #6fcf97;
+  }
+
+  /* ---- Price lists ---- */
+  .singoli {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: 46rem;
+  }
+
+  .singolo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .singolo:last-child {
+    border-bottom: none;
+  }
+
+  .singolo__name {
+    display: block;
+    font-size: var(--text-md);
+    font-weight: 500;
+  }
+
+  .singolo__note {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .singolo__price {
+    flex-shrink: 0;
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    line-height: 1;
+  }
+
+  .ab-block-cta {
+    margin-top: 28px;
+    justify-content: center;
+  }
+
+  .ab-pt-note {
+    margin: 20px 0 24px;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .ab-pt-note strong {
+    color: var(--color-dark);
+  }
+
+  /* ---- Tour ---- */
+  .ab-tour-label {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+    margin-bottom: 12px;
+  }
+
+  .ab-tour {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border-dark);
+  }
+
+  .ab-tour iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .ab-tour-caption {
+    margin: 14px 0 32px;
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  .planning {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 22px 24px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-dark);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .planning__title {
+    margin: 0 0 4px;
+    font-size: var(--text-md);
+    font-weight: 500;
+  }
+
+  .planning__note {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* ---- FAQ ---- */
+  .faq {
+    max-width: 52rem;
+  }
+
+  .faq__item {
+    border-top: 1px solid var(--border);
+  }
+
+  .faq__item:last-child {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .faq__q {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--font-body);
+    font-size: var(--text-md);
+    font-weight: 500;
+    color: var(--color-dark);
+    transition: color var(--dur-fast) ease;
+  }
+
+  .faq__q:hover {
+    color: var(--color-primary);
+  }
+
+  .faq__icon {
+    flex-shrink: 0;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--color-primary);
+    transition: transform var(--dur-base) var(--ease-out-crit);
+  }
+
+  .faq__item.open .faq__icon {
+    transform: rotate(45deg);
+  }
+
+  /* grid-rows 0fr -> 1fr animates to auto height without measuring in JS */
+  .faq__a {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--dur-base) var(--ease-out-crit);
+  }
+
+  .faq__item.open .faq__a {
+    grid-template-rows: 1fr;
+  }
+
+  .faq__a-inner {
+    overflow: hidden;
+    min-height: 0;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  .faq__item.open .faq__a-inner {
+    padding-bottom: 20px;
+  }
+
+  .faq__a-inner :global(a) {
+    color: var(--color-primary);
+  }
+
+  .faq__a-inner :global(a:hover) {
+    text-decoration: underline;
+  }
+
+  .faq__a-inner :global(strong) {
+    color: var(--color-dark);
+  }
+
+  /* ---- Contatti ---- */
+  .ab-address {
+    font-size: var(--text-md);
+    margin-bottom: 8px;
+  }
+
+  .ab-hours {
+    font-size: var(--text-sm);
+    line-height: 1.9;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 900px) {
+    .plans {
+      grid-template-columns: 1fr;
+    }
+    .guest {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 24px;
+    }
+    .guest__actions {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .plan__head,
+    .plan__activities,
+    .plan__option {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+    .plan__option-head {
+      flex-direction: column;
+      gap: 10px;
+    }
+    .plan__amount {
+      font-size: 2.5rem;
+    }
+  }
+</style>
