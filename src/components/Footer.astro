@@ -43,10 +43,6 @@ const affiliazioni = [
   { src: '/wp-content/uploads/2024/07/logo-asi-ok.jpg', alt: 'ASI' },
   { src: '/wp-content/uploads/2024/07/logo-csen.png', alt: 'CSEN' },
   { src: '/wp-content/uploads/2024/07/logo-coni.png', alt: 'CONI' },
-  { src: '/wp-content/uploads/2024/07/anif-logo-1.png', alt: 'ANIF' },
-  { src: '/wp-content/uploads/2024/07/logo-ciwas.png', alt: 'CIWAS' },
-  { src: '/wp-content/uploads/2024/07/matrix-logo.png', alt: 'Matrix' },
-  { src: '/wp-content/uploads/2024/08/BB-logo-horizontal-2-color-1024x205.png', alt: 'Bloomberg Blue' },
 ];
 ---
 
@@ -191,7 +187,9 @@ const affiliazioni = [
   <!-- Affiliazioni e partner -->
   <div class="footer-logos">
     <div class="container">
-      <p class="footer-logos__label">Affiliazioni e partner</p>
+      <p class="footer-logos__label">
+        Sito web per la propaganda dell'attività sportiva dilettantistica
+      </p>
     </div>
     <div class="logo-marquee">
       {/* The list is rendered twice so the track can loop seamlessly at -50%. */}
@@ -503,12 +501,15 @@ const affiliazioni = [
   }
 
   .footer-logos__label {
-    font-size: var(--text-2xs);
+    max-width: 52rem;
+    margin: 0 auto 22px;
+    text-align: center;
+    font-size: var(--text-xs);
     font-weight: 700;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.12em;
+    line-height: 1.6;
     text-transform: uppercase;
-    color: rgba(39, 36, 35, 0.4);
-    margin-bottom: 20px;
+    color: rgba(39, 36, 35, 0.55);
   }
 
   .logo-marquee {

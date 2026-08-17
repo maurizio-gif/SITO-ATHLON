@@ -3,6 +3,57 @@ import Layout from '../layouts/Layout.astro';
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 
+// Shown in the quick modal behind each "attività incluse" chip.
+const activityInfo: Record<string, { title: string; body: string; href?: string }> = {
+  'Gym Floor': {
+    title: 'Gym Floor',
+    body:
+      '400 mq di sala accessibile dalle 6:00 alle 22:00: area cardio Matrix 4.0 con macchinari connessi all\'app, area isotonica, area funzionale Ziva con rig da 8 metri, manubri fino a 50 kg e area cavi e carico libero.',
+    href: '/gym-floor',
+  },
+  'Nuoto Libero Assistito': {
+    title: 'Nuoto Libero Assistito',
+    body:
+      'Nuoto libero nella vasca da 25 metri a 5 corsie, con assistenza bagnino sempre presente. Corsie divise per ritmo, temperatura costante fra 28 °C e 28,5 °C.',
+    href: '/nuoto-libero',
+  },
+  'Athlon TV': {
+    title: 'Athlon TV',
+    body:
+      'La piattaforma di allenamenti on demand inclusa nell\'abbonamento: sessioni da seguire quando vuoi, anche da casa, direttamente dall\'app Athlon Club.',
+  },
+  'Corsi Fitness': {
+    title: 'Corsi Fitness',
+    body:
+      'Oltre 80 corsi a settimana in tre sale dedicate: attività aerobiche, olistiche e di tonificazione, HIIT in Sala B e Group Reformer in Sala C. Prenoti dall\'app fino a 3 giorni prima.',
+    href: '/corsi-fitness',
+  },
+  'Group Reformer': {
+    title: 'Group Reformer',
+    body:
+      'Pilates Reformer in piccoli gruppi da 10 persone con istruttore dedicato, nella nuova Sala C da 80 mq. Lavoro su postura, forza e mobilità.',
+    href: '/reformer',
+  },
+  'Aqua Fitness': {
+    title: 'Aqua Fitness',
+    body:
+      'Allenamento cardio a basso impatto in acqua: Aqua Gym e Hydrobike nella vasca da 12 metri, con temperatura fra 30 °C e 31,8 °C. Ideale anche per chi cerca un carico dolce sulle articolazioni.',
+    href: '/aqua-fitness',
+  },
+  'Scuola Nuoto Adulti': {
+    title: 'Scuola Nuoto Adulti',
+    body:
+      'Corsi su tre livelli — base, intermedio e avanzato — con istruttori federali. Dal primo approccio all\'acqua al perfezionamento dei quattro stili.',
+    href: '/scuola-nuoto-adulti',
+  },
+  'Corso Gestanti': {
+    title: 'Corso Gestanti',
+    body:
+      'Attività in acqua pensata per la gravidanza, seguita da personale specializzato, nella vasca a temperatura più alta. Lavoro dolce su respirazione, mobilità e scarico del peso.',
+    href: '/gestanti',
+  },
+};
+
 const plans = [
   {
     id: 'smart',
@@ -113,7 +164,7 @@ const faqs = [
   },
   {
     q: 'Come disdico il rinnovo automatico?',
-    a: '<strong>Mensile Flex:</strong> direttamente dall\'area riservata → Abbonamenti → Disdici rinnovo automatico.<br /><strong>Annuale:</strong> via email a staff@athlonroma.it almeno 10 giorni prima del rinnovo.',
+    a: '<strong>Mensile Flex:</strong> direttamente dall\'area riservata → Abbonamenti → Disdici rinnovo automatico.<br /><strong>Annuale:</strong> via email a <a href="mailto:disdetta@athlonroma.it">disdetta@athlonroma.it</a> almeno 10 giorni prima del rinnovo.',
   },
   {
     q: 'Cosa succede in caso di infortunio?',
@@ -172,9 +223,16 @@ const trust = [
             </div>
 
             <div class="plan__activities">
-              <span class="plan__activities-title">Attività incluse</span>
+              <span class="plan__activities-title">Attività incluse — tocca per i dettagli</span>
               <ul>
-                {p.activities.map((a) => (<li>{a}</li>))}
+                {p.activities.map((a) => (
+                  <li>
+                    <button type="button" class="activity-chip" data-activity={a}>
+                      {a}
+                      <span class="activity-chip__mark" aria-hidden="true">?</span>
+                    </button>
+                  </li>
+                ))}
               </ul>
             </div>
 
@@ -192,7 +250,10 @@ const trust = [
                         <span class="plan__amount">{o.amount}</span>
                         <span class="plan__period">{o.period}</span>
                       </div>
-                      <span class="plan__activation">Quota di attivazione una tantum €50</span>
+                      <span class="plan__activation">
+                        <span class="plan__activation-fee">+ €50</span>
+                        <span class="plan__activation-label">attivazione una tantum</span>
+                      </span>
                     </div>
                   </div>
                   <a href={o.href} class="plan__cta">Scegli questo piano →</a>
@@ -352,9 +413,74 @@ const trust = [
       <a href="/contatti" class="btn btn-outline-dark">Parla con il nostro staff →</a>
     </div>
   </section>
+
+  <!-- Quick explainer for each included activity -->
+  <div class="amodal" id="activity-modal" aria-hidden="true">
+    <div class="amodal__backdrop" data-amodal-close></div>
+    <div class="amodal__panel" role="dialog" aria-modal="true" aria-labelledby="amodal-title">
+      <button type="button" class="amodal__close" data-amodal-close aria-label="Chiudi">×</button>
+      <span class="amodal__eyebrow">Attività inclusa</span>
+      <h3 class="amodal__title" id="amodal-title"></h3>
+      <p class="amodal__body"></p>
+      <a class="amodal__link btn btn-primary" href="#">Scopri di più →</a>
+    </div>
+  </div>
+
+  <script is:inline set:html={`window.__ATHLON_ACTIVITIES__ = ${JSON.stringify(activityInfo)};`} />
 </Layout>
 
 <script>
+  // ---- Activity explainer modal ----
+  type ActivityInfo = { title: string; body: string; href?: string };
+  const info = ((window as any).__ATHLON_ACTIVITIES__ || {}) as Record<string, ActivityInfo>;
+
+  const modal = document.getElementById('activity-modal');
+  const mTitle = modal?.querySelector<HTMLElement>('.amodal__title');
+  const mBody = modal?.querySelector<HTMLElement>('.amodal__body');
+  const mLink = modal?.querySelector<HTMLAnchorElement>('.amodal__link');
+  let lastTrigger: HTMLElement | null = null;
+
+  function closeModal() {
+    modal?.classList.remove('open');
+    modal?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('amodal-locked');
+    // Send focus back where it came from, so keyboard users don't lose place.
+    lastTrigger?.focus();
+  }
+
+  function openModal(name: string, trigger: HTMLElement) {
+    const data = info[name];
+    if (!data || !modal) return;
+    lastTrigger = trigger;
+    if (mTitle) mTitle.textContent = data.title;
+    if (mBody) mBody.textContent = data.body;
+    if (mLink) {
+      // Not every activity has a page yet — hide the CTA rather than link nowhere.
+      if (data.href) {
+        mLink.href = data.href;
+        mLink.hidden = false;
+      } else {
+        mLink.hidden = true;
+      }
+    }
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('amodal-locked');
+    modal.querySelector<HTMLElement>('.amodal__close')?.focus();
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-activity]').forEach((btn) => {
+    btn.addEventListener('click', () => openModal(btn.dataset.activity || '', btn));
+  });
+
+  modal?.querySelectorAll('[data-amodal-close]').forEach((el) =>
+    el.addEventListener('click', closeModal)
+  );
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('open')) closeModal();
+  });
+
   // Copy the guest-pass code, with the button itself confirming the result.
   document.querySelectorAll<HTMLButtonElement>('[data-copy-code]').forEach((btn) => {
     const code = btn.dataset.copyCode || '';
@@ -665,20 +791,67 @@ const trust = [
   }
 
   .plan__activities li {
-    font-size: var(--text-xs);
-    font-weight: 500;
-    padding: 5px 12px;
-    border-radius: 999px;
+    display: flex;
   }
 
-  .plan.smart .plan__activities li {
+  .activity-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    padding: 6px 10px 6px 12px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) ease, transform var(--dur-fast) var(--ease-out-crit);
+  }
+
+  .activity-chip:active {
+    transform: scale(0.96);
+    transition-duration: var(--dur-press);
+  }
+
+  /* Small marker so it reads as "there's more here", not a dead label. */
+  .activity-chip__mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .plan.smart .activity-chip {
     background: rgba(255, 255, 255, 0.12);
     color: var(--color-white);
   }
 
-  .plan.premium .plan__activities li {
+  .plan.smart .activity-chip:hover {
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  .plan.smart .activity-chip__mark {
+    background: rgba(255, 255, 255, 0.25);
+    color: var(--color-white);
+  }
+
+  .plan.premium .activity-chip {
     background: rgba(255, 87, 1, 0.12);
     color: var(--color-dark);
+  }
+
+  .plan.premium .activity-chip:hover {
+    background: rgba(255, 87, 1, 0.22);
+  }
+
+  .plan.premium .activity-chip__mark {
+    background: var(--color-primary);
+    color: var(--color-white);
   }
 
   .plan__option {
@@ -772,20 +945,47 @@ const trust = [
     gap: 4px;
   }
 
+  /* Small chip under the price: the amount carries the weight, the wording
+     stays quiet so it never competes with the plan price above it. */
   .plan__activation {
-    margin-top: 4px;
-    max-width: 15ch;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 5px;
+    margin-top: 8px;
+    padding: 4px 9px;
+    border-radius: 999px;
     font-size: 10px;
-    line-height: 1.35;
-    letter-spacing: 0.02em;
+    line-height: 1.3;
+    white-space: nowrap;
+  }
+
+  .plan__activation-fee {
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 0.01em;
+  }
+
+  .plan__activation-label {
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
 
   .plan.smart .plan__activation {
-    color: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .plan.smart .plan__activation-fee {
+    color: var(--color-white);
   }
 
   .plan.premium .plan__activation {
+    background: rgba(255, 87, 1, 0.12);
     color: var(--text-muted);
+  }
+
+  .plan.premium .plan__activation-fee {
+    color: var(--color-dark);
   }
 
   .plan__amount {
@@ -1051,7 +1251,7 @@ const trust = [
 
   /* ---- FAQ ---- */
   .faq {
-    max-width: 52rem;
+    max-width: none;
   }
 
   .faq__item {
@@ -1174,11 +1374,112 @@ const trust = [
       align-items: flex-start;
       text-align: left;
     }
-    .plan__activation {
-      max-width: none;
-    }
     .plan__amount {
       font-size: 2.5rem;
+    }
+  }
+
+  /* ---- Activity modal ---- */
+  .amodal {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-fast) ease;
+  }
+
+  .amodal.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .amodal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 8, 0.6);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
+  .amodal__panel {
+    position: relative;
+    z-index: 1;
+    width: min(30rem, 100%);
+    padding: 32px 30px 30px;
+    border-radius: var(--radius);
+    background: var(--color-white);
+    box-shadow: 0 30px 70px -18px rgba(0, 0, 0, 0.5);
+    transform: translateY(10px) scale(0.98);
+    transition: transform var(--dur-base) var(--ease-out-crit);
+  }
+
+  .amodal.open .amodal__panel {
+    transform: none;
+  }
+
+  .amodal__close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: var(--color-cream);
+    color: var(--color-dark);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) ease;
+  }
+
+  .amodal__close:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .amodal__eyebrow {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin-bottom: 10px;
+  }
+
+  .amodal__title {
+    font-size: var(--text-2xl);
+    letter-spacing: var(--tracking-2xl);
+    margin-bottom: 14px;
+  }
+
+  .amodal__body {
+    color: var(--text-muted);
+    margin-bottom: 22px;
+  }
+
+  .amodal__link {
+    width: 100%;
+    justify-content: center;
+  }
+
+  :global(body.amodal-locked) {
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .amodal,
+    .amodal__panel {
+      transition: none;
     }
   }
 </style>
