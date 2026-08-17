@@ -1,0 +1,168 @@
+---
+/**
+ * FAQ accordion, one panel open at a time.
+ *
+ * The same markup lives inline in abbonamenti, personal-training and gym-floor;
+ * those predate this component and still carry their own copy. New pages should
+ * use this one, and the older three can move over when they are next touched.
+ */
+export interface FaqEntry {
+  q: string;
+  /** Answer, may contain inline HTML (links, <strong>). */
+  a: string;
+}
+
+interface Props {
+  entries: FaqEntry[];
+  /**
+   * Emit FAQPage structured data alongside the accordion. This is what makes
+   * the answers eligible for rich results and quotable by AI answer engines,
+   * so it is on by default — turn it off only for a second FAQ block on the
+   * same page, since one page should declare one FAQPage.
+   */
+  schema?: boolean;
+}
+
+const { entries, schema = true } = Astro.props;
+
+// Structured data wants plain text, so the inline links and <strong> that make
+// the on-page answer readable are stripped out here.
+const plain = (html: string) =>
+  html
+    .replace(/<br\s*\/?>/gi, ' ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const faqSchema = schema
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: entries.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: plain(f.a) },
+      })),
+    }
+  : null;
+---
+
+{faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
+
+<div class="faq">
+  {entries.map((f) => (
+    <div class="faq__item" data-faq-item>
+      <button class="faq__q" type="button" aria-expanded="false" data-faq-trigger>
+        <span>{f.q}</span>
+        <span class="faq__icon" aria-hidden="true">+</span>
+      </button>
+      <div class="faq__a">
+        <div class="faq__a-inner" set:html={f.a} />
+      </div>
+    </div>
+  ))}
+</div>
+
+<script>
+  // Scoped to this component's own items, so several FAQ blocks on one page
+  // would not fight over which panel is open.
+  document.querySelectorAll<HTMLElement>('.faq').forEach((group) => {
+    const items = Array.from(group.querySelectorAll<HTMLElement>('[data-faq-item]'));
+    items.forEach((item) => {
+      const trigger = item.querySelector<HTMLButtonElement>('[data-faq-trigger]');
+      trigger?.addEventListener('click', () => {
+        const willOpen = !item.classList.contains('open');
+        items.forEach((other) => {
+          other.classList.remove('open');
+          other.querySelector('[data-faq-trigger]')?.setAttribute('aria-expanded', 'false');
+        });
+        if (willOpen) {
+          item.classList.add('open');
+          trigger.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  .faq__item {
+    border-top: 1px solid var(--border);
+  }
+
+  .faq__item:last-child {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .faq__q {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--font-body);
+    font-size: var(--text-md);
+    font-weight: 500;
+    color: var(--color-dark);
+    transition: color var(--dur-fast) ease;
+  }
+
+  .faq__q:hover {
+    color: var(--color-primary);
+  }
+
+  .faq__icon {
+    flex-shrink: 0;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--color-primary);
+    transition: transform var(--dur-base) var(--ease-out-crit);
+  }
+
+  .faq__item.open .faq__icon {
+    transform: rotate(45deg);
+  }
+
+  /* grid-rows 0fr -> 1fr animates to auto height without measuring in JS */
+  .faq__a {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--dur-base) var(--ease-out-crit);
+  }
+
+  .faq__item.open .faq__a {
+    grid-template-rows: 1fr;
+  }
+
+  .faq__a-inner {
+    overflow: hidden;
+    min-height: 0;
+    max-width: 46rem;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  .faq__item.open .faq__a-inner {
+    padding-bottom: 20px;
+  }
+
+  .faq__a-inner :global(a) {
+    color: var(--color-primary);
+  }
+
+  .faq__a-inner :global(a:hover) {
+    text-decoration: underline;
+  }
+
+  .faq__a-inner :global(strong) {
+    color: var(--color-dark);
+  }
+</style>

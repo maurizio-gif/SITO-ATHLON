@@ -1,0 +1,232 @@
+import { defineConfig } from 'tinacms';
+
+// Credenziali TinaCloud — da aggiungere come variabili d'ambiente:
+//   TINA_CLIENT_ID  →  Vercel: Project Settings > Environment Variables
+//   TINA_TOKEN      →  stessa posizione
+// Si ottengono creando un progetto per QUESTO repo su https://app.tina.io
+// (uno per repository: quello del TCA non vale qui).
+
+export default defineConfig({
+  branch:
+    process.env.VERCEL_GIT_COMMIT_REF || process.env.GITHUB_BRANCH || process.env.HEAD || 'main',
+  clientId: process.env.TINA_CLIENT_ID || '',
+  token: process.env.TINA_TOKEN || '',
+
+  build: {
+    outputFolder: 'admin',
+    publicFolder: 'public',
+  },
+
+  media: {
+    tina: {
+      // Le immagini del sito stanno sotto public/wp-content/uploads/
+      mediaRoot: 'wp-content/uploads',
+      publicFolder: 'public',
+    },
+  },
+
+  schema: {
+    collections: [
+      // ─── EVENTI ────────────────────────────────────────────────────────────
+      // Template standard: ogni evento ha la stessa struttura, e "Crea nuovo"
+      // parte già compilato (defaultItem) con una sala e due lezioni da
+      // modificare. Il testo libero vive solo nel corpo; tutto il resto è un
+      // campo, così la pagina viene sempre uguale.
+      // ───────────────────────────────────────────────────────────────────────
+      {
+        name: 'eventi',
+        label: 'Eventi',
+        path: 'src/content/eventi',
+        format: 'md',
+        ui: {
+          // Il nome file diventa lo slug dell'URL: /eventi/<slug>
+          filename: {
+            slugify: (values) =>
+              (values?.title || 'nuovo-evento')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[̀-ͯ]/g, '')
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-|-$/g, ''),
+          },
+          defaultItem: () => ({
+            kicker: 'Masterclass',
+            date: new Date().toISOString(),
+            time: '09:30 – 13:00',
+            image: '/wp-content/uploads/2025/11/ATHLON79-scaled.jpg',
+            excerpt: '',
+            free: true,
+            ctaLabel: 'Prenota ora',
+            ctaHref: 'https://athlon.perfectgym.com/ClientPortal2/#/Registration',
+            notes: ['Prenotazione dall’app o dal portale'],
+            program: [
+              {
+                room: 'Sala A',
+                slots: [
+                  { time: '09:30', lesson: '', trainer: '' },
+                  { time: '10:20', lesson: '', trainer: '' },
+                ],
+              },
+            ],
+          }),
+        },
+        fields: [
+          {
+            type: 'string',
+            name: 'title',
+            label: 'Titolo evento',
+            isTitle: true,
+            required: true,
+          },
+          {
+            type: 'string',
+            name: 'kicker',
+            label: 'Tipo di evento (etichetta sopra al titolo)',
+            required: true,
+            options: ['Masterclass', 'Open Day', 'Evento', 'Gara', 'Stage'],
+          },
+          {
+            type: 'datetime',
+            name: 'date',
+            label: 'Data',
+            required: true,
+            ui: { dateFormat: 'DD/MM/YYYY' },
+            description:
+              'Il giorno della settimana viene calcolato dal sito: non va scritto a mano.',
+          },
+          {
+            type: 'string',
+            name: 'time',
+            label: 'Orario (es. 09:30 – 13:00)',
+          },
+          {
+            type: 'image',
+            name: 'image',
+            label: 'Immagine di copertina',
+            required: true,
+          },
+          {
+            type: 'string',
+            name: 'imageAlt',
+            label: 'Descrizione immagine (per accessibilità e SEO)',
+          },
+          {
+            type: 'string',
+            name: 'excerpt',
+            label: 'Riassunto breve (una o due righe, appare nelle card in home)',
+            required: true,
+            ui: { component: 'textarea' },
+          },
+          {
+            type: 'boolean',
+            name: 'free',
+            label: 'Evento gratuito (mostra il badge "Gratuito")',
+          },
+          {
+            type: 'string',
+            name: 'price',
+            label: 'Prezzo, se a pagamento (es. €10)',
+          },
+          {
+            type: 'string',
+            name: 'notes',
+            label: 'Informazioni pratiche',
+            list: true,
+            description: 'Cosa portare, cosa serve. Una voce per riga.',
+          },
+          {
+            type: 'object',
+            name: 'program',
+            label: 'Programma',
+            list: true,
+            ui: { itemProps: (item) => ({ label: item?.room || 'Sala' }) },
+            fields: [
+              {
+                type: 'string',
+                name: 'room',
+                label: 'Sala o spazio (es. Sala A, Vasca Grande, Gym Floor)',
+                required: true,
+              },
+              {
+                type: 'object',
+                name: 'slots',
+                label: 'Lezioni',
+                list: true,
+                ui: {
+                  itemProps: (item) => ({
+                    label: [item?.time, item?.lesson].filter(Boolean).join(' — ') || 'Lezione',
+                  }),
+                },
+                fields: [
+                  { type: 'string', name: 'time', label: 'Orario (es. 09:30)', required: true },
+                  { type: 'string', name: 'lesson', label: 'Lezione', required: true },
+                  { type: 'string', name: 'trainer', label: 'Trainer' },
+                ],
+              },
+            ],
+          },
+          {
+            type: 'string',
+            name: 'ctaLabel',
+            label: 'Testo del pulsante',
+          },
+          {
+            type: 'string',
+            name: 'ctaHref',
+            label: 'Link del pulsante',
+          },
+          {
+            type: 'boolean',
+            name: 'draft',
+            label: 'Bozza (non pubblicare)',
+          },
+          {
+            type: 'rich-text',
+            name: 'body',
+            label: 'Descrizione dell’evento',
+            isBody: true,
+            description:
+              'Il racconto dell’evento. Le informazioni pratiche vanno nel campo sopra, non qui.',
+          },
+        ],
+      },
+
+      // ─── HELP DESK (la wiki) ───────────────────────────────────────────────
+      // Attenzione: la cartella determina l'URL, /wikiathlon/<cartella>/<file>.
+      // Spostare un articolo di cartella ne cambia il link.
+      // ───────────────────────────────────────────────────────────────────────
+      {
+        name: 'articles',
+        label: 'Help Desk',
+        path: 'src/content/articles',
+        format: 'md',
+        fields: [
+          { type: 'string', name: 'title', label: 'Titolo', isTitle: true, required: true },
+          {
+            type: 'string',
+            name: 'description',
+            label: 'Sottotitolo / riassunto',
+            required: true,
+            ui: { component: 'textarea' },
+          },
+          {
+            type: 'string',
+            name: 'area',
+            label: 'Area',
+            list: true,
+            options: ['Generali', 'Adulti – Club', 'Scuola Nuoto Bambini', 'News'],
+          },
+          { type: 'string', name: 'tags', label: 'Tag', list: true },
+          {
+            type: 'number',
+            name: 'order',
+            label: 'Ordine nell’elenco (numero più basso = più in alto)',
+          },
+          { type: 'string', name: 'updatedDate', label: 'Data aggiornamento' },
+          { type: 'boolean', name: 'draft', label: 'Bozza (non pubblicare)' },
+          { type: 'rich-text', name: 'body', label: 'Contenuto', isBody: true },
+        ],
+      },
+    ],
+  },
+});

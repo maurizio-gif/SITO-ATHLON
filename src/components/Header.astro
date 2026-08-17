@@ -63,18 +63,26 @@ const juniorMenu = {
 const adultiCtas = [
   { label: 'Scopri gli Abbonamenti', href: '/abbonamenti', accent: true, arrow: true },
   { label: 'Athlon Club', href: 'https://onelink.to/athlon', sub: "Scarica l'app →" },
-  { label: 'Orari Corsi', href: 'https://planning.athlonroma.it/' },
+  { label: 'Orari Corsi', href: '/planning' },
 ];
 
 const juniorCtas = [
   { label: 'Accedi al tuo account', href: 'https://athlon.perfectgym.com/ClientPortal2/#/Login', accent: true, arrow: true },
   { label: 'Athlon Club', href: 'https://onelink.to/athlon', sub: "Scarica l'app →" },
-  { label: 'Scopri gli orari dei corsi', href: 'https://planning.athlonroma.it/' },
+  { label: 'Scopri gli orari dei corsi', href: '/planning' },
 ];
 
 const menus = [
   { id: 'adulti', label: 'Attività Adulti', data: adultiMenu, ctas: adultiCtas },
   { id: 'junior', label: 'Corsi Junior', data: juniorMenu, ctas: juniorCtas },
+];
+
+// Top-level destinations without a submenu, listed after the two groups in the
+// mobile menu.
+const flatLinks = [
+  { label: 'Planning', href: '/planning' },
+  { label: 'Abbonamenti', href: '/abbonamenti' },
+  { label: 'Contatti', href: '/contatti' },
 ];
 
 // Official brand glyphs (Simple Icons paths), drawn in currentColor.
@@ -184,38 +192,39 @@ const social = [
             {m.label}
             <span class="mobile-chev" aria-hidden="true"></span>
           </button>
+          {/* One level of tapping, not two: the column heading is a plain
+              label and its links are already there. The second accordion this
+              replaced meant two taps to reach any link. */}
           <div class="mobile-submenu">
-            {m.data.columns.length === 1 ? (
-              /* A single group (Junior) would mean tapping twice to reach the
-                 same four links — show them straight away instead. */
-              <ul class="mobile-sublist mobile-sublist--flat">
-                {m.data.columns[0].links.map((l) => (
-                  <li><a class="mobile-sublink" href={l.href}>{l.label}</a></li>
-                ))}
-              </ul>
-            ) : (
-              m.data.columns.map((col) => (
-                <div class="mobile-subgroup">
-                  <button class="mobile-sublabel mobile-subgroup-trigger" aria-expanded="false">
-                    {col.heading}
-                    <span class="mobile-chev small" aria-hidden="true"></span>
-                  </button>
-                  <ul class="mobile-sublist">
-                    {col.links.map((l) => (
-                      <li><a class="mobile-sublink" href={l.href}>{l.label}</a></li>
-                    ))}
-                  </ul>
-                </div>
-              ))
-            )}
+            {m.data.columns.map((col) => (
+              <div class="mobile-subgroup">
+                {m.data.columns.length > 1 && (
+                  <span class="mobile-sublabel">{col.heading}</span>
+                )}
+                <ul class="mobile-sublist">
+                  {col.links.map((l) => (
+                    <li><a class="mobile-sublink" href={l.href}>{l.label}</a></li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
+        </li>
+      ))}
+
+      {/* Flat destinations sit in the same list as the groups, so the whole
+          menu reads as one index rather than a couple of dropdowns plus a
+          row of buttons at the bottom. */}
+      {flatLinks.map((l) => (
+        <li class="mobile-group">
+          <a class="mobile-link" href={l.href}>{l.label}</a>
         </li>
       ))}
     </ul>
 
     <div class="mobile-secondary">
       <a class="mobile-secondary-btn" href="https://onelink.to/athlon">Scarica l'app</a>
-      <a class="mobile-secondary-btn" href="https://planning.athlonroma.it/">Orari Corsi</a>
+      <a class="mobile-secondary-btn" href="/planning">Orari Corsi</a>
       <a class="mobile-secondary-btn" href="https://athlon.perfectgym.com/ClientPortal2/#/Login">Accedi</a>
     </div>
 
@@ -338,25 +347,8 @@ const social = [
     });
   });
 
-  // Second level (Palestra / Corsi Fitness / Piscina) — also one at a time,
-  // but scoped to its own parent group.
-  document.querySelectorAll<HTMLElement>('.mobile-submenu').forEach((submenu) => {
-    const subgroups = Array.from(submenu.querySelectorAll<HTMLElement>('.mobile-subgroup'));
-    subgroups.forEach((subgroup) => {
-      const trigger = subgroup.querySelector<HTMLButtonElement>('.mobile-subgroup-trigger');
-      trigger?.addEventListener('click', () => {
-        const willOpen = !subgroup.classList.contains('open');
-        subgroups.forEach((other) => {
-          other.classList.remove('open');
-          other.querySelector('.mobile-subgroup-trigger')?.setAttribute('aria-expanded', 'false');
-        });
-        if (willOpen) {
-          subgroup.classList.add('open');
-          trigger.setAttribute('aria-expanded', 'true');
-        }
-      });
-    });
-  });
+  // No second level any more: once a group is open its links are all visible,
+  // so there is nothing left to toggle inside it.
 </script>
 
 <style>
@@ -872,8 +864,10 @@ const social = [
       transition: max-height var(--dur-base) var(--ease-out-crit);
     }
 
+    /* All the pills are visible at once now, so this has to clear the tallest
+       group (Adulti, 23 links over three captions). The list itself scrolls. */
     .mobile-group.open .mobile-submenu {
-      max-height: 60rem;
+      max-height: 110rem;
     }
 
     .mobile-subgroup {
@@ -884,59 +878,31 @@ const social = [
       border-top: none;
     }
 
+    /* A quiet caption over its pills, not a control. */
     .mobile-sublabel {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      width: 100%;
-      padding: 0.8rem 0;
-      margin: 0;
-      background: none;
-      border: none;
-      cursor: pointer;
-      text-align: left;
+      display: block;
+      padding: 0.85rem 0 0.55rem;
       font-family: var(--font-body);
-      font-size: var(--text-sm);
+      font-size: var(--text-xs);
       font-weight: 700;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--text-muted);
-      padding-right: 4px;
-    }
-
-    .mobile-chev.small {
-      width: 9px;
-      height: 9px;
-      border-width: 2px;
-    }
-
-    .mobile-subgroup.open .mobile-chev.small {
-      transform: rotate(-135deg) translateY(-2px);
     }
 
     .mobile-sublist {
       list-style: none;
       margin: 0;
-      padding: 0;
+      padding: 0 0 0.9rem;
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height var(--dur-base) var(--ease-out-crit),
-        padding var(--dur-base) var(--ease-out-crit);
     }
 
-    .mobile-subgroup.open .mobile-sublist {
-      max-height: 40rem;
-      padding: 0 0 0.9rem;
-    }
-
-    /* Not inside a collapsible sub-group, so it is always open. */
-    .mobile-sublist--flat {
-      max-height: none;
-      padding: 0.9rem 0;
+    /* A group with one column has no caption, so its pills need the top
+       breathing room the caption would have provided. */
+    .mobile-subgroup:first-child .mobile-sublist:only-child {
+      padding-top: 0.9rem;
     }
 
     /* Pills wrap into a compact block — a 17-item vertical list would make

@@ -1,0 +1,125 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import EventiPreview from '../../components/eventi/EventiPreview.astro';
+import { pastEvents, formatEventDate } from '../../data/eventi';
+
+const past = await pastEvents();
+---
+
+<Layout
+  title="Eventi e Masterclass | Athlon Club Roma Talenti"
+  description="Masterclass gratuite, open day e appuntamenti della Athlon Community a Roma Talenti: il calendario dei prossimi eventi del club."
+>
+  <section class="evh">
+    <div class="container">
+      <span class="eyebrow">Athlon Community</span>
+      <h1 class="evh__title">Eventi <em class="accent">e masterclass</em></h1>
+      <p class="evh__lede">
+        Masterclass gratuite, open day e giornate aperte anche a chi non è iscritto. Partecipa alla
+        community del club.
+      </p>
+    </div>
+  </section>
+
+  <EventiPreview
+    limit={99}
+    eyebrow="In programma"
+    title="Prossimi eventi"
+    showAllLink={false}
+  />
+
+  {past.length > 0 && (
+    <section class="evp">
+      <div class="container">
+        <span class="eyebrow" data-anim="from-left">Archivio</span>
+        <h2 class="evp__title" data-anim="reveal">Già passati</h2>
+        <ul class="evp__list">
+          {past.map((e) => (
+            <li class="evp__item">
+              <a href={`/eventi/${e.id}`}>
+                <span class="evp__name">{e.data.title}</span>
+                <span class="evp__date">{formatEventDate(e.data.date, true)}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+</Layout>
+
+<style>
+  .evh {
+    background: var(--color-dark);
+    color: var(--color-white);
+    padding: var(--space-section-lg) 0 var(--space-section-md);
+  }
+
+  .evh__title {
+    font-size: var(--text-4xl);
+    line-height: var(--leading-4xl);
+    letter-spacing: var(--tracking-4xl);
+    margin: 14px 0 0;
+    padding: 0.08em 0 0.06em;
+  }
+
+  .evh__title .accent {
+    font-style: normal;
+    color: var(--color-primary);
+  }
+
+  .evh__lede {
+    max-width: 34rem;
+    margin: 20px 0 0;
+    font-size: var(--text-md);
+    color: rgba(255, 255, 255, 0.68);
+  }
+
+  .evp {
+    padding: var(--space-section-lg) 0;
+    background: var(--color-cream);
+  }
+
+  .evp__title {
+    font-size: var(--text-3xl);
+    letter-spacing: var(--tracking-2xl);
+    margin: 10px 0 26px;
+  }
+
+  .evp__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: 48rem;
+  }
+
+  .evp__item {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .evp__item a {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px 0;
+  }
+
+  .evp__item a:hover .evp__name {
+    color: var(--color-primary);
+  }
+
+  .evp__name {
+    font-size: var(--text-md);
+    font-weight: 500;
+    transition: color var(--dur-fast) ease;
+  }
+
+  .evp__date {
+    flex-shrink: 0;
+    font-size: var(--text-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+</style>

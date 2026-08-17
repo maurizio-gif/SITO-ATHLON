@@ -1,4 +1,6 @@
 ---
+import SpacesGallery from './SpacesGallery.astro';
+
 // Computed, not hardcoded: the "anni di storia" figure must not go stale.
 const FOUNDED = 1973;
 const years = new Date().getFullYear() - FOUNDED;
@@ -27,6 +29,10 @@ const stats = [
       ))}
     </ul>
   </div>
+
+  {/* Photos live in this block now, under the numbers: same anthracite ground,
+      no heading of its own. */}
+  <SpacesGallery />
 </section>
 
 <script>
@@ -79,6 +85,7 @@ const stats = [
     background: var(--color-dark);
     color: var(--color-white);
     padding: var(--space-section-md) 0;
+    overflow: hidden;
   }
 
   .stats-grid {
@@ -114,13 +121,17 @@ const stats = [
     margin-bottom: 14px;
   }
 
+  /* The hero claim's exact treatment, one step down the scale: the serif italic
+     answering the display figure, the same way it answers the hero title. */
   .stat__label {
-    font-family: var(--font-heading);
-    text-transform: uppercase;
-    letter-spacing: -0.005em;
-    font-size: var(--text-md);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: var(--text-lg);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
     color: var(--color-white);
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
 
   .stat__sub {
@@ -150,7 +161,7 @@ const stats = [
       margin-bottom: 10px;
     }
     .stat__label {
-      font-size: var(--text-sm);
+      font-size: var(--text-md);
     }
     .stat__sub {
       font-size: var(--text-2xs);

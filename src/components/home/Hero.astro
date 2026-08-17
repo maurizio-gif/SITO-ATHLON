@@ -11,7 +11,7 @@
   <div class="hero-content">
     <span class="eyebrow hero-eyebrow">Club Sportivo · Roma Talenti</span>
     <h1 class="hero-title">Athlon Club <em class="accent">4.0</em></h1>
-    <p class="hero-lede">Innovare è la nostra miglior tradizione.</p>
+    <p class="hero-lede">Innovare è la nostra<br />miglior tradizione.</p>
     <a href="https://athlon.perfectgym.com/ClientPortal2/#/Registration" class="btn btn-primary">
       Iscriviti ora <span aria-hidden="true">→</span>
     </a>
@@ -78,7 +78,7 @@
   }
 
   .hero-title {
-    font-size: var(--text-4xl);
+    font-size: calc(var(--text-4xl) * 1.5);
     letter-spacing: var(--tracking-4xl);
     line-height: var(--leading-4xl);
     color: var(--color-white);
@@ -94,14 +94,19 @@
     font-style: normal;
   }
 
+  /* Same pairing as the app section's claim: the condensed caps state the name,
+     the serif italic answers it. At this size it is part of the title block,
+     not a caption under it — which is what stopped the hero reading as flat. */
   .hero-lede {
-    margin: 20px 0 32px;
-    font-size: var(--text-lg);
+    margin: 10px 0 34px;
+    font-size: var(--text-2xl);
+    line-height: 1.05;
     font-family: Georgia, 'Times New Roman', serif;
     font-style: italic;
     font-weight: 400;
-    color: rgba(255, 255, 255, 0.92);
-    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
+    letter-spacing: -0.01em;
+    color: var(--color-white);
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.5);
   }
 
   .scroll-down {
@@ -210,14 +215,15 @@
     .hero-title {
       color: var(--color-dark);
       text-shadow: none;
-      font-size: clamp(2.75rem, 13vw, 3.75rem);
+      font-size: clamp(4.125rem, 19.5vw, 5.625rem);
     }
 
+    /* The mobile hero puts this copy on a light ground, so it cannot stay
+       white — dark keeps the same weight in the composition. */
     .hero-lede {
       color: var(--color-dark);
-      opacity: 0.8;
+      opacity: 1;
       text-shadow: none;
-      font-size: var(--text-md);
     }
 
     .hero-bg {

@@ -7,7 +7,7 @@ import InfoCards from '../components/home/InfoCards.astro';
 import ActivityGrid from '../components/home/ActivityGrid.astro';
 import Struttura from '../components/home/Struttura.astro';
 import AppSection from '../components/home/AppSection.astro';
-import Eventi from '../components/home/Eventi.astro';
+import EventiPreview from '../components/eventi/EventiPreview.astro';
 
 const adultiItems = [
   { title: 'Gym Floor', image: '/wp-content/uploads/2024/08/IMG_2065-scaled.jpg', desc: '400 mq di sala pesi e cardio di ultima generazione.', href: '/gym-floor' },
@@ -40,5 +40,12 @@ const juniorItems = [
   <ActivityGrid eyebrow="Attività Sportive" accent="Junior" variant="sand" items={juniorItems} trackId="junior" />
   <Struttura />
   <AppSection />
-  <Eventi />
+  {/* Reads the shared events collection, so the home preview and the events
+      page can never disagree about what is coming next. */}
+  <EventiPreview
+    limit={3}
+    eyebrow="Athlon Community"
+    title="I nostri eventi"
+    sub="Masterclass gratuite e giornate aperte anche a chi non è ancora iscritto."
+  />
 </Layout>

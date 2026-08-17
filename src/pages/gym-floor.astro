@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import OpeningHours from '../components/planning/OpeningHours.astro';
+import Faq, { type FaqEntry } from '../components/Faq.astro';
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 const U = '/wp-content/uploads';
@@ -144,6 +145,40 @@ const workouts = [
 ];
 
 const facts = ['400 mq di sala', 'Aperti dalle 6:00 alle 22:00', 'Matrix 4.0 connesso all\'app', 'Vista sulle piscine'];
+
+const WIKI = 'https://wiki.athlonroma.it/wikiathlon';
+
+/**
+ * Written for someone deciding whether to come, not for a member looking up a
+ * rule: the facts come from the wiki but the framing is reassuring rather than
+ * procedural, and the full procedures stay one link away.
+ */
+const faqs: FaqEntry[] = [
+  {
+    q: 'Non mi sono mai allenato in sala pesi: è adatta anche a me?',
+    a: "Sì. Nell'app trovi due percorsi <strong>Start Up</strong> pensati esattamente per chi parte da zero o riprende dopo una lunga pausa, e in sala c'è sempre qualcuno a cui chiedere. Se preferisci essere seguito passo a passo, c'è il <a href=\"/personal-training\">personal training</a>.",
+  },
+  {
+    q: 'Devo prenotare per allenarmi?',
+    a: "Sì, l'accesso si prenota dall'app Athlon Club o dal portale, fino a 3 giorni prima. Serve a garantirti che in sala ci sia posto: scegli l'orario e la modalità — <strong>Con Assistenza</strong>, con un trainer presente, o <strong>Allenamento Libero</strong>.",
+  },
+  {
+    q: 'Posso allenarmi senza abbonamento?',
+    a: 'Sì. Il singolo accesso alla Gym Floor costa <strong>€20</strong> per 90 minuti, più €5 una tantum per il badge. Se poi decidi di iscriverti, la sala è compresa in entrambi i piani, <a href="/abbonamenti">Smart e Premium</a>.',
+  },
+  {
+    q: 'Serve il certificato medico?',
+    a: `Sì, quello di idoneità sportiva <strong>non agonistica</strong> — lo rilascia anche il tuo medico di base. Hai <strong>15 giorni</strong> dall'inizio dell'attività per inviarlo, quindi non è qualcosa da risolvere prima di cominciare. <a href="${WIKI}/generali/certificato-medico/" target="_blank" rel="noopener">Tutti i dettagli qui →</a>`,
+  },
+  {
+    q: 'Cosa devo portare la prima volta?',
+    a: "Scarpe da cambiare all'ingresso della sala, un asciugamano da appoggiare sulle macchine e un lucchetto per l'armadietto (diametro 30, non lo forniamo noi). Docce, phon e spogliatoi sono gratuiti.",
+  },
+  {
+    q: "Qual è l'orario meno affollato?",
+    a: 'La sala è aperta dalle 6:00 alle 22:00 e le fasce più tranquille sono la prima mattina e il primo pomeriggio; il picco è fra le 18:00 e le 20:00. Prenotando vedi in tempo reale quanti posti restano per ogni orario.',
+  },
+];
 ---
 
 <Layout
@@ -186,10 +221,14 @@ const facts = ['400 mq di sala', 'Aperti dalle 6:00 alle 22:00', 'Matrix 4.0 con
     <div class="container">
       <span class="eyebrow" data-anim="from-left">Il nuovo spazio</span>
       <h2 class="gf-sec__title" data-anim="reveal">Allenati nella nostra Gym Floor 4.0</h2>
+      {/* The backup's copy said "train whenever you like, no booking" — the
+          wiki and the planning F.A.Q. both say the opposite, so this follows
+          them: booking is required, and you pick one of two modes. */}
       <p class="gf-sec__sub">
         Athlon si evolve. La Sala Pesi è stata completamente rinnovata, con una vista sulle nostre
-        piscine. Allenati quando vuoi, durante tutti gli orari di apertura del club, scegliendo tra
-        l'autonomia e il supporto personalizzato del nostro team.
+        piscine. L'accesso si prenota da app o portale, scegliendo la modalità:
+        <strong>Con Assistenza</strong>, con un trainer presente in sala, oppure
+        <strong>Allenamento Libero</strong>, in autonomia.
       </p>
 
       {/* The hours themselves rather than a link to them. Comes from the shared
@@ -273,15 +312,15 @@ const facts = ['400 mq di sala', 'Aperti dalle 6:00 alle 22:00', 'Matrix 4.0 con
         personalizzabili: modificali in autonomia o con l'aiuto di un trainer in sala.
       </p>
 
-      <div class="faq">
+      <div class="wk">
         {workouts.map((w) => (
-          <div class="faq__item" data-faq-item>
-            <button class="faq__q" type="button" aria-expanded="false" data-faq-trigger>
+          <div class="wk__item" data-wk-item>
+            <button class="wk__q" type="button" aria-expanded="false" data-wk-trigger>
               <span>{w.name}</span>
-              <span class="faq__icon" aria-hidden="true">+</span>
+              <span class="wk__icon" aria-hidden="true">+</span>
             </button>
-            <div class="faq__a">
-              <div class="faq__a-inner">
+            <div class="wk__a">
+              <div class="wk__a-inner">
                 {w.body.map((par) => (<p>{par}</p>))}
               </div>
             </div>
@@ -292,6 +331,19 @@ const facts = ['400 mq di sala', 'Aperti dalle 6:00 alle 22:00', 'Matrix 4.0 con
       <a href="https://onelink.to/athlon" class="btn btn-primary gf-block-cta" data-anim="pop">
         Scarica l'app →
       </a>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="gf-sec">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Prima di venire</span>
+      <h2 class="gf-sec__title" data-anim="reveal">Domande frequenti</h2>
+      <p class="gf-sec__sub">
+        Le cose che ci chiedono più spesso quando si entra in sala pesi la prima volta.
+      </p>
+
+      <Faq entries={faqs} />
     </div>
   </section>
 
@@ -327,14 +379,14 @@ const facts = ['400 mq di sala', 'Aperti dalle 6:00 alle 22:00', 'Matrix 4.0 con
   });
 
   // Workout accordion — one open at a time, as on the other pages.
-  const items = Array.from(document.querySelectorAll<HTMLElement>('[data-faq-item]'));
+  const items = Array.from(document.querySelectorAll<HTMLElement>('[data-wk-item]'));
   items.forEach((item) => {
-    const trigger = item.querySelector<HTMLButtonElement>('[data-faq-trigger]');
+    const trigger = item.querySelector<HTMLButtonElement>('[data-wk-trigger]');
     trigger?.addEventListener('click', () => {
       const willOpen = !item.classList.contains('open');
       items.forEach((other) => {
         other.classList.remove('open');
-        other.querySelector('[data-faq-trigger]')?.setAttribute('aria-expanded', 'false');
+        other.querySelector('[data-wk-trigger]')?.setAttribute('aria-expanded', 'false');
       });
       if (willOpen) {
         item.classList.add('open');
@@ -672,16 +724,16 @@ const facts = ['400 mq di sala', 'Aperti dalle 6:00 alle 22:00', 'Matrix 4.0 con
     }
   }
 
-  /* ---- Workouts accordion ---- */
-  .faq__item {
+  /* ---- Workouts accordion (own names: the shared Faq component owns .faq) ---- */
+  .wk__item {
     border-top: 1px solid var(--border);
   }
 
-  .faq__item:last-child {
+  .wk__item:last-child {
     border-bottom: 1px solid var(--border);
   }
 
-  .faq__q {
+  .wk__q {
     width: 100%;
     display: flex;
     align-items: center;
@@ -699,11 +751,11 @@ const facts = ['400 mq di sala', 'Aperti dalle 6:00 alle 22:00', 'Matrix 4.0 con
     transition: color var(--dur-fast) ease;
   }
 
-  .faq__q:hover {
+  .wk__q:hover {
     color: var(--color-primary);
   }
 
-  .faq__icon {
+  .wk__icon {
     flex-shrink: 0;
     font-family: var(--font-body);
     font-size: 20px;
@@ -712,28 +764,28 @@ const facts = ['400 mq di sala', 'Aperti dalle 6:00 alle 22:00', 'Matrix 4.0 con
     transition: transform var(--dur-base) var(--ease-out-crit);
   }
 
-  .faq__item.open .faq__icon {
+  .wk__item.open .wk__icon {
     transform: rotate(45deg);
   }
 
-  .faq__a {
+  .wk__a {
     display: grid;
     grid-template-rows: 0fr;
     transition: grid-template-rows var(--dur-base) var(--ease-out-crit);
   }
 
-  .faq__item.open .faq__a {
+  .wk__item.open .wk__a {
     grid-template-rows: 1fr;
   }
 
-  .faq__a-inner {
+  .wk__a-inner {
     overflow: hidden;
     min-height: 0;
     max-width: 46rem;
     color: var(--text-muted);
   }
 
-  .faq__item.open .faq__a-inner {
+  .wk__item.open .wk__a-inner {
     padding-bottom: 12px;
   }
 

@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import AppSection from '../components/home/AppSection.astro';
+import Faq, { type FaqEntry } from '../components/Faq.astro';
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 const bookPT = (trainerId: string | null) =>
@@ -204,26 +205,38 @@ const pacchetti = [
   { sedute: '8', prezzo: '280' },
 ];
 
-const faqs = [
+const WIKI = 'https://wiki.athlonroma.it/wikiathlon';
+
+/**
+ * Rebalanced towards someone still deciding: what it costs, what happens in the
+ * first session, how to pick a trainer. The purely procedural entries from the
+ * old page (how to cancel, when sessions are credited) were written for people
+ * who had already bought, so only the parts that affect the decision survive.
+ */
+const faqs: FaqEntry[] = [
   {
-    q: 'Ho bisogno del certificato medico?',
-    a: 'Se sei nostro iscritto e quindi tesserato, sì. Se acquisti e prenoti una singola lezione, no.',
+    q: 'Quanto costa una seduta di personal training?',
+    a: 'La seduta singola costa <strong>€45</strong> per gli iscritti e <strong>€55</strong> per gli esterni. Se ti alleni con continuità, gli iscritti possono aggiungere all\'abbonamento un pacchetto mensile da 2, 4 o 8 sedute, da €80 a €280.',
   },
   {
-    q: 'Posso prenotare una seduta senza essere iscritto?',
-    a: 'Certamente. Puoi prenotare e pagare la singola lezione: in questo caso non è richiesta la quota di attivazione.',
+    q: 'Posso fare personal training senza essere iscritto?',
+    a: 'Sì. Puoi prenotare e pagare una seduta singola anche senza abbonamento, e in quel caso non è richiesta la quota di attivazione. È il modo più semplice per provare.',
   },
   {
-    q: 'Ho acquistato una seduta singola, cosa succede in caso di disdetta?',
-    a: "Potrai disdire la tua prenotazione entro due ore dall'inizio della seduta. Il prodotto acquistato ti verrà riaccreditato e ti permetterà una nuova prenotazione in futuro.",
+    q: 'Cosa include la prima seduta?',
+    a: "La prima seduta è dedicata a capire da dove parti: comprende un'<strong>analisi posturale</strong> e un <strong>test della composizione corporea</strong>. Il percorso viene costruito su quei risultati, non su un programma standard.",
   },
   {
-    q: 'Per gli abbonamenti devo obbligatoriamente consumare le sedute entro il mese?',
-    a: 'Sì. Gli abbonamenti mensili prevedono il caricamento del numero di lezioni scelte ogni 1° giorno del mese: le potrai consumare entro la fine del mese.',
+    q: 'Quante sedute servono per vedere risultati?',
+    a: 'Dipende da dove parti e dall\'obiettivo, e nessuno può prometterti un numero preciso. Molti scelgono 2 o 4 sedute al mese e negli altri giorni si allenano in autonomia seguendo la scheda preparata dal trainer.',
   },
   {
-    q: 'Come posso effettuare la prenotazione della seduta?',
-    a: "Potrai prenotare tramite Portale Web o App: la disponibilità dei nostri Personal Trainer è sempre aggiornata.",
+    q: 'Come scelgo il trainer giusto per me?',
+    a: 'Qui sopra trovi i sei profili con laurea, specializzazioni e servizi di ciascuno: scegli chi lavora su quello che ti interessa — postura, ipertrofia, dimagrimento, recupero post infortunio, gravidanza — e prenoti direttamente la sua disponibilità.',
+  },
+  {
+    q: 'Serve il certificato medico?',
+    a: `Per una <strong>seduta singola</strong> no. Se invece ti iscrivi al club serve quello di idoneità sportiva non agonistica, che rilascia anche il tuo medico di base, e hai 15 giorni di tempo dall'inizio dell'attività. <a href="${WIKI}/generali/certificato-medico/" target="_blank" rel="noopener">Dettagli qui →</a>`,
   },
 ];
 
@@ -408,17 +421,7 @@ const trust = [
       <span class="eyebrow" data-anim="from-left">Domande frequenti</span>
       <h2 class="pt-sec__title" data-anim="reveal">FAQ</h2>
 
-      <div class="faq">
-        {faqs.map((f) => (
-          <div class="faq__item" data-faq-item>
-            <button class="faq__q" type="button" aria-expanded="false" data-faq-trigger>
-              <span>{f.q}</span>
-              <span class="faq__icon" aria-hidden="true">+</span>
-            </button>
-            <div class="faq__a"><div class="faq__a-inner">{f.a}</div></div>
-          </div>
-        ))}
-      </div>
+      <Faq entries={faqs} />
     </div>
   </section>
 
@@ -445,22 +448,7 @@ const trust = [
     });
   });
 
-  // FAQ accordion — one open at a time, same behaviour as /abbonamenti.
-  const items = Array.from(document.querySelectorAll<HTMLElement>('[data-faq-item]'));
-  items.forEach((item) => {
-    const trigger = item.querySelector<HTMLButtonElement>('[data-faq-trigger]');
-    trigger?.addEventListener('click', () => {
-      const willOpen = !item.classList.contains('open');
-      items.forEach((other) => {
-        other.classList.remove('open');
-        other.querySelector('[data-faq-trigger]')?.setAttribute('aria-expanded', 'false');
-      });
-      if (willOpen) {
-        item.classList.add('open');
-        trigger.setAttribute('aria-expanded', 'true');
-      }
-    });
-  });
+  // The FAQ accordion now lives in the shared Faq component.
 </script>
 
 <style>
@@ -1098,71 +1086,6 @@ const trust = [
 
   .pt-note a:hover {
     text-decoration: underline;
-  }
-
-  /* ---- FAQ ---- */
-  .faq__item {
-    border-top: 1px solid var(--border);
-  }
-
-  .faq__item:last-child {
-    border-bottom: 1px solid var(--border);
-  }
-
-  .faq__q {
-    width: 100%;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 20px 0;
-    background: none;
-    border: none;
-    cursor: pointer;
-    text-align: left;
-    font-family: var(--font-body);
-    font-size: var(--text-md);
-    font-weight: 500;
-    color: var(--color-dark);
-    transition: color var(--dur-fast) ease;
-  }
-
-  .faq__q:hover {
-    color: var(--color-primary);
-  }
-
-  .faq__icon {
-    flex-shrink: 0;
-    font-size: 20px;
-    line-height: 1;
-    color: var(--color-primary);
-    transition: transform var(--dur-base) var(--ease-out-crit);
-  }
-
-  .faq__item.open .faq__icon {
-    transform: rotate(45deg);
-  }
-
-  .faq__a {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows var(--dur-base) var(--ease-out-crit);
-  }
-
-  .faq__item.open .faq__a {
-    grid-template-rows: 1fr;
-  }
-
-  .faq__a-inner {
-    overflow: hidden;
-    min-height: 0;
-    font-size: var(--text-sm);
-    line-height: 1.7;
-    color: var(--text-muted);
-  }
-
-  .faq__item.open .faq__a-inner {
-    padding-bottom: 20px;
   }
 
   /* ---- Responsive ---- */

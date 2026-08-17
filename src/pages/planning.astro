@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import OpeningHours from '../components/planning/OpeningHours.astro';
 import PlanningBand from '../components/planning/PlanningBand.astro';
 import LessonModal from '../components/planning/LessonModal.astro';
+import Faq, { type FaqEntry } from '../components/Faq.astro';
 import { bands, countLessons, PLANNING_MONTH } from '../data/planning';
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
@@ -18,6 +19,30 @@ const bandPages: Record<string, string> = {
 };
 
 const totalLessons = bands.reduce((n, b) => n + countLessons(b), 0);
+
+// Booking rules, carried over verbatim from the planning site's own F.A.Q.
+const faqs: FaqEntry[] = [
+  {
+    q: 'Devo prenotare per partecipare alle attività?',
+    a: 'Sì, tutte le attività — Gym Floor, Corsi Fitness, Group Reformer, Aqua Fitness, Scuola Nuoto Adulti e Nuoto Libero Assistito — richiedono la prenotazione obbligatoria tramite app o portale web.',
+  },
+  {
+    q: 'Quando posso prenotare e fino a quando posso disdire?',
+    a: "Puoi prenotare fino a <strong>3 giorni prima</strong> (72 ore) e disdire fino a <strong>1 ora</strong> dall'inizio della lezione. Se hai acquistato una singola lezione e disdici in tempo, viene riaccreditata per una nuova prenotazione.",
+  },
+  {
+    q: 'Quante prenotazioni attive posso avere contemporaneamente?',
+    a: 'Massimo <strong>3 prenotazioni attive</strong> per Corsi Fitness, Aqua Fitness e Scuola Nuoto Adulti; massimo <strong>1 prenotazione attiva</strong> per il Group Reformer.',
+  },
+  {
+    q: "Come funziona la lista d'attesa?",
+    a: "Se il corso è al completo puoi iscriverti in lista d'attesa: in caso di disdetta di un prenotato, il subentro avviene in ordine cronologico con avviso via email, fino a 1 ora dall'inizio della lezione.",
+  },
+  {
+    q: 'Cosa succede se non mi presento o disdico in ritardo?',
+    a: 'Se non disdici e non sei presente per più di <strong>2 volte in 30 giorni</strong>, la funzione prenotazione viene bloccata per 3 giorni.',
+  },
+];
 ---
 
 <Layout
@@ -46,8 +71,9 @@ const totalLessons = bands.reduce((n, b) => n + countLessons(b), 0);
       <span class="eyebrow" data-anim="from-left">Sala pesi</span>
       <h2 class="pl-sec__title" data-anim="reveal">Gym Floor</h2>
       <p class="pl-sec__sub">
-        La Gym Floor non si prenota a orario: entri quando vuoi, durante tutti gli orari di apertura
-        del club. <a href="/gym-floor">Scopri la sala →</a>
+        La Gym Floor non ha lezioni a orario, ma l'accesso va prenotato da app o portale — scegliendo
+        fra Con Assistenza e Allenamento Libero — entro gli orari di apertura qui sotto.
+        <a href="/gym-floor">Scopri la sala →</a>
       </p>
       <OpeningHours href={`${PG}/#/Classes/1/Calendar?categoryId=6`} />
     </div>
@@ -80,13 +106,19 @@ const totalLessons = bands.reduce((n, b) => n + countLessons(b), 0);
   {/* One panel shared by every band on the page. */}
   <LessonModal bands={bands.map((b) => b.id)} />
 
-  <!-- NOTA -->
+  <!-- FAQ -->
   <section class="pl-sec">
     <div class="container">
+      <span class="eyebrow" data-anim="from-left">Come funzionano le prenotazioni</span>
+      <h2 class="pl-sec__title" data-anim="reveal">F.A.Q.</h2>
+
+      <Faq entries={faqs} />
+
+      {/* The old note's booking-window line now lives in the FAQ above, so
+          only the monthly-update caveat is left here. */}
       <p class="pl-note">
-        Il planning viene aggiornato ogni mese. Le prenotazioni si aprono 3 giorni prima della
-        lezione, dall'<a href="https://onelink.to/athlon">app Athlon Club</a> o dal
-        <a href={`${PG}/#/Classes/1/Calendar`}>portale web</a>.
+        Il planning viene aggiornato ogni mese. Prenoti dall'<a href="https://onelink.to/athlon">app
+        Athlon Club</a> o dal <a href={`${PG}/#/Classes/1/Calendar`}>portale web</a>.
       </p>
     </div>
   </section>
@@ -170,7 +202,7 @@ const totalLessons = bands.reduce((n, b) => n + countLessons(b), 0);
 
   .pl-note {
     max-width: 48rem;
-    margin: 0;
+    margin: 26px 0 0;
     font-size: var(--text-sm);
     color: var(--text-muted);
   }

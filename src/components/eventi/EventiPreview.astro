@@ -1,0 +1,295 @@
+---
+/**
+ * Upcoming events as cards. The same component serves the home page preview and
+ * the club-life hub, so both always show the same next events.
+ */
+import { upcomingEvents, formatEventDate, formatEventBadge } from '../../data/eventi';
+
+interface Props {
+  limit?: number;
+  /** Section heading; pass null when the page supplies its own. */
+  eyebrow?: string;
+  title?: string;
+  sub?: string;
+  showAllLink?: boolean;
+  variant?: 'light' | 'alt' | 'dark';
+}
+
+const {
+  limit = 3,
+  eyebrow = 'Athlon Community',
+  title = 'I nostri eventi',
+  sub,
+  showAllLink = true,
+  variant = 'light',
+} = Astro.props;
+
+const events = await upcomingEvents(limit);
+---
+
+<section class:list={['ev', `ev--${variant}`]}>
+  <div class="container">
+    <span class="eyebrow" data-anim="from-left">{eyebrow}</span>
+    <h2 class="ev__title" data-anim="reveal">{title}</h2>
+    {sub && <p class="ev__sub">{sub}</p>}
+
+    {events.length === 0 ? (
+      /* Says when the next one lands rather than just "nothing here". */
+      <p class="ev__empty">
+        Nessun evento in programma in questo momento. Il calendario si aggiorna ogni mese —
+        intanto trovi tutte le lezioni sul <a href="/planning">planning</a>.
+      </p>
+    ) : (
+      <>
+        <div class="ev__grid">
+          {events.map((e, i) => {
+            const badge = formatEventBadge(e.data.date);
+            return (
+              <article class="evcard" data-anim="scale" data-anim-delay={String(i * 100)}>
+                <a class="evcard__link" href={`/eventi/${e.id}`}>
+                  <div class="evcard__media">
+                    <img src={e.data.image} alt={e.data.imageAlt ?? e.data.title} loading="lazy" />
+                    <span class="evcard__date">
+                      <span class="evcard__day">{badge.day}</span>
+                      <span class="evcard__month">{badge.month}</span>
+                    </span>
+                    {e.data.free && <span class="evcard__free">Gratuito</span>}
+                  </div>
+
+                  <div class="evcard__body">
+                    <span class="evcard__kicker">{e.data.kicker}</span>
+                    <h3 class="evcard__title">{e.data.title}</h3>
+                    <p class="evcard__when">
+                      {formatEventDate(e.data.date)}
+                      {e.data.time && <span> · {e.data.time}</span>}
+                    </p>
+                    <p class="evcard__excerpt">{e.data.excerpt}</p>
+                    <span class="evcard__more">Scopri di più →</span>
+                  </div>
+                </a>
+              </article>
+            );
+          })}
+        </div>
+
+        {showAllLink && (
+          <a href="/eventi" class="ev__all" data-anim="pop">Tutti gli eventi →</a>
+        )}
+      </>
+    )}
+  </div>
+</section>
+
+<style>
+  .ev {
+    padding: var(--space-section-lg) 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ev--alt {
+    background: var(--color-cream);
+    border-bottom: none;
+  }
+
+  .ev--dark {
+    background: var(--color-dark);
+    color: var(--color-white);
+    border-bottom: none;
+  }
+
+  .ev__title {
+    font-size: var(--text-3xl);
+    letter-spacing: var(--tracking-2xl);
+    margin: 10px 0 8px;
+  }
+
+  .ev__sub {
+    max-width: 46rem;
+    color: var(--text-muted);
+    margin-bottom: 30px;
+  }
+
+  .ev--dark .ev__sub {
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  .ev__empty {
+    max-width: 42rem;
+    margin: 18px 0 0;
+    color: var(--text-muted);
+  }
+
+  .ev__empty a {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .ev__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 30px;
+  }
+
+  .evcard {
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--color-white);
+    border: 1px solid var(--border-strong);
+    transition: transform var(--dur-base) var(--ease-out-crit),
+      box-shadow var(--dur-base) var(--ease-out-crit);
+  }
+
+  .ev--dark .evcard {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--border-dark);
+  }
+
+  .evcard:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 34px rgba(23, 21, 20, 0.16);
+  }
+
+  .evcard__link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .evcard__media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+  }
+
+  .evcard__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s var(--ease-out-crit);
+  }
+
+  .evcard:hover .evcard__media img {
+    transform: scale(1.05);
+  }
+
+  /* Date as a torn-off calendar corner: the one thing people look for first. */
+  .evcard__date {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 12px 6px;
+    border-radius: 12px;
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .evcard__day {
+    font-family: var(--font-heading);
+    font-size: 1.6rem;
+    line-height: 1;
+  }
+
+  .evcard__month {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--color-primary);
+  }
+
+  .evcard__free {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .evcard__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 22px 22px 24px;
+  }
+
+  .evcard__kicker {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .evcard__title {
+    font-size: var(--text-xl);
+    margin: 8px 0 6px;
+  }
+
+  .ev--dark .evcard__title {
+    color: var(--color-white);
+  }
+
+  .evcard__when {
+    margin: 0 0 10px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+
+  .ev--dark .evcard__when {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .evcard__excerpt {
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  .ev--dark .evcard__excerpt {
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  .evcard__more {
+    margin-top: auto;
+    padding-top: 16px;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .ev__all {
+    display: inline-block;
+    margin-top: 30px;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .ev__all:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 900px) {
+    .ev__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .ev__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

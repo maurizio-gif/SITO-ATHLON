@@ -1,65 +1,514 @@
 ---
+/**
+ * App section, staged like a product page: claim and figures on the left, the
+ * device on the right, white ground and a lot of air. The words are kept few on
+ * purpose — the phone is the subject.
+ *
+ * The splash inside the screen is composed in markup — the mark is the real
+ * brand asset, so it cannot go stale the way a baked-in screenshot did. Only
+ * the photo behind it is a file; swap SCREEN to change it.
+ */
+const SCREEN = '/wp-content/uploads/2026/08/app-splash.jpg';
+
+const features = [
+  { value: '2', unit: 'tap', label: 'per prenotare una lezione' },
+  { value: '30', unit: '+', label: 'piani di allenamento' },
+  { value: '4.0', unit: '', label: 'macchinari Matrix connessi' },
+];
 ---
 
-<section class="app-section">
-  <div class="container layout">
-    <div class="copy" data-anim="from-left">
-      <h2>APP Athlon Club</h2>
-      <p>
-        Migliora la tua routine sportiva con l'app!<br />
-        È la soluzione tutto in uno per monitorare facilmente i tuoi allenamenti, tenere traccia dei progressi e
-        raggiungere i tuoi obiettivi con approfondimenti e motivazione coinvolgenti.
+<section class="app">
+  <div class="app__glow" aria-hidden="true"></div>
+
+  <div class="container app__inner">
+    <div class="app__copy">
+      <span class="app__eyebrow" data-anim="from-left">Athlon Club App</span>
+
+      <h2 class="app__title" data-anim="reveal">
+        Il club,<br /><em>in tasca.</em>
+      </h2>
+
+      <p class="app__lede" data-anim="fade" data-anim-delay="120">
+        Prenoti, ti alleni e tieni traccia dei progressi. La sala ti riconosce: i macchinari Matrix
+        4.0 sono connessi all'app, e riprendi da dove avevi lasciato.
       </p>
-      <a href="https://onelink.to/athlon" class="btn btn-primary" data-anim="pop" data-anim-delay="150">Scarica l'app</a>
+
+      <ul class="app__facts">
+        {features.map((f, i) => (
+          <li class="fact" data-anim="fade" data-anim-delay={String(200 + i * 90)}>
+            <span class="fact__value">{f.value}<span class="fact__unit">{f.unit}</span></span>
+            <span class="fact__label">{f.label}</span>
+          </li>
+        ))}
+      </ul>
+
+      <a href="https://onelink.to/athlon" class="app__cta" data-anim="pop" data-anim-delay="420">
+        Scarica l'app
+        <span aria-hidden="true">→</span>
+      </a>
+
+      <span class="app__note" data-anim="fade" data-anim-delay="480">
+        Disponibile su iPhone e Android
+      </span>
     </div>
-    <div class="phone" data-anim="scale">
-      <img src="/wp-content/uploads/2024/07/app_bg-scaled.jpg" alt="App Athlon Club" />
+
+    <div class="app__stage" data-anim="scale" data-anim-delay="160" data-tilt-stage>
+      <div class="phone" data-tilt>
+        <span class="phone__notch" aria-hidden="true"></span>
+        {/* Specular sheen across the glass — it moves with the tilt, which is
+            what makes the thing read as an object rather than a picture. */}
+        <span class="phone__glare" aria-hidden="true"></span>
+
+        <div class="splash" role="img" aria-label="Schermata di apertura dell'app Athlon Club">
+          <img class="splash__bg" src={SCREEN} alt="" loading="lazy" />
+          <span class="splash__veil" aria-hidden="true"></span>
+
+          <span class="splash__mark">
+            <img src="/wp-content/uploads/2025/08/Pittogramma.png" alt="" />
+            <span class="splash__version">4.0</span>
+          </span>
+          <span class="splash__word">Athlon</span>
+          <span class="splash__spinner" aria-hidden="true"></span>
+        </div>
+      </div>
+      {/* Grounds the device instead of leaving it floating. */}
+      <span class="app__shadow" aria-hidden="true"></span>
     </div>
   </div>
 </section>
 
+<script>
+  // Pointer-driven tilt: the phone turns towards the cursor, so it reads as an
+  // object in space rather than a flat mockup. Only where there is a real
+  // pointer — on touch there is nothing to follow, and the base three-quarter
+  // tilt from the CSS is left alone.
+  const stage = document.querySelector<HTMLElement>('[data-tilt-stage]');
+  const phone = document.querySelector<HTMLElement>('[data-tilt]');
+  const glare = phone?.querySelector<HTMLElement>('.phone__glare');
+
+  const canTilt =
+    window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (stage && phone && canTilt) {
+    // Base pose, matching the CSS. The pointer nudges around it rather than
+    // replacing it, so the phone never faces fully front-on.
+    const BASE_Y = -17;
+    const BASE_X = 6;
+    const RANGE = 13; // degrees of travel either side
+
+    let frame: number | undefined;
+
+    const apply = (e: PointerEvent) => {
+      const r = stage.getBoundingClientRect();
+      // -1 … 1 across the stage
+      const px = ((e.clientX - r.left) / r.width) * 2 - 1;
+      const py = ((e.clientY - r.top) / r.height) * 2 - 1;
+
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        phone.style.setProperty('--tilt-y', `${BASE_Y + px * RANGE}deg`);
+        phone.style.setProperty('--tilt-x', `${BASE_X - py * (RANGE * 0.6)}deg`);
+        // Sheen slides the opposite way, like a light source staying put.
+        glare?.style.setProperty('--glare-angle', `${108 - px * 26}deg`);
+      });
+    };
+
+    const reset = () => {
+      if (frame) cancelAnimationFrame(frame);
+      phone.style.removeProperty('--tilt-y');
+      phone.style.removeProperty('--tilt-x');
+      glare?.style.removeProperty('--glare-angle');
+    };
+
+    stage.addEventListener('pointermove', apply);
+    stage.addEventListener('pointerleave', reset);
+  }
+</script>
+
 <style>
-  .app-section {
-    background: var(--color-cream);
-    padding: var(--space-section-lg) 0;
+  /* ---- Stage ---- */
+  .app {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-white);
+    color: var(--color-dark);
+    padding: calc(var(--space-section-lg) * 1.1) 0;
   }
 
-  .layout {
-    display: flex;
+  /* A wash of brand colour behind the device rather than a spotlight: on white
+     it has to lift the phone off the page without tinting the copy. */
+  .app__glow {
+    position: absolute;
+    top: 50%;
+    right: -6%;
+    width: min(820px, 90vw);
+    aspect-ratio: 1;
+    transform: translateY(-50%);
+    background: radial-gradient(
+      circle,
+      rgba(255, 87, 1, 0.13) 0%,
+      rgba(255, 87, 1, 0.05) 42%,
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  .app__inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     align-items: center;
-    justify-content: flex-start;
-    gap: 64px;
-    flex-wrap: wrap;
+    gap: clamp(40px, 6vw, 90px);
+  }
+
+  .app__copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* ---- Words ---- */
+  .app__eyebrow {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .app__title {
+    font-size: var(--text-4xl);
+    line-height: var(--leading-4xl);
+    letter-spacing: var(--tracking-4xl);
+    margin: 18px 0 0;
+    padding: 0.08em 0 0.06em;
+  }
+
+  /* The second line lifts out of the display face into the italic serif the
+     rest of the site uses for its asides — the claim, not the label. */
+  .app__title em {
+    display: block;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: -0.01em;
+    color: var(--color-primary);
+  }
+
+  .app__lede {
+    max-width: 32rem;
+    margin: 20px 0 0;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  /* ---- Device ----
+     Presented in three-quarter view. The tilt lives in two custom properties so
+     the pointer script can drive them without touching the rest of the
+     transform, and the idle float stays independent of both. */
+  .app__stage {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    perspective: 1300px;
   }
 
   .phone {
-    flex: 0 0 auto;
-    width: min(320px, 80vw);
+    --tilt-y: -17deg;
+    --tilt-x: 6deg;
+    position: relative;
+    width: min(330px, 74vw);
+    aspect-ratio: 9 / 19.5;
+    padding: 11px;
+    border-radius: 46px;
+    background: linear-gradient(155deg, #5a5350 0%, #201e1c 44%, #38332f 100%);
+    transform-style: preserve-3d;
+    transform: rotateY(var(--tilt-y)) rotateX(var(--tilt-x)) rotateZ(-1.5deg);
+    transition: transform 0.5s var(--ease-out-crit);
+    animation: phone-float 7s ease-in-out infinite;
+    /* Shadow falls to the side the phone turns away from. */
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+      28px 40px 80px rgba(23, 21, 20, 0.32);
   }
 
-  .copy {
-    flex: 1 1 360px;
-    max-width: 480px;
-    text-align: left;
+  /* While the pointer is driving the tilt, the float would fight it. */
+  .app__stage:hover .phone {
+    animation-play-state: paused;
+    transition-duration: 0.18s;
   }
 
-  .copy h2 {
-    font-size: var(--text-2xl);
+  @keyframes phone-float {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    50% {
+      translate: 0 -14px;
+    }
+  }
+
+  .phone__glare {
+    position: absolute;
+    inset: 11px;
+    z-index: 2;
+    border-radius: 35px;
+    pointer-events: none;
+    background: linear-gradient(
+      var(--glare-angle, 108deg),
+      rgba(255, 255, 255, 0.24) 0%,
+      rgba(255, 255, 255, 0.06) 22%,
+      transparent 42%,
+      transparent 100%
+    );
+    transition: background var(--dur-base) ease;
+  }
+
+  .phone__notch {
+    position: absolute;
+    top: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    width: 88px;
+    height: 21px;
+    border-radius: 999px;
+    background: #100c0b;
+  }
+
+  /* Offset to the turned-away side, so it agrees with the perspective. */
+  .app__shadow {
+    position: absolute;
+    left: 54%;
+    bottom: -30px;
+    width: 70%;
+    height: 34px;
+    transform: translateX(-50%) rotate(-2deg);
+    background: radial-gradient(ellipse, rgba(23, 21, 20, 0.3) 0%, transparent 72%);
+    filter: blur(7px);
+  }
+
+  /* ---- Composed splash ---- */
+  .splash {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 35px;
+    overflow: hidden;
+    background: var(--color-dark);
+    /* Type inside scales with the phone, not the viewport. */
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4%;
+  }
+
+  .splash__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .splash__veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      rgba(23, 21, 20, 0.74) 0%,
+      rgba(23, 21, 20, 0.42) 45%,
+      rgba(23, 21, 20, 0.82) 100%
+    );
+  }
+
+  .splash__mark {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    gap: 2%;
+  }
+
+  /* Already the orange mark on transparency — no recolouring needed. */
+  .splash__mark img {
+    width: 52cqw;
+    filter: drop-shadow(0 4px 16px rgba(23, 21, 20, 0.5));
+  }
+
+  .splash__version {
+    font-family: var(--font-heading);
+    font-size: 9cqw;
+    line-height: 1;
+    color: var(--color-white);
+    padding-bottom: 4%;
+  }
+
+  .splash__word {
+    position: relative;
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: 24cqw;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    color: var(--color-white);
+  }
+
+  .splash__spinner {
+    position: absolute;
+    bottom: 15%;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.22);
+    border-top-color: var(--color-white);
+    animation: splash-spin 0.9s linear infinite;
+  }
+
+  @keyframes splash-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* ---- Facts ---- */
+  .app__facts {
+    list-style: none;
+    margin: 34px 0 0;
+    padding: 26px 0 0;
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    width: 100%;
+    max-width: 32rem;
+  }
+
+  .fact {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 16px;
+    border-left: 1px solid var(--border);
+  }
+
+  .fact:first-child {
+    padding-left: 0;
+  }
+
+  .fact:first-child {
+    border-left: none;
+  }
+
+  .fact__value {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 3.4vw, 2.6rem);
+    line-height: 1;
     letter-spacing: var(--tracking-2xl);
-    margin-bottom: 16px;
     color: var(--color-dark);
   }
 
-  .copy p {
-    color: var(--color-dark);
-    opacity: 0.85;
-    margin-bottom: 24px;
+  .fact__unit {
+    color: var(--color-primary);
   }
 
-  @media (max-width: 700px) {
-    .layout {
-      flex-direction: column;
-      align-items: flex-start;
+  .fact__label {
+    font-size: var(--text-xs);
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+
+  /* ---- CTA ---- */
+  .app__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 36px;
+    padding: 19px 40px;
+    border-radius: 100px;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: transform var(--dur-fast) var(--ease-out-crit),
+      box-shadow var(--dur-fast) var(--ease-out-crit);
+  }
+
+  .app__cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(255, 87, 1, 0.32);
+  }
+
+  .app__cta:active {
+    transform: scale(0.97);
+    transition-duration: var(--dur-press);
+  }
+
+  .app__note {
+    margin-top: 14px;
+    font-size: var(--text-2xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 900px) {
+    .app__inner {
+      grid-template-columns: 1fr;
+      justify-items: center;
+      text-align: center;
+    }
+
+    /* Text leads, device follows — the claim should be read before the object. */
+    .app__copy {
+      align-items: center;
+      order: 1;
+    }
+
+    .app__stage {
+      order: 2;
+      margin-top: 46px;
+    }
+
+    .app__glow {
+      top: 26%;
+      right: 50%;
+      transform: translate(50%, -50%);
+    }
+
+    .fact:first-child {
+      padding-left: 16px;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .app__facts {
+      grid-template-columns: 1fr;
+      gap: 22px;
+      max-width: 20rem;
+    }
+
+    .fact {
+      border-left: none;
+      padding: 0;
+    }
+
+    .app__cta {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .splash__spinner,
+    .phone {
+      animation: none;
     }
   }
 </style>
