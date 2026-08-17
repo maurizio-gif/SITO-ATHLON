@@ -1241,6 +1241,15 @@ const trust = [
     border: 0;
   }
 
+  /* 16/9 collapses to a ~180px letterbox on a phone — too shallow to move
+     around in. Match the home tour's fixed 500px frame instead. */
+  @media (max-width: 900px) {
+    .ab-tour {
+      aspect-ratio: auto;
+      height: 500px;
+    }
+  }
+
   .ab-tour-caption {
     margin: 14px 0 32px;
     font-size: var(--text-xs);

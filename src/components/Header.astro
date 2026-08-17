@@ -714,20 +714,20 @@ const social = [
       display: none !important;
     }
 
-    /* Matches the live site's mobile bar: 84px tall, orange hairline,
-       asymmetric 16/24 padding, 60px logo. */
+    /* Mirrors the live site's mobile bar, trimmed a little shorter so it
+       eats less of the viewport when sticky. */
     .site-header {
       border-bottom: 1px solid var(--color-primary);
     }
 
     .header-inner {
-      height: 84px;
+      height: 72px;
       padding: 0 24px 0 16px;
       gap: 12px;
     }
 
     .logo img {
-      width: 60px;
+      width: 52px;
       height: auto;
     }
 
@@ -796,8 +796,8 @@ const social = [
       z-index: 1;
       display: flex;
       flex-direction: column;
-      /* Clears the 84px bar so the burger stays reachable. */
-      padding: 104px 1.5rem 2rem;
+      /* Clears the 72px bar so the burger stays reachable. */
+      padding: 92px 1.5rem 2rem;
       background: rgba(255, 255, 255, 0.94);
       backdrop-filter: blur(24px) saturate(160%);
       -webkit-backdrop-filter: blur(24px) saturate(160%);
