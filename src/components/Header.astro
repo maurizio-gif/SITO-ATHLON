@@ -185,23 +185,32 @@ const social = [
             <span class="mobile-chev" aria-hidden="true"></span>
           </button>
           <div class="mobile-submenu">
-            {m.data.columns.map((col) => (
-              <div class="mobile-subgroup">
-                <button class="mobile-sublabel mobile-subgroup-trigger" aria-expanded="false">
-                  {col.heading}
-                  <span class="mobile-chev small" aria-hidden="true"></span>
-                </button>
-                <ul class="mobile-sublist">
-                  {col.links.map((l) => (
-                    <li><a class="mobile-sublink" href={l.href}>{l.label}</a></li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            {m.data.columns.length === 1 ? (
+              /* A single group (Junior) would mean tapping twice to reach the
+                 same four links — show them straight away instead. */
+              <ul class="mobile-sublist mobile-sublist--flat">
+                {m.data.columns[0].links.map((l) => (
+                  <li><a class="mobile-sublink" href={l.href}>{l.label}</a></li>
+                ))}
+              </ul>
+            ) : (
+              m.data.columns.map((col) => (
+                <div class="mobile-subgroup">
+                  <button class="mobile-sublabel mobile-subgroup-trigger" aria-expanded="false">
+                    {col.heading}
+                    <span class="mobile-chev small" aria-hidden="true"></span>
+                  </button>
+                  <ul class="mobile-sublist">
+                    {col.links.map((l) => (
+                      <li><a class="mobile-sublink" href={l.href}>{l.label}</a></li>
+                    ))}
+                  </ul>
+                </div>
+              ))
+            )}
           </div>
         </li>
       ))}
-      <li><a class="mobile-link" href="/contatti">Contattaci</a></li>
     </ul>
 
     <div class="mobile-secondary">
@@ -684,10 +693,14 @@ const social = [
     }
   }
 
-  @media (max-width: 960px) {
+  /* Width alone is the wrong test: a 27" portrait kiosk is ~1080px wide but
+     driven by a finger, so it was getting the hover-only desktop menu. Any
+     coarse pointer gets the touch menu regardless of how wide the screen is. */
+  @media (max-width: 960px), (pointer: coarse) {
     /* backdrop-filter on an ancestor makes it the containing block for
        position:fixed descendants — with it the overlay below would size
-       itself to the header instead of the viewport. Solid bar on mobile. */
+       itself to the header instead of the viewport, which is what pushed the
+       panel off to the right on the kiosk. Solid bar here. */
     .site-header {
       background: var(--color-white);
       backdrop-filter: none;
@@ -821,8 +834,9 @@ const social = [
       align-items: center;
       justify-content: space-between;
       width: 100%;
-      gap: 12px;
-      padding: 0.95rem 0;
+      /* Trailing room so the chevron never sits on the panel edge. */
+      gap: 16px;
+      padding: 1.15rem 4px 1.15rem 0;
       border: none;
       border-bottom: 1px solid var(--border);
       background: none;
@@ -831,17 +845,18 @@ const social = [
       font-family: var(--font-heading);
       text-transform: uppercase;
       letter-spacing: -0.01em;
-      font-size: 1.5rem;
+      font-size: clamp(1.9rem, 5.5vw, 2.4rem);
       color: var(--color-dark);
     }
 
     .mobile-chev {
       flex-shrink: 0;
-      width: 9px;
-      height: 9px;
-      border-right: 2px solid var(--color-primary);
-      border-bottom: 2px solid var(--color-primary);
-      transform: rotate(45deg) translateY(-2px);
+      width: 12px;
+      height: 12px;
+      margin-right: 4px;
+      border-right: 2.5px solid var(--color-primary);
+      border-bottom: 2.5px solid var(--color-primary);
+      transform: rotate(45deg) translateY(-3px);
       transition: transform var(--dur-fast) ease;
     }
 
@@ -880,17 +895,18 @@ const social = [
       cursor: pointer;
       text-align: left;
       font-family: var(--font-body);
-      font-size: var(--text-2xs);
+      font-size: var(--text-sm);
       font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--text-muted);
+      padding-right: 4px;
     }
 
     .mobile-chev.small {
-      width: 7px;
-      height: 7px;
-      border-width: 1.5px;
+      width: 9px;
+      height: 9px;
+      border-width: 2px;
     }
 
     .mobile-subgroup.open .mobile-chev.small {
@@ -915,15 +931,22 @@ const social = [
       padding: 0 0 0.9rem;
     }
 
+    /* Not inside a collapsible sub-group, so it is always open. */
+    .mobile-sublist--flat {
+      max-height: none;
+      padding: 0.9rem 0;
+    }
+
     /* Pills wrap into a compact block — a 17-item vertical list would make
        this menu endless. */
     .mobile-sublink {
       display: inline-flex;
       align-items: center;
-      padding: 0.5rem 0.9rem;
+      /* Comfortable finger target on the kiosk. */
+      padding: 0.7rem 1.15rem;
       border: 1px solid var(--border-strong);
       border-radius: 999px;
-      font-size: var(--text-sm);
+      font-size: var(--text-md);
       line-height: 1.1;
       color: var(--color-dark);
       transition: background-color var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;

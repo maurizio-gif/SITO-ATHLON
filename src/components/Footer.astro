@@ -79,7 +79,13 @@ const affiliazioni = [
         </div>
         <div class="find-us__item">
           <p class="find-us__label">Orari</p>
-          <p>Lunedì–Venerdì 6:00 – 22:00 · Sabato 8:00 – 20:00 · Domenica 9:30 – 13:00</p>
+          {/* Day in the lighter weight, hours bold: the times are what people
+              actually scan for, so they carry the emphasis. */}
+          <ul class="hours">
+            <li><span class="hours__day">Lunedì–Venerdì</span><span class="hours__time">6:00 – 22:00</span></li>
+            <li><span class="hours__day">Sabato</span><span class="hours__time">8:00 – 20:00</span></li>
+            <li><span class="hours__day">Domenica</span><span class="hours__time">9:30 – 13:00</span></li>
+          </ul>
         </div>
         <div class="find-us__item">
           <p class="find-us__label">Contatti</p>
@@ -206,17 +212,11 @@ const affiliazioni = [
         Point 2000 Srl Società Sportiva Dilettantistica · Via Ugo Ojetti 134, 00137 Roma · P.IVA 05154811003 ·
         Affiliazione ASI: LAZ-RM4453 · Affiliazione FIN: 996434 · Affiliazione CSEN: 71519
       </p>
-      <p class="footer-legal__disclaimer">
-        Sito web per la propaganda attività fisica didattica sportiva dilettantistica. Le attività proposte sono
-        attività sportive dilettantistiche e attività motorie strutturate, svolte da Società Sportiva
-        Dilettantistica affiliata a Enti sportivi riconosciuti dal CONI. Le attività non hanno finalità
-        sanitarie, terapeutiche, riabilitative o estetiche.
-      </p>
-      <a class="footer-credit" href="https://www.ready2digital.it" target="_blank" rel="noopener">
-        <span>Realizzato da</span>
-        <img src="/wp-content/uploads/2026/04/logo-ready2digital_54x.png" alt="Ready 2 Digital" height="18" loading="lazy" />
-      </a>
     </div>
+    <a class="footer-credit" href="https://www.ready2digital.it" target="_blank" rel="noopener">
+      <span>Powered by</span>
+      <img src="/wp-content/uploads/2026/04/logo-ready2digital_54x.png" alt="Ready 2 Digital" height="18" loading="lazy" />
+    </a>
   </div>
 </footer>
 
@@ -312,6 +312,34 @@ const affiliazioni = [
   .find-us__item p:last-child {
     margin: 0;
     color: var(--text-muted);
+  }
+
+  .hours {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .hours li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    padding: 3px 0;
+  }
+
+  .hours__day {
+    flex: 1 1 auto;
+    font-size: var(--text-sm);
+    font-weight: 400;
+    color: var(--text-muted);
+  }
+
+  .hours__time {
+    font-weight: 700;
+    color: var(--color-dark);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   .find-us__cta {
@@ -550,57 +578,40 @@ const affiliazioni = [
     background: rgba(0, 0, 0, 0.2);
   }
 
+  /* Full page width, not held inside the content container — this line is
+     fine print that should span the whole bar. */
   .footer-legal__inner {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: end;
-    gap: 12px 40px;
+    max-width: none;
     padding-top: 28px;
-    padding-bottom: 32px;
+    padding-bottom: 8px;
+    text-align: center;
   }
 
   .footer-legal p {
-    grid-column: 1;
     font-size: 12px;
     line-height: 1.75;
     color: rgba(255, 255, 255, 0.5);
     margin: 0;
   }
 
-  .footer-legal__disclaimer {
-    max-width: 88ch;
-    font-size: 11px !important;
-    color: rgba(255, 255, 255, 0.32) !important;
-  }
-
+  /* Own row, centred under the legal text. Shown at full strength — the
+     logo is already light and coloured, so no hover reveal is needed. */
   .footer-credit {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    align-self: center;
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
+    margin-top: 20px;
     font-size: 11px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.35);
+    color: rgba(255, 255, 255, 0.6);
     white-space: nowrap;
-    transition: color var(--dur-fast) ease;
-  }
-
-  .footer-credit:hover {
-    color: rgba(255, 255, 255, 0.75);
   }
 
   .footer-credit img {
     height: 18px;
     width: auto;
-    opacity: 0.55;
-    transition: opacity var(--dur-fast) ease;
-  }
-
-  .footer-credit:hover img {
-    opacity: 1;
   }
 
   @media (max-width: 1000px) {
@@ -618,16 +629,10 @@ const affiliazioni = [
 
   @media (max-width: 640px) {
     .footer-grid,
-    .find-us__info,
-    .footer-legal__inner {
+    .find-us__info {
       grid-template-columns: 1fr;
     }
 
-    .footer-credit {
-      grid-column: 1;
-      grid-row: auto;
-      margin-top: 8px;
-    }
     .find-us__item {
       border-right: none;
       border-bottom: 1px solid var(--border);
