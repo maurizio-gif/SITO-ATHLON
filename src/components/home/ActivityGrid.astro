@@ -21,8 +21,8 @@ const { eyebrow, accent, variant, items, trackId } = Astro.props;
   <div class="container">
     <div class="activity-head">
       <h2 data-anim="reveal">
-        {eyebrow}<br />
-        <span class="accent-word">{accent}</span>
+        <span class="head-kicker">{eyebrow}</span>
+        <span class="head-word">{accent}</span>
       </h2>
       <div class="carousel-nav">
         <button class="carousel-btn" data-dir="-1" data-track={trackId} aria-label="Precedente">←</button>
@@ -150,18 +150,61 @@ const { eyebrow, accent, variant, items, trackId } = Astro.props;
     margin-bottom: 32px;
   }
 
+  /* Editorial pairing: a small tracked-out label in the body face over one
+     oversized word in the display face. No synthetic italic — Tusker has no
+     true italic cut, and the browser's faux-oblique on a condensed display
+     face looks broken. */
   .activity-head h2 {
-    font-size: var(--text-2xl);
-    letter-spacing: var(--tracking-2xl);
-    line-height: var(--leading-2xl);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
 
-  .activity.dark .accent-word {
+  .head-kicker {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  .head-word {
+    display: block;
+    position: relative;
+    font-size: var(--text-3xl);
+    line-height: 0.88;
+    letter-spacing: var(--tracking-4xl);
+    padding-left: 22px;
+  }
+
+  /* A short accent rule anchored to the left edge of the word. */
+  .head-word::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.1em;
+    bottom: 0.18em;
+    width: 6px;
+    border-radius: 3px;
+    background: currentColor;
+  }
+
+  .activity.dark .head-word {
     color: var(--color-primary);
   }
 
-  .activity.orange .accent-word {
+  .activity.orange .head-word {
     color: var(--color-dark);
+  }
+
+  @media (max-width: 640px) {
+    .head-word {
+      padding-left: 16px;
+    }
+    .head-word::before {
+      width: 4px;
+    }
   }
 
   .carousel-nav {
@@ -310,11 +353,13 @@ const { eyebrow, accent, variant, items, trackId } = Astro.props;
   }
 
   .card__name {
+    display: block;
     font-family: var(--font-heading);
     text-transform: uppercase;
-    letter-spacing: -0.005em;
-    font-weight: 500;
-    font-size: var(--text-md);
+    letter-spacing: -0.015em;
+    line-height: 0.95;
+    font-weight: 700;
+    font-size: clamp(1.75rem, 2.4vw, 2.4rem);
     color: var(--color-white);
   }
 

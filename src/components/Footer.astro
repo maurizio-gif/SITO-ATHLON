@@ -1,191 +1,651 @@
 ---
-const sitemap = [
-  { label: 'Home', href: '/' },
+const ADDRESS = 'Via Ugo Ojetti 134, 00137 Roma';
+const MAPS_QUERY = encodeURIComponent(ADDRESS);
+
+const attivitaAdulti = [
   { label: 'Gym Floor (Sala Pesi)', href: '/gym-floor' },
   { label: 'Corsi Fitness', href: '/corsi-fitness' },
+  { label: 'Group Reformer', href: '/reformer' },
+  { label: 'Personal Training', href: '/personal-training' },
+  { label: 'Aqua Fitness', href: '/aqua-fitness' },
   { label: 'Nuoto Libero Assistito', href: '/nuoto-libero' },
   { label: 'Scuola Nuoto Adulti', href: '/scuola-nuoto-adulti' },
-  { label: 'Aqua Fitness', href: '/aqua-fitness' },
-  { label: 'Group Reformer', href: '/reformer' },
+  { label: 'Corso Gestanti', href: '/gestanti' },
+];
+
+const corsiJunior = [
+  { label: 'Baby Nuoto', href: '/baby-nuoto' },
+  { label: 'Scuola Nuoto Bambini', href: '/scuola-nuoto-bambini-3' },
+  { label: 'Nuoto Agonistico', href: '/nuoto-agonistico' },
+  { label: 'Pallanuoto', href: '/pallanuoto' },
+];
+
+const ilClub = [
+  { label: 'Abbonamenti', href: '/abbonamenti' },
+  { label: 'Orari Corsi', href: 'https://planning.athlonroma.it/', external: true },
+  { label: 'Eventi', href: '/eventi' },
+  { label: 'Lavora con noi', href: '/lavora' },
+  { label: 'Contattaci', href: '/contatti' },
 ];
 
 const risorse = [
+  { label: 'Portale Athlon', href: 'https://athlon.perfectgym.com/ClientPortal2/', external: true },
+  { label: 'App Athlon Club', href: 'https://onelink.to/athlon', external: true },
+  { label: 'Help Desk', href: '/knowledge-base' },
   { label: 'Privacy Policy', href: '/privacy' },
   { label: 'Termini e Condizioni', href: '/termini' },
-  { label: 'Portale Athlon', href: 'https://athlon.perfectgym.com/ClientPortal2/' },
-  { label: 'Help Desk', href: '/knowledge-base' },
   { label: 'Modello Organizzativo (MOG)', href: '/mog' },
   { label: 'Codice Condotta', href: '/codice-condotta' },
-  { label: 'App Athlon Club', href: 'https://onelink.to/athlon' },
 ];
 
-const social = [
-  { label: 'Instagram', href: 'https://www.instagram.com/athlonclub_roma/' },
-  { label: 'Facebook', href: 'https://www.facebook.com/AthlonClubRoma' },
-  { label: 'Youtube', href: 'https://www.youtube.com/' },
+const affiliazioni = [
+  { src: '/wp-content/uploads/2024/08/FIN_logo.png', alt: 'Federazione Italiana Nuoto' },
+  { src: '/wp-content/uploads/2024/07/logo-asi-ok.jpg', alt: 'ASI' },
+  { src: '/wp-content/uploads/2024/07/logo-csen.png', alt: 'CSEN' },
+  { src: '/wp-content/uploads/2024/07/logo-coni.png', alt: 'CONI' },
+  { src: '/wp-content/uploads/2024/07/anif-logo-1.png', alt: 'ANIF' },
+  { src: '/wp-content/uploads/2024/07/logo-ciwas.png', alt: 'CIWAS' },
+  { src: '/wp-content/uploads/2024/07/matrix-logo.png', alt: 'Matrix' },
+  { src: '/wp-content/uploads/2024/08/BB-logo-horizontal-2-color-1024x205.png', alt: 'Bloomberg Blue' },
 ];
 ---
 
-<footer class="site-footer">
-  <div class="cta-band">
-    <div class="container cta-inner">
-      <a href="/contatti" class="btn btn-primary">Contattaci</a>
-      <span>Entra nel mondo Athlon</span>
-    </div>
-  </div>
+<footer class="footer">
+  <!-- Dove siamo -->
+  <section class="find-us" aria-label="Come trovarci">
+    <div class="container">
+      <div class="find-us__head">
+        <span class="eyebrow" data-anim="from-left">Dove siamo</span>
+        <h2 class="find-us__title" data-anim="reveal">Vieni a trovarci</h2>
+      </div>
 
+      <div class="find-us__map" data-anim="scale">
+        <iframe
+          src={`https://www.google.com/maps?q=${MAPS_QUERY}&output=embed`}
+          title={`Mappa: Athlon Club, ${ADDRESS}`}
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <a
+          class="find-us__maps-link"
+          href={`https://www.google.com/maps/search/?api=1&query=${MAPS_QUERY}`}
+          target="_blank"
+          rel="noopener">Apri in Maps ↗</a>
+      </div>
+
+      <div class="find-us__info">
+        <div class="find-us__item">
+          <p class="find-us__label">Indirizzo</p>
+          <p>{ADDRESS}</p>
+        </div>
+        <div class="find-us__item">
+          <p class="find-us__label">Orari</p>
+          <p>Lunedì–Venerdì 6:00 – 22:00 · Sabato 8:00 – 20:00 · Domenica 9:30 – 13:00</p>
+        </div>
+        <div class="find-us__item">
+          <p class="find-us__label">Contatti</p>
+          <p><a href="mailto:desk@athlonroma.it">desk@athlonroma.it</a></p>
+        </div>
+        <div class="find-us__item">
+          <p class="find-us__label">Zona</p>
+          <p>Roma Nord — Talenti, vicino a Montesacro, Bufalotta e Porta di Roma.</p>
+        </div>
+      </div>
+
+      <div class="find-us__cta">
+        <a
+          class="btn btn-outline-dark"
+          href={`https://www.google.com/maps/dir/?api=1&destination=${MAPS_QUERY}`}
+          target="_blank"
+          rel="noopener">Indicazioni</a>
+        <a class="btn btn-primary" href="/contatti">Contattaci</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Link -->
   <div class="container footer-grid">
-    <div class="footer-col">
-      <h4>Dove Siamo</h4>
-      <p>Via Ugo Ojetti, 134 – 00137 – Roma</p>
-      <h4>Orari</h4>
-      <p>Lunedì–Venerdì: 6:00 – 22:00<br />Sabato: 8:00 – 20:00<br />Domenica: 9:30 – 13:00</p>
-      <a href="/lavora" class="work-with-us">Athlon è alla ricerca di personale, lavora con noi</a>
-      <a href="/lavora" class="btn btn-outline-dark small">Posizioni aperte</a>
+    <div class="footer-brand">
+      <img src="/wp-content/uploads/2025/08/Logo-oriz-full-2.png" alt="Athlon Club 4.0" height="44" />
+      <p class="footer-blurb">
+        Da oltre cinquant'anni palestra e piscina a <strong>Roma Nord Talenti</strong>: oltre 3000 mq
+        dedicati allo sport, per ogni età.
+      </p>
+      <ul class="footer-contacts">
+        <li><a href="mailto:desk@athlonroma.it">desk@athlonroma.it</a></li>
+        <li class="muted">{ADDRESS}</li>
+      </ul>
+      <div class="footer-social">
+        <a class="social-btn" href="https://www.instagram.com/athlon_club/" target="_blank" rel="noopener">
+          <span class="social-btn__icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" stroke="currentColor" stroke-width="1.8" />
+              <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8" />
+              <circle cx="17.1" cy="6.9" r="1.2" fill="currentColor" />
+            </svg>
+          </span>
+          <span>Instagram</span>
+        </a>
+        <a class="social-btn" href="https://www.facebook.com/AthlonClubRoma" target="_blank" rel="noopener">
+          <span class="social-btn__icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14 8.5V6.9c0-.7.2-1.1 1.2-1.1H16.5V3.1A16 16 0 0 0 14.6 3c-2 0-3.4 1.2-3.4 3.5v2H9v3h2.2V21h3v-9.5h2.3l.4-3H14Z" />
+            </svg>
+          </span>
+          <span>Facebook</span>
+        </a>
+        <a class="social-btn" href="https://www.youtube.com/channel/UC9XX5E0u-qqlqavtawlmOnQ" target="_blank" rel="noopener">
+          <span class="social-btn__icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8ZM10 15V9l5.2 3L10 15Z" />
+            </svg>
+          </span>
+          <span>Youtube</span>
+        </a>
+      </div>
     </div>
 
     <div class="footer-col">
-      <h4>Sitemap</h4>
+      <p class="footer-heading">Attività Adulti</p>
       <ul>
-        {sitemap.map((l) => (
-          <li><a href={l.href}>{l.label}</a></li>
+        {attivitaAdulti.map((l) => (<li><a href={l.href}>{l.label}</a></li>))}
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <p class="footer-heading">Corsi Junior</p>
+      <ul>
+        {corsiJunior.map((l) => (<li><a href={l.href}>{l.label}</a></li>))}
+      </ul>
+      <p class="footer-heading footer-heading--spaced">Il Club</p>
+      <ul>
+        {ilClub.map((l) => (
+          <li>
+            <a href={l.href} target={l.external ? '_blank' : undefined} rel={l.external ? 'noopener' : undefined}>
+              {l.label}
+            </a>
+          </li>
         ))}
       </ul>
     </div>
 
     <div class="footer-col">
-      <h4>Social</h4>
-      <ul>
-        {social.map((l) => (
-          <li><a href={l.href} target="_blank" rel="noopener">{l.label}</a></li>
-        ))}
-      </ul>
-    </div>
-
-    <div class="footer-col">
-      <h4>Risorse</h4>
+      <p class="footer-heading">Risorse</p>
       <ul>
         {risorse.map((l) => (
-          <li><a href={l.href}>{l.label}</a></li>
+          <li>
+            <a href={l.href} target={l.external ? '_blank' : undefined} rel={l.external ? 'noopener' : undefined}>
+              {l.label}
+            </a>
+          </li>
         ))}
       </ul>
     </div>
   </div>
 
-  <div class="container legal">
-    <p>
-      Point 2000 Srl Società Sportiva Dilettantistica | Via Ugo Ojetti 134, 00137 Roma | P.IVA 05154811003 |
-      desk@athlonroma.it | Affiliazione ASI: LAZ-RM4453 | Affiliazione FIN: 996434 | Affiliazione CSEN: 71519
-    </p>
-    <p class="disclaimer">
-      SITO WEB PER LA PROPAGANDA ATTIVITÀ FISICA DIDATTICA SPORTIVA DILETTANTISTICA — Le attività proposte su
-      questo sito sono attività sportive dilettantistiche e attività motorie strutturate, svolte da Società
-      Sportiva Dilettantistica affiliata a Enti sportivi riconosciuti dal CONI. Le attività non hanno finalità
-      sanitarie, terapeutiche, riabilitative o estetiche.
-    </p>
+  <!-- Affiliazioni e partner -->
+  <div class="footer-logos">
+    <div class="container">
+      <p class="footer-logos__label">Affiliazioni e partner</p>
+    </div>
+    <div class="logo-marquee">
+      {/* The list is rendered twice so the track can loop seamlessly at -50%. */}
+      <div class="logo-marquee__track">
+        {[...affiliazioni, ...affiliazioni].map((logo, i) => (
+          <span class="logo-chip" aria-hidden={i >= affiliazioni.length ? 'true' : undefined}>
+            <img src={logo.src} alt={i >= affiliazioni.length ? '' : logo.alt} loading="lazy" />
+          </span>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <!-- Legale -->
+  <div class="footer-legal">
+    <div class="container footer-legal__inner">
+      <p>
+        Point 2000 Srl Società Sportiva Dilettantistica · Via Ugo Ojetti 134, 00137 Roma · P.IVA 05154811003 ·
+        Affiliazione ASI: LAZ-RM4453 · Affiliazione FIN: 996434 · Affiliazione CSEN: 71519
+      </p>
+      <p class="footer-legal__disclaimer">
+        Sito web per la propaganda attività fisica didattica sportiva dilettantistica. Le attività proposte sono
+        attività sportive dilettantistiche e attività motorie strutturate, svolte da Società Sportiva
+        Dilettantistica affiliata a Enti sportivi riconosciuti dal CONI. Le attività non hanno finalità
+        sanitarie, terapeutiche, riabilitative o estetiche.
+      </p>
+      <a class="footer-credit" href="https://www.ready2digital.it" target="_blank" rel="noopener">
+        <span>Realizzato da</span>
+        <img src="/wp-content/uploads/2026/04/logo-ready2digital_54x.png" alt="Ready 2 Digital" height="18" loading="lazy" />
+      </a>
+    </div>
   </div>
 </footer>
 
 <style>
-  .site-footer {
+  .footer {
     background: var(--color-dark);
     color: var(--color-white);
   }
 
-  .cta-band {
-    background: var(--color-primary);
+  /* ---- Dove siamo ---- */
+  .find-us {
+    background: var(--color-cream);
+    color: var(--color-dark);
+    padding: var(--space-section-lg) 0;
   }
 
-  .cta-inner {
-    display: flex;
+  .find-us__head {
+    margin-bottom: 32px;
+  }
+
+  .find-us__title {
+    font-size: var(--text-2xl);
+    letter-spacing: var(--tracking-2xl);
+    margin-top: 10px;
+  }
+
+  .find-us__map {
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 20px 45px rgba(39, 36, 35, 0.16);
+  }
+
+  .find-us__map iframe {
+    display: block;
+    width: 100%;
+    height: 420px;
+    border: 0;
+    filter: grayscale(0.25);
+  }
+
+  .find-us__maps-link {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    display: inline-flex;
     align-items: center;
-    gap: 24px;
-    padding: 32px 24px;
-  }
-
-  .cta-inner .btn-primary {
+    gap: 6px;
+    padding: 9px 14px;
+    border-radius: 999px;
     background: var(--color-white);
-    color: var(--color-primary);
+    color: var(--color-dark);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
   }
 
-  .cta-inner span {
-    font-family: var(--font-heading);
-    text-transform: uppercase;
-    font-size: 22px;
+  .find-us__maps-link:hover {
+    background: var(--color-primary);
     color: var(--color-white);
   }
 
-  .footer-grid {
+  .find-us__info {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 40px;
-    padding: 64px 24px 40px;
+    gap: 0;
+    margin-top: 32px;
+    border-top: 1px solid var(--border-strong);
   }
 
-  .footer-col h4 {
-    font-size: 16px;
+  .find-us__item {
+    padding: 24px 24px 8px 0;
+    border-right: 1px solid var(--border);
+  }
+
+  .find-us__item:last-child {
+    border-right: none;
+  }
+
+  .find-us__item:not(:first-child) {
+    padding-left: 24px;
+  }
+
+  .find-us__label {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--color-primary);
-    margin-bottom: 16px;
+    margin-bottom: 8px;
   }
 
-  .footer-col p {
-    font-size: 14px;
-    opacity: 0.85;
+  .find-us__item p:last-child {
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  .find-us__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  /* ---- Link grid ---- */
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.7fr 1fr 1fr 1fr;
+    gap: 56px 40px;
+    padding-top: var(--space-section-lg);
+    padding-bottom: var(--space-section-md);
+  }
+
+  .footer-brand img {
+    height: 48px;
+    width: auto;
+    margin-bottom: 26px;
+  }
+
+  .footer-blurb {
+    max-width: 32ch;
+    font-size: var(--text-md);
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .footer-blurb strong {
+    color: var(--color-white);
+    font-weight: 600;
+  }
+
+  .footer-contacts {
+    list-style: none;
+    margin: 26px 0 28px;
+    padding: 0;
+    font-size: var(--text-sm);
+  }
+
+  .footer-contacts li {
+    margin-bottom: 8px;
+  }
+
+  .footer-contacts a {
+    color: var(--color-white);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+    padding-bottom: 2px;
+    transition: border-color var(--dur-fast) ease, color var(--dur-fast) ease;
+  }
+
+  .footer-contacts a:hover {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+  }
+
+  .footer-contacts .muted {
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .footer-social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .social-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px 8px 10px;
+    border: 1px solid var(--border-dark);
+    border-radius: 999px;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    transition: background-color var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
+  }
+
+  .social-btn:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .social-btn__icon {
+    display: inline-flex;
+  }
+
+  /* Small tracked-out label in the body face, over a hairline — reads as a
+     section marker rather than competing with the display headings above. */
+  .footer-heading {
+    font-family: var(--font-body);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.42);
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--border-dark);
+  }
+
+  .footer-heading--spaced {
+    margin-top: 36px;
   }
 
   .footer-col ul {
     list-style: none;
-    padding: 0;
     margin: 0;
+    padding: 0;
   }
 
   .footer-col li {
-    margin-bottom: 10px;
+    margin-bottom: 11px;
   }
 
   .footer-col a {
-    font-size: 14px;
-    opacity: 0.85;
+    position: relative;
+    display: inline-block;
+    font-size: var(--text-sm);
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.72);
+    transition: color var(--dur-fast) ease, transform var(--dur-fast) var(--ease-out-crit);
+  }
+
+  /* An accent tick slides in from the left as the label steps aside. */
+  .footer-col a::before {
+    content: '';
+    position: absolute;
+    left: -14px;
+    top: 50%;
+    width: 7px;
+    height: 1.5px;
+    background: var(--color-primary);
+    transform: translateY(-50%) scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-fast) var(--ease-out-crit);
   }
 
   .footer-col a:hover {
-    opacity: 1;
-    color: var(--color-primary);
-  }
-
-  .work-with-us {
-    display: block;
-    margin: 20px 0 16px;
-    font-weight: 600;
-  }
-
-  .btn.small {
-    padding: 12px 24px;
-    font-size: 12px;
-    border-color: var(--color-white);
     color: var(--color-white);
+    transform: translateX(6px);
   }
 
-  .legal {
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
-    padding: 24px;
+  .footer-col a:hover::before {
+    transform: translateY(-50%) scaleX(1);
+  }
+
+  /* ---- Affiliations ----
+     Full-width white band: the logos come from mixed sources (transparent
+     PNGs and JPGs with a baked-in white background) and simply read best on
+     white, with no chrome around them. */
+  .footer-logos {
+    background: var(--color-white);
+    padding-top: 34px;
+    padding-bottom: 34px;
+  }
+
+  .footer-logos__label {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(39, 36, 35, 0.4);
+    margin-bottom: 20px;
+  }
+
+  .logo-marquee {
+    overflow: hidden;
+    /* Fades the strip into the white band at both ends instead of cutting it. */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+  }
+
+  .logo-marquee__track {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    animation: logo-marquee 45s linear infinite;
+  }
+
+  .logo-marquee:hover .logo-marquee__track {
+    animation-play-state: paused;
+  }
+
+  /* The track holds the list twice, so -50% lands exactly on the copy.
+     Spacing lives on the chip (margin), not on a flex gap — a gap would add
+     a half-step at the seam and make the loop visibly jump. */
+  @keyframes logo-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* No frame around each logo — the band itself is white, so they sit
+     directly on it. The fixed slot keeps very different aspect ratios
+     (square CONI vs. wide Matrix) optically balanced. */
+  .logo-chip {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 150px;
+    height: 64px;
+    margin-right: 28px;
+    padding: 0 8px;
+  }
+
+  .logo-chip img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .logo-marquee__track {
+      animation: none;
+    }
+    .logo-marquee {
+      overflow-x: auto;
+    }
+  }
+
+  /* ---- Legal ---- */
+  .footer-legal {
+    border-top: 1px solid var(--border-dark);
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .footer-legal__inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 12px 40px;
+    padding-top: 28px;
+    padding-bottom: 32px;
+  }
+
+  .footer-legal p {
+    grid-column: 1;
     font-size: 12px;
-    opacity: 0.6;
-    line-height: 1.6;
+    line-height: 1.75;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
   }
 
-  @media (max-width: 900px) {
+  .footer-legal__disclaimer {
+    max-width: 88ch;
+    font-size: 11px !important;
+    color: rgba(255, 255, 255, 0.32) !important;
+  }
+
+  .footer-credit {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.35);
+    white-space: nowrap;
+    transition: color var(--dur-fast) ease;
+  }
+
+  .footer-credit:hover {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .footer-credit img {
+    height: 18px;
+    width: auto;
+    opacity: 0.55;
+    transition: opacity var(--dur-fast) ease;
+  }
+
+  .footer-credit:hover img {
+    opacity: 1;
+  }
+
+  @media (max-width: 1000px) {
     .footer-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+    .find-us__info {
       grid-template-columns: repeat(2, 1fr);
     }
+    .find-us__item:nth-child(2n) {
+      border-right: none;
+    }
   }
-  @media (max-width: 560px) {
-    .footer-grid {
+
+  @media (max-width: 640px) {
+    .footer-grid,
+    .find-us__info,
+    .footer-legal__inner {
       grid-template-columns: 1fr;
     }
-    .cta-inner {
-      flex-direction: column;
-      align-items: flex-start;
+
+    .footer-credit {
+      grid-column: 1;
+      grid-row: auto;
+      margin-top: 8px;
+    }
+    .find-us__item {
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0 14px;
+    }
+    .find-us__item:not(:first-child) {
+      padding-left: 0;
+    }
+    .find-us__item:last-child {
+      border-bottom: none;
+    }
+    .find-us__map iframe {
+      height: 300px;
+    }
+    .logo-chip {
+      width: 112px;
+      height: 52px;
+      margin-right: 20px;
     }
   }
 </style>

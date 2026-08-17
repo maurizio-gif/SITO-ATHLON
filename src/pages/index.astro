@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Hero from '../components/home/Hero.astro';
+import Stats from '../components/home/Stats.astro';
 import ChiSiamo from '../components/home/ChiSiamo.astro';
 import InfoCards from '../components/home/InfoCards.astro';
 import ActivityGrid from '../components/home/ActivityGrid.astro';
@@ -32,6 +33,7 @@ const juniorItems = [
   description="Palestra e Piscina a Roma Nord Talenti. Per imparare a nuotare o migliorare il tuo stato di salute con corsi Fitness e Acqua Gym. Reformer Pilates, Yoga..."
 >
   <Hero />
+  <Stats />
   <ChiSiamo />
   <InfoCards />
   <ActivityGrid eyebrow="Attività Sportive" accent="Adulti" variant="dark" items={adultiItems} trackId="adulti" />

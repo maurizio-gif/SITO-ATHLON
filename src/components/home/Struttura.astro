@@ -35,8 +35,13 @@ const gallery = [
     <span class="eyebrow" data-anim="from-left">Il Club</span>
     <h2 data-anim="reveal">La Struttura</h2>
     <p class="intro" data-anim="from-left" data-anim-delay="80">
-      Oltre 3000 mq dedicati allo sport. Completamente rinnovata dalle ristrutturazioni tra il 2021 ed il 2024,
+      Oltre 3000 mq dedicati allo sport. Completamente rinnovata dalle ristrutturazioni tra il 2021 ed il 2026,
       offre spazi all'avanguardia per la pratica sportiva ad ogni età.
+    </p>
+
+    <p class="tour-hint" data-anim="pop" data-anim-delay="160">
+      <span class="tour-hint__icon" aria-hidden="true">▶</span>
+      Clicca play per il virtual tour completo
     </p>
 
     <div class="tour" data-anim="scale">
@@ -224,8 +229,37 @@ const gallery = [
     opacity: 0.9;
   }
 
+  .tour-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0 0;
+    padding: 12px 22px 12px 14px;
+    border: 1px solid rgba(255, 87, 1, 0.45);
+    border-radius: 999px;
+    background: rgba(255, 87, 1, 0.1);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--color-white);
+  }
+
+  .tour-hint__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-size: 10px;
+    /* Optical centring: the triangle glyph sits left of its own box. */
+    padding-left: 2px;
+  }
+
   .tour {
-    margin: 40px 0;
+    margin: 24px 0 40px;
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);

@@ -1,46 +1,95 @@
 ---
-const adultiLinks = [
-  { label: 'Gym Floor (Sala Pesi)', href: '/gym-floor' },
-  { label: 'Corsi Fitness', href: '/corsi-fitness' },
-  { label: 'Group Reformer', href: '/reformer' },
-  { label: 'Personal Training', href: '/personal-training' },
-  { label: 'Nuoto Libero Assistito', href: '/nuoto-libero' },
-  { label: 'Aqua Fitness', href: '/aqua-fitness' },
-  { label: 'Scuola Nuoto Adulti', href: '/scuola-nuoto-adulti' },
-  { label: 'Corso Gestanti', href: '/gestanti' },
+const adultiMenu = {
+  image: '/wp-content/uploads/2024/08/IMG_2065-scaled.jpg',
+  imageAlt: 'Gym Floor Athlon Club',
+  columns: [
+    {
+      heading: 'Palestra',
+      links: [
+        { label: 'Gym Floor (Sala Pesi)', href: '/gym-floor' },
+        { label: 'Personal Training', href: '/personal-training' },
+      ],
+    },
+    {
+      heading: 'Corsi Fitness',
+      links: [
+        { label: 'Tutti i Corsi Fitness', href: '/corsi-fitness' },
+        { label: 'Yoga', href: '/yoga' },
+        { label: 'Pilates', href: '/pilates' },
+        { label: 'Group Reformer', href: '/reformer' },
+        { label: 'Calisthenics', href: '/calisthenics' },
+        { label: 'Booty Workout', href: '/booty-workout' },
+        { label: 'HBX', href: '/hbx' },
+        { label: 'Motr®', href: '/motr' },
+        { label: 'Body Sculpt', href: '/body-sculpt' },
+        { label: 'Body Pump®', href: '/body-pump' },
+        { label: 'Antigravity®', href: '/antigravity' },
+        { label: 'GP Coreo', href: '/gpcoreo' },
+        { label: 'Ginnastica Posturale', href: '/ginnastica-posturale' },
+        { label: 'Ginnastica Dolce', href: '/ginnastica-dolce' },
+        { label: 'Balli di Gruppo', href: '/balli-di-gruppo' },
+        { label: 'Difesa Personale', href: '/difesa-personale' },
+        { label: 'Strenght', href: '/strenght' },
+      ],
+    },
+    {
+      heading: 'Piscina',
+      links: [
+        { label: 'Scuola Nuoto Adulti', href: '/scuola-nuoto-adulti' },
+        { label: 'Aqua Fitness', href: '/aqua-fitness' },
+        { label: 'Nuoto Libero', href: '/nuoto-libero' },
+        { label: 'Corso Gestanti', href: '/gestanti' },
+      ],
+    },
+  ],
+};
+
+const juniorMenu = {
+  image: '/wp-content/uploads/2023/11/Baby-Nuoto.jpg',
+  imageAlt: 'Baby Nuoto Athlon Club',
+  columns: [
+    {
+      heading: 'Corsi Junior',
+      links: [
+        { label: 'Baby Nuoto', href: '/baby-nuoto' },
+        { label: 'Scuola Nuoto Bambini', href: '/scuola-nuoto-bambini-3' },
+        { label: 'Nuoto Agonistico', href: '/nuoto-agonistico' },
+        { label: 'Pallanuoto', href: '/pallanuoto' },
+      ],
+    },
+  ],
+};
+
+const menus = [
+  { id: 'adulti', label: 'Attività Adulti', data: adultiMenu },
+  { id: 'junior', label: 'Corsi Junior', data: juniorMenu },
 ];
 
-const juniorLinks = [
-  { label: 'Baby Nuoto', href: '/baby-nuoto' },
-  { label: 'Scuola Nuoto Bambini', href: '/scuola-nuoto-bambini-3' },
-  { label: 'Pallanuoto', href: '/pallanuoto' },
-  { label: 'Nuoto Agonistico', href: '/nuoto-agonistico' },
-];
-
-const groups = [
-  { label: 'Attività Adulti', links: adultiLinks },
-  { label: 'Corsi Junior', links: juniorLinks },
-  { label: 'Contattaci', links: [{ label: 'Contatti', href: '/contatti' }, { label: 'Lavora con noi', href: '/lavora' }] },
+const social = [
+  { label: 'Instagram', href: 'https://www.instagram.com/athlon_club/' },
+  { label: 'Facebook', href: 'https://www.facebook.com/AthlonClubRoma' },
+  { label: 'Youtube', href: 'https://www.youtube.com/channel/UC9XX5E0u-qqlqavtawlmOnQ' },
 ];
 ---
 
 <header class="site-header" id="site-header">
   <div class="container header-inner">
     <a href="/" class="logo">
-      <img src="/wp-content/uploads/2025/08/Pittogramma.png" alt="Athlon Club" width="40" height="40" />
+      <img src="/wp-content/uploads/2025/08/Pittogramma.png" alt="Athlon Club" width="32" height="32" />
     </a>
 
+    <a href="/contatti" class="header-contact-mobile">Contattaci</a>
+
     <nav class="main-nav">
-      {groups.map((g) => (
-        <div class="nav-item has-dropdown">
-          <button>{g.label}</button>
-          <div class="dropdown">
-            {g.links.map((l) => (
-              <a href={l.href}>{l.label}</a>
-            ))}
-          </div>
+      {menus.map((m) => (
+        <div class="nav-item" data-nav-item={m.id}>
+          <button class="nav-trigger" data-nav-trigger={m.id} aria-expanded="false">
+            {m.label}
+            <span class="chev" aria-hidden="true"></span>
+          </button>
         </div>
       ))}
+      <a href="/contatti" class="nav-cta">Contattaci</a>
     </nav>
 
     <div class="header-actions">
@@ -52,36 +101,202 @@ const groups = [
     </div>
   </div>
 
-  <div class="mobile-panel" id="mobile-panel">
-    {groups.map((g) => (
-      <div class="mobile-group">
-        <span class="mobile-group-title">{g.label}</span>
-        {g.links.map((l) => (
-          <a href={l.href}>{l.label}</a>
-        ))}
+  <!-- Desktop / tablet mega menu panels -->
+  <div class="mega-backdrop" data-mega-backdrop></div>
+  {menus.map((m) => (
+    <div class="mega" id={`mega-${m.id}`} data-mega={m.id}>
+      <div class="container mega-inner">
+        <div class="mega-image">
+          <img src={m.data.image} alt={m.data.imageAlt} loading="lazy" />
+        </div>
+        <div class="mega-columns" style={`--col-count:${m.data.columns.length}`}>
+          {m.data.columns.map((col) => (
+            <div class="mega-col">
+              <span class="mega-col-heading">{col.heading}</span>
+              <ul>
+                {col.links.map((l) => (
+                  <li><a href={l.href}>{l.label}</a></li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </div>
-    ))}
-    <div class="mobile-actions">
-      <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="btn btn-outline-dark">Accedi</a>
-      <a href="https://athlon.perfectgym.com/ClientPortal2/#/Registration" class="btn btn-primary">Iscriviti</a>
+
+      <div class="mega-cta">
+        <a href="/abbonamenti" class="mega-cta-item mega-cta-item--accent">
+          Scopri gli Abbonamenti <span aria-hidden="true">↓</span>
+        </a>
+        <a href="https://onelink.to/athlon" class="mega-cta-item">
+          Athlon Club <span class="mega-cta-sub">Scarica l'app →</span>
+        </a>
+        <a href="https://planning.athlonroma.it/" class="mega-cta-item">Orari Corsi</a>
+      </div>
+
+      <div class="mega-social">
+        <div class="container mega-social-inner">
+          <div class="mega-social-icons">
+            {social.map((s) => (
+              <a href={s.href} target="_blank" rel="noopener" aria-label={s.label}>{s.label.slice(0, 2)}</a>
+            ))}
+          </div>
+          <a href="/contatti" class="mega-social-contact">Contattaci</a>
+        </div>
+      </div>
+    </div>
+  ))}
+
+  <!-- Mobile / tablet full-screen menu -->
+  <div class="mobile-panel" id="mobile-panel">
+    <span class="mobile-eyebrow">Menu</span>
+
+    <ul class="mobile-list">
+      {menus.map((m) => (
+        <li class="mobile-group">
+          <button class="mobile-link mobile-group-trigger" aria-expanded="false">
+            {m.label}
+            <span class="mobile-chev" aria-hidden="true"></span>
+          </button>
+          <div class="mobile-submenu">
+            {m.data.columns.map((col) => (
+              <div class="mobile-subgroup">
+                <button class="mobile-sublabel mobile-subgroup-trigger" aria-expanded="false">
+                  {col.heading}
+                  <span class="mobile-chev small" aria-hidden="true"></span>
+                </button>
+                <ul class="mobile-sublist">
+                  {col.links.map((l) => (
+                    <li><a class="mobile-sublink" href={l.href}>{l.label}</a></li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </li>
+      ))}
+      <li><a class="mobile-link" href="/contatti">Contattaci</a></li>
+    </ul>
+
+    <div class="mobile-secondary">
+      <a class="mobile-secondary-btn" href="https://onelink.to/athlon">Scarica l'app</a>
+      <a class="mobile-secondary-btn" href="https://planning.athlonroma.it/">Orari Corsi</a>
+      <a class="mobile-secondary-btn" href="https://athlon.perfectgym.com/ClientPortal2/#/Login">Accedi</a>
+    </div>
+
+    <div class="mobile-ctas">
+      <a class="btn btn-primary mobile-cta" href="/abbonamenti">Scopri gli Abbonamenti</a>
+      <a class="btn btn-outline-dark mobile-cta" href="https://athlon.perfectgym.com/ClientPortal2/#/Registration">Iscriviti</a>
     </div>
   </div>
 </header>
 
 <script>
+  const header = document.getElementById('site-header');
   const burger = document.getElementById('burger');
   const panel = document.getElementById('mobile-panel');
-  const header = document.getElementById('site-header');
+  const backdrop = document.querySelector('[data-mega-backdrop]') as HTMLElement | null;
+  const navItems = Array.from(document.querySelectorAll<HTMLElement>('[data-nav-item]'));
+  const megaPanels = Array.from(document.querySelectorAll<HTMLElement>('[data-mega]'));
+  const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  function closeAllMega() {
+    navItems.forEach((item) => {
+      item.classList.remove('open');
+      item.querySelector('[data-nav-trigger]')?.setAttribute('aria-expanded', 'false');
+    });
+    megaPanels.forEach((mega) => mega.classList.remove('is-visible'));
+    backdrop?.classList.remove('visible');
+  }
+
+  function openMega(id: string) {
+    navItems.forEach((item) => {
+      const isTarget = item.dataset.navItem === id;
+      item.classList.toggle('open', isTarget);
+      item.querySelector('[data-nav-trigger]')?.setAttribute('aria-expanded', String(isTarget));
+    });
+    megaPanels.forEach((mega) => mega.classList.toggle('is-visible', mega.dataset.mega === id));
+    backdrop?.classList.add('visible');
+  }
+
+  navItems.forEach((item) => {
+    const id = item.dataset.navItem!;
+    const trigger = item.querySelector<HTMLButtonElement>('[data-nav-trigger]');
+
+    trigger?.addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      isOpen ? closeAllMega() : openMega(id);
+    });
+
+    if (canHover) {
+      let closeTimer: number | undefined;
+      item.addEventListener('mouseenter', () => {
+        window.clearTimeout(closeTimer);
+        openMega(id);
+      });
+      item.addEventListener('mouseleave', () => {
+        closeTimer = window.setTimeout(closeAllMega, 200);
+      });
+    }
+  });
+
+  backdrop?.addEventListener('click', closeAllMega);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeAllMega();
+  });
+
+  // Mobile burger — full-screen overlay, so lock the page behind it.
+  function closeMobileMenu() {
+    header?.classList.remove('menu-open');
+    burger?.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('nav-mobile-locked');
+  }
 
   burger?.addEventListener('click', () => {
     const isOpen = header?.classList.toggle('menu-open');
     burger.setAttribute('aria-expanded', String(!!isOpen));
+    document.body.classList.toggle('nav-mobile-locked', !!isOpen);
   });
 
-  panel?.querySelectorAll('a').forEach((a) => {
-    a.addEventListener('click', () => {
-      header?.classList.remove('menu-open');
-      burger?.setAttribute('aria-expanded', 'false');
+  panel?.querySelectorAll('a').forEach((a) => a.addEventListener('click', closeMobileMenu));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMobileMenu();
+  });
+
+  // Accordion: only one group open at a time.
+  const mobileGroups = Array.from(document.querySelectorAll<HTMLElement>('.mobile-group'));
+  mobileGroups.forEach((group) => {
+    const trigger = group.querySelector<HTMLButtonElement>('.mobile-group-trigger');
+    trigger?.addEventListener('click', () => {
+      const willOpen = !group.classList.contains('open');
+      mobileGroups.forEach((other) => {
+        other.classList.remove('open');
+        other.querySelector('.mobile-group-trigger')?.setAttribute('aria-expanded', 'false');
+      });
+      if (willOpen) {
+        group.classList.add('open');
+        trigger.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  // Second level (Palestra / Corsi Fitness / Piscina) — also one at a time,
+  // but scoped to its own parent group.
+  document.querySelectorAll<HTMLElement>('.mobile-submenu').forEach((submenu) => {
+    const subgroups = Array.from(submenu.querySelectorAll<HTMLElement>('.mobile-subgroup'));
+    subgroups.forEach((subgroup) => {
+      const trigger = subgroup.querySelector<HTMLButtonElement>('.mobile-subgroup-trigger');
+      trigger?.addEventListener('click', () => {
+        const willOpen = !subgroup.classList.contains('open');
+        subgroups.forEach((other) => {
+          other.classList.remove('open');
+          other.querySelector('.mobile-subgroup-trigger')?.setAttribute('aria-expanded', 'false');
+        });
+        if (willOpen) {
+          subgroup.classList.add('open');
+          trigger.setAttribute('aria-expanded', 'true');
+        }
+      });
     });
   });
 </script>
@@ -101,8 +316,8 @@ const groups = [
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 16px;
-    padding-bottom: 16px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     gap: 24px;
   }
 
@@ -115,9 +330,15 @@ const groups = [
     transform: scale(0.92);
   }
 
+  /* Mobile-only pill in the bar — desktop keeps the CTA inside the nav. */
+  .header-contact-mobile {
+    display: none;
+  }
+
   .main-nav {
     display: flex;
-    gap: 32px;
+    align-items: center;
+    gap: 8px;
     flex: 1;
     justify-content: center;
   }
@@ -126,71 +347,255 @@ const groups = [
     position: relative;
   }
 
-  .nav-item > button {
+  .nav-trigger {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     background: none;
     border: none;
     font-family: var(--font-body);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.02em;
     color: var(--color-dark);
     cursor: pointer;
-    padding: 8px 0;
+    padding: 8px 14px;
+    border-radius: 100px;
+    transition: background-color var(--dur-fast) var(--ease-out-crit);
   }
 
-  .dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    box-shadow: 0 16px 32px rgba(39, 36, 35, 0.14);
-    border-radius: 12px;
-    padding: 12px 0;
-    min-width: 240px;
-    flex-direction: column;
-    transform-origin: top center;
-    opacity: 0;
-    transform: translateY(-6px) scale(0.98);
-    pointer-events: none;
-    transition: opacity var(--dur-fast) var(--ease-out-crit),
-      transform var(--dur-fast) var(--ease-out-crit);
-    display: flex;
+  .nav-item.open .nav-trigger,
+  .nav-trigger:hover {
+    background: rgba(39, 36, 35, 0.06);
   }
 
-  .nav-item:hover .dropdown,
-  .nav-item:focus-within .dropdown {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    pointer-events: auto;
+  .chev {
+    width: 8px;
+    height: 8px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg) translateY(-2px);
+    transition: transform var(--dur-fast) var(--ease-out-crit);
   }
 
-  .dropdown a {
-    padding: 10px 20px;
-    font-size: 14px;
-    white-space: nowrap;
+  .nav-item.open .chev {
+    transform: rotate(-135deg) translateY(0px);
   }
 
-  .dropdown a:hover {
-    background: var(--color-cream);
+  .nav-cta {
+    margin-left: 8px;
+    padding: 9px 20px;
+    border-radius: 100px;
+    background: var(--color-dark);
+    color: var(--color-white);
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .nav-cta:hover {
+    background: var(--color-primary);
   }
 
   .header-actions {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 18px;
   }
 
   .header-link {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
   }
 
   .header-link.strong {
     color: var(--color-primary);
+  }
+
+  /* ---- Mega menu ---- */
+  .mega-backdrop {
+    position: fixed;
+    inset: 0;
+    top: 0;
+    background: rgba(10, 10, 8, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-base) ease;
+    z-index: 89;
+  }
+
+  .mega-backdrop.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mega {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 90;
+    background: var(--color-dark);
+    color: var(--color-white);
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition: opacity var(--dur-base) var(--ease-out-crit), transform var(--dur-base) var(--ease-out-crit);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  .mega.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .mega-inner {
+    display: flex;
+    gap: 48px;
+    padding: 40px 24px;
+  }
+
+  .mega-image {
+    flex: 0 0 34%;
+    max-width: 420px;
+    border-radius: 16px;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+  }
+
+  .mega-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .mega-columns {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(var(--col-count, 3), 1fr);
+    gap: 32px;
+  }
+
+  .mega-col-heading {
+    display: block;
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    color: var(--color-primary);
+    font-size: var(--text-lg);
+    margin-bottom: 16px;
+  }
+
+  .mega-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .mega-col a {
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.85);
+    transition: color var(--dur-fast) ease, padding-left var(--dur-fast) var(--ease-out-crit);
+  }
+
+  .mega-col a:hover {
+    color: var(--color-white);
+    padding-left: 4px;
+  }
+
+  .mega-cta {
+    display: flex;
+    border-top: 1px solid var(--border-dark);
+  }
+
+  .mega-cta-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px 24px;
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    font-size: var(--text-md);
+    color: var(--color-white);
+    background: #35312f;
+    border-left: 1px solid var(--border-dark);
+    transition: background-color var(--dur-fast) ease;
+  }
+
+  .mega-cta-item:first-child {
+    border-left: none;
+  }
+
+  .mega-cta-item--accent {
+    background: var(--color-primary);
+  }
+
+  .mega-cta-item:hover {
+    background: #443e3b;
+  }
+
+  .mega-cta-item--accent:hover {
+    background: var(--accent-hover);
+  }
+
+  .mega-cta-sub {
+    font-family: var(--font-body);
+    text-transform: none;
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.75);
+    letter-spacing: 0;
+  }
+
+  .mega-social {
+    background: var(--color-cream);
+  }
+
+  .mega-social-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+  }
+
+  .mega-social-icons {
+    display: flex;
+    gap: 12px;
+  }
+
+  .mega-social-icons a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--color-dark);
+    color: var(--color-white);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .mega-social-icons a:hover {
+    background: var(--color-primary);
+  }
+
+  .mega-social-contact {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
   }
 
   .burger {
@@ -228,61 +633,298 @@ const groups = [
     display: none;
   }
 
-  @media (max-width: 960px) {
-    .main-nav,
-    .header-link {
-      display: none;
+  @media (max-width: 1100px) {
+    .mega-columns {
+      grid-template-columns: repeat(min(var(--col-count, 3), 2), 1fr);
     }
-    .burger {
-      display: flex;
+  }
+
+  @media (max-width: 960px) {
+    /* backdrop-filter on an ancestor makes it the containing block for
+       position:fixed descendants — with it the overlay below would size
+       itself to the header instead of the viewport. Solid bar on mobile. */
+    .site-header {
+      background: var(--color-white);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
     }
 
+    .main-nav,
+    .header-link,
+    .mega,
+    .mega-backdrop {
+      display: none !important;
+    }
+
+    /* Matches the live site's mobile bar: 84px tall, orange hairline,
+       asymmetric 16/24 padding, 60px logo. */
+    .site-header {
+      border-bottom: 1px solid var(--color-primary);
+    }
+
+    .header-inner {
+      height: 84px;
+      padding: 0 24px 0 16px;
+      gap: 12px;
+    }
+
+    .logo img {
+      width: 60px;
+      height: auto;
+    }
+
+    .header-contact-mobile {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      padding: 10px 14px;
+      border: 1px solid var(--color-primary);
+      border-radius: 20px;
+      background: var(--color-white);
+      color: var(--color-primary);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 1.25px;
+      line-height: 1;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .header-actions {
+      gap: 0;
+    }
+
+    .burger {
+      display: flex;
+      position: relative;
+      z-index: 2;
+      width: 28px;
+      height: 28px;
+      gap: 7px;
+      padding: 0;
+    }
+
+    .burger span {
+      width: 28px;
+    }
+
+    /* The live site uses a two-rule icon, not three. */
+    .burger span:nth-child(2) {
+      display: none;
+    }
+
+    .menu-open .burger span:nth-child(1) {
+      transform: translateY(4.5px) rotate(45deg);
+    }
+
+    .menu-open .burger span:nth-child(3) {
+      transform: translateY(-4.5px) rotate(-45deg);
+    }
+
+    /* Logo and pill sit above the overlay so the bar stays intact while the
+       menu is open. */
+    .logo,
+    .header-contact-mobile {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Full-screen translucent overlay rather than an inline accordion that
+       pushes the page down — keeps the menu short and the page still. */
     .mobile-panel {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
       display: flex;
       flex-direction: column;
-      gap: 24px;
-      padding: 8px 24px 28px;
-      max-height: 0;
-      overflow: hidden;
+      /* Clears the 84px bar so the burger stays reachable. */
+      padding: 104px 1.5rem 2rem;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
       opacity: 0;
-      transition: max-height var(--dur-base) var(--ease-out-crit), opacity var(--dur-fast) var(--ease-out-crit);
+      pointer-events: none;
+      transition: opacity var(--dur-base) ease;
     }
 
     .menu-open .mobile-panel {
-      max-height: 80vh;
       opacity: 1;
-      overflow-y: auto;
+      pointer-events: auto;
     }
 
-    .mobile-group {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .mobile-group-title {
-      font-family: var(--font-heading);
+    .mobile-eyebrow {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--color-primary);
-      font-size: 15px;
-      letter-spacing: -0.01em;
+      margin-bottom: 1.25rem;
     }
 
-    .mobile-group a {
-      font-size: 15px;
-      padding: 2px 0;
-    }
-
-    .mobile-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 8px;
-    }
-
-    .mobile-actions .btn {
+    .mobile-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
       flex: 1;
-      justify-content: center;
-      padding: 14px 20px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
+
+    .mobile-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 12px;
+      padding: 0.95rem 0;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      background: none;
+      cursor: pointer;
+      text-align: left;
+      font-family: var(--font-heading);
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      font-size: 1.5rem;
+      color: var(--color-dark);
+    }
+
+    .mobile-chev {
+      flex-shrink: 0;
+      width: 9px;
+      height: 9px;
+      border-right: 2px solid var(--color-primary);
+      border-bottom: 2px solid var(--color-primary);
+      transform: rotate(45deg) translateY(-2px);
+      transition: transform var(--dur-fast) ease;
+    }
+
+    .mobile-group.open .mobile-chev {
+      transform: rotate(-135deg) translateY(-2px);
+    }
+
+    .mobile-submenu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height var(--dur-base) var(--ease-out-crit);
+    }
+
+    .mobile-group.open .mobile-submenu {
+      max-height: 60rem;
+    }
+
+    .mobile-subgroup {
+      border-top: 1px solid var(--border);
+    }
+
+    .mobile-subgroup:first-child {
+      border-top: none;
+    }
+
+    .mobile-sublabel {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+      padding: 0.8rem 0;
+      margin: 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      font-family: var(--font-body);
+      font-size: var(--text-2xs);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .mobile-chev.small {
+      width: 7px;
+      height: 7px;
+      border-width: 1.5px;
+    }
+
+    .mobile-subgroup.open .mobile-chev.small {
+      transform: rotate(-135deg) translateY(-2px);
+    }
+
+    .mobile-sublist {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height var(--dur-base) var(--ease-out-crit),
+        padding var(--dur-base) var(--ease-out-crit);
+    }
+
+    .mobile-subgroup.open .mobile-sublist {
+      max-height: 40rem;
+      padding: 0 0 0.9rem;
+    }
+
+    /* Pills wrap into a compact block — a 17-item vertical list would make
+       this menu endless. */
+    .mobile-sublink {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 0.9rem;
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      font-size: var(--text-sm);
+      line-height: 1.1;
+      color: var(--color-dark);
+      transition: background-color var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
+    }
+
+    .mobile-sublink:active,
+    .mobile-sublink:hover {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: var(--color-white);
+    }
+
+    .mobile-secondary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1.25rem;
+    }
+
+    .mobile-secondary-btn {
+      flex: 1 1 auto;
+      text-align: center;
+      padding: 0.65rem 1rem;
+      border-radius: 999px;
+      background: var(--color-cream);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+
+    .mobile-ctas {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: 0.75rem;
+    }
+
+    .mobile-cta {
+      justify-content: center;
+      padding: 15px 20px;
+    }
+  }
+
+  :global(body.nav-mobile-locked) {
+    overflow: hidden;
   }
 </style>

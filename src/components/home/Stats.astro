@@ -1,0 +1,162 @@
+---
+// Computed, not hardcoded: the "anni di storia" figure must not go stale.
+const FOUNDED = 1973;
+const years = new Date().getFullYear() - FOUNDED;
+
+const stats = [
+  { value: years, suffix: '', label: 'Anni di storia', sub: `dal ${FOUNDED}` },
+  { value: 3300, suffix: '+', label: 'Metri quadri', sub: 'dedicati allo sport' },
+  { value: 200, suffix: '+', label: 'Corsi a settimana', sub: 'fitness e piscina' },
+  { value: 200000, suffix: '+', label: 'Persone', sub: 'hanno imparato a nuotare da noi' },
+];
+---
+
+<section class="stats" aria-label="Athlon in numeri">
+  <div class="container">
+    <ul class="stats-grid">
+      {stats.map((s, i) => (
+        <li class="stat" data-anim="scale" data-anim-delay={String(i * 90)}>
+          <span
+            class="stat__value"
+            data-count-to={s.value}
+            data-suffix={s.suffix}
+          >0{s.suffix}</span>
+          <span class="stat__label">{s.label}</span>
+          <span class="stat__sub">{s.sub}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<script>
+  const counters = Array.from(document.querySelectorAll<HTMLElement>('[data-count-to]'));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const format = (n: number) => n.toLocaleString('it-IT');
+
+  function run(el: HTMLElement) {
+    const target = Number(el.dataset.countTo || 0);
+    const suffix = el.dataset.suffix || '';
+
+    if (reduceMotion) {
+      el.textContent = format(target) + suffix;
+      return;
+    }
+
+    const duration = 1800;
+    let startTs: number | undefined;
+
+    const tick = (ts: number) => {
+      if (startTs === undefined) startTs = ts;
+      const p = Math.min((ts - startTs) / duration, 1);
+      // easeOutExpo: fast off the mark, long settle — reads as "counting up"
+      // rather than a linear odometer.
+      const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+      el.textContent = format(Math.round(target * eased)) + suffix;
+      if (p < 1) requestAnimationFrame(tick);
+    };
+
+    requestAnimationFrame(tick);
+  }
+
+  const obs = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target as HTMLElement;
+        obs.unobserve(el); // count once, never replay on scroll-back
+        run(el);
+      });
+    },
+    { threshold: 0.4 }
+  );
+
+  counters.forEach((el) => obs.observe(el));
+</script>
+
+<style>
+  .stats {
+    background: var(--color-dark);
+    color: var(--color-white);
+    padding: var(--space-section-md) 0;
+  }
+
+  .stats-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 32px;
+    border-left: 1px solid var(--border-dark);
+  }
+
+  .stat:first-child {
+    border-left: none;
+    padding-left: 0;
+  }
+
+  .stat__value {
+    font-family: var(--font-heading);
+    font-size: clamp(3rem, 6vw, 5rem);
+    line-height: 0.95;
+    letter-spacing: var(--tracking-4xl);
+    color: var(--color-primary);
+    /* Digits change every frame — tabular figures stop the line from
+       jittering as glyph widths swap during the count. */
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 14px;
+  }
+
+  .stat__label {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    font-size: var(--text-md);
+    color: var(--color-white);
+    margin-bottom: 6px;
+  }
+
+  .stat__sub {
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Two columns for the whole tablet/mobile range — never a single stack. */
+  @media (max-width: 900px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 36px 0;
+    }
+    .stat {
+      padding: 0 20px;
+    }
+    .stat:nth-child(odd) {
+      border-left: none;
+      padding-left: 0;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .stat__value {
+      font-size: clamp(2.4rem, 12vw, 3.2rem);
+      margin-bottom: 10px;
+    }
+    .stat__label {
+      font-size: var(--text-sm);
+    }
+    .stat__sub {
+      font-size: var(--text-2xs);
+    }
+    .stat {
+      padding: 0 12px;
+    }
+  }
+</style>
