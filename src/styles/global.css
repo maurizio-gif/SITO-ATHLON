@@ -27,6 +27,9 @@
   --color-primary: #ff5701;
   --color-dark: #272423;
   --color-cream: #eeeae3;
+  /* Warmer and a shade deeper than cream: for full-bleed sections that need
+     to sit apart from the near-white ones without shouting like the orange. */
+  --color-sand: #e5d8c3;
   --color-white: #ffffff;
 
   /* Single accent, two contexts — no wider palette */

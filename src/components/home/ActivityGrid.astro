@@ -9,7 +9,7 @@ interface Item {
 interface Props {
   eyebrow: string;
   accent: string;
-  variant: 'dark' | 'orange';
+  variant: 'dark' | 'sand';
   items: Item[];
   trackId: string;
 }
@@ -137,9 +137,9 @@ const { eyebrow, accent, variant, items, trackId } = Astro.props;
     color: var(--color-white);
   }
 
-  .activity.orange {
-    background: var(--color-primary);
-    color: var(--color-white);
+  .activity.sand {
+    background: var(--color-sand);
+    color: var(--color-dark);
   }
 
   .activity-head {
@@ -169,6 +169,12 @@ const { eyebrow, accent, variant, items, trackId } = Astro.props;
     opacity: 0.6;
   }
 
+  /* Dark ink faded to 0.6 on sand lands at 3.8:1 — under AA for a 12.8px
+     label. 0.75 brings it back to 5.4:1 and still reads as a quiet eyebrow. */
+  .activity.sand .head-kicker {
+    opacity: 0.75;
+  }
+
   .head-word {
     display: block;
     position: relative;
@@ -190,12 +196,11 @@ const { eyebrow, accent, variant, items, trackId } = Astro.props;
     background: currentColor;
   }
 
+  /* Only the dark variant gets the orange word. On sand there is no override:
+     the word inherits the section's dark ink, because the brand orange reaches
+     just 2.3:1 against sand — too weak even at display size. */
   .activity.dark .head-word {
     color: var(--color-primary);
-  }
-
-  .activity.orange .head-word {
-    color: var(--color-dark);
   }
 
   @media (max-width: 640px) {
@@ -224,12 +229,17 @@ const { eyebrow, accent, variant, items, trackId } = Astro.props;
     cursor: pointer;
   }
 
-  .activity.orange .carousel-btn {
+  .activity.sand .carousel-btn {
     border-color: rgba(39, 36, 35, 0.25);
   }
 
   .carousel-btn:hover {
     background: rgba(255, 255, 255, 0.12);
+  }
+
+  /* A white wash is invisible on sand — hover darkens instead. */
+  .activity.sand .carousel-btn:hover {
+    background: rgba(39, 36, 35, 0.08);
   }
 
   .carousel-btn:active {
