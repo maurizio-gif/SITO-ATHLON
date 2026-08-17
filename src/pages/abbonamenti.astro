@@ -1393,15 +1393,32 @@ const trust = [
     }
   }
 
-  @media (max-width: 560px) {
+  @media (max-width: 640px) {
     .plan__head,
     .plan__activities {
-      padding-left: 20px;
-      padding-right: 20px;
+      padding-left: 18px;
+      padding-right: 18px;
     }
     .plan__options {
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+    .pcard {
       padding-left: 16px;
       padding-right: 16px;
+    }
+    /* The guest-pass band and the planning strip carry the same double gutter. */
+    .guest {
+      padding: 28px 20px;
+    }
+    .planning {
+      padding: 20px 18px;
+    }
+    .amodal {
+      padding: 16px;
+    }
+    .amodal__panel {
+      padding: 28px 20px 24px;
     }
   }
 
