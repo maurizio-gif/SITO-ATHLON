@@ -179,7 +179,11 @@ const { eyebrow, accent, variant, items, trackId } = Astro.props;
     display: block;
     position: relative;
     font-size: var(--text-3xl);
+    /* Leading this tight sits below even the corrected Tusker ascent (see the
+       @font-face note in global.css), so the caps need the headroom by hand —
+       without it the top of ADULTI / JUNIOR was being shaved off. */
     line-height: 0.88;
+    padding-top: 0.06em;
     letter-spacing: var(--tracking-4xl);
     padding-left: 22px;
   }
@@ -368,6 +372,7 @@ const { eyebrow, accent, variant, items, trackId } = Astro.props;
     text-transform: uppercase;
     letter-spacing: -0.015em;
     line-height: 0.95;
+    padding-top: 0.04em;
     font-weight: 700;
     font-size: clamp(1.75rem, 2.4vw, 2.4rem);
     color: var(--color-white);

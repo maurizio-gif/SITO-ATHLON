@@ -1,0 +1,156 @@
+---
+/**
+ * Gym Floor opening hours, read from the shared planning data.
+ * Used in place of a "see our hours" link: the hours themselves are short
+ * enough to show, and showing them beats sending people to a portal.
+ */
+import { gymFloor, PLANNING_MONTH } from '../../data/planning';
+
+interface Props {
+  /** Optional link out to the booking calendar, shown under the table. */
+  href?: string;
+  variant?: 'light' | 'dark';
+}
+
+const { href, variant = 'light' } = Astro.props;
+---
+
+<div class:list={['hours', `hours--${variant}`]} data-anim="scale">
+  <div class="hours__head">
+    <span class="hours__label">Orari di apertura</span>
+    <span class="hours__month">{PLANNING_MONTH}</span>
+  </div>
+
+  <ul class="hours__list">
+    {gymFloor.hours.map((row) => (
+      <li class="hours__row">
+        <span class="hours__day">{row.label}</span>
+        <span class="hours__time">{row.hours}</span>
+      </li>
+    ))}
+  </ul>
+
+  {href && (
+    <a href={href} class="hours__cta">Prenota la tua sessione →</a>
+  )}
+</div>
+
+<style>
+  .hours {
+    max-width: 34rem;
+    padding: 26px 26px 24px;
+    border-radius: var(--radius);
+  }
+
+  .hours--light {
+    background: var(--color-cream);
+  }
+
+  .hours--dark {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-dark);
+  }
+
+  .hours__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    padding-bottom: 14px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hours--dark .hours__head {
+    border-bottom-color: var(--border-dark);
+  }
+
+  .hours__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .hours__month {
+    font-size: var(--text-2xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .hours--dark .hours__month {
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  .hours__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .hours__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hours--dark .hours__row {
+    border-bottom-color: var(--border-dark);
+  }
+
+  .hours__row:last-child {
+    border-bottom: none;
+  }
+
+  .hours__day {
+    font-size: var(--text-md);
+  }
+
+  .hours--dark .hours__day {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  /* Times are the thing people scan for, so they get the display face and
+     tabular figures to keep the column aligned. */
+  .hours__time {
+    flex-shrink: 0;
+    font-family: var(--font-heading);
+    font-size: 1.6rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-dark);
+  }
+
+  .hours--dark .hours__time {
+    color: var(--color-white);
+  }
+
+  .hours__cta {
+    display: inline-block;
+    margin-top: 18px;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .hours__cta:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 640px) {
+    .hours {
+      padding: 22px 20px 20px;
+    }
+
+    .hours__time {
+      font-size: 1.4rem;
+    }
+  }
+</style>

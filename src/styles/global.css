@@ -1,10 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
+/* ascent-override on all three faces, and it is load-bearing: Tusker declares
+   a 0.90em ascent but draws caps up to 0.95em and accented caps (À, È) up to
+   1.04em. The line box is built from the declared metric, so that extra ink
+   fell outside the box and was shaved off the top of every heading — the
+   accent on "MODALITÀ" vanished completely. Overriding the metric fixes it
+   once for everything set in this font (headings, prices, menu items) instead
+   of needing padding on each one. Safari below 17 ignores this and keeps the
+   old clipping; nothing else regresses there. */
 @font-face {
   font-family: 'Tusker-Grotesk';
   font-style: normal;
   font-weight: 500;
   font-display: swap;
+  ascent-override: 105%;
   src: url('/wp-content/uploads/2024/07/TuskerGrotesk-3500Medium.woff2') format('woff2');
 }
 @font-face {
@@ -12,6 +21,7 @@
   font-style: normal;
   font-weight: 600;
   font-display: swap;
+  ascent-override: 105%;
   src: url('/wp-content/uploads/2024/07/TuskerGrotesk-4500Medium.woff2') format('woff2');
 }
 @font-face {
@@ -19,6 +29,7 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
+  ascent-override: 105%;
   src: url('/wp-content/uploads/2024/07/TuskerGrotesk-3700Bold.woff2') format('woff2');
 }
 

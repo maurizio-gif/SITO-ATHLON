@@ -1,0 +1,786 @@
+---
+import Layout from '../layouts/Layout.astro';
+import OpeningHours from '../components/planning/OpeningHours.astro';
+
+const PG = 'https://athlon.perfectgym.com/ClientPortal2';
+const U = '/wp-content/uploads';
+
+// The four zones, in the order the old page listed them. Equipment lists are
+// verbatim from the backup — "Martix" was a typo there and is corrected here.
+const aree = [
+  {
+    id: 'cardio',
+    name: 'Area Cardio',
+    lede: 'Macchinari Matrix 4.0 interconnessi con l\'app Athlon Club: riprendi l\'allenamento dove l\'avevi lasciato.',
+    items: [
+      '6 Treadmill',
+      '3 Ellittiche',
+      '3 Bike Recline',
+      '2 Climbmill',
+      '2 Bike Indoor Cycling',
+      '1 Rower',
+      '1 S-Force',
+    ],
+    photos: [
+      `${U}/2024/08/ACK2226Giacomo-lattanzio_-1-1024x683.jpg`,
+      `${U}/2024/08/IMG_2054-1024x683.jpg`,
+      `${U}/2024/08/ACK2167Giacomo-lattanzio_-1-1024x683.jpg`,
+      `${U}/2024/08/IMG_2823-1024x1536.jpg`,
+      `${U}/2024/08/WM_07685-1024x683.jpg`,
+      `${U}/2024/08/DSC08100-1024x1536.jpg`,
+    ],
+  },
+  {
+    id: 'isotonica',
+    name: 'Area Isotonica',
+    lede: 'Allenamento di forza guidato, con macchinari Matrix serie Versa e Aura.',
+    items: [
+      '1 Hip Abductor / Adductor',
+      '1 Leg curl',
+      '1 Leg extension',
+      '2 Leg press',
+      '1 Pec fly / Rear delt',
+      '1 Multi press',
+      '1 Chest press',
+      '1 Row machine',
+      '1 Lat pulldown',
+      '1 Shoulder press',
+      '2 Lat machine',
+      '1 Pulley',
+      '1 Bicep / Tricep cable station',
+      '3 Panche reclinabili per addominali',
+    ],
+    photos: [
+      `${U}/2024/08/ACK2162Giacomo-lattanzio_-1-1024x683.jpg`,
+      `${U}/2024/08/ACK2019-ModificaGiacomo-lattanzio_-1024x1536.jpg`,
+      `${U}/2024/08/ACK2136Giacomo-lattanzio_-1024x683.jpg`,
+      `${U}/2024/08/ACK1971-HDRGiacomo-lattanzio_-1024x683.jpg`,
+      `${U}/2025/12/P1000283-scaled.jpeg`,
+      `${U}/2024/08/ACK2150Giacomo-lattanzio_-1024x683.jpg`,
+    ],
+  },
+  {
+    id: 'funzionale',
+    name: 'Area Funzionale',
+    lede: 'Corpo libero e pesi liberi, con un rig calisthenics da 8 metri.',
+    items: [
+      'Rig calisthenics con 1 postazione anelli',
+      '3 Postazioni stacco',
+      '2 Postazioni squat',
+      '4 Bilancieri olimpionici (2 da 15 kg e 2 da 20 kg)',
+      '1 Trap bar',
+      'Manubri fino a 50 kg',
+      'Kettlebell fino a 20 kg',
+      '3 Panche',
+      '1 Plyobox',
+      '1 Sacco da boxe',
+      '1 Set completo di elastici fino a 70 kg',
+      '685 kg di pacco pesi tra bumpers e ghisa',
+    ],
+    photos: [
+      `${U}/2025/11/ATHLON81-scaled.jpg`,
+      `${U}/2025/11/ATHLON85-scaled.jpg`,
+      `${U}/2024/08/DSC07940-2-1024x1536.jpg`,
+      `${U}/2024/08/DSC07625-1024x683.jpg`,
+      `${U}/2024/08/IMG_1914-1024x1536.jpg`,
+      `${U}/2024/08/IMG_1842-2-1024x1536.jpg`,
+      `${U}/2024/08/DSC08980-1024x683.jpg`,
+      `${U}/2024/08/ACK2040Giacomo-lattanzio_-1024x683.jpg`,
+    ],
+  },
+  {
+    id: 'carico-libero',
+    name: 'Carico libero e cavi',
+    lede: 'Macchinari "Plate Loaded" della serie Magnum di Matrix, più due postazioni cavi.',
+    items: [
+      '1 Leg press',
+      '1 Hack squat',
+      '1 Multipower',
+      '1 Hip thrust',
+      '1 Panca piana',
+      '1 Panca inclinata',
+      '2 Postazioni cavi',
+    ],
+    photos: [
+      `${U}/2025/11/ATHLON78-1024x683.jpg`,
+      `${U}/2025/11/ATHLON52-1024x683.jpg`,
+      `${U}/2025/11/ATHLON80-1024x683.jpg`,
+      `${U}/2025/11/ATHLON50-1024x683.jpg`,
+      `${U}/2024/08/ACK2362Giacomo-lattanzio_-1024x683.jpg`,
+    ],
+  },
+];
+
+// App training paths. Copy is verbatim from the backup, with "perscorsi" fixed.
+const workouts = [
+  {
+    name: 'Tonificazione',
+    body: [
+      'I nostri programmi di tonificazione sono ideali per chi desidera un corpo tonico, definito e in forma. Attraverso workout mirati, ti aiuteremo a scolpire il fisico, rafforzando muscoli, ossa e articolazioni, per una condizione fisica ottimale.',
+      'Oltre a migliorare l\'aspetto estetico, i nostri allenamenti sono studiati per potenziare la tua salute metabolica e cardiovascolare, garantendoti risultati duraturi e una maggiore energia quotidiana.',
+    ],
+  },
+  {
+    name: 'Dimagrimento',
+    body: [
+      'Questi percorsi lavorano sul consumo energetico per portarti a una diminuzione sostenibile della massa grassa, rendendo il tuo corpo più leggero, metabolicamente più efficiente e in salute.',
+      'La periodizzazione degli allenamenti durante l\'anno rende il percorso divertente e funzionale anche a lungo termine, così da evitare aumenti di peso repentini e non voluti. Il segreto per la perdita di peso è la costanza.',
+    ],
+  },
+  {
+    name: 'Ipertrofia',
+    body: [
+      'La strada migliore per aumentare la massa muscolare. Che tu voglia far crescere i muscoli, aumentare la forza o ottenere entrambi, questi programmi sono fatti su misura per te.',
+      'I workout, basati sulle più recenti evidenze scientifiche, sono progettati per massimizzare i guadagni muscolari e portarti a una versione di te più grande, più forte e più definita.',
+    ],
+  },
+  {
+    name: 'Start Up',
+    body: [
+      'La porta d\'ingresso nel mondo della sala pesi: per chi è nuovo all\'allenamento, riprende dopo una lunga pausa o desidera un ritorno graduale e sicuro all\'attività fisica.',
+      'Con i percorsi Start Up riattiverai i muscoli e riaccenderai il metabolismo. Alla fine sarai pronto a passare ai percorsi principali e a lavorare verso i tuoi obiettivi con sicurezza.',
+    ],
+  },
+];
+
+const facts = ['400 mq di sala', 'Aperti dalle 6:00 alle 22:00', 'Matrix 4.0 connesso all\'app', 'Vista sulle piscine'];
+---
+
+<Layout
+  title="Sala Pesi Roma Talenti – Gym Floor 400mq | Athlon Club"
+  description="La Gym Floor 4.0 di Athlon Club: 400 mq di sala pesi a Roma Talenti con area cardio Matrix connessa all'app, isotonica, funzionale e carico libero. Aperti dalle 6:00."
+>
+  <!-- HERO -->
+  <section class="gf-hero">
+    <video
+      class="gf-hero__video"
+      autoplay
+      muted
+      loop
+      playsinline
+      poster={`${U}/2024/08/ACK2162Giacomo-lattanzio_-1-1024x683.jpg`}
+    >
+      <source src={`${U}/2025/12/solo-sala-pesi_H3BXNqoj.mp4`} type="video/mp4" />
+    </video>
+    <div class="gf-hero__scrim"></div>
+
+    <div class="container gf-hero__inner">
+      <span class="eyebrow">Sala pesi · 400 mq</span>
+      {/* One line with an orange 4.0, same construction as the home hero. The
+          tagline is its own element rather than an <em> inside the heading, so
+          the gap under the title is a margin instead of a line box. */}
+      <h1 class="gf-hero__title">Gym Floor <em class="accent">4.0</em></h1>
+      <p class="gf-hero__lede">Aperti dalle 6 di mattina.</p>
+      <a href={`${PG}/#/Registration`} class="btn btn-primary gf-hero__cta">Iscriviti ora →</a>
+    </div>
+
+    <div class="gf-facts">
+      <div class="container gf-facts__inner">
+        {facts.map((f) => (<span class="gf-facts__item">{f}</span>))}
+      </div>
+    </div>
+  </section>
+
+  <!-- INTRO -->
+  <section class="gf-sec">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Il nuovo spazio</span>
+      <h2 class="gf-sec__title" data-anim="reveal">Allenati nella nostra Gym Floor 4.0</h2>
+      <p class="gf-sec__sub">
+        Athlon si evolve. La Sala Pesi è stata completamente rinnovata, con una vista sulle nostre
+        piscine. Allenati quando vuoi, durante tutti gli orari di apertura del club, scegliendo tra
+        l'autonomia e il supporto personalizzato del nostro team.
+      </p>
+
+      {/* The hours themselves rather than a link to them. Comes from the shared
+          planning data, so editing that updates this section too. */}
+      <OpeningHours href={`${PG}/#/Classes/1/Calendar?categoryId=6`} />
+    </div>
+  </section>
+
+  <!-- AREE -->
+  <section class="gf-sec gf-sec--dark">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Gym Floor 4.0</span>
+      <h2 class="gf-sec__title" data-anim="reveal">Scopri i nostri nuovi spazi</h2>
+      <p class="gf-sec__sub">Quattro aree, ognuna con la sua attrezzatura. Scorri le foto di ciascuna.</p>
+
+      {aree.map((a, ai) => (
+        <article class="area" data-anim="fade">
+          <div class="area__head">
+            <div>
+              <span class="area__num">{`0${ai + 1}`}</span>
+              <h3 class="area__name">{a.name}</h3>
+              <p class="area__lede">{a.lede}</p>
+            </div>
+            {/* Same arrow-driven track the home activity carousels use. */}
+            <div class="area__nav">
+              <button class="carousel-btn" data-dir="-1" data-track={a.id} aria-label={`${a.name}: foto precedente`}>←</button>
+              <button class="carousel-btn" data-dir="1" data-track={a.id} aria-label={`${a.name}: foto successiva`}>→</button>
+            </div>
+          </div>
+
+          <div class="area__body">
+            <ul class="area__list">
+              {a.items.map((it) => (<li>{it}</li>))}
+            </ul>
+
+            <div class="area__track" data-carousel-id={a.id}>
+              {a.photos.map((src, i) => (
+                <img
+                  class="area__photo"
+                  src={src}
+                  alt={`${a.name} — Gym Floor Athlon Club`}
+                  loading="lazy"
+                  decoding="async"
+                  width="1024"
+                  height="683"
+                />
+              ))}
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- VIRTUAL TOUR -->
+  <section class="gf-sec gf-sec--alt">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Guarda prima di venire</span>
+      <h2 class="gf-sec__title" data-anim="reveal">Il tour virtuale della sala</h2>
+      <p class="gf-sec__sub">Muoviti nella Gym Floor come se fossi già dentro.</p>
+
+      <div class="gf-tour" data-anim="scale">
+        <iframe
+          src="https://my.mpskin.com/tour/dwg8pjdrkh?play=1&sr=2.81,-1.56&ss=49"
+          title="Tour virtuale della Gym Floor — Athlon Club"
+          allowfullscreen
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORKOUTS -->
+  <section class="gf-sec">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Dall'app Athlon Club</span>
+      <h2 class="gf-sec__title" data-anim="reveal">Più di 30 piani di allenamento</h2>
+      <p class="gf-sec__sub">
+        Tre percorsi per obiettivo — tonificazione, ipertrofia e dimagrimento — ognuno con tre piani
+        progettati dai nostri trainer. I percorsi vengono aggiornati periodicamente e sono
+        personalizzabili: modificali in autonomia o con l'aiuto di un trainer in sala.
+      </p>
+
+      <div class="faq">
+        {workouts.map((w) => (
+          <div class="faq__item" data-faq-item>
+            <button class="faq__q" type="button" aria-expanded="false" data-faq-trigger>
+              <span>{w.name}</span>
+              <span class="faq__icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq__a">
+              <div class="faq__a-inner">
+                {w.body.map((par) => (<p>{par}</p>))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <a href="https://onelink.to/athlon" class="btn btn-primary gf-block-cta" data-anim="pop">
+        Scarica l'app →
+      </a>
+    </div>
+  </section>
+
+  <!-- PERSONAL TRAINING -->
+  <section class="gf-sec gf-sec--alt">
+    <div class="container gf-pt">
+      <div>
+        <span class="eyebrow" data-anim="from-left">Non vuoi allenarti da solo?</span>
+        <h2 class="gf-sec__title" data-anim="reveal">Hai bisogno di un allenamento individuale?</h2>
+        <p class="gf-sec__sub">
+          Schede su misura e lezioni individuali con uno dei nostri sei personal trainer qualificati.
+        </p>
+      </div>
+      <a href="/personal-training" class="btn btn-primary" data-anim="pop">Personal Trainer →</a>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // Photo tracks: arrows scroll by one photo. Same behaviour as the home
+  // activity carousels, scoped here by the track id on each area.
+  document.querySelectorAll<HTMLElement>('[data-carousel-id]').forEach((track) => {
+    const id = track.dataset.carouselId;
+    const step = () => {
+      const photo = track.querySelector<HTMLElement>('.area__photo');
+      return photo ? photo.getBoundingClientRect().width + 14 : track.clientWidth * 0.8;
+    };
+    document.querySelectorAll<HTMLButtonElement>(`.carousel-btn[data-track="${id}"]`).forEach((btn) => {
+      btn.addEventListener('click', () => {
+        track.scrollBy({ left: Number(btn.dataset.dir) * step(), behavior: 'smooth' });
+      });
+    });
+  });
+
+  // Workout accordion — one open at a time, as on the other pages.
+  const items = Array.from(document.querySelectorAll<HTMLElement>('[data-faq-item]'));
+  items.forEach((item) => {
+    const trigger = item.querySelector<HTMLButtonElement>('[data-faq-trigger]');
+    trigger?.addEventListener('click', () => {
+      const willOpen = !item.classList.contains('open');
+      items.forEach((other) => {
+        other.classList.remove('open');
+        other.querySelector('[data-faq-trigger]')?.setAttribute('aria-expanded', 'false');
+      });
+      if (willOpen) {
+        item.classList.add('open');
+        trigger.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+</script>
+
+<style>
+  /* ---- Hero ---- */
+  .gf-hero {
+    position: relative;
+    background: var(--color-dark);
+    color: var(--color-white);
+    overflow: hidden;
+  }
+
+  .gf-hero__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Dark at the bottom where the copy sits, clearer at the top so the room is
+     still readable behind it. */
+  .gf-hero__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      rgba(39, 36, 35, 0.45) 0%,
+      rgba(39, 36, 35, 0.55) 45%,
+      rgba(39, 36, 35, 0.9) 100%
+    );
+  }
+
+  .gf-hero__inner {
+    position: relative;
+    z-index: 1;
+    padding-top: var(--space-section-lg);
+    padding-bottom: var(--space-section-md);
+    min-height: 78vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .gf-hero__title {
+    font-size: var(--text-4xl);
+    line-height: var(--leading-4xl);
+    letter-spacing: var(--tracking-4xl);
+    margin: 14px 0 0;
+    padding: 0.08em 0 0.06em;
+    clip-path: inset(0 0 100% 0);
+    animation: hero-reveal 0.9s var(--ease-spring) 0.4s forwards;
+  }
+
+  .gf-hero__title .accent {
+    font-style: normal;
+    color: var(--color-primary);
+  }
+
+  .gf-hero__lede {
+    margin: 22px 0 34px;
+    font-size: var(--text-lg);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.92);
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    animation: hero-rise 0.6s var(--ease-out-crit) 0.85s forwards;
+  }
+
+  @keyframes hero-reveal {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+    to {
+      clip-path: inset(0 0 0% 0);
+    }
+  }
+
+  @keyframes hero-rise {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .gf-hero .eyebrow {
+    opacity: 0;
+    animation: hero-rise 0.6s var(--ease-out-crit) 0.2s forwards;
+  }
+
+  .gf-hero__cta {
+    align-self: flex-start;
+    opacity: 0;
+    animation: hero-rise 0.6s var(--ease-out-crit) 0.9s forwards;
+  }
+
+  .gf-facts {
+    position: relative;
+    z-index: 1;
+    background: rgba(23, 21, 20, 0.55);
+    border-top: 1px solid var(--border-dark);
+  }
+
+  .gf-facts__inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .gf-facts__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .gf-facts__item::before {
+    content: '✓';
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gf-hero__title,
+    .gf-hero .eyebrow,
+    .gf-hero__lede,
+    .gf-hero__cta {
+      animation: none;
+      opacity: 1;
+      clip-path: none;
+    }
+
+    .gf-hero__video {
+      display: none;
+    }
+  }
+
+  /* ---- Sections ---- */
+  .gf-sec {
+    padding: var(--space-section-lg) 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .gf-sec--alt {
+    background: var(--color-cream);
+    border-bottom: none;
+  }
+
+  .gf-sec--dark {
+    background: var(--color-dark);
+    color: var(--color-white);
+    border-bottom: none;
+  }
+
+  .gf-sec__title {
+    font-size: var(--text-3xl);
+    letter-spacing: var(--tracking-2xl);
+    margin: 10px 0 8px;
+  }
+
+  .gf-sec__sub {
+    max-width: 46rem;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+  }
+
+  .gf-sec--dark .gf-sec__sub {
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  .gf-block-cta {
+    margin-top: 32px;
+  }
+
+  /* ---- Aree ---- */
+  .area + .area {
+    margin-top: 56px;
+    padding-top: 44px;
+    border-top: 1px solid var(--border-dark);
+  }
+
+  .area__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 22px;
+  }
+
+  .area__num {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--color-primary);
+    margin-bottom: 10px;
+  }
+
+  .area__name {
+    font-size: var(--text-2xl);
+    letter-spacing: var(--tracking-2xl);
+    margin-bottom: 8px;
+  }
+
+  .area__lede {
+    margin: 0;
+    max-width: 34rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .area__nav {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .carousel-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid var(--border-dark);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--color-white);
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .carousel-btn:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  .carousel-btn:active {
+    transform: scale(0.94);
+    transition-duration: var(--dur-press);
+  }
+
+  /* List on the left, photos scrolling on the right. */
+  .area__body {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  .area__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .area__list li {
+    position: relative;
+    padding-left: 14px;
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .area__list li + li {
+    margin-top: 6px;
+  }
+
+  .area__list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-primary);
+  }
+
+  .area__track {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+
+  .area__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .area__photo {
+    flex: 0 0 auto;
+    width: min(420px, 78%);
+    height: 280px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    scroll-snap-align: start;
+  }
+
+  /* ---- Tour ---- */
+  .gf-tour {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border-strong);
+  }
+
+  .gf-tour iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  /* 16/9 leaves a letterbox too shallow to move around in on a phone — the
+     other tours on the site use a fixed frame here for the same reason. */
+  @media (max-width: 900px) {
+    .gf-tour {
+      aspect-ratio: auto;
+      height: 500px;
+    }
+  }
+
+  /* ---- Workouts accordion ---- */
+  .faq__item {
+    border-top: 1px solid var(--border);
+  }
+
+  .faq__item:last-child {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .faq__q {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: var(--text-xl);
+    color: var(--color-dark);
+    transition: color var(--dur-fast) ease;
+  }
+
+  .faq__q:hover {
+    color: var(--color-primary);
+  }
+
+  .faq__icon {
+    flex-shrink: 0;
+    font-family: var(--font-body);
+    font-size: 20px;
+    line-height: 1;
+    color: var(--color-primary);
+    transition: transform var(--dur-base) var(--ease-out-crit);
+  }
+
+  .faq__item.open .faq__icon {
+    transform: rotate(45deg);
+  }
+
+  .faq__a {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--dur-base) var(--ease-out-crit);
+  }
+
+  .faq__item.open .faq__a {
+    grid-template-rows: 1fr;
+  }
+
+  .faq__a-inner {
+    overflow: hidden;
+    min-height: 0;
+    max-width: 46rem;
+    color: var(--text-muted);
+  }
+
+  .faq__item.open .faq__a-inner {
+    padding-bottom: 12px;
+  }
+
+  /* ---- Personal training strip ---- */
+  .gf-pt {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 28px;
+  }
+
+  .gf-pt .gf-sec__sub {
+    margin-bottom: 0;
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 900px) {
+    .area__body {
+      grid-template-columns: 1fr;
+    }
+
+    .area__head {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .gf-hero__inner {
+      min-height: 68vh;
+    }
+
+    /* "Gym Floor 4.0" has to stay on one line here, and the display scale
+       bottoms out at 3.2rem — which at 320px fills the container to the last
+       pixel. Cap the size by the width actually available (gutters are 14px a
+       side at this breakpoint) so it holds together on narrower phones too. */
+    .gf-hero__title {
+      font-size: min(var(--text-4xl), calc((100vw - 28px) / 6));
+    }
+
+    .gf-hero__lede {
+      font-size: var(--text-md);
+    }
+
+    .area__photo {
+      height: 220px;
+    }
+  }
+</style>

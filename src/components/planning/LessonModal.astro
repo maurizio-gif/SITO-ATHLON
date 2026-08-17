@@ -1,0 +1,335 @@
+---
+/**
+ * The panel that opens when a timetable entry is clicked: description, video
+ * and characteristics. Include it once per page; every PlanningBand on the
+ * page shares it. Card data is injected as JSON for the bands present.
+ */
+import { lessonCardsFor } from '../../data/planning';
+
+interface Props {
+  /** Band ids whose lesson cards should be available on this page. */
+  bands: string[];
+}
+
+const { bands } = Astro.props;
+const cards = lessonCardsFor(bands);
+---
+
+<div class="lmodal" id="lesson-modal" aria-hidden="true">
+  <div class="lmodal__backdrop" data-lmodal-close></div>
+  <div class="lmodal__panel" role="dialog" aria-modal="true" aria-labelledby="lmodal-title">
+    <button type="button" class="lmodal__close" data-lmodal-close aria-label="Chiudi">×</button>
+
+    <div class="lmodal__video" hidden>
+      <video playsinline muted loop preload="metadata"></video>
+    </div>
+
+    <div class="lmodal__body">
+      <span class="lmodal__eyebrow" data-lmodal-meta></span>
+      <h3 class="lmodal__title" id="lmodal-title"></h3>
+      <div class="lmodal__desc"></div>
+
+      <div class="lmodal__stats" hidden>
+        <span class="lmodal__stats-title">Caratteristiche</span>
+        <ul class="lmodal__stats-list"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline set:html={`window.__ATHLON_LESSONS__ = ${JSON.stringify(cards)};`} />
+
+<script>
+  type Stat = { l: string; v: number };
+  type Card = { desc: string; videoUrl?: string; videoStart?: number; stats?: Stat[] };
+
+  const cards = ((window as any).__ATHLON_LESSONS__ || {}) as Record<string, Card>;
+
+  const modal = document.getElementById('lesson-modal');
+  const panel = modal?.querySelector<HTMLElement>('.lmodal__panel');
+  const titleEl = modal?.querySelector<HTMLElement>('.lmodal__title');
+  const metaEl = modal?.querySelector<HTMLElement>('[data-lmodal-meta]');
+  const descEl = modal?.querySelector<HTMLElement>('.lmodal__desc');
+  const videoWrap = modal?.querySelector<HTMLElement>('.lmodal__video');
+  const video = modal?.querySelector<HTMLVideoElement>('.lmodal__video video');
+  const statsWrap = modal?.querySelector<HTMLElement>('.lmodal__stats');
+  const statsList = modal?.querySelector<HTMLElement>('.lmodal__stats-list');
+
+  let lastTrigger: HTMLElement | null = null;
+
+  function close() {
+    modal?.classList.remove('open');
+    modal?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('lmodal-locked');
+    if (video) {
+      video.pause();
+      // Drop the source so a closed panel is not still pulling bytes.
+      video.removeAttribute('src');
+      video.load();
+    }
+    lastTrigger?.focus();
+  }
+
+  function open(name: string, meta: string, trigger: HTMLElement) {
+    const card = cards[name];
+    if (!card || !modal) return;
+    lastTrigger = trigger;
+
+    if (titleEl) titleEl.textContent = name;
+    if (metaEl) metaEl.textContent = meta;
+    if (descEl) descEl.innerHTML = card.desc;
+
+    if (video && videoWrap) {
+      if (card.videoUrl) {
+        video.src = card.videoUrl;
+        if (card.videoStart) video.currentTime = card.videoStart;
+        videoWrap.hidden = false;
+        // Autoplay can be refused; the poster frame is still worth showing.
+        video.play().catch(() => {});
+      } else {
+        videoWrap.hidden = true;
+      }
+    }
+
+    if (statsWrap && statsList) {
+      const stats = card.stats ?? [];
+      statsList.innerHTML = '';
+      if (stats.length) {
+        stats.forEach((s) => {
+          const li = document.createElement('li');
+          li.className = 'lstat';
+          li.innerHTML =
+            `<span class="lstat__label">${s.l}</span>` +
+            `<span class="lstat__track"><span class="lstat__fill"></span></span>`;
+          statsList.appendChild(li);
+          // Next frame, so the width transition actually runs.
+          requestAnimationFrame(() => {
+            const fill = li.querySelector<HTMLElement>('.lstat__fill');
+            if (fill) fill.style.width = `${Math.max(0, Math.min(100, s.v))}%`;
+          });
+        });
+        statsWrap.hidden = false;
+      } else {
+        statsWrap.hidden = true;
+      }
+    }
+
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('lmodal-locked');
+    panel?.scrollTo({ top: 0 });
+    modal.querySelector<HTMLElement>('.lmodal__close')?.focus();
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-lesson]').forEach((el) => {
+    el.addEventListener('click', () =>
+      open(el.dataset.lesson || '', el.dataset.lessonMeta || '', el)
+    );
+  });
+
+  modal?.querySelectorAll('[data-lmodal-close]').forEach((el) =>
+    el.addEventListener('click', close)
+  );
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('open')) close();
+  });
+</script>
+
+<style is:global>
+  body.lmodal-locked {
+    overflow: hidden;
+  }
+</style>
+
+<style>
+  .lmodal {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .lmodal.open {
+    display: flex;
+  }
+
+  .lmodal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(23, 21, 20, 0.72);
+    backdrop-filter: blur(3px);
+  }
+
+  .lmodal__panel {
+    position: relative;
+    width: 100%;
+    max-width: 46rem;
+    max-height: 88vh;
+    overflow-y: auto;
+    background: var(--color-white);
+    border-radius: var(--radius);
+    animation: lmodal-in 0.35s var(--ease-out-crit);
+  }
+
+  @keyframes lmodal-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .lmodal__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 1;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(23, 21, 20, 0.55);
+    color: var(--color-white);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .lmodal__close:hover {
+    background: var(--color-dark);
+  }
+
+  .lmodal__video {
+    background: var(--color-dark);
+  }
+
+  .lmodal__video video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  .lmodal__body {
+    padding: 26px 28px 30px;
+  }
+
+  .lmodal__eyebrow {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin-bottom: 8px;
+  }
+
+  .lmodal__title {
+    font-size: var(--text-2xl);
+    letter-spacing: var(--tracking-2xl);
+    margin-bottom: 14px;
+  }
+
+  .lmodal__desc {
+    font-size: var(--text-base);
+    line-height: 1.65;
+    color: var(--text-muted);
+  }
+
+  .lmodal__desc :global(b) {
+    color: var(--color-dark);
+    font-weight: 600;
+  }
+
+  .lmodal__stats {
+    margin-top: 26px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border);
+  }
+
+  .lmodal__stats-title {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .lmodal__stats-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .lmodal__stats-list :global(.lstat) {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .lmodal__stats-list :global(.lstat__label) {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-dark);
+  }
+
+  .lmodal__stats-list :global(.lstat__track) {
+    display: block;
+    height: 7px;
+    border-radius: 999px;
+    background: rgba(39, 36, 35, 0.1);
+    overflow: hidden;
+  }
+
+  .lmodal__stats-list :global(.lstat__fill) {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--color-primary);
+    transition: width 0.8s var(--ease-out-crit);
+  }
+
+  @media (max-width: 640px) {
+    .lmodal {
+      padding: 0;
+      align-items: flex-end;
+    }
+
+    /* Bottom sheet on a phone: reachable with a thumb, and the close button
+       stays in the same place as the panel grows. */
+    .lmodal__panel {
+      max-width: none;
+      max-height: 92vh;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .lmodal__body {
+      padding: 22px 20px 28px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lmodal__panel {
+      animation: none;
+    }
+
+    .lmodal__stats-list :global(.lstat__fill) {
+      transition: none;
+    }
+  }
+</style>

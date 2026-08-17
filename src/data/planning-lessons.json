@@ -1,0 +1,625 @@
+{
+ "GYM FLOOR": {
+  "desc": "<b>Athlon si evolve!</b> Scopri la nuova <b>Gym Floor completamente rinnovata</b>, con una vista mozzafiato sulle piscine. Allenati liberamente durante tutti gli orari di apertura del club, in autonomia o con il <b>supporto personalizzato del nostro Team di esperti</b>.<br><br><b>3 percorsi di allenamento per obiettivo</b> — <b>Tonificazione</b>, <b>Ipertrofia</b> e <b>Dimagrimento</b> — ciascuno con tre piani progettati dai nostri Trainer. I percorsi vengono <b>aggiornati periodicamente</b> per sfide sempre più avanzate. I programmi sono <b>completamente personalizzabili</b>, da soli o con un trainer in sala.<br><br><b>Prenota la tua sessione di allenamento!</b>",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2026/05/Gym-Floor-Piani-di-Allenamento.mp4",
+  "stats": []
+ },
+ "BODY SCULPT": {
+  "desc": "Lezione di tonificazione total body con esercizi mirati per modellare, rinforzare e migliorare la resistenza muscolare, alternando lavoro dinamico e controllo tecnico.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2026/05/Body-Sculpt-New.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 80
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 70
+   },
+   {
+    "l": "Coordinazione",
+    "v": 60
+   },
+   {
+    "l": "Flessibilità",
+    "v": 30
+   }
+  ]
+ },
+ "GINNASTICA DOLCE": {
+  "desc": "Attività motoria dolce e a basso impatto, ideale per mantenere la mobilità articolare e il benessere generale. Perfetta per chi inizia o desidera un allenamento moderato.",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 25
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 20
+   },
+   {
+    "l": "Coordinazione",
+    "v": 35
+   },
+   {
+    "l": "Flessibilità",
+    "v": 70
+   }
+  ]
+ },
+ "PILATES MATWORK": {
+  "desc": "Lezione basata sui principi del Pilates, con focus su postura, controllo, respirazione, core stability e fluidità del movimento.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2024/08/PILATES.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 60
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 30
+   },
+   {
+    "l": "Coordinazione",
+    "v": 60
+   },
+   {
+    "l": "Flessibilità",
+    "v": 90
+   }
+  ]
+ },
+ "HBX FUSION": {
+  "desc": "Format funzionale ad alta intensità che combina forza, condizionamento e lavoro metabolico. Ideale per chi cerca un allenamento completo e sfidante.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2026/05/HBX-FUSION-SCRITTE-NEW.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 90
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 80
+   },
+   {
+    "l": "Coordinazione",
+    "v": 60
+   },
+   {
+    "l": "Flessibilità",
+    "v": 40
+   }
+  ]
+ },
+ "HBX BOXING": {
+  "desc": "Allenamento ispirato alla boxe, intenso e cardiovascolare. Combina colpi, combinazioni, ritmo e lavoro funzionale per aumentare energia, resistenza e coordinazione.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2024/08/BOXING-2.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 80
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 100
+   },
+   {
+    "l": "Coordinazione",
+    "v": 60
+   },
+   {
+    "l": "Flessibilità",
+    "v": 30
+   }
+  ]
+ },
+ "MOTR": {
+  "desc": "Allenamento con attrezzo specifico che integra Pilates, equilibrio, forza e mobilità. Lavora sul controllo del corpo e sulla qualità del movimento.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2024/11/Motr-1.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 65
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 50
+   },
+   {
+    "l": "Coordinazione",
+    "v": 60
+   },
+   {
+    "l": "Flessibilità",
+    "v": 80
+   }
+  ]
+ },
+ "BOOTY WORKOUT": {
+  "desc": "Allenamento mirato su glutei, gambe e core. Combina esercizi di tonificazione, controllo e resistenza per migliorare forza, stabilità e percezione muscolare.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2026/05/booty-workout_JGhsobrd.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 75
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 70
+   },
+   {
+    "l": "Coordinazione",
+    "v": 75
+   },
+   {
+    "l": "Flessibilità",
+    "v": 80
+   }
+  ]
+ },
+ "POWER YOGA": {
+  "desc": "Pratica yoga dinamica e intensa, con sequenze fluide che combinano forza, equilibrio, respirazione e flessibilità.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2026/05/POWER-YOGA-NEW.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 60
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 40
+   },
+   {
+    "l": "Coordinazione",
+    "v": 80
+   },
+   {
+    "l": "Flessibilità",
+    "v": 100
+   }
+  ]
+ },
+ "CALISTHENICS": {
+  "desc": "Allenamento a corpo libero basato su forza, controllo e progressioni tecniche. Sviluppa potenza, stabilità, mobilità e padronanza del proprio peso corporeo.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2024/08/CALISTHENICS-.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 90
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 30
+   },
+   {
+    "l": "Coordinazione",
+    "v": 40
+   },
+   {
+    "l": "Flessibilità",
+    "v": 70
+   }
+  ]
+ },
+ "ANTIGRAVITY": {
+  "desc": "Allenamento in sospensione su amaca, pensato per migliorare mobilità, controllo del corpo, forza funzionale e flessibilità, con una componente esperienziale molto elevata.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2024/11/Antigravity-2.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 50
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 31
+   },
+   {
+    "l": "Coordinazione",
+    "v": 60
+   },
+   {
+    "l": "Flessibilità",
+    "v": 80
+   }
+  ]
+ },
+ "STRENGTH DEVELOPMENT": {
+  "desc": "Allenamento focalizzato sullo sviluppo della forza, con esercizi strutturati, progressioni tecniche e carichi modulati per migliorare performance e controllo.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2026/05/STRENGTH-DEVELOPMENT-NEW.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 90
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 40
+   },
+   {
+    "l": "Coordinazione",
+    "v": 65
+   },
+   {
+    "l": "Flessibilità",
+    "v": 20
+   }
+  ]
+ },
+ "GINN. POSTURALE": {
+  "desc": "Attività orientata al miglioramento della postura, della mobilità articolare e dell'equilibrio muscolare, con esercizi controllati e progressivi.",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 40
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 15
+   },
+   {
+    "l": "Coordinazione",
+    "v": 50
+   },
+   {
+    "l": "Flessibilità",
+    "v": 75
+   }
+  ]
+ },
+ "G. POSTURALE": {
+  "desc": "Attività orientata al miglioramento della postura, della mobilità articolare e dell'equilibrio muscolare, con esercizi controllati e progressivi.",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 40
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 15
+   },
+   {
+    "l": "Coordinazione",
+    "v": 50
+   },
+   {
+    "l": "Flessibilità",
+    "v": 75
+   }
+  ]
+ },
+ "POSTURALE": {
+  "desc": "Attività orientata al miglioramento della postura, della mobilità articolare e dell'equilibrio muscolare, con esercizi controllati e progressivi.",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 40
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 15
+   },
+   {
+    "l": "Coordinazione",
+    "v": 50
+   },
+   {
+    "l": "Flessibilità",
+    "v": 75
+   }
+  ]
+ },
+ "GP COREO": {
+  "desc": "Lezione coreografica ad alta componente coordinativa, con sequenze dinamiche a ritmo di musica per migliorare movimento, resistenza e fluidità.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2024/08/Gpasse.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 40
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 70
+   },
+   {
+    "l": "Coordinazione",
+    "v": 95
+   },
+   {
+    "l": "Flessibilità",
+    "v": 85
+   }
+  ]
+ },
+ "DIFESA PERSONALE": {
+  "desc": "Lezione dinamica dedicata a tecniche di autodifesa, reattività e gestione del movimento. Allena coordinazione, prontezza, resistenza e consapevolezza corporea.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2026/05/difesa-personale-ultimo_wJT8l40H-1.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 70
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 85
+   },
+   {
+    "l": "Coordinazione",
+    "v": 90
+   },
+   {
+    "l": "Flessibilità",
+    "v": 60
+   }
+  ]
+ },
+ "YOGASSÈ": {
+  "desc": "Lezione che integra elementi di yoga, controllo posturale e lavoro sulla flessibilità. Ideale per migliorare mobilità, equilibrio e consapevolezza corporea.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2025/03/Yogasse.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 60
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 40
+   },
+   {
+    "l": "Coordinazione",
+    "v": 80
+   },
+   {
+    "l": "Flessibilità",
+    "v": 100
+   }
+  ]
+ },
+ "LES MILLS BODY PUMP": {
+  "desc": "Format di tonificazione con bilanciere e carichi modulabili. Lavora su tutto il corpo con sequenze ripetute, ritmo musicale e forte stimolo muscolare e cardiovascolare.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2026/05/body-pump_HVfMP7Ky.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 90
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 90
+   },
+   {
+    "l": "Coordinazione",
+    "v": 80
+   },
+   {
+    "l": "Flessibilità",
+    "v": 30
+   }
+  ]
+ },
+ "GINN. PILATES": {
+  "desc": "Fusione di ginnastica tradizionale e principi del metodo Pilates. Lavoro su postura, rinforzo del tronco e mobilità articolare con un approccio accessibile a tutte le età.",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 50
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 20
+   },
+   {
+    "l": "Coordinazione",
+    "v": 55
+   },
+   {
+    "l": "Flessibilità",
+    "v": 78
+   }
+  ]
+ },
+ "GROUP REFORMER": {
+  "desc": "Allenamento su Reformer guidato da istruttore, pensato per rinforzare la muscolatura, migliorare postura, controllo, flessibilità e qualità del movimento. La resistenza della macchina permette un lavoro preciso, progressivo e adatto a diversi livelli.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2025/03/Video-Reformer-Compresso-per-Sito.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 75
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 40
+   },
+   {
+    "l": "Coordinazione",
+    "v": 60
+   },
+   {
+    "l": "Flessibilità",
+    "v": 80
+   }
+  ]
+ },
+ "HYDROBIKE": {
+  "desc": "Allenamento intenso di 45 minuti su bike immersa in acqua. Lavora soprattutto su tono muscolare degli arti inferiori e sistema cardio-circolatorio, con un formato dinamico e ad alta efficacia.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2024/11/HYDROBIKE-3-1.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 70
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 90
+   },
+   {
+    "l": "Coordinazione",
+    "v": 30
+   }
+  ]
+ },
+ "AQUA SOFT": {
+  "desc": "Attività in acqua a basso impatto, dolce e rigenerante. Aiuta a migliorare mobilità, tonificazione muscolare e circolazione, con esercizi fluidi adatti a diversi livelli di allenamento.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2026/05/AQUA-SOFT-NEW.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 40
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 35
+   },
+   {
+    "l": "Coordinazione",
+    "v": 30
+   }
+  ]
+ },
+ "AQUA TONIC": {
+  "desc": "Allenamento in acqua ad alta intensità orientato a tonificazione, resistenza e forza. Combina esercizi di potenziamento e cardio, sfruttando la resistenza dell'acqua per coinvolgere tutti i gruppi muscolari.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2026/05/aqua-gym_M6QBdqYk.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 70
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 60
+   },
+   {
+    "l": "Coordinazione",
+    "v": 50
+   }
+  ]
+ },
+ "AQUA AEROBIC": {
+  "desc": "Allenamento energico in acqua che combina movimenti aerobici a ritmo di musica per migliorare resistenza cardiovascolare, coordinazione e tonificazione muscolare. Sfrutta la resistenza naturale dell'acqua riducendo lo stress sulle articolazioni.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2025/03/AQUA-TONIC.mp4",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 60
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 70
+   },
+   {
+    "l": "Coordinazione",
+    "v": 75
+   }
+  ]
+ },
+ "AQUA TRAINING": {
+  "desc": "Lezione ad alta intensità in vasca grande, pensata per migliorare resistenza aerobica e cardiovascolare. Utilizza tecniche di nuoto, andature specifiche e lavoro in sospensione per coinvolgere tutto il corpo. Si svolge nella vasca grande (altezza 140–250 cm).",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 75
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 75
+   },
+   {
+    "l": "Coordinazione",
+    "v": 30
+   }
+  ]
+ },
+ "BALLI DI GRUPPO": {
+  "desc": "Lezione coreografica in stile country e folkloristico, con sequenze semplici e ripetute a ritmo di musica. Perfetta per chi vuole stare in movimento divertendosi, migliorare la coordinazione e la memoria motoria, e farlo in compagnia. Nessuna esperienza richiesta.",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 30
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 50
+   },
+   {
+    "l": "Coordinazione",
+    "v": 85
+   },
+   {
+    "l": "Flessibilità",
+    "v": 40
+   }
+  ]
+ },
+ "BABY SWIM": {
+  "desc": "Attività acquatica per neonati e bambini piccoli (da 4 mesi) con un genitore. In un ambiente caldo e sicuro si favorisce la familiarizzazione con l'acqua e la motricità.",
+  "stats": [
+   {
+    "l": "Divertimento",
+    "v": 100
+   },
+   {
+    "l": "Sicurezza",
+    "v": 100
+   },
+   {
+    "l": "Sviluppo motorio",
+    "v": 85
+   },
+   {
+    "l": "Relax",
+    "v": 80
+   }
+  ]
+ },
+ "SCUOLA NUOTO": {
+  "desc": "Corsi divisi per livello: Base, Intermedio e Avanzato. Potrai prenotarti nel turno del tuo livello. Consulta l'app o il portale per il turno effettivo diviso per livello. I turni sono da 50 minuti e la capienza massima per corso è di 7 partecipanti.",
+  "stats": []
+ },
+ "NUOTO LIBERO": {
+  "desc": "Nuoto Libero Assistito, potrai allenarti con il supporto dei nostri tecnici federali che potranno aiutarti a programmare il tuo allenamento in Vasca. Ideale per chi già sa nuotare e si deve concentrare sull'allenamento. Richiesta la corretta esecuzione di almeno due stili (Stile Libero e Dorso). Per chi invece vuole imparare a nuotare o semplicemente migliorare la propria tecnica consigliamo i nostri corsi di Scuola Nuoto Adulti.",
+  "videoUrl": "https://www.athlonroma.it/wp-content/uploads/2024/08/Nuoto.mp4",
+  "videoStart": 3,
+  "stats": []
+ },
+ "MAT 4.1": {
+  "desc": "Allenamento funzionale a corpo libero su tappetino, con esercizi a stazioni per forza, resistenza e controllo del corpo. Format dinamico adatto a diversi livelli.",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 70
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 60
+   },
+   {
+    "l": "Coordinazione",
+    "v": 55
+   },
+   {
+    "l": "Flessibilità",
+    "v": 40
+   }
+  ]
+ },
+ "HATHA YOGA": {
+  "desc": "Pratica yoga tradizionale e posturale, con sequenze lente e respirazione consapevole. Migliora flessibilità, equilibrio e rilassamento mentale.",
+  "stats": [
+   {
+    "l": "Intensità muscolare",
+    "v": 35
+   },
+   {
+    "l": "Intensità cardiovascolare",
+    "v": 20
+   },
+   {
+    "l": "Coordinazione",
+    "v": 60
+   },
+   {
+    "l": "Flessibilità",
+    "v": 95
+   }
+  ]
+ }
+}

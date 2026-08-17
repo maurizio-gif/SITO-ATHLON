@@ -615,7 +615,7 @@ const trust = [
   .pt-sec__title {
     font-size: var(--text-3xl);
     letter-spacing: var(--tracking-2xl);
-    margin: 10px 0 8px;
+    margin: 0 0 8px;
   }
 
   .pt-sec__sub {
@@ -810,9 +810,10 @@ const trust = [
   .coach:hover .coach__reveal,
   .coach.is-open .coach__reveal,
   .coach:focus-within .coach__reveal {
-    /* Generous cap: the tallest entry measures well under this, so nothing is
-       ever clipped — it only exists because max-height cannot animate to auto. */
-    max-height: 34rem;
+    /* Only here because max-height cannot animate to auto, so it is set well
+       past the tallest profile at the narrowest width (566px at 320px wide).
+       A cap that merely limits costs nothing when it is never reached. */
+    max-height: 44rem;
     opacity: 1;
     margin-top: 12px;
     transform: none;
@@ -998,7 +999,10 @@ const trust = [
     margin: 0;
     font-family: var(--font-heading);
     font-size: clamp(2.6rem, 5vw, 3.4rem);
+    /* Sub-1 leading puts the box below even the corrected ascent, so the € —
+       which rises past the caps — needs the headroom back by hand. */
     line-height: 0.9;
+    padding-top: 0.05em;
     letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
     color: var(--color-primary);
@@ -1183,8 +1187,23 @@ const trust = [
 
   @media (max-width: 640px) {
     .coaches {
-      --coach-h: 620px;
       grid-template-columns: 1fr;
+    }
+
+    /* One card per row here, so there is no neighbour to stay level with. The
+       fixed height only existed to stop the grid reflowing, and it cannot work
+       at this width anyway: the narrower the card, the more the lists wrap, and
+       on a 320px screen the longest profile needed 90px more than any sane
+       fixed height. So the card grows as it opens — closed, it is also much
+       shorter than the reserved-height version was. */
+    .coach {
+      height: auto;
+    }
+
+    .coach__body {
+      position: relative;
+      inset: auto;
+      padding-top: min(76%, 290px);
     }
 
     .pt-hero__title em {

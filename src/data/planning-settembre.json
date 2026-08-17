@@ -1,0 +1,1156 @@
+{
+  "gymFloor": {
+    "title": "Gym Floor",
+    "planTags": [
+      "smart",
+      "premium"
+    ],
+    "lede": "Allenati nella nostra nuova Gym Floor di 400 m², completamente rinnovata e all'avanguardia. Prenota subito la tua sessione di allenamento.",
+    "hours": [
+      {
+        "label": "Lunedì – Venerdì",
+        "hours": "06:00 – 22:00"
+      },
+      {
+        "label": "Sabato",
+        "hours": "08:00 – 20:00"
+      },
+      {
+        "label": "Domenica",
+        "hours": "09:30 – 13:00"
+      }
+    ]
+  },
+  "bands": [
+    {
+      "id": "corsi-fitness",
+      "title": "Corsi Fitness",
+      "planTags": [
+        "premium"
+      ],
+      "lede": "80 lezioni ogni settimana, tra discipline olistiche, funzionali e musicali: un'offerta per ogni livello e ogni gusto.",
+      "days": [
+        {
+          "short": "Lun",
+          "full": "Lunedì",
+          "classes": [
+            {
+              "time": "07:40–08:30",
+              "name": "Body Sculpt",
+              "sala": "Sala A"
+            },
+            {
+              "time": "09:30–10:20",
+              "name": "G. Posturale",
+              "sala": "Sala A"
+            },
+            {
+              "time": "10:30–11:20",
+              "name": "Ginnastica Dolce",
+              "sala": "Sala A"
+            },
+            {
+              "time": "11:30–12:20",
+              "name": "HBX Fusion",
+              "sala": "Sala B"
+            },
+            {
+              "time": "11:30–12:20",
+              "name": "Pilates Matwork",
+              "sala": "Sala A"
+            },
+            {
+              "time": "13:30–14:20",
+              "name": "HBX Boxing",
+              "sala": "Sala B"
+            },
+            {
+              "time": "16:40–17:30",
+              "name": "Booty Workout",
+              "sala": "Sala A"
+            },
+            {
+              "time": "17:20–18:10",
+              "name": "HBX Fusion",
+              "sala": "Sala B"
+            },
+            {
+              "time": "17:30–18:20",
+              "name": "Pilates Matwork",
+              "sala": "Sala A"
+            },
+            {
+              "time": "18:20–19:10",
+              "name": "MOTR®",
+              "sala": "Sala B"
+            },
+            {
+              "time": "18:20–19:10",
+              "name": "Body Sculpt",
+              "sala": "Sala A"
+            },
+            {
+              "time": "19:10–20:00",
+              "name": "HBX Fusion",
+              "sala": "Sala B"
+            },
+            {
+              "time": "19:20–20:10",
+              "name": "Booty Workout",
+              "sala": "Sala A"
+            },
+            {
+              "time": "20:00–20:50",
+              "name": "Calisthenics",
+              "sala": "Sala B"
+            },
+            {
+              "time": "20:10–21:00",
+              "name": "Mat 4.1",
+              "sala": "Sala A"
+            }
+          ]
+        },
+        {
+          "short": "Mar",
+          "full": "Martedì",
+          "classes": [
+            {
+              "time": "07:40–08:30",
+              "name": "HBX Boxing",
+              "sala": "Sala B"
+            },
+            {
+              "time": "09:30–10:20",
+              "name": "Pilates Matwork",
+              "sala": "Sala A"
+            },
+            {
+              "time": "10:30–11:20",
+              "name": "Ginnastica Dolce",
+              "sala": "Sala A"
+            },
+            {
+              "time": "11:30–12:20",
+              "name": "Antigravity",
+              "sala": "Sala A"
+            },
+            {
+              "time": "11:30–12:20",
+              "name": "Strength Development",
+              "sala": "Sala B"
+            },
+            {
+              "time": "13:30–14:20",
+              "name": "Pilates",
+              "sala": "Sala A"
+            },
+            {
+              "time": "13:30–14:20",
+              "name": "HBX Fusion",
+              "sala": "Sala B"
+            },
+            {
+              "time": "16:30–17:20",
+              "name": "MOTR®",
+              "sala": "Sala B"
+            },
+            {
+              "time": "16:50–17:40",
+              "name": "Posturale",
+              "sala": "Sala A"
+            },
+            {
+              "time": "17:30–18:20",
+              "name": "Strength Development",
+              "sala": "Sala B"
+            },
+            {
+              "time": "17:40–18:30",
+              "name": "Power Yoga",
+              "sala": "Sala A"
+            },
+            {
+              "time": "18:20–19:10",
+              "name": "HBX Fusion",
+              "sala": "Sala B"
+            },
+            {
+              "time": "18:30–19:20",
+              "name": "Pilates Matwork",
+              "sala": "Sala A"
+            },
+            {
+              "time": "19:10–20:00",
+              "name": "Strength Development",
+              "sala": "Sala B"
+            },
+            {
+              "time": "19:20–20:10",
+              "name": "GP Coreo",
+              "sala": "Sala A"
+            },
+            {
+              "time": "20:00–20:50",
+              "name": "Difesa Personale",
+              "sala": "Sala B"
+            },
+            {
+              "time": "20:10–21:00",
+              "name": "Body Sculpt",
+              "sala": "Sala A"
+            }
+          ]
+        },
+        {
+          "short": "Mer",
+          "full": "Mercoledì",
+          "classes": [
+            {
+              "time": "07:40–08:30",
+              "name": "Body Sculpt",
+              "sala": "Sala A"
+            },
+            {
+              "time": "09:30–10:20",
+              "name": "Pilates Matwork",
+              "sala": "Sala A"
+            },
+            {
+              "time": "10:30–11:20",
+              "name": "G. Posturale",
+              "sala": "Sala A"
+            },
+            {
+              "time": "11:30–12:20",
+              "name": "HBX Fusion",
+              "sala": "Sala B"
+            },
+            {
+              "time": "11:30–12:20",
+              "name": "Balli di Gruppo",
+              "sala": "Sala A"
+            },
+            {
+              "time": "13:00–13:50",
+              "name": "Body Sculpt",
+              "sala": "Sala A"
+            },
+            {
+              "time": "16:40–17:30",
+              "name": "Hatha Yoga",
+              "sala": "Sala A"
+            },
+            {
+              "time": "17:30–18:20",
+              "name": "Booty Workout",
+              "sala": "Sala A"
+            },
+            {
+              "time": "17:30–18:20",
+              "name": "MOTR®",
+              "sala": "Sala B"
+            },
+            {
+              "time": "18:20–19:10",
+              "name": "Mat 4.1",
+              "sala": "Sala A"
+            },
+            {
+              "time": "18:30–19:20",
+              "name": "HBX Fusion",
+              "sala": "Sala B"
+            },
+            {
+              "time": "19:10–20:00",
+              "name": "Booty Workout",
+              "sala": "Sala A"
+            },
+            {
+              "time": "19:20–20:10",
+              "name": "HBX Boxing",
+              "sala": "Sala B"
+            },
+            {
+              "time": "20:10–21:00",
+              "name": "Body Sculpt",
+              "sala": "Sala A"
+            },
+            {
+              "time": "20:10–21:00",
+              "name": "Calisthenics",
+              "sala": "Sala B"
+            }
+          ]
+        },
+        {
+          "short": "Gio",
+          "full": "Giovedì",
+          "classes": [
+            {
+              "time": "07:40–08:30",
+              "name": "Strength Development",
+              "sala": "Sala B"
+            },
+            {
+              "time": "09:30–10:20",
+              "name": "Ginnastica Dolce",
+              "sala": "Sala A"
+            },
+            {
+              "time": "10:30–11:20",
+              "name": "Pilates Matwork",
+              "sala": "Sala A"
+            },
+            {
+              "time": "11:30–12:20",
+              "name": "HBX Boxing",
+              "sala": "Sala B"
+            },
+            {
+              "time": "13:30–14:20",
+              "name": "Body Sculpt",
+              "sala": "Sala A"
+            },
+            {
+              "time": "16:40–17:30",
+              "name": "Posturale",
+              "sala": "Sala A"
+            },
+            {
+              "time": "17:30–18:20",
+              "name": "Strength Development",
+              "sala": "Sala B"
+            },
+            {
+              "time": "17:40–18:30",
+              "name": "Antigravity",
+              "sala": "Sala A"
+            },
+            {
+              "time": "18:20–19:10",
+              "name": "HBX Fusion",
+              "sala": "Sala B"
+            },
+            {
+              "time": "18:30–19:20",
+              "name": "Yogassè",
+              "sala": "Sala A"
+            },
+            {
+              "time": "19:10–20:00",
+              "name": "MOTR®",
+              "sala": "Sala B"
+            },
+            {
+              "time": "19:20–20:10",
+              "name": "Body Sculpt",
+              "sala": "Sala A"
+            },
+            {
+              "time": "20:10–21:00",
+              "name": "Strength Development",
+              "sala": "Sala B"
+            }
+          ]
+        },
+        {
+          "short": "Ven",
+          "full": "Venerdì",
+          "classes": [
+            {
+              "time": "09:30–10:20",
+              "name": "Pilates Matwork",
+              "sala": "Sala A"
+            },
+            {
+              "time": "10:30–11:20",
+              "name": "Ginnastica Dolce",
+              "sala": "Sala A"
+            },
+            {
+              "time": "11:30–12:20",
+              "name": "Body Sculpt",
+              "sala": "Sala A"
+            },
+            {
+              "time": "13:30–14:20",
+              "name": "Pilates Matwork",
+              "sala": "Sala A"
+            },
+            {
+              "time": "13:30–14:20",
+              "name": "Strength Development",
+              "sala": "Sala B"
+            },
+            {
+              "time": "16:50–17:40",
+              "name": "Body Sculpt",
+              "sala": "Sala A"
+            },
+            {
+              "time": "16:50–17:40",
+              "name": "MOTR®",
+              "sala": "Sala B"
+            },
+            {
+              "time": "17:40–18:30",
+              "name": "Pilates Matwork",
+              "sala": "Sala A"
+            },
+            {
+              "time": "18:30–19:20",
+              "name": "HBX Boxing",
+              "sala": "Sala B"
+            },
+            {
+              "time": "18:30–19:20",
+              "name": "Hatha Yoga",
+              "sala": "Sala A"
+            },
+            {
+              "time": "19:20–20:10",
+              "name": "Calisthenics",
+              "sala": "Sala B"
+            },
+            {
+              "time": "19:20–20:10",
+              "name": "Body Sculpt",
+              "sala": "Sala A"
+            },
+            {
+              "time": "20:10–21:00",
+              "name": "Difesa Personale",
+              "sala": "Sala B"
+            }
+          ]
+        },
+        {
+          "short": "Sab",
+          "full": "Sabato",
+          "classes": [
+            {
+              "time": "09:30–10:20",
+              "name": "HBX Fusion",
+              "sala": "Sala B"
+            },
+            {
+              "time": "09:30–10:20",
+              "name": "Pilates",
+              "sala": "Sala A"
+            },
+            {
+              "time": "10:30–11:20",
+              "name": "Body Sculpt",
+              "sala": "Sala A"
+            },
+            {
+              "time": "11:20–12:10",
+              "name": "HBX Boxing",
+              "sala": "Sala B"
+            },
+            {
+              "time": "11:30–12:20",
+              "name": "Antigravity",
+              "sala": "Sala A"
+            },
+            {
+              "time": "12:10–13:00",
+              "name": "Strength Development",
+              "sala": "Sala B"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "group-reformer",
+      "title": "Group Reformer",
+      "planTags": [
+        "premium"
+      ],
+      "lede": "34 sessioni ogni settimana su 10 Reformer Balanced Body Allegro: allenamento guidato per tonificare, migliorare postura, controllo e flessibilità.",
+      "days": [
+        {
+          "short": "Lun",
+          "full": "Lunedì",
+          "classes": [
+            {
+              "time": "08:30–09:20",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "09:30–10:20",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "13:30–14:20",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "16:40–17:30",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "17:30–18:20",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "18:20–19:10",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "19:10–20:00",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "20:00–20:50",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            }
+          ]
+        },
+        {
+          "short": "Mar",
+          "full": "Martedì",
+          "classes": [
+            {
+              "time": "09:00–09:50",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "10:00–10:50",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "17:20–18:10",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "18:10–19:00",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "19:10–20:00",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "20:10–21:00",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            }
+          ]
+        },
+        {
+          "short": "Mer",
+          "full": "Mercoledì",
+          "classes": [
+            {
+              "time": "08:30–09:20",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "10:30–11:20",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "13:30–14:20",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "18:30–19:20",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "19:20–20:10",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "20:10–21:00",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            }
+          ]
+        },
+        {
+          "short": "Gio",
+          "full": "Giovedì",
+          "classes": [
+            {
+              "time": "09:00–09:50",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "10:00–10:50",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "13:30–14:20",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "18:20–19:10",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "19:20–20:10",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "20:10–21:00",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            }
+          ]
+        },
+        {
+          "short": "Ven",
+          "full": "Venerdì",
+          "classes": [
+            {
+              "time": "08:30–09:20",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "10:30–11:20",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "11:30–12:20",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "17:40–18:30",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "18:30–19:20",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "19:30–20:20",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            }
+          ]
+        },
+        {
+          "short": "Sab",
+          "full": "Sabato",
+          "classes": [
+            {
+              "time": "10:30–11:20",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            },
+            {
+              "time": "12:30–13:20",
+              "name": "Group Reformer",
+              "sala": "Sala C"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scuola-nuoto-adulti",
+      "title": "Scuola Nuoto Adulti",
+      "planTags": [
+        "premium"
+      ],
+      "lede": "15 lezioni a settimana tra cui scegliere, divise per livello — Base, Intermedio e Avanzato. Puoi prenotare in uno qualsiasi degli orari: alla prima lezione l'istruttore ti assegnerà il livello definitivo, nel quale potrai prenotare le lezioni successive.",
+      "days": [
+        {
+          "short": "Lun",
+          "full": "Lunedì",
+          "classes": [
+            {
+              "time": "14:10–15:00",
+              "name": "Scuola Nuoto",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "18:30–19:20",
+              "name": "Scuola Nuoto",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "19:20–20:10",
+              "name": "Scuola Nuoto",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "20:10–21:00",
+              "name": "Scuola Nuoto",
+              "sala": "Vasca Grande"
+            }
+          ]
+        },
+        {
+          "short": "Mar",
+          "full": "Martedì",
+          "classes": [
+            {
+              "time": "10:00–10:50",
+              "name": "Scuola Nuoto",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "19:20–20:10",
+              "name": "Scuola Nuoto",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "20:10–21:00",
+              "name": "Scuola Nuoto",
+              "sala": "Vasca Grande"
+            }
+          ]
+        },
+        {
+          "short": "Mer",
+          "full": "Mercoledì",
+          "classes": [
+            {
+              "time": "18:30–19:20",
+              "name": "Scuola Nuoto",
+              "sala": "Vasca Grande"
+            }
+          ]
+        },
+        {
+          "short": "Gio",
+          "full": "Giovedì",
+          "classes": [
+            {
+              "time": "14:10–15:00",
+              "name": "Scuola Nuoto",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "19:20–20:10",
+              "name": "Scuola Nuoto",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "20:10–21:00",
+              "name": "Scuola Nuoto",
+              "sala": "Vasca Grande"
+            }
+          ]
+        },
+        {
+          "short": "Ven",
+          "full": "Venerdì",
+          "classes": [
+            {
+              "time": "10:00–10:50",
+              "name": "Scuola Nuoto",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "18:30–19:20",
+              "name": "Scuola Nuoto",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "19:20–20:10",
+              "name": "Scuola Nuoto",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "20:10–21:00",
+              "name": "Scuola Nuoto",
+              "sala": "Vasca Grande"
+            }
+          ]
+        },
+        {
+          "short": "Sab",
+          "full": "Sabato",
+          "classes": []
+        }
+      ]
+    },
+    {
+      "id": "nuoto-libero",
+      "title": "Nuoto Libero",
+      "planTags": [
+        "smart",
+        "premium"
+      ],
+      "lede": "44 ore di nuoto libero a settimana tra cui scegliere, con tutte le corsie a disposizione e turni da 60 minuti. Ideale per livelli natatori intermedi e avanzati.",
+      "days": [
+        {
+          "short": "Lun",
+          "full": "Lunedì",
+          "classes": [
+            {
+              "time": "07:00–11:00",
+              "name": "Nuoto Libero",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "12:30–15:00",
+              "name": "Nuoto Libero",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "20:10–22:00",
+              "name": "Nuoto Libero",
+              "sala": "Vasca Grande"
+            }
+          ]
+        },
+        {
+          "short": "Mar",
+          "full": "Martedì",
+          "classes": [
+            {
+              "time": "07:00–10:00",
+              "name": "Nuoto Libero",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "12:30–14:30",
+              "name": "Nuoto Libero",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "21:00–22:00",
+              "name": "Nuoto Libero",
+              "sala": "Vasca Grande"
+            }
+          ]
+        },
+        {
+          "short": "Mer",
+          "full": "Mercoledì",
+          "classes": [
+            {
+              "time": "07:00–11:00",
+              "name": "Nuoto Libero",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "12:30–14:30",
+              "name": "Nuoto Libero",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "20:10–22:00",
+              "name": "Nuoto Libero",
+              "sala": "Vasca Grande"
+            }
+          ]
+        },
+        {
+          "short": "Gio",
+          "full": "Giovedì",
+          "classes": [
+            {
+              "time": "07:00–11:00",
+              "name": "Nuoto Libero",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "12:30–15:00",
+              "name": "Nuoto Libero",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "20:10–22:00",
+              "name": "Nuoto Libero",
+              "sala": "Vasca Grande"
+            }
+          ]
+        },
+        {
+          "short": "Ven",
+          "full": "Venerdì",
+          "classes": [
+            {
+              "time": "07:00–10:00",
+              "name": "Nuoto Libero",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "12:30–14:30",
+              "name": "Nuoto Libero",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "21:00–22:00",
+              "name": "Nuoto Libero",
+              "sala": "Vasca Grande"
+            }
+          ]
+        },
+        {
+          "short": "Sab",
+          "full": "Sabato",
+          "classes": [
+            {
+              "time": "08:00–10:00",
+              "name": "Nuoto Libero",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "12:00–14:30",
+              "name": "Nuoto Libero",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "Dom 09:30–12:30",
+              "name": "Nuoto Libero",
+              "sala": "Vasca Grande"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aqua-fitness",
+      "title": "Aqua Fitness",
+      "planTags": [
+        "premium"
+      ],
+      "lede": "34 lezioni ogni settimana in Vasca Grande (25 metri) o nella Vasca Piccola, con attività di aqua fitness per tutti i gusti.",
+      "days": [
+        {
+          "short": "Lun",
+          "full": "Lunedì",
+          "classes": [
+            {
+              "time": "08:15–09:00",
+              "name": "Hydrobike",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "09:00–09:50",
+              "name": "Aqua Soft",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "11:00–11:50",
+              "name": "Aqua Training",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "13:30–14:20",
+              "name": "Aqua Tonic",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "18:50–19:35",
+              "name": "Hydrobike",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "19:40–20:30",
+              "name": "Aqua Tonic",
+              "sala": "Vasca Media"
+            }
+          ]
+        },
+        {
+          "short": "Mar",
+          "full": "Martedì",
+          "classes": [
+            {
+              "time": "09:00–09:50",
+              "name": "Aqua Soft",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "11:00–11:50",
+              "name": "Aqua Training",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "13:00–13:45",
+              "name": "Hydrobike",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "13:50–14:40",
+              "name": "Aqua Aerobic",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "18:50–19:40",
+              "name": "Aqua Aerobic",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "19:40–20:25",
+              "name": "Hydrobike",
+              "sala": "Vasca Media"
+            }
+          ]
+        },
+        {
+          "short": "Mer",
+          "full": "Mercoledì",
+          "classes": [
+            {
+              "time": "08:15–09:05",
+              "name": "Aqua Soft",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "09:05–09:55",
+              "name": "Aqua Soft",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "11:00–11:50",
+              "name": "Aqua Training",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "13:00–13:50",
+              "name": "Aqua Tonic",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "13:50–14:35",
+              "name": "Hydrobike",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "19:20–20:10",
+              "name": "Aqua Training",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "20:10–20:55",
+              "name": "Hydrobike",
+              "sala": "Vasca Media"
+            }
+          ]
+        },
+        {
+          "short": "Gio",
+          "full": "Giovedì",
+          "classes": [
+            {
+              "time": "09:00–09:50",
+              "name": "Aqua Soft",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "11:00–11:50",
+              "name": "Aqua Training",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "13:30–14:20",
+              "name": "Aqua Aerobic",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "18:50–19:40",
+              "name": "Aqua Aerobic",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "19:40–20:25",
+              "name": "Hydrobike",
+              "sala": "Vasca Media"
+            }
+          ]
+        },
+        {
+          "short": "Ven",
+          "full": "Venerdì",
+          "classes": [
+            {
+              "time": "08:15–09:00",
+              "name": "Hydrobike",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "09:00–09:50",
+              "name": "Aqua Soft",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "11:00–11:50",
+              "name": "Aqua Training",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "13:00–13:45",
+              "name": "Hydrobike",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "13:50–14:40",
+              "name": "Aqua Aerobic",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "18:50–19:35",
+              "name": "Hydrobike",
+              "sala": "Vasca Media"
+            },
+            {
+              "time": "19:40–20:30",
+              "name": "Aqua Tonic",
+              "sala": "Vasca Media"
+            }
+          ]
+        },
+        {
+          "short": "Sab",
+          "full": "Sabato",
+          "classes": [
+            {
+              "time": "10:00–10:50",
+              "name": "Aqua Training",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "11:00–11:50",
+              "name": "Aqua Gestanti",
+              "sala": "Vasca Grande"
+            },
+            {
+              "time": "12:20–13:05",
+              "name": "Hydrobike",
+              "sala": "Vasca Media"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

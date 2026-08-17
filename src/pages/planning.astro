@@ -1,0 +1,186 @@
+---
+import Layout from '../layouts/Layout.astro';
+import OpeningHours from '../components/planning/OpeningHours.astro';
+import PlanningBand from '../components/planning/PlanningBand.astro';
+import LessonModal from '../components/planning/LessonModal.astro';
+import { bands, countLessons, PLANNING_MONTH } from '../data/planning';
+
+const PG = 'https://athlon.perfectgym.com/ClientPortal2';
+
+// Where each band also lives as its own page, so the planning can send people
+// on to the activity. Bands without a page yet simply get no link.
+const bandPages: Record<string, string> = {
+  'corsi-fitness': '/corsi-fitness',
+  'group-reformer': '/reformer',
+  'scuola-nuoto-adulti': '/scuola-nuoto-adulti',
+  'nuoto-libero': '/nuoto-libero',
+  'aqua-fitness': '/aqua-fitness',
+};
+
+const totalLessons = bands.reduce((n, b) => n + countLessons(b), 0);
+---
+
+<Layout
+  title={`Orari e Planning ${PLANNING_MONTH} | Athlon Club Roma Talenti`}
+  description={`Il planning completo di Athlon Club: ${totalLessons} lezioni a settimana tra corsi fitness, group reformer, scuola nuoto, nuoto libero e aqua fitness, più gli orari di apertura della Gym Floor.`}
+>
+  <!-- HERO -->
+  <section class="pl-hero">
+    <div class="container">
+      <span class="eyebrow">{PLANNING_MONTH}</span>
+      <h1 class="pl-hero__title">Orari <em class="accent">e planning</em></h1>
+      <p class="pl-hero__lede">
+        {totalLessons} lezioni ogni settimana, più la Gym Floor aperta tutti i giorni. Prenoti tutto
+        dall'app o dal portale.
+      </p>
+      <div class="pl-hero__actions">
+        <a href={`${PG}/#/Classes/1/Calendar`} class="btn btn-primary">Prenota una lezione →</a>
+        <a href="https://onelink.to/athlon" class="btn btn-outline">Scarica l'app</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- GYM FLOOR -->
+  <section class="pl-sec">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Sala pesi</span>
+      <h2 class="pl-sec__title" data-anim="reveal">Gym Floor</h2>
+      <p class="pl-sec__sub">
+        La Gym Floor non si prenota a orario: entri quando vuoi, durante tutti gli orari di apertura
+        del club. <a href="/gym-floor">Scopri la sala →</a>
+      </p>
+      <OpeningHours href={`${PG}/#/Classes/1/Calendar?categoryId=6`} />
+    </div>
+  </section>
+
+  <!-- UNA SEZIONE PER FASCIA -->
+  {bands.map((band, i) => (
+    <section class:list={['pl-sec', i % 2 === 0 ? 'pl-sec--dark' : 'pl-sec--alt']}>
+      <div class="container">
+        <span class="eyebrow" data-anim="from-left">
+          {countLessons(band)} lezioni a settimana
+        </span>
+        <h2 class="pl-sec__title" data-anim="reveal">{band.title}</h2>
+        <p class="pl-sec__sub">
+          {band.lede}
+          {bandPages[band.id] && (
+            <> <a href={bandPages[band.id]}>Scopri l'attività →</a></>
+          )}
+        </p>
+
+        <PlanningBand
+          id={band.id}
+          showTitle={false}
+          variant={i % 2 === 0 ? 'dark' : 'light'}
+        />
+      </div>
+    </section>
+  ))}
+
+  {/* One panel shared by every band on the page. */}
+  <LessonModal bands={bands.map((b) => b.id)} />
+
+  <!-- NOTA -->
+  <section class="pl-sec">
+    <div class="container">
+      <p class="pl-note">
+        Il planning viene aggiornato ogni mese. Le prenotazioni si aprono 3 giorni prima della
+        lezione, dall'<a href="https://onelink.to/athlon">app Athlon Club</a> o dal
+        <a href={`${PG}/#/Classes/1/Calendar`}>portale web</a>.
+      </p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* ---- Hero ---- */
+  .pl-hero {
+    background: var(--color-dark);
+    color: var(--color-white);
+    padding: var(--space-section-lg) 0 var(--space-section-md);
+  }
+
+  .pl-hero__title {
+    font-size: var(--text-4xl);
+    line-height: var(--leading-4xl);
+    letter-spacing: var(--tracking-4xl);
+    margin: 14px 0 0;
+    padding: 0.08em 0 0.06em;
+  }
+
+  .pl-hero__title .accent {
+    font-style: normal;
+    color: var(--color-primary);
+  }
+
+  .pl-hero__lede {
+    max-width: 34rem;
+    margin: 20px 0 30px;
+    font-size: var(--text-md);
+    color: rgba(255, 255, 255, 0.68);
+  }
+
+  .pl-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* ---- Sections ---- */
+  .pl-sec {
+    padding: var(--space-section-lg) 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pl-sec--alt {
+    background: var(--color-cream);
+    border-bottom: none;
+  }
+
+  .pl-sec--dark {
+    background: var(--color-dark);
+    color: var(--color-white);
+    border-bottom: none;
+  }
+
+  .pl-sec__title {
+    font-size: var(--text-3xl);
+    letter-spacing: var(--tracking-2xl);
+    margin: 10px 0 8px;
+  }
+
+  .pl-sec__sub {
+    max-width: 48rem;
+    color: var(--text-muted);
+    margin-bottom: 30px;
+  }
+
+  .pl-sec--dark .pl-sec__sub {
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  .pl-sec__sub a {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .pl-sec__sub a:hover {
+    text-decoration: underline;
+  }
+
+  .pl-note {
+    max-width: 48rem;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .pl-note a {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .pl-note a:hover {
+    text-decoration: underline;
+  }
+</style>
