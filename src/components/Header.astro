@@ -1,0 +1,288 @@
+---
+const adultiLinks = [
+  { label: 'Gym Floor (Sala Pesi)', href: '/gym-floor' },
+  { label: 'Corsi Fitness', href: '/corsi-fitness' },
+  { label: 'Group Reformer', href: '/reformer' },
+  { label: 'Personal Training', href: '/personal-training' },
+  { label: 'Nuoto Libero Assistito', href: '/nuoto-libero' },
+  { label: 'Aqua Fitness', href: '/aqua-fitness' },
+  { label: 'Scuola Nuoto Adulti', href: '/scuola-nuoto-adulti' },
+  { label: 'Corso Gestanti', href: '/gestanti' },
+];
+
+const juniorLinks = [
+  { label: 'Baby Nuoto', href: '/baby-nuoto' },
+  { label: 'Scuola Nuoto Bambini', href: '/scuola-nuoto-bambini-3' },
+  { label: 'Pallanuoto', href: '/pallanuoto' },
+  { label: 'Nuoto Agonistico', href: '/nuoto-agonistico' },
+];
+
+const groups = [
+  { label: 'Attività Adulti', links: adultiLinks },
+  { label: 'Corsi Junior', links: juniorLinks },
+  { label: 'Contattaci', links: [{ label: 'Contatti', href: '/contatti' }, { label: 'Lavora con noi', href: '/lavora' }] },
+];
+---
+
+<header class="site-header" id="site-header">
+  <div class="container header-inner">
+    <a href="/" class="logo">
+      <img src="/wp-content/uploads/2025/08/Pittogramma.png" alt="Athlon Club" width="40" height="40" />
+    </a>
+
+    <nav class="main-nav">
+      {groups.map((g) => (
+        <div class="nav-item has-dropdown">
+          <button>{g.label}</button>
+          <div class="dropdown">
+            {g.links.map((l) => (
+              <a href={l.href}>{l.label}</a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </nav>
+
+    <div class="header-actions">
+      <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="header-link">Accedi</a>
+      <a href="https://athlon.perfectgym.com/ClientPortal2/#/Registration" class="header-link strong">Iscriviti</a>
+      <button class="burger" aria-label="Menu" aria-expanded="false" id="burger">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-panel" id="mobile-panel">
+    {groups.map((g) => (
+      <div class="mobile-group">
+        <span class="mobile-group-title">{g.label}</span>
+        {g.links.map((l) => (
+          <a href={l.href}>{l.label}</a>
+        ))}
+      </div>
+    ))}
+    <div class="mobile-actions">
+      <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="btn btn-outline-dark">Accedi</a>
+      <a href="https://athlon.perfectgym.com/ClientPortal2/#/Registration" class="btn btn-primary">Iscriviti</a>
+    </div>
+  </div>
+</header>
+
+<script>
+  const burger = document.getElementById('burger');
+  const panel = document.getElementById('mobile-panel');
+  const header = document.getElementById('site-header');
+
+  burger?.addEventListener('click', () => {
+    const isOpen = header?.classList.toggle('menu-open');
+    burger.setAttribute('aria-expanded', String(!!isOpen));
+  });
+
+  panel?.querySelectorAll('a').forEach((a) => {
+    a.addEventListener('click', () => {
+      header?.classList.remove('menu-open');
+      burger?.setAttribute('aria-expanded', 'false');
+    });
+  });
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid rgba(39, 36, 35, 0.08);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    gap: 24px;
+  }
+
+  .logo img {
+    display: block;
+    transition: transform var(--dur-fast) var(--ease-out-crit);
+  }
+
+  .logo:active img {
+    transform: scale(0.92);
+  }
+
+  .main-nav {
+    display: flex;
+    gap: 32px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .nav-item {
+    position: relative;
+  }
+
+  .nav-item > button {
+    background: none;
+    border: none;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--color-dark);
+    cursor: pointer;
+    padding: 8px 0;
+  }
+
+  .dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    box-shadow: 0 16px 32px rgba(39, 36, 35, 0.14);
+    border-radius: 12px;
+    padding: 12px 0;
+    min-width: 240px;
+    flex-direction: column;
+    transform-origin: top center;
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+    pointer-events: none;
+    transition: opacity var(--dur-fast) var(--ease-out-crit),
+      transform var(--dur-fast) var(--ease-out-crit);
+    display: flex;
+  }
+
+  .nav-item:hover .dropdown,
+  .nav-item:focus-within .dropdown {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  .dropdown a {
+    padding: 10px 20px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .dropdown a:hover {
+    background: var(--color-cream);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .header-link {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .header-link.strong {
+    color: var(--color-primary);
+  }
+
+  .burger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .burger span {
+    width: 24px;
+    height: 2px;
+    background: var(--color-dark);
+    transition: transform var(--dur-fast) var(--ease-out-crit), opacity var(--dur-fast) var(--ease-out-crit);
+    transform-origin: center;
+  }
+
+  .menu-open .burger span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .menu-open .burger span:nth-child(2) {
+    opacity: 0;
+  }
+  .menu-open .burger span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  .mobile-panel {
+    display: none;
+  }
+
+  @media (max-width: 960px) {
+    .main-nav,
+    .header-link {
+      display: none;
+    }
+    .burger {
+      display: flex;
+    }
+
+    .mobile-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding: 8px 24px 28px;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height var(--dur-base) var(--ease-out-crit), opacity var(--dur-fast) var(--ease-out-crit);
+    }
+
+    .menu-open .mobile-panel {
+      max-height: 80vh;
+      opacity: 1;
+      overflow-y: auto;
+    }
+
+    .mobile-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .mobile-group-title {
+      font-family: var(--font-heading);
+      text-transform: uppercase;
+      color: var(--color-primary);
+      font-size: 15px;
+      letter-spacing: -0.01em;
+    }
+
+    .mobile-group a {
+      font-size: 15px;
+      padding: 2px 0;
+    }
+
+    .mobile-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .mobile-actions .btn {
+      flex: 1;
+      justify-content: center;
+      padding: 14px 20px;
+    }
+  }
+</style>

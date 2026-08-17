@@ -1,0 +1,375 @@
+---
+interface Item {
+  title: string;
+  image: string;
+  desc: string;
+  href?: string;
+}
+
+interface Props {
+  eyebrow: string;
+  accent: string;
+  variant: 'dark' | 'orange';
+  items: Item[];
+  trackId: string;
+}
+
+const { eyebrow, accent, variant, items, trackId } = Astro.props;
+---
+
+<section class:list={['activity', variant]}>
+  <div class="container">
+    <div class="activity-head">
+      <h2 data-anim="reveal">
+        {eyebrow}<br />
+        <span class="accent-word">{accent}</span>
+      </h2>
+      <div class="carousel-nav">
+        <button class="carousel-btn" data-dir="-1" data-track={trackId} aria-label="Precedente">←</button>
+        <button class="carousel-btn" data-dir="1" data-track={trackId} aria-label="Successivo">→</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="carousel">
+    <div class="carousel__track" data-carousel-id={trackId}>
+      {items.map((item, i) => (
+        <a
+          href={item.href ?? '#'}
+          class="card"
+          data-anim="scale"
+          data-anim-delay={String(i * 70)}
+        >
+          <div class="card__clip">
+            <div class="card__img" style={`background-image:url(${item.image})`}></div>
+            <div class="card__scrim"></div>
+            <div class="card__body">
+              <span class="card__num">{String(i + 1).padStart(2, '0')}</span>
+              <strong class="card__name">{item.title}</strong>
+              <div class="card__hover">
+                <p class="card__desc">{item.desc}</p>
+                <span class="card__more">Scopri di più →</span>
+              </div>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.carousel__track').forEach((track) => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const id = track.dataset.carouselId;
+
+    const cardStep = () => {
+      const card = track.querySelector<HTMLElement>('.card');
+      return card ? card.getBoundingClientRect().width + 20 : 0;
+    };
+    const advance = (amount: number) => track.scrollBy({ left: amount, behavior: 'smooth' });
+
+    document.querySelectorAll<HTMLButtonElement>(`.carousel-btn[data-track="${id}"]`).forEach((btn) => {
+      btn.addEventListener('click', () => advance(Number(btn.dataset.dir) * cardStep()));
+    });
+
+    // A single gentle nudge the first time the row comes into view — just
+    // enough to say "this scrolls" — then it settles back on card one,
+    // which stays the resting position. No looping auto-advance.
+    if (!prefersReducedMotion) {
+      const hintObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            hintObserver.unobserve(track);
+            window.setTimeout(() => {
+              track.scrollTo({ left: 64, behavior: 'smooth' });
+              window.setTimeout(() => track.scrollTo({ left: 0, behavior: 'smooth' }), 500);
+            }, 500);
+          });
+        },
+        { threshold: 0.4 }
+      );
+      hintObserver.observe(track);
+    }
+
+    if (window.matchMedia('(hover: none)').matches) {
+      const cards = Array.from(track.querySelectorAll<HTMLElement>('.card'));
+      let ticking = false;
+      const activateCentered = () => {
+        ticking = false;
+        const trackRect = track.getBoundingClientRect();
+        const center = trackRect.left + trackRect.width / 2;
+        let closest: HTMLElement | null = null;
+        let closestDist = Infinity;
+        cards.forEach((card) => {
+          const r = card.getBoundingClientRect();
+          const dist = Math.abs(r.left + r.width / 2 - center);
+          if (dist < closestDist) {
+            closestDist = dist;
+            closest = card;
+          }
+        });
+        cards.forEach((c) => c.classList.toggle('is-active', c === closest));
+      };
+      track.addEventListener(
+        'scroll',
+        () => {
+          if (!ticking) {
+            ticking = true;
+            requestAnimationFrame(activateCentered);
+          }
+        },
+        { passive: true }
+      );
+      activateCentered();
+    }
+  });
+</script>
+
+<style>
+  .activity {
+    padding: var(--space-section-lg) 0;
+  }
+
+  .activity.dark {
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .activity.orange {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .activity-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .activity-head h2 {
+    font-size: var(--text-2xl);
+    letter-spacing: var(--tracking-2xl);
+    line-height: var(--leading-2xl);
+  }
+
+  .activity.dark .accent-word {
+    color: var(--color-primary);
+  }
+
+  .activity.orange .accent-word {
+    color: var(--color-dark);
+  }
+
+  .carousel-nav {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .carousel-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border-dark);
+    background: transparent;
+    color: inherit;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .activity.orange .carousel-btn {
+    border-color: rgba(39, 36, 35, 0.25);
+  }
+
+  .carousel-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .carousel-btn:active {
+    transform: scale(0.92);
+    transition-duration: var(--dur-press);
+  }
+
+  .carousel {
+    overflow: hidden;
+  }
+
+  .carousel__track {
+    --carousel-gap: 1.25rem;
+    /* The first/last card is never flush with the edge: its inset is at
+       least the same as the gap between cards, on every breakpoint. On wide
+       screens it grows further to line up with the section title above —
+       same formula for both the Adulti and Junior rows since they share
+       this component. */
+    --carousel-inset: max(var(--carousel-gap), calc((100vw - var(--container-width)) / 2 + var(--carousel-gap)));
+    display: flex;
+    gap: var(--carousel-gap);
+    overflow-x: scroll;
+    scroll-snap-type: x mandatory;
+    /* Without this, scroll-snap-align: start on the cards snaps the first
+       card flush against the scrollport edge, cancelling the padding below
+       the moment anything calls scrollTo/scrollBy — the padding would only
+       ever be visible for a single frame. This tells snapping to treat the
+       padding as reserved space instead of eating it. */
+    scroll-padding-inline: var(--carousel-inset);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0.5rem var(--carousel-inset) 1rem;
+  }
+
+  .carousel__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Desktop only, both rows: starts closer to the edge than the
+     title-aligned inset above (still never less than the card gap). */
+  @media (min-width: 961px) {
+    .carousel__track {
+      --carousel-inset: var(--carousel-gap);
+    }
+  }
+
+  .card {
+    position: relative;
+    flex: 0 0 calc((100% - 3 * 1.25rem) / 4);
+    aspect-ratio: 3 / 4;
+    display: block;
+    border-radius: var(--radius);
+    background: var(--color-dark);
+    color: var(--color-white);
+    scroll-snap-align: start;
+    box-shadow: 0 0 22px rgba(0, 0, 0, 0.22);
+    transform: translateY(0) scale(1);
+    transition: transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-base) var(--ease-out-crit);
+  }
+
+  .card:hover,
+  .card.is-active {
+    transform: translateY(-10px) scale(1.015);
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.3);
+  }
+
+  .card:active {
+    transform: scale(0.985);
+    transition-duration: var(--dur-press);
+  }
+
+  .card__clip {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .card__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.5s ease;
+  }
+
+  .card:hover .card__img,
+  .card.is-active .card__img {
+    transform: scale(1.06);
+  }
+
+  .card__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(20, 18, 17, 0) 40%, rgba(20, 18, 17, 0.88) 82%, rgba(20, 18, 17, 1) 96%);
+    transition: background 0.35s ease;
+  }
+
+  .card:hover .card__scrim,
+  .card.is-active .card__scrim {
+    background: linear-gradient(180deg, rgba(20, 18, 17, 0.15) 0%, rgba(20, 18, 17, 0.94) 78%, rgba(20, 18, 17, 1) 96%);
+  }
+
+  .card__body {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.5rem;
+  }
+
+  .card__num {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--color-primary);
+    margin-bottom: 6px;
+  }
+
+  .card__name {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    font-weight: 500;
+    font-size: var(--text-md);
+    color: var(--color-white);
+  }
+
+  .card__hover {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(10px);
+    overflow: hidden;
+    transition: opacity 0.35s ease, transform 0.35s ease, max-height 0.35s ease;
+  }
+
+  .card:hover .card__hover,
+  .card.is-active .card__hover {
+    max-height: 10rem;
+    opacity: 1;
+    transform: translateY(0);
+    margin-top: 8px;
+  }
+
+  .card__desc {
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.5;
+    margin: 0 0 12px;
+    font-family: var(--font-body);
+    text-transform: none;
+  }
+
+  .card__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-dark);
+    background: var(--color-primary);
+    padding: 0.55rem 1rem;
+    border-radius: 100px;
+  }
+
+  @media (max-width: 960px) {
+    .card {
+      flex-basis: calc((100% - 1.25rem) / 2);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .activity-head {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .card {
+      flex-basis: 78vw;
+    }
+  }
+</style>
