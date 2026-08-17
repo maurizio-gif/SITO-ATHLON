@@ -245,15 +245,11 @@ const social = [
     backdrop?.classList.add('visible');
   }
 
-  // One shared timer: the trigger and its panel are separate elements (the
-  // panel is a sibling further down the header, not a child of .nav-item), so
-  // moving the pointer from one to the other fires mouseleave. Without a
-  // grace period the menu would slam shut before it can be reached.
   let closeTimer: number | undefined;
   const cancelClose = () => window.clearTimeout(closeTimer);
   const scheduleClose = () => {
     cancelClose();
-    closeTimer = window.setTimeout(closeAllMega, 260);
+    closeTimer = window.setTimeout(closeAllMega, 320);
   };
 
   navItems.forEach((item) => {
@@ -272,20 +268,24 @@ const social = [
     });
 
     if (canHover) {
+      // Only ever opens/switches. Closing is owned by the header below, so
+      // drifting off the trigger into the dead space beside or under it
+      // doesn't dismiss the panel.
       item.addEventListener('mouseenter', () => {
         cancelClose();
         openMega(id);
       });
-      item.addEventListener('mouseleave', scheduleClose);
     }
   });
 
-  // Keep it open while the pointer is inside the panel itself.
+  // The panels are descendants of <header>, so mouseleave on the header only
+  // fires once the pointer has left the bar *and* the open panel — the gap
+  // between them, and any wobble along the way, counts as "still inside".
+  // That is what stops the menu from snapping shut on a near-miss.
   if (canHover) {
-    megaPanels.forEach((mega) => {
-      mega.addEventListener('mouseenter', cancelClose);
-      mega.addEventListener('mouseleave', scheduleClose);
-    });
+    header?.addEventListener('mouseleave', scheduleClose);
+    header?.addEventListener('mouseenter', cancelClose);
+    megaPanels.forEach((mega) => mega.addEventListener('mouseenter', cancelClose));
   }
 
   backdrop?.addEventListener('click', closeAllMega);
