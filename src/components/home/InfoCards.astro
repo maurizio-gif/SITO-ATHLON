@@ -1,0 +1,126 @@
+---
+const cards = [
+  {
+    variant: 'dark',
+    title: 'Abbonamenti',
+    html: 'Scopri i nuovi <strong>Abbonamenti Smart</strong> e <strong>Premium</strong>, con pagamento mensile o annuale.',
+    link: 'https://r2d.ply.so/abbonamenti-athlon/?source=SitoWeb&medium=HomeAbbonamenti',
+  },
+  {
+    variant: 'photo',
+    image: '/wp-content/uploads/2026/04/P1000616-scaled.jpg',
+    title: 'Promo Agosto',
+    html: 'Scopri la nostra promozione riservata agli <strong>Abbonamenti Annuali</strong>. Entro il <strong>31/08/2026</strong>',
+    link: 'https://www.athlonroma.it/promo/',
+  },
+  {
+    variant: 'light',
+    image: '/wp-content/uploads/2024/07/calendario-card.jpg',
+    title: 'Planning 2026/27',
+    html: 'Scopri il Planning della nuova Stagione: Fitness, Gym Floor, Aqua Fitness, Nuoto Libero e Scuola Nuoto Adulti.',
+    link: 'https://planning.athlonroma.it/',
+  },
+];
+---
+
+<section class="info-cards">
+  <div class="container grid">
+    {cards.map((c, i) => (
+      <div
+        class:list={['card', c.variant]}
+        style={c.image ? `--bg-image: url(${c.image})` : ''}
+        data-anim="scale"
+        data-anim-delay={String(i * 90)}
+      >
+        <div class="card-content">
+          <h3>{c.title}</h3>
+          <p set:html={c.html} />
+          <a href={c.link} class="btn btn-outline-dark">Scopri di più</a>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .info-cards {
+    padding: var(--space-section-sm) 0;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .card {
+    border-radius: 32px;
+    padding: 48px 40px;
+    min-height: 340px;
+    display: flex;
+    align-items: flex-end;
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--dur-base) var(--ease-out-crit), box-shadow var(--dur-base) var(--ease-out-crit);
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(39, 36, 35, 0.18);
+  }
+
+  .card:active {
+    transform: translateY(-1px) scale(0.99);
+    transition-duration: var(--dur-instant);
+  }
+
+  .card h3 {
+    font-size: 28px;
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
+  }
+
+  .card-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .card.dark {
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .card.dark .btn-outline-dark {
+    border-color: var(--color-white);
+    color: var(--color-white);
+  }
+
+  .card.photo {
+    background: var(--bg-image) center / cover no-repeat, var(--color-primary);
+    background-blend-mode: multiply;
+    color: var(--color-white);
+  }
+
+  .card.photo .btn-outline-dark {
+    border-color: var(--color-white);
+    color: var(--color-white);
+  }
+
+  .card.light {
+    background: var(--bg-image) center / cover no-repeat, var(--color-cream);
+    background-blend-mode: luminosity;
+    color: var(--color-dark);
+  }
+  .card.light::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(238, 234, 227, 0.75);
+  }
+
+  @media (max-width: 960px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

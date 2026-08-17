@@ -1,0 +1,538 @@
+---
+const gallery = [
+  // Gym Floor
+  { image: '/wp-content/uploads/2025/12/P1000273-scaled.jpeg', caption: 'Gym Floor' },
+  { image: '/wp-content/uploads/2025/12/P1000283-scaled.jpeg', caption: 'Gym Floor' },
+  { image: '/wp-content/uploads/2025/12/P1000225-scaled.jpeg', caption: 'Gym Floor' },
+  { image: '/wp-content/uploads/2025/12/P1000266-1-scaled.jpeg', caption: 'Gym Floor' },
+  { image: '/wp-content/uploads/2025/11/ATHLON81-scaled.jpg', caption: 'Gym Floor' },
+  { image: '/wp-content/uploads/2025/11/ATHLON85-scaled.jpg', caption: 'Gym Floor' },
+  { image: '/wp-content/uploads/2025/11/ATHLON79-scaled.jpg', caption: 'Gym Floor' },
+  // Sala Fitness
+  { image: '/wp-content/uploads/2025/12/P1000232-scaled.jpeg', caption: 'Sala Fitness' },
+  { image: '/wp-content/uploads/2025/12/P1000317-scaled.jpeg', caption: 'Sala Fitness' },
+  { image: '/wp-content/uploads/2025/12/P1000320-scaled.jpeg', caption: 'Sala Fitness' },
+  // Piscine
+  { image: '/wp-content/uploads/2025/11/ATHLON88-scaled.jpg', caption: 'Piscine' },
+  { image: '/wp-content/uploads/2024/09/IMG_3388-scaled.jpg', caption: 'Piscine' },
+  { image: '/wp-content/uploads/2024/09/IMG_3386-scaled.jpg', caption: 'Piscine' },
+  // Spogliatoi
+  { image: '/wp-content/uploads/2024/08/IMG_2019-scaled.jpg', caption: 'Spogliatoi' },
+  { image: '/wp-content/uploads/2024/08/IMG_2018-scaled.jpg', caption: 'Spogliatoi' },
+  { image: '/wp-content/uploads/2024/09/IMG_3393-scaled.jpg', caption: 'Spogliatoi' },
+  { image: '/wp-content/uploads/2024/08/IMG_2007-2-scaled.jpg', caption: 'Spogliatoi' },
+  { image: '/wp-content/uploads/2024/08/IMG_1652-scaled.jpg', caption: 'Spogliatoi' },
+  { image: '/wp-content/uploads/2024/08/IMG_1630-1024x1024-1.jpeg', caption: 'Spogliatoi' },
+  { image: '/wp-content/uploads/2025/12/P1000180-scaled.jpeg', caption: 'Spogliatoi' },
+  { image: '/wp-content/uploads/2024/09/IMG_3389-scaled.jpg', caption: 'Spogliatoi' },
+  { image: '/wp-content/uploads/2025/12/P1000158-scaled.jpeg', caption: 'Spogliatoi' },
+  { image: '/wp-content/uploads/2025/12/P1000246-scaled.jpeg', caption: 'Spogliatoi' },
+];
+---
+
+<section class="struttura">
+  <div class="container">
+    <span class="eyebrow" data-anim="from-left">Il Club</span>
+    <h2 data-anim="reveal">La Struttura</h2>
+    <p class="intro" data-anim="from-left" data-anim-delay="80">
+      Oltre 3000 mq dedicati allo sport. Completamente rinnovata dalle ristrutturazioni tra il 2021 ed il 2024,
+      offre spazi all'avanguardia per la pratica sportiva ad ogni età.
+    </p>
+
+    <div class="tour" data-anim="scale">
+      <iframe
+        width="100%"
+        height="500"
+        src="https://my.mpskin.com/tour/dwg8pjdrkh"
+        frameborder="0"
+        allowfullscreen
+        loading="lazy"
+        title="Tour virtuale 3D Athlon Club"></iframe>
+    </div>
+
+    <div class="gallery-head">
+      <div>
+        <h3 data-anim="reveal">Scopri gli spazi</h3>
+        <span class="gallery-hint">Gym floor, sale fitness, piscine e spogliatoi</span>
+      </div>
+      <div class="carousel-nav">
+        <button class="carousel-btn" data-gallery-dir="-1" aria-label="Precedente">←</button>
+        <button class="carousel-btn" data-gallery-dir="1" aria-label="Successivo">→</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="struttura-gallery-wrap">
+    <div class="struttura-gallery" id="struttura-gallery-track">
+      {gallery.map((item, i) => (
+        <button
+          type="button"
+          class="struttura-gallery__item"
+          data-gallery-index={i}
+          data-anim="scale"
+          data-anim-delay={String(i * 70)}
+        >
+          <img src={item.image} alt={item.caption} loading="lazy" />
+          <span class="struttura-gallery__scrim" aria-hidden="true"></span>
+          <span class="struttura-gallery__num">{String(i + 1).padStart(2, '0')}</span>
+          <span class="struttura-gallery__caption">{item.caption}</span>
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <div class="struttura-lightbox" id="struttura-lightbox" aria-hidden="true">
+    <div class="struttura-lightbox__backdrop" data-lightbox-close></div>
+    <button type="button" class="struttura-lightbox__close" data-lightbox-close aria-label="Chiudi">×</button>
+    <button type="button" class="struttura-lightbox__nav struttura-lightbox__nav--prev" data-lightbox-prev aria-label="Foto precedente">←</button>
+    <figure class="struttura-lightbox__figure">
+      <img id="struttura-lightbox-img" src="" alt="" />
+      <figcaption id="struttura-lightbox-caption"></figcaption>
+    </figure>
+    <button type="button" class="struttura-lightbox__nav struttura-lightbox__nav--next" data-lightbox-next aria-label="Foto successiva">→</button>
+  </div>
+</section>
+
+<script>
+  const items = Array.from(document.querySelectorAll<HTMLButtonElement>('.struttura-gallery__item'));
+  const lightbox = document.getElementById('struttura-lightbox');
+  const lbImg = document.getElementById('struttura-lightbox-img') as HTMLImageElement | null;
+  const lbCaption = document.getElementById('struttura-lightbox-caption');
+  let current = 0;
+
+  const show = (index: number) => {
+    current = (index + items.length) % items.length;
+    const item = items[current];
+    const img = item.querySelector('img');
+    const caption = item.querySelector('.struttura-gallery__caption');
+    if (lbImg && img) {
+      lbImg.src = img.src;
+      lbImg.alt = img.alt;
+    }
+    if (lbCaption && caption) lbCaption.textContent = caption.textContent;
+  };
+
+  const open = (index: number) => {
+    show(index);
+    lightbox?.classList.add('open');
+    lightbox?.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('struttura-lightbox-locked');
+  };
+
+  const close = () => {
+    lightbox?.classList.remove('open');
+    lightbox?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('struttura-lightbox-locked');
+  };
+
+  items.forEach((item, i) => item.addEventListener('click', () => open(i)));
+  lightbox?.querySelectorAll('[data-lightbox-close]').forEach((el) => el.addEventListener('click', close));
+  lightbox?.querySelector('[data-lightbox-prev]')?.addEventListener('click', () => show(current - 1));
+  lightbox?.querySelector('[data-lightbox-next]')?.addEventListener('click', () => show(current + 1));
+
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox?.classList.contains('open')) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowLeft') show(current - 1);
+    if (e.key === 'ArrowRight') show(current + 1);
+  });
+
+  // Horizontal scroll nav for the gallery strip itself (separate from the lightbox).
+  const galleryTrack = document.getElementById('struttura-gallery-track');
+  document.querySelectorAll<HTMLButtonElement>('[data-gallery-dir]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      pauseGalleryAuto();
+      const card = galleryTrack?.querySelector<HTMLElement>('.struttura-gallery__item');
+      const step = card ? card.getBoundingClientRect().width + 16 : 0;
+      galleryTrack?.scrollBy({ left: Number(btn.dataset.galleryDir) * step, behavior: 'smooth' });
+      resumeGalleryAutoLater();
+    });
+  });
+
+  // Continuous auto-scroll, looping back to the start — this gallery is meant
+  // to play on its own; the arrows are just a manual override on top of it.
+  const prefersReducedMotionGallery = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const GALLERY_SPEED = 32; // px per second
+  let galleryRaf: number | undefined;
+  let galleryLastTs: number | undefined;
+  let galleryPaused = false;
+  let galleryResumeTimer: number | undefined;
+
+  const galleryTick = (ts: number) => {
+    if (!galleryTrack) return;
+    if (galleryPaused) {
+      galleryLastTs = ts;
+      galleryRaf = requestAnimationFrame(galleryTick);
+      return;
+    }
+    if (galleryLastTs === undefined) galleryLastTs = ts;
+    const dt = (ts - galleryLastTs) / 1000;
+    galleryLastTs = ts;
+
+    const max = galleryTrack.scrollWidth - galleryTrack.clientWidth;
+    if (max > 2) {
+      let next = galleryTrack.scrollLeft + GALLERY_SPEED * dt;
+      if (next >= max) next = 0;
+      galleryTrack.scrollLeft = next;
+    }
+    galleryRaf = requestAnimationFrame(galleryTick);
+  };
+
+  const pauseGalleryAuto = () => {
+    galleryPaused = true;
+    window.clearTimeout(galleryResumeTimer);
+  };
+  const resumeGalleryAutoLater = () => {
+    window.clearTimeout(galleryResumeTimer);
+    galleryResumeTimer = window.setTimeout(() => {
+      galleryPaused = false;
+    }, 2000);
+  };
+
+  if (galleryTrack && !prefersReducedMotionGallery) {
+    galleryTrack.addEventListener('mouseenter', pauseGalleryAuto);
+    galleryTrack.addEventListener('mouseleave', resumeGalleryAutoLater);
+    galleryTrack.addEventListener('pointerdown', pauseGalleryAuto);
+    galleryTrack.addEventListener('pointerup', resumeGalleryAutoLater);
+    galleryTrack.addEventListener('touchstart', pauseGalleryAuto, { passive: true });
+    galleryTrack.addEventListener('touchend', resumeGalleryAutoLater);
+    galleryTrack.addEventListener('wheel', () => { pauseGalleryAuto(); resumeGalleryAutoLater(); }, { passive: true });
+    galleryRaf = requestAnimationFrame(galleryTick);
+  }
+</script>
+
+<style>
+  .struttura {
+    background: var(--color-dark);
+    color: var(--color-white);
+    padding: var(--space-section-lg) 0;
+  }
+
+  .struttura h2 {
+    color: var(--color-primary);
+    font-size: var(--text-2xl);
+    letter-spacing: var(--tracking-2xl);
+    margin-bottom: 24px;
+  }
+
+  .struttura .eyebrow {
+    margin-bottom: 12px;
+  }
+
+  .intro {
+    max-width: 640px;
+    opacity: 0.9;
+  }
+
+  .tour {
+    margin: 40px 0;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--border-dark);
+  }
+
+  .tour iframe {
+    display: block;
+    border: 0;
+  }
+
+  /* ---- Gallery header: separates the gallery from the tour above it,
+     and spells out that it scrolls (same lesson as the activity carousels). ---- */
+  .gallery-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 64px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border-dark);
+  }
+
+  .gallery-head h3 {
+    font-size: var(--text-lg);
+    letter-spacing: -0.005em;
+    margin-bottom: 6px;
+  }
+
+  .gallery-hint {
+    display: block;
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.55);
+    letter-spacing: 0.02em;
+  }
+
+  .carousel-nav {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .carousel-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border-dark);
+    background: transparent;
+    color: inherit;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .carousel-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .carousel-btn:active {
+    transform: scale(0.92);
+    transition-duration: var(--dur-press);
+  }
+
+  /* ---- Gallery: horizontal scroll strip, deliberately distinct from the
+     boxed virtual tour above (full-bleed, no card frame around the whole row). ---- */
+  .struttura-gallery-wrap {
+    overflow: hidden;
+    margin-top: 24px;
+  }
+
+  .struttura-gallery {
+    display: flex;
+    gap: 1rem;
+    overflow-x: scroll;
+    /* No scroll-snap here on purpose: this row auto-scrolls continuously via
+       JS, and snap-points fight a continuous drive, causing it to jerk back
+       to the nearest item. Manual drag still scrolls freely without it. */
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0.5rem clamp(24px, 4vw, 48px) 1rem;
+  }
+
+  .struttura-gallery::-webkit-scrollbar {
+    display: none;
+  }
+
+  .struttura-gallery__item {
+    position: relative;
+    display: block;
+    flex: 0 0 clamp(240px, 26vw, 340px);
+    aspect-ratio: 4 / 3;
+    padding: 0;
+    overflow: hidden;
+    background: var(--color-dark);
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
+    transition: transform var(--dur-base) var(--ease-out-crit), box-shadow var(--dur-base) var(--ease-out-crit);
+  }
+
+  .struttura-gallery__item:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  }
+
+  .struttura-gallery__item:active {
+    transform: translateY(-2px) scale(0.99);
+    transition-duration: var(--dur-press);
+  }
+
+  .struttura-gallery__item img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s var(--ease-out-crit);
+  }
+
+  .struttura-gallery__item:hover img,
+  .struttura-gallery__item:focus-visible img {
+    transform: scale(1.08);
+  }
+
+  .struttura-gallery__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(20, 18, 17, 0) 50%, rgba(20, 18, 17, 0.9) 100%);
+    opacity: 0;
+    transition: opacity var(--dur-fast) ease;
+  }
+
+  .struttura-gallery__item:hover .struttura-gallery__scrim,
+  .struttura-gallery__item:focus-visible .struttura-gallery__scrim {
+    opacity: 1;
+  }
+
+  .struttura-gallery__num {
+    position: absolute;
+    top: 1rem;
+    left: 1.1rem;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--color-primary);
+    opacity: 0;
+    transition: opacity var(--dur-fast) ease;
+  }
+
+  .struttura-gallery__item:hover .struttura-gallery__num,
+  .struttura-gallery__item:focus-visible .struttura-gallery__num {
+    opacity: 1;
+  }
+
+  .struttura-gallery__caption {
+    position: absolute;
+    bottom: 1rem;
+    left: 1.1rem;
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: var(--text-md);
+    letter-spacing: -0.005em;
+    color: var(--color-white);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity var(--dur-fast) ease, transform var(--dur-fast) ease;
+  }
+
+  .struttura-gallery__item:hover .struttura-gallery__caption,
+  .struttura-gallery__item:focus-visible .struttura-gallery__caption {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 760px) {
+    .gallery-head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .struttura-gallery__item {
+      flex-basis: 72vw;
+    }
+    /* No hover on touch — caption/num stay visible so the strip still reads. */
+    .struttura-gallery__caption,
+    .struttura-gallery__num {
+      opacity: 1;
+      transform: none;
+    }
+    .struttura-gallery__scrim {
+      opacity: 1;
+      background: linear-gradient(180deg, rgba(20, 18, 17, 0) 65%, rgba(20, 18, 17, 0.75) 100%);
+    }
+  }
+
+  /* ---- Lightbox ---- */
+  .struttura-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-fast) ease;
+  }
+
+  .struttura-lightbox.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .struttura-lightbox__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 8, 0.92);
+  }
+
+  .struttura-lightbox__figure {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 68rem;
+    max-height: 84vh;
+    margin: 0;
+    transform: scale(0.97);
+    transition: transform var(--dur-fast) ease;
+  }
+
+  .struttura-lightbox.open .struttura-lightbox__figure {
+    transform: scale(1);
+  }
+
+  .struttura-lightbox__figure img {
+    max-width: 100%;
+    max-height: 74vh;
+    border-radius: 10px;
+    box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.6);
+  }
+
+  .struttura-lightbox__figure figcaption {
+    margin-top: 1rem;
+    font-size: var(--text-sm);
+    letter-spacing: 0.04em;
+    color: var(--color-white);
+    opacity: 0.8;
+  }
+
+  .struttura-lightbox__close,
+  .struttura-lightbox__nav {
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-white);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-dark);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .struttura-lightbox__close {
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1.4rem;
+    line-height: 1;
+    transition: transform var(--dur-instant) ease-out;
+  }
+
+  .struttura-lightbox__close:active {
+    transition-duration: var(--dur-press);
+    transform: scale(0.9);
+  }
+
+  .struttura-lightbox__nav {
+    top: 50%;
+    width: 46px;
+    height: 46px;
+    transform: translateY(-50%);
+    transition: background var(--dur-fast) ease;
+  }
+
+  .struttura-lightbox__nav:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .struttura-lightbox__nav:active {
+    transition-duration: var(--dur-press);
+    transform: translateY(-50%) scale(0.88);
+  }
+
+  .struttura-lightbox__nav--prev {
+    left: 1.5rem;
+  }
+
+  .struttura-lightbox__nav--next {
+    right: 1.5rem;
+  }
+
+  :global(body.struttura-lightbox-locked) {
+    overflow: hidden;
+  }
+</style>

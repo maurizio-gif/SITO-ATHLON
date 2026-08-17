@@ -1,0 +1,65 @@
+---
+---
+
+<section class="app-section">
+  <div class="container layout">
+    <div class="copy" data-anim="from-left">
+      <h2>APP Athlon Club</h2>
+      <p>
+        Migliora la tua routine sportiva con l'app!<br />
+        È la soluzione tutto in uno per monitorare facilmente i tuoi allenamenti, tenere traccia dei progressi e
+        raggiungere i tuoi obiettivi con approfondimenti e motivazione coinvolgenti.
+      </p>
+      <a href="https://onelink.to/athlon" class="btn btn-primary" data-anim="pop" data-anim-delay="150">Scarica l'app</a>
+    </div>
+    <div class="phone" data-anim="scale">
+      <img src="/wp-content/uploads/2024/07/app_bg-scaled.jpg" alt="App Athlon Club" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .app-section {
+    background: var(--color-cream);
+    padding: var(--space-section-lg) 0;
+  }
+
+  .layout {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 64px;
+    flex-wrap: wrap;
+  }
+
+  .phone {
+    flex: 0 0 auto;
+    width: min(320px, 80vw);
+  }
+
+  .copy {
+    flex: 1 1 360px;
+    max-width: 480px;
+    text-align: left;
+  }
+
+  .copy h2 {
+    font-size: var(--text-2xl);
+    letter-spacing: var(--tracking-2xl);
+    margin-bottom: 16px;
+    color: var(--color-dark);
+  }
+
+  .copy p {
+    color: var(--color-dark);
+    opacity: 0.85;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 700px) {
+    .layout {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

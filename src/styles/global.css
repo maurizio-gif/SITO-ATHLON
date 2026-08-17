@@ -1,0 +1,330 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@font-face {
+  font-family: 'Tusker-Grotesk';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/wp-content/uploads/2024/07/TuskerGrotesk-3500Medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Tusker-Grotesk';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/wp-content/uploads/2024/07/TuskerGrotesk-4500Medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Tusker-Grotesk';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/wp-content/uploads/2024/07/TuskerGrotesk-3700Bold.woff2') format('woff2');
+}
+
+:root {
+  /* Brand */
+  --color-primary: #ff5701;
+  --color-dark: #272423;
+  --color-cream: #eeeae3;
+  --color-white: #ffffff;
+
+  /* Single accent, two contexts — no wider palette */
+  --accent: var(--color-primary);
+  --accent-on-dark: var(--color-primary);
+  --accent-hover: #e14e00;
+
+  --text-muted: rgba(39, 36, 35, 0.65);
+
+  /* Semi-transparent borders adapt to whatever they sit on */
+  --border: rgba(39, 36, 35, 0.08);
+  --border-strong: rgba(39, 36, 35, 0.12);
+  --border-dark: rgba(255, 255, 255, 0.14);
+
+  --font-heading: 'Tusker-Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  --container-width: 1320px;
+  --container-narrow: 54rem;
+  --container-wide: 88rem;
+
+  /* Type scale — never an isolated size outside this */
+  --text-2xs: 0.72rem;
+  --text-xs: 0.8rem;
+  --text-sm: 0.9rem;
+  --text-base: 0.95rem;
+  --text-md: 1.1rem;
+  --text-lg: 1.375rem;
+  --text-xl: 1.6rem;
+  --text-2xl: clamp(1.75rem, 3.5vw, 2.5rem);
+  --text-3xl: clamp(2.6rem, 5vw, 3.6rem);
+  --text-4xl: clamp(2.75rem, 7vw, 5.5rem);
+
+  /* Tracking/leading are size-specific: negative + tight on display text,
+     the opposite on small text. Never one fixed value for every size. */
+  --tracking-4xl: -0.03em;
+  --leading-4xl: 0.98;
+  --tracking-2xl: -0.02em;
+  --leading-2xl: 1.05;
+
+  --radius: 20px;
+
+  /* Section rhythm — pick by section "weight", not ad hoc */
+  --space-section-sm: 3.5rem;
+  --space-section-md: 5rem;
+  --space-section-lg: 6.5rem;
+
+  /* Critically damped, no-overshoot curve: the default for anything that isn't
+     carrying momentum from a drag/flick (buttons, cards, menus, accordions). */
+  --ease-out-crit: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Slight overshoot, reserved for momentum-driven feedback (press release, snap). */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --dur-press: 0.05s;
+  --dur-instant: 0.1s;
+  --dur-fast: 0.2s;
+  --dur-base: 0.35s;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --space-section-sm: 2rem;
+    --space-section-md: 3rem;
+    --space-section-lg: 3.5rem;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--color-dark);
+  background: var(--color-white);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+h3, h4 {
+  letter-spacing: -0.01em;
+}
+
+/* Project rule: body copy is always the same size everywhere (cards, intros,
+   sections) — never re-declare font-size on a <p> outside this. Only
+   headings, eyebrows/captions, and fine print use other scale steps. */
+p {
+  margin: 0 0 1em;
+  font-size: var(--text-base);
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a, button {
+  transition: opacity var(--dur-fast) var(--ease-out-crit),
+    transform var(--dur-fast) var(--ease-out-crit),
+    background-color var(--dur-fast) var(--ease-out-crit),
+    color var(--dur-fast) var(--ease-out-crit);
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Narrow: intro copy, centered lede text. Wide: carousels/galleries that
+   need a little extra room to hint at the next card. */
+.container-narrow {
+  width: 100%;
+  max-width: var(--container-narrow);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.container-wide {
+  width: 100%;
+  max-width: var(--container-wide);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 20px 32px;
+  border-radius: 100px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform var(--dur-instant) ease-out, box-shadow var(--dur-fast) var(--ease-out-crit),
+    background-color var(--dur-fast) var(--ease-out-crit), opacity var(--dur-fast) var(--ease-out-crit);
+}
+
+.btn:hover {
+  box-shadow: 0 8px 20px rgba(39, 36, 35, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Feedback lands on press, not on release — instant, no easing delay. */
+.btn:active {
+  transform: scale(0.96);
+  box-shadow: none;
+  transition-duration: var(--dur-press);
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.btn-outline {
+  background: transparent;
+  border-color: var(--color-white);
+  color: var(--color-white);
+}
+
+.btn-outline-dark {
+  background: transparent;
+  border-color: var(--color-dark);
+  color: var(--color-dark);
+}
+
+.btn-cream {
+  background: var(--color-cream);
+  color: var(--color-dark);
+  font-weight: 800;
+  border-radius: 0;
+}
+
+.eyebrow {
+  display: block;
+  color: var(--color-primary);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+/* ---- Reveal on scroll -----------------------------------------------
+   One shared IntersectionObserver (see Layout.astro) toggles .is-visible.
+   Pick the variant per element via data-anim; default = fade+rise+blur. */
+[data-anim] {
+  opacity: 0;
+  transform: translateY(34px);
+  filter: blur(4px);
+  transition: opacity 0.7s var(--ease-spring), transform 0.8s var(--ease-spring), filter 0.6s ease;
+}
+[data-anim].is-visible {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+
+/* Headings: a touch of overshoot as they settle. */
+[data-anim='reveal'] {
+  opacity: 0;
+  transform: translateX(-32px) translateY(6px);
+  filter: blur(3px);
+  transition: opacity 0.75s var(--ease-out-crit), transform 0.85s var(--ease-spring), filter 0.6s ease;
+}
+[data-anim='reveal'].is-visible {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+
+/* Eyebrows / intro copy: clean lateral slide. */
+[data-anim='from-left'] {
+  opacity: 0;
+  transform: translateX(-38px);
+  filter: blur(3px);
+  transition: opacity 0.72s ease, transform 0.8s var(--ease-out-crit), filter 0.6s ease;
+}
+[data-anim='from-left'].is-visible {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+
+/* Images/cards: gentle zoom-in from below. */
+[data-anim='scale'] {
+  opacity: 0;
+  transform: scale(0.92) translateY(20px);
+  filter: blur(5px);
+  transition: opacity 0.78s ease, transform 0.88s var(--ease-out-crit), filter 0.65s ease;
+}
+[data-anim='scale'].is-visible {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+
+/* Buttons/badges: an elastic pop. */
+[data-anim='pop'] {
+  opacity: 0;
+  transform: translateY(16px) scale(0.92);
+  transition: opacity 0.5s ease, transform 0.55s var(--ease-spring);
+}
+[data-anim='pop'].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Fade only — for elements where a position shift would be distracting. */
+[data-anim='fade'] {
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+[data-anim='fade'].is-visible {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-anim] {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}

@@ -1,0 +1,191 @@
+---
+const sitemap = [
+  { label: 'Home', href: '/' },
+  { label: 'Gym Floor (Sala Pesi)', href: '/gym-floor' },
+  { label: 'Corsi Fitness', href: '/corsi-fitness' },
+  { label: 'Nuoto Libero Assistito', href: '/nuoto-libero' },
+  { label: 'Scuola Nuoto Adulti', href: '/scuola-nuoto-adulti' },
+  { label: 'Aqua Fitness', href: '/aqua-fitness' },
+  { label: 'Group Reformer', href: '/reformer' },
+];
+
+const risorse = [
+  { label: 'Privacy Policy', href: '/privacy' },
+  { label: 'Termini e Condizioni', href: '/termini' },
+  { label: 'Portale Athlon', href: 'https://athlon.perfectgym.com/ClientPortal2/' },
+  { label: 'Help Desk', href: '/knowledge-base' },
+  { label: 'Modello Organizzativo (MOG)', href: '/mog' },
+  { label: 'Codice Condotta', href: '/codice-condotta' },
+  { label: 'App Athlon Club', href: 'https://onelink.to/athlon' },
+];
+
+const social = [
+  { label: 'Instagram', href: 'https://www.instagram.com/athlonclub_roma/' },
+  { label: 'Facebook', href: 'https://www.facebook.com/AthlonClubRoma' },
+  { label: 'Youtube', href: 'https://www.youtube.com/' },
+];
+---
+
+<footer class="site-footer">
+  <div class="cta-band">
+    <div class="container cta-inner">
+      <a href="/contatti" class="btn btn-primary">Contattaci</a>
+      <span>Entra nel mondo Athlon</span>
+    </div>
+  </div>
+
+  <div class="container footer-grid">
+    <div class="footer-col">
+      <h4>Dove Siamo</h4>
+      <p>Via Ugo Ojetti, 134 – 00137 – Roma</p>
+      <h4>Orari</h4>
+      <p>Lunedì–Venerdì: 6:00 – 22:00<br />Sabato: 8:00 – 20:00<br />Domenica: 9:30 – 13:00</p>
+      <a href="/lavora" class="work-with-us">Athlon è alla ricerca di personale, lavora con noi</a>
+      <a href="/lavora" class="btn btn-outline-dark small">Posizioni aperte</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Sitemap</h4>
+      <ul>
+        {sitemap.map((l) => (
+          <li><a href={l.href}>{l.label}</a></li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Social</h4>
+      <ul>
+        {social.map((l) => (
+          <li><a href={l.href} target="_blank" rel="noopener">{l.label}</a></li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Risorse</h4>
+      <ul>
+        {risorse.map((l) => (
+          <li><a href={l.href}>{l.label}</a></li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <div class="container legal">
+    <p>
+      Point 2000 Srl Società Sportiva Dilettantistica | Via Ugo Ojetti 134, 00137 Roma | P.IVA 05154811003 |
+      desk@athlonroma.it | Affiliazione ASI: LAZ-RM4453 | Affiliazione FIN: 996434 | Affiliazione CSEN: 71519
+    </p>
+    <p class="disclaimer">
+      SITO WEB PER LA PROPAGANDA ATTIVITÀ FISICA DIDATTICA SPORTIVA DILETTANTISTICA — Le attività proposte su
+      questo sito sono attività sportive dilettantistiche e attività motorie strutturate, svolte da Società
+      Sportiva Dilettantistica affiliata a Enti sportivi riconosciuti dal CONI. Le attività non hanno finalità
+      sanitarie, terapeutiche, riabilitative o estetiche.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .cta-band {
+    background: var(--color-primary);
+  }
+
+  .cta-inner {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 32px 24px;
+  }
+
+  .cta-inner .btn-primary {
+    background: var(--color-white);
+    color: var(--color-primary);
+  }
+
+  .cta-inner span {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: 22px;
+    color: var(--color-white);
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+    padding: 64px 24px 40px;
+  }
+
+  .footer-col h4 {
+    font-size: 16px;
+    color: var(--color-primary);
+    margin-bottom: 16px;
+  }
+
+  .footer-col p {
+    font-size: 14px;
+    opacity: 0.85;
+  }
+
+  .footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .footer-col li {
+    margin-bottom: 10px;
+  }
+
+  .footer-col a {
+    font-size: 14px;
+    opacity: 0.85;
+  }
+
+  .footer-col a:hover {
+    opacity: 1;
+    color: var(--color-primary);
+  }
+
+  .work-with-us {
+    display: block;
+    margin: 20px 0 16px;
+    font-weight: 600;
+  }
+
+  .btn.small {
+    padding: 12px 24px;
+    font-size: 12px;
+    border-color: var(--color-white);
+    color: var(--color-white);
+  }
+
+  .legal {
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 24px;
+    font-size: 12px;
+    opacity: 0.6;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 900px) {
+    .footer-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 560px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
+    }
+    .cta-inner {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

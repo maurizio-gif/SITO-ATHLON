@@ -1,0 +1,42 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/home/Hero.astro';
+import ChiSiamo from '../components/home/ChiSiamo.astro';
+import InfoCards from '../components/home/InfoCards.astro';
+import ActivityGrid from '../components/home/ActivityGrid.astro';
+import Struttura from '../components/home/Struttura.astro';
+import AppSection from '../components/home/AppSection.astro';
+import Eventi from '../components/home/Eventi.astro';
+
+const adultiItems = [
+  { title: 'Gym Floor', image: '/wp-content/uploads/2024/08/IMG_2065-scaled.jpg', desc: '400 mq di sala pesi e cardio di ultima generazione.', href: '/gym-floor' },
+  { title: 'Corsi Fitness', image: '/wp-content/uploads/2024/08/WM_08332-scaled.jpg', desc: 'Oltre 80 corsi a settimana, per ogni livello.', href: '/corsi-fitness' },
+  { title: 'Group Reformer', image: '/wp-content/uploads/2025/03/Athlon130-scaled.jpg', desc: 'Allenamento funzionale su reformer, in piccoli gruppi.', href: '/reformer' },
+  { title: 'Personal Trainer*', image: '/wp-content/uploads/2024/08/WM_07530-scaled.jpg', desc: 'Un percorso su misura seguito dai nostri coach.', href: '/personal-training' },
+  { title: 'Nuoto Libero Assistito', image: '/wp-content/uploads/2025/03/Athlon85-scaled.jpg', desc: 'Nuoto libero in piscina, con assistenza bagnino.', href: '/nuoto-libero' },
+  { title: 'Aqua Fitness', image: '/wp-content/uploads/2025/03/Athlon95-scaled.jpg', desc: 'Allenamento cardio a basso impatto in acqua.', href: '/aqua-fitness' },
+  { title: 'Scuola Nuoto Adulti', image: '/wp-content/uploads/2025/03/Athlon86-scaled.jpg', desc: 'Impara o perfeziona il nuoto, a ogni età.', href: '/scuola-nuoto-adulti' },
+  { title: 'Corso Gestanti', image: '/wp-content/uploads/2024/07/AdobeStock_388153177-scaled.jpeg', desc: 'Corsi in acqua pensati per la gravidanza.', href: '/gestanti' },
+];
+
+const juniorItems = [
+  { title: 'Baby Nuoto', image: '/wp-content/uploads/2023/11/Baby-Nuoto.jpg', desc: "Il primo approccio all'acqua, dai 3 mesi.", href: '/baby-nuoto' },
+  { title: 'Scuola Nuoto Bambini', image: '/wp-content/uploads/2023/11/18731889-e1542300353899.jpg', desc: 'Corsi di nuoto per bambini dai 3 anni.', href: '/scuola-nuoto-bambini-3' },
+  { title: 'Pallanuoto', image: '/wp-content/uploads/2023/11/pallanuoto-e1554138780996.jpg', desc: 'Squadre giovanili dal 1989, per tutte le età.', href: '/pallanuoto' },
+  { title: 'Nuoto Agonistico', image: '/wp-content/uploads/2023/11/11313169_10206527687013706_6056148720556778069_o.jpg', desc: 'Percorsi agonistici dagli 8 anni in su.', href: '/nuoto-agonistico' },
+];
+---
+
+<Layout
+  title="Athlon Club 4.0 – Palestre e Piscine | Roma Nord Talenti Montesacro"
+  description="Palestra e Piscina a Roma Nord Talenti. Per imparare a nuotare o migliorare il tuo stato di salute con corsi Fitness e Acqua Gym. Reformer Pilates, Yoga..."
+>
+  <Hero />
+  <ChiSiamo />
+  <InfoCards />
+  <ActivityGrid eyebrow="Attività Sportive" accent="Adulti" variant="dark" items={adultiItems} trackId="adulti" />
+  <ActivityGrid eyebrow="Attività Sportive" accent="Junior" variant="orange" items={juniorItems} trackId="junior" />
+  <Struttura />
+  <AppSection />
+  <Eventi />
+</Layout>
