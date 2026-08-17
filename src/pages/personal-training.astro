@@ -1,0 +1,1203 @@
+---
+import Layout from '../layouts/Layout.astro';
+import AppSection from '../components/home/AppSection.astro';
+
+const PG = 'https://athlon.perfectgym.com/ClientPortal2';
+const bookPT = (trainerId: string | null) =>
+  `${PG}/#/PersonalTraining?clubId=1&trainerId=${trainerId ?? 'null'}`;
+
+// Trainer roster, in the same order as the old site's accordion. trainerId is
+// the PerfectGym id used to open that coach's own availability calendar —
+// Filippo has none yet, so his CTA falls back to the general booking page.
+const trainers = [
+  {
+    name: 'Giulia Pagliaccia',
+    image: '/wp-content/uploads/2024/08/pt-giulia-pagliaccia.jpg',
+    quote: 'Chi non balla non sa cosa succede',
+    trainerId: '42',
+    groups: [
+      {
+        label: 'Laurea',
+        items: [
+          'Magistrale in Scienze Motorie Preventive Adattate presso il Foro Italico',
+          'Magistrale in Tecniche Ortopediche',
+        ],
+      },
+      {
+        label: 'Specializzazioni',
+        items: ['Diploma di Alta Formazione per Ballerini', 'Pilates Reformer Balanced Body'],
+      },
+      {
+        label: 'Servizi proposti',
+        items: [
+          'Percorsi posturali',
+          'Lezioni individuali di Pilates, GPassè, Yoga e Reformer',
+          'Percorsi di recupero funzionale post infortunio',
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Manuel Di Censi',
+    image: '/wp-content/uploads/2024/08/pt-manuel-di-censi.jpg',
+    quote: "L'unica competizione che non possiamo permetterci il lusso di perdere è quella contro noi stessi",
+    trainerId: '43',
+    groups: [
+      {
+        label: 'Laurea',
+        items: [
+          "Magistrale al Foro Italico in scienza e tecnica delle attività motorie preventive ed adattate",
+        ],
+      },
+      {
+        label: 'Specializzazioni',
+        items: [
+          'Istruttore primo livello per la Jury Chechi Academy',
+          'Master Elav Personal Training Specialist',
+          'Antigravity Trainer',
+        ],
+      },
+      {
+        label: 'Servizi proposti',
+        items: [
+          'Schede di allenamento personalizzate',
+          "Percorsi personalizzati per il dimagrimento e l'ipertrofia",
+          'Percorsi posturali',
+          'Allenamento funzionale',
+          'Allenamento calistenico',
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Valerio Palermo',
+    image: '/wp-content/uploads/2024/08/pt-valerio-palermo.jpg',
+    quote: 'Intensità e concentrazione sono la chiave di ogni allenamento ben riuscito',
+    trainerId: '44',
+    groups: [
+      {
+        label: 'Laurea',
+        items: ['Magistrale in Scienze Motorie Preventive Adattate presso Tor Vergata'],
+      },
+      {
+        label: 'Specializzazioni',
+        items: [
+          'Master Elav, Fitness Instructor',
+          'Master Elav, Personal Trainer Specialist',
+          'Master Elav, Hypertrophy Specialist',
+          'Master Elav, Slimming Trainer Specialist',
+        ],
+      },
+      {
+        label: 'Servizi proposti',
+        items: [
+          'Schede di allenamento personalizzate',
+          "Percorsi per l'ipertrofia e la tonificazione",
+          'Percorsi per il dimagrimento',
+          'Allenamento in gravidanza e post parto',
+          'Percorsi di recupero funzionale post infortunio',
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Dario Rossini',
+    image: '/wp-content/uploads/2024/08/pt-dario-rossini.jpg',
+    quote: 'Se vuoi realmente fare qualcosa troverai il modo. Se non vuoi veramente troverai una scusa',
+    trainerId: '98',
+    groups: [
+      {
+        label: 'Laurea',
+        items: ['Magistrale in Scienze e Tecniche dello Sport presso il Foro Italico'],
+      },
+      {
+        label: 'Specializzazioni',
+        items: ['Personal Trainer FIPE livello 2', 'Master Elav Personal Trainer Specialist'],
+      },
+      {
+        label: 'Servizi proposti',
+        items: [
+          'Schede di allenamento personalizzate',
+          'Percorsi posturali',
+          "Percorsi per l'ipertrofia e il dimagrimento",
+          'Preparazione atletica sport specifica',
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Alessandra Re',
+    image: '/wp-content/uploads/2024/08/pt-alessandra-re.jpg',
+    quote: "Fissare degli obiettivi è il primo passo per trasformare l'invisibile nel visibile",
+    trainerId: '210',
+    groups: [
+      {
+        label: 'Laurea',
+        items: ['Magistrale in attività motoria preventiva e adattata presso il Foro Italico'],
+      },
+      {
+        label: 'Specializzazioni',
+        items: [
+          'Master Clinical Exercises ELAV',
+          'Corso di specializzazione Posturalmed per il riequilibrio posturale',
+          'Reformer Balanced Body',
+        ],
+      },
+      {
+        label: 'Servizi proposti',
+        items: [
+          'Percorsi individuali per contrastare o ridurre le malattie metaboliche',
+          'Percorsi posturali',
+          'Percorsi di riabilitazione post intervento',
+          'Percorsi di tonificazione e dimagrimento',
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Filippo Fiorita',
+    image: '/wp-content/uploads/2024/08/pt-filippo-fiorita.jpg',
+    quote: 'Anche per arrivare in cima alla montagna più alta si comincia con un passo',
+    trainerId: null,
+    groups: [
+      {
+        label: 'Specializzazioni',
+        items: [
+          'Istruttore Pesistica FIPE 1° livello',
+          'Istruttore Fitness e Bodybuilding Nonsolofitness 1° livello',
+        ],
+      },
+      {
+        label: 'Servizi proposti',
+        items: [
+          'Schede di allenamento personalizzate',
+          'Preparazione atletica generale e specifica',
+          'Personal di ginnastica posturale',
+        ],
+      },
+    ],
+  },
+];
+
+// Who the service is for — drawn from the old page's intro copy, split out so
+// the three cases read at a glance instead of inside one long paragraph.
+const casi = [
+  {
+    title: 'Riprendi da dove avevi lasciato',
+    body: 'Per chi torna ad allenarsi dopo una lunga pausa e vuole ripartire senza sbagliare i primi passi.',
+  },
+  {
+    title: 'Ritrova la motivazione',
+    body: 'Un coach che ti aspetta in sala cambia il modo in cui ci vai: hai un appuntamento, non un buon proposito.',
+  },
+  {
+    title: 'Obiettivi mirati, tempi brevi',
+    body: 'Quando hai una scadenza precisa in testa, il percorso viene costruito addosso a quella.',
+  },
+];
+
+// Kept in step with the same list on /abbonamenti — the old Elementor page
+// still advertised a 12-session package and no 2-session one.
+const pacchetti = [
+  { sedute: '2', prezzo: '80' },
+  { sedute: '4', prezzo: '140' },
+  { sedute: '8', prezzo: '280' },
+];
+
+const faqs = [
+  {
+    q: 'Ho bisogno del certificato medico?',
+    a: 'Se sei nostro iscritto e quindi tesserato, sì. Se acquisti e prenoti una singola lezione, no.',
+  },
+  {
+    q: 'Posso prenotare una seduta senza essere iscritto?',
+    a: 'Certamente. Puoi prenotare e pagare la singola lezione: in questo caso non è richiesta la quota di attivazione.',
+  },
+  {
+    q: 'Ho acquistato una seduta singola, cosa succede in caso di disdetta?',
+    a: "Potrai disdire la tua prenotazione entro due ore dall'inizio della seduta. Il prodotto acquistato ti verrà riaccreditato e ti permetterà una nuova prenotazione in futuro.",
+  },
+  {
+    q: 'Per gli abbonamenti devo obbligatoriamente consumare le sedute entro il mese?',
+    a: 'Sì. Gli abbonamenti mensili prevedono il caricamento del numero di lezioni scelte ogni 1° giorno del mese: le potrai consumare entro la fine del mese.',
+  },
+  {
+    q: 'Come posso effettuare la prenotazione della seduta?',
+    a: "Potrai prenotare tramite Portale Web o App: la disponibilità dei nostri Personal Trainer è sempre aggiornata.",
+  },
+];
+
+const trust = [
+  'Schede di allenamento personalizzate',
+  'Lezioni individuali Reformer e Fitness',
+  '6 trainer qualificati',
+  'Prenoti da App o Portale',
+];
+---
+
+<Layout
+  title="Personal Trainer Roma Talenti – Allenamento su misura | Athlon Club"
+  description="Personal Training ad Athlon Club, Roma Talenti: schede personalizzate, percorsi su misura e lezioni individuali di Reformer e Fitness con 6 trainer qualificati."
+>
+  <!-- HERO -->
+  <section class="pt-hero">
+    <div class="container">
+      {/* Above the fold: plays its own CSS entrance on load rather than
+          waiting on the scroll observer, exactly like the other page heroes. */}
+      <span class="eyebrow">Servizi extra</span>
+      <h1 class="pt-hero__title">
+        Personal<br />Training.<br /><em>Affidati ai professionisti.</em>
+      </h1>
+      <p class="pt-hero__sub">
+        Schede su misura, percorsi mirati e lezioni individuali di Reformer e Fitness,
+        con un <strong>coach dedicato</strong> accanto a te.
+      </p>
+    </div>
+    <div class="pt-trust">
+      <div class="container pt-trust__inner">
+        {trust.map((t) => (<span class="pt-trust__item">{t}</span>))}
+      </div>
+    </div>
+  </section>
+
+  <!-- INTRO -->
+  <section class="pt-sec">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Allenamento individuale</span>
+      <h2 class="pt-sec__title" data-anim="reveal">Un percorso su misura</h2>
+      <p class="pt-sec__sub">
+        Il nostro servizio di Personal Training si adatta alle tue esigenze specifiche: schede di
+        allenamento personalizzate, percorsi costruiti su di te e lezioni individuali di Reformer e
+        Fitness. Con un supporto esperto e dedicato, raggiungere i tuoi obiettivi è più facile — e
+        più gratificante.
+      </p>
+
+      <div class="casi">
+        {casi.map((c, i) => (
+          <article class="caso" data-anim="scale" data-anim-delay={String(i * 100)}>
+            <span class="caso__num">{`0${i + 1}`}</span>
+            <h3 class="caso__title">{c.title}</h3>
+            <p class="caso__body">{c.body}</p>
+          </article>
+        ))}
+      </div>
+
+      <a href={bookPT(null)} class="btn btn-primary pt-block-cta" data-anim="pop">Prenota ora →</a>
+    </div>
+  </section>
+
+  <!-- TRAINER -->
+  <section class="pt-sec pt-sec--dark">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Chi ti allena</span>
+      <h2 class="pt-sec__title" data-anim="reveal">I nostri personal trainer</h2>
+      <p class="pt-sec__sub">
+        Scopri i profili, le abilità e le competenze dei nostri Personal Trainer qualificati.
+        <span class="pt-sec__hint">Passa il mouse su una scheda — o toccala da smartphone — per vedere formazione, competenze e disponibilità.</span>
+      </p>
+
+      <div class="coaches">
+        {trainers.map((t, i) => (
+          <article
+            class="coach"
+            tabindex="0"
+            data-coach
+            {/* "fade" and not "scale": the card owns its own transform for the
+                hover lift, and the scale variant would fight it. */}
+            data-anim="fade"
+            data-anim-delay={String((i % 3) * 100)}
+          >
+            <div class="coach__clip">
+              <img class="coach__img" src={t.image} alt={t.name} width="768" height="768" loading="lazy" />
+              <div class="coach__scrim"></div>
+            </div>
+
+            {/* The reveal keeps its space while hidden, so opening a card
+                fades content in instead of pushing the grid around. */}
+            <div class="coach__body">
+              <h3 class="coach__name">{t.name}</h3>
+              <span class="coach__hint">Competenze e servizi <span aria-hidden="true">→</span></span>
+
+              <div class="coach__reveal">
+                <p class="coach__quote">{t.quote}</p>
+                {t.groups.map((g) => (
+                  <div class="cgroup">
+                    <span class="cgroup__label">{g.label}</span>
+                    <ul>
+                      {g.items.map((it) => (<li>{it}</li>))}
+                    </ul>
+                  </div>
+                ))}
+                <a href={bookPT(t.trainerId)} class="coach__cta">
+                  {t.trainerId ? 'Disponibilità →' : 'Prenota una seduta →'}
+                </a>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- MODALITÀ DI ADESIONE -->
+  <section class="pt-sec pt-sec--alt">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Quanto costa</span>
+      <h2 class="pt-sec__title" data-anim="reveal">Modalità di adesione</h2>
+      <p class="pt-sec__sub">
+        Una seduta alla volta, aperta anche a chi non è iscritto, oppure un pacchetto mensile da
+        aggiungere al tuo abbonamento.
+      </p>
+
+      <div class="modi">
+        <article class="modo modo--single" data-anim="scale">
+          <div class="modo__head">
+            <span class="modo__badge">Prenota e paga</span>
+            <h3 class="modo__name">Lezione singola</h3>
+            <p class="modo__desc">Nessun vincolo e nessuna quota di attivazione: paghi la seduta che prenoti.</p>
+          </div>
+
+          <div class="modo__prices">
+            <div class="pricebox">
+              <span class="pricebox__label">Iscritti</span>
+              <p class="pricebox__value"><span class="pricebox__cur">€</span>45</p>
+            </div>
+            <div class="pricebox">
+              <span class="pricebox__label">Esterni</span>
+              <p class="pricebox__value"><span class="pricebox__cur">€</span>55</p>
+            </div>
+          </div>
+
+          <a href={bookPT(null)} class="modo__cta">Prenota ora →</a>
+        </article>
+
+        <article class="modo modo--sub" data-anim="scale" data-anim-delay="100">
+          <div class="modo__head">
+            <span class="modo__badge">Riservato agli iscritti</span>
+            <h3 class="modo__name">Abbonamento mensile</h3>
+            <p class="modo__desc">
+              Aggiungi al tuo abbonamento principale uno di questi pacchetti di sedute.
+            </p>
+          </div>
+
+          <ul class="pacchetti">
+            {pacchetti.map((p) => (
+              <li class="pacchetto">
+                <span class="pacchetto__label">
+                  <strong>{p.sedute}</strong> sedute al mese
+                </span>
+                <span class="pacchetto__price">€{p.prezzo}</span>
+              </li>
+            ))}
+          </ul>
+
+          <p class="modo__note">Le sedute sono utilizzabili entro il mese solare.</p>
+          <a href={`${PG}/#/Login`} class="modo__cta">Accedi ora →</a>
+        </article>
+      </div>
+
+      <p class="pt-note">
+        Non hai ancora un abbonamento? <a href="/abbonamenti">Scopri i piani Smart e Premium →</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="pt-sec">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Domande frequenti</span>
+      <h2 class="pt-sec__title" data-anim="reveal">FAQ</h2>
+
+      <div class="faq">
+        {faqs.map((f) => (
+          <div class="faq__item" data-faq-item>
+            <button class="faq__q" type="button" aria-expanded="false" data-faq-trigger>
+              <span>{f.q}</span>
+              <span class="faq__icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq__a"><div class="faq__a-inner">{f.a}</div></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <AppSection />
+</Layout>
+
+<script>
+  // Coach cards open on hover on the desktop (pure CSS). Touch has no hover,
+  // so a tap toggles the same state — and Enter/Space do it from the keyboard.
+  // Clicks that land on the card's own link must pass through untouched.
+  document.querySelectorAll<HTMLElement>('[data-coach]').forEach((card) => {
+    const toggle = () => card.classList.toggle('is-open');
+
+    card.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) return;
+      toggle();
+    });
+
+    card.addEventListener('keydown', (e) => {
+      if ((e.target as HTMLElement).closest('a')) return;
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      toggle();
+    });
+  });
+
+  // FAQ accordion — one open at a time, same behaviour as /abbonamenti.
+  const items = Array.from(document.querySelectorAll<HTMLElement>('[data-faq-item]'));
+  items.forEach((item) => {
+    const trigger = item.querySelector<HTMLButtonElement>('[data-faq-trigger]');
+    trigger?.addEventListener('click', () => {
+      const willOpen = !item.classList.contains('open');
+      items.forEach((other) => {
+        other.classList.remove('open');
+        other.querySelector('[data-faq-trigger]')?.setAttribute('aria-expanded', 'false');
+      });
+      if (willOpen) {
+        item.classList.add('open');
+        trigger.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+</script>
+
+<style>
+  /* ---- Hero ---- */
+  .pt-hero {
+    position: relative;
+    background: var(--color-dark);
+    color: var(--color-white);
+    padding-top: var(--space-section-lg);
+    overflow: hidden;
+  }
+
+  .pt-hero::after {
+    content: 'ATHLON';
+    position: absolute;
+    right: -20px;
+    bottom: 40px;
+    font-family: var(--font-heading);
+    font-size: clamp(120px, 20vw, 260px);
+    line-height: 0.8;
+    color: rgba(255, 255, 255, 0.03);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .pt-hero .container {
+    position: relative;
+    z-index: 1;
+    padding-bottom: var(--space-section-md);
+  }
+
+  .pt-hero__title {
+    font-size: var(--text-4xl);
+    line-height: var(--leading-4xl);
+    letter-spacing: var(--tracking-4xl);
+    margin: 14px 0 22px;
+    padding: 0.08em 0 0.06em;
+    clip-path: inset(0 0 100% 0);
+    animation: hero-reveal 0.9s var(--ease-spring) 0.4s forwards;
+  }
+
+  /* Italic serif against the condensed display caps — the tagline treatment
+     shared by the home and abbonamenti heroes. */
+  .pt-hero__title em {
+    display: block;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: -0.01em;
+    font-size: 0.52em;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  @keyframes hero-reveal {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+    to {
+      clip-path: inset(0 0 0% 0);
+    }
+  }
+
+  @keyframes hero-rise {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .pt-hero .eyebrow {
+    opacity: 0;
+    animation: hero-rise 0.6s var(--ease-out-crit) 0.2s forwards;
+  }
+
+  .pt-hero__sub {
+    opacity: 0;
+    animation: hero-rise 0.6s var(--ease-out-crit) 0.85s forwards;
+    max-width: 34rem;
+    font-size: var(--text-md);
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  .pt-hero__sub strong {
+    color: var(--color-white);
+    font-weight: 600;
+  }
+
+  .pt-trust {
+    position: relative;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--border-dark);
+    opacity: 0;
+    animation: hero-rise 0.6s var(--ease-out-crit) 1.05s forwards;
+  }
+
+  .pt-trust__inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .pt-trust__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .pt-trust__item::before {
+    content: '✓';
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pt-hero__title,
+    .pt-hero .eyebrow,
+    .pt-hero__sub,
+    .pt-trust {
+      animation: none;
+      opacity: 1;
+      clip-path: none;
+    }
+  }
+
+  /* ---- Sections ---- */
+  .pt-sec {
+    padding: var(--space-section-lg) 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pt-sec--alt {
+    background: var(--color-cream);
+    border-bottom: none;
+  }
+
+  .pt-sec--dark {
+    background: var(--color-dark);
+    color: var(--color-white);
+    border-bottom: none;
+  }
+
+  .pt-sec__title {
+    font-size: var(--text-3xl);
+    letter-spacing: var(--tracking-2xl);
+    margin: 10px 0 8px;
+  }
+
+  .pt-sec__sub {
+    max-width: 46rem;
+    color: var(--text-muted);
+    margin-bottom: 36px;
+  }
+
+  .pt-sec--dark .pt-sec__sub {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  /* How-to line for the cards below — quieter than the intro it follows. */
+  .pt-sec__hint {
+    display: block;
+    margin-top: 8px;
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.42);
+  }
+
+  /* ---- Who it's for ---- */
+  .casi {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .caso {
+    padding: 26px 24px 24px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+  }
+
+  .caso__num {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--color-primary);
+    margin-bottom: 14px;
+  }
+
+  .caso__title {
+    font-size: var(--text-lg);
+    margin-bottom: 8px;
+  }
+
+  .caso__body {
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  .pt-block-cta {
+    margin-top: 32px;
+  }
+
+  /* ---- Coaches ---- */
+  /* The card height is fixed rather than content-driven, because the details
+     collapse when the card is closed: without a definite height the whole grid
+     row would resize every time one card opened. Tuned per breakpoint to the
+     tallest roster entry — see the media queries at the bottom. */
+  .coaches {
+    --coach-h: 580px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    align-items: stretch;
+  }
+
+  /* The photo fills the whole card and the copy sits on top of it, anchored to
+     the bottom edge: closed, that means just the name over the scrim. */
+  .coach {
+    position: relative;
+    height: var(--coach-h);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--color-dark);
+    cursor: pointer;
+    transform: translateY(0) scale(1);
+    box-shadow: 0 0 22px rgba(23, 21, 20, 0.22);
+    transition: transform var(--dur-base) var(--ease-out-crit),
+      box-shadow var(--dur-base) var(--ease-out-crit);
+  }
+
+  /* :focus-within is in here too, so tabbing to the CTA inside a closed card
+     opens it rather than moving focus to something invisible. */
+  .coach:hover,
+  .coach.is-open,
+  .coach:focus-visible,
+  .coach:focus-within {
+    transform: translateY(-8px) scale(1.015);
+    box-shadow: 0 0 34px rgba(23, 21, 20, 0.34);
+  }
+
+  .coach__clip {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .coach__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s var(--ease-out-crit);
+  }
+
+  .coach:hover .coach__img,
+  .coach.is-open .coach__img,
+  .coach:focus-within .coach__img {
+    transform: scale(1.06);
+  }
+
+  .coach__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      rgba(39, 36, 35, 0) 26%,
+      rgba(39, 36, 35, 0.86) 64%,
+      var(--color-dark) 92%
+    );
+    transition: background var(--dur-base) ease;
+  }
+
+  .coach:hover .coach__scrim,
+  .coach.is-open .coach__scrim,
+  .coach:focus-within .coach__scrim {
+    background: linear-gradient(
+      rgba(39, 36, 35, 0.3) 0%,
+      rgba(39, 36, 35, 0.94) 52%,
+      var(--color-dark) 90%
+    );
+  }
+
+  .coach__body {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 22px;
+  }
+
+  /* The name is the card's headline, so it takes a display step rather than a
+     heading-in-a-card step. The shadow is what keeps it readable where the
+     scrim is still thin, over a light patch of the photo. */
+  .coach__name {
+    font-size: var(--text-2xl);
+    line-height: var(--leading-2xl);
+    letter-spacing: var(--tracking-2xl);
+    text-shadow: 0 2px 18px rgba(23, 21, 20, 0.55);
+  }
+
+  .coach__hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+    transition: opacity var(--dur-fast) ease;
+  }
+
+  /* Taken out of the flow rather than just faded, so the revealed content
+     lands in the same place the hint occupied. */
+  .coach:hover .coach__hint,
+  .coach.is-open .coach__hint,
+  .coach:focus-within .coach__hint {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Collapsed when closed, so the name rests on the bottom edge. Opening grows
+     it upwards — the card itself never changes size, only what fills it. */
+  .coach__reveal {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateY(8px);
+    transition: max-height var(--dur-base) var(--ease-out-crit), opacity var(--dur-fast) ease,
+      transform var(--dur-base) var(--ease-out-crit);
+  }
+
+  .coach:hover .coach__reveal,
+  .coach.is-open .coach__reveal,
+  .coach:focus-within .coach__reveal {
+    /* Generous cap: the tallest entry measures well under this, so nothing is
+       ever clipped — it only exists because max-height cannot animate to auto. */
+    max-height: 34rem;
+    opacity: 1;
+    margin-top: 12px;
+    transform: none;
+  }
+
+  /* The coach's own words, so they get the italic serif rather than the
+     body font — same device the heroes use for their taglines. */
+  .coach__quote {
+    margin: 0 0 14px;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-size: var(--text-sm);
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  .coach__quote::before {
+    content: '“';
+  }
+
+  .coach__quote::after {
+    content: '”';
+  }
+
+  .cgroup {
+    padding-bottom: 11px;
+  }
+
+  .cgroup__label {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin-bottom: 8px;
+  }
+
+  .cgroup ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cgroup li {
+    position: relative;
+    padding-left: 14px;
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .cgroup li + li {
+    margin-top: 4px;
+  }
+
+  .cgroup li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.58em;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-primary);
+  }
+
+  .coach__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-white);
+  }
+
+  .coach__cta:hover,
+  .coach__cta:focus-visible {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  /* ---- Pricing ---- */
+  .modi {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+
+  .modo {
+    display: flex;
+    flex-direction: column;
+    padding: 28px 26px 26px;
+    border-radius: var(--radius);
+  }
+
+  .modo--single {
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .modo--sub {
+    background: var(--color-white);
+    border: 1px solid rgba(255, 87, 1, 0.35);
+  }
+
+  .modo__head {
+    margin-bottom: 22px;
+  }
+
+  .modo__badge {
+    display: inline-block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+  }
+
+  .modo--single .modo__badge {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .modo--sub .modo__badge {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .modo__name {
+    font-size: var(--text-2xl);
+    letter-spacing: var(--tracking-2xl);
+    margin-bottom: 10px;
+  }
+
+  .modo__desc {
+    margin: 0;
+  }
+
+  .modo--single .modo__desc {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .modo--sub .modo__desc {
+    color: var(--text-muted);
+  }
+
+  .modo__prices {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+
+  .pricebox {
+    padding: 20px 18px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    text-align: center;
+  }
+
+  .pricebox__label {
+    display: block;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 8px;
+  }
+
+  .pricebox__value {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(2.6rem, 5vw, 3.4rem);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-primary);
+  }
+
+  .pricebox__cur {
+    font-size: 0.45em;
+    vertical-align: 0.55em;
+    margin-right: 2px;
+  }
+
+  .pacchetti {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+  }
+
+  .pacchetto {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pacchetto:last-child {
+    border-bottom: none;
+  }
+
+  .pacchetto__label {
+    font-size: var(--text-md);
+  }
+
+  .pacchetto__label strong {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin-right: 4px;
+  }
+
+  .pacchetto__price {
+    flex-shrink: 0;
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    line-height: 1;
+    color: var(--color-primary);
+  }
+
+  .modo__note {
+    margin: 0 0 22px;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  /* Both cards end on the same baseline even though their bodies differ. */
+  .modo__cta {
+    margin-top: auto;
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    padding: 18px 30px;
+    border-radius: 100px;
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .modo__cta:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+  }
+
+  .modo__cta:active {
+    transform: scale(0.97);
+    transition-duration: var(--dur-press);
+  }
+
+  .pt-note {
+    margin: 28px 0 0;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .pt-note a {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .pt-note a:hover {
+    text-decoration: underline;
+  }
+
+  /* ---- FAQ ---- */
+  .faq__item {
+    border-top: 1px solid var(--border);
+  }
+
+  .faq__item:last-child {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .faq__q {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--font-body);
+    font-size: var(--text-md);
+    font-weight: 500;
+    color: var(--color-dark);
+    transition: color var(--dur-fast) ease;
+  }
+
+  .faq__q:hover {
+    color: var(--color-primary);
+  }
+
+  .faq__icon {
+    flex-shrink: 0;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--color-primary);
+    transition: transform var(--dur-base) var(--ease-out-crit);
+  }
+
+  .faq__item.open .faq__icon {
+    transform: rotate(45deg);
+  }
+
+  .faq__a {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--dur-base) var(--ease-out-crit);
+  }
+
+  .faq__item.open .faq__a {
+    grid-template-rows: 1fr;
+  }
+
+  .faq__a-inner {
+    overflow: hidden;
+    min-height: 0;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  .faq__item.open .faq__a-inner {
+    padding-bottom: 20px;
+  }
+
+  /* ---- Responsive ---- */
+  /* Narrower cards wrap the lists onto more lines, so the card has to grow as
+     the column count drops — not shrink. */
+  @media (max-width: 1000px) {
+    .coaches {
+      --coach-h: 560px;
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 900px) {
+    .casi {
+      grid-template-columns: 1fr;
+    }
+
+    .modi {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .coaches {
+      --coach-h: 620px;
+      grid-template-columns: 1fr;
+    }
+
+    .pt-hero__title em {
+      font-size: 0.42em;
+    }
+
+    .modo {
+      padding: 24px 20px 22px;
+    }
+
+    .modo__cta {
+      align-self: stretch;
+      justify-content: center;
+    }
+  }
+</style>
