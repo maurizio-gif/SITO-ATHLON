@@ -597,12 +597,15 @@ const affiliazioni = [
 
   /* Own row, centred under the legal text. Shown at full strength — the
      logo is already light and coloured, so no hover reveal is needed. */
+  /* Sits on its own at the very bottom: generous padding gives it room to
+     breathe and makes the whole strip a comfortable tap target. */
   .footer-credit {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    margin-top: 20px;
+    gap: 12px;
+    margin: 24px auto 0;
+    padding: 18px 24px 30px;
     font-size: 11px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -611,7 +614,7 @@ const affiliazioni = [
   }
 
   .footer-credit img {
-    height: 18px;
+    height: 20px;
     width: auto;
   }
 
