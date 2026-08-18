@@ -1,4 +1,8 @@
 ---
+import { trialCta } from '../../data/cta';
+
+/* La prova vale per tutto il club, quindi dalla home non porta un'attività. */
+const prova = trialCta({ source: '/' });
 ---
 
 <header class="hero">
@@ -32,9 +36,17 @@
     <p class="hero-lede">Innovare è la nostra<br />miglior tradizione.</p>
 
     <div class="hero-actions">
-      <a href="https://athlon.perfectgym.com/ClientPortal2/#/Registration" class="btn btn-primary">
-        Iscriviti ora <span aria-hidden="true">→</span>
+      <a
+        href={prova.href}
+        class="btn btn-primary"
+        target="_blank"
+        rel="noopener noreferrer"
+        {...prova.attrs}
+      >
+        {prova.label} <span aria-hidden="true">→</span>
       </a>
+
+      <a href="/abbonamenti" class="hero-secondary">Scopri gli abbonamenti</a>
 
       {/* Members already signed up go the other way: straight into the account
           panel the header icon opens. Same trigger hook, so one panel serves
@@ -249,6 +261,23 @@
     gap: 14px 18px;
   }
 
+  /* Secondaria dell'hero: un link, non un secondo pulsante — la gerarchia fra
+     provare e leggere i piani deve restare leggibile a colpo d'occhio. */
+  .hero-secondary {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--color-white);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+    text-decoration-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .hero-secondary:hover {
+    text-decoration-color: var(--color-white);
+  }
+
   .hero-login {
     display: inline-flex;
     align-items: center;
@@ -418,8 +447,13 @@
       font-size: var(--text-xl);
     }
 
-    .hero-login__hint {
+    .hero-login__hint,
+    .hero-secondary {
       color: var(--color-dark);
+    }
+
+    .hero-secondary {
+      text-decoration-color: rgba(39, 36, 35, 0.4);
     }
 
     /* Shrinks to the leftover space instead of holding a fixed ratio, which is

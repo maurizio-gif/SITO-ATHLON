@@ -19,6 +19,7 @@ import { faqConSchede, type FaqEntry } from '../data/faq';
 import { CORSI, mediaVariante, type Corso } from '../data/corsi';
 import { scheda } from '../data/pagine';
 import { getBand, bands, PLANNING_MONTH } from '../data/planning';
+import { trialCta } from '../data/cta';
 
 export function getStaticPaths() {
   return CORSI.map((c) => ({ params: { corso: c.slug }, props: { corso: c } }));
@@ -32,7 +33,7 @@ const PG = 'https://athlon.perfectgym.com/ClientPortal2';
    5 nuoto libero, 7 scuola nuoto adulti. */
 const PRENOTA = `${PG}/#/Classes/1/Calendar?categoryId=${corso.categoria ?? 1}`;
 const BANDA = corso.banda ?? 'corsi-fitness';
-const GUEST_PASS = `https://automazione.n8ndevelop.it/form/40cc4d53-8515-4657-b6ae-6bb0fa1acf77?source=SitoWeb&medium=${corso.slug}`;
+const prova = trialCta({ activity: corso.slug, source: `/${corso.slug}` });
 
 /* Tutti gli slot del corso in palinsesto: da qui escono i numeri della pagina,
    così non c'è niente da riscrivere quando il planning cambia. */
@@ -61,6 +62,9 @@ const unita = corso.unita ?? { s: 'lezione', p: 'lezioni' };
 /* Il nuoto libero non si compra a lezione ma ad accesso: la formula del "paga
    solo quella volta" cambia parola con l'attività. */
 const singola = unita.s === 'turno' ? 'il singolo accesso' : 'la singola lezione';
+/* L'etichetta della CTA member segue l'unità dell'attività: «una lezione» per i
+   corsi, «il tuo allenamento» per i turni di nuoto libero. */
+const labelPrenota = unita.s === 'turno' ? 'Prenota il tuo allenamento' : `Prenota una ${unita.s}`;
 /* In piscina gli spazi sono vasche, non sale: la parola esce dai nomi che il
    planning dà agli spazi, non da un campo in più da tenere aggiornato. */
 const spazi = sale.every((s) => s.startsWith('Vasca')) ? 'vasche' : 'sale';
@@ -116,7 +120,7 @@ const faqs: FaqEntry[] = await faqConSchede([
     : []),
   {
     q: `Posso provare ${corso.nome} prima di iscrivermi?`,
-    a: `Sì. Puoi richiedere un <strong>Guest Pass Premium di una settimana</strong> e provare tutte le nostre attività, ${corso.nome} compreso. <a href="${GUEST_PASS}" target="_blank" rel="noopener">Richiedilo qui</a>. Se preferisci una volta sola, puoi prenotare e pagare ${singola}.`,
+    a: `Sì. Puoi richiedere un <strong>Guest Pass Premium di una settimana</strong> e provare tutte le nostre attività, ${corso.nome} compreso. <a href="${prova.href}" target="_blank" rel="noopener">Richiedilo qui</a>. Se preferisci una volta sola, puoi prenotare e pagare ${singola}.`,
   },
 ]);
 
@@ -158,7 +162,18 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
       <span class="eyebrow">{corso.eyebrow ?? 'Corso Fitness'}</span>
       <h1 class="co-hero__title">{corso.nome}</h1>
       {corso.claim && <p class="co-hero__lede">{corso.claim}</p>}
-      <a href={`${PG}/#/Registration`} class="btn btn-primary co-hero__cta">Iscriviti ora →</a>
+      <div class="co-hero__actions">
+        <a
+          href={prova.href}
+          class="btn btn-primary co-hero__cta"
+          target="_blank"
+          rel="noopener noreferrer"
+          {...prova.attrs}
+        >{prova.label} →</a>
+        <a href={corso.ctaOrienta?.href ?? '#orari'} class="co-hero__link" data-cta="explore">
+          {corso.ctaOrienta?.label ?? corso.ctaOrari ?? 'Vedi gli orari'}
+        </a>
+      </div>
     </div>
 
     <div class="co-facts">
@@ -192,8 +207,8 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
       )}
 
       <div class="co-cta">
-        <a href={PRENOTA} class="btn btn-primary">Prenota ora →</a>
-        <a href="#orari" class="co-link">Vedi gli orari →</a>
+        <a href={PRENOTA} class="btn btn-primary" data-cta="member">{labelPrenota} →</a>
+        <a href="#orari" class="co-link" data-cta="explore">{corso.ctaOrari ?? 'Vedi gli orari'} →</a>
       </div>
     </div>
   </section>
@@ -217,7 +232,7 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
 
   <!-- CARATTERISTICHE -->
   {conVideo.length > 0 && (
-    <section class="co-sec co-sec--dark">
+    <section class="co-sec co-sec--dark" id="lezioni">
       <div class="container">
         <span class="eyebrow" data-anim="from-left">Caratteristiche</span>
         <h2 class="co-sec__title" data-anim="reveal">
@@ -226,6 +241,9 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
 
         {conVideo.map((v, i) => (
           <div class="co-var">
+            {v.gruppo && v.gruppo !== conVideo[i - 1]?.gruppo && (
+              <p class="co-var__gruppo">{v.gruppo}</p>
+            )}
             {v.nome && (
               <h3 class="co-var__title" id={v.id}>
                 {v.nome}
@@ -355,13 +373,21 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
     <div class="container co-prova">
       <div>
         <span class="eyebrow" data-anim="from-left">Prima di decidere</span>
-        <h2 class="co-sec__title" data-anim="reveal">Provalo per una settimana</h2>
+        <h2 class="co-sec__title" data-anim="reveal">Prova Athlon per sette giorni</h2>
         <p class="co-sec__sub">
-          Con il Guest Pass Premium provi tutte le nostre attività, {corso.nome} compreso.
+          {prova.micro} Con il Guest Pass Premium provi tutte le attività che quel piano comprende,
+          {' '}{corso.nome} compreso.
         </p>
       </div>
-      <a href={GUEST_PASS} class="btn btn-primary" data-anim="pop" target="_blank" rel="noopener noreferrer">
-        Richiedi il Guest Pass →
+      <a
+        href={prova.href}
+        class="btn btn-primary"
+        data-anim="pop"
+        target="_blank"
+        rel="noopener noreferrer"
+        {...prova.attrs}
+      >
+        {prova.label} →
       </a>
     </div>
   </section>
@@ -478,6 +504,27 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
   }
 
   /* ---- Striscia dei fatti ---- */
+  /* Hero: primaria e link secondario sulla stessa riga. */
+  .co-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+  }
+
+  .co-hero__link {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-white);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .co-hero__link:hover {
+    text-decoration-color: var(--color-white);
+  }
+
   .co-facts {
     position: relative;
     z-index: 1;
@@ -805,6 +852,17 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
   .co-punto__testo {
     margin: 0;
     color: var(--text-muted);
+  }
+
+  /* Il modo di stare in acqua: un'etichetta che ordina le schede sotto, non un
+     titolo di sezione — le lezioni restano quelle, coi loro nomi. */
+  .co-var__gruppo {
+    margin: 0 0 6px;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-primary);
   }
 
   .co-var__nota {

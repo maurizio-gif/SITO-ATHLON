@@ -76,6 +76,26 @@ export interface CorsoJunior {
   /** L'etichetta dei pulsanti. Default: "Richiedi orari e costi". */
   cta?: string;
   /**
+   * Cosa chiede quel pulsante, per il modal della fase successiva: informazioni
+   * su un corso junior o la prova di inserimento, che per pallanuoto e nuoto
+   * agonistico è obbligatoria e fa parte del prodotto.
+   */
+  ctaIntent?: 'junior_info' | 'insertion_trial';
+  /**
+   * Il Metodo Athlon: i passaggi che il club fa e può dimostrare. Esiste solo
+   * per la Scuola Nuoto Bambini, che è l'attività con un metodo documentato —
+   * gruppi definiti in vasca, istruttore assegnato, progressione consultabile,
+   * brevetti a fine stagione (`snb/didattica.md`). Non è un elenco di valori:
+   * ogni pilastro è una cosa che accade.
+   */
+  metodo?: {
+    eyebrow: string;
+    titolo: string;
+    sub: string;
+    pilastri: { nome: string; titolo: string; testo: string }[];
+    rimando?: { label: string; href: string };
+  };
+  /**
    * Le modalità di adesione, con i prezzi, quando la pagina originale le
    * mostrava: il Baby Nuoto si compra a lezione o a mese, e il genitore vuole
    * sapere quanto costa prima di lasciare i suoi dati. Dove questo campo manca
@@ -128,13 +148,14 @@ export const JUNIOR: CorsoJunior[] = [
     slug: 'baby-nuoto',
     nome: 'Baby Nuoto',
     eta: 'Dai 3 ai 36 mesi',
-    claim: 'Un’esperienza unica per il tuo bambino, in acqua con te',
+    claim: 'In acqua con te, dai tre mesi.',
+    cta: 'Trova il turno per il tuo bambino',
+    ctaIntent: 'junior_info',
     hero: `${U}/2024/08/P1160529.jpg`,
     fuoco: '50% 35%',
 
     medium: 'PulsanteBabyNuoto',
     mediumParam: 'Medium',
-    cta: 'Registrati ora per prenotare',
     adesione: [
       {
         titolo: 'Lezione singola',
@@ -153,7 +174,7 @@ export const JUNIOR: CorsoJunior[] = [
         medium: 'PulsanteMensileBabyNuoto',
       },
     ],
-    titoloIntro: 'Attività in acqua con il genitore',
+    titoloIntro: 'Come funziona una lezione',
     /* Il video del club, impaginato accanto al testo come sulla Scuola Nuoto
        Bambini. Le foto della galleria sono fotogrammi di questo stesso video —
        nella libreria del sito vecchio di baby nuoto ce n'erano solo tre — e il
@@ -300,16 +321,50 @@ export const JUNIOR: CorsoJunior[] = [
   {
     slug: 'scuola-nuoto-bambini',
     nome: 'Scuola Nuoto Bambini',
-    eta: 'Dai 3 anni in poi',
-    claim: 'Attività in acqua senza genitore',
+    eta: 'Scuola Nuoto Athlon · dal 1973',
+    claim: 'Prima la passione. Poi i risultati.',
+    cta: 'Trova il corso giusto per tuo figlio',
+    ctaIntent: 'junior_info',
     hero: `${U}/2024/08/P1120412.jpg`,
     fuoco: '50% 35%',
     medium: 'SNB',
-    titoloIntro: 'Benvenuti nella nuova era della Scuola Nuoto Bambini Athlon',
+    titoloIntro: 'Dai 3 anni, in acqua senza il genitore',
     intro: [
       'Da oltre 50 anni Athlon è il punto di riferimento per la scuola nuoto bambini a Talenti, in Via Ugo Ojetti, facilmente raggiungibile da Montesacro, Bufalotta e Porta di Roma.',
-      'La struttura è stata completamente rinnovata, con spazi dedicati esclusivamente ai bambini e ai genitori. I corsi sono pensati per ogni età e per ogni livello: all’interno dello stesso turno i bambini vengono divisi per livello, e per ognuno si stabilisce un percorso didattico individuale.',
+      'I turni sono divisi per età e i gruppi per livello: dentro lo stesso orario i bambini vengono divisi in più corsi, e per ognuno si stabilisce un percorso didattico individuale. La struttura è stata rinnovata, con spazi dedicati ai bambini e ai genitori.',
     ],
+    metodo: {
+      eyebrow: 'Il metodo',
+      titolo: 'Il Metodo Athlon',
+      sub: 'Cinquant’anni di scuola nuoto federale in quattro passaggi. Prima costruiamo il rapporto di tuo figlio con l’acqua; i risultati arrivano da lì.',
+      pilastri: [
+        {
+          nome: 'Inserimento',
+          titolo: 'Il gruppo si decide in vasca',
+          testo:
+            'Gli orari sono divisi per età, e dentro lo stesso orario ci sono più corsi e più istruttori. Il gruppo di tuo figlio si definisce guardandolo nuotare, e l’istruttore viene assegnato definitivamente dopo le prime due settimane.',
+        },
+        {
+          nome: 'Livello',
+          titolo: 'Si cambia gruppo senza cambiare orario',
+          testo:
+            'Se durante la stagione tuo figlio è pronto per il gruppo successivo, passa: l’orario che avevi organizzato resta quello. Per ognuno si stabilisce un percorso didattico individuale.',
+        },
+        {
+          nome: 'Progressione',
+          titolo: 'Vedi a che punto è, e cosa gli manca',
+          testo:
+            'Nel tuo account, alla voce Brevetti, trovi i brevetti raggiunti e le prove necessarie per il livello successivo, aggiornati circa ogni due mesi. Se vuoi parlarne con una persona, il Direttore Tecnico si prenota: ti richiamiamo noi.',
+        },
+        {
+          nome: 'Brevetto',
+          titolo: 'A fine stagione si chiude il percorso',
+          testo:
+            'Sessione brevetti a fine maggio: diploma della nostra Scuola Nuoto Federale e libretto aggiornato. Durante l’anno ci sono le gare del Trofeo Athlon, e l’iscrizione è facoltativa.',
+        },
+      ],
+      rimando: { label: 'Parla con il Direttore Tecnico', href: '/wikiathlon/snb/direzione-tecnica/' },
+    },
     video: 'https://www.athlonroma.it/wp-content/uploads/2024/11/SCUOLA-NUOTO-BAMBINI-2.mp4',
     poster: `${U}/2024/08/P1120372-scaled.jpg`,
     facts: [
@@ -425,6 +480,8 @@ export const JUNIOR: CorsoJunior[] = [
   {
     slug: 'pallanuoto',
     nome: 'Pallanuoto',
+    cta: 'Richiedi la prova di inserimento',
+    ctaIntent: 'insertion_trial',
     eta: 'Dagli 8 anni in poi',
     claim: 'Nuoto, squadra e tattica di gioco',
     /* Ritaglio della foto originale (1140547): il soffitto occupava il terzo
@@ -537,12 +594,14 @@ export const JUNIOR: CorsoJunior[] = [
   {
     slug: 'nuoto-agonistico',
     nome: 'Nuoto Agonistico',
+    cta: 'Richiedi la prova di inserimento',
+    ctaIntent: 'insertion_trial',
     eta: 'Dagli 8 anni in poi',
     claim: 'Il ponte tra la scuola nuoto e la gara',
     hero: `${U}/2024/08/scuola-nuoto-bambini.jpg`,
     fuoco: '50% 35%',
     medium: 'NuotoAgonistico',
-    titoloIntro: 'Nuoto agonistico e preagonistico',
+    titoloIntro: 'Dal gruppo alla gara, un passo alla volta',
     intro: [
       'Il corso di nuoto avanzato è il ponte naturale tra la scuola nuoto e il mondo agonistico — il passo successivo per chi vuole alzare l’asticella.',
       'Gli allenamenti sono pensati per perfezionare ogni movimento e tenere viva la passione per l’acqua. Le gare diventano palcoscenici di confronto e crescita personale, dove il cronometro misura i progressi ma non racconta tutto: ciò che si costruisce davvero è la costanza, la dedizione e la mentalità da atleta.',

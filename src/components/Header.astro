@@ -1,4 +1,10 @@
 ---
+import { trialCta } from '../data/cta';
+
+/* La prova è un prodotto solo e vale per tutto il club, quindi qui non porta
+   nessuna attività: la pagina di provenienza è l'header, su qualunque pagina. */
+const prova = trialCta({ source: 'header' });
+
 /* I corsi fitness sono il secondo livello del menu, in ordine alfabetico —
    ordinati qui e non a mano, così aggiungerne uno non richiede di rimetterli
    in fila. localeCompare con 'it' perché ® e accenti non devono contare. */
@@ -57,12 +63,9 @@ const flatLinks = [
   { label: 'Planning', href: '/planning' },
   { label: 'Abbonamenti', href: '/abbonamenti' },
   { label: 'Club Life', href: '/club-life' },
-  { label: 'Contatti', href: '/contatti' },
 ];
 
-/* Nella barra desktop i contatti sono già il pulsante a destra, quindi la voce
-   di testo sarebbe un doppione. */
-const navFlat = flatLinks.filter((l) => l.href !== '/contatti');
+const navFlat = flatLinks;
 
 // The account panel behind the header's user icon: everything a member needs
 // once they are already a member, in two blocks — account, then bookings.
@@ -90,8 +93,6 @@ const accountBlocks = [
     <a href="/" class="logo">
       <img src="/wp-content/uploads/2025/08/Pittogramma.png" alt="Athlon Club" width="32" height="32" />
     </a>
-
-    <a href="/contatti" class="header-contact-mobile">Contattaci</a>
 
     {/* Una riga piatta: due tendine e tre destinazioni, poi il pulsante. I
         pannelli stanno dentro la loro voce, così si aprono sotto di essa
@@ -155,7 +156,7 @@ const accountBlocks = [
         <a href={l.href} class="nav-link">{l.label}</a>
       ))}
 
-      <a href="/contatti" class="nav-cta">Contattaci</a>
+      <a href="/abbonamenti" class="nav-cta">Abbonamenti</a>
     </nav>
 
     <div class="header-actions">
@@ -173,7 +174,13 @@ const accountBlocks = [
           <circle cx="12" cy="7" r="4" />
         </svg>
       </button>
-      <a href={`${PG}/#/Registration`} class="header-link strong">Iscriviti</a>
+      <a
+        href={prova.href}
+        class="header-link strong"
+        target="_blank"
+        rel="noopener noreferrer"
+        {...prova.attrs}
+      >{prova.label}</a>
       <button class="burger" aria-label="Menu" aria-expanded="false" id="burger">
         <span></span><span></span><span></span>
       </button>
@@ -247,8 +254,14 @@ const accountBlocks = [
     {/* No app / planning / login row here any more — those live in the account
         panel behind the header's user icon, reachable without opening the menu. */}
     <div class="mobile-ctas">
-      <a class="btn btn-primary mobile-cta" href="/abbonamenti">Scopri gli Abbonamenti</a>
-      <a class="btn btn-outline-dark mobile-cta" href={`${PG}/#/Registration`}>Iscriviti</a>
+      <a
+        class="btn btn-primary mobile-cta"
+        href={prova.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        {...prova.attrs}
+      >{prova.label}</a>
+      <a class="btn btn-outline-dark mobile-cta" href="/abbonamenti">Scopri gli Abbonamenti</a>
     </div>
   </div>
 
@@ -517,9 +530,6 @@ const accountBlocks = [
   }
 
   /* Mobile-only pill in the bar — desktop keeps the CTA inside the nav. */
-  .header-contact-mobile {
-    display: none;
-  }
 
   .main-nav {
     display: flex;
@@ -1115,23 +1125,6 @@ const accountBlocks = [
       height: auto;
     }
 
-    .header-contact-mobile {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto;
-      padding: 10px 14px;
-      border: 1px solid var(--color-primary);
-      border-radius: 20px;
-      background: var(--color-white);
-      color: var(--color-primary);
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 1.25px;
-      line-height: 1;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
 
     .header-actions {
       gap: 14px;
@@ -1176,10 +1169,6 @@ const accountBlocks = [
     /* Logo and pill sit above the overlay so the bar stays intact while the
        menu is open. */
     .logo,
-    .header-contact-mobile {
-      position: relative;
-      z-index: 2;
-    }
 
     /* Full-screen translucent overlay rather than an inline accordion that
        pushes the page down — keeps the menu short and the page still. */

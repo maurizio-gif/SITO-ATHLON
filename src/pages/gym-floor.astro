@@ -2,9 +2,39 @@
 import Layout from '../layouts/Layout.astro';
 import OpeningHours from '../components/planning/OpeningHours.astro';
 import Faq, { type FaqEntry } from '../components/Faq.astro';
+import { trialCta } from '../data/cta';
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 const U = '/wp-content/uploads';
+
+/* La prova è una sola per tutto il club — il Guest Pass Premium da sette
+   giorni — e da qui parte con la sala pesi come contesto di provenienza. */
+const prova = trialCta({ activity: 'gym-floor', source: '/gym-floor' });
+
+/* Il sistema della sala: tre modi che esistono davvero. Libero e Con Assistenza
+   sono le due modalità prenotabili (articolo `adulti/gym-floor` e f.a.q. di
+   questa pagina); il collegamento dei Matrix all'account è quello che la
+   sezione app della home già racconta. */
+const sistema = [
+  {
+    nome: 'Libero',
+    titolo: 'Entri e fai la tua parte.',
+    testo:
+      'Prenoti la fascia Allenamento Libero e ti alleni in autonomia con il tuo programma. La sala è aperta dalle 6:00 alle 22:00.',
+  },
+  {
+    nome: 'Assistito',
+    titolo: 'C’è un trainer in sala, e puoi chiedere.',
+    testo:
+      'Nelle fasce Con Assistenza un nostro trainer è in sala per quella sessione: gli chiedi un esercizio, un carico, una correzione.',
+  },
+  {
+    nome: 'Connesso',
+    titolo: 'Quando torni, ritrovi il tuo percorso.',
+    testo:
+      'I macchinari Matrix 4.0 dell’area cardio sono collegati al tuo account nell’app Athlon Club.',
+  },
+];
 
 // The four zones, in the order the old page listed them. Equipment lists are
 // verbatim from the backup — "Martix" was a typo there and is corrected here.
@@ -205,8 +235,17 @@ const faqs: FaqEntry[] = [
           tagline is its own element rather than an <em> inside the heading, so
           the gap under the title is a margin instead of a line box. */}
       <h1 class="gf-hero__title">Gym Floor <em class="accent">4.0</em></h1>
-      <p class="gf-hero__lede">Aperti dalle 6 di mattina.</p>
-      <a href={`${PG}/#/Registration`} class="btn btn-primary gf-hero__cta">Iscriviti ora →</a>
+      <p class="gf-hero__lede">Allenati come preferisci.<br />Non allenarti mai a caso.</p>
+      <div class="gf-hero__actions">
+        <a
+          href={prova.href}
+          class="btn btn-primary gf-hero__cta"
+          target="_blank"
+          rel="noopener noreferrer"
+          {...prova.attrs}
+        >{prova.label} →</a>
+        <a href="/abbonamenti" class="gf-hero__link">Scopri gli abbonamenti</a>
+      </div>
     </div>
 
     <div class="gf-facts">
@@ -219,17 +258,27 @@ const faqs: FaqEntry[] = [
   <!-- INTRO -->
   <section class="gf-sec">
     <div class="container">
-      <span class="eyebrow" data-anim="from-left">Il nuovo spazio</span>
-      <h2 class="gf-sec__title" data-anim="reveal">Allenati nella nostra Gym Floor 4.0</h2>
+      <span class="eyebrow" data-anim="from-left">Il sistema</span>
+      <h2 class="gf-sec__title" data-anim="reveal">Tre modi di usare la sala</h2>
       {/* The backup's copy said "train whenever you like, no booking" — the
           wiki and the planning F.A.Q. both say the opposite, so this follows
           them: booking is required, and you pick one of two modes. */}
       <p class="gf-sec__sub">
-        Athlon si evolve. La Sala Pesi è stata completamente rinnovata, con una vista sulle nostre
-        piscine. L'accesso si prenota da app o portale, scegliendo
-        la modalità: <strong>Con Assistenza</strong>, con un trainer presente in sala,
-        oppure <strong>Allenamento Libero</strong>, in autonomia.
+        Quattrocento metri quadri con la vista sulle piscine. Prima di entrare scegli come vuoi
+        allenarti e prenoti la fascia da app o portale: <strong>Allenamento Libero</strong>, in
+        autonomia con il tuo programma, oppure <strong>Con Assistenza</strong>, con un trainer
+        presente in sala.
       </p>
+
+      <ul class="gf-sistema">
+        {sistema.map((m, i) => (
+          <li class="gf-sistema__item" data-anim="fade" data-anim-delay={String(i * 90)}>
+            <span class="gf-sistema__name u-display">{m.nome}</span>
+            <h3 class="gf-sistema__title">{m.titolo}</h3>
+            <p class="gf-sistema__text">{m.testo}</p>
+          </li>
+        ))}
+      </ul>
 
       {/* The hours themselves rather than a link to them. Comes from the shared
           planning data, so editing that updates this section too. */}
@@ -240,9 +289,12 @@ const faqs: FaqEntry[] = [
   <!-- AREE -->
   <section class="gf-sec gf-sec--dark">
     <div class="container">
-      <span class="eyebrow" data-anim="from-left">Gym Floor 4.0</span>
-      <h2 class="gf-sec__title" data-anim="reveal">Scopri i nostri nuovi spazi</h2>
-      <p class="gf-sec__sub">Quattro aree, ognuna con la sua attrezzatura. Scorri le foto di ciascuna.</p>
+      <span class="eyebrow" data-anim="from-left">Quattro aree</span>
+      <h2 class="gf-sec__title" data-anim="reveal">Cosa c'è, area per area</h2>
+      <p class="gf-sec__sub">
+        Quaranta voci d'attrezzatura, divise per come si allenano: cardio connesso all'app,
+        isotonica guidata, funzionale e carico libero. Scorri le foto di ciascuna.
+      </p>
 
       {aree.map((a, ai) => (
         <article class="area" data-anim="fade">
@@ -304,12 +356,13 @@ const faqs: FaqEntry[] = [
   <!-- WORKOUTS -->
   <section class="gf-sec">
     <div class="container">
-      <span class="eyebrow" data-anim="from-left">Dall'app Athlon Club</span>
-      <h2 class="gf-sec__title" data-anim="reveal">Più di 30 piani di allenamento</h2>
+      <span class="eyebrow" data-anim="from-left">Il tuo programma</span>
+      <h2 class="gf-sec__title" data-anim="reveal">Trenta piani, tre obiettivi, un punto di partenza</h2>
       <p class="gf-sec__sub">
-        Tre percorsi per obiettivo — tonificazione, ipertrofia e dimagrimento — ognuno con tre piani
-        progettati dai nostri trainer. I percorsi vengono aggiornati periodicamente e sono
-        personalizzabili: modificali in autonomia o con l'aiuto di un trainer in sala.
+        Tonificazione, dimagrimento e ipertrofia: tre piani per ciascuno, progettati dai nostri
+        trainer, aggiornati periodicamente e personalizzabili in autonomia o con un trainer in sala.
+        E se parti da zero, o riprendi dopo una lunga pausa, ci sono i percorsi <strong>Start
+        Up</strong>: si comincia da lì e si passa ai percorsi principali quando è il momento.
       </p>
 
       <div class="wk">
@@ -351,13 +404,16 @@ const faqs: FaqEntry[] = [
   <section class="gf-sec gf-sec--alt">
     <div class="container gf-pt">
       <div>
-        <span class="eyebrow" data-anim="from-left">Non vuoi allenarti da solo?</span>
-        <h2 class="gf-sec__title" data-anim="reveal">Hai bisogno di un allenamento individuale?</h2>
+        <span class="eyebrow" data-anim="from-left">Allenamento individuale</span>
+        <h2 class="gf-sec__title" data-anim="reveal">Un'ora con qualcuno che sa il tuo nome</h2>
         <p class="gf-sec__sub">
-          Schede su misura e lezioni individuali con uno dei nostri sei personal trainer qualificati.
+          Sei personal trainer qualificati, ognuno con le sue specializzazioni. Schede su misura e
+          lezioni individuali di Reformer e Fitness.
         </p>
       </div>
-      <a href="/personal-training" class="btn btn-primary" data-anim="pop">Personal Trainer →</a>
+      <a href="/personal-training" class="btn btn-primary" data-anim="pop" data-cta="explore">
+        Conosci i personal trainer →
+      </a>
     </div>
   </section>
 </Layout>
@@ -492,6 +548,77 @@ const faqs: FaqEntry[] = [
     align-self: flex-start;
     opacity: 0;
     animation: hero-rise 0.6s var(--ease-out-crit) 0.9s forwards;
+  }
+
+  /* Hero: primaria e link secondario sulla stessa riga, la gerarchia fra
+     provare e leggere i piani resta visibile. */
+  .gf-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+  }
+
+  .gf-hero__link {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-white);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .gf-hero__link:hover {
+    text-decoration-color: var(--color-white);
+  }
+
+  /* Il sistema della sala: tre colonne, il nome della modalità nella display
+     face e il beneficio come titolo in corpo testo. */
+  .gf-sistema {
+    list-style: none;
+    margin: 34px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 26px;
+  }
+
+  .gf-sistema__item {
+    border-top: 2px solid var(--color-dark);
+    padding-top: 16px;
+  }
+
+  .gf-sistema__name {
+    display: block;
+    font-size: var(--text-lg);
+    color: var(--color-primary);
+    --lh: 1;
+    margin-bottom: 10px;
+  }
+
+  /* Leading via --lh: è da lì che la regola dell'headroom calcola il padding. */
+  .gf-sistema__title {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: var(--text-md);
+    --lh: 1.28;
+    letter-spacing: -0.01em;
+    margin: 0 0 8px;
+  }
+
+  .gf-sistema__text {
+    margin: 0;
+    font-size: var(--text-base);
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 900px) {
+    .gf-sistema {
+      grid-template-columns: 1fr;
+      gap: 22px;
+      margin-top: 26px;
+    }
   }
 
   .gf-facts {

@@ -5,6 +5,7 @@ const cards = [
     title: 'Abbonamenti',
     html: 'Scopri i nuovi <strong>Abbonamenti Smart</strong> e <strong>Premium</strong>, con pagamento mensile o annuale.',
     link: '/abbonamenti',
+    cta: 'Vedi i piani',
   },
   {
     variant: 'photo',
@@ -12,6 +13,7 @@ const cards = [
     title: 'Promo Agosto',
     html: 'Scopri la nostra promozione riservata agli <strong>Abbonamenti Annuali</strong>. Entro il <strong>31/08/2026</strong>',
     link: 'https://www.athlonroma.it/promo/',
+    cta: 'Vedi la promo',
   },
   {
     variant: 'light',
@@ -19,6 +21,7 @@ const cards = [
     title: 'Planning 2026/27',
     html: 'Scopri il Planning della nuova Stagione: Fitness, Gym Floor, Aqua Fitness, Nuoto Libero e Scuola Nuoto Adulti.',
     link: '/planning',
+    cta: 'Apri il planning',
   },
 ];
 ---
@@ -35,7 +38,7 @@ const cards = [
         <div class="card-content">
           <h3>{c.title}</h3>
           <p set:html={c.html} />
-          <a href={c.link} class="btn btn-outline-dark">Scopri di più</a>
+          <a href={c.link} class="btn btn-outline-dark" data-cta="explore">{c.cta}</a>
         </div>
       </div>
     ))}

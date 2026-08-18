@@ -26,6 +26,15 @@ import { getLessonCard, type LessonStat } from './planning';
 const U = '/wp-content/uploads';
 
 export interface VarianteCorso {
+  /**
+   * Il modo in cui il corpo sta in acqua: in appoggio, in sospensione, in
+   * sella. Serve solo all'Aqua Fitness, dove le cinque lezioni si somigliavano
+   * tutte perché la differenza vera — l'altezza dell'acqua e l'attrezzo — era
+   * scritta in una nota e non ordinava niente. È un'etichetta di orientamento
+   * sopra le stesse schede: nessuna lezione cambia nome e nessuna card è
+   * duplicata. `LessonSchedule` e il planning non lo vedono.
+   */
+  gruppo?: string;
   /** Un dato pratico della lezione, es. l'altezza dell'acqua. */
   nota?: string;
   /** Nome della variante, es. "HBX Boxing". Nei corsi singoli è null. */
@@ -118,6 +127,18 @@ export interface Corso {
   singola?: { prezzo: string; testo: string };
   /** Risposta su misura alla domanda "è compreso nell'abbonamento?". */
   faqCompreso?: string;
+  /**
+   * L'etichetta della CTA di esplorazione: «Vedi gli orari» va bene per un
+   * corso, non per il nuoto libero (dove contano le corsie) né per la scuola
+   * nuoto (dove contano i livelli).
+   */
+  ctaOrari?: string;
+  /**
+   * Una CTA di orientamento nell'hero, dove la pagina risponde davvero alla
+   * domanda: l'Aqua Fitness manda ai tre modi di stare in acqua. Resta
+   * un'esplorazione — diventerà una richiesta quando dietro ci sarà il modal.
+   */
+  ctaOrienta?: { label: string; href: string };
   /** Domande in più rispetto alle cinque comuni a tutte le attività. */
   faqExtra?: { q: string; a: string; scheda?: string; rimando?: string }[];
   /**
@@ -139,12 +160,12 @@ export const CORSI: Corso[] = [
   {
     slug: 'antigravity',
     nome: 'Antigravity®',
-    claim: 'Sei pronto a volare?',
+    claim: 'Yoga e pilates, appesi a un’amaca.',
     hero: `${U}/2024/08/WM_07842-1-scaled.jpg`,
     fuoco: '72% 38%',
     intro: [
       'Antigravity Fitness® è una disciplina innovativa che unisce yoga, pilates e acrobatica, utilizzando un tessuto sospeso al soffitto per creare un’esperienza di allenamento unica. Questo “tessuto”, simile a un’amaca, sostiene il corpo, permettendo di eseguire tecniche di sospensione che alleviano la pressione sulle articolazioni e favoriscono l’allungamento muscolare.',
-      'Sfida la forza di gravità con posizioni insolite ed efficaci, migliorando la flessibilità, la forza e l’equilibrio. Antigravity Fitness® è l’ideale per chi cerca un allenamento completo e rigenerante, capace di trasformare il modo di vivere il fitness.',
+      'Le posizioni si eseguono dentro e sopra il tessuto, in appoggio o in sospensione, e si lavora su flessibilità, forza ed equilibrio. In sospensione il peso del corpo è sostenuto dall’amaca, non dalle articolazioni.',
     ],
     varianti: [{ nome: null, testo: '', lezione: 'Antigravity', poster: `${U}/2024/08/DSC08475-scaled.jpg` }],
     lezioni: ['Antigravity'],
@@ -161,6 +182,7 @@ export const CORSI: Corso[] = [
   {
     slug: 'balli-di-gruppo',
     nome: 'Balli di Gruppo',
+    claim: 'Coreografie semplici, in gruppo.',
     hero: `${U}/2024/08/balli-di-gruppo.jpg`,
     fuoco: '61% 34%',
     intro: [
@@ -181,7 +203,7 @@ export const CORSI: Corso[] = [
   {
     slug: 'body-pump',
     nome: 'Body Pump®',
-    claim: 'Il corso di rinforzo muscolare con bilanciere e pesi più famoso al mondo',
+    claim: 'Bilanciere, carichi leggeri, tante ripetizioni.',
     hero: `${U}/2024/08/WM_07735-scaled.webp`,
     fuoco: '50% 40%',
     intro: [
@@ -205,7 +227,7 @@ export const CORSI: Corso[] = [
   {
     slug: 'body-sculpt',
     nome: 'Body Sculpt',
-    claim: 'Scolpisci il tuo corpo. Potenzia la tua forma',
+    claim: 'Tonificazione a corpo libero e con piccoli attrezzi.',
     hero: `${U}/2024/07/AdobeStock_199850289-scaled.jpeg`,
     fuoco: '50% 28%',
     intro: [
@@ -228,7 +250,7 @@ export const CORSI: Corso[] = [
   {
     slug: 'booty-workout',
     nome: 'Booty Workout',
-    claim: 'Tonifica il tuo lato B',
+    claim: 'Cinquanta minuti a tempo, per gambe e glutei.',
     hero: `${U}/2024/08/Giulia-Pagliaccia-75-1-scaled.jpg`,
     fuoco: '60% 44%',
     intro: [
@@ -298,6 +320,7 @@ export const CORSI: Corso[] = [
   {
     slug: 'ginnastica-dolce',
     nome: 'Ginnastica Dolce',
+    claim: 'Ritmo lento, articolazioni al centro.',
     hero: `${U}/2024/08/Ginnastica-Dolce-Athlon.jpg`,
     fuoco: '48% 38%',
     intro: [
@@ -320,6 +343,7 @@ export const CORSI: Corso[] = [
   {
     slug: 'ginnastica-posturale',
     nome: 'Ginnastica Posturale',
+    claim: 'Un’ora sul controllo della postura.',
     hero: `${U}/2024/08/P1160261-1536x865.jpg`,
     fuoco: '62% 44%',
     intro: [
@@ -342,7 +366,7 @@ export const CORSI: Corso[] = [
   {
     slug: 'gpcoreo',
     nome: 'GP Coreo',
-    claim: 'La fusione della danza con il fitness',
+    claim: 'La tecnica della danza, dentro un allenamento.',
     hero: `${U}/2025/11/ATHLON65-scaled.jpg`,
     fuoco: '45% 38%',
     intro: [
@@ -364,7 +388,7 @@ export const CORSI: Corso[] = [
   {
     slug: 'hbx',
     nome: 'HBX',
-    claim: 'Allenati come un campione',
+    claim: 'Sacco, guantoni e lavoro a intervalli. Fusion o Boxing.',
     hero: `${U}/2024/08/WM_08286-1-scaled.jpg`,
     fuoco: '79% 44%',
     intro: [
@@ -403,7 +427,7 @@ export const CORSI: Corso[] = [
   {
     slug: 'motr',
     nome: 'Motr®',
-    claim: 'Pilates, yoga e potenziamento muscolare',
+    claim: 'Un attrezzo instabile, tre discipline in una lezione.',
     hero: `${U}/2024/08/MOTR_1.jpg`,
     fuoco: '38% 40%',
     intro: [
@@ -424,12 +448,12 @@ export const CORSI: Corso[] = [
   {
     slug: 'pilates',
     nome: 'Pilates',
-    claim: 'Forza, flessibilità, equilibrio e coordinazione',
+    claim: 'Il centro del corpo, un movimento alla volta.',
     hero: `${U}/2024/08/IMG_2499-scaled.jpg`,
     fuoco: '32% 40%',
     intro: [
       'Il nostro programma di Pilates è strutturato per sviluppare forza funzionale, flessibilità articolare, equilibrio dinamico e coordinazione neuromuscolare. Attraverso una serie di esercizi che integrano movimenti precisi e controllati, questo metodo lavora sui muscoli profondi del core, migliorando la stabilità del tronco e la postura globale. Ogni sessione combina esercizi di mobilizzazione della colonna vertebrale, allungamento attivo e rafforzamento muscolare per un corpo tonico e allineato.',
-      'Il Pilates è ideale per chi desidera correggere squilibri muscolari, ridurre tensioni e migliorare la biomeccanica del movimento. L’approccio olistico di questa pratica contribuisce anche al rilassamento e alla gestione dello stress, stimolando il sistema nervoso parasimpatico e favorendo un profondo senso di benessere.',
+      'Si lavora a bassa intensità, con la respirazione guidata dall’istruttore e un numero contenuto di ripetizioni per esercizio: conta come si esegue il movimento, non quante volte. È il lavoro che le barre qui sotto misurano su controllo e flessibilità.',
     ],
     varianti: [
       { nome: null, testo: '', lezione: 'Pilates Matwork', poster: `${U}/2024/08/IMG_2547-1-scaled.jpg` },
@@ -477,7 +501,7 @@ export const CORSI: Corso[] = [
   {
     slug: 'yoga',
     nome: 'Yoga',
-    claim: 'Scopri il tuo yoga ideale',
+    claim: 'Hatha, Power e Yogassè: tre lezioni diverse.',
     hero: `${U}/2024/07/AdobeStock_137057659-scaled.jpeg`,
     fuoco: '42% 42%',
     intro: [
@@ -507,7 +531,7 @@ export const CORSI: Corso[] = [
         lezione: 'Yogassè',
         poster: `${U}/2024/08/IMG_2547-1-scaled.jpg`,
         testo:
-          'Yogassè è una pratica che unisce elementi di yoga, barre fit, danza e GP Coreo, per un allenamento completo di corpo e mente adatto a tutti i livelli. Le sessioni iniziano con movimenti alla sbarra, proseguono con esercizi di mobilità e culminano in una coreografia fluida che combina asana dello yoga dinamico con transizioni e passi della danza contemporanea. Un percorso che invita a “far danzare i tuoi chakra”, promuovendo equilibrio, flessibilità e benessere generale.',
+          'Yogassè unisce elementi di yoga, barre fit, danza e GP Coreo. La lezione comincia con movimenti alla sbarra, prosegue con esercizi di mobilità e chiude con una coreografia che combina asana dello yoga dinamico, transizioni e passi della danza contemporanea.',
       },
     ],
     lezioni: ['Hatha Yoga', 'Power Yoga', 'Yogassè'],
@@ -524,40 +548,54 @@ export const CORSI: Corso[] = [
   {
     slug: 'aqua-fitness',
     nome: 'Aqua Fitness',
-    eyebrow: 'Attività adulti',
-    claim: 'Attività ginnico motorie acquatiche applicative alle discipline del nuoto',
-    titoloIntro: 'Il fitness in acqua',
-    eyebrowIntro: 'L’attività',
+    ctaOrienta: { label: 'Trova il tuo allenamento in acqua', href: '#lezioni' },
+    eyebrow: 'Athlon Aqua',
+    claim: 'L’acqua è l’attrezzo.',
+    titoloIntro: 'Ti spinge indietro a ogni movimento',
+    eyebrowIntro: 'Perché in acqua',
     banda: 'aqua-fitness',
     categoria: 4,
     faqSoggetto: 'l’Aqua Fitness',
     hero: `${U}/2025/03/Athlon95-scaled.jpg`,
     fuoco: '50% 35%',
     intro: [
-      'Il fitness in acqua rappresenta un’opzione eccellente per chi cerca un modo efficace e sicuro per mantenersi in forma. Grazie alle sue caratteristiche uniche — la riduzione dell’impatto e la resistenza naturale dell’acqua — offre benefici significativi sia per la salute fisica che mentale.',
-      'Che si tratti di una lezione di Aqua Training, Hydrobike o Aqua Tonic, il fitness in acqua si adatta alle esigenze di tutti, migliorando la qualità della vita e promuovendo il benessere generale.',
+      'L’acqua oppone resistenza al movimento e allo stesso tempo riduce il carico del peso corporeo: si spinge contro qualcosa in tutte le direzioni, e le articolazioni lavorano scaricate. È la ragione per cui la stessa vasca ospita una lezione ad alta intensità e una a ritmo lento.',
+      'Cinque lezioni, tre modi di stare in acqua: in appoggio sul fondo, in sospensione nella vasca grande o in sella alla bike. Le trovi tutte qui sotto, con l’altezza dell’acqua di ciascuna.',
     ],
     varianti: [
       {
         nome: 'Aqua Aerobic',
+        gruppo: 'In appoggio',
         id: 'aqua-aerobic',
         lezione: 'Aqua Aerobic',
         poster: `${U}/2025/03/Athlon99-scaled.jpg`,
         nota: 'Altezza dell’acqua 120 cm',
         testo:
-          'Il corso di Aqua Aerobic è un allenamento energico in acqua che combina movimenti aerobici a ritmo di musica per migliorare la resistenza cardiovascolare, la coordinazione e la tonificazione muscolare. Questa attività sfrutta la resistenza naturale dell’acqua per intensificare il lavoro muscolare senza stressare le articolazioni, rendendola adatta a tutte le età e a tutti i livelli. È ideale per chi cerca un modo divertente e sicuro per bruciare calorie, aumentare la flessibilità e migliorare il benessere generale.',
+          'Movimenti aerobici a ritmo di musica, con i piedi che toccano il fondo. Si lavora su resistenza cardiovascolare, coordinazione e tonificazione: la resistenza dell’acqua rende più impegnativo ogni gesto, e allo stesso tempo tiene scaricate le articolazioni.',
+      },
+      {
+        nome: 'Aqua Tonic',
+        gruppo: 'In appoggio',
+        id: 'aqua-tonic',
+        lezione: 'Aqua Tonic',
+        poster: `${U}/2025/03/Athlon99-scaled.jpg`,
+        nota: 'Altezza dell’acqua 120 cm',
+        testo:
+          'La lezione in appoggio più intensa: tonificazione, resistenza e forza, con tutti i gruppi muscolari coinvolti. Ogni movimento richiede un impegno maggiore per la resistenza dell’acqua, senza sovraccaricare le articolazioni.',
       },
       {
         nome: 'Aqua Soft',
+        gruppo: 'In appoggio',
         id: 'aqua-soft',
         lezione: 'Aqua Soft',
         poster: `${U}/2024/08/acquasoft1.jpg`,
         nota: 'Altezza dell’acqua 120 cm',
         testo:
-          'Il corso di Aqua Soft è un’attività in acqua a basso impatto, ideale per chi cerca un allenamento dolce e rigenerante. Grazie alla resistenza naturale dell’acqua, questo programma aiuta a migliorare la mobilità, la tonificazione muscolare e la circolazione, senza stressare le articolazioni. Perfetto per tutte le età e per tutti i livelli, unisce esercizi fluidi che promuovono benessere e rilassamento.',
+          'Ritmo lento e basso impatto, sempre con i piedi sul fondo: esercizi fluidi che lavorano su mobilità articolare e tonificazione. È la lezione in appoggio meno intensa delle tre.',
       },
       {
         nome: 'Aqua Training',
+        gruppo: 'In sospensione',
         id: 'aqua-training',
         lezione: 'Aqua Training',
         /* La scheda del planning non ha ancora il video: resta quello della
@@ -566,25 +604,17 @@ export const CORSI: Corso[] = [
         poster: `${U}/2024/11/aqua-training.jpg`,
         nota: 'Vasca grande, altezza da 140 a 250 cm',
         testo:
-          'Aqua Training è una lezione ad alta intensità svolta in vasca grande, pensata per chi vuole spingersi al massimo e migliorare la resistenza aerobica e cardiovascolare. Utilizzando tecniche avanzate di nuoto e andature specifiche si lavora in sospensione, coinvolgendo l’intero corpo e aumentando forza, potenza e resistenza. È l’allenamento per chi cerca un lavoro completo e impegnativo.',
-      },
-      {
-        nome: 'Aqua Tonic',
-        id: 'aqua-tonic',
-        lezione: 'Aqua Tonic',
-        poster: `${U}/2025/03/Athlon99-scaled.jpg`,
-        nota: 'Altezza dell’acqua 120 cm',
-        testo:
-          'Il corso di Aqua Tonic è un allenamento in acqua ad alta intensità progettato per migliorare tonificazione muscolare, resistenza e forza. Grazie alla resistenza dell’acqua ogni movimento richiede un impegno maggiore, e gli esercizi restano efficaci senza sovraccaricare le articolazioni. Combina potenziamento e cardio per scolpire il corpo e aumentare il metabolismo, coinvolgendo tutti i gruppi muscolari.',
+          'In vasca grande, dove i piedi non toccano: si lavora in sospensione con andature e tecniche di nuoto, e il corpo lavora anche per restare in assetto. È la lezione in acqua più impegnativa, su resistenza aerobica, forza e potenza.',
       },
       {
         nome: 'Hydrobike',
+        gruppo: 'In sella',
         id: 'hydrobike',
         lezione: 'Hydrobike',
         poster: `${U}/2025/03/Athlon126-scaled.jpg`,
         nota: 'Lezioni da 45 minuti · altezza dell’acqua 120 cm',
         testo:
-          'L’Hydrobike è un allenamento intenso di 45 minuti svolto su una speciale bike immersa in acqua. Grazie alla resistenza dell’acqua migliora in modo significativo il tono muscolare degli arti inferiori e potenzia il sistema cardio-circolatorio. Unisce il divertimento dell’attività in acqua ai benefici di un lavoro cardiovascolare completo.',
+          'Quarantacinque minuti in sella a una bike immersa in acqua. L’acqua frena ogni pedalata: il lavoro è sugli arti inferiori e sul sistema cardio-circolatorio, con la barra della cardio più alta di tutte le lezioni in vasca.',
       },
     ],
     lezioni: ['Aqua Aerobic', 'Aqua Soft', 'Aqua Training', 'Aqua Tonic', 'Hydrobike'],
@@ -602,9 +632,11 @@ export const CORSI: Corso[] = [
   {
     slug: 'nuoto-libero',
     nome: 'Nuoto Libero Assistito',
-    eyebrow: 'Attività adulti',
-    titoloIntro: 'La pura essenza del nuoto',
-    eyebrowIntro: 'L’attività',
+    eyebrow: 'Nuoto',
+    claim: 'Libero di nuotare. Mai lasciato a te stesso.',
+    titoloIntro: 'Il nuoto libero, secondo Athlon',
+    eyebrowIntro: 'Il sistema',
+    ctaOrari: 'Vedi corsie e orari',
     banda: 'nuoto-libero',
     categoria: 5,
     unita: { s: 'turno', p: 'turni' },
@@ -612,14 +644,14 @@ export const CORSI: Corso[] = [
     hero: `${U}/2025/03/Athlon88-scaled.jpg`,
     fuoco: '36% 40%',
     intro: [
-      'Una vasca di 25 metri, suddivisa in 5 corsie, disponibile tutti i giorni della settimana. Nuota in tranquillità con il supporto costante dei nostri Tecnici Federali, sempre a bordo vasca.',
+      'A bordo vasca trovi Tecnici Federali, per tutta la durata del turno. Sotto, la vasca da 25 metri con cinque corsie, tutti i giorni della settimana, e la capienza di ogni corsia definita in anticipo: il turno che prenoti è il tuo.',
       'Per allenarsi, per perfezionare la tecnica, per rilassarsi oppure per sfidare gli amici in gara. Siamo in Via Ugo Ojetti, a Talenti, vicino a Montesacro, Bufalotta e Porta di Roma.',
     ],
     punti: [
-      { testo: 'Assistenza continua di Tecnici Federali e Assistenti Bagnanti' },
-      { testo: 'Possibilità di avere un programma di allenamento personalizzato per ogni esigenza' },
-      { testo: 'Corsie a capienza controllata' },
-      { testo: 'Prenotazione del proprio allenamento' },
+      { titolo: 'Prenoti il turno', testo: 'Da app o dall’area riservata, a partire da tre giorni prima.' },
+      { titolo: 'Trovi la corsia con posto', testo: 'Corsie a capienza controllata: quanti posti restano lo vedi mentre prenoti.' },
+      { titolo: 'C’è un tecnico a bordo vasca', testo: 'Assistenza continua di Tecnici Federali e Assistenti Bagnanti.' },
+      { titolo: 'Puoi avere un programma', testo: 'Possibilità di avere un programma di allenamento personalizzato per ogni esigenza.' },
     ],
     varianti: [
       { nome: null, testo: '', lezione: 'Nuoto Libero', poster: `${U}/2025/03/Athlon85-scaled.jpg` },
@@ -640,33 +672,35 @@ export const CORSI: Corso[] = [
   {
     slug: 'scuola-nuoto-adulti',
     nome: 'Scuola Nuoto Adulti',
-    eyebrow: 'Attività adulti',
-    titoloIntro: 'Imparare a nuotare a qualsiasi età',
-    eyebrowIntro: 'L’attività',
+    eyebrow: 'Scuola Nuoto Athlon',
+    claim: 'Impari con un metodo. Ti alleni con i tuoi tempi.',
+    titoloIntro: 'Il livello lo assegniamo noi. L’orario lo scegli tu.',
+    eyebrowIntro: 'Come funziona',
+    ctaOrari: 'Vedi livelli e orari',
     banda: 'scuola-nuoto-adulti',
     categoria: 7,
     faqSoggetto: 'la Scuola Nuoto Adulti',
     hero: `${U}/2025/03/Athlon86-scaled.jpg`,
     fuoco: '62% 40%',
     intro: [
-      'La Scuola Nuoto di Athlon, attiva dal 1973, è il fiore all’occhiello del nostro centro sportivo e un punto di riferimento per l’insegnamento del nuoto a Roma Nord.',
-      'Vuoi imparare a nuotare o migliorare il tuo stile ma hai paura di non riuscire a rispettare un orario fisso? Non riesci a recuperare le lezioni perse per gli imprevisti di tutti i giorni? Lavori su turni variabili e hai bisogno di un istruttore per ottimizzare il tuo allenamento in acqua?',
+      'Si impara a nuotare a qualsiasi età, e la Scuola Nuoto di Athlon è attiva dal 1973: quello che è cambiato è come ci si organizza.',
+      'Il livello lo assegnano gli istruttori dopo averti visto in acqua. Dentro quel livello prenoti quando ti serve, dall’app, senza un giorno fisso da rispettare per tutta la stagione.',
     ],
     punti: [
       {
-        titolo: 'Abbiamo la soluzione',
+        titolo: 'Ti vediamo in acqua',
         testo:
-          'La Scuola Nuoto Adulti Athlon è flessibile: ti organizzi in base ai tuoi impegni, in autonomia e in pochi secondi, direttamente dallo smartphone.',
+          'Gli istruttori ti assegnano il livello: Base, Intermedio o Avanzato. Non è un test da superare, è il punto da cui parti.',
       },
       {
-        titolo: 'Prenoti il giorno e l’orario che preferisci',
+        titolo: 'Prenoti i turni del tuo livello',
         testo:
-          'Ti prenoti in autonomia nei giorni e negli orari che preferisci, senza limiti, all’interno del livello che ti assegnano gli istruttori.',
+          'Dentro il tuo livello prenoti in autonomia, nei giorni e negli orari che preferisci, senza limiti e in pochi secondi dallo smartphone.',
       },
       {
-        titolo: 'Tre livelli',
+        titolo: 'Passi al livello dopo quando sei pronto',
         testo:
-          'I corsi sono divisi in Base, Intermedio e Avanzato. Il livello lo assegnano gli istruttori, e da lì puoi prenotare liberamente tutti i turni di quel livello.',
+          'Lo dicono gli istruttori che ti hanno in acqua. E alla Scuola Nuoto Adulti si entra anche a metà stagione: i corsi non si fermano.',
       },
     ],
     varianti: [
@@ -674,6 +708,8 @@ export const CORSI: Corso[] = [
     ],
     lezioni: ['Scuola Nuoto'],
     attrezzatura: 'Costume da piscina e cuffia.',
+    faqAdatto:
+      'Sì, e il punto di partenza lo stabiliamo noi: gli istruttori ti vedono in acqua e ti assegnano il livello — Base, Intermedio o Avanzato. Da lì prenoti liberamente i turni del tuo livello, e passi al successivo quando gli istruttori lo ritengono il momento giusto.',
     faqExtra: [
       {
         q: 'I corsi di nuoto per adulti durano tutto l’anno?',
@@ -696,10 +732,11 @@ export const CORSI: Corso[] = [
   {
     slug: 'gestanti',
     nome: 'Corso Gestanti',
-    eyebrow: 'Aqua Fitness',
-    claim: 'Ginnastica in acqua per gestanti',
-    titoloIntro: 'Ginnastica in acqua per gestanti',
+    eyebrow: 'Athlon Aqua',
+    claim: 'Cinquanta minuti in cui l’acqua ti tiene su.',
+    titoloIntro: 'Come funziona la lezione',
     eyebrowIntro: 'L’attività',
+    ctaOrari: 'Vedi giorno e orario',
     banda: 'aqua-fitness',
     categoria: 4,
     hero: `${U}/2024/08/gestanti-ok.jpg`,

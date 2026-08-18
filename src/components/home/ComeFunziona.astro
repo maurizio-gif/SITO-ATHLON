@@ -1,0 +1,139 @@
+---
+/**
+ * «Come funziona Athlon»: lo strato che mancava fra il racconto del brand e il
+ * catalogo delle attività.
+ *
+ * È il punto in cui Athlon Club 4.0 viene definito una volta — sport, servizi e
+ * tecnologia dentro lo stesso club — e da lì in poi il sito lo dimostra con i
+ * fatti invece di ripetere il nome.
+ *
+ * Ogni blocco segue lo stesso ordine: il beneficio come titolo, il meccanismo
+ * e la prova nel testo. Tutti i fatti citati sono verificati nel repository —
+ * la prenotazione a tre giorni e la capienza per fascia (articolo
+ * `adulti/gym-floor` e f.a.q. della Gym Floor), i piani e i percorsi Start Up
+ * (`/gym-floor`), i livelli assegnati dagli istruttori (`corsi.ts`,
+ * scuola-nuoto-adulti), i Matrix collegati all'account (`AppSection`), i
+ * brevetti nel portale (`snb/didattica.md`).
+ *
+ * Nessuna promessa di disponibilità: la capienza è definita e prenotando si
+ * vede quanti posti restano, che è un'altra cosa dal dire «il posto c'è».
+ */
+const blocchi = [
+  {
+    titolo: 'Sai quando allenarti, e lo spazio è organizzato.',
+    testo:
+      'Sala pesi, corsi, reformer, corsie e scuola nuoto si prenotano dall’app Athlon Club o dal portale, fino a tre giorni prima. Ogni fascia ha una capienza definita: mentre prenoti vedi quanti posti restano.',
+  },
+  {
+    titolo: 'Sai cosa fare quando entri.',
+    testo:
+      'In sala il programma è nell’app: più di trenta piani divisi per obiettivo, più i percorsi Start Up per chi comincia da zero. In vasca il livello lo assegnano gli istruttori. E nelle fasce Con Assistenza un trainer è in sala con te.',
+  },
+  {
+    titolo: 'Quello che fai resta.',
+    testo:
+      'I macchinari Matrix 4.0 dell’area cardio sono collegati al tuo account: quando torni, ritrovi il tuo percorso. Per i bambini della scuola nuoto, nel portale ci sono i brevetti raggiunti e le prove per il livello successivo.',
+  },
+];
+---
+
+<section class="come" aria-labelledby="come-funziona">
+  <div class="container">
+    <span class="eyebrow come__eyebrow" data-anim="from-left">Athlon Club 4.0</span>
+    <h2 class="come__title" id="come-funziona" data-anim="reveal">Come funziona Athlon</h2>
+    <p class="come__sub">Sport, servizi e tecnologia fanno parte dello stesso club.</p>
+
+    <ol class="come__grid">
+      {blocchi.map((b, i) => (
+        <li class="come__item" data-anim="fade" data-anim-delay={String(i * 90)}>
+          <span class="come__num u-display">{String(i + 1).padStart(2, '0')}</span>
+          <h3 class="come__item-title">{b.titolo}</h3>
+          <p class="come__item-text">{b.testo}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .come {
+    padding: var(--space-section-md) 0;
+    background: var(--color-cream);
+  }
+
+  .come__eyebrow {
+    color: var(--color-primary);
+    display: block;
+    margin-bottom: 14px;
+  }
+
+  .come__title {
+    font-size: var(--text-2xl);
+    letter-spacing: var(--tracking-2xl);
+    --lh: var(--leading-2xl);
+  }
+
+  .come__sub {
+    margin: 10px 0 0;
+    max-width: 30ch;
+    font-size: var(--text-lg);
+    line-height: 1.3;
+    color: var(--color-dark);
+  }
+
+  .come__grid {
+    list-style: none;
+    margin: 44px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+
+  /* Il numero è una scansione, non una decorazione: i tre blocchi sono la
+     sequenza con cui si usa il club, prima, durante e dopo la sessione. */
+  .come__num {
+    display: block;
+    font-size: var(--text-xl);
+    color: var(--color-primary);
+    --lh: 1;
+    margin-bottom: 12px;
+  }
+
+  .come__item {
+    border-top: 2px solid var(--color-dark);
+    padding-top: 18px;
+  }
+
+  /* In corpo testo, non nella display face: una frase intera di beneficio si
+     legge meglio così. La leading passa per --lh, che è ciò da cui la regola
+     dell'headroom calcola il padding — a 1.28 il padding si annulla da sé. */
+  .come__item-title {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: var(--text-md);
+    --lh: 1.28;
+    letter-spacing: -0.01em;
+    margin: 0 0 10px;
+  }
+
+  .come__item-text {
+    margin: 0;
+    font-size: var(--text-base);
+    line-height: 1.62;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 900px) {
+    .come__grid {
+      grid-template-columns: 1fr;
+      gap: 26px;
+      margin-top: 32px;
+    }
+
+    .come__sub {
+      max-width: none;
+      font-size: var(--text-md);
+    }
+  }
+</style>

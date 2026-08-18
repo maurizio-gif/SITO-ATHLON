@@ -44,7 +44,7 @@ Hai bisogno di un programma completamente personalizzato?
 
 1. Clicca su **Prenota → Personal Training**
 2. Scegli il Trainer che preferisci
-3. La prima sessione include analisi posturale e test composizione corporea
+3. Prenoti la sua disponibilità e concordate il percorso con lui
 
 > Servizio a pagamento. Chiedi le tariffe in reception.
 

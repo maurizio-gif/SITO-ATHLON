@@ -5,8 +5,14 @@ import PlanningBand from '../components/planning/PlanningBand.astro';
 import LessonModal from '../components/planning/LessonModal.astro';
 import Faq, { type FaqEntry } from '../components/Faq.astro';
 import { bands, countLessons, PLANNING_MONTH } from '../data/planning';
+import { trialCta } from '../data/cta';
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
+
+/* Il planning è la pagina che chi non è iscritto guarda più a lungo: è l'unico
+   posto in cui vede la settimana reale del club. Una CTA di prova in testa, e
+   nessun form davanti agli orari. */
+const prova = trialCta({ source: '/planning' });
 
 // Where each band also lives as its own page, so the planning can send people
 // on to the activity. Bands without a page yet simply get no link.
@@ -59,8 +65,17 @@ const faqs: FaqEntry[] = [
         dall'app o dal portale.
       </p>
       <div class="pl-hero__actions">
-        <a href={`${PG}/#/Classes/1/Calendar`} class="btn btn-primary">Prenota una lezione →</a>
-        <a href="https://onelink.to/athlon" class="btn btn-outline">Scarica l'app</a>
+        <a href={`${PG}/#/Classes/1/Calendar`} class="btn btn-primary" data-cta="member">
+          Prenota una lezione →
+        </a>
+        <a
+          href={prova.href}
+          class="btn btn-outline"
+          target="_blank"
+          rel="noopener noreferrer"
+          {...prova.attrs}
+        >{prova.label}</a>
+        <a href="https://onelink.to/athlon" class="pl-hero__link" data-cta="member">Scarica l'app</a>
       </div>
     </div>
   </section>
@@ -143,6 +158,21 @@ const faqs: FaqEntry[] = [
   .pl-hero__title .accent {
     font-style: normal;
     color: var(--color-primary);
+  }
+
+  /* Il terzo link dell'hero: azione da socio, quindi testo e non pulsante. */
+  .pl-hero__link {
+    align-self: center;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-white);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .pl-hero__link:hover {
+    text-decoration-color: var(--color-white);
   }
 
   .pl-hero__lede {

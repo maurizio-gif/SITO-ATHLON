@@ -223,8 +223,8 @@ const faqs: FaqEntry[] = [
     a: 'Sì. Puoi prenotare e pagare una seduta singola anche senza abbonamento, e in quel caso non è richiesta la quota di attivazione. È il modo più semplice per provare.',
   },
   {
-    q: 'Cosa include la prima seduta?',
-    a: "La prima seduta è dedicata a capire da dove parti: comprende un'<strong>analisi posturale</strong> e un <strong>test della composizione corporea</strong>. Il percorso viene costruito su quei risultati, non su un programma standard.",
+    q: 'Mi allena sempre la stessa persona?',
+    a: 'Sì, se vuoi: prenoti la disponibilità del trainer che hai scelto, non un turno generico. È il motivo per cui vale la pena leggere le sei schede prima di prenotare la prima ora.',
   },
   {
     q: 'Quante sedute servono per vedere risultati?',
@@ -257,14 +257,18 @@ const trust = [
     <div class="container">
       {/* Above the fold: plays its own CSS entrance on load rather than
           waiting on the scroll observer, exactly like the other page heroes. */}
-      <span class="eyebrow">Servizi extra</span>
+      <span class="eyebrow">Allenamento individuale</span>
       <h1 class="pt-hero__title">
         Personal<br />Training.<br /><em>Affidati ai professionisti.</em>
       </h1>
       <p class="pt-hero__sub">
-        Schede su misura, percorsi mirati e lezioni individuali di Reformer e Fitness,
-        con un <strong>coach dedicato</strong> accanto a te.
+        Un'ora con qualcuno che sa il tuo nome. <strong>Sei trainer qualificati</strong>, ognuno con
+        le sue specializzazioni: postura, ipertrofia, dimagrimento, recupero funzionale post
+        infortunio, gravidanza e post parto.
       </p>
+      <a href="#trainer" class="btn btn-primary pt-hero__cta" data-cta="explore">
+        Conosci i nostri trainer →
+      </a>
     </div>
     <div class="pt-trust">
       <div class="container pt-trust__inner">
@@ -276,13 +280,12 @@ const trust = [
   <!-- INTRO -->
   <section class="pt-sec">
     <div class="container">
-      <span class="eyebrow" data-anim="from-left">Allenamento individuale</span>
-      <h2 class="pt-sec__title" data-anim="reveal">Un percorso su misura</h2>
+      <span class="eyebrow" data-anim="from-left">Come funziona</span>
+      <h2 class="pt-sec__title" data-anim="reveal">Scegli chi ti segue.</h2>
       <p class="pt-sec__sub">
-        Il nostro servizio di Personal Training si adatta alle tue esigenze specifiche: schede di
-        allenamento personalizzate, percorsi costruiti su di te e lezioni individuali di Reformer e
-        Fitness. Con un supporto esperto e dedicato, raggiungere i tuoi obiettivi è più facile — e
-        più gratificante.
+        Le schede qui sotto dicono cosa ha studiato ciascun trainer e su cosa lavora: scegli in base
+        a quello che ti serve, guardi la sua disponibilità e prenoti l'ora. Fuori dalle sedute ti
+        alleni con la scheda che ti prepara lui, di Reformer o di Fitness.
       </p>
 
       <div class="casi">
@@ -295,12 +298,14 @@ const trust = [
         ))}
       </div>
 
-      <a href={bookPT(null)} class="btn btn-primary pt-block-cta" data-anim="pop">Prenota ora →</a>
+      <a href={bookPT(null)} class="btn btn-primary pt-block-cta" data-anim="pop" data-cta="buy">
+        Prenota una seduta →
+      </a>
     </div>
   </section>
 
   <!-- TRAINER -->
-  <section class="pt-sec pt-sec--dark">
+  <section class="pt-sec pt-sec--dark" id="trainer">
     <div class="container">
       <span class="eyebrow" data-anim="from-left">Chi ti allena</span>
       <h2 class="pt-sec__title" data-anim="reveal">I nostri personal trainer</h2>
@@ -341,8 +346,8 @@ const trust = [
                     </ul>
                   </div>
                 ))}
-                <a href={bookPT(t.trainerId)} class="coach__cta">
-                  {t.trainerId ? 'Disponibilità →' : 'Prenota una seduta →'}
+                <a href={bookPT(t.trainerId)} class="coach__cta" data-cta="buy">
+                  {t.trainerId ? 'Verifica la disponibilità →' : 'Prenota una seduta →'}
                 </a>
               </div>
             </div>
@@ -356,7 +361,7 @@ const trust = [
   <section class="pt-sec pt-sec--alt">
     <div class="container">
       <span class="eyebrow" data-anim="from-left">Quanto costa</span>
-      <h2 class="pt-sec__title" data-anim="reveal">Modalità di adesione</h2>
+      <h2 class="pt-sec__title" data-anim="reveal">Una seduta, o un pacchetto al mese</h2>
       <p class="pt-sec__sub">
         Una seduta alla volta, aperta anche a chi non è iscritto, oppure un pacchetto mensile da
         aggiungere al tuo abbonamento.
@@ -405,7 +410,7 @@ const trust = [
           </ul>
 
           <p class="modo__note">Le sedute sono utilizzabili entro il mese solare.</p>
-          <a href={`${PG}/#/Login`} class="modo__cta">Accedi ora →</a>
+          <a href={`${PG}/#/Login`} class="modo__cta" data-cta="buy">Aggiungi al tuo abbonamento →</a>
         </article>
       </div>
 

@@ -13,13 +13,13 @@ import LessonModal from '../components/planning/LessonModal.astro';
 import Faq from '../components/Faq.astro';
 import { faqConSchede, type FaqEntry } from '../data/faq';
 import { getBand, countLessons, roomsOf, PLANNING_MONTH } from '../data/planning';
+import { trialCta } from '../data/cta';
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 const U = '/wp-content/uploads';
-/* Guest Pass: lo stesso form della pagina Reformer, con il suo medium così le
-   richieste si distinguono per pagina di partenza. */
-const GUEST_PASS =
-  'https://automazione.n8ndevelop.it/form/40cc4d53-8515-4657-b6ae-6bb0fa1acf77?source=SitoWeb&medium=CorsiFitness';
+/* La prova passa dalla configurazione condivisa: un solo punto da cambiare
+   quando al posto del form ci sarà il modal. */
+const prova = trialCta({ activity: 'corsi-fitness', source: '/corsi-fitness' });
 
 const band = getBand('corsi-fitness');
 const lezioni = countLessons(band);
@@ -55,25 +55,44 @@ const facts = [
  * `lezioni` sono i nomi con cui il corso compare nel planning: da lì leggiamo
  * quante volte a settimana si tiene, invece di scriverlo a mano.
  */
+/**
+ * Athlon Classes: cinque famiglie che ordinano i corsi per quello che una
+ * persona cerca quando prenota. Non sono discipline nuove e non rinominano
+ * niente — sono tag, e un corso può averne due (il Booty Workout è musica e
+ * tono, l'Antigravity® è postura e mobilità).
+ *
+ * Restano una griglia sola e un URL solo per corso: la fascia di orientamento
+ * elenca i nomi, non ricrea le card.
+ */
+const FAMIGLIE = [
+  { id: 'forza', nome: 'Forza e tono', riga: 'Carichi, bilanciere, corpo libero.' },
+  { id: 'fiato', nome: 'Fiato', riga: 'Intervalli, colpi, cinquanta minuti che si sentono.' },
+  { id: 'musica', nome: 'Musica', riga: 'Coreografie da seguire, a tempo di musica.' },
+  { id: 'postura', nome: 'Postura', riga: 'Core, controllo e precisione del movimento.' },
+  { id: 'mobilita', nome: 'Mobilità', riga: 'Respiro e allungamento, dal ritmo lento al più dinamico.' },
+];
+
+const NOME_FAMIGLIA: Record<string, string> = Object.fromEntries(FAMIGLIE.map((f) => [f.id, f.nome]));
+
 const corsi = [
-  { nome: 'Antigravity®', href: '/antigravity', lezioni: ['Antigravity'], foto: `${U}/2024/08/DSC08394-1024x1536.jpg` },
-  { nome: 'Balli di Gruppo', href: '/balli-di-gruppo', lezioni: ['Balli di Gruppo'], foto: `${U}/2024/08/balli-di-gruppo.jpg` },
-  { nome: 'Body Pump®', href: '/body-pump', lezioni: [], foto: `${U}/2024/08/WM_07771-1024x1536.jpg` },
-  { nome: 'Body Sculpt', href: '/body-sculpt', lezioni: ['Body Sculpt'], foto: `${U}/2024/08/WM_07791-2-1024x683.jpg` },
-  { nome: 'Booty Workout', href: '/booty-workout', lezioni: ['Booty Workout'], foto: `${U}/2024/08/Giulia-Pagliaccia-77-scaled-e1589104949906-1024x1024.jpg` },
-  { nome: 'Calisthenics', href: '/calisthenics', lezioni: ['Calisthenics'], foto: `${U}/2024/01/DSC07725-1024x1536.jpg` },
-  { nome: 'Difesa Personale', href: '/difesa-personale', lezioni: ['Difesa Personale'], foto: `${U}/2025/11/ATHLON9-1024x1536.jpg` },
-  { nome: 'GP Coreo', href: '/gpcoreo', lezioni: ['GP Coreo'], foto: `${U}/2025/11/ATHLON87-1024x1536.jpg` },
-  { nome: 'Ginnastica Dolce', href: '/ginnastica-dolce', lezioni: ['Ginnastica Dolce'], foto: `${U}/2024/08/Ginnastica-Dolce-Athlon-1024x682.jpg` },
-  { nome: 'Ginnastica Pilates', href: '/pilates', lezioni: ['Pilates Matwork', 'Pilates'], foto: `${U}/2023/11/IMG_2542-scaled-1-1024x1536.jpg` },
-  { nome: 'Ginnastica Posturale', href: '/ginnastica-posturale', lezioni: ['Posturale', 'G. Posturale'], foto: `${U}/2024/08/P1160261-1024x577.jpg` },
-  { nome: 'Hatha Yoga', href: '/yoga#hatha', lezioni: ['Hatha Yoga'], foto: `${U}/2024/08/Yoga-Athlon-1024x683.jpg` },
-  { nome: 'HBX Boxing', href: '/hbx#boxing', lezioni: ['HBX Boxing'], foto: `${U}/2025/03/Athlon178-1024x1536.jpg` },
-  { nome: 'HBX Fusion', href: '/hbx#fusion', lezioni: ['HBX Fusion'], foto: `${U}/2024/08/DSC08480-1024x1536.jpg` },
-  { nome: 'Motr®', href: '/motr', lezioni: ['MOTR®'], foto: `${U}/2024/08/motr-1-768x768.jpg` },
-  { nome: 'Power Yoga', href: '/yoga#power', lezioni: ['Power Yoga'], foto: `${U}/2025/03/Athlon193-1024x1536.jpg` },
-  { nome: 'Strength Development™', href: '/strenght', lezioni: ['Strength Development'], foto: `${U}/2025/08/2024-SEPT-ADIDAS-X-LES-MILLS-FW24-BERLIN-STRENGTH-IMAGE-6-1024x768.jpg` },
-  { nome: 'Yogassè', href: '/yoga#yogasse', lezioni: ['Yogassè'], foto: `${U}/2024/08/IMG_5274-768x1024.jpg` },
+  { nome: 'Antigravity®', href: '/antigravity', famiglie: ['postura', 'mobilita'], lezioni: ['Antigravity'], foto: `${U}/2024/08/DSC08394-1024x1536.jpg` },
+  { nome: 'Balli di Gruppo', href: '/balli-di-gruppo', famiglie: ['musica'], lezioni: ['Balli di Gruppo'], foto: `${U}/2024/08/balli-di-gruppo.jpg` },
+  { nome: 'Body Pump®', href: '/body-pump', famiglie: ['forza'], lezioni: [], foto: `${U}/2024/08/WM_07771-1024x1536.jpg` },
+  { nome: 'Body Sculpt', href: '/body-sculpt', famiglie: ['forza'], lezioni: ['Body Sculpt'], foto: `${U}/2024/08/WM_07791-2-1024x683.jpg` },
+  { nome: 'Booty Workout', href: '/booty-workout', famiglie: ['musica', 'forza'], lezioni: ['Booty Workout'], foto: `${U}/2024/08/Giulia-Pagliaccia-77-scaled-e1589104949906-1024x1024.jpg` },
+  { nome: 'Calisthenics', href: '/calisthenics', famiglie: ['forza'], lezioni: ['Calisthenics'], foto: `${U}/2024/01/DSC07725-1024x1536.jpg` },
+  { nome: 'Difesa Personale', href: '/difesa-personale', famiglie: ['fiato'], lezioni: ['Difesa Personale'], foto: `${U}/2025/11/ATHLON9-1024x1536.jpg` },
+  { nome: 'GP Coreo', href: '/gpcoreo', famiglie: ['musica'], lezioni: ['GP Coreo'], foto: `${U}/2025/11/ATHLON87-1024x1536.jpg` },
+  { nome: 'Ginnastica Dolce', href: '/ginnastica-dolce', famiglie: ['mobilita'], lezioni: ['Ginnastica Dolce'], foto: `${U}/2024/08/Ginnastica-Dolce-Athlon-1024x682.jpg` },
+  { nome: 'Ginnastica Pilates', href: '/pilates', famiglie: ['postura'], lezioni: ['Pilates Matwork', 'Pilates'], foto: `${U}/2023/11/IMG_2542-scaled-1-1024x1536.jpg` },
+  { nome: 'Ginnastica Posturale', href: '/ginnastica-posturale', famiglie: ['postura'], lezioni: ['Posturale', 'G. Posturale'], foto: `${U}/2024/08/P1160261-1024x577.jpg` },
+  { nome: 'Hatha Yoga', href: '/yoga#hatha', famiglie: ['mobilita'], lezioni: ['Hatha Yoga'], foto: `${U}/2024/08/Yoga-Athlon-1024x683.jpg` },
+  { nome: 'HBX Boxing', href: '/hbx#boxing', famiglie: ['fiato'], lezioni: ['HBX Boxing'], foto: `${U}/2025/03/Athlon178-1024x1536.jpg` },
+  { nome: 'HBX Fusion', href: '/hbx#fusion', famiglie: ['fiato'], lezioni: ['HBX Fusion'], foto: `${U}/2024/08/DSC08480-1024x1536.jpg` },
+  { nome: 'Motr®', href: '/motr', famiglie: ['postura'], lezioni: ['MOTR®'], foto: `${U}/2024/08/motr-1-768x768.jpg` },
+  { nome: 'Power Yoga', href: '/yoga#power', famiglie: ['mobilita'], lezioni: ['Power Yoga'], foto: `${U}/2025/03/Athlon193-1024x1536.jpg` },
+  { nome: 'Strength Development™', href: '/strenght', famiglie: ['forza'], lezioni: ['Strength Development'], foto: `${U}/2025/08/2024-SEPT-ADIDAS-X-LES-MILLS-FW24-BERLIN-STRENGTH-IMAGE-6-1024x768.jpg` },
+  { nome: 'Yogassè', href: '/yoga#yogasse', famiglie: ['mobilita'], lezioni: ['Yogassè'], foto: `${U}/2024/08/IMG_5274-768x1024.jpg` },
 ].map((c) => {
   // Quante volte a settimana quel corso è in palinsesto: è l'informazione che
   // manca a una griglia di nomi, e ce l'abbiamo già nel planning. Vuoto quando
@@ -135,7 +154,7 @@ const faqs: FaqEntry[] = await faqConSchede([
   },
   {
     q: 'Si può provare un corso fitness senza abbonarsi?',
-    a: `Sì, in due modi. Puoi <a href="${GUEST_PASS}">richiedere un Guest Pass Premium di una settimana</a> e provare tutte le nostre attività, corsi fitness compresi. Oppure prenoti e paghi la singola lezione, senza quota di attivazione.`,
+    a: `Sì, in due modi. Puoi <a href="${prova.href}">richiedere un Guest Pass Premium di una settimana</a> e provare tutte le nostre attività, corsi fitness compresi. Oppure prenoti e paghi la singola lezione, senza quota di attivazione.`,
   },
   {
     q: 'Che livello serve per iniziare un corso fitness?',
@@ -165,10 +184,15 @@ const faqs: FaqEntry[] = await faqConSchede([
     <div class="cf-hero__scrim"></div>
 
     <div class="container cf-hero__inner">
-      <span class="eyebrow">Attività adulti</span>
+      <span class="eyebrow">Athlon Classes</span>
       <h1 class="cf-hero__title">Corsi <em class="accent">fitness</em></h1>
-      <p class="cf-hero__lede">Solo l'imbarazzo della scelta.</p>
-      <a href={`${PG}/#/Registration`} class="btn btn-primary cf-hero__cta">Iscriviti ora →</a>
+      <p class="cf-hero__lede">{corsi.length} corsi.<br />{FAMIGLIE.length} modi di allenarti.</p>
+      <div class="cf-hero__actions">
+        <a href="#famiglie" class="btn btn-primary cf-hero__cta" data-cta="explore">
+          Trova il corso giusto per te →
+        </a>
+        <a href="#orari" class="cf-hero__link">Vedi gli orari</a>
+      </div>
     </div>
 
     <div class="cf-facts">
@@ -181,15 +205,39 @@ const faqs: FaqEntry[] = await faqConSchede([
   <!-- INTRO -->
   <section class="cf-sec">
     <div class="container">
-      <span class="eyebrow" data-anim="from-left">Più di 80 corsi a settimana</span>
-      <h2 class="cf-sec__title" data-anim="reveal">Scegli come allenarti</h2>
+      <span class="eyebrow" data-anim="from-left" id="famiglie">Come scegliere</span>
+      <h2 class="cf-sec__title" data-anim="reveal">{FAMIGLIE.length} famiglie, per non scegliere a caso</h2>
       <p class="cf-sec__sub">
-        Antigravity®, HBX Fusion e Boxing, Strength Development, yoga, tonificazione, pilates,
-        posturale, Motr, GP Coreo, Booty Workout, Body Pump… e tanto altro. Tutti i corsi sono
-        compresi negli abbonamenti che li prevedono, e si prenotano da app o portale.
+        Le famiglie non sono corsi nuovi: sono cinque modi di arrivare al corso giusto. Ogni lezione
+        resta quella che è, col suo nome, e si prenota da app o portale.
       </p>
-      <a href={`${PG}/#/Classes/1/Calendar?categoryId=1`} class="btn btn-primary" data-anim="pop">
-        Prenota ora →
+
+      <ul class="cf-fam">
+        {FAMIGLIE.map((f, i) => (
+          <li class="cf-fam__item" data-anim="fade" data-anim-delay={String(i * 70)}>
+            <span class="cf-fam__name u-display">{f.nome}</span>
+            <p class="cf-fam__line">{f.riga}</p>
+            <p class="cf-fam__corsi">
+              {corsi
+                .filter((c) => c.famiglie.includes(f.id))
+                .map((c, j) => (<>{j > 0 && ' · '}<a href={c.href}>{c.nome}</a></>))}
+            </p>
+          </li>
+        ))}
+      </ul>
+
+      <p class="cf-fam__nota">
+        Qualche lezione sta in due famiglie: il Booty Workout è musica e tono, l'Antigravity® è
+        postura e mobilità. Se sei indeciso fra due, sono comprese nello stesso abbonamento.
+      </p>
+
+      <a
+        href={`${PG}/#/Classes/1/Calendar?categoryId=1`}
+        class="btn btn-primary"
+        data-anim="pop"
+        data-cta="member"
+      >
+        Prenota una lezione →
       </a>
     </div>
   </section>
@@ -198,10 +246,10 @@ const faqs: FaqEntry[] = await faqConSchede([
   <section class="cf-sec cf-sec--alt">
     <div class="container">
       <span class="eyebrow" data-anim="from-left">I nostri corsi</span>
-      <h2 class="cf-sec__title" data-anim="reveal">Venti corsi fra cui scegliere</h2>
+      <h2 class="cf-sec__title" data-anim="reveal">I corsi, uno per uno</h2>
       <p class="cf-sec__sub">
-        Apri un corso per la sua pagina: com'è una lezione, a chi è adatta, cosa serve e quando si
-        tiene.
+        {corsi.length} corsi in {sale.length} sale. Apri un corso per la sua pagina: com'è una
+        lezione, a chi è adatta, cosa serve e quando si tiene.
       </p>
 
       <div class="cf-grid">
@@ -213,12 +261,13 @@ const faqs: FaqEntry[] = await faqConSchede([
               </span>
               <span class="cfc__body">
                 <span class="cfc__name u-display">{c.nome}</span>
+                <span class="cfc__fam">{c.famiglie.map((f) => NOME_FAMIGLIA[f]).join(' · ')}</span>
                 {c.volte > 0 && (
                   <span class="cfc__when">
                     {c.volte === 1 ? '1 lezione a settimana' : `${c.volte} lezioni a settimana`}
                   </span>
                 )}
-                <span class="cfc__more">Scopri di più →</span>
+                <span class="cfc__more">Vedi il corso →</span>
               </span>
             </a>
           </article>
@@ -228,7 +277,7 @@ const faqs: FaqEntry[] = await faqConSchede([
   </section>
 
   <!-- ORARI -->
-  <section class="cf-sec">
+  <section class="cf-sec" id="orari">
     <div class="container">
       <span class="eyebrow" data-anim="from-left">{PLANNING_MONTH}</span>
       <h2 class="cf-sec__title" data-anim="reveal">Gli orari dei corsi</h2>
@@ -339,6 +388,109 @@ const faqs: FaqEntry[] = await faqConSchede([
 
   .cf-hero__cta {
     margin-top: 28px;
+  }
+
+  /* Hero: primaria e link secondario sulla stessa riga. */
+  .cf-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+  }
+
+  .cf-hero__link {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-white);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .cf-hero__link:hover {
+    text-decoration-color: var(--color-white);
+  }
+
+  /* Athlon Classes: cinque colonne di orientamento, i corsi come link e non
+     come card — la griglia canonica resta una sola, più sotto. */
+  .cf-fam {
+    list-style: none;
+    margin: 32px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 24px;
+  }
+
+  .cf-fam__item {
+    border-top: 2px solid var(--color-dark);
+    padding-top: 14px;
+  }
+
+  .cf-fam__name {
+    display: block;
+    font-size: var(--text-lg);
+    color: var(--color-primary);
+    --lh: 1;
+    margin-bottom: 8px;
+  }
+
+  .cf-fam__line {
+    margin: 0 0 10px;
+    font-size: var(--text-base);
+    line-height: 1.5;
+    color: var(--color-dark);
+  }
+
+  .cf-fam__corsi {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  .cf-fam__corsi a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(39, 36, 35, 0.25);
+  }
+
+  .cf-fam__corsi a:hover {
+    color: var(--color-primary);
+    text-decoration-color: currentColor;
+  }
+
+  .cf-fam__nota {
+    margin: 26px 0 30px;
+    max-width: 62ch;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  /* Il tag sulla card: dice a quale famiglia appartiene, senza ripetere la card
+     dentro la fascia di orientamento. */
+  .cfc__fam {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin-top: 6px;
+  }
+
+  @media (max-width: 1100px) {
+    .cf-fam {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .cf-fam {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
   }
 
   .cf-facts {

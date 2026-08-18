@@ -61,7 +61,11 @@ const eventi = defineCollection({
     /** Free events say so loudly — it is the strongest thing on the card. */
     free: z.boolean().default(false),
     price: z.string().optional(),
-    ctaLabel: z.string().default('Prenota ora'),
+    /* La destinazione di default è la registrazione al portale, quindi
+       l'etichetta dice quello: «prenota il tuo posto» sarebbe una promessa che
+       quella pagina non mantiene. Un evento con un vero link di prenotazione
+       mette la sua etichetta nel suo file. */
+    ctaLabel: z.string().default('Registrati per partecipare'),
     ctaHref: z.string().default('https://athlon.perfectgym.com/ClientPortal2/#/Registration'),
     /**
      * Practical notes — what to bring, what is required. A list rather than a
