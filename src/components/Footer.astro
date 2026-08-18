@@ -1,6 +1,12 @@
 ---
+import { talkCta } from '../data/cta';
+
 const ADDRESS = 'Via Ugo Ojetti 134, 00137 Roma';
 const MAPS_QUERY = encodeURIComponent(ADDRESS);
+
+/* Il contatto del footer: stessa configurazione dell'header, così la
+   destinazione si cambia in un posto solo. */
+const contatta = talkCta({ source: 'footer' });
 
 const attivitaAdulti = [
   { label: 'Gym Floor (Sala Pesi)', href: '/gym-floor' },
@@ -24,6 +30,7 @@ const ilClub = [
   { label: 'Abbonamenti', href: '/abbonamenti' },
   { label: 'Orari Corsi', href: '/planning' },
   { label: 'Eventi', href: '/eventi' },
+  { label: contatta.label, href: contatta.href },
 ];
 
 const risorse = [
@@ -106,6 +113,7 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
           href={`https://www.google.com/maps/dir/?api=1&destination=${MAPS_QUERY}`}
           target="_blank"
           rel="noopener">Indicazioni</a>
+        <a class="btn btn-primary" href={contatta.href} {...contatta.attrs}>{contatta.label}</a>
       </div>
     </div>
   </section>

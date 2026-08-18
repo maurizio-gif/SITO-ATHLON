@@ -14,6 +14,7 @@ import PlanningBand from '../components/planning/PlanningBand.astro';
 import LessonModal from '../components/planning/LessonModal.astro';
 import Faq, { type FaqEntry } from '../components/Faq.astro';
 import { getBand, getLessonCard, countLessons, PLANNING_MONTH } from '../data/planning';
+import { getCorso } from '../data/corsi';
 import { trialCta } from '../data/cta';
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
@@ -60,6 +61,31 @@ const blocchi = [
 ];
 
 
+
+/**
+ * Le tre attività affini, come sulle pagine dei corsi: nome, foto e URL escono
+ * da `data/corsi.ts`, così non c'è una seconda copia da tenere aggiornata.
+ *
+ * L'affinità è per tipo di lavoro, non per spinta commerciale: il Reformer è
+ * controllo del movimento con la resistenza della macchina, quindi accanto
+ * stanno il tappetino (Pilates), un altro attrezzo (Motr®) e la sospensione
+ * (Antigravity®). Le ragioni sono scritte con le parole che il corso usa già
+ * nella sua scheda.
+ */
+const simili = [
+  {
+    corso: getCorso('pilates'),
+    perche: 'Lo stesso lavoro sul centro del corpo, a terra sul tappetino: un movimento alla volta, senza macchina.',
+  },
+  {
+    corso: getCorso('motr'),
+    perche: 'Un altro attrezzo che unisce pilates, equilibrio e mobilità — instabile, invece che su binari.',
+  },
+  {
+    corso: getCorso('antigravity'),
+    perche: 'Ancora controllo e centro, appesi a un’amaca: la sospensione al posto della resistenza.',
+  },
+];
 
 // Le cinque domande della pagina vecchia, verbatim nelle risposte. L'unico
 // cambio: il link alle prenotazioni ora è quello interno.
@@ -281,6 +307,43 @@ const faqs: FaqEntry[] = [
     </div>
   </section>
 
+  <!-- CORRELATI -->
+  <section class="rf-sec rf-sec--alt">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Se ti piace il Reformer</span>
+      <h2 class="rf-sec__title" data-anim="reveal">Ti piacerà anche</h2>
+      <p class="rf-sec__sub">
+        Fanno parte dello stesso club: <a class="rf-link-inline" href="/abbonamenti">guarda quali
+        comprende il tuo abbonamento</a>.
+      </p>
+
+      <ul class="rf-simili">
+        {simili.map((s, i) => (
+          <li data-anim="fade" data-anim-delay={String(i * 80)}>
+            <a class="rf-simile" href={`/${s.corso.slug}`} data-cta="explore">
+              <img class="rf-simile__foto" src={s.corso.hero} alt="" loading="lazy" />
+              <span class="rf-simile__body">
+                <span class="rf-simile__nome u-display">{s.corso.nome}</span>
+                <span class="rf-simile__perche">{s.perche}</span>
+                <span class="rf-simile__cta">Scopri il corso →</span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <p class="rf-tutti">
+        <span class="rf-tutti__label">Tutte le altre attività:</span>
+        <a class="rf-chip" href="/corsi-fitness">Corsi Fitness</a>
+        <a class="rf-chip" href="/gym-floor">Gym Floor</a>
+        <a class="rf-chip" href="/personal-training">Personal Training</a>
+        <a class="rf-chip" href="/aqua-fitness">Aqua Fitness</a>
+        <a class="rf-chip" href="/nuoto-libero">Nuoto Libero</a>
+        <a class="rf-chip" href="/scuola-nuoto-adulti">Scuola Nuoto Adulti</a>
+      </p>
+    </div>
+  </section>
+
   {/* Il pannello della lezione, aperto dalle celle del planning. */}
   <LessonModal bands={['group-reformer']} />
 </Layout>
@@ -480,6 +543,105 @@ const faqs: FaqEntry[] = [
     text-decoration: underline;
   }
 
+  .rf-link-inline {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  /* ---- Correlati ---- */
+  .rf-simili {
+    list-style: none;
+    margin: 26px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .rf-simile {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--color-white);
+    border: 1px solid var(--border);
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .rf-simile:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+  }
+
+  .rf-simile__foto {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+
+  .rf-simile__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 20px 22px 22px;
+  }
+
+  .rf-simile__nome {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: var(--text-xl);
+    --lh: 1;
+  }
+
+  .rf-simile__perche {
+    margin-top: 10px;
+    color: var(--text-muted);
+  }
+
+  .rf-simile__cta {
+    margin-top: auto;
+    padding-top: 18px;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  /* Le altre restano etichette: servono a non chiudere la strada, non a
+     competere con le tre consigliate. */
+  .rf-tutti {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    margin: 30px 0 0;
+  }
+
+  .rf-tutti__label {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-right: 4px;
+  }
+
+  .rf-chip {
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background: var(--color-white);
+    font-size: var(--text-xs);
+  }
+
+  .rf-chip:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
   /* ---- Tre blocchi di testo ---- */
   .rfb {
     display: grid;
@@ -652,10 +814,17 @@ const faqs: FaqEntry[] = [
     margin-bottom: 0;
   }
 
+  @media (max-width: 1000px) {
+    .rf-simili {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
   @media (max-width: 900px) {
     .rfb,
     .rf-car,
-    .rf-plans {
+    .rf-plans,
+    .rf-simili {
       grid-template-columns: 1fr;
     }
 
