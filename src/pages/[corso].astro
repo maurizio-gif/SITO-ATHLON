@@ -18,7 +18,7 @@ import Faq from '../components/Faq.astro';
 import { faqConSchede, type FaqEntry } from '../data/faq';
 import { CORSI, mediaVariante, type Corso } from '../data/corsi';
 import { scheda } from '../data/pagine';
-import { getBand, bands, PLANNING_MONTH } from '../data/planning';
+import { getBand, bands } from '../data/planning';
 import { trialCta } from '../data/cta';
 
 export function getStaticPaths() {
@@ -303,7 +303,7 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
   <!-- ORARI -->
   <section class="co-sec co-sec--alt" id="orari">
     <div class="container">
-      <span class="eyebrow" data-anim="from-left">{PLANNING_MONTH}</span>
+      <span class="eyebrow" data-anim="from-left">Ogni settimana</span>
       <h2 class="co-sec__title" data-anim="reveal">Quando c’è {corso.nome}</h2>
 
       <LessonSchedule lezioni={corso.lezioni} nome={corso.nome} unita={unita} />

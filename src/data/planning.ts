@@ -53,7 +53,13 @@ export interface GymFloor {
 
 const planning = data as unknown as { gymFloor: GymFloor; bands: Band[] };
 
-/** The month this planning covers, for labelling. Update with the data. */
+/**
+ * Il mese che questo planning copre. Va aggiornato insieme al JSON, ma **non va
+ * stampato in pagina**: un'etichetta con il mese invecchia da sola e fa sembrare
+ * vecchio un orario che è quello giusto. Gli orari si presentano come la
+ * settimana tipo, che è ciò che sono. Serve qui a dire quale palinsesto è
+ * caricato, per chi lo sostituisce.
+ */
 export const PLANNING_MONTH = 'Settembre 2026';
 
 export const gymFloor: GymFloor = planning.gymFloor;
@@ -77,7 +83,6 @@ export function countLessons(band: Band): number {
   return band.days.reduce((n, d) => n + d.classes.length, 0);
 }
 
-/** Rooms actually used by a band, in a stable order, for its legend. */
 /**
  * Tutte le lezioni della settimana, in tutte le fasce: corsi fitness, group
  * reformer, scuola nuoto adulti, nuoto libero e aqua fitness.
@@ -91,6 +96,35 @@ export function totalLessons(): number {
   return bands.reduce((n, b) => n + countLessons(b), 0);
 }
 
+/** Minuti di un intervallo del planning: `07:40–08:30`, o `Dom 09:30–12:30`. */
+function durata(time: string): number {
+  const [da, a] = time.replace(/^[A-Za-z]{3}\s*/, '').replace(/\s/g, '').split(/[–-]/);
+  const min = (t: string) => Number(t.split(':')[0]) * 60 + Number(t.split(':')[1]);
+  return min(a) - min(da);
+}
+
+/**
+ * Ore di palinsesto in una settimana: la somma della durata di ogni lezione,
+ * corsie del nuoto libero comprese — nel planning sono fasce come le altre.
+ *
+ * Arrotondate per difetto, perché è un numero che si mostra: dire «più di N ore»
+ * di un totale di N,9 è vero, il contrario no.
+ */
+export function totalHours(): number {
+  return Math.floor(bands.reduce((n, b) => n + b.days.reduce((m, d) => m + d.classes.reduce((k, c) => k + durata(c.time), 0), 0), 0) / 60);
+}
+
+/**
+ * Ore di sala aperta in una settimana, dagli orari della Gym Floor: la fascia
+ * infrasettimanale conta cinque volte, sabato e domenica una.
+ */
+export function openHours(): number {
+  return Math.floor(
+    gymFloor.hours.reduce((n, h) => n + durata(h.hours) * (/venerd/i.test(h.label) ? 5 : 1), 0) / 60
+  );
+}
+
+/** Rooms actually used by a band, in a stable order, for its legend. */
 export function roomsOf(band: Band): string[] {
   const order = ['Sala A', 'Sala B', 'Sala C', 'Vasca Media', 'Vasca Grande'];
   const used = new Set(band.days.flatMap((d) => d.classes.map((c) => c.sala)).filter(Boolean));

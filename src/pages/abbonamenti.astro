@@ -460,6 +460,13 @@ const trust = [
           </div>
         ))}
       </div>
+
+      {/* Le f.a.q. rispondono ai casi; il regolamento è il testo che vale.
+          Sta qui e non solo nel footer: è la pagina dove si decide di pagare. */}
+      <p class="ab-condizioni">
+        Durata, rinnovi, disdette, sospensioni e recuperi sono scritti per esteso nei <a
+          href="/regolamento">Termini e Condizioni</a>.
+      </p>
     </div>
   </section>
 
@@ -1484,6 +1491,19 @@ const trust = [
   }
 
   /* ---- Contatti ---- */
+  /* Sotto le f.a.q.: presente e leggibile, senza il tono del piè di pagina. */
+  .ab-condizioni {
+    margin: 26px 0 0;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .ab-condizioni a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
   .ab-address {
     font-size: var(--text-md);
     margin-bottom: 8px;

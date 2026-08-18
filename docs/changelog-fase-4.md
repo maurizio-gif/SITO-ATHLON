@@ -577,3 +577,38 @@ Vimeo.
 - **Responsive** delle sezioni nuove a 390, 768 e 1280 px: colonne 3→1, 5→2→1, 4→2→1, nessun overflow orizzontale, nessun figlio fuori dal contenitore, nessun errore JS.
 - **Regola tipografica di progetto**: verifica con `TextMetrics` su dodici pagine, 317 elementi nella display face, margine minimo 1.12 px — nessun titolo tagliato.
 - **Spaziatura sui tag inline**: audit `grep` del progetto, una sola occorrenza residua, preesistente e visivamente corretta.
+
+---
+
+## Dopo la Fase 4 — revisioni richieste
+
+Le decisioni prese sopra che sono state cambiate dopo, perché questo documento
+resti leggibile senza portare fuori strada.
+
+| Cosa | Nella Fase 4 | Ora | Perché |
+| --- | --- | --- | --- |
+| **Contattaci** | `BLOCKED CTA — FUTURE MODAL`, link rimossi | pubblicata in header e footer, destinazione `/club-life#help-desk` | L'Help Desk è un canale che esiste e mantiene la promessa: si scrive, si riceve risposta, e il modulo di assistenza mette in contatto col team. Serviva una destinazione vera, non una pagina nuova. |
+| **Iscriviti** | assente | pulsante nell'header, a `/abbonamenti` | La registrazione su PerfectGym parte da un `PaymentPlanId`: da un pulsante generico non si può scegliere il piano al posto della persona. |
+| **Abbonamenti nella barra desktop** | voce di menu | rimossa: c'è «Iscriviti» | Erano due porte per la stessa pagina nella stessa barra. |
+| **Sezione home** | «Come funziona Athlon», tre blocchi su prenotazione, programma e storico | «180 lezioni a settimana. Scegli le tue.», tre blocchi sulla scelta di ora, attività e cambio | Richiesta: incentrarla sulla libertà di scelta. I numeri sono derivati dal planning — `totalLessons()`, `totalHours()`, `openHours()`. |
+| **Baby Nuoto** | «Trova il turno per il tuo bambino» | «Registrati per prenotare la tua lezione» | Richiesta. Il contratto di handoff registra che ora la CTA promette una prenotazione: il modal dovrà chiudere lì. |
+| **Mese negli orari** | `Settembre 2026` come etichetta in otto punti | rimosso: «Orari della settimana», «Ogni settimana», «La settimana al club», e le ore di apertura al posto del mese | Un'etichetta con il mese invecchia da sola e fa sembrare vecchio un orario giusto. `PLANNING_MONTH` resta nei dati, documentato come «non stampare». |
+| **Scuola Nuoto Bambini** | rimando «Parla con il Direttore Tecnico», blocco «I corsi stagionali» | rimando rimosso, blocco «Dai 3 ai 13 anni» | Richiesta: tutti i corsi sono stagionali per definizione. Il termine è uscito anche dalla meta description. |
+| **Termini e Condizioni** | solo nel footer | anche nel menu (in piccolo, desktop e mobile) e sotto le f.a.q. degli abbonamenti | È la pagina dove si decide di pagare. |
+| **Corsi fitness** | hero → «Trova il corso giusto per te» (`#famiglie`) | hero → «Prova Ora» (`#prova`), nuova sezione «Provali tutti»; «Trova il corso giusto per te» resta come link | Richiesta. La sezione usa i dati del Guest Pass già in `/abbonamenti`: sette giorni, 19 €, requisito dal 2021. La parola *gratuita* non compare. |
+
+### Nuova f.a.q. sulla Scuola Nuoto Bambini
+
+«È possibile effettuare una prova?» — non esiste una lezione di prova, e non è
+stata inventata: quello che esiste è l'adesione mensile, che si disdice di mese
+in mese. La risposta riporta il meccanismo del regolamento (punto 4.11: rinnovo
+il primo del mese, disdetta almeno dieci giorni prima) e la quota di attivazione
+alla riscrizione, perché «senza vincoli» senza quel dettaglio sarebbe una
+promessa che il regolamento non mantiene.
+
+### Da confermare
+
+`wikiathlon/adulti/cessione-abbonamento` chiama il Guest Pass del referral «una
+settimana di prova **gratuita**», mentre il Guest Pass di `/abbonamenti` costa
+19 €. La scheda del referral non dichiara un prezzo, quindi non è possibile dire
+quale delle due sia da correggere: serve una conferma prima di toccarla.

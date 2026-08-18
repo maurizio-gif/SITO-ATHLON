@@ -14,7 +14,7 @@
  * Quando l'elenco è vuoto — il corso esiste ma questo mese non è in palinsesto —
  * il componente lo dice, invece di mostrare una tabella vuota.
  */
-import { bands, ROOM_COLORS, PLANNING_MONTH } from '../../data/planning';
+import { bands, ROOM_COLORS } from '../../data/planning';
 
 interface Props {
   /** Nomi con cui il corso compare nel planning. */
@@ -51,7 +51,7 @@ const mostraNome = nomiDistinti.size > 1;
 
 <div class:list={['sched', `sched--${variant}`]}>
   <div class="sched__head">
-    <span class="sched__eyebrow">Orari · {PLANNING_MONTH}</span>
+    <span class="sched__eyebrow">Orari della settimana</span>
     {totale > 0 && (
       <span class="sched__count">
         {totale} {totale === 1 ? unita.s : unita.p} a settimana
@@ -81,8 +81,8 @@ const mostraNome = nomiDistinti.size > 1;
     </ul>
   ) : (
     <p class="sched__vuoto">
-      {nome} non è in palinsesto a {PLANNING_MONTH}. Gli orari cambiano ogni mese: nel planning trovi
-      quelli aggiornati, e se vuoi che torni scrivicelo.
+      {nome} non è in palinsesto in questo momento. Il palinsesto cambia: nel planning trovi
+      sempre quello aggiornato, e se vuoi che torni scrivicelo.
     </p>
   )}
 

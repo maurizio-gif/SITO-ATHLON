@@ -149,7 +149,7 @@ export const JUNIOR: CorsoJunior[] = [
     nome: 'Baby Nuoto',
     eta: 'Dai 3 ai 36 mesi',
     claim: 'In acqua con te, dai tre mesi.',
-    cta: 'Trova il turno per il tuo bambino',
+    cta: 'Registrati per prenotare la tua lezione',
     ctaIntent: 'junior_info',
     hero: `${U}/2024/08/P1160529.jpg`,
     fuoco: '50% 35%',
@@ -363,7 +363,6 @@ export const JUNIOR: CorsoJunior[] = [
             'Sessione brevetti a fine maggio: diploma della nostra Scuola Nuoto Federale e libretto aggiornato. Durante l’anno ci sono le gare del Trofeo Athlon, e l’iscrizione è facoltativa.',
         },
       ],
-      rimando: { label: 'Parla con il Direttore Tecnico', href: '/wikiathlon/snb/direzione-tecnica/' },
     },
     video: 'https://www.athlonroma.it/wp-content/uploads/2024/11/SCUOLA-NUOTO-BAMBINI-2.mp4',
     poster: `${U}/2024/08/P1120372-scaled.jpg`,
@@ -376,7 +375,7 @@ export const JUNIOR: CorsoJunior[] = [
     titoloCorsi: 'I corsi',
     corsi: [
       {
-        nome: 'I corsi stagionali',
+        nome: 'Dai 3 ai 13 anni',
         sottotitolo: 'Stagione 2026/27',
         dettagli: [
           { l: 'Durata corso', v: 'Dal 14 settembre 2026 al 20 giugno 2027' },
@@ -438,6 +437,19 @@ export const JUNIOR: CorsoJunior[] = [
       },
     ],
     faq: [
+      /* La prima domanda di un genitore che sta decidendo. Non esiste una lezione
+         di prova, e non va inventata: quello che esiste è l'adesione mensile, che
+         si disdice di mese in mese — quindi si frequenta un periodo e si smette.
+         Il meccanismo è quello del regolamento (punto 4.11): rinnovo il primo del
+         mese, disdetta 240 ore prima, cioè dieci giorni. La quota di attivazione
+         alla riscrizione è scritta lì e va detta qui, altrimenti «senza vincoli»
+         è una promessa che il regolamento non mantiene. */
+      {
+        q: 'È possibile effettuare una prova?',
+        a: 'Sì, e il modo è l’abbonamento stesso: l’adesione è mensile e si rinnova il primo del mese, quindi puoi frequentare un periodo e, se tuo figlio non si trova bene, disdire — non ti leghi alla stagione intera. Per fermarti basta una email a <a href="mailto:disdetta@athlonroma.it">disdetta@athlonroma.it</a> almeno dieci giorni prima del primo del mese. Se più avanti tornate, la quota di attivazione va versata di nuovo.',
+        scheda: 'snb/disdetta',
+        rimando: 'Come e quando si disdice',
+      },
       {
         q: 'Serve il certificato medico per la scuola nuoto bambini?',
         a: 'Per i bambini dai 6 anni compiuti sì: serve il certificato di idoneità all’attività sportiva non agonistica. Puoi inviarlo via email entro e non oltre 14 giorni dall’inizio dell’attività.',
@@ -475,7 +487,7 @@ export const JUNIOR: CorsoJunior[] = [
     ],
     titolo: 'Scuola Nuoto Bambini Roma Talenti – Dai 3 anni | Athlon Club',
     descrizione:
-      'Scuola Nuoto Bambini ad Athlon Club Roma Talenti: corsi stagionali dai 3 ai 13 anni, turni divisi per età, gruppi per livello e brevetto federale a fine stagione. Richiedi turni e costi.',
+      'Scuola Nuoto Bambini ad Athlon Club Roma Talenti: dai 3 ai 13 anni, turni divisi per età, gruppi per livello e brevetto federale a fine stagione. Richiedi turni e costi.',
   },
   {
     slug: 'pallanuoto',
