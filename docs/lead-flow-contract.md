@@ -58,11 +58,11 @@ non compare da nessuna parte.
 
 ---
 
-## 3. Registrati per prenotare la tua lezione
+## 3. Registrati per prenotare
 
 | | |
 | --- | --- |
-| **CTA label** | Registrati per prenotare la tua lezione |
+| **CTA label** | Registrati per prenotare |
 | **Tipo** | `resolve` |
 | **intent** | `junior_info` |
 | **activity** | `baby-nuoto` |
