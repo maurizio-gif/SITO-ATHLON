@@ -50,15 +50,31 @@ const gallery = [
   {/* Full-bleed: the strip runs past the container so it reads as continuing
       beyond the screen rather than stopping at a margin. */}
   <div class="sg__wrap">
+    {/* The list is rendered twice. The strip auto-scrolls forever, and wrapping
+        from the end of the first copy to the start of the second lands on
+        identical pixels — so the loop has no seam. Before this the scroll just
+        snapped back to 0, which read as a glitch rather than a loop. The second
+        copy is decorative: hidden from assistive tech and out of the tab order,
+        but still clickable, and it carries the original photo's index. */}
     <div class="struttura-gallery" id="struttura-gallery-track">
-      {gallery.map((item, i) => (
-        <button type="button" class="struttura-gallery__item" data-gallery-index={i}>
-          <img src={item.image} alt={item.caption} loading="lazy" />
-          <span class="struttura-gallery__scrim" aria-hidden="true"></span>
-          <span class="struttura-gallery__num">{String(i + 1).padStart(2, '0')}</span>
-          <span class="struttura-gallery__caption">{item.caption}</span>
-        </button>
-      ))}
+      {[...gallery, ...gallery].map((item, i) => {
+        const orig = i % gallery.length;
+        const isClone = i >= gallery.length;
+        return (
+          <button
+            type="button"
+            class="struttura-gallery__item"
+            data-gallery-index={orig}
+            aria-hidden={isClone ? 'true' : undefined}
+            tabindex={isClone ? -1 : undefined}
+          >
+            <img src={item.image} alt={isClone ? '' : item.caption} loading="lazy" />
+            <span class="struttura-gallery__scrim" aria-hidden="true"></span>
+            <span class="struttura-gallery__num">{String(orig + 1).padStart(2, '0')}</span>
+            <span class="struttura-gallery__caption">{item.caption}</span>
+          </button>
+        );
+      })}
     </div>
   </div>
 
@@ -75,20 +91,26 @@ const gallery = [
 </div>
 
 <script>
-  const items = Array.from(document.querySelectorAll<HTMLButtonElement>('.struttura-gallery__item'));
+  const galleryTrack = document.getElementById('struttura-gallery-track');
+  const tiles = Array.from(document.querySelectorAll<HTMLButtonElement>('.struttura-gallery__item'));
+  // Half the tiles are the loop's second copy; the lightbox only ever walks
+  // the real photos.
+  const originals = tiles.slice(0, tiles.length / 2);
+
   const lightbox = document.getElementById('struttura-lightbox');
   const lbImg = document.getElementById('struttura-lightbox-img') as HTMLImageElement | null;
   const lbCaption = document.getElementById('struttura-lightbox-caption');
   let current = 0;
 
   const show = (index: number) => {
-    current = (index + items.length) % items.length;
-    const item = items[current];
+    current = (index + originals.length) % originals.length;
+    const item = originals[current];
     const img = item.querySelector('img');
     const caption = item.querySelector('.struttura-gallery__caption');
     if (lbImg && img) {
+      // The strip loads a scaled-down file; the lightbox shows the full one.
       lbImg.src = img.src;
-      lbImg.alt = img.alt;
+      lbImg.alt = caption?.textContent ?? '';
     }
     if (lbCaption && caption) lbCaption.textContent = caption.textContent;
   };
@@ -98,15 +120,25 @@ const gallery = [
     lightbox?.classList.add('open');
     lightbox?.setAttribute('aria-hidden', 'false');
     document.body.classList.add('struttura-lightbox-locked');
+    lightboxOpen = true;
+    // Hold the strip still for as long as the lightbox is up — it used to keep
+    // creeping along behind it and the photo you closed onto had moved.
+    pauseGalleryAuto();
   };
 
   const close = () => {
     lightbox?.classList.remove('open');
     lightbox?.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('struttura-lightbox-locked');
+    lightboxOpen = false;
+    resumeGalleryAutoLater();
   };
 
-  items.forEach((item, i) => item.addEventListener('click', () => open(i)));
+  // Clones carry the original photo's index, so clicking one opens the right
+  // shot and steps on from the right place.
+  tiles.forEach((item) =>
+    item.addEventListener('click', () => open(Number(item.dataset.galleryIndex ?? 0)))
+  );
   lightbox?.querySelectorAll('[data-lightbox-close]').forEach((el) => el.addEventListener('click', close));
   lightbox?.querySelector('[data-lightbox-prev]')?.addEventListener('click', () => show(current - 1));
   lightbox?.querySelector('[data-lightbox-next]')?.addEventListener('click', () => show(current + 1));
@@ -118,59 +150,81 @@ const gallery = [
     if (e.key === 'ArrowRight') show(current + 1);
   });
 
-  // Arrow nav for the strip itself, separate from the lightbox.
-  const galleryTrack = document.getElementById('struttura-gallery-track');
-  document.querySelectorAll<HTMLButtonElement>('[data-gallery-dir]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      pauseGalleryAuto();
-      const card = galleryTrack?.querySelector<HTMLElement>('.struttura-gallery__item');
-      const step = card ? card.getBoundingClientRect().width + 16 : 0;
-      galleryTrack?.scrollBy({ left: Number(btn.dataset.galleryDir) * step, behavior: 'smooth' });
-      resumeGalleryAutoLater();
-    });
-  });
-
-  // Continuous auto-scroll, looping back to the start — this gallery is meant
-  // to play on its own; the arrows are just a manual override on top of it.
+  // ---- Continuous loop ----
+  // The strip owns its own position rather than reading scrollLeft back each
+  // frame: at this speed the per-frame step is under a pixel, and a browser
+  // that rounds scrollLeft on write would swallow it and never move.
   const prefersReducedMotionGallery = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const GALLERY_SPEED = 32; // px per second
+  const GALLERY_SPEED = 34; // px per second
   let galleryRaf: number | undefined;
   let galleryLastTs: number | undefined;
   let galleryPaused = false;
   let galleryResumeTimer: number | undefined;
+  let pos = 0;
+  let selfScrolling = false;
+  // Not just "paused": while the lightbox is up nothing may schedule a resume.
+  // Relying on event order alone did not hold — opening the lightbox moves the
+  // pointer off the strip, and that mouseleave queued a resume of its own.
+  let lightboxOpen = false;
+
+  // Distance from the first tile to its copy: wrapping by exactly this lands on
+  // an identical frame, which is what makes the loop seamless. Measured live so
+  // it survives resizes and the responsive tile widths.
+  const wrapDistance = () => {
+    const kids = galleryTrack?.children;
+    if (!kids || kids.length < 2) return 0;
+    const half = kids.length / 2;
+    // Fractional on purpose. Tile widths are vw-based, so the true pitch is not
+    // a whole number; offsetLeft rounds it and the loop would land a fraction
+    // of a pixel short every lap, drifting further out of register over time.
+    // The gap between two rects taken in the same frame is scroll-independent.
+    const first = (kids[0] as HTMLElement).getBoundingClientRect().left;
+    const clone = (kids[half] as HTMLElement).getBoundingClientRect().left;
+    return clone - first;
+  };
 
   const galleryTick = (ts: number) => {
     if (!galleryTrack) return;
-    if (galleryPaused) {
-      galleryLastTs = ts;
-      galleryRaf = requestAnimationFrame(galleryTick);
-      return;
-    }
     if (galleryLastTs === undefined) galleryLastTs = ts;
-    const dt = (ts - galleryLastTs) / 1000;
+    const dt = Math.min((ts - galleryLastTs) / 1000, 0.05); // ignore tab-away jumps
     galleryLastTs = ts;
 
-    const max = galleryTrack.scrollWidth - galleryTrack.clientWidth;
-    if (max > 2) {
-      let next = galleryTrack.scrollLeft + GALLERY_SPEED * dt;
-      if (next >= max) next = 0;
-      galleryTrack.scrollLeft = next;
+    if (!galleryPaused) {
+      const wrap = wrapDistance();
+      if (wrap > 0) {
+        pos += GALLERY_SPEED * dt;
+        if (pos >= wrap) pos -= wrap;
+        selfScrolling = true;
+        galleryTrack.scrollLeft = pos;
+        selfScrolling = false;
+      }
     }
     galleryRaf = requestAnimationFrame(galleryTick);
   };
 
-  const pauseGalleryAuto = () => {
+  function pauseGalleryAuto() {
     galleryPaused = true;
     window.clearTimeout(galleryResumeTimer);
-  };
-  const resumeGalleryAutoLater = () => {
+  }
+  function resumeGalleryAutoLater() {
     window.clearTimeout(galleryResumeTimer);
+    if (lightboxOpen) return;
     galleryResumeTimer = window.setTimeout(() => {
       galleryPaused = false;
     }, 2000);
-  };
+  }
 
   if (galleryTrack && !prefersReducedMotionGallery) {
+    // Pick up wherever the reader left the strip, so auto-scroll carries on
+    // from there instead of jumping back to its own idea of the position.
+    galleryTrack.addEventListener(
+      'scroll',
+      () => {
+        if (!selfScrolling && galleryPaused) pos = galleryTrack.scrollLeft;
+      },
+      { passive: true }
+    );
+
     galleryTrack.addEventListener('mouseenter', pauseGalleryAuto);
     galleryTrack.addEventListener('mouseleave', resumeGalleryAutoLater);
     galleryTrack.addEventListener('pointerdown', pauseGalleryAuto);
@@ -178,8 +232,45 @@ const gallery = [
     galleryTrack.addEventListener('touchstart', pauseGalleryAuto, { passive: true });
     galleryTrack.addEventListener('touchend', resumeGalleryAutoLater);
     galleryTrack.addEventListener('wheel', () => { pauseGalleryAuto(); resumeGalleryAutoLater(); }, { passive: true });
-    galleryRaf = requestAnimationFrame(galleryTick);
+    galleryTrack.addEventListener('focusin', pauseGalleryAuto);
+    galleryTrack.addEventListener('focusout', resumeGalleryAutoLater);
+
+    // Only run while the strip is on screen: otherwise it burns frames and,
+    // worse, has already wandered somewhere arbitrary by the time you reach it.
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            if (galleryRaf === undefined) {
+              galleryLastTs = undefined;
+              galleryRaf = requestAnimationFrame(galleryTick);
+            }
+          } else if (galleryRaf !== undefined) {
+            cancelAnimationFrame(galleryRaf);
+            galleryRaf = undefined;
+          }
+        });
+      },
+      { threshold: 0 }
+    );
+    io.observe(galleryTrack);
   }
+
+  // Arrow nav for the strip itself, separate from the lightbox.
+  document.querySelectorAll<HTMLButtonElement>('[data-gallery-dir]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      pauseGalleryAuto();
+      const card = galleryTrack?.querySelector<HTMLElement>('.struttura-gallery__item');
+      const step = card ? card.getBoundingClientRect().width + 16 : 0;
+      galleryTrack?.scrollBy({ left: Number(btn.dataset.galleryDir) * step, behavior: 'smooth' });
+      // Let the smooth scroll finish before syncing, or we'd resume from the
+      // position it had when the click landed.
+      window.setTimeout(() => {
+        if (galleryTrack) pos = galleryTrack.scrollLeft;
+        resumeGalleryAutoLater();
+      }, 450);
+    });
+  });
 </script>
 
 <style is:global>
