@@ -14,11 +14,13 @@ import PlanningBand from '../components/planning/PlanningBand.astro';
 import LessonModal from '../components/planning/LessonModal.astro';
 import Faq, { type FaqEntry } from '../components/Faq.astro';
 import { getBand, getLessonCard, countLessons, PLANNING_MONTH } from '../data/planning';
+import { trialCta } from '../data/cta';
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 const U = '/wp-content/uploads';
-const PROVA =
-  'https://automazione.n8ndevelop.it/form/40cc4d53-8515-4657-b6ae-6bb0fa1acf77?source=SitoWeb&medium=Reformer';
+/* La prova è quella del club, non della singola disciplina: Guest Pass Premium
+   da sette giorni, con il reformer come contesto di provenienza. */
+const prova = trialCta({ activity: 'group-reformer', source: '/reformer' });
 
 const band = getBand('group-reformer');
 const sessioni = countLessons(band);
@@ -32,21 +34,28 @@ const facts = [
   'Sala C',
 ];
 
-// I tre blocchi centrali, testo verbatim dalla pagina attuale. Nessuna foto:
-// la pagina live non ne ha, e le foto Reformer in libreria non sono mai state
-// pubblicate.
+/**
+ * I tre blocchi centrali. Il testo della pagina attuale era tutto promessa —
+ * «la magia», «ti fa sentire rinato», «superare i tuoi limiti» — e nessun dato.
+ * Qui c'è solo quello che le fonti dicono: la riga di dati di questa pagina
+ * (dieci Reformer Balanced Body Allegro, Sala C, cinquanta minuti), la nota
+ * degli accessi singoli su /abbonamenti («gruppi da 10 con istruttore») e la
+ * scheda lezione del planning, che descrive cosa allena. Niente sequenze di
+ * esercizi e niente descrizioni di cosa fa l'istruttore durante la lezione:
+ * non sono documentate da nessuna parte.
+ */
 const blocchi = [
   {
-    title: 'Benefici del Group Reformer',
-    body: 'Immagina un allenamento che non solo rinforza i tuoi muscoli, ma ti fa sentire rinato, più forte e in perfetta armonia con il tuo corpo. Il Group Reformer ti offre tutto questo e molto di più. La resistenza del Reformer combinata con il potere del gruppo crea un’esperienza che trasforma la tua forza, flessibilità e postura. Ma soprattutto, è divertente!',
+    title: 'Com’è fatta la sala',
+    body: 'Sala C, dieci Reformer Balanced Body Allegro. Le lezioni sono in gruppi da dieci con l’istruttore e durano cinquanta minuti.',
   },
   {
-    title: 'Cosa aspettarsi in una classe',
-    body: 'Ogni sessione di Group Reformer è un’avventura per il tuo corpo. Guidato da un istruttore esperto, eseguirai movimenti che sfruttano la resistenza del Reformer per scolpire il tuo corpo in modo che ogni muscolo senta il cambiamento. E la parte migliore? Non sarai mai solo: la forza del gruppo ti spingerà a fare sempre di più.',
+    title: 'Cosa allena',
+    body: 'Un allenamento sul Reformer guidato dall’istruttore: rinforzo muscolare, postura, controllo, flessibilità e qualità del movimento. La resistenza della macchina permette un lavoro preciso e progressivo.',
   },
   {
-    title: 'Per chi è adatto',
-    body: 'Che tu sia un principiante che vuole esplorare il mondo del Pilates o un veterano che cerca una nuova sfida, il Group Reformer è perfetto per te. Le nostre lezioni sono disegnate per adattarsi a tutti i livelli di esperienza, con modifiche personalizzate per ogni partecipante. Tutti si divertono, tutti ottengono risultati.',
+    title: 'Se non l’hai mai fatto',
+    body: 'La resistenza si adatta a livelli diversi, quindi la stessa lezione funziona per chi comincia e per chi pratica da tempo. Se è la tua prima volta, o se hai un problema fisico da tenere presente, dillo all’istruttore all’inizio della lezione.',
   },
 ];
 
@@ -92,10 +101,19 @@ const faqs: FaqEntry[] = [
     <div class="rf-hero__scrim"></div>
 
     <div class="container rf-hero__inner">
-      <span class="eyebrow">Pilates Reformer</span>
+      <span class="eyebrow">Athlon Reformer</span>
       <h1 class="rf-hero__title">Group <em class="accent">Reformer</em></h1>
-      <p class="rf-hero__lede">Il Pilates che ti trasforma, in gruppo.</p>
-      <a href={`${PG}/#/Registration`} class="btn btn-primary rf-hero__cta">Iscriviti ora →</a>
+      <p class="rf-hero__lede">La precisione del Reformer.<br />L'energia del gruppo.</p>
+      <div class="rf-hero__actions">
+        <a
+          href={prova.href}
+          class="btn btn-primary rf-hero__cta"
+          target="_blank"
+          rel="noopener noreferrer"
+          {...prova.attrs}
+        >{prova.label} →</a>
+        <a href="#orari" class="rf-hero__link">Vedi orari e disponibilità</a>
+      </div>
     </div>
 
     <div class="rf-facts">
@@ -108,18 +126,25 @@ const faqs: FaqEntry[] = [
   <!-- INTRO -->
   <section class="rf-sec">
     <div class="container">
-      <span class="eyebrow" data-anim="from-left">Il Pilates che ti trasforma</span>
-      <h2 class="rf-sec__title" data-anim="reveal">Il Pilates come non l’hai mai provato</h2>
+      <span class="eyebrow" data-anim="from-left">Il format</span>
+      <h2 class="rf-sec__title" data-anim="reveal">Il Pilates sul Reformer, in gruppi da dieci</h2>
       <p class="rf-sec__sub">
-        Group Reformer è l'allenamento di cui non sapevi di aver bisogno: il Pilates diventa
-        un'esperienza di gruppo dinamica, che usa la potenza del Reformer per scolpire, tonificare e
-        rafforzare il corpo come mai prima d'ora.
+        Dieci Reformer Balanced Body Allegro in Sala C, un istruttore, cinquanta minuti. Si lavora
+        sulla resistenza della macchina, che permette un lavoro preciso e progressivo: è questo che
+        rende possibile una classe in cui ognuno sta sul proprio livello.
       </p>
       <p class="rf-sec__sub">
-        È il mix di energia, innovazione e risultati. Entri in una classe e lasci che il Reformer
-        faccia la sua magia, mentre ti alleni in compagnia e trovi la motivazione giusta per superare
-        i tuoi limiti.
+        {sessioni} sessioni a settimana, tutte in Sala C. Si prenotano da app o portale come le altre
+        lezioni, a partire da tre giorni prima.
       </p>
+
+      {/* Il format dichiarato: quattro numeri, tutti verificati. */}
+      <ul class="rf-format">
+        <li><strong class="u-display">10</strong> Reformer</li>
+        <li><strong class="u-display">50</strong> minuti</li>
+        <li><strong class="u-display">1</strong> istruttore</li>
+        <li><strong class="u-display">10</strong> persone per classe</li>
+      </ul>
     </div>
   </section>
 
@@ -182,7 +207,7 @@ const faqs: FaqEntry[] = [
   </section>
 
   <!-- ORARI -->
-  <section class="rf-sec rf-sec--alt">
+  <section class="rf-sec rf-sec--alt" id="orari">
     <div class="container">
       <span class="eyebrow" data-anim="from-left">{PLANNING_MONTH}</span>
       <h2 class="rf-sec__title" data-anim="reveal">Orari del Group Reformer</h2>
@@ -213,7 +238,9 @@ const faqs: FaqEntry[] = [
           <p class="rf-plan__text">
             Scegli di prenotare e pagare una lezione alla volta. Non è richiesta quota di attivazione.
           </p>
-          <a href={`${PG}/#/Classes/1/Calendar?categoryId=36`} class="rf-plan__cta">Scopri di più →</a>
+          <a href={`${PG}/#/Classes/1/Calendar?categoryId=36`} class="rf-plan__cta" data-cta="member">
+            Prenota una lezione →
+          </a>
         </article>
 
         <article class="rf-plan rf-plan--on" data-anim="fade" data-anim-delay="80">
@@ -234,13 +261,13 @@ const faqs: FaqEntry[] = [
     <div class="container rf-prova">
       <div>
         <span class="eyebrow" data-anim="from-left">Prima di decidere</span>
-        <h2 class="rf-sec__title" data-anim="reveal">Richiedi la tua settimana di prova</h2>
+        <h2 class="rf-sec__title" data-anim="reveal">Prova Athlon per sette giorni</h2>
         <p class="rf-sec__sub">
           Potrai provare tutte le attività del nostro Club, compreso il Group Reformer.
         </p>
       </div>
-      <a href={PROVA} class="btn btn-primary" data-anim="pop" target="_blank" rel="noopener noreferrer">
-        Richiedi qui la settimana di prova →
+      <a href={prova.href} class="btn btn-primary" data-anim="pop" target="_blank" rel="noopener noreferrer">
+        {prova.label} →
       </a>
     </div>
   </section>
@@ -334,6 +361,49 @@ const faqs: FaqEntry[] = [
   }
 
   /* ---- Striscia dei fatti ---- */
+  /* Hero: primaria e link secondario sulla stessa riga. */
+  .rf-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+  }
+
+  .rf-hero__link {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-white);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .rf-hero__link:hover {
+    text-decoration-color: var(--color-white);
+  }
+
+  /* Il format: quattro dati sulla stessa riga, il numero nella display face. */
+  .rf-format {
+    list-style: none;
+    margin: 28px 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 40px;
+    font-size: var(--text-sm);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .rf-format strong {
+    font-weight: 400;
+    font-size: var(--text-xl);
+    --lh: 1;
+    color: var(--color-primary);
+    margin-right: 8px;
+  }
+
   .rf-facts {
     position: relative;
     z-index: 1;

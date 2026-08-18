@@ -1,7 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
+import { trialCta } from '../data/cta';
+
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
+/* La prova, dalla configurazione condivisa: qui il contesto è l'abbonamento,
+   perché è la pagina in cui si sta scegliendo un piano. */
+const prova = trialCta({ activity: 'membership', source: '/abbonamenti' });
 
 // Shown in the quick modal behind each "attività incluse" chip.
 const activityInfo: Record<string, { title: string; body: string; href?: string }> = {
@@ -73,9 +78,10 @@ const activityIcon: Record<string, string> = {
 const plans = [
   {
     id: 'smart',
-    badge: 'Essenziale',
+    badge: 'Autonomia',
     name: 'Smart',
-    desc: "Sala pesi, nuoto libero e allenamenti online. L'essenziale per allenarti ogni giorno.",
+    claim: 'Allenati in autonomia.',
+    desc: 'Gym Floor e Nuoto Libero Assistito tutti i giorni, più Athlon TV: costruisci la tua routine fra sala e vasca, senza dipendere dal palinsesto dei corsi.',
     activities: ['Gym Floor', 'Nuoto Libero Assistito', 'Athlon TV'],
     options: [
       {
@@ -108,9 +114,10 @@ const plans = [
   },
   {
     id: 'premium',
-    badge: 'Consigliato · Accesso completo',
+    badge: 'Consigliato · Tutto il club',
     name: 'Premium',
-    desc: 'Tutto il club in un abbonamento: palestra, piscina, corsi, reformer e online.',
+    claim: 'Vivi tutto il club.',
+    desc: 'Corsi fitness, Group Reformer, Aqua Fitness, Scuola Nuoto Adulti e Corso Gestanti, oltre a Gym Floor, nuoto libero e Athlon TV: entri nel palinsesto completo e scegli ogni settimana cosa fare.',
     activities: [
       'Gym Floor',
       'Corsi Fitness',
@@ -212,9 +219,9 @@ const trust = [
       {/* No data-anim here: the hero is above the fold, so it plays its own
           CSS entrance on load exactly like the home hero, rather than waiting
           on the scroll observer. */}
-      <span class="eyebrow">Benvenuto nel club</span>
+      <span class="eyebrow">Abbonamenti adulti</span>
       <h1 class="ab-hero__title">
-        Scegli il<br />tuo accesso.<br /><em>Inizia oggi.</em>
+        Due modi<br />di vivere<br /><em>Athlon.</em>
       </h1>
       <p class="ab-hero__sub">
         Hai già scoperto Athlon. Ora è semplice: <strong>scegli il piano</strong> che fa per te e iscriviti
@@ -232,8 +239,11 @@ const trust = [
   <section class="ab-sec">
     <div class="container">
       <span class="eyebrow" data-anim="from-left">Abbonamenti adulti</span>
-      <h2 class="ab-sec__title" data-anim="reveal">Smart o Premium</h2>
-      <p class="ab-sec__sub">Due piani, tre modalità di pagamento ciascuno. Stesso club, accessi diversi.</p>
+      <h2 class="ab-sec__title" data-anim="reveal">Come vuoi vivere il club?</h2>
+      <p class="ab-sec__sub">
+        Due piani, tre modalità di pagamento ciascuno. La differenza non è quanto paghi: è quante
+        cose del club vuoi usare.
+      </p>
 
       <div class="plans">
         {plans.map((p, i) => (
@@ -243,6 +253,7 @@ const trust = [
               {/* Two-tone lockup, as on the old site: the word "Abbonamento"
                   in the card's own ink, the plan name in brand orange. */}
               <h3 class="plan__name">Abbonamento <span>{p.name}</span></h3>
+              <p class="plan__claim">{p.claim}</p>
               <p class="plan__desc">{p.desc}</p>
             </div>
 
@@ -301,7 +312,7 @@ const trust = [
                     <li>{o.note}</li>
                   </ul>
 
-                  <a href={o.href} class="plan__cta">Scegli →</a>
+                  <a href={o.href} class="plan__cta" data-cta="buy">Iscriviti a {p.name} →</a>
                 </div>
               ))}
             </div>
@@ -322,8 +333,8 @@ const trust = [
   <section class="ab-sec ab-sec--alt">
     <div class="container">
       <span class="eyebrow" data-anim="from-left">Non sei ancora sicuro?</span>
-      <h2 class="ab-sec__title" data-anim="reveal">Prova prima.</h2>
-      <p class="ab-sec__sub">Una settimana per scoprire tutto il club, senza impegno.</p>
+      <h2 class="ab-sec__title" data-anim="reveal">Prova Athlon.</h2>
+      <p class="ab-sec__sub">{prova.micro}</p>
 
       <div class="guest" data-anim="scale">
         <div class="guest__main">
@@ -336,7 +347,13 @@ const trust = [
         </div>
         <div class="guest__actions">
           <button class="guest__code" type="button" data-copy-code="GOLD7">Codice: GOLD7 · copia</button>
-          <a href={`${PG}/#/Registration`} class="btn btn-primary">Attiva il Guest Pass →</a>
+          <a
+            href={prova.href}
+            class="btn btn-primary"
+            target="_blank"
+            rel="noopener noreferrer"
+            {...prova.attrs}
+          >{prova.label} →</a>
         </div>
       </div>
     </div>
@@ -455,7 +472,6 @@ const trust = [
       <p class="ab-hours">
         Lun–Ven: 6:00 – 22:00<br />Sabato: 8:00 – 20:00<br />Domenica: 9:30 – 13:00
       </p>
-      <a href="/contatti" class="btn btn-outline-dark">Parla con il nostro staff →</a>
     </div>
   </section>
 
@@ -467,7 +483,10 @@ const trust = [
       <span class="amodal__eyebrow">Attività inclusa</span>
       <h3 class="amodal__title" id="amodal-title"></h3>
       <p class="amodal__body"></p>
-      <a class="amodal__link btn btn-primary" href="#">Scopri di più →</a>
+      {/* Parte nascosto e senza destinazione: l'href lo mette lo script quando
+          l'attività ha una pagina, e resta nascosto quando non ce l'ha. Un
+          href="#" in pagina è un link che non porta da nessuna parte. */}
+      <a class="amodal__link btn btn-primary" data-cta="explore" hidden>Vedi la pagina →</a>
     </div>
   </div>
 
@@ -800,6 +819,15 @@ const trust = [
     letter-spacing: var(--tracking-4xl);
     margin-bottom: 12px;
     text-wrap: balance;
+  }
+
+  /* La riga di posizionamento: un'affermazione, non un elenco. */
+  .plan__claim {
+    margin: 10px 0 6px;
+    font-size: var(--text-md);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-white);
   }
 
   .plan__name span {

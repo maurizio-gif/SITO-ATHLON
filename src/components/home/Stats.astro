@@ -1,14 +1,18 @@
 ---
 import SpacesGallery from './SpacesGallery.astro';
+import { totalLessons } from '../../data/planning';
 
 // Computed, not hardcoded: the "anni di storia" figure must not go stale.
 const FOUNDED = 1973;
 const years = new Date().getFullYear() - FOUNDED;
 
+/* Le lezioni si contano dal planning, e si chiamano lezioni: «corsi a
+   settimana» contava un'altra cosa (i corsi sono diciotto) e il 200+ non
+   tornava con nessuna delle due unità. */
 const stats = [
   { value: years, suffix: '', label: 'Anni di storia', sub: `dal ${FOUNDED}` },
   { value: 3300, suffix: '+', label: 'Metri quadri', sub: 'dedicati allo sport' },
-  { value: 200, suffix: '+', label: 'Corsi a settimana', sub: 'fitness e piscina' },
+  { value: totalLessons(), suffix: '', label: 'Lezioni a settimana', sub: 'fitness e piscina' },
   { value: 200000, suffix: '+', label: 'Persone', sub: 'hanno imparato a nuotare da noi' },
 ];
 ---

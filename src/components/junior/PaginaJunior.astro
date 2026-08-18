@@ -16,6 +16,7 @@ import SpacesGallery from '../home/SpacesGallery.astro';
 import { faqConSchede, type FaqEntry } from '../../data/faq';
 import { formDi, type CorsoJunior } from '../../data/junior';
 import { scheda, PAGINE_ADULTI } from '../../data/pagine';
+import { ctaAttrs } from '../../data/cta';
 
 interface Props {
   corso: CorsoJunior;
@@ -27,6 +28,12 @@ const FORM = formDi(corso);
    registra un account per poter prenotare, sulle altre si chiedono turni e
    costi, e le due cose non si dicono allo stesso modo. */
 const CTA = corso.cta ?? 'Richiedi orari e costi';
+/* Il contesto che la CTA porta con sé: da qui il modal della fase successiva sa
+   già di quale attività si parla, e non lo chiede di nuovo al genitore. */
+const CTA_ATTRS = ctaAttrs('resolve', corso.ctaIntent ?? 'junior_info', {
+  activity: corso.slug,
+  source: `/${corso.slug}`,
+});
 
 const faqs: FaqEntry[] = await faqConSchede(corso.faq);
 
@@ -55,7 +62,13 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
     <span class="eyebrow">{corso.eta}</span>
     <h1 class="ju-hero__title">{corso.nome}</h1>
     {corso.claim && <p class="ju-hero__lede">{corso.claim}</p>}
-    <a href={FORM} class="btn btn-primary ju-hero__cta" target="_blank" rel="noopener noreferrer">
+    <a
+      href={FORM}
+      class="btn btn-primary ju-hero__cta"
+      target="_blank"
+      rel="noopener noreferrer"
+      {...CTA_ATTRS}
+    >
       {CTA} →
     </a>
   </div>
@@ -80,7 +93,13 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
         <div>
           <h2 class="ju-sec__title ju-intro__title" data-anim="reveal">{corso.titoloIntro}</h2>
           {corso.intro.map((p) => <p class="ju-sec__sub">{p}</p>)}
-          <a href={FORM} class="btn btn-primary ju-cta__btn" target="_blank" rel="noopener noreferrer">
+          <a
+            href={FORM}
+            class="btn btn-primary ju-cta__btn"
+            target="_blank"
+            rel="noopener noreferrer"
+            {...CTA_ATTRS}
+          >
             {CTA} →
           </a>
         </div>
@@ -101,7 +120,7 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
         <h2 class="ju-sec__title" data-anim="reveal">{corso.titoloIntro}</h2>
         {corso.intro.map((p) => <p class="ju-sec__sub">{p}</p>)}
         <div class="ju-cta">
-          <a href={FORM} class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+          <a href={FORM} class="btn btn-primary" target="_blank" rel="noopener noreferrer" {...CTA_ATTRS}>
             {CTA} →
           </a>
           {corso.adesione && <a href="#iscrizione" class="ju-link">Quanto costa →</a>}
@@ -141,6 +160,34 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
           </article>
         ))}
       </div>
+    </div>
+  </section>
+)}
+
+<!-- IL METODO -->
+{corso.metodo && (
+  <section class="ju-sec" id="metodo">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">{corso.metodo.eyebrow}</span>
+      <h2 class="ju-sec__title" data-anim="reveal">{corso.metodo.titolo}</h2>
+      <p class="ju-sec__sub">{corso.metodo.sub}</p>
+
+      <ol class="ju-metodo">
+        {corso.metodo.pilastri.map((m, i) => (
+          <li class="ju-metodo__item" data-anim="fade" data-anim-delay={String(i * 80)}>
+            <span class="ju-metodo__num u-display">{String(i + 1).padStart(2, '0')}</span>
+            <span class="ju-metodo__nome">{m.nome}</span>
+            <h3 class="ju-metodo__titolo">{m.titolo}</h3>
+            <p class="ju-metodo__testo">{m.testo}</p>
+          </li>
+        ))}
+      </ol>
+
+      {corso.metodo.rimando && (
+        <a href={corso.metodo.rimando.href} class="ju-link" data-cta="explore">
+          {corso.metodo.rimando.label} →
+        </a>
+      )}
     </div>
   </section>
 )}
@@ -553,6 +600,71 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
   }
 
   /* ---- Blocchi ---- */
+  /* Il Metodo Athlon: quattro passaggi in sequenza, e la sequenza è
+     informazione — l'inserimento viene prima del brevetto. */
+  .ju-metodo {
+    list-style: none;
+    margin: 36px 0 26px;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 26px;
+  }
+
+  .ju-metodo__item {
+    border-top: 2px solid var(--color-dark);
+    padding-top: 16px;
+  }
+
+  .ju-metodo__num {
+    display: block;
+    font-size: var(--text-lg);
+    color: var(--color-primary);
+    --lh: 1;
+  }
+
+  .ju-metodo__nome {
+    display: block;
+    margin: 8px 0 6px;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* La leading passa da --lh: è da lì che la regola dell'headroom deriva il
+     padding, e a 1.28 su un titolo in corpo testo si annulla. */
+  .ju-metodo__titolo {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: var(--text-md);
+    --lh: 1.28;
+    letter-spacing: -0.01em;
+    margin: 0 0 8px;
+  }
+
+  .ju-metodo__testo {
+    margin: 0;
+    font-size: var(--text-base);
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 1000px) {
+    .ju-metodo {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .ju-metodo {
+      grid-template-columns: 1fr;
+      gap: 22px;
+      margin-top: 28px;
+    }
+  }
+
   .ju-blocchi {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));

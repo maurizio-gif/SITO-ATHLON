@@ -78,6 +78,19 @@ export function countLessons(band: Band): number {
 }
 
 /** Rooms actually used by a band, in a stable order, for its legend. */
+/**
+ * Tutte le lezioni della settimana, in tutte le fasce: corsi fitness, group
+ * reformer, scuola nuoto adulti, nuoto libero e aqua fitness.
+ *
+ * Esiste perché il numero girava scritto a mano in tre posti diversi e in tre
+ * unità diverse — «200+ corsi a settimana» sulla home, «180 lezioni» in una
+ * news, «200+ ore settimanali» sugli abbonamenti. Una lezione è una lezione:
+ * qui si conta quella, e chi la mostra la chiama col suo nome.
+ */
+export function totalLessons(): number {
+  return bands.reduce((n, b) => n + countLessons(b), 0);
+}
+
 export function roomsOf(band: Band): string[] {
   const order = ['Sala A', 'Sala B', 'Sala C', 'Vasca Media', 'Vasca Grande'];
   const used = new Set(band.days.flatMap((d) => d.classes.map((c) => c.sala)).filter(Boolean));
