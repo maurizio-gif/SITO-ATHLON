@@ -75,6 +75,9 @@
     if (!heroVideo) return;
     heroVideo.controls = false;
     heroVideo.muted = true;
+    // Pausing with the fullscreen controls must not leave the background frozen
+    // on the way out.
+    void heroVideo.play().catch(() => {});
   };
 
   heroExpand?.addEventListener('click', () => {

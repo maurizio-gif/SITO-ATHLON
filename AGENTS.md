@@ -55,6 +55,48 @@ line as the word it touches. To audit a build:
 grep -oE '[a-zà-ù,;:·)]<(strong|a |em)[^>]*>|</(strong|a|em)>[a-zà-ùA-Z]' dist/**/index.html
 ```
 
+## Video: silent, looping, self-starting — everywhere
+
+Every `<video>` on the site is a background clip: it starts on load, loops, and
+never makes a sound. Write the attributes in the markup so it works before any
+script runs and without JavaScript at all:
+
+```html
+<video autoplay muted loop playsinline poster="…">
+  <source src="…" type="video/mp4" />
+</video>
+```
+
+`src/scripts/video-autoplay.ts` (loaded once by `Layout.astro`, so every page
+has it) is the safety net for what those attributes cannot do:
+
+- a first `play()` the browser **refuses** — Low Power Mode on iOS, a data
+  saver, a tab restored in the background — retried when the tab comes back and
+  on the visitor's first interaction, the gesture those policies wait for;
+- a clip whose **src arrives from script**, or a `<video>` added to the page
+  later: both are picked up and primed;
+- a clip a mobile browser **paused on its own** (scrolled away, stalled
+  network), which otherwise stays frozen for the rest of the visit.
+
+It deliberately leaves three cases alone: a video the visitor is driving
+(`controls` on, or fullscreen — the hero expand button, the only place sound is
+allowed), a video that is not rendered (a closed modal must not play to nobody),
+and anything marked `data-no-autoplay`.
+
+- **Never turn a video's sound on at load.** Autoplay with audio is refused by
+  every browser, and the whole clip stays black.
+- **Turning sound on for a deliberate act is fine** — put it back on the way
+  out, and resume playback there too, or a pause from the fullscreen controls
+  leaves the background frozen (`restoreHeroVideo` in `Hero.astro`).
+- **A clip that must not start on its own opts out with `data-no-autoplay`.**
+  Nothing on the site does today.
+
+To verify: for every `<video>` on the page, `paused` is `false` and `muted`,
+`loop`, `playsInline` are all `true` — and `currentTime` keeps rising. Note
+that headless Chromium here has **no H.264 decoder**
+(`canPlayType('video/mp4; codecs="avc1.42E01E"')` is `''`), so the site's own
+MP4s never advance in it; measure frames with a VP8/WebM clip instead.
+
 ## Documentation
 
 Full documentation: https://docs.astro.build
