@@ -149,7 +149,7 @@ export const JUNIOR: CorsoJunior[] = [
     nome: 'Baby Nuoto',
     eta: 'Dai 3 ai 36 mesi',
     claim: 'In acqua con te, dai tre mesi.',
-    cta: 'Registrati per prenotare la tua lezione',
+    cta: 'Registrati per prenotare',
     ctaIntent: 'junior_info',
     hero: `${U}/2024/08/P1160529.jpg`,
     fuoco: '50% 35%',
