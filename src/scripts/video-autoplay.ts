@@ -104,10 +104,29 @@ function kick(v: HTMLVideoElement) {
 const videos = () => document.querySelectorAll<HTMLVideoElement>('video');
 const kickAll = () => videos().forEach(kick);
 
-videos().forEach((v) => {
+/**
+ * A clip below the fold is the case the attributes handle worst: mobile Safari
+ * grants an autoplay only once the element is actually on screen, and if the
+ * attempt made before that is refused, nothing asks again — the visitor scrolls
+ * down to a poster with a play button on it.
+ *
+ * Hence several thresholds rather than one generous margin: a single early
+ * trigger fires while the clip is still out of view, gets refused for exactly
+ * that reason, and never comes back. Firing again at a quarter and at half
+ * visible means one of the attempts lands when the browser is ready to say yes.
+ */
+const arriving = new IntersectionObserver(
+  (entries) => entries.forEach((e) => e.isIntersecting && kick(e.target as HTMLVideoElement)),
+  { rootMargin: '100px 0px', threshold: [0, 0.25, 0.5] }
+);
+
+const adopt = (v: HTMLVideoElement) => {
   prime(v);
   kick(v);
-});
+  arriving.observe(v);
+};
+
+videos().forEach(adopt);
 
 // A gesture is what an autoplay policy is holding out for, so retry on the
 // first few. Capture phase and passive: this must never interfere with the
@@ -127,8 +146,7 @@ window.addEventListener('pageshow', kickAll);
 new MutationObserver((records) => {
   records.forEach((r) => {
     if (r.type === 'attributes' && r.target instanceof HTMLVideoElement) {
-      prime(r.target);
-      kick(r.target);
+      adopt(r.target);
       return;
     }
     r.addedNodes.forEach((node) => {
@@ -137,10 +155,7 @@ new MutationObserver((records) => {
         node instanceof HTMLVideoElement
           ? [node]
           : Array.from(node.querySelectorAll<HTMLVideoElement>('video'));
-      found.forEach((v) => {
-        prime(v);
-        kick(v);
-      });
+      found.forEach(adopt);
     });
   });
 }).observe(document.documentElement, {

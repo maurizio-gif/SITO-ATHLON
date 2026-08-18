@@ -238,7 +238,12 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
               {v.media.video ? (
                 /* Riquadro sempre quadrato qualunque sia il formato del file:
                    `cover` ritaglia ai lati invece di lasciare bande nere. Parte
-                   muto e in loop, con i controlli perché il file è pesante. */
+                   muto e in loop; i controlli restano per chi vuole l'audio o
+                   lo schermo intero. Niente `preload`: dichiarare "none" con
+                   `autoplay` significa non scaricare nulla, e su mobile il
+                   video resta il poster col tasto play. Il file pesante non è
+                   un problema perché parte quando arriva sullo schermo, non al
+                   caricamento della pagina (vedi scripts/video-autoplay.ts). */
                 <video
                   class="co-car__video"
                   autoplay
@@ -246,7 +251,6 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
                   loop
                   playsinline
                   controls
-                  preload="none"
                   poster={v.poster}
                 >
                   <source src={v.media.video} type="video/mp4" />

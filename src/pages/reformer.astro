@@ -147,7 +147,8 @@ const faqs: FaqEntry[] = [
       <div class="rf-car">
         {/* Come sulla pagina attuale: parte da solo, muto e in loop. I controlli
             restano perché il file è pesante e uno deve poterlo fermare; il
-            poster copre il tempo di buffering. */}
+            poster copre il tempo di buffering. Nessun `preload`: il video parte
+            quando arriva sullo schermo, quindi non serve trattenerlo. */}
         <video
           class="rf-car__video"
           autoplay
@@ -155,7 +156,6 @@ const faqs: FaqEntry[] = [
           loop
           playsinline
           controls
-          preload="metadata"
           poster={`${U}/2025/03/Athlon143-scaled.jpg`}
         >
           <source src={`${U}/2025/03/Video-Reformer-Compresso-per-Sito.mp4`} type="video/mp4" />

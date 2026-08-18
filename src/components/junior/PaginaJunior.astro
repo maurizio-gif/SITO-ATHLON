@@ -84,9 +84,12 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
             {CTA} →
           </a>
         </div>
-        {/* Riquadro sempre quadrato, come nelle altre pagine attività. */}
+        {/* Riquadro sempre quadrato, come nelle altre pagine attività. Il video
+            non dichiara `preload`: "none" insieme ad `autoplay` non scarica
+            niente e su mobile lascia il poster col tasto play. Parte da sé
+            quando entra nello schermo. */}
         {corso.video ? (
-          <video class="ju-video" autoplay muted loop playsinline controls preload="none" poster={corso.poster}>
+          <video class="ju-video" autoplay muted loop playsinline controls poster={corso.poster}>
             <source src={corso.video} type="video/mp4" />
           </video>
         ) : (

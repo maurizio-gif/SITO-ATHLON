@@ -100,6 +100,10 @@ Embedded players are the same rule with the provider's own switches. Vimeo:
 refused. Keep `loading="lazy"` on a page with several: each starts as its card
 comes into view instead of all of them pulling a stream at once.
 
+- **Never write `preload="none"` on a clip that autoplays.** It says "fetch
+  nothing", and on a phone that wins: the visitor gets the poster with a play
+  button on it. Leave `preload` off entirely — the clip starts as it reaches the
+  screen, so a heavy file costs nothing until then. `poster` covers the wait.
 - **Never turn a video's sound on at load.** Autoplay with audio is refused by
   every browser, and the whole clip stays black.
 - **Turning sound on for a deliberate act is fine** — put it back on the way
@@ -108,8 +112,20 @@ comes into view instead of all of them pulling a stream at once.
 - **A clip that must not start on its own opts out with `data-no-autoplay`.**
   Nothing on the site does today.
 
+Two things make a clip below the fold behave. Mobile Safari grants an autoplay
+only once the element is on screen, so the script retries at several
+intersection thresholds — one early trigger fires while the clip is still out of
+view, is refused for that reason, and never comes back on its own. And
+`global.css` hides `::-webkit-media-controls-start-playback-button`, the big play
+glyph iOS paints over any video that has not started, controls or not: when
+autoplay is refused anyway (Low Power Mode, a data saver) the clip reads as a
+still frame of the site rather than a stalled player, and the first tap anywhere
+starts it.
+
 To verify: for every `<video>` on the page, `paused` is `false` and `muted`,
-`loop`, `playsInline` are all `true` — and `currentTime` keeps rising. Note
+`loop`, `playsInline` are all `true` — and `currentTime` keeps rising. Check it
+with a clip below the fold too, and with `play()` patched to reject while the
+element is off screen, which is how mobile Safari behaves. Note
 that headless Chromium here has **no H.264 decoder**
 (`canPlayType('video/mp4; codecs="avc1.42E01E"')` is `''`), so the site's own
 MP4s never advance in it; measure frames with a VP8/WebM clip instead.
