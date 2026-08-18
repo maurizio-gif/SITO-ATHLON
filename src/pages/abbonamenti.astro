@@ -224,7 +224,9 @@ const trust = [
           <article class:list={['plan', p.id]} data-anim="scale" data-anim-delay={String(i * 100)}>
             <div class="plan__head">
               <span class="plan__badge">{p.badge}</span>
-              <h3 class="plan__name">{p.name}</h3>
+              {/* Two-tone lockup, as on the old site: the word "Abbonamento"
+                  in the card's own ink, the plan name in brand orange. */}
+              <h3 class="plan__name">Abbonamento <span>{p.name}</span></h3>
               <p class="plan__desc">{p.desc}</p>
             </div>
 
@@ -752,11 +754,24 @@ const trust = [
     color: var(--color-white);
   }
 
+  /* Sized for the whole "Abbonamento <nome>" lockup, and bigger than the single
+     word it replaced: 88px against the old 73.6px on desktop, 49px against 37.6
+     on a 430px phone.
+     The ceiling is set by the longest of the two names. "Abbonamento Premium"
+     measures 5.95em wide in this face, so the largest size that still sets on
+     one line is ~40px at 320px, 50px at 390px and 102px at 768px — the vw term
+     stays under every one of those, which is what keeps it on one line without
+     needing a break. */
   .plan__name {
-    font-size: clamp(3.2rem, 5.5vw, 4.6rem);
+    font-size: clamp(2.2rem, 11.4vw, 5.5rem);
     --lh: 0.92;
     letter-spacing: var(--tracking-4xl);
     margin-bottom: 12px;
+    text-wrap: balance;
+  }
+
+  .plan__name span {
+    color: var(--color-primary);
   }
 
   .plan__desc {
