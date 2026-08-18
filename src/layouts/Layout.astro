@@ -35,6 +35,12 @@ const { title, description = '', chrome = true } = Astro.props;
 </html>
 
 <script>
+  // Every <video> on the site autoplays, muted, on loop — see the script for
+  // the cases the markup attributes alone do not cover.
+  import '../scripts/video-autoplay';
+</script>
+
+<script>
   // One shared observer for the whole page. Each element opts in via
   // data-anim (the variant) and reveals once, then stops being observed —
   // scrolling back up must not replay the animation.
