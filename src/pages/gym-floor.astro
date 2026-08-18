@@ -2,10 +2,35 @@
 import Layout from '../layouts/Layout.astro';
 import OpeningHours from '../components/planning/OpeningHours.astro';
 import Faq, { type FaqEntry } from '../components/Faq.astro';
+import SpacesGallery from '../components/home/SpacesGallery.astro';
+import { getCorso } from '../data/corsi';
 import { trialCta } from '../data/cta';
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 const U = '/wp-content/uploads';
+
+/**
+ * Le tre attività affini, come sulle pagine dei corsi. Nome, foto e URL escono
+ * da `data/corsi.ts`, quindi non c'è una seconda copia da tenere aggiornata.
+ *
+ * Sono i tre corsi che lavorano sul carico come la sala: chi si trova bene fra
+ * i pesi ritrova lo stesso gesto in una classe, con qualcuno che conta il tempo.
+ * Le ragioni derivano dal claim che ogni corso usa già nella sua scheda.
+ */
+const simili = [
+  {
+    corso: getCorso('strenght'),
+    perche: 'Il bilanciere della sala, ma programmato: una progressione di forza costruita lezione dopo lezione.',
+  },
+  {
+    corso: getCorso('body-pump'),
+    perche: 'Bilanciere a carichi leggeri e tante ripetizioni, a tempo di musica: lo stesso lavoro, in gruppo.',
+  },
+  {
+    corso: getCorso('body-sculpt'),
+    perche: 'Tonificazione a corpo libero e con piccoli attrezzi, se in sala cerchi soprattutto quello.',
+  },
+];
 
 /* La prova è una sola per tutto il club — il Guest Pass Premium da sette
    giorni — e da qui parte con la sala pesi come contesto di provenienza. */
@@ -299,16 +324,9 @@ const faqs: FaqEntry[] = [
       {aree.map((a, ai) => (
         <article class="area" data-anim="fade">
           <div class="area__head">
-            <div>
-              <span class="area__num">{`0${ai + 1}`}</span>
-              <h3 class="area__name">{a.name}</h3>
-              <p class="area__lede">{a.lede}</p>
-            </div>
-            {/* Same arrow-driven track the home activity carousels use. */}
-            <div class="area__nav">
-              <button class="carousel-btn" data-dir="-1" data-track={a.id} aria-label={`${a.name}: foto precedente`}>←</button>
-              <button class="carousel-btn" data-dir="1" data-track={a.id} aria-label={`${a.name}: foto successiva`}>→</button>
-            </div>
+            <span class="area__num">{`0${ai + 1}`}</span>
+            <h3 class="area__name">{a.name}</h3>
+            <p class="area__lede">{a.lede}</p>
           </div>
 
           <div class="area__body">
@@ -316,19 +334,15 @@ const faqs: FaqEntry[] = [
               {a.items.map((it) => (<li>{it}</li>))}
             </ul>
 
-            <div class="area__track" data-carousel-id={a.id}>
-              {a.photos.map((src, i) => (
-                <img
-                  class="area__photo"
-                  src={src}
-                  alt={`${a.name} — Gym Floor Athlon Club`}
-                  loading="lazy"
-                  decoding="async"
-                  width="1024"
-                  height="683"
-                />
-              ))}
-            </div>
+            {/* La striscia della home: scorre da sola, si apre in lightbox, e le
+                frecce stanno appena sopra le foto. L'etichetta dice quante foto
+                ci sono e non ripete il nome dell'area, che è già il titolo. */}
+            <SpacesGallery
+              photos={a.photos.map((image) => ({ image, caption: a.name }))}
+              hint={`${a.photos.length} foto`}
+              bleed={false}
+              divider={false}
+            />
           </div>
         </article>
       ))}
@@ -405,7 +419,7 @@ const faqs: FaqEntry[] = [
     <div class="container gf-pt">
       <div>
         <span class="eyebrow" data-anim="from-left">Allenamento individuale</span>
-        <h2 class="gf-sec__title" data-anim="reveal">Un'ora con qualcuno che sa il tuo nome</h2>
+        <h2 class="gf-sec__title" data-anim="reveal">Un'ora costruita sul tuo obiettivo</h2>
         <p class="gf-sec__sub">
           Sei personal trainer qualificati, ognuno con le sue specializzazioni. Schede su misura e
           lezioni individuali di Reformer e Fitness.
@@ -416,24 +430,46 @@ const faqs: FaqEntry[] = [
       </a>
     </div>
   </section>
+
+  <!-- CORRELATI -->
+  <section class="gf-sec">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Se ti piace la sala</span>
+      <h2 class="gf-sec__title" data-anim="reveal">Ti piacerà anche</h2>
+      <p class="gf-sec__sub">
+        Fanno parte dello stesso club: <a class="gf-link-inline" href="/abbonamenti">guarda quali
+        comprende il tuo abbonamento</a>.
+      </p>
+
+      <ul class="gf-simili">
+        {simili.map((s, i) => (
+          <li data-anim="fade" data-anim-delay={String(i * 80)}>
+            <a class="gf-simile" href={`/${s.corso.slug}`} data-cta="explore">
+              <img class="gf-simile__foto" src={s.corso.hero} alt="" loading="lazy" />
+              <span class="gf-simile__body">
+                <span class="gf-simile__nome u-display">{s.corso.nome}</span>
+                <span class="gf-simile__perche">{s.perche}</span>
+                <span class="gf-simile__cta">Scopri il corso →</span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <p class="gf-tutti">
+        <span class="gf-tutti__label">Tutte le altre attività:</span>
+        <a class="gf-chip" href="/corsi-fitness">Corsi Fitness</a>
+        <a class="gf-chip" href="/reformer">Group Reformer</a>
+        <a class="gf-chip" href="/personal-training">Personal Training</a>
+        <a class="gf-chip" href="/aqua-fitness">Aqua Fitness</a>
+        <a class="gf-chip" href="/nuoto-libero">Nuoto Libero</a>
+        <a class="gf-chip" href="/scuola-nuoto-adulti">Scuola Nuoto Adulti</a>
+      </p>
+    </div>
+  </section>
 </Layout>
 
 <script>
-  // Photo tracks: arrows scroll by one photo. Same behaviour as the home
-  // activity carousels, scoped here by the track id on each area.
-  document.querySelectorAll<HTMLElement>('[data-carousel-id]').forEach((track) => {
-    const id = track.dataset.carouselId;
-    const step = () => {
-      const photo = track.querySelector<HTMLElement>('.area__photo');
-      return photo ? photo.getBoundingClientRect().width + 14 : track.clientWidth * 0.8;
-    };
-    document.querySelectorAll<HTMLButtonElement>(`.carousel-btn[data-track="${id}"]`).forEach((btn) => {
-      btn.addEventListener('click', () => {
-        track.scrollBy({ left: Number(btn.dataset.dir) * step(), behavior: 'smooth' });
-      });
-    });
-  });
-
   // Workout accordion — one open at a time, as on the other pages.
   const items = Array.from(document.querySelectorAll<HTMLElement>('[data-wk-item]'));
   items.forEach((item) => {
@@ -710,10 +746,6 @@ const faqs: FaqEntry[] = [
   }
 
   .area__head {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 24px;
     margin-bottom: 22px;
   }
 
@@ -738,37 +770,15 @@ const faqs: FaqEntry[] = [
     color: rgba(255, 255, 255, 0.7);
   }
 
-  .area__nav {
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0;
-  }
+  /* Lista a sinistra, foto che scorrono a destra.
 
-  .carousel-btn {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    border: 1px solid var(--border-dark);
-    background: rgba(255, 255, 255, 0.06);
-    color: var(--color-white);
-    font-size: 16px;
-    cursor: pointer;
-  }
-
-  .carousel-btn:hover {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
-  }
-
-  .carousel-btn:active {
-    transform: scale(0.94);
-    transition-duration: var(--dur-press);
-  }
-
-  /* List on the left, photos scrolling on the right. */
+     `minmax(0, 1fr)` e non `1fr`: il minimo implicito di una traccia fr è
+     min-content, quindi la colonna si allargava fino a contenere tutta la
+     striscia — 8355px — e la striscia non aveva più niente da scorrere. La
+     pagina finiva in overflow orizzontale e le frecce non muovevano nulla. */
   .area__body {
     display: grid;
-    grid-template-columns: 260px 1fr;
+    grid-template-columns: 260px minmax(0, 1fr);
     gap: 28px;
     align-items: start;
   }
@@ -802,26 +812,103 @@ const faqs: FaqEntry[] = [
     background: var(--color-primary);
   }
 
-  .area__track {
+  /* ---- Correlati ---- */
+  .gf-link-inline {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .gf-simili {
+    list-style: none;
+    margin: 26px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .gf-simile {
     display: flex;
-    gap: 14px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    padding-bottom: 4px;
-  }
-
-  .area__track::-webkit-scrollbar {
-    display: none;
-  }
-
-  .area__photo {
-    flex: 0 0 auto;
-    width: min(420px, 78%);
-    height: 280px;
-    object-fit: cover;
+    flex-direction: column;
+    height: 100%;
     border-radius: var(--radius);
-    scroll-snap-align: start;
+    overflow: hidden;
+    background: var(--color-white);
+    border: 1px solid var(--border);
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .gf-simile:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+  }
+
+  .gf-simile__foto {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+
+  .gf-simile__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 20px 22px 22px;
+  }
+
+  .gf-simile__nome {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: var(--text-xl);
+    --lh: 1;
+  }
+
+  .gf-simile__perche {
+    margin-top: 10px;
+    color: var(--text-muted);
+  }
+
+  .gf-simile__cta {
+    margin-top: auto;
+    padding-top: 18px;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  /* Le altre restano etichette: servono a non chiudere la strada, non a
+     competere con le tre consigliate. */
+  .gf-tutti {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    margin: 30px 0 0;
+  }
+
+  .gf-tutti__label {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-right: 4px;
+  }
+
+  .gf-chip {
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background: var(--color-white);
+    font-size: var(--text-xs);
+  }
+
+  .gf-chip:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
   }
 
   /* ---- Tour ---- */
@@ -930,14 +1017,19 @@ const faqs: FaqEntry[] = [
   }
 
   /* ---- Responsive ---- */
+  @media (max-width: 1000px) {
+    .gf-simili {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
   @media (max-width: 900px) {
     .area__body {
       grid-template-columns: 1fr;
     }
 
-    .area__head {
-      flex-direction: column;
-      align-items: flex-start;
+    .gf-simili {
+      grid-template-columns: 1fr;
     }
   }
 
@@ -956,10 +1048,6 @@ const faqs: FaqEntry[] = [
 
     .gf-hero__lede {
       font-size: var(--text-md);
-    }
-
-    .area__photo {
-      height: 220px;
     }
   }
 </style>

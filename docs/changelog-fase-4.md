@@ -612,3 +612,27 @@ promessa che il regolamento non mantiene.
 settimana di prova **gratuita**», mentre il Guest Pass di `/abbonamenti` costa
 19 €. La scheda del referral non dichiara un prezzo, quindi non è possibile dire
 quale delle due sia da correggere: serve una conferma prima di toccarla.
+
+---
+
+## Seconda tornata di revisioni
+
+| Cosa | Prima | Ora | Perché |
+| --- | --- | --- | --- |
+| **Contattaci** | `/club-life#help-desk` | form n8n `a4283d20…` con `source=SitoWeb&Medium=PulsanteContattaci` | Richiesta. Il valore di `Medium` dice quale pulsante è stato premuto, con la maiuscola che il modulo junior già usa. Il link si apre in una scheda nuova, come le altre CTA verso un form esterno. |
+| **Gallerie della Gym Floor** | quattro caroselli a frecce, senza scorrimento automatico e senza lightbox | la striscia della home, una per area | Richiesta. `SpacesGallery` ora regge più istanze nella stessa pagina: niente più id fissi, e la lista si ripete finché una metà del binario supera lo schermo. |
+| **«Un'ora con qualcuno che sa il tuo nome»** | titolo della sezione PT sulla Gym Floor e sub della hero di `/personal-training` | «Un'ora costruita sul tuo obiettivo» | La frase suggeriva che senza personal trainer nessuno ti conosca. Il beneficio vero è che la seduta è costruita su quello che vuoi ottenere. |
+| **Gym Floor** | finiva con la sezione Personal Training | nuova sezione «Se ti piace la sala / Ti piacerà anche»: Strength Development™, Body Pump®, Body Sculpt | Richiesta. Sono i tre corsi che lavorano sul carico come la sala; nome, foto e URL da `corsi.ts`. |
+
+### Un bug trovato strada facendo
+
+Messa la striscia dentro la colonna delle aree, non scorreva e la pagina andava
+in overflow orizzontale (8667px di larghezza contro 1280 di viewport). La causa
+è `grid-template-columns: 260px 1fr`: il minimo implicito di una traccia `fr` è
+`min-content`, quindi la colonna si allargava fino a contenere tutte le foto in
+fila e al binario non restava niente da scorrere. Corretto con `minmax(0, 1fr)`,
+e `min-width: 0` sul componente perché non possa più sfondare un contenitore.
+
+Verificato in browser su tutte e sei le strisce del sito (quattro sulla Gym
+Floor, home, Baby Nuoto): scorrono da sole, le frecce le muovono, ogni striscia
+apre **la propria** lightbox, la lightbox avanza e si chiude con Escape.

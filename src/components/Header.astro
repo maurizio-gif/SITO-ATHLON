@@ -170,7 +170,13 @@ const accountBlocks = [
       {/* Le due azioni in fondo alla riga: contornata quella che chiede, piena
           quella che compra. Contattaci ha lo stesso contorno arancio della
           pastiglia mobile, così è la stessa cosa su tutti gli schermi. */}
-      <a href={contatta.href} class="nav-cta nav-cta--ghost" {...contatta.attrs}>{contatta.label}</a>
+      <a
+        href={contatta.href}
+        class="nav-cta nav-cta--ghost"
+        target="_blank"
+        rel="noopener noreferrer"
+        {...contatta.attrs}
+      >{contatta.label}</a>
       <a href={iscriviti.href} class="nav-cta" {...iscriviti.attrs}>{iscriviti.label}</a>
 
       {/* In piccolo, dopo le azioni: le condizioni si trovano senza scendere
@@ -180,7 +186,13 @@ const accountBlocks = [
 
     {/* Solo su mobile: la barra non ha spazio per la riga di navigazione, e
         chiedere qualcosa non deve richiedere di aprire il menu. */}
-    <a href={contatta.href} class="header-contact-mobile" {...contatta.attrs}>{contatta.label}</a>
+    <a
+      href={contatta.href}
+      class="header-contact-mobile"
+      target="_blank"
+      rel="noopener noreferrer"
+      {...contatta.attrs}
+    >{contatta.label}</a>
 
     <div class="header-actions">
       <button
