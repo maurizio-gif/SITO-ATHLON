@@ -1,0 +1,15 @@
+---
+/**
+ * pallanuoto. Contenuti in src/data/junior.ts, impaginazione in PaginaJunior:
+ * le quattro pagine dei corsi per bambini hanno la stessa struttura.
+ */
+import Layout from '../layouts/Layout.astro';
+import PaginaJunior from '../components/junior/PaginaJunior.astro';
+import { getJunior } from '../data/junior';
+
+const corso = getJunior('pallanuoto');
+---
+
+<Layout title={corso.titolo} description={corso.descrizione}>
+  <PaginaJunior corso={corso} />
+</Layout>

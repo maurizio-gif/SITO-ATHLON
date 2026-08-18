@@ -6,7 +6,6 @@ order: 1
 tags:
   - sospensione
   - pausa
-  - sospensione straordinaria
   - inabilità
   - certificato medico
   - adulti
@@ -28,14 +27,13 @@ attivita:
 
 Valido per abbonamenti **Adulti** acquistati dal 1 Settembre 2021 e abbonamenti **Baby Nuoto**.
 
-## Le tre sospensioni non sono la stessa cosa
+## Le due sospensioni non sono la stessa cosa
 
 Vengono confuse spesso, e hanno regole diverse. Trova la tua prima di procedere.
 
 | Tipo | Costo | Durata | Come si richiede | Vincoli |
 |:---|:---|:---|:---|:---|
 | **Ordinaria** | **€15** al mese | un mese solare | Da area riservata: seleziona "Mese di Sospensione a pagamento", poi paga da **Scadenze** | Richiesta con 10 giorni di anticipo |
-| **Straordinaria** | gratuita | un mese solare | Da area riservata, **entro la finestra comunicata** | Concessa solo in occasioni specifiche che comunichiamo noi (es. lavori). Il termine è **perentorio**: fuori finestra non è concedibile |
 | **Per inabilità fisica** | gratuita | minimo **60 giorni** | Invia richiesta e documentazione a [desk@athlonroma.it](mailto:desk@athlonroma.it), poi attendi la conferma via email | Certificato di struttura sanitaria nazionale con inidoneità e termine espliciti. Nessun recupero sotto i 2 mesi. Non sovrapponibile ad altre sospensioni |
 
 ## Come richiedere la sospensione
@@ -53,7 +51,7 @@ Vengono confuse spesso, e hanno regole diverse. Trova la tua prima di procedere.
 
 **€15** per ogni mese sospeso, richiesto all'atto della richiesta.
 
-La sospensione **straordinaria** e quella **per inabilità fisica** sono invece gratuite.
+La sospensione **per inabilità fisica** è invece gratuita.
 
 ---
 
@@ -76,15 +74,6 @@ La sospensione **straordinaria** e quella **per inabilità fisica** sono invece 
 La sospensione **trasla la scadenza** del contratto di pari durata.
 
 **Esempio:** contratto 12 mesi + 2 sospensioni = durata minima **14 mesi**
-
-</details>
-
-<details>
-<summary><strong>Non trovo l'opzione della sospensione straordinaria</strong></summary>
-
-La sospensione straordinaria compare **solo dentro la finestra di richiesta** che comunichiamo via email, e solo per gli abbonamenti a cui si applica. Se sei nei termini e non la vedi, [scrivici](/club-life#help-desk) indicando il mese che vuoi sospendere: la inseriamo noi e ti confermiamo via email.
-
-Se la finestra è già chiusa, il termine è perentorio e la sospensione non è più concedibile.
 
 </details>
 

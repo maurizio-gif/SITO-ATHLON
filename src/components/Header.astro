@@ -1,90 +1,68 @@
 ---
+/* I corsi fitness sono il secondo livello del menu, in ordine alfabetico —
+   ordinati qui e non a mano, così aggiungerne uno non richiede di rimetterli
+   in fila. localeCompare con 'it' perché ® e accenti non devono contare. */
+const corsiFitness = [
+  { label: 'Antigravity®', href: '/antigravity' },
+  { label: 'Balli di Gruppo', href: '/balli-di-gruppo' },
+  { label: 'Body Pump®', href: '/body-pump' },
+  { label: 'Body Sculpt', href: '/body-sculpt' },
+  { label: 'Booty Workout', href: '/booty-workout' },
+  { label: 'Calisthenics', href: '/calisthenics' },
+  { label: 'Difesa Personale', href: '/difesa-personale' },
+  { label: 'GP Coreo', href: '/gpcoreo' },
+  { label: 'Ginnastica Dolce', href: '/ginnastica-dolce' },
+  { label: 'Ginnastica Posturale', href: '/ginnastica-posturale' },
+  { label: 'HBX', href: '/hbx' },
+  { label: 'Motr®', href: '/motr' },
+  { label: 'Pilates', href: '/pilates' },
+  { label: 'Strenght', href: '/strenght' },
+  { label: 'Yoga', href: '/yoga' },
+].sort((a, b) => a.label.localeCompare(b.label, 'it'));
+
+/* Primo livello: le otto attività per adulti come le nomina il club. Solo
+   "Corsi Fitness" si apre, e dentro ci sono i singoli corsi. */
 const adultiMenu = {
-  image: '/wp-content/uploads/2024/08/IMG_2065-scaled.jpg',
-  imageAlt: 'Gym Floor Athlon Club',
-  columns: [
-    {
-      heading: 'Palestra',
-      links: [
-        { label: 'Gym Floor (Sala Pesi)', href: '/gym-floor' },
-        { label: 'Personal Training', href: '/personal-training' },
-      ],
-    },
-    {
-      heading: 'Corsi Fitness',
-      links: [
-        { label: 'Tutti i Corsi Fitness', href: '/corsi-fitness' },
-        { label: 'Yoga', href: '/yoga' },
-        { label: 'Pilates', href: '/pilates' },
-        { label: 'Group Reformer', href: '/reformer' },
-        { label: 'Calisthenics', href: '/calisthenics' },
-        { label: 'Booty Workout', href: '/booty-workout' },
-        { label: 'HBX', href: '/hbx' },
-        { label: 'Motr®', href: '/motr' },
-        { label: 'Body Sculpt', href: '/body-sculpt' },
-        { label: 'Body Pump®', href: '/body-pump' },
-        { label: 'Antigravity®', href: '/antigravity' },
-        { label: 'GP Coreo', href: '/gpcoreo' },
-        { label: 'Ginnastica Posturale', href: '/ginnastica-posturale' },
-        { label: 'Ginnastica Dolce', href: '/ginnastica-dolce' },
-        { label: 'Balli di Gruppo', href: '/balli-di-gruppo' },
-        { label: 'Difesa Personale', href: '/difesa-personale' },
-        { label: 'Strenght', href: '/strenght' },
-      ],
-    },
-    {
-      heading: 'Piscina',
-      links: [
-        { label: 'Scuola Nuoto Adulti', href: '/scuola-nuoto-adulti' },
-        { label: 'Aqua Fitness', href: '/aqua-fitness' },
-        { label: 'Nuoto Libero', href: '/nuoto-libero' },
-        { label: 'Corso Gestanti', href: '/gestanti' },
-      ],
-    },
+  items: [
+    { label: 'Gym Floor', href: '/gym-floor' },
+    { label: 'Corsi Fitness', href: '/corsi-fitness', children: corsiFitness },
+    { label: 'Group Reformer', href: '/reformer' },
+    { label: 'Personal Training', href: '/personal-training' },
+    { label: 'Aqua Fitness', href: '/aqua-fitness' },
+    { label: 'Nuoto Libero', href: '/nuoto-libero' },
+    { label: 'Scuola Nuoto Adulti', href: '/scuola-nuoto-adulti' },
+    { label: 'Corso Gestanti', href: '/gestanti' },
   ],
 };
 
 const juniorMenu = {
-  image: '/wp-content/uploads/2023/11/Baby-Nuoto.jpg',
-  imageAlt: 'Baby Nuoto Athlon Club',
-  columns: [
-    {
-      heading: 'Corsi Junior',
-      links: [
-        { label: 'Baby Nuoto', href: '/baby-nuoto' },
-        { label: 'Scuola Nuoto Bambini', href: '/scuola-nuoto-bambini-3' },
-        { label: 'Nuoto Agonistico', href: '/nuoto-agonistico' },
-        { label: 'Pallanuoto', href: '/pallanuoto' },
-      ],
-    },
+  items: [
+    { label: 'Baby Nuoto', href: '/baby-nuoto' },
+    { label: 'Scuola Nuoto Bambini', href: '/scuola-nuoto-bambini' },
+    { label: 'Nuoto Agonistico', href: '/nuoto-agonistico' },
+    { label: 'Pallanuoto', href: '/pallanuoto' },
   ],
 };
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 
-/* Portal, app and planning used to be repeated in both mega-menu CTA rows and
-   again in the mobile menu. They now live only in the user panel behind the
-   header's account icon, so the menus stay the site index and the panel is the
-   "my club" shelf. What is left here is marketing, not utility. */
-const adultiCtas = [
-  { label: 'Scopri gli Abbonamenti', href: '/abbonamenti', accent: true, arrow: true },
-];
-
-const juniorCtas = [];
-
 const menus = [
-  { id: 'adulti', label: 'Attività Adulti', data: adultiMenu, ctas: adultiCtas },
-  { id: 'junior', label: 'Corsi Junior', data: juniorMenu, ctas: juniorCtas },
+  { id: 'adulti', label: 'Attività Adulti', data: adultiMenu },
+  { id: 'junior', label: 'Corsi Junior', data: juniorMenu },
 ];
 
-// Top-level destinations without a submenu, listed after the two groups in the
-// mobile menu.
+// Top-level destinations without a submenu. Stanno nella barra desktop e, di
+// seguito ai due gruppi, nel menu mobile: una lista sola, due usi.
 const flatLinks = [
-  { label: 'Club Life', href: '/club-life' },
   { label: 'Planning', href: '/planning' },
   { label: 'Abbonamenti', href: '/abbonamenti' },
+  { label: 'Club Life', href: '/club-life' },
   { label: 'Contatti', href: '/contatti' },
 ];
+
+/* Nella barra desktop i contatti sono già il pulsante a destra, quindi la voce
+   di testo sarebbe un doppione. */
+const navFlat = flatLinks.filter((l) => l.href !== '/contatti');
 
 // The account panel behind the header's user icon: everything a member needs
 // once they are already a member, in two blocks — account, then bookings.
@@ -105,24 +83,6 @@ const accountBlocks = [
   },
 ];
 
-// Official brand glyphs (Simple Icons paths), drawn in currentColor.
-const social = [
-  {
-    label: 'Instagram',
-    href: 'https://www.instagram.com/athlon_club/',
-    icon: `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63c-.79.3-1.46.72-2.12 1.39C1.35 2.68.93 3.35.63 4.14.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.3.79.72 1.46 1.39 2.12.66.67 1.33 1.09 2.12 1.39.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56.79-.3 1.46-.72 2.12-1.39.67-.66 1.09-1.33 1.39-2.12.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91-.3-.79-.72-1.46-1.39-2.12C21.32 1.35 20.65.93 19.86.63 19.1.33 18.22.13 16.95.07 15.67.01 15.26 0 12 0Zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32ZM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm7.85-10.4a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0Z"/></svg>`,
-  },
-  {
-    label: 'Facebook',
-    href: 'https://www.facebook.com/AthlonClubRoma',
-    icon: `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07Z"/></svg>`,
-  },
-  {
-    label: 'Youtube',
-    href: 'https://www.youtube.com/channel/UC9XX5E0u-qqlqavtawlmOnQ',
-    icon: `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.5A3.02 3.02 0 0 0 .5 6.19C0 8.08 0 12 0 12s0 3.92.5 5.81a3.02 3.02 0 0 0 2.12 2.14c1.88.5 9.38.5 9.38.5s7.5 0 9.38-.5a3.02 3.02 0 0 0 2.12-2.14C24 15.92 24 12 24 12s0-3.92-.5-5.81ZM9.55 15.57V8.43L15.82 12l-6.27 3.57Z"/></svg>`,
-  },
-];
 ---
 
 <header class="site-header" id="site-header">
@@ -133,6 +93,9 @@ const social = [
 
     <a href="/contatti" class="header-contact-mobile">Contattaci</a>
 
+    {/* Una riga piatta: due tendine e tre destinazioni, poi il pulsante. I
+        pannelli stanno dentro la loro voce, così si aprono sotto di essa
+        invece che a tutta larghezza. */}
     <nav class="main-nav">
       {menus.map((m) => (
         <div class="nav-item" data-nav-item={m.id}>
@@ -140,8 +103,58 @@ const social = [
             {m.label}
             <span class="chev" aria-hidden="true"></span>
           </button>
+
+          <div class="mega" id={`mega-${m.id}`} data-mega={m.id}>
+            <ul class="mega-list">
+              {m.data.items.map((it) => (
+                <li class:list={['mega-li', it.children && 'has-sub']}>
+                  {it.children ? (
+                    <>
+                      <span class="mega-row">
+                        <a href={it.href}>{it.label}</a>
+                        {/* Il link resta cliccabile: il comando apre l'elenco e
+                            non ruba la destinazione alla voce.
+                            Dice quante voci ci sono e mostra un chevron che
+                            ruota: un "+" da solo si leggeva come decorazione, e
+                            nessuno capiva che la riga si apriva. */}
+                        <button
+                          type="button"
+                          class="mega-expand"
+                          data-mega-expand
+                          aria-expanded="false"
+                          aria-label={`Mostra tutti i ${it.children.length} corsi fitness`}
+                        >
+                          <span class="mega-expand__n">{it.children.length} corsi</span>
+                          <svg class="chev" viewBox="0 0 10 6" aria-hidden="true">
+                            <path d="M1 1l4 4 4-4" />
+                          </svg>
+                        </button>
+                      </span>
+                      {/* Il wrapper è quello che si anima: grid-template-rows
+                          da 0fr a 1fr apre all'altezza esatta del contenuto,
+                          senza numeri magici da tenere aggiornati. */}
+                      <div class="mega-subwrap">
+                        <ul class="mega-sub">
+                          {it.children.map((c) => (
+                            <li><a href={c.href}>{c.label}</a></li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  ) : (
+                    <a href={it.href}>{it.label}</a>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       ))}
+
+      {navFlat.map((l) => (
+        <a href={l.href} class="nav-link">{l.label}</a>
+      ))}
+
       <a href="/contatti" class="nav-cta">Contattaci</a>
     </nav>
 
@@ -167,54 +180,7 @@ const social = [
     </div>
   </div>
 
-  <!-- Desktop / tablet mega menu panels -->
   <div class="mega-backdrop" data-mega-backdrop></div>
-  {menus.map((m) => (
-    <div class="mega" id={`mega-${m.id}`} data-mega={m.id}>
-      <div class="container mega-inner">
-        <div class="mega-image">
-          <img src={m.data.image} alt={m.data.imageAlt} loading="lazy" />
-        </div>
-        <div class="mega-columns" style={`--col-count:${m.data.columns.length}`}>
-          {m.data.columns.map((col) => (
-            <div class="mega-col">
-              <span class="mega-col-heading">{col.heading}</span>
-              <ul>
-                {col.links.map((l) => (
-                  <li><a href={l.href}>{l.label}</a></li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {m.ctas.length > 0 && (
-      <div class="mega-cta">
-        {m.ctas.map((c) => (
-          <a
-            href={c.href}
-            class:list={['mega-cta-item', { 'mega-cta-item--accent': c.accent }]}
-          >
-            {c.label}
-            {c.sub && <span class="mega-cta-sub">{c.sub}</span>}
-            {c.arrow && <span aria-hidden="true">↓</span>}
-          </a>
-        ))}
-      </div>
-      )}
-
-      <div class="mega-social">
-        <div class="container mega-social-inner">
-          <div class="mega-social-icons">
-            {social.map((s) => (
-              <a href={s.href} target="_blank" rel="noopener" aria-label={s.label} set:html={s.icon} />
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  ))}
 
   <!-- Mobile / tablet full-screen menu -->
   <div class="mobile-panel" id="mobile-panel">
@@ -227,22 +193,43 @@ const social = [
             {m.label}
             <span class="mobile-chev" aria-hidden="true"></span>
           </button>
-          {/* One level of tapping, not two: the column heading is a plain
-              label and its links are already there. The second accordion this
-              replaced meant two taps to reach any link. */}
+          {/* Stesse voci del desktop: otto attività, e solo i corsi fitness
+              hanno un livello sotto. */}
           <div class="mobile-submenu">
-            {m.data.columns.map((col) => (
-              <div class="mobile-subgroup">
-                {m.data.columns.length > 1 && (
-                  <span class="mobile-sublabel">{col.heading}</span>
-                )}
-                <ul class="mobile-sublist">
-                  {col.links.map((l) => (
-                    <li><a class="mobile-sublink" href={l.href}>{l.label}</a></li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            <ul class="mobile-sublist">
+              {m.data.items.map((it) => (
+                <li class:list={[it.children && 'mobile-subgroup2']}>
+                  {it.children ? (
+                    <>
+                      <span class="mobile-subrow">
+                        <a class="mobile-sublink" href={it.href}>{it.label}</a>
+                        <button
+                          type="button"
+                          class="mobile-sub2trigger"
+                          data-sub2
+                          aria-expanded="false"
+                          aria-label={`Mostra tutti i ${it.children.length} corsi fitness`}
+                        >
+                          <span class="mega-expand__n">{it.children.length} corsi</span>
+                          <svg class="chev" viewBox="0 0 10 6" aria-hidden="true">
+                            <path d="M1 1l4 4 4-4" />
+                          </svg>
+                        </button>
+                      </span>
+                      <div class="mobile-sub2wrap">
+                        <ul class="mobile-sub2">
+                          {it.children.map((c) => (
+                            <li><a class="mobile-sublink" href={c.href}>{c.label}</a></li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  ) : (
+                    <a class="mobile-sublink" href={it.href}>{it.label}</a>
+                  )}
+                </li>
+              ))}
+            </ul>
           </div>
         </li>
       ))}
@@ -266,40 +253,46 @@ const social = [
   </div>
 
   <!-- Account panel — opened by the user icon in the header -->
-  <div class="acct" id="acct-modal" aria-hidden="true">
-    <div class="acct__backdrop" data-acct-close></div>
-    <div class="acct__panel" role="dialog" aria-modal="true" aria-labelledby="acct-title">
-      <button class="acct__close" type="button" data-acct-close aria-label="Chiudi">×</button>
-
-      <span class="acct__eyebrow">Il tuo club</span>
-      <h2 class="acct__title" id="acct-title">Il tuo club<br />a portata di click</h2>
-      <p class="acct__sub">Gestisci il tuo abbonamento</p>
-
-      {accountBlocks.map((b, i) => (
-        <>
-          {i > 0 && (
-            <>
-              <hr class="acct__rule" />
-              <span class="acct__eyebrow">{b.eyebrow}</span>
-            </>
-          )}
-          <div class="acct__row">
-            {b.links.map((l) => (
-              <a
-                class:list={['acct__btn', { 'acct__btn--solid': l.solid }]}
-                href={l.href}
-                target={l.external ? '_blank' : undefined}
-                rel={l.external ? 'noopener' : undefined}
-              >
-                {l.label}
-              </a>
-            ))}
-          </div>
-        </>
-      ))}
-    </div>
-  </div>
 </header>
+
+{/* Il pannello account sta FUORI dall'header, e deve restarci: .site-header ha
+    un backdrop-filter, e un filtro rende l'elemento il blocco di contenimento
+    dei figli in position:fixed. Da dentro, "inset: 0" copriva i 73px
+    dell'header invece dello schermo, e il pannello si apriva incollato in alto
+    e tagliato a metà. */}
+<div class="acct" id="acct-modal" aria-hidden="true">
+  <div class="acct__backdrop" data-acct-close></div>
+  <div class="acct__panel" role="dialog" aria-modal="true" aria-labelledby="acct-title">
+    <button class="acct__close" type="button" data-acct-close aria-label="Chiudi">×</button>
+
+    <span class="acct__eyebrow">Il tuo club</span>
+    <h2 class="acct__title" id="acct-title">Il tuo club<br />a portata di click</h2>
+    <p class="acct__sub">Gestisci il tuo abbonamento</p>
+
+    {accountBlocks.map((b, i) => (
+      <>
+        {i > 0 && (
+          <>
+            <hr class="acct__rule" />
+            <span class="acct__eyebrow">{b.eyebrow}</span>
+          </>
+        )}
+        <div class="acct__row">
+          {b.links.map((l) => (
+            <a
+              class:list={['acct__btn', { 'acct__btn--solid': l.solid }]}
+              href={l.href}
+              target={l.external ? '_blank' : undefined}
+              rel={l.external ? 'noopener' : undefined}
+            >
+              {l.label}
+            </a>
+          ))}
+        </div>
+      </>
+    ))}
+  </div>
+</div>
 
 <script>
   const header = document.getElementById('site-header');
@@ -307,6 +300,16 @@ const social = [
   const panel = document.getElementById('mobile-panel');
   const backdrop = document.querySelector('[data-mega-backdrop]') as HTMLElement | null;
   const navItems = Array.from(document.querySelectorAll<HTMLElement>('[data-nav-item]'));
+  /* L'altezza dell'header cambia con la larghezza (59px in desktop, 72-73 sotto):
+     la pubblica come variabile CSS, così le hero a schermo intero la sottraggono
+     esatta invece di tenerne una copia indovinata. */
+  const misuraHeader = () => {
+    const h = document.getElementById('site-header');
+    if (h) document.documentElement.style.setProperty('--header-h', `${Math.round(h.getBoundingClientRect().height)}px`);
+  };
+  misuraHeader();
+  new ResizeObserver(misuraHeader).observe(document.getElementById('site-header')!);
+
   const megaPanels = Array.from(document.querySelectorAll<HTMLElement>('[data-mega]'));
   const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
@@ -413,8 +416,35 @@ const social = [
     });
   });
 
-  // No second level any more: once a group is open its links are all visible,
-  // so there is nothing left to toggle inside it.
+  /* Secondo livello, desktop e mobile. Il click sul "+" non deve arrivare al
+     documento: chiuderebbe la tendina che si sta aprendo.
+
+     L'apertura è tutta in CSS: max-height fra due valori concreti si anima
+     sempre, mentre grid-template-rows da 0fr a 1fr qui non interpola — saltava
+     da 0 all'altezza finale. */
+  function apriSottolivello(btn: HTMLElement, classeAperto: string) {
+    const riga = btn.parentElement?.parentElement;
+    if (!riga) return;
+    const aperto = riga.classList.toggle(classeAperto);
+    btn.setAttribute('aria-expanded', String(aperto));
+
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-mega-expand]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      apriSottolivello(btn, 'open');
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-sub2]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      apriSottolivello(btn, 'open');
+    });
+  });
 
   // ---- Account panel ----
   // Any [data-acct-open] opens it: the header icon, and the "Accedi" icon
@@ -494,7 +524,7 @@ const social = [
   .main-nav {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 2px;
     flex: 1;
     justify-content: center;
   }
@@ -537,6 +567,23 @@ const social = [
 
   .nav-item.open .chev {
     transform: rotate(-135deg) translateY(0px);
+  }
+
+  /* Stessa misura e stesso peso dei trigger: la riga si legge come una sola
+     lista, non come voci di rango diverso. */
+  .nav-link {
+    padding: 8px 14px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--color-dark);
+    transition: background-color var(--dur-fast) var(--ease-out-crit);
+  }
+
+  .nav-link:hover {
+    background: rgba(39, 36, 35, 0.06);
   }
 
   .nav-cta {
@@ -609,6 +656,10 @@ const social = [
     display: flex;
     align-items: center;
     justify-content: center;
+    /* Su schermi bassi il pannello è più alto della finestra: così scorre e
+       resta comunque centrato, invece di uscire sopra e sotto. */
+    overflow-y: auto;
+    overscroll-behavior: contain;
     padding: 24px;
     opacity: 0;
     pointer-events: none;
@@ -629,6 +680,7 @@ const social = [
   .acct__panel {
     position: relative;
     z-index: 1;
+    margin: auto;
     width: 100%;
     max-width: 30rem;
     padding: 40px;
@@ -750,186 +802,192 @@ const social = [
   }
 
   /* ---- Mega menu ---- */
+  /* Serve solo a intercettare il clic fuori dalla tendina. Non oscura più la
+     pagina: aveva senso con la fascia a tutta larghezza, non con un pannello
+     di 200-560px. */
   .mega-backdrop {
     position: fixed;
     inset: 0;
-    top: 0;
-    background: rgba(10, 10, 8, 0.4);
-    opacity: 0;
+    background: transparent;
     pointer-events: none;
-    transition: opacity var(--dur-base) ease;
     z-index: 89;
   }
 
   .mega-backdrop.visible {
-    opacity: 1;
     pointer-events: auto;
   }
 
+  /* Tendina ancorata alla sua voce, non fascia a tutta larghezza: centrata sul
+     trigger e larga quanto le serve, con un tetto perché non esca dallo
+     schermo. */
   .mega {
     position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
+    top: calc(100% + 10px);
+    left: 50%;
     z-index: 90;
+    width: max-content;
+    max-width: min(86vw, 780px);
+    padding: 26px 28px;
+    border-radius: 18px;
     background: var(--color-dark);
     color: var(--color-white);
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translate(-50%, -8px);
     pointer-events: none;
     transition: opacity var(--dur-base) var(--ease-out-crit), transform var(--dur-base) var(--ease-out-crit);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
   }
 
   .mega.is-visible {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate(-50%, 0);
     pointer-events: auto;
   }
 
-  .mega-inner {
-    display: flex;
-    gap: 48px;
-    padding: 40px 24px;
-  }
-
-  .mega-image {
-    flex: 0 0 34%;
-    max-width: 420px;
-    border-radius: 16px;
-    overflow: hidden;
-    aspect-ratio: 4 / 3;
-  }
-
-  .mega-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .mega-columns {
-    flex: 1;
-    display: grid;
-    grid-template-columns: repeat(var(--col-count, 3), 1fr);
-    gap: 32px;
-  }
-
-  .mega-col-heading {
-    display: block;
-    font-family: var(--font-heading);
-    text-transform: uppercase;
-    letter-spacing: -0.005em;
-    color: var(--color-primary);
-    font-size: var(--text-lg);
-    margin-bottom: 16px;
-  }
-
-  .mega-col ul {
+  .mega-list {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 2px;
+    min-width: 15rem;
   }
 
-  .mega-col a {
+  .mega-li > a,
+  .mega-row > a {
+    display: block;
+    padding: 7px 0;
     font-size: var(--text-sm);
     color: rgba(255, 255, 255, 0.85);
     transition: color var(--dur-fast) ease, padding-left var(--dur-fast) var(--ease-out-crit);
   }
 
-  .mega-col a:hover {
+  .mega-li > a:hover,
+  .mega-row > a:hover {
     color: var(--color-white);
     padding-left: 4px;
   }
 
-  .mega-cta {
-    display: flex;
-    border-top: 1px solid var(--border-dark);
-  }
-
-  .mega-cta-item {
-    flex: 1;
+  .mega-row {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 24px;
-    font-family: var(--font-heading);
-    text-transform: uppercase;
-    letter-spacing: -0.005em;
-    /* A step above the column headings: this bar is the panel's call to
-       action, so it should be the loudest text in it rather than the quietest. */
-    font-size: var(--text-xl);
-    color: var(--color-white);
-    background: #35312f;
-    border-left: 1px solid var(--border-dark);
-    transition: background-color var(--dur-fast) ease;
-  }
-
-  .mega-cta-item:first-child {
-    border-left: none;
-  }
-
-  .mega-cta-item--accent {
-    background: var(--color-primary);
-  }
-
-  .mega-cta-item:hover {
-    background: #443e3b;
-  }
-
-  .mega-cta-item--accent:hover {
-    background: var(--accent-hover);
-  }
-
-  .mega-cta-sub {
-    font-family: var(--font-body);
-    text-transform: none;
-    font-size: var(--text-sm);
-    color: rgba(255, 255, 255, 0.75);
-    letter-spacing: 0;
-  }
-
-  .mega-social {
-    background: var(--color-cream);
-  }
-
-  .mega-social-inner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px 24px;
-  }
-
-  .mega-social-icons {
-    display: flex;
-    justify-content: center;
+    justify-content: space-between;
     gap: 12px;
   }
 
-  .mega-social-icons a {
-    display: flex;
+  /* Come sul mobile: il segno e basta, in arancio. */
+  /* Il comando di apertura: una pastiglia con il numero delle voci e un
+     chevron. Sta discosta dal link, ha un bordo suo e cambia colore al
+     passaggio, così si vede che è un comando e non un'etichetta. */
+  .mega-expand,
+  .mobile-sub2trigger {
+    flex-shrink: 0;
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--color-dark);
-    color: var(--color-white);
-    transition: background-color var(--dur-fast) ease, transform var(--dur-fast) var(--ease-out-crit);
+    gap: 7px;
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color var(--dur-fast) ease, border-color var(--dur-fast) ease,
+      background-color var(--dur-fast) ease;
   }
 
-  .mega-social-icons a:hover {
-    background: var(--color-primary);
-    transform: translateY(-2px);
+  .mega-expand__n {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1;
   }
 
-  .mega-social-icons :global(svg) {
+  .chev {
+    width: 10px;
+    height: 6px;
+    flex-shrink: 0;
+    fill: none;
+    stroke: var(--color-primary);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform var(--dur-fast) var(--ease-out-crit);
+  }
+
+  .mega-expand:hover,
+  .mobile-sub2trigger:hover,
+  .has-sub.open .mega-expand,
+  .mobile-subgroup2.open .mobile-sub2trigger {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+    background: rgba(255, 87, 1, 0.07);
+  }
+
+  /* Aperto: il chevron si gira. È il segnale che nel "+" mancava. */
+  .has-sub.open .chev,
+  .mobile-subgroup2.open .chev {
+    transform: rotate(180deg);
+  }
+
+  .mega-expand:hover {
+    opacity: 0.7;
+  }
+
+
+  /* Chiuso di default: il primo livello sono otto voci e devono restare
+     leggibili senza scorrere. Si apre in 260ms fino all'altezza del contenuto,
+     invece di comparire di scatto. */
+  .mega-subwrap {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 300ms var(--ease-out-crit);
+  }
+
+  .has-sub.open .mega-subwrap {
+    /* Generoso di proposito: la lista è più corta, quindi l'apertura finisce
+       prima dei 300ms e il valore esatto non si vede. */
+    max-height: 34rem;
+  }
+
+  /* Una colonna, come il primo livello: due colonne dentro un pannello da 15rem
+     forzavano l'elenco a sbordare. */
+  .mega-sub {
+    list-style: none;
+    margin: 0;
+    padding: 8px 0 2px 14px;
+    border-left: 1px solid var(--border-dark);
+    opacity: 0;
+    transition: opacity 220ms ease 80ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mega-subwrap,
+    .mega-sub,
+    .mobile-sub2wrap,
+    .mobile-sub2 {
+      transition: none;
+    }
+  }
+
+  .has-sub.open .mega-sub {
+    opacity: 1;
+  }
+
+  .mega-sub a {
     display: block;
+    padding: 5px 0;
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.7);
   }
 
+  .mega-sub a:hover {
+    color: var(--color-primary);
+  }
+
+  /* Fuori dalle media query: su desktop l'hamburger e il pannello mobile non
+     esistono. Senza queste due regole il pannello finisce in pagina. */
   .burger {
     display: none;
     flex-direction: column;
@@ -954,15 +1012,63 @@ const social = [
   .menu-open .burger span:nth-child(1) {
     transform: translateY(7px) rotate(45deg);
   }
+
   .menu-open .burger span:nth-child(2) {
     opacity: 0;
   }
+
   .menu-open .burger span:nth-child(3) {
     transform: translateY(-7px) rotate(-45deg);
   }
 
   .mobile-panel {
     display: none;
+  }
+
+  /* ---- Secondo livello nel menu mobile ---- */
+  .mobile-subrow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  /* Area di tocco piena su mobile, senza far crescere la pastiglia. */
+  .mobile-sub2trigger {
+    padding: 12px 14px;
+    margin: -6px 0;
+  }
+
+  /* Solo un "+" arancio: il cerchio bianco con il bordo pesava troppo per un
+     comando secondario. Il bersaglio resta 44px — è l'area a essere grande,
+     non il segno. */
+
+  .mobile-sub2trigger:active {
+    opacity: 0.6;
+  }
+
+
+  .mobile-sub2wrap {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 300ms var(--ease-out-crit);
+  }
+
+  .mobile-subgroup2.open .mobile-sub2wrap {
+    max-height: 46rem;
+  }
+
+  .mobile-sub2 {
+    list-style: none;
+    margin: 0;
+    padding: 6px 0 4px 16px;
+    border-left: 1px solid var(--border);
+    opacity: 0;
+    transition: opacity 200ms ease 60ms;
+  }
+
+  .mobile-subgroup2.open .mobile-sub2 {
+    opacity: 1;
   }
 
   @media (max-width: 1100px) {
@@ -1157,10 +1263,10 @@ const social = [
       transition: max-height var(--dur-base) var(--ease-out-crit);
     }
 
-    /* All the pills are visible at once now, so this has to clear the tallest
-       group (Adulti, 23 links over three captions). The list itself scrolls. */
+    /* Deve bastare anche col secondo livello aperto: otto voci più quindici
+       corsi. La lista scorre. */
     .mobile-group.open .mobile-submenu {
-      max-height: 110rem;
+      max-height: 140rem;
     }
 
     .mobile-subgroup {
@@ -1183,13 +1289,16 @@ const social = [
       color: var(--text-muted);
     }
 
+    /* Otto voci in colonna, una per riga: le pillole a capo servivano quando
+       qui c'erano 23 corsi tutti allo stesso livello. Ora i corsi stanno un
+       livello sotto. */
     .mobile-sublist {
       list-style: none;
       margin: 0;
-      padding: 0 0 0.9rem;
+      padding: 0.4rem 0 0.9rem;
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
+      flex-direction: column;
+      gap: 0;
     }
 
     /* A group with one column has no caption, so its pills need the top
@@ -1198,16 +1307,16 @@ const social = [
       padding-top: 0.9rem;
     }
 
-    /* Pills wrap into a compact block — a 17-item vertical list would make
-       this menu endless. */
+    /* Riga piena invece di pillola: in colonna la pillola non aggiunge nulla e
+       il bersaglio per il dito è più grande così. */
     .mobile-sublink {
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      /* Comfortable finger target on the kiosk — the padding keeps the target
-         big while the label steps down, so nothing gets harder to hit. */
-      padding: 0.68rem 1.05rem;
-      border: 1px solid var(--border-strong);
-      border-radius: 999px;
+      flex: 1;
+      min-height: 44px;
+      padding: 0.6rem 0;
+      border: none;
+      border-radius: 0;
       /* A step below the body size: at --text-md these pills sat too close in
          weight to the group titles above them, and the menu read as one flat
          list instead of titles with their activities nested under. */
@@ -1219,9 +1328,28 @@ const social = [
 
     .mobile-sublink:active,
     .mobile-sublink:hover {
-      background: var(--color-primary);
-      border-color: var(--color-primary);
-      color: var(--color-white);
+      color: var(--color-primary);
+    }
+
+    /* Una riga, un filo di separazione: la lista si legge come un indice. */
+    .mobile-sublist > li + li {
+      border-top: 1px solid var(--border);
+    }
+
+    .mobile-sub2 > li + li {
+      border-top: 1px solid var(--border);
+    }
+
+    /* Il secondo livello rientra e scende di misura, così si vede a quale voce
+       appartiene. */
+    .mobile-sub2 .mobile-sublink {
+      min-height: 40px;
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+    }
+
+    .mobile-sub2 .mobile-sublink:hover {
+      color: var(--color-primary);
     }
 
     .mobile-secondary {

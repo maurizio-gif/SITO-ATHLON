@@ -1,0 +1,567 @@
+---
+/**
+ * Corsi Fitness. Contenuti dal backup Elementor (post 4251) e dalla pagina
+ * attuale: hero, il testo "Solo l'imbarazzo della scelta", le venti schede
+ * corso con le loro foto e le tre FAQ.
+ *
+ * Una cosa cambia rispetto all'originale: là ogni card puntava a "#" e non
+ * portava da nessuna parte. Qui ognuna porta alla pagina del suo corso.
+ */
+import Layout from '../layouts/Layout.astro';
+import PlanningBand from '../components/planning/PlanningBand.astro';
+import LessonModal from '../components/planning/LessonModal.astro';
+import Faq from '../components/Faq.astro';
+import { faqConSchede, type FaqEntry } from '../data/faq';
+import { getBand, countLessons, roomsOf, PLANNING_MONTH } from '../data/planning';
+
+const PG = 'https://athlon.perfectgym.com/ClientPortal2';
+const U = '/wp-content/uploads';
+/* Guest Pass: lo stesso form della pagina Reformer, con il suo medium così le
+   richieste si distinguono per pagina di partenza. */
+const GUEST_PASS =
+  'https://automazione.n8ndevelop.it/form/40cc4d53-8515-4657-b6ae-6bb0fa1acf77?source=SitoWeb&medium=CorsiFitness';
+
+const band = getBand('corsi-fitness');
+const lezioni = countLessons(band);
+const sale = roomsOf(band);
+
+/* Prima e ultima lezione della settimana, lette dal planning: servono alle FAQ,
+   dove "ci sono corsi la sera?" è una domanda che la gente cerca davvero. */
+const orari = [...new Set(band.days.flatMap((d) => d.classes.map((c) => c.time)))].sort();
+const prima = orari[0]?.split('–')[0];
+const ultima = orari[orari.length - 1]?.split('–')[1];
+const giorni = band.days.length;
+
+/* Quali abbonamenti comprendono i corsi lo dice il planning (planTags), non
+   questa pagina: se cambia il listino cambia lì e qui segue. */
+const piani = band.planTags.map((p) => (p === 'premium' ? 'Premium' : 'Smart'));
+
+const facts = [
+  `${lezioni} lezioni a settimana`,
+  `${sale.length} sale`,
+  'Prenoti da app o portale',
+  piani.length === 1 ? `Compresi nell'abbonamento ${piani[0]}` : `Compresi negli abbonamenti ${piani.join(' e ')}`,
+];
+
+/**
+ * I corsi come li elenca la pagina attuale, nello stesso ordine e con le stesse
+ * foto. Manca Body Tone, che c'era fra le card ma non ha una pagina, né un
+ * testo, né una foto propria nel backup, e non è in palinsesto: una card che
+ * non porta da nessuna parte era già il problema della pagina vecchia.
+ *
+ * `href` è la pagina del corso, e per le tre lezioni di HBX e le tre di Yoga è
+ * l'ancora della loro sezione dentro la pagina che le raccoglie.
+ *
+ * `lezioni` sono i nomi con cui il corso compare nel planning: da lì leggiamo
+ * quante volte a settimana si tiene, invece di scriverlo a mano.
+ */
+const corsi = [
+  { nome: 'Antigravity®', href: '/antigravity', lezioni: ['Antigravity'], foto: `${U}/2024/08/DSC08394-1024x1536.jpg` },
+  { nome: 'Balli di Gruppo', href: '/balli-di-gruppo', lezioni: ['Balli di Gruppo'], foto: `${U}/2024/08/balli-di-gruppo.jpg` },
+  { nome: 'Body Pump®', href: '/body-pump', lezioni: [], foto: `${U}/2024/08/WM_07771-1024x1536.jpg` },
+  { nome: 'Body Sculpt', href: '/body-sculpt', lezioni: ['Body Sculpt'], foto: `${U}/2024/08/WM_07791-2-1024x683.jpg` },
+  { nome: 'Booty Workout', href: '/booty-workout', lezioni: ['Booty Workout'], foto: `${U}/2024/08/Giulia-Pagliaccia-77-scaled-e1589104949906-1024x1024.jpg` },
+  { nome: 'Calisthenics', href: '/calisthenics', lezioni: ['Calisthenics'], foto: `${U}/2024/01/DSC07725-1024x1536.jpg` },
+  { nome: 'Difesa Personale', href: '/difesa-personale', lezioni: ['Difesa Personale'], foto: `${U}/2025/11/ATHLON9-1024x1536.jpg` },
+  { nome: 'GP Coreo', href: '/gpcoreo', lezioni: ['GP Coreo'], foto: `${U}/2025/11/ATHLON87-1024x1536.jpg` },
+  { nome: 'Ginnastica Dolce', href: '/ginnastica-dolce', lezioni: ['Ginnastica Dolce'], foto: `${U}/2024/08/Ginnastica-Dolce-Athlon-1024x682.jpg` },
+  { nome: 'Ginnastica Pilates', href: '/pilates', lezioni: ['Pilates Matwork', 'Pilates'], foto: `${U}/2023/11/IMG_2542-scaled-1-1024x1536.jpg` },
+  { nome: 'Ginnastica Posturale', href: '/ginnastica-posturale', lezioni: ['Posturale', 'G. Posturale'], foto: `${U}/2024/08/P1160261-1024x577.jpg` },
+  { nome: 'Hatha Yoga', href: '/yoga#hatha', lezioni: ['Hatha Yoga'], foto: `${U}/2024/08/Yoga-Athlon-1024x683.jpg` },
+  { nome: 'HBX Boxing', href: '/hbx#boxing', lezioni: ['HBX Boxing'], foto: `${U}/2025/03/Athlon178-1024x1536.jpg` },
+  { nome: 'HBX Fusion', href: '/hbx#fusion', lezioni: ['HBX Fusion'], foto: `${U}/2024/08/DSC08480-1024x1536.jpg` },
+  { nome: 'Motr®', href: '/motr', lezioni: ['MOTR®'], foto: `${U}/2024/08/motr-1-768x768.jpg` },
+  { nome: 'Power Yoga', href: '/yoga#power', lezioni: ['Power Yoga'], foto: `${U}/2025/03/Athlon193-1024x1536.jpg` },
+  { nome: 'Strength Development™', href: '/strenght', lezioni: ['Strength Development'], foto: `${U}/2025/08/2024-SEPT-ADIDAS-X-LES-MILLS-FW24-BERLIN-STRENGTH-IMAGE-6-1024x768.jpg` },
+  { nome: 'Yogassè', href: '/yoga#yogasse', lezioni: ['Yogassè'], foto: `${U}/2024/08/IMG_5274-768x1024.jpg` },
+].map((c) => {
+  // Quante volte a settimana quel corso è in palinsesto: è l'informazione che
+  // manca a una griglia di nomi, e ce l'abbiamo già nel planning. Vuoto quando
+  // il corso esiste ma questo mese non è programmato.
+  const volte = band.days.reduce(
+    (n, d) => n + d.classes.filter((l) => c.lezioni.includes(l.name)).length,
+    0
+  );
+  return { ...c, volte };
+});
+
+/* L'elenco per le risposte esce dalle card: se un corso entra o esce, la
+   risposta segue. */
+const elencoCorsi = corsi
+  .map((c) => c.nome)
+  .join(', ')
+  .replace(/, ([^,]*)$/, ' e $1');
+
+/**
+ * FAQ per chi sta ancora decidendo — e per chi ci cerca.
+ *
+ * Due vincoli insieme. Il tono: dice come stanno le cose senza il linguaggio
+ * delle procedure, che spaventa chi non è ancora iscritto; la profondità sta
+ * nella scheda dell'Help Desk, linkata.
+ *
+ * E la reperibilità: le domande sono scritte come le si digita — con l'attività
+ * e il posto dentro, non "devo prenotare?" — e ogni risposta si apre con il
+ * fatto e si regge da sola, perché un motore o un assistente la citano fuori da
+ * questa pagina e devono restare comprensibili. I numeri vengono dal planning,
+ * così nelle risposte citate non invecchiano.
+ *
+ * Il componente Faq emette anche il JSON-LD FAQPage, che è ciò che rende queste
+ * risposte candidabili nei risultati arricchiti.
+ */
+const faqs: FaqEntry[] = await faqConSchede([
+  {
+    q: 'Quali corsi fitness si possono fare ad Athlon Club a Roma Talenti?',
+    a: `${corsi.length} corsi diversi, per ${lezioni} lezioni a settimana: ${elencoCorsi}. Ogni corso ha la sua pagina con orari e caratteristiche della lezione.`,
+  },
+  {
+    q: 'I corsi fitness sono compresi nell’abbonamento?',
+    a: `Sì: tutti i corsi di questa pagina sono compresi nell'abbonamento <strong>${piani.join(' o ')}</strong> di Athlon Club, senza costi aggiuntivi per singolo corso. In alternativa puoi prenotare e pagare la singola lezione, senza quota di attivazione.`,
+  },
+  {
+    q: 'Ci sono corsi fitness la sera o la mattina presto?',
+    a: `Sì. I corsi vanno dalle ${prima} alle ${ultima}, su ${giorni} giorni a settimana, in due sale. La prima lezione è prima del lavoro, l'ultima finisce alle ${ultima}.`,
+  },
+  {
+    q: 'Serve il certificato medico per i corsi fitness?',
+    a: `Sì: serve il certificato di idoneità all'attività sportiva non agonistica, da inviare via email entro le prime due settimane. Lo rilascia il tuo medico di base o un medico sportivo.`,
+    scheda: 'generali/certificato-medico',
+    rimando: 'Requisiti e modello',
+  },
+  {
+    q: 'Come si prenota una lezione di un corso fitness?',
+    a: `Dall'app Athlon Club o dal portale, a partire da tre giorni prima della lezione. I posti in sala sono limitati, quindi la prenotazione serve a garantirti il posto.`,
+    scheda: 'generali/prenotazioni',
+    rimando: 'Come funziona',
+  },
+  {
+    q: 'Si può provare un corso fitness senza abbonarsi?',
+    a: `Sì, in due modi. Puoi <a href="${GUEST_PASS}">richiedere un Guest Pass Premium di una settimana</a> e provare tutte le nostre attività, corsi fitness compresi. Oppure prenoti e paghi la singola lezione, senza quota di attivazione.`,
+  },
+  {
+    q: 'Che livello serve per iniziare un corso fitness?',
+    a: `Nessuno in particolare. I corsi coprono intensità molto diverse, dalla ginnastica dolce all'HBX, e gli istruttori adattano gli esercizi a chi hanno davanti. Se non sai da dove partire, chiedi in accoglienza: ti indichiamo la lezione giusta.`,
+  },
+  {
+    q: 'Se poi devo fermarmi, posso sospendere o disdire?',
+    a: `Sì. Gli abbonamenti mensili si disdicono dalla tua area riservata, e se ti serve una pausa puoi sospendere un mese. Lo fai da solo, senza passare dalla segreteria.`,
+    scheda: 'adulti/sospensione',
+    rimando: 'Come si sospende',
+  },
+]);
+
+---
+
+<Layout
+  title="Corsi Fitness Roma Talenti – 80+ corsi a settimana | Athlon Club"
+  description={`I corsi fitness di Athlon Club a Roma Talenti: ${lezioni} lezioni a settimana in ${sale.length} sale, da Antigravity a HBX, yoga, pilates, posturale e tonificazione. Compresi negli abbonamenti.`}
+>
+  <!-- HERO -->
+  <section class="cf-hero">
+    <img
+      class="cf-hero__bg"
+      src={`${U}/2024/01/IMG_0351-1-1024x683.jpg`}
+      alt="Una lezione di corso fitness ad Athlon Club"
+    />
+    <div class="cf-hero__scrim"></div>
+
+    <div class="container cf-hero__inner">
+      <span class="eyebrow">Attività adulti</span>
+      <h1 class="cf-hero__title">Corsi <em class="accent">fitness</em></h1>
+      <p class="cf-hero__lede">Solo l'imbarazzo della scelta.</p>
+      <a href={`${PG}/#/Registration`} class="btn btn-primary cf-hero__cta">Iscriviti ora →</a>
+    </div>
+
+    <div class="cf-facts">
+      <div class="container cf-facts__inner">
+        {facts.map((f) => <span class="cf-facts__item">{f}</span>)}
+      </div>
+    </div>
+  </section>
+
+  <!-- INTRO -->
+  <section class="cf-sec">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Più di 80 corsi a settimana</span>
+      <h2 class="cf-sec__title" data-anim="reveal">Scegli come allenarti</h2>
+      <p class="cf-sec__sub">
+        Antigravity®, HBX Fusion e Boxing, Strength Development, yoga, tonificazione, pilates,
+        posturale, Motr, GP Coreo, Booty Workout, Body Pump… e tanto altro. Tutti i corsi sono
+        compresi negli abbonamenti che li prevedono, e si prenotano da app o portale.
+      </p>
+      <a href={`${PG}/#/Classes/1/Calendar?categoryId=1`} class="btn btn-primary" data-anim="pop">
+        Prenota ora →
+      </a>
+    </div>
+  </section>
+
+  <!-- CORSI -->
+  <section class="cf-sec cf-sec--alt">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">I nostri corsi</span>
+      <h2 class="cf-sec__title" data-anim="reveal">Venti corsi fra cui scegliere</h2>
+      <p class="cf-sec__sub">
+        Apri un corso per la sua pagina: com'è una lezione, a chi è adatta, cosa serve e quando si
+        tiene.
+      </p>
+
+      <div class="cf-grid">
+        {corsi.map((c, i) => (
+          <article class="cfc" data-anim="fade" data-anim-delay={String((i % 4) * 60)}>
+            <a class="cfc__hit" href={c.href}>
+              <span class="cfc__media">
+                <img src={c.foto} alt={c.nome} loading="lazy" />
+              </span>
+              <span class="cfc__body">
+                <span class="cfc__name u-display">{c.nome}</span>
+                {c.volte > 0 && (
+                  <span class="cfc__when">
+                    {c.volte === 1 ? '1 lezione a settimana' : `${c.volte} lezioni a settimana`}
+                  </span>
+                )}
+                <span class="cfc__more">Scopri di più →</span>
+              </span>
+            </a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ORARI -->
+  <section class="cf-sec">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">{PLANNING_MONTH}</span>
+      <h2 class="cf-sec__title" data-anim="reveal">Gli orari dei corsi</h2>
+      <p class="cf-sec__sub">
+        {lezioni} lezioni a settimana fra {sale.join(', ')}. Tocca una lezione per vedere la scheda.
+      </p>
+
+      <PlanningBand id="corsi-fitness" showTitle={false} />
+
+      <div class="cf-cta-row">
+        <a href={`${PG}/#/Classes/1/Calendar?categoryId=1`} class="btn btn-primary">Prenota una lezione →</a>
+        <a href="/planning" class="cf-link">Planning completo del club →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABBONAMENTI -->
+  <section class="cf-sec cf-sec--dark">
+    <div class="container cf-abb">
+      <div>
+        <span class="eyebrow" data-anim="from-left">Abbonamenti e lezioni</span>
+        <h2 class="cf-sec__title" data-anim="reveal">Come si accede</h2>
+        <p class="cf-sec__sub">
+          I corsi fitness sono compresi
+          {piani.length === 1 ? " nell'abbonamento " : ' negli abbonamenti '}
+          {piani.map((nome, i) => (<>{i > 0 && ' e '}<strong>{nome}</strong></>))}. In alternativa
+          puoi prenotare e pagare la singola lezione, senza quota di attivazione.
+        </p>
+      </div>
+      <a href="/abbonamenti" class="btn btn-primary" data-anim="pop">Vedi gli abbonamenti →</a>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="cf-sec">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Prima di prenotare</span>
+      <h2 class="cf-sec__title" data-anim="reveal">Domande frequenti</h2>
+      <Faq entries={faqs} />
+    </div>
+  </section>
+
+  <LessonModal bands={['corsi-fitness']} />
+</Layout>
+
+<style>
+  /* ---- Hero ---- */
+  .cf-hero {
+    position: relative;
+    min-height: calc(100svh - var(--header-h, 73px));
+    display: flex;
+    flex-direction: column;
+    background: var(--color-dark);
+    color: var(--color-white);
+    overflow: hidden;
+  }
+
+  .cf-hero__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 35%;
+  }
+
+  .cf-hero__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      rgba(23, 21, 20, 0.5) 0%,
+      rgba(23, 21, 20, 0.68) 55%,
+      rgba(23, 21, 20, 0.92) 100%
+    );
+  }
+
+  .cf-hero__inner {
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+    /* Solo verticale: la scorciatoia azzererebbe il padding di .container. */
+    padding-top: var(--space-section-lg);
+    padding-bottom: var(--space-section-md);
+  }
+
+  .cf-hero__title {
+    font-size: var(--text-4xl);
+    --lh: var(--leading-4xl);
+    letter-spacing: var(--tracking-4xl);
+    margin: 12px 0 0;
+  }
+
+  .cf-hero__title .accent {
+    font-style: normal;
+    color: var(--color-primary);
+  }
+
+  .cf-hero__lede {
+    max-width: 32rem;
+    margin: 12px 0 0;
+    font-size: var(--text-2xl);
+    line-height: 1.05;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .cf-hero__cta {
+    margin-top: 28px;
+  }
+
+  .cf-facts {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.42);
+    border-top: 1px solid var(--border-dark);
+  }
+
+  .cf-facts__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 18px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .cf-facts__item {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  /* Il separatore chiude la voce: a capo non resta un puntino orfano. */
+  .cf-facts__item:not(:last-child)::after {
+    content: '·';
+    margin-left: 18px;
+    color: var(--color-primary);
+  }
+
+  /* ---- Sezioni ---- */
+  .cf-sec {
+    padding: var(--space-section-lg) 0;
+  }
+
+  .cf-sec--alt {
+    background: var(--color-cream);
+  }
+
+  .cf-sec--dark {
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .cf-sec__title {
+    font-size: var(--text-3xl);
+    letter-spacing: var(--tracking-2xl);
+    margin: 10px 0 14px;
+  }
+
+  /* Nessun tetto di larghezza: il testo segue la sezione, come i titoli. Il
+     limite a 46rem lo teneva schiacciato al centro di pagine larghe. */
+  .cf-sec__sub {
+    color: var(--text-muted);
+    margin: 0 0 22px;
+  }
+
+  .cf-sec--dark .cf-sec__sub {
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  .cf-link {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .cf-link:hover {
+    text-decoration: underline;
+  }
+
+  .cf-cta-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px 26px;
+    margin-top: 26px;
+  }
+
+  /* ---- Griglia dei corsi ---- */
+  .cf-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .cfc {
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--color-white);
+    border: 1px solid var(--border-strong);
+    transition: transform var(--dur-base) var(--ease-out-crit),
+      box-shadow var(--dur-base) var(--ease-out-crit);
+  }
+
+  .cfc:has(.cfc__hit:hover) {
+    transform: translateY(-5px);
+    box-shadow: 0 14px 32px rgba(23, 21, 20, 0.16);
+  }
+
+  /* Il bersaglio è tutta la card. */
+  .cfc__hit {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    font-family: var(--font-body);
+    color: inherit;
+  }
+
+  .cfc__media {
+    display: block;
+    /* Le foto arrivano in formati diversi — verticali, quadrate, orizzontali —
+       e la griglia le pareggia invece di seguirle. */
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+  }
+
+  .cfc__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s var(--ease-out-crit);
+  }
+
+  .cfc__hit:hover .cfc__media img {
+    transform: scale(1.05);
+  }
+
+  .cfc__body {
+    display: block;
+    padding: 16px 18px 18px;
+  }
+
+  .cfc__name {
+    display: block;
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: var(--text-lg);
+    --lh: 1;
+    color: var(--color-dark);
+  }
+
+  .cfc__when {
+    display: block;
+    margin-top: 6px;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  .cfc__more {
+    display: block;
+    margin-top: 8px;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  /* ---- Abbonamenti ---- */
+  .cf-abb {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 30px;
+  }
+
+  .cf-abb .cf-sec__sub {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 1100px) {
+    .cf-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 900px) {
+    /* Le quattro voci non stanno su una riga: due colonne, senza separatori. */
+    .cf-facts__inner {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 16px;
+    }
+
+    .cf-facts__item {
+      font-size: var(--text-2xs);
+      line-height: 1.35;
+      letter-spacing: 0.06em;
+    }
+
+    .cf-facts__item:not(:last-child)::after {
+      content: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .cf-hero__inner {
+      padding-top: var(--space-section-md);
+    }
+
+    .cf-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .cfc__body {
+      padding: 12px 14px 14px;
+    }
+
+    .cfc__name {
+      font-size: var(--text-md);
+    }
+  }
+</style>

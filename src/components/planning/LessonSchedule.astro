@@ -1,0 +1,271 @@
+---
+/**
+ * Lo specchietto degli orari di un singolo corso.
+ *
+ * Legge il planning condiviso e mostra solo le lezioni di quel corso: sulle
+ * pagine dei corsi la griglia completa della fascia sarebbe illeggibile, perché
+ * il corso in questione occupa tre slot su settanta.
+ *
+ * I nomi arrivano da `lezioni`, cioè da come il corso è scritto in palinsesto —
+ * e il palinsesto è l'unico posto dove si modificano gli orari: cambiando
+ * planning-settembre.json cambiano insieme /planning, /corsi-fitness e questo
+ * specchietto.
+ *
+ * Quando l'elenco è vuoto — il corso esiste ma questo mese non è in palinsesto —
+ * il componente lo dice, invece di mostrare una tabella vuota.
+ */
+import { bands, ROOM_COLORS, PLANNING_MONTH } from '../../data/planning';
+
+interface Props {
+  /** Nomi con cui il corso compare nel planning. */
+  lezioni: string[];
+  /** Nome del corso, per il testo quando non è in palinsesto. */
+  nome: string;
+  /** Come chiamare una seduta: il nuoto libero ha turni, non lezioni. */
+  unita?: { s: string; p: string };
+  variant?: 'light' | 'dark';
+}
+
+const { lezioni, nome, unita = { s: 'lezione', p: 'lezioni' }, variant = 'light' } = Astro.props;
+
+/* Cerco in tutte le fasce, non solo nei corsi fitness: così lo stesso
+   componente serve anche a un corso che venisse spostato di fascia. */
+const giorni = bands
+  .flatMap((b) => b.days)
+  .reduce<{ short: string; full: string; slots: { time: string; name: string; sala?: string }[] }[]>((acc, day) => {
+    const slots = day.classes.filter((c) => lezioni.includes(c.name));
+    if (!slots.length) return acc;
+    const esistente = acc.find((d) => d.full === day.full);
+    if (esistente) esistente.slots.push(...slots);
+    else acc.push({ short: day.short, full: day.full, slots: [...slots] });
+    return acc;
+  }, [])
+  .map((d) => ({ ...d, slots: d.slots.sort((a, b) => a.time.localeCompare(b.time)) }));
+
+const totale = giorni.reduce((n, d) => n + d.slots.length, 0);
+/* Il nome della lezione si mostra solo quando ce n'è più di uno: su Yoga
+   distingue Hatha, Power e Yogassè; su Pilates sarebbe una ripetizione. */
+const nomiDistinti = new Set(giorni.flatMap((d) => d.slots.map((s) => s.name)));
+const mostraNome = nomiDistinti.size > 1;
+---
+
+<div class:list={['sched', `sched--${variant}`]}>
+  <div class="sched__head">
+    <span class="sched__eyebrow">Orari · {PLANNING_MONTH}</span>
+    {totale > 0 && (
+      <span class="sched__count">
+        {totale} {totale === 1 ? unita.s : unita.p} a settimana
+      </span>
+    )}
+  </div>
+
+  {totale > 0 ? (
+    <ul class="sched__days">
+      {giorni.map((d) => (
+        <li class="row">
+          <span class="row__day">
+            <span class="row__short u-display">{d.short}</span>
+            <span class="row__full u-display">{d.full}</span>
+          </span>
+          <span class="row__slots">
+            {d.slots.map((s) => (
+              <span class="slot" style={s.sala ? `--room:${ROOM_COLORS[s.sala] ?? 'var(--color-primary)'}` : undefined}>
+                <span class="slot__time">{s.time}</span>
+                {mostraNome && <span class="slot__name">{s.name}</span>}
+                {s.sala && <span class="slot__room">{s.sala}</span>}
+              </span>
+            ))}
+          </span>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p class="sched__vuoto">
+      {nome} non è in palinsesto a {PLANNING_MONTH}. Gli orari cambiano ogni mese: nel planning trovi
+      quelli aggiornati, e se vuoi che torni scrivicelo.
+    </p>
+  )}
+
+  <a class="sched__link" href="/planning">Tutto il planning →</a>
+</div>
+
+<style>
+  .sched {
+    border-radius: 20px;
+    background: var(--color-cream);
+    padding: 22px 22px 20px;
+  }
+
+  .sched--dark {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-dark);
+  }
+
+  .sched__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sched--dark .sched__head {
+    border-bottom-color: var(--border-dark);
+  }
+
+  .sched__eyebrow,
+  .sched__count {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .sched__eyebrow {
+    color: var(--text-muted);
+  }
+
+  .sched--dark .sched__eyebrow {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .sched__count {
+    color: var(--color-primary);
+  }
+
+  .sched__days {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .row {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sched--dark .row {
+    border-bottom-color: var(--border-dark);
+  }
+
+  .row:last-child {
+    border-bottom: 0;
+  }
+
+  .row__day {
+    flex: 0 0 84px;
+  }
+
+  .row__short {
+    display: none;
+  }
+
+  /* MARTEDÌ, GIOVEDÌ, VENERDÌ: cap accentate nella faccia display, quindi
+     `u-display` nel markup e `--lh` qui — con line-height diretto l'accento si
+     rasa. Vedi la regola in global.css. */
+  .row__full {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: var(--text-base);
+    --lh: 1;
+  }
+
+  .row__slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .slot {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--color-white);
+  }
+
+  .sched--dark .slot {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  /* Il punto colorato è la stessa legenda delle sale del planning. Un tempo era
+     una barra sul bordo sinistro, ma la pillola è arrotondata e la ritagliava a
+     mezzaluna: sembrava una sbavatura. */
+  .slot::before {
+    content: '';
+    flex: 0 0 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--room, var(--color-primary));
+  }
+
+  .slot__time {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: var(--text-sm);
+  }
+
+  .slot__name {
+    font-size: var(--text-xs);
+  }
+
+  .slot__room {
+    font-size: var(--text-2xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .sched--dark .slot__room {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .sched__vuoto {
+    margin: 14px 0 0;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    max-width: 54ch;
+  }
+
+  .sched--dark .sched__vuoto {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .sched__link {
+    display: inline-block;
+    margin-top: 16px;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .sched__link:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 560px) {
+    .sched {
+      padding: 18px 16px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .row__day {
+      flex: none;
+    }
+  }
+</style>

@@ -79,7 +79,7 @@ Può essere rilasciato **solo** da medici specialisti in medicina dello sport o 
 
 Per ottenere il certificato agonistico è necessario presentare al medico il **modulo di richiesta** compilato dalla società sportiva:
 
-[📥 Scarica il modulo di richiesta visita medico-sportiva](/modulo-richiesta-certificato-agonistico.pdf)
+<a href="/modulo-richiesta-certificato-agonistico.pdf" download="Modulo-richiesta-visita-medico-sportiva-Athlon.pdf">📥 Scarica il modulo di richiesta visita medico-sportiva</a>
 
 > ℹ️ Questo modulo è richiesto **solo per il certificato agonistico**. Per il certificato non agonistico non serve alcun modulo.
 

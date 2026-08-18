@@ -6,8 +6,19 @@
  * numbers — no heading of its own: the photos are the point, and the block
  * already says where you are. Styles are written for the anthracite ground it
  * sits on, not the white section it used to live in.
+ *
+ * The photos are a prop so the same strip can carry another set — the Baby
+ * Nuoto page uses it for its own gallery — while the home page keeps the club
+ * spaces it has always shown. One instance per page: the lightbox and the
+ * track are addressed by id.
  */
-const gallery = [
+interface Props {
+  photos?: { image: string; caption: string }[];
+  /** The small label above the arrows. */
+  hint?: string;
+}
+
+const SPAZI = [
   // Gym Floor
   { image: '/wp-content/uploads/2025/12/P1000273-scaled.jpeg', caption: 'Gym Floor' },
   { image: '/wp-content/uploads/2025/12/P1000283-scaled.jpeg', caption: 'Gym Floor' },
@@ -36,11 +47,14 @@ const gallery = [
   { image: '/wp-content/uploads/2025/12/P1000158-scaled.jpeg', caption: 'Spogliatoi' },
   { image: '/wp-content/uploads/2025/12/P1000246-scaled.jpeg', caption: 'Spogliatoi' },
 ];
+
+const { photos = SPAZI, hint = 'I nostri spazi' } = Astro.props;
+const gallery = photos;
 ---
 
 <div class="sg">
   <div class="container sg__nav-row">
-    <span class="sg__hint">I nostri spazi</span>
+    <span class="sg__hint">{hint}</span>
     <div class="sg__nav">
       <button class="sg__btn" data-gallery-dir="-1" aria-label="Foto precedenti">←</button>
       <button class="sg__btn" data-gallery-dir="1" aria-label="Foto successive">→</button>

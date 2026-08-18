@@ -757,13 +757,17 @@ window.__ATHLON_ACTIVITIES__ = ${JSON.stringify(ACTIVITY_TAGS)};`}
   input?.addEventListener('input', () => {
     // Debounced: typing a question fires this on every keystroke otherwise.
     window.clearTimeout(timer);
-    timer = window.setTimeout(() => render(input.value), 140);
+    timer = window.setTimeout(() => {
+      render(input.value);
+      ricorda();
+    }, 140);
   });
 
   clear?.addEventListener('click', () => {
     if (!input) return;
     input.value = '';
     render('');
+    ricorda();
     input.focus();
   });
 
@@ -833,6 +837,53 @@ window.__ATHLON_ACTIVITIES__ = ${JSON.stringify(ACTIVITY_TAGS)};`}
   };
 
   /** Called after every tick: the selection drives step 2, the hints and the search. */
+  /**
+   * La ricerca sopravvive alla navigazione. Chi apre una scheda dalla risposta
+   * e torna indietro deve ritrovare la sua domanda dov'era: senza questo, il
+   * giro "chiedo → apro → torno → chiedo di nuovo" è la norma, e il passo 1
+   * ricomincia da zero. sessionStorage e non localStorage: vale per la
+   * navigazione in corso, non per sempre.
+   */
+  const MEMORIA = 'athlon:helpdesk';
+
+  function ricorda() {
+    try {
+      sessionStorage.setItem(
+        MEMORIA,
+        JSON.stringify({ attivita: Array.from(chosen), domanda: input?.value ?? '' })
+      );
+    } catch {
+      // Navigazione privata o storage pieno: la ricerca non si ricorda, e basta.
+    }
+  }
+
+  function ripristina() {
+    let salvato: { attivita?: unknown; domanda?: unknown } | null = null;
+    try {
+      salvato = JSON.parse(sessionStorage.getItem(MEMORIA) || 'null');
+    } catch {
+      return;
+    }
+    if (!salvato) return;
+
+    // Solo attività che esistono ancora: la tassonomia può essere cambiata da
+    // quando la scelta è stata salvata.
+    const ids = Array.isArray(salvato.attivita) ? salvato.attivita : [];
+    const validi = ids.filter((id): id is string => typeof id === 'string' && LABEL_OF.has(id));
+    if (validi.length === 0) return;
+
+    validi.forEach((id) => {
+      chosen.add(id);
+      const cb = boxes.find((b) => b.value === id);
+      if (cb) cb.checked = true;
+    });
+    if (input && typeof salvato.domanda === 'string') input.value = salvato.domanda;
+
+    // Riapre il passo 2 e rifà la ricerca. Nessun focus: l'utente sta tornando
+    // su una pagina, non iniziando a scrivere, e il focus la farebbe saltare.
+    syncActivities();
+  }
+
   function syncActivities() {
     paintTrigger();
 
@@ -852,6 +903,17 @@ window.__ATHLON_ACTIVITIES__ = ${JSON.stringify(ACTIVITY_TAGS)};`}
     if (hint) hint.hidden = !ready;
     paintChips();
 
+    if (!ready) {
+      /* Senza attività non esiste risposta: l'ordine è attività, poi domanda, e
+         deve valere anche all'indietro. Togliendo l'ultima spunta la risposta
+         sparisce, invece di restare a schermo calcolata su niente. */
+      if (results) results.innerHTML = '';
+      box?.classList.remove('is-searching');
+      if (browse) browse.hidden = false;
+      lastAnswer = null;
+      return;
+    }
+
     // A question already typed is re-answered against the new selection.
     if (input?.value.trim()) render(input.value);
   }
@@ -861,6 +923,7 @@ window.__ATHLON_ACTIVITIES__ = ${JSON.stringify(ACTIVITY_TAGS)};`}
       if (cb.checked) chosen.add(cb.value);
       else chosen.delete(cb.value);
       syncActivities();
+      ricorda();
     });
   });
 
@@ -892,6 +955,8 @@ window.__ATHLON_ACTIVITIES__ = ${JSON.stringify(ACTIVITY_TAGS)};`}
     openPanel(true);
     (panel?.querySelector('input') as HTMLInputElement | null)?.focus();
   });
+
+  ripristina();
 
   // Delegated: the chips are re-rendered whenever the activity changes.
   chips?.addEventListener('click', (e) => {
