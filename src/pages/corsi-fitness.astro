@@ -12,8 +12,8 @@ import PlanningBand from '../components/planning/PlanningBand.astro';
 import LessonModal from '../components/planning/LessonModal.astro';
 import Faq from '../components/Faq.astro';
 import { faqConSchede, type FaqEntry } from '../data/faq';
-import { getBand, countLessons, roomsOf, PLANNING_MONTH } from '../data/planning';
-import { trialCta } from '../data/cta';
+import { getBand, countLessons, roomsOf } from '../data/planning';
+import { trialCta, ctaAttrs } from '../data/cta';
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 const U = '/wp-content/uploads';
@@ -188,9 +188,15 @@ const faqs: FaqEntry[] = await faqConSchede([
       <h1 class="cf-hero__title">Corsi <em class="accent">fitness</em></h1>
       <p class="cf-hero__lede">{corsi.length} corsi.<br />{FAMIGLIE.length} modi di allenarti.</p>
       <div class="cf-hero__actions">
-        <a href="#famiglie" class="btn btn-primary cf-hero__cta" data-cta="explore">
-          Trova il corso giusto per te →
-        </a>
+        {/* Porta a un'ancora di questa pagina, quindi è `explore`: la CTA di prova
+            vera, con la sua destinazione, sta nella sezione. L'intento viaggia
+            comunque, così il percorso resta leggibile. */}
+        <a
+          href="#prova"
+          class="btn btn-primary cf-hero__cta"
+          {...ctaAttrs('explore', 'trial', { activity: 'corsi-fitness', source: '/corsi-fitness' })}
+        >Prova Ora →</a>
+        <a href="#famiglie" class="cf-hero__link">Trova il corso giusto per te</a>
         <a href="#orari" class="cf-hero__link">Vedi gli orari</a>
       </div>
     </div>
@@ -279,7 +285,7 @@ const faqs: FaqEntry[] = await faqConSchede([
   <!-- ORARI -->
   <section class="cf-sec" id="orari">
     <div class="container">
-      <span class="eyebrow" data-anim="from-left">{PLANNING_MONTH}</span>
+      <span class="eyebrow" data-anim="from-left">Ogni settimana</span>
       <h2 class="cf-sec__title" data-anim="reveal">Gli orari dei corsi</h2>
       <p class="cf-sec__sub">
         {lezioni} lezioni a settimana fra {sale.join(', ')}. Tocca una lezione per vedere la scheda.
@@ -291,6 +297,50 @@ const faqs: FaqEntry[] = await faqConSchede([
         <a href={`${PG}/#/Classes/1/Calendar?categoryId=1`} class="btn btn-primary">Prenota una lezione →</a>
         <a href="/planning" class="cf-link">Planning completo del club →</a>
       </div>
+    </div>
+  </section>
+
+  <!-- PROVA -->
+  {/* La sezione a cui punta «Prova Ora» dell'hero. I dati sono quelli del Guest
+      Pass su /abbonamenti — sette giorni, 19 €, accesso completo, requisito dal
+      2021 — e non ne aggiunge di nuovi. La parola «gratuita» non compare: il
+      Guest Pass ha un prezzo, e chiamarlo gratis sarebbe falso. Per chi non ha i
+      requisiti resta la singola lezione, che questa pagina già documenta. */}
+  <section class="cf-sec cf-sec--alt" id="prova">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Sette giorni</span>
+      <h2 class="cf-sec__title" data-anim="reveal">Provali tutti</h2>
+      <p class="cf-sec__sub">
+        Con il Guest Pass hai il club completo per una settimana: {lezioni} lezioni di corsi fitness
+        in palinsesto, più Gym Floor, Group Reformer, Aqua Fitness e nuoto libero. Sette giorni
+        bastano per capire quali corsi sono i tuoi.
+      </p>
+
+      <div class="cf-prova" data-anim="scale">
+        <ul class="cf-prova__facts">
+          <li><strong class="u-display">7</strong> giorni</li>
+          <li><strong class="u-display">19</strong> euro</li>
+          <li><strong class="u-display">{corsi.length}</strong> corsi da provare</li>
+        </ul>
+        <div class="cf-prova__side">
+          <p class="cf-prova__nota">
+            Accesso completo a tutte le attività, con l'esperienza Premium. Riservato a chi non ha
+            avuto un abbonamento Athlon dal 2021.
+          </p>
+          <a
+            href={prova.href}
+            class="btn btn-primary"
+            target="_blank"
+            rel="noopener noreferrer"
+            {...prova.attrs}
+          >{prova.label} →</a>
+        </div>
+      </div>
+
+      <p class="cf-prova__alt">
+        Se il Guest Pass non è per te, puoi <a href={`${PG}/#/Classes/1/Calendar?categoryId=1`}>prenotare
+        e pagare una singola lezione</a>: nessuna quota di attivazione.
+      </p>
     </div>
   </section>
 
@@ -574,6 +624,79 @@ const faqs: FaqEntry[] = await faqConSchede([
     flex-wrap: wrap;
     gap: 16px 26px;
     margin-top: 26px;
+  }
+
+  /* ---- Prova ---- */
+  .cf-prova {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 30px 44px;
+    margin-top: 28px;
+    padding: 30px 34px;
+    border-radius: var(--radius);
+    background: var(--color-white);
+    border: 1px solid var(--border);
+  }
+
+  .cf-prova__facts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 30px;
+  }
+
+  .cf-prova__facts li {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  /* Display face fuori da h1–h4: serve u-display, e la leading passa da --lh
+     perché è da lì che si calcola lo spazio sopra le maiuscole accentate. */
+  .cf-prova__facts strong {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    --lh: 1;
+    color: var(--color-primary);
+  }
+
+  .cf-prova__side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .cf-prova__nota {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .cf-prova__alt {
+    margin: 22px 0 0;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .cf-prova__alt a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 900px) {
+    .cf-prova {
+      grid-template-columns: 1fr;
+      gap: 22px;
+      padding: 24px 20px;
+    }
   }
 
   /* ---- Griglia dei corsi ---- */

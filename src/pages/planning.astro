@@ -4,7 +4,7 @@ import OpeningHours from '../components/planning/OpeningHours.astro';
 import PlanningBand from '../components/planning/PlanningBand.astro';
 import LessonModal from '../components/planning/LessonModal.astro';
 import Faq, { type FaqEntry } from '../components/Faq.astro';
-import { bands, countLessons, PLANNING_MONTH } from '../data/planning';
+import { bands, countLessons } from '../data/planning';
 import { trialCta } from '../data/cta';
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
@@ -52,13 +52,13 @@ const faqs: FaqEntry[] = [
 ---
 
 <Layout
-  title={`Orari e Planning ${PLANNING_MONTH} | Athlon Club Roma Talenti`}
+  title="Orari e Planning | Athlon Club Roma Talenti"
   description={`Il planning completo di Athlon Club: ${totalLessons} lezioni a settimana tra corsi fitness, group reformer, scuola nuoto, nuoto libero e aqua fitness, più gli orari di apertura della Gym Floor.`}
 >
   <!-- HERO -->
   <section class="pl-hero">
     <div class="container">
-      <span class="eyebrow">{PLANNING_MONTH}</span>
+      <span class="eyebrow">La settimana al club</span>
       <h1 class="pl-hero__title">Orari <em class="accent">e planning</em></h1>
       <p class="pl-hero__lede">
         {totalLessons} lezioni ogni settimana, più la Gym Floor aperta tutti i giorni. Prenoti tutto

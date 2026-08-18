@@ -1,47 +1,68 @@
 ---
 /**
- * «Come funziona Athlon»: lo strato che mancava fra il racconto del brand e il
- * catalogo delle attività.
+ * «Scegli tu»: la sezione che spiega di cosa è fatta una settimana ad Athlon.
  *
- * È il punto in cui Athlon Club 4.0 viene definito una volta — sport, servizi e
- * tecnologia dentro lo stesso club — e da lì in poi il sito lo dimostra con i
- * fatti invece di ripetere il nome.
+ * Il tema è la libertà di scelta, e per raccontarla servono numeri veri: sono
+ * tutti derivati dal planning del mese, nessuno scritto a mano. Se il palinsesto
+ * cambia, cambia la sezione.
  *
- * Ogni blocco segue lo stesso ordine: il beneficio come titolo, il meccanismo
- * e la prova nel testo. Tutti i fatti citati sono verificati nel repository —
- * la prenotazione a tre giorni e la capienza per fascia (articolo
- * `adulti/gym-floor` e f.a.q. della Gym Floor), i piani e i percorsi Start Up
- * (`/gym-floor`), i livelli assegnati dagli istruttori (`corsi.ts`,
- * scuola-nuoto-adulti), i Matrix collegati all'account (`AppSection`), i
- * brevetti nel portale (`snb/didattica.md`).
+ *  - `totalLessons()` — 180 lezioni a settimana, su cinque fasce;
+ *  - `totalHours()`   — le ore che quelle lezioni occupano;
+ *  - `openHours()`    — le ore in cui la Gym Floor è aperta;
+ *  - la prima e l'ultima lezione di ogni giornata, per dire da che ora a che ora.
  *
- * Nessuna promessa di disponibilità: la capienza è definita e prenotando si
- * vede quanti posti restano, che è un'altra cosa dal dire «il posto c'è».
+ * Le due voci sono tenute distinte di proposito: le ore di palinsesto sono
+ * lezioni a orario fisso, le ore di sala aperta sono accesso libero. Sommarle in
+ * un solo numero senza dire di cosa è fatto sarebbe gonfiarlo.
+ *
+ * Athlon Club 4.0 resta l'eyebrow, ma qui è un mezzo e non un vanto: l'app e il
+ * planning servono a rendere gestibile la scelta — prenoti, vedi i posti che
+ * restano, cambi idea. I fatti citati sono verificati: prenotazione fino a tre
+ * giorni prima e capienza per fascia (`adulti/gym-floor`, f.a.q. Gym Floor), le
+ * otto attività comprese in Premium (`abbonamenti.astro`, `plans[].activities`),
+ * le cinque famiglie dei corsi (`corsi-fitness.astro`).
  */
+import { bands, totalLessons, totalHours, openHours } from '../../data/planning';
+
+const lezioni = totalLessons();
+const ore = totalHours();
+const oreSala = openHours();
+
+/* Da che ora a che ora si può fare qualcosa: la prima lezione del palinsesto e
+   l'ultima, lette dal planning invece che ricordate a memoria. */
+const orari = bands.flatMap((b) =>
+  b.days.flatMap((d) => d.classes.map((c) => c.time.replace(/^[A-Za-z]{3}\s*/, '').split(/[–-]/)))
+);
+const prima = orari.map((o) => o[0]).sort()[0];
+const ultima = orari.map((o) => o[1]).sort().at(-1);
+
 const blocchi = [
   {
-    titolo: 'Sai quando allenarti, e lo spazio è organizzato.',
-    testo:
-      'Sala pesi, corsi, reformer, corsie e scuola nuoto si prenotano dall’app Athlon Club o dal portale, fino a tre giorni prima. Ogni fascia ha una capienza definita: mentre prenoti vedi quanti posti restano.',
+    titolo: 'Scegli l’ora',
+    testo: `Il palinsesto va da ${prima} a ${ultima}, e la Gym Floor è aperta ${oreSala} ore a settimana. Prenoti dall’app Athlon Club o dal portale fino a tre giorni prima: ogni fascia ha una capienza definita e mentre prenoti vedi quanti posti restano.`,
   },
   {
-    titolo: 'Sai cosa fare quando entri.',
-    testo:
-      'In sala il programma è nell’app: più di trenta piani divisi per obiettivo, più i percorsi Start Up per chi comincia da zero. In vasca il livello lo assegnano gli istruttori. E nelle fasce Con Assistenza un trainer è in sala con te.',
+    titolo: 'Scegli l’attività',
+    testo: `${lezioni} lezioni a settimana su cinque fasce: corsi fitness, Group Reformer, Aqua Fitness, Scuola Nuoto Adulti e nuoto libero assistito. I soli corsi fitness sono diciotto, divisi in cinque famiglie — forza, fiato, musica, postura, mobilità.`,
   },
   {
-    titolo: 'Quello che fai resta.',
+    titolo: 'Cambia quando vuoi',
     testo:
-      'I macchinari Matrix 4.0 dell’area cardio sono collegati al tuo account: quando torni, ritrovi il tuo percorso. Per i bambini della scuola nuoto, nel portale ci sono i brevetti raggiunti e le prove per il livello successivo.',
+      'Con Premium le attività comprese sono otto, quindi non ti leghi a una sola: il Reformer una settimana, la vasca quella dopo, la sala nei giorni in cui hai poco tempo. Senza cambiare abbonamento e senza chiedere il permesso a nessuno.',
   },
 ];
 ---
 
-<section class="come" aria-labelledby="come-funziona">
+<section class="come" aria-labelledby="come-scegli">
   <div class="container">
     <span class="eyebrow come__eyebrow" data-anim="from-left">Athlon Club 4.0</span>
-    <h2 class="come__title" id="come-funziona" data-anim="reveal">Come funziona Athlon</h2>
-    <p class="come__sub">Sport, servizi e tecnologia fanno parte dello stesso club.</p>
+    <h2 class="come__title" id="come-scegli" data-anim="reveal">
+      {lezioni} lezioni a settimana.<br />Scegli le tue.
+    </h2>
+    <p class="come__sub">
+      {ore} ore di palinsesto e {oreSala} ore di sala aperta: quando allenarti, e cosa fare, lo
+      decidi ogni settimana.
+    </p>
 
     <ol class="come__grid">
       {blocchi.map((b, i) => (
@@ -52,6 +73,10 @@ const blocchi = [
         </li>
       ))}
     </ol>
+
+    <p class="come__foot">
+      <a class="come__link" href="/planning">Apri il planning della settimana →</a>
+    </p>
   </div>
 </section>
 
@@ -74,8 +99,8 @@ const blocchi = [
   }
 
   .come__sub {
-    margin: 10px 0 0;
-    max-width: 30ch;
+    margin: 14px 0 0;
+    max-width: 40ch;
     font-size: var(--text-lg);
     line-height: 1.3;
     color: var(--color-dark);
@@ -90,8 +115,7 @@ const blocchi = [
     gap: 30px;
   }
 
-  /* Il numero è una scansione, non una decorazione: i tre blocchi sono la
-     sequenza con cui si usa il club, prima, durante e dopo la sessione. */
+  /* Il numero scandisce le tre scelte: l'ora, l'attività, il cambio di idea. */
   .come__num {
     display: block;
     font-size: var(--text-xl);
@@ -122,6 +146,22 @@ const blocchi = [
     font-size: var(--text-base);
     line-height: 1.62;
     color: var(--text-muted);
+  }
+
+  .come__foot {
+    margin: 30px 0 0;
+  }
+
+  .come__link {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .come__link:hover {
+    text-decoration: underline;
   }
 
   @media (max-width: 900px) {

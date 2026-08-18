@@ -4,7 +4,7 @@
  * Used in place of a "see our hours" link: the hours themselves are short
  * enough to show, and showing them beats sending people to a portal.
  */
-import { gymFloor, PLANNING_MONTH } from '../../data/planning';
+import { gymFloor, openHours } from '../../data/planning';
 
 interface Props {
   /** Optional link out to the booking calendar, shown under the table. */
@@ -13,12 +13,16 @@ interface Props {
 }
 
 const { href, variant = 'light' } = Astro.props;
+
+/* Al posto del mese, un dato che non scade: quante ore la sala è aperta in una
+   settimana, sommate dalle fasce qui sotto. */
+const ore = openHours();
 ---
 
 <div class:list={['hours', `hours--${variant}`]} data-anim="scale">
   <div class="hours__head">
     <span class="hours__label">Orari di apertura</span>
-    <span class="hours__month">{PLANNING_MONTH}</span>
+    <span class="hours__meta">{ore} ore a settimana</span>
   </div>
 
   <ul class="hours__list">
@@ -73,14 +77,14 @@ const { href, variant = 'light' } = Astro.props;
     color: var(--color-primary);
   }
 
-  .hours__month {
+  .hours__meta {
     font-size: var(--text-2xs);
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--text-muted);
   }
 
-  .hours--dark .hours__month {
+  .hours--dark .hours__meta {
     color: rgba(255, 255, 255, 0.45);
   }
 

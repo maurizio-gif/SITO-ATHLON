@@ -13,7 +13,7 @@ import Layout from '../layouts/Layout.astro';
 import PlanningBand from '../components/planning/PlanningBand.astro';
 import LessonModal from '../components/planning/LessonModal.astro';
 import Faq, { type FaqEntry } from '../components/Faq.astro';
-import { getBand, getLessonCard, countLessons, PLANNING_MONTH } from '../data/planning';
+import { getBand, getLessonCard, countLessons } from '../data/planning';
 import { getCorso } from '../data/corsi';
 import { trialCta } from '../data/cta';
 
@@ -235,7 +235,7 @@ const faqs: FaqEntry[] = [
   <!-- ORARI -->
   <section class="rf-sec rf-sec--alt" id="orari">
     <div class="container">
-      <span class="eyebrow" data-anim="from-left">{PLANNING_MONTH}</span>
+      <span class="eyebrow" data-anim="from-left">Ogni settimana</span>
       <h2 class="rf-sec__title" data-anim="reveal">Orari del Group Reformer</h2>
       <p class="rf-sec__sub">
         {sessioni} sessioni a settimana, tutte in Sala C. Tocca una lezione per vedere la scheda.

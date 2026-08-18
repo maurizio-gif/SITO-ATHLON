@@ -10,7 +10,6 @@ import {
   countLessons,
   roomsOf,
   ROOM_COLORS,
-  PLANNING_MONTH,
   getLessonCard,
 } from '../../data/planning';
 
@@ -35,7 +34,7 @@ const rooms = roomsOf(band);
   {showTitle && (
     <div class="band__head">
       <h3 class="band__title">{band.title}</h3>
-      <span class="band__count">{total} lezioni · {PLANNING_MONTH}</span>
+      <span class="band__count">{total} lezioni a settimana</span>
     </div>
   )}
 

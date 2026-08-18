@@ -1,5 +1,5 @@
 ---
-import { trialCta, talkCta } from '../data/cta';
+import { trialCta, talkCta, joinCta } from '../data/cta';
 
 /* La prova è un prodotto solo e vale per tutto il club, quindi qui non porta
    nessuna attività: la pagina di provenienza è l'header, su qualunque pagina. */
@@ -8,6 +8,10 @@ const prova = trialCta({ source: 'header' });
 /* Contattaci sta in fondo alla barra e, su mobile, come pastiglia al centro:
    da qualunque pagina si arriva a chiedere qualcosa a una persona. */
 const contatta = talkCta({ source: 'header' });
+
+/* Iscriviti gli sta accanto: chi ha già deciso non deve cercare la pagina degli
+   abbonamenti nel menu. */
+const iscriviti = joinCta({ source: 'header' });
 
 /* I corsi fitness sono il secondo livello del menu, in ordine alfabetico —
    ordinati qui e non a mano, così aggiungerne uno non richiede di rimetterli
@@ -69,7 +73,10 @@ const flatLinks = [
   { label: 'Club Life', href: '/club-life' },
 ];
 
-const navFlat = flatLinks;
+/* Nella barra desktop «Iscriviti» è già il pulsante che porta agli abbonamenti,
+   quindi la voce non si ripete nella riga dei link. Nel menu mobile resta, dove
+   i pulsanti stanno in fondo al pannello. */
+const navFlat = flatLinks.filter((l) => l.href !== '/abbonamenti');
 
 // The account panel behind the header's user icon: everything a member needs
 // once they are already a member, in two blocks — account, then bookings.
@@ -160,7 +167,15 @@ const accountBlocks = [
         <a href={l.href} class="nav-link">{l.label}</a>
       ))}
 
-      <a href={contatta.href} class="nav-cta" {...contatta.attrs}>{contatta.label}</a>
+      {/* Le due azioni in fondo alla riga: contornata quella che chiede, piena
+          quella che compra. Contattaci ha lo stesso contorno arancio della
+          pastiglia mobile, così è la stessa cosa su tutti gli schermi. */}
+      <a href={contatta.href} class="nav-cta nav-cta--ghost" {...contatta.attrs}>{contatta.label}</a>
+      <a href={iscriviti.href} class="nav-cta" {...iscriviti.attrs}>{iscriviti.label}</a>
+
+      {/* In piccolo, dopo le azioni: le condizioni si trovano senza scendere
+          fino al footer. */}
+      <a href="/regolamento" class="nav-fine">Termini e Condizioni</a>
     </nav>
 
     {/* Solo su mobile: la barra non ha spazio per la riga di navigazione, e
@@ -269,7 +284,10 @@ const accountBlocks = [
         rel="noopener noreferrer"
         {...prova.attrs}
       >{prova.label}</a>
-      <a class="btn btn-outline-dark mobile-cta" href="/abbonamenti">Scopri gli Abbonamenti</a>
+      <a class="btn btn-outline-dark mobile-cta" href={iscriviti.href} {...iscriviti.attrs}>
+        {iscriviti.label}
+      </a>
+      <a class="mobile-fine" href="/regolamento">Termini e Condizioni</a>
     </div>
   </div>
 
@@ -621,6 +639,36 @@ const accountBlocks = [
 
   .nav-cta:hover {
     background: var(--color-primary);
+  }
+
+  /* La variante che chiede invece di vendere: stesso ingombro, contorno arancio
+     come la pastiglia della barra mobile. */
+  .nav-cta--ghost {
+    margin-left: 12px;
+    border: 1px solid var(--color-primary);
+    background: transparent;
+    color: var(--color-primary);
+  }
+
+  .nav-cta--ghost:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  /* Le condizioni: presenti, non in gara con le due azioni accanto. */
+  .nav-fine {
+    margin-left: 14px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .nav-fine:hover {
+    color: var(--color-dark);
+    text-decoration: underline;
   }
 
   .header-actions {
@@ -1408,6 +1456,20 @@ const accountBlocks = [
     .mobile-cta {
       justify-content: center;
       padding: 15px 20px;
+    }
+
+    /* Sotto i pulsanti, in piccolo: chi cerca le condizioni le trova nel menu. */
+    .mobile-fine {
+      align-self: center;
+      margin-top: 6px;
+      padding: 6px 4px;
+      font-size: var(--text-2xs);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
   }
 

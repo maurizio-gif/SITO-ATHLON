@@ -58,19 +58,20 @@ non compare da nessuna parte.
 
 ---
 
-## 3. Trova il turno per il tuo bambino
+## 3. Registrati per prenotare la tua lezione
 
 | | |
 | --- | --- |
-| **CTA label** | Trova il turno per il tuo bambino |
+| **CTA label** | Registrati per prenotare la tua lezione |
 | **Tipo** | `resolve` |
 | **intent** | `junior_info` |
 | **activity** | `baby-nuoto` |
 | **source page** | `/baby-nuoto` |
 | **Destinazione temporanea** | form n8n `a4283d20…` con `Medium=PulsanteBabyNuoto` (la maiuscola è quella del sito vecchio e va riprodotta) |
-| **Dati già precompilabili** | attività, pagina; i prezzi di lezione e mese sono già in pagina |
-| **Risultato che l'utente si aspetta** | il turno compatibile con l'età in mesi del bambino |
-| **Output futuro** | età in mesi → turni disponibili → prenotazione o contatto |
+| **Dati già precompilabili** | attività, pagina; i prezzi di lezione (32 €) e mese (89 €) sono già in pagina |
+| **Risultato che l'utente si aspetta** | essere registrato e poter prenotare una lezione |
+| **Output futuro** | registrazione → età in mesi → turni disponibili → prenotazione |
+| **Requirement** | l'etichetta promette una registrazione che porta a prenotare: il modal deve chiudere con una prenotazione, non con «ti contattiamo». Finché la destinazione è il form, la promessa è coperta solo a metà — è il primo punto da sistemare quando il flusso esiste. |
 
 ---
 

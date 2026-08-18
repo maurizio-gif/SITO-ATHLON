@@ -108,6 +108,28 @@ export function talkCta(ctx: CtaContext) {
   };
 }
 
+/**
+ * «Iscriviti»: comprare. Porta agli abbonamenti e non direttamente al portale,
+ * perché la registrazione su PerfectGym parte da un `PaymentPlanId` — un piano
+ * preciso, con il suo prezzo e la sua durata. Da un pulsante generico dell'header
+ * non si può scegliere al posto della persona: prima si guardano i due piani e
+ * le loro opzioni, poi «Iscriviti a Smart» o «Iscriviti a Premium» apre la
+ * registrazione di quel piano.
+ */
+export const JOIN = {
+  label: 'Iscriviti',
+  href: '/abbonamenti',
+  intent: 'membership',
+} as const;
+
+export function joinCta(ctx: CtaContext) {
+  return {
+    label: JOIN.label,
+    href: JOIN.href,
+    attrs: ctaAttrs('buy', JOIN.intent, ctx),
+  };
+}
+
 /** Gli intenti che il modal della prossima fase dovrà saper gestire. */
 export const INTENTS = {
   trial: 'trial',
