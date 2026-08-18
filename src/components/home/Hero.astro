@@ -2,14 +2,32 @@
 ---
 
 <header class="hero">
-  <video class="hero-bg" autoplay muted loop playsinline>
-    <source src="/wp-content/uploads/2025/12/Athlon-Tour-2025-COMPRESSED.mp4" type="video/mp4" />
-  </video>
+  {/* The video and its expand button share a box, so the button can sit in the
+      video's bottom-right corner in both layouts — over the full-bleed frame on
+      desktop, over the cropped band on a phone. */}
+  <div class="hero-media">
+    <video class="hero-bg" id="hero-video" autoplay muted loop playsinline>
+      <source src="/wp-content/uploads/2025/12/Athlon-Tour-2025-COMPRESSED.mp4" type="video/mp4" />
+    </video>
+    <button
+      type="button"
+      class="hero-expand"
+      id="hero-expand"
+      aria-label="Guarda il video a schermo intero"
+      title="Schermo intero"
+    >
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 3h6v6" /><path d="M9 21H3v-6" />
+        <path d="M21 3l-7 7" /><path d="M3 21l7-7" />
+      </svg>
+    </button>
+  </div>
   <div class="hero-scrim"></div>
   <div class="hero-spot"></div>
 
   <div class="hero-content">
-    <span class="eyebrow hero-eyebrow">Club Sportivo · Roma Talenti</span>
+    <span class="eyebrow hero-eyebrow">Club Sportivo dal 1973 · Roma Talenti</span>
     <h1 class="hero-title">Athlon Club <em class="accent">4.0</em></h1>
     <p class="hero-lede">Innovare è la nostra<br />miglior tradizione.</p>
 
@@ -46,6 +64,47 @@
   </div>
 </header>
 
+<script>
+  // Fullscreen for the hero video. The inline copy is muted so it can autoplay;
+  // going fullscreen is a deliberate act, so it gets sound and controls, and
+  // both are put back on exit so the background loop stays a background loop.
+  const heroVideo = document.getElementById('hero-video') as HTMLVideoElement | null;
+  const heroExpand = document.getElementById('hero-expand');
+
+  const restoreHeroVideo = () => {
+    if (!heroVideo) return;
+    heroVideo.controls = false;
+    heroVideo.muted = true;
+  };
+
+  heroExpand?.addEventListener('click', () => {
+    if (!heroVideo) return;
+    heroVideo.controls = true;
+    heroVideo.muted = false;
+
+    const v = heroVideo as HTMLVideoElement & {
+      webkitEnterFullscreen?: () => void;
+      webkitRequestFullscreen?: () => void;
+    };
+    if (v.requestFullscreen) {
+      v.requestFullscreen().catch(restoreHeroVideo);
+    } else if (v.webkitEnterFullscreen) {
+      // iOS Safari only ever fullscreens the video element itself.
+      v.webkitEnterFullscreen();
+    } else if (v.webkitRequestFullscreen) {
+      v.webkitRequestFullscreen();
+    } else {
+      restoreHeroVideo();
+    }
+  });
+
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement) restoreHeroVideo();
+  });
+  // iOS does not fire fullscreenchange; the video reports its own exit.
+  heroVideo?.addEventListener('webkitendfullscreen', restoreHeroVideo);
+</script>
+
 <style>
   .hero {
     position: relative;
@@ -58,12 +117,52 @@
     overflow: hidden;
   }
 
+  .hero-media {
+    position: absolute;
+    inset: 0;
+  }
+
   .hero-bg {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  /* Above the scrim, which is a later sibling of .hero-media and would
+     otherwise paint over it. */
+  .hero-expand {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    background: rgba(20, 18, 17, 0.45);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    color: var(--color-white);
+    cursor: pointer;
+    transition: background-color var(--dur-fast) var(--ease-out-crit),
+      border-color var(--dur-fast) var(--ease-out-crit),
+      transform var(--dur-fast) var(--ease-out-crit);
+  }
+
+  .hero-expand:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  .hero-expand:active {
+    transform: scale(0.92);
+    transition-duration: var(--dur-press);
   }
 
   /* Darker top/bottom, lighter middle — keeps chrome and scroll-hint legible
@@ -315,17 +414,22 @@
     }
 
     /* Shrinks to the leftover space instead of holding a fixed ratio, which is
-       what used to push the CTA off screen. It crops rather than letterboxes. */
-    .hero-bg {
+       what used to push the CTA off screen. It crops rather than letterboxes.
+       The video stays absolute inside it and fills it. */
+    .hero-media {
       order: 1;
       position: relative;
       inset: auto;
       width: 100%;
       flex: 1 1 auto;
       min-height: 0;
-      height: auto;
-      aspect-ratio: auto;
-      object-fit: cover;
+    }
+
+    .hero-expand {
+      right: 14px;
+      bottom: 14px;
+      width: 42px;
+      height: 42px;
     }
   }
 

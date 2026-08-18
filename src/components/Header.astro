@@ -1202,11 +1202,15 @@ const social = [
     .mobile-sublink {
       display: inline-flex;
       align-items: center;
-      /* Comfortable finger target on the kiosk. */
-      padding: 0.7rem 1.15rem;
+      /* Comfortable finger target on the kiosk — the padding keeps the target
+         big while the label steps down, so nothing gets harder to hit. */
+      padding: 0.68rem 1.05rem;
       border: 1px solid var(--border-strong);
       border-radius: 999px;
-      font-size: var(--text-md);
+      /* A step below the body size: at --text-md these pills sat too close in
+         weight to the group titles above them, and the menu read as one flat
+         list instead of titles with their activities nested under. */
+      font-size: var(--text-sm);
       line-height: 1.1;
       color: var(--color-dark);
       transition: background-color var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
