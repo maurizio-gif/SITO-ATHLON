@@ -81,21 +81,24 @@ export function trialCta(ctx: CtaContext) {
 /**
  * «Contattaci»: mettersi in contatto con una persona del club.
  *
- * La destinazione è l'Help Desk, che è dove la richiesta finisce davvero — si
- * scrive la domanda, la risposta arriva dalle schede o dal regolamento, e se
- * non basta il modulo di assistenza mette in contatto con il team. Non è una
- * pagina di cortesia con un indirizzo stampato sopra: è il canale che il club
- * usa, ed è già la destinazione di «Richiedi assistenza» e dei rimandi del
- * regolamento.
+ * Va al modulo contatti n8n, lo stesso che raccoglie le richieste dei corsi
+ * junior. I parametri riproducono la convenzione già in uso: `source=SitoWeb`
+ * minuscolo e `Medium` con la maiuscola, con un valore che dice **quale**
+ * pulsante è stato premuto — `PulsanteContattaci`, come `PulsanteBabyNuoto` per
+ * il baby nuoto. Da qui la richiesta si distingue dalle altre senza guardare
+ * altro.
  *
  * Quando il modal contatto esisterà — lascia un messaggio · prenota una
  * telefonata · prenota un appuntamento in sede — si cambia `href` qui e
- * cambiano tutti i punti del sito. L'intento è già `contact`, quindi il modal
- * sa da dove arriva la persona senza chiederlo.
+ * cambiano tutti i punti del sito. L'intento è già `contact`, e la pagina di
+ * partenza viaggia nel markup, quindi il modal sa da dove arriva la persona
+ * senza chiederlo.
  */
+const CONTACT_FORM = 'https://automazione.n8ndevelop.it/form/a4283d20-5832-46a3-9d88-df3561060e12';
+
 export const TALK = {
   label: 'Contattaci',
-  href: '/club-life#help-desk',
+  href: `${CONTACT_FORM}?source=SitoWeb&Medium=PulsanteContattaci`,
   intent: 'contact',
 } as const;
 
@@ -104,6 +107,8 @@ export function talkCta(ctx: CtaContext) {
   return {
     label: TALK.label,
     href: TALK.href,
+    /** Il modulo è esterno: si apre in una scheda nuova finché è un form. */
+    external: true,
     attrs: ctaAttrs('talk', TALK.intent, ctx),
   };
 }

@@ -112,20 +112,26 @@ quindi la CTA può nominarla.
 
 ---
 
-## 6. Parla con noi
+## 6. Contattaci
 
 | | |
 | --- | --- |
-| **CTA label** | Parla con noi |
+| **CTA label** | Contattaci |
 | **Tipo** | `talk` |
 | **intent** | `contact` |
-| **activity** | dalla pagina di partenza |
-| **source page** | header, `/abbonamenti`, `/personal-training`, footer |
-| **Destinazione** | **nessuna: non pubblicata** (`TALK.available = false` in `cta.ts`) |
-| **Dati già precompilabili** | attività, pagina |
+| **activity** | assente: il contatto è del club, non di un'attività |
+| **source page** | header (barra desktop e pastiglia mobile), footer (pulsante e voce «Il Club») |
+| **Presente in** | 140 punti, quattro per pagina, tutti dalla stessa configurazione |
+| **Destinazione** | form n8n `a4283d20-5832-46a3-9d88-df3561060e12`, con `source=SitoWeb` e `Medium=PulsanteContattaci` |
+| **Dati già precompilabili** | pagina di partenza (`data-cta-source`: `header` o `footer`) |
 | **Risultato che l'utente si aspetta** | parlare con una persona del club |
 | **Output futuro** | tre strade dentro lo stesso modal: lascia un messaggio · prenota una telefonata · prenota un appuntamento in sede |
-| **Stato** | `BLOCKED CTA — FUTURE MODAL`. `/contatti` non esiste e non va creata: i link che ci puntavano sono stati rimossi. Quando il modal è pronto basta mettere `available: true` e i punti previsti la mostrano. |
+
+**Sul parametro `Medium`.** La maiuscola è quella che il modulo junior usa già
+(`Medium=PulsanteBabyNuoto`) e va riprodotta. Il valore dice **quale** pulsante è
+stato premuto, non da quale pagina: la pagina viaggia nel markup. Se servisse
+distinguere header e footer nei dati del form, basta comporre il valore in
+`talkCta()` — il contesto è già lì.
 
 ---
 
