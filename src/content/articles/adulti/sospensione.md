@@ -3,7 +3,23 @@ title: "Procedura di Sospensione"
 description: "Come sospendere l'abbonamento adulti: requisiti, costi, tempistiche e effetti sul contratto."
 area: "Adulti – Club"
 order: 1
-tags: ["sospensione", "pausa", "15 euro", "adulti", "portale"]
+tags:
+  - sospensione
+  - pausa
+  - sospensione straordinaria
+  - inabilità
+  - certificato medico
+  - adulti
+  - portale
+attivita:
+  - gym-floor
+  - corsi-fitness
+  - group-reformer
+  - nuoto-libero
+  - aqua-fitness
+  - scuola-nuoto-adulti
+  - gestanti
+  - baby-nuoto
 ---
 
 <div class="ci-hero">
@@ -11,6 +27,16 @@ tags: ["sospensione", "pausa", "15 euro", "adulti", "portale"]
 </div>
 
 Valido per abbonamenti **Adulti** acquistati dal 1 Settembre 2021 e abbonamenti **Baby Nuoto**.
+
+## Le tre sospensioni non sono la stessa cosa
+
+Vengono confuse spesso, e hanno regole diverse. Trova la tua prima di procedere.
+
+| Tipo | Costo | Durata | Come si richiede | Vincoli |
+|:---|:---|:---|:---|:---|
+| **Ordinaria** | **€15** al mese | un mese solare | Da area riservata: seleziona "Mese di Sospensione a pagamento", poi paga da **Scadenze** | Richiesta con 10 giorni di anticipo |
+| **Straordinaria** | gratuita | un mese solare | Da area riservata, **entro la finestra comunicata** | Concessa solo in occasioni specifiche che comunichiamo noi (es. lavori). Il termine è **perentorio**: fuori finestra non è concedibile |
+| **Per inabilità fisica** | gratuita | minimo **60 giorni** | Invia richiesta e documentazione a [desk@athlonroma.it](mailto:desk@athlonroma.it), poi attendi la conferma via email | Certificato di struttura sanitaria nazionale con inidoneità e termine espliciti. Nessun recupero sotto i 2 mesi. Non sovrapponibile ad altre sospensioni |
 
 ## Come richiedere la sospensione
 
@@ -21,9 +47,13 @@ Valido per abbonamenti **Adulti** acquistati dal 1 Settembre 2021 e abbonamenti 
 
 > ⚠️ La richiesta deve essere inserita con almeno **10 giorni di anticipo** rispetto al mese da sospendere.
 
+> ⚠️ **La sospensione non è retroattiva:** non è possibile sospendere il mese in corso. Si sospende sempre a partire dal 1° giorno di un mese futuro.
+
 ## Costo
 
 **€15** per ogni mese sospeso, richiesto all'atto della richiesta.
+
+La sospensione **straordinaria** e quella **per inabilità fisica** sono invece gratuite.
 
 ---
 
@@ -46,6 +76,40 @@ Valido per abbonamenti **Adulti** acquistati dal 1 Settembre 2021 e abbonamenti 
 La sospensione **trasla la scadenza** del contratto di pari durata.
 
 **Esempio:** contratto 12 mesi + 2 sospensioni = durata minima **14 mesi**
+
+</details>
+
+<details>
+<summary><strong>Non trovo l'opzione della sospensione straordinaria</strong></summary>
+
+La sospensione straordinaria compare **solo dentro la finestra di richiesta** che comunichiamo via email, e solo per gli abbonamenti a cui si applica. Se sei nei termini e non la vedi, [scrivici](/club-life#help-desk) indicando il mese che vuoi sospendere: la inseriamo noi e ti confermiamo via email.
+
+Se la finestra è già chiusa, il termine è perentorio e la sospensione non è più concedibile.
+
+</details>
+
+<details>
+<summary><strong>Sospensione per infortunio o malattia (punto 7.8)</strong></summary>
+
+> in caso di inabilità all'attività sportiva è possibile richiedere la sospensione del proprio abbonamento. La richiesta dovrà essere corredata da idonea documentazione medica di una struttura sanitaria nazionale (ad es. Ospedale) e dovrà indicare con chiarezza l'inidoneità all'attività sportiva ed il termine del periodo di non idoneità. E' possibile il recupero di un minimo di 2 mesi (no recuperi per periodi inferiori a 2 mesi). Per richiedere la sospensione inviare la richiesta con la documentazione allegata a desk@athlonroma.it e attendere la conferma via e-mail (una volta visionata la documentazione verrà eliminata). La sospensione per malattia non è mai sovrapponibile con altre sospensioni previste da contratto.
+
+🔒 **Privacy:** la documentazione medica viene **eliminata dopo la visione**. Ci serve solo per valutare la richiesta.
+
+Testo completo: [punto 7.8 del regolamento](/regolamento#c7-8).
+
+</details>
+
+<details>
+<summary><strong>Ho inserito una sospensione per errore: si può togliere?</strong></summary>
+
+Sì, la rimozione è possibile: [scrivici](/club-life#help-desk) indicando il mese inserito per errore, prima che la sospensione entri in vigore.
+
+</details>
+
+<details>
+<summary><strong>Come verifico che la sospensione sia registrata</strong></summary>
+
+Area riservata → **Abbonamenti** → sezione sospensioni: devi vedere le date di inizio e fine. Se non le vedi, la richiesta non è stata registrata — [tutti i controlli, operazione per operazione](/wikiathlon/generali/verifica-stato-richieste/).
 
 </details>
 

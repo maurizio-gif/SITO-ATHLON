@@ -1,5 +1,17 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { ACTIVITY_IDS } from './data/activities';
+
+/**
+ * Which of the club's macro activities a piece of content belongs to.
+ *
+ * Validated against the list in data/activities.ts, so a typo fails the build
+ * instead of silently producing a tag nothing matches. An empty list is the
+ * normal case for anything that applies to everyone — the medical certificate,
+ * the changing rooms, the payment method — and the Help Desk reads it as
+ * "valid for every activity" rather than "untagged".
+ */
+const attivita = z.array(z.enum(ACTIVITY_IDS)).optional().default([]);
 
 /**
  * Help-desk articles — the Athlon wiki, moved in from its own project.
@@ -20,6 +32,7 @@ const articles = defineCollection({
     area: z.union([z.string(), z.array(z.string())]),
     tags: z.array(z.string()).optional().default([]),
     order: z.number().optional().default(99),
+    attivita,
     draft: z.boolean().optional().default(false),
     updatedDate: z.string().optional(),
   }),
@@ -72,6 +85,7 @@ const eventi = defineCollection({
       )
       .optional()
       .default([]),
+    attivita,
     draft: z.boolean().optional().default(false),
   }),
 });
@@ -93,6 +107,7 @@ const news = defineCollection({
     imageAlt: z.string().optional(),
     ctaLabel: z.string().optional(),
     ctaHref: z.string().optional(),
+    attivita,
     draft: z.boolean().optional().default(false),
   }),
 });
@@ -115,6 +130,7 @@ const servizi = defineCollection({
     /** Where to send someone who wants it — a page or an external link. */
     href: z.string().optional(),
     hrefLabel: z.string().optional(),
+    attivita,
     draft: z.boolean().optional().default(false),
   }),
 });

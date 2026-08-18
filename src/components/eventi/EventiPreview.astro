@@ -50,7 +50,7 @@ const events = await upcomingEvents(limit);
                   <div class="evcard__media">
                     <img src={e.data.image} alt={e.data.imageAlt ?? e.data.title} loading="lazy" />
                     <span class="evcard__date">
-                      <span class="evcard__day">{badge.day}</span>
+                      <span class="evcard__day u-display">{badge.day}</span>
                       <span class="evcard__month">{badge.month}</span>
                     </span>
                     {e.data.free && <span class="evcard__free">Gratuito</span>}
@@ -190,7 +190,7 @@ const events = await upcomingEvents(limit);
   .evcard__day {
     font-family: var(--font-heading);
     font-size: 1.6rem;
-    line-height: 1;
+    --lh: 1;
   }
 
   .evcard__month {

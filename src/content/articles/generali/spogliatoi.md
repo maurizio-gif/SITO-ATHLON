@@ -4,6 +4,7 @@ description: "Posizione, dotazioni e regole degli spogliatoi femminili, maschili
 area: "Generali"
 order: 6
 tags: ["spogliatoio", "armadietto", "lucchetto", "docce", "phon"]
+attivita: []
 ---
 
 <div class="ci-hero">

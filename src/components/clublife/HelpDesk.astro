@@ -8,6 +8,10 @@
  */
 import { getCollection } from 'astro:content';
 import { AREA_LABELS, AREA_ORDER } from '../../data/helpdesk';
+import { ACTIVITY_TAGS } from '../../data/activities';
+import { clausole, urlClausola } from '../../data/termini';
+import { formatEventDate } from '../../data/eventi';
+import SupportForm from './SupportForm.astro';
 
 interface Props {
   id?: string;
@@ -24,26 +28,327 @@ const groups = AREA_ORDER.map((folder) => ({
     .filter((a) => a.id.split('/')[0] === folder)
     .sort((a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title)),
 })).filter((g) => g.items.length > 0);
+
+/* ---- Answer extraction -------------------------------------------------
+   The description only says what an article is about ("Come impostare,
+   cambiare o eliminare il metodo di pagamento"), which is not an answer. The
+   articles carry two better things: a .ci-hero strip of key facts, and an
+   opening paragraph. Both are lifted here at build time so the box can answer
+   directly instead of describing. */
+
+/* The domain part is spelled out label-by-label rather than as [\w.]+ so the
+   pattern cannot swallow the full stop that ends the sentence — which turned
+   "a desk@athlonroma.it. Non accettiamo" into "a Non accettiamo". */
+const EMAIL = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/;
+
+/**
+ * Emails are stripped: this page deliberately shows none. Removing just the
+ * address leaves the phrase that introduced it dangling — "Invia a · Solo
+ * formato digitale" — so the whole clause goes, not only the address.
+ */
+function stripEmails(s: string): string {
+  let out = s.replace(/\[([^\]]+)\]\(mailto:[^)]+\)/gi, '$1');
+
+  // The facts strip is a list of clauses; drop any clause that named an inbox.
+  if (out.includes('·')) {
+    out = out
+      .split('·')
+      .filter((part) => !EMAIL.test(part))
+      .join(' · ');
+  }
+
+  return out
+    /* The preposition that introduced the address goes with it: dropping the
+       address alone left "invia un'email a dall'indirizzo registrato". */
+    .replace(new RegExp('(?:\\b(?:ad?|all’|all\')\\s+)?' + EMAIL.source, 'gi'), '')
+    // Tidy what the removal left behind: a trailing preposition, doubled
+    // separators, space before punctuation.
+    .replace(/\s+\ba\b\s*(?=[.,;:]|$)/gi, '')
+    .replace(/·\s*·/g, '·')
+    .replace(/\s+([.,;:])/g, '$1')
+    .replace(/^\s*·\s*|\s*·\s*$/g, '');
+}
+
+const toPlain = (s: string) =>
+  stripEmails(s)
+    // Markdown link → its text; bold/italic markers dropped.
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/[*_`]+/g, '')
+    .replace(/<[^>]+>/g, '')
+    // Leading pictogram on the facts strip — the rest of the site has none.
+    .replace(/^[\p{Extended_Pictographic}️\s]+/u, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+/** Trim to a whole sentence rather than mid-word. */
+function clamp(s: string, max: number) {
+  if (s.length <= max) return s;
+  const cut = s.slice(0, max);
+  const stop = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('? '), cut.lastIndexOf('! '));
+  return stop > max * 0.5 ? cut.slice(0, stop + 1) : cut.replace(/\s+\S*$/, '') + '…';
+}
+
+function extract(body: string) {
+  const hero = body.match(/<div class="ci-hero">([\s\S]*?)<\/div>/);
+  const facts = hero ? toPlain(hero[1]) : '';
+
+  const prose = body
+    .replace(/<div class="ci-hero">[\s\S]*?<\/div>/g, '')
+    .replace(/<details>[\s\S]*?<\/details>/g, '')
+    .split(/\n\s*\n/)
+    .map((p) => toPlain(p))
+    // Skip headings, list items, tables, images and one-liners.
+    .find((p) => p.length > 70 && !/^[#\-*>|!]/.test(p));
+
+  return { facts, prose: prose ? clamp(prose, 260) : '' };
+}
+
+/* The box answers from everything on this page, not just the help desk: an
+   event, a news item or a service is often what someone is actually asking
+   about. News and services have no page of their own, so they link to the
+   destination they already carry, or to their section on this page. */
+const [eventi, news, servizi] = await Promise.all([
+  getCollection('eventi', ({ data }) => !data.draft),
+  getCollection('news', ({ data }) => !data.draft),
+  getCollection('servizi', ({ data }) => !data.draft),
+]);
+
+const helpIndex = articles.map((a) => {
+  const { facts, prose } = extract(a.body ?? '');
+  return {
+    kind: 'Help Desk',
+    title: a.data.title,
+    /** Key facts first — the short answer. */
+    facts,
+    /** Then the explanation, falling back to the description when there is none. */
+    answer: prose || a.data.description,
+    url: `/wikiathlon/${a.id}/`,
+    linkLabel: `Apri la scheda “${a.data.title}”`,
+    area: AREA_LABELS[a.id.split('/')[0]]?.label ?? '',
+    /** Which area the article is filed under — the coarse half of step 1. */
+    scope: a.id.split('/')[0],
+    /** The macro activities it is about; empty means "every activity". */
+    activities: a.data.attivita,
+    tags: a.data.tags,
+  };
+});
+
+const eventiIndex = eventi.map((e) => ({
+  kind: 'Evento',
+  title: e.data.title,
+  facts: `${formatEventDate(e.data.date, true)}${e.data.time ? ` · ${e.data.time}` : ''}${
+    e.data.free ? ' · Gratuito' : ''
+  }`,
+  answer: e.data.excerpt,
+  url: `/eventi/${e.id}`,
+  linkLabel: 'Vedi l’evento',
+  area: e.data.kicker,
+  // Not filed under an area, so only the activity tags position them.
+  scope: 'club',
+  activities: e.data.attivita,
+  // The line-up is what people search by: "masterclass di reformer", "hydrobike".
+  tags: [e.data.kicker, ...e.data.program.flatMap((b) => [b.room, ...b.slots.map((s) => s.lesson)])],
+}));
+
+const newsIndex = news.map((n) => ({
+  kind: 'News',
+  title: n.data.title,
+  facts: formatEventDate(n.data.date, true),
+  answer: n.data.excerpt,
+  url: n.data.ctaHref || '#news',
+  linkLabel: n.data.ctaLabel || 'Leggi la news',
+  area: n.data.category,
+  scope: 'club',
+  activities: n.data.attivita,
+  tags: [n.data.category],
+}));
+
+const serviziIndex = servizi.map((sv) => ({
+  kind: 'Servizio',
+  title: sv.data.title,
+  facts: sv.data.desc,
+  answer: clamp(sv.data.detail, 260),
+  url: sv.data.href || '#servizi',
+  linkLabel: sv.data.hrefLabel || 'Vedi il servizio',
+  area: 'Servizi del club',
+  scope: 'club',
+  activities: sv.data.attivita,
+  tags: [],
+}));
+
+/* Il contratto risponde a molte domande meglio di qualsiasi parafrasi — quanto
+   costa una sospensione, entro quando si disdice, chi deve il certificato — ma
+   risponde da avvocato. Quindi ogni clausola e' cercabile e linkata al suo
+   punto esatto su /regolamento, e in classifica sta un passo dietro alle schede
+   dell'Help Desk, che le stesse cose le spiegano in italiano corrente.
+   Le email vengono via come dal resto della pagina. */
+const terminiIndex = clausole().map((c) => ({
+  kind: 'Regolamento',
+  title: `${c.id} ${c.titolo}`,
+  facts: `Sezione ${c.sezione.numero} · ${c.sezione.titolo}`,
+  answer: clamp(toPlain(c.testo), 320),
+  url: urlClausola(c.id),
+  linkLabel: `Leggi il punto ${c.id}`,
+  area: c.sezione.titolo,
+  scope: 'club',
+  activities: c.sezione.attivita,
+  tags: [c.titolo, c.sezione.titolo],
+  /* Pesa meno di una scheda: e' la fonte, non la spiegazione. Deve restare sotto
+     1 anche dopo il premio per l'attivita' (x1.8), altrimenti "certificato
+     medico scaduto" risponde con la clausola invece che con la procedura. */
+  weight: 0.5,
+}));
+
+const index = [...helpIndex, ...eventiIndex, ...newsIndex, ...serviziIndex, ...terminiIndex];
+
+/**
+ * First step of the box: the activity, asked before the question rather than
+ * guessed from it. "Disdetta", "recuperi" and "cambio orario" are all real
+ * procedures with the same name and different rules depending on whether you
+ * swim, train on the gym floor, or bring a child to the swimming school.
+ *
+ * Split into the same two families the home page uses, because twelve chips in
+ * one row is a list, not a choice.
+ */
+const ACTIVITY_GROUPS = [
+  { id: 'adulti', label: 'Adulti', tags: ACTIVITY_TAGS.filter((a) => a.audience === 'adulti') },
+  { id: 'junior', label: 'Junior', tags: ACTIVITY_TAGS.filter((a) => a.audience === 'junior') },
+];
+
+/** Starting points, so the box is never a blank prompt. Keyed by family, because
+    "recuperare una lezione" is a swimming-school question and "sala pesi" is not. */
+const SUGGESTIONS: Record<string, string[]> = {
+  adulti: [
+    'certificato medico',
+    'sospendere l’abbonamento',
+    'come disdire',
+    'lucchetto armadietto',
+    'come prenoto',
+  ],
+  junior: [
+    'recuperare una lezione',
+    'cambiare orario del corso',
+    'brevetti',
+    'certificato medico',
+    'cosa occorre',
+  ],
+  all: [
+    'certificato medico',
+    'come disdire',
+    'sospendere l’abbonamento',
+    'cambiare orario del corso',
+    'lucchetto armadietto',
+  ],
+};
 ---
 
 <section class="hd" id={id}>
   <div class="container">
     <span class="eyebrow" data-anim="from-left">Help Desk</span>
-    <h2 class="hd__title" data-anim="reveal">Le risposte, senza chiamare</h2>
+    <h2 class="hd__title" data-anim="reveal">Trova subito la risposta alla tua domanda</h2>
     <p class="hd__sub">
-      {articles.length} schede su iscrizioni, prenotazioni, certificati, abbonamenti e organizzazione
-      dei corsi. Se non trovi quello che cerchi,
-      <a href="/contatti">scrivi allo staff</a>.
+      Scegli l'attività e scrivi la tua domanda: la risposta arriva subito, dalle nostre schede o
+      dal regolamento. Se non ti basta, ti mettiamo in contatto con il nostro team.
     </p>
 
-    <div class="hd__groups">
-      {groups.map((g, gi) => (
-        <div class="hdg" data-anim="fade" data-anim-delay={String(gi * 80)}>
-          <div class="hdg__head">
-            <h3 class="hdg__name">{g.meta.label}</h3>
-            <span class="hdg__count">{g.items.length}</span>
+    {/* Ask-a-question box, in two steps: the activity, then the question.
+        Matching runs in the browser against an index built at compile time — no
+        request, no back end, and it works offline once the page is loaded. */}
+    <div class="ask is-locked" data-ask>
+      <div class="ask__step">
+        <span class="ask__num" aria-hidden="true">1</span>
+        <span class="ask__label" id="ask-area-label">Di quale attività si tratta?</span>
+      </div>
+
+      <p class="ask__help" id="ask-area-help">
+        Scegli almeno una delle attività — puoi selezionarne anche più di una.
+      </p>
+
+      {/* A dropdown rather than twelve chips in the open: the list is long, and
+          the choice matters more than it needs room. Real checkboxes inside, so
+          multiple selection and keyboard use come for free. */}
+      <div class="ask__picker" data-ask-picker>
+        <button
+          type="button"
+          class="ask__trigger"
+          data-ask-trigger
+          aria-expanded="false"
+          aria-describedby="ask-area-help"
+        >
+          <span class="ask__triggertext" data-ask-triggertext>Scegli le attività</span>
+          <span class="ask__caret" aria-hidden="true">▾</span>
+        </button>
+
+        <div class="ask__panel" data-ask-panel hidden role="group" aria-labelledby="ask-area-label">
+          <div class="ask__families">
+            {ACTIVITY_GROUPS.map((g) => (
+              <div class="ask__family">
+                <span class="ask__familyname">{g.label}</span>
+                {g.tags.map((a) => (
+                  <label class="ask__opt">
+                    <input type="checkbox" value={a.id} data-ask-area />
+                    <span>{a.label}</span>
+                  </label>
+                ))}
+              </div>
+            ))}
           </div>
-          <p class="hdg__blurb">{g.meta.blurb}</p>
+
+          <button type="button" class="ask__done" data-ask-done>Fatto</button>
+        </div>
+      </div>
+
+      <div class="ask__step">
+        <span class="ask__num" aria-hidden="true">2</span>
+        <span class="ask__label">La tua domanda</span>
+      </div>
+
+      <div class="ask__field">
+        <span class="ask__icon" aria-hidden="true">?</span>
+        <input
+          type="search"
+          class="ask__input"
+          data-ask-input
+          disabled
+          placeholder="Scegli l’attività qui sopra"
+          autocomplete="off"
+          aria-label="Fai una domanda all'Help Desk"
+          aria-describedby="ask-hint"
+        />
+        <button type="button" class="ask__clear" data-ask-clear hidden aria-label="Cancella">×</button>
+      </div>
+
+      <p class="ask__hint" id="ask-hint" data-ask-hint hidden>
+        Prova con:
+        {/* Filled by the script from the chosen activity; this is the fallback
+            for anyone browsing without JavaScript. */}
+        <span data-ask-chips>
+          {SUGGESTIONS.all.map((s, i) => (
+            <>
+              {i > 0 && <span aria-hidden="true"> · </span>}
+              <button type="button" class="ask__chip" data-ask-fill={s}>{s}</button>
+            </>
+          ))}
+        </span>
+      </p>
+
+      <div class="ask__results" data-ask-results role="status" aria-live="polite"></div>
+    </div>
+
+    {/* Folded by default: 24 articles listed at once is a wall, and the box
+        above is the faster way in. Native <details>, so it needs no script and
+        still opens for in-page search. */}
+    <div class="hd__groups" data-ask-browse>
+      {groups.map((g, gi) => (
+        <details class="hdg" data-anim="fade" data-anim-delay={String(gi * 80)}>
+          <summary class="hdg__head">
+            <span class="hdg__text">
+              <span class="hdg__name u-display">{g.meta.label}</span>
+              <span class="hdg__blurb">{g.meta.blurb}</span>
+            </span>
+            <span class="hdg__count u-display">{g.items.length}</span>
+            <span class="hdg__mark" aria-hidden="true">+</span>
+          </summary>
 
           <ul class="hdg__list">
             {g.items.map((a) => (
@@ -55,11 +360,548 @@ const groups = AREA_ORDER.map((folder) => ({
               </li>
             ))}
           </ul>
-        </div>
+        </details>
       ))}
     </div>
+
+    <SupportForm />
   </div>
 </section>
+
+<script
+  is:inline
+  set:html={`window.__ATHLON_HELPDESK__ = ${JSON.stringify(index)};
+window.__ATHLON_HELPDESK_HINTS__ = ${JSON.stringify(SUGGESTIONS)};
+window.__ATHLON_ACTIVITIES__ = ${JSON.stringify(ACTIVITY_TAGS)};`}
+/>
+
+<script>
+  type Entry = {
+    kind: string;
+    title: string;
+    facts: string;
+    answer: string;
+    url: string;
+    linkLabel: string;
+    area: string;
+    scope: string;
+    activities: string[];
+    tags: string[];
+    /** Sotto 1 sta un passo dietro a parita' di pertinenza; assente = 1. */
+    weight?: number;
+  };
+
+  type ActivityTag = { id: string; label: string; audience: 'adulti' | 'junior' };
+
+  const entries = ((window as any).__ATHLON_HELPDESK__ || []) as Entry[];
+  const HINTS = ((window as any).__ATHLON_HELPDESK_HINTS__ || {}) as Record<string, string[]>;
+  const TAGS = ((window as any).__ATHLON_ACTIVITIES__ || []) as ActivityTag[];
+
+  const LABEL_OF = new Map(TAGS.map((a) => [a.id, a.label]));
+  const AUDIENCE_OF = new Map(TAGS.map((a) => [a.id, a.audience]));
+
+  const box = document.querySelector<HTMLElement>('[data-ask]');
+  const input = document.querySelector<HTMLInputElement>('[data-ask-input]');
+  const results = document.querySelector<HTMLElement>('[data-ask-results]');
+  const clear = document.querySelector<HTMLButtonElement>('[data-ask-clear]');
+  const browse = document.querySelector<HTMLElement>('[data-ask-browse]');
+  const hint = document.querySelector<HTMLElement>('[data-ask-hint]');
+  const chips = document.querySelector<HTMLElement>('[data-ask-chips]');
+  const picker = document.querySelector<HTMLElement>('[data-ask-picker]');
+  const trigger = document.querySelector<HTMLButtonElement>('[data-ask-trigger]');
+  const triggerText = document.querySelector<HTMLElement>('[data-ask-triggertext]');
+  const panel = document.querySelector<HTMLElement>('[data-ask-panel]');
+  const boxes = Array.from(document.querySelectorAll<HTMLInputElement>('[data-ask-area]'));
+
+  /** Step 1: one or more activity ids, or the single value 'all'. */
+  const chosen = new Set<string>();
+
+  /** The two folders that hold the same procedure written twice. */
+  const AUDIENCE_FOLDERS = ['adulti', 'snb'];
+
+  const activityLabel = (id: string) => LABEL_OF.get(id) || id;
+
+  /** Nothing picked yet — step 2 is still locked, so this only guards the maths. */
+  const nothingChosen = () => chosen.size === 0;
+
+  /** The folders that answer for the chosen activities. */
+  const chosenFolders = () => {
+    const f = new Set<string>();
+    chosen.forEach((id) => f.add(AUDIENCE_OF.get(id) === 'junior' ? 'snb' : 'adulti'));
+    return f;
+  };
+
+  /**
+   * How much the chosen activities move an entry. Two signals, multiplied:
+   *
+   * - the folder it is filed under, which separates the adults' procedures from
+   *   the swimming school's — the sibling is pushed down hard but never removed,
+   *   because it is often the right "forse cerchi anche". Picking activities from
+   *   both families keeps both folders in play, which is the point of picking both;
+   * - its own activity tags, when it has any. No tags means it applies to
+   *   everyone (certificate, changing rooms, payments) and it is left alone.
+   */
+  function activityFactor(entry: Entry): number {
+    if (nothingChosen()) return 1;
+
+    let f = 1;
+    const folders = chosenFolders();
+    if (folders.has(entry.scope)) f *= 1.6;
+    else if (AUDIENCE_FOLDERS.includes(entry.scope)) f *= 0.35;
+
+    const own = entry.activities || [];
+    if (own.some((a) => chosen.has(a))) f *= 1.8;
+    else if (own.length) f *= 0.45;
+
+    return f;
+  }
+
+  /** What to call the selection in prose and in the support form. */
+  function chosenLabel(): string {
+    return Array.from(chosen).map(activityLabel).join(', ');
+  }
+
+  /** Accents and punctuation are noise for matching — "PIÙ" and "piu" are one word. */
+  const norm = (s: string) =>
+    s
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+  // Words that carry no signal in a question — without this, "come posso fare
+  // per disdire" scores every article that happens to contain "come".
+  const STOP = new Set(
+    ('come cosa quando dove quale quali perche posso devo si e a da di del della dello delle dei ' +
+      'il lo la le i gli un uno una per con su in al alla allo ai agli non che ci mi ti se ma o ho ' +
+      'sono fare va vuoi serve deve puo piu meno molto tutto tutti')
+      .split(' ')
+  );
+
+  // Words of 1-2 letters carry no meaning and actively hurt: "sospendere"
+  // contains "e", so every title with a conjunction in it would score as a
+  // near-perfect match.
+  const words = (s: string) => norm(s).split(' ').filter((w) => w.length > 2);
+
+  /**
+   * Questions use verbs, articles use nouns — and Italian does not always leave
+   * a shared stem between the two. "pago" and "pagamento" have only "pag" in
+   * common, and matching on three letters would tie "posto" to "postura" as
+   * well. So the handful of real gaps are mapped by hand instead of loosening
+   * the rule for everything.
+   */
+  const SYNONYMS: Record<string, string> = {
+    pago: 'pagamento',
+    pagare: 'pagamento',
+    paghi: 'pagamento',
+    iscrivo: 'iscrizione',
+    iscrivere: 'iscrizione',
+    iscritto: 'iscrizione',
+    disdire: 'disdetta',
+    recuperare: 'recuperi',
+    recupero: 'recuperi',
+    prenotare: 'prenotazione',
+    prenoto: 'prenotazione',
+    spogliatoio: 'spogliatoi',
+    armadietto: 'armadietti',
+    fattura: 'ricevute',
+    infortunio: 'infortunio',
+    brevetto: 'brevetti',
+  };
+
+  const expand = (t: string) => (SYNONYMS[t] ? [t, SYNONYMS[t]] : [t]);
+
+  const indexed = entries.map((e) => ({
+    entry: e,
+    titleWords: words(e.title),
+    answerWords: words(e.answer),
+    tagWords: e.tags.flatMap(words),
+    /* I tag contengono i messaggi d'errore letterali ("booking blocked due to
+       blocking node"). Chi li incolla cerca una frase, non parole sparse, e le
+       singole parole di quella frase sono banali: senza questo, "non ci risulta
+       un abbonamento attivo" finisce sulla scheda che ha "abbonamento" nel
+       titolo. */
+    tagBlob: norm(e.tags.join(' · ')),
+  }));
+
+  /** Length of the shared opening run of two words. */
+  function sharedPrefix(a: string, b: string): number {
+    const n = Math.min(a.length, b.length);
+    let i = 0;
+    while (i < n && a[i] === b[i]) i++;
+    return i;
+  }
+
+  /**
+   * How strongly one query term matches one indexed word.
+   *
+   * Italian asks questions with verbs and answers them with nouns — someone
+   * types "disdico" and the article is called "Disdetta", "sospendere" against
+   * "Sospensione". Exact containment alone misses all of those, so a shared
+   * opening run counts too, worth less the shorter it is.
+   */
+  function termHit(term: string, word: string): number {
+    if (word === term) return 1;
+    // Containment counts only when the contained side is a real word, in both
+    // directions — otherwise short fragments match everything.
+    if (term.length >= 4 && word.includes(term)) return 0.9;
+    if (word.length >= 5 && term.includes(word)) return 0.85;
+    // Shared stem, for verb-to-noun ("disdico" → "disdetta"). Requires both
+    // sides to be long enough that the run means something.
+    if (term.length >= 5 && word.length >= 5) {
+      const p = sharedPrefix(term, word);
+      if (p >= 6) return 0.8;
+      if (p >= 5) return 0.55;
+      if (p >= 4) return 0.3;
+    }
+    return 0;
+  }
+
+  /** Best hit for a term across a field, trying its synonym too. */
+  const best = (term: string, list: string[]) =>
+    expand(term).reduce(
+      (outer, t) => Math.max(outer, list.reduce((m, w) => Math.max(m, termHit(t, w)), 0)),
+      0
+    );
+
+  function search(q: string) {
+    const terms = norm(q)
+      .split(' ')
+      .filter((t) => t.length > 2 && !STOP.has(t));
+    if (terms.length === 0) return [];
+
+    const frase = norm(q);
+
+    return indexed
+      .map(({ entry, titleWords, answerWords, tagWords, tagBlob }) => {
+        let score = 0;
+        let covered = 0;
+        let strongest = 0;
+
+        // Frase intera ritrovata fra i tag: è il messaggio d'errore incollato.
+        const esatta = frase.length > 12 && tagBlob.includes(frase);
+        if (esatta) {
+          score += 30;
+          strongest = 1;
+        }
+        for (const t of terms) {
+          const inTitle = best(t, titleWords);
+          const inTags = best(t, tagWords);
+          const inAnswer = best(t, answerWords);
+          // Weighted by where the word turns up: the title is a much stronger
+          // signal than the same word buried in the summary.
+          const hit = inTitle * 10 + inTags * 6 + inAnswer * 3;
+          if (hit > 0) covered++;
+          strongest = Math.max(strongest, inTitle, inTags, inAnswer);
+          score += hit;
+        }
+        // Reward covering more of the question over repeating one word.
+        const relevance = score * (1 + covered / terms.length);
+        /* Relevance decides whether an entry is an answer at all; the activity
+           only decides which of the answers comes first. Weighing before the
+           gate would silently drop the sibling article instead of demoting it.
+
+           L'unica eccezione è la frase esatta: chi incolla "non ci risulta un
+           abbonamento attivo" ha già detto tutto, e l'attività scelta non conta
+           più nulla. Senza questo, una scheda con la parola nel titolo e il tag
+           dell'attività giusta scavalcava la scheda che parla proprio di quel
+           messaggio. */
+        const rank = esatta
+          ? relevance * 4
+          : relevance * activityFactor(entry) * (entry.weight ?? 1);
+        return { entry, score: relevance, rank, strongest };
+      })
+      /* At least one term has to match properly somewhere. Without this, a pile
+         of weak stem coincidences answers questions about things the club does
+         not even offer — and a confident wrong answer is worse than none. */
+      .filter((r) => r.strongest >= 0.55 && r.score > 4)
+      .sort((a, b) => b.rank - a.rank)
+      .slice(0, 4);
+  }
+
+  const escape = (s: string) =>
+    s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+  /**
+   * The answer currently on screen. The support form carries it over, so the
+   * confirmation email can show the person what we had already told them —
+   * and the desk can see which answer did not satisfy.
+   */
+  let lastAnswer: { kind: string; title: string; text: string; url: string } | null = null;
+
+  function render(q: string) {
+    if (!results || !browse) return;
+    const trimmed = q.trim();
+
+    if (clear) clear.hidden = trimmed.length === 0;
+
+    if (trimmed.length < 3) {
+      results.innerHTML = '';
+      box?.classList.remove('is-searching');
+      browse.hidden = false;
+      lastAnswer = null;
+      return;
+    }
+
+    const hits = search(trimmed);
+    box?.classList.add('is-searching');
+    // The full index stays available underneath; hide it only while there is
+    // something better to show.
+    browse.hidden = hits.length > 0;
+
+    // Rendered as an exchange: the question is echoed back, then answered.
+    // The answer is always text from the article itself — nothing is generated,
+    // so it cannot say anything the club has not written down.
+    const asked = `
+      <p class="chat__q"><span class="chat__who">La tua domanda</span>${escape(trimmed)}</p>`;
+
+    if (hits.length === 0) {
+      lastAnswer = null;
+      // When the search was narrowed to one activity, widening it is the first
+      // thing to try — before writing to the desk.
+      const widen = !nothingChosen()
+        ? `<p>Stiamo cercando fra le schede di ${escape(chosenLabel())}. Se la domanda riguarda
+           altro, <button type="button" class="chat__widen" data-ask-widen>cambia le attività</button>.</p>`
+        : '';
+      results.innerHTML =
+        asked +
+        `<div class="chat__a chat__a--none">
+           <span class="chat__who">Help Desk</span>
+           <p>Su questo non ho una scheda. Prova a chiedere in un altro modo — per esempio
+           con una parola sola, come “certificato” o “disdetta”.</p>
+           ${widen}
+           <button type="button" class="chat__ask" data-open-support>
+             Mettimi in contatto con il team →
+           </button>
+         </div>`;
+      return;
+    }
+
+    const [top, ...rest] = hits;
+    const also = rest.length
+      ? `<p class="chat__also">Forse cerchi anche: ${rest
+          .map(
+            (r) =>
+              `<a href="${escape(r.entry.url)}">${escape(r.entry.title)}` +
+              `<span class="chat__alsokind">${escape(r.entry.kind)}</span></a>`
+          )
+          .join('<span aria-hidden="true"> · </span>')}</p>`
+      : '';
+
+    // Key facts first as the short answer, then the explanation under it.
+    const facts = top.entry.facts
+      ? `<p class="chat__facts">${escape(top.entry.facts)}</p>`
+      : '';
+
+    lastAnswer = {
+      kind: top.entry.kind,
+      title: top.entry.title,
+      // Same two pieces the bubble shows, in the same order.
+      text: [top.entry.facts, top.entry.answer].filter(Boolean).join('\n\n'),
+      // Absolute, because it has to survive inside an email.
+      url: new URL(top.entry.url, location.origin).href,
+    };
+
+    // Named only where the same question has two answers: it tells the person
+    // straight away that this is the adults' procedure, not the school's.
+    const own = top.entry.activities || [];
+    // Two names at most: the pool closure covers eight activities, and spelling
+    // them all out turns a badge into a paragraph. The one that was asked for
+    // goes first, so it is the one that survives the cut.
+    const ordered = own.some((a) => chosen.has(a))
+      ? [...own.filter((a) => chosen.has(a)), ...own.filter((a) => !chosen.has(a))]
+      : own;
+    const shown = ordered.slice(0, 2).map((a) => LABEL_OF.get(a) || a);
+    const more = ordered.length - shown.length;
+
+    const areaTag = own.length
+      ? `<span class="chat__area">${escape(shown.join(' · '))}${more ? ` +${more}` : ''}</span>`
+      : AUDIENCE_FOLDERS.includes(top.entry.scope) && top.entry.area
+        ? `<span class="chat__area">${escape(top.entry.area)}</span>`
+        : '';
+
+    // The bubble already says "Help Desk", so that badge would only repeat it;
+    // an event, a news item or a service is worth naming.
+    const kindTag =
+      top.entry.kind === 'Help Desk'
+        ? ''
+        : `<span class="chat__kind">${escape(top.entry.kind)}</span>`;
+
+    results.innerHTML =
+      asked +
+      `<div class="chat__a">
+         <span class="chat__who">
+           Help Desk
+           ${kindTag}
+           ${areaTag}
+         </span>
+         <p class="chat__title">${escape(top.entry.title)}</p>
+         ${facts}
+         <p class="chat__text">${escape(top.entry.answer)}</p>
+         <a class="chat__link" href="${escape(top.entry.url)}">
+           ${escape(top.entry.linkLabel)} →
+         </a>
+       </div>` +
+      also +
+      `<div class="chat__escape">
+         <span class="chat__escape-lead">Non ti soddisfa questa risposta?</span>
+         <button type="button" class="chat__ask" data-open-support>
+           Mettiti in contatto con il nostro team →
+         </button>
+       </div>`;
+  }
+
+  let timer: number | undefined;
+  input?.addEventListener('input', () => {
+    // Debounced: typing a question fires this on every keystroke otherwise.
+    window.clearTimeout(timer);
+    timer = window.setTimeout(() => render(input.value), 140);
+  });
+
+  clear?.addEventListener('click', () => {
+    if (!input) return;
+    input.value = '';
+    render('');
+    input.focus();
+  });
+
+  // Opening the form from an answer carries the question across, so nobody
+  // types it twice, then hands over to the modal.
+  results?.addEventListener('click', (e) => {
+    const trigger = (e.target as HTMLElement).closest('[data-open-support]');
+    if (!trigger) return;
+
+    const asked = input?.value.trim() || '';
+    const box = document.querySelector<HTMLTextAreaElement>('[data-support-message]');
+    const queryField = document.querySelector<HTMLInputElement>('[data-support-query]');
+    if (queryField) queryField.value = asked;
+    if (box && asked && box.value.trim() === '') box.value = asked;
+
+    // The answer that was on screen when they gave up on it. Blank when the
+    // search found nothing, so the email simply omits the recap.
+    const set = (sel: string, value: string) => {
+      const el = document.querySelector<HTMLInputElement>(sel);
+      if (el) el.value = value;
+    };
+    set('[data-support-answer-kind]', lastAnswer?.kind || '');
+    set('[data-support-answer-title]', lastAnswer?.title || '');
+    set('[data-support-answer-text]', lastAnswer?.text || '');
+    set('[data-support-answer-url]', lastAnswer?.url || '');
+    // Which activity they picked in step 1: for an ambiguous request like
+    // "disdetta" it is the difference between two different procedures.
+    set('[data-support-activity]', chosenLabel());
+
+    (window as any).__athlonOpenSupport?.();
+  });
+
+  /** Rebuilt on every change, so the examples match what was chosen. Mixed
+      families fall back to the general list. */
+  function paintChips() {
+    if (!chips) return;
+    const families = new Set(Array.from(chosen).map((id) => AUDIENCE_OF.get(id)));
+    const family = families.size === 1 ? Array.from(families)[0]! : 'all';
+    const list = HINTS[family] || HINTS.all || [];
+    chips.innerHTML = list
+      .map(
+        (s) =>
+          `<button type="button" class="ask__chip" data-ask-fill="${escape(s)}">${escape(s)}</button>`
+      )
+      .join('<span aria-hidden="true"> · </span>');
+  }
+
+  /** Two names at most on the button, then a count: it has to stay one line. */
+  function paintTrigger() {
+    if (!triggerText) return;
+    const picked = Array.from(chosen);
+    if (picked.length === 0) {
+      triggerText.textContent = 'Scegli le attività';
+      trigger?.classList.remove('is-on');
+      return;
+    }
+    const shown = picked.slice(0, 2).map(activityLabel).join(', ');
+    const more = picked.length - Math.min(2, picked.length);
+    triggerText.textContent = more ? `${shown} +${more}` : shown;
+    trigger?.classList.add('is-on');
+  }
+
+  const openPanel = (open: boolean) => {
+    if (!panel || !trigger) return;
+    panel.hidden = !open;
+    trigger.setAttribute('aria-expanded', String(open));
+  };
+
+  /** Called after every tick: the selection drives step 2, the hints and the search. */
+  function syncActivities() {
+    paintTrigger();
+
+    // Step 2 opens only once an activity is chosen: a question asked before it
+    // is the very ambiguity this step exists to remove.
+    const ready = chosen.size > 0;
+    box?.classList.toggle('is-locked', !ready);
+    if (input) {
+      input.disabled = !ready;
+      const families = new Set(Array.from(chosen).map((id) => AUDIENCE_OF.get(id)));
+      input.placeholder = !ready
+        ? 'Scegli l’attività qui sopra'
+        : families.size === 1 && families.has('junior')
+          ? 'Cosa vuoi sapere? Es. come recupero una lezione?'
+          : 'Cosa vuoi sapere? Es. serve il certificato medico?';
+    }
+    if (hint) hint.hidden = !ready;
+    paintChips();
+
+    // A question already typed is re-answered against the new selection.
+    if (input?.value.trim()) render(input.value);
+  }
+
+  boxes.forEach((cb) => {
+    cb.addEventListener('change', () => {
+      if (cb.checked) chosen.add(cb.value);
+      else chosen.delete(cb.value);
+      syncActivities();
+    });
+  });
+
+  trigger?.addEventListener('click', () => openPanel(panel?.hidden ?? true));
+
+  document.querySelector<HTMLButtonElement>('[data-ask-done]')?.addEventListener('click', () => {
+    openPanel(false);
+    input?.focus();
+  });
+
+  // Clicking away and Esc both close it — a panel that only closes with a
+  // button feels stuck.
+  document.addEventListener('click', (e) => {
+    if (!panel || panel.hidden) return;
+    if (!picker?.contains(e.target as Node)) openPanel(false);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && panel && !panel.hidden) {
+      openPanel(false);
+      trigger?.focus();
+    }
+  });
+
+  // Offered when a narrowed search found nothing: reopen the picker rather than
+  // silently widening to everything.
+  results?.addEventListener('click', (e) => {
+    if (!(e.target as HTMLElement).closest('[data-ask-widen]')) return;
+    openPanel(true);
+    (panel?.querySelector('input') as HTMLInputElement | null)?.focus();
+  });
+
+  // Delegated: the chips are re-rendered whenever the activity changes.
+  chips?.addEventListener('click', (e) => {
+    const chip = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-ask-fill]');
+    if (!chip || !input) return;
+    input.value = chip.dataset.askFill || '';
+    render(input.value);
+    input.focus();
+  });
+</script>
 
 <style>
   .hd {
@@ -89,49 +931,582 @@ const groups = AREA_ORDER.map((folder) => ({
     text-decoration: underline;
   }
 
+  /* ---- Ask box ---- */
+  .ask {
+    margin-bottom: 44px;
+  }
+
+  /* ---- Step 1: activity ---- */
+  .ask__step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .ask__num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  .ask__label {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  /* Step 2 stays quiet until step 1 is answered. */
+  .ask.is-locked .ask__step:nth-of-type(2) .ask__num,
+  .ask.is-locked .ask__step:nth-of-type(2) .ask__label {
+    opacity: 0.4;
+  }
+
+  .ask__help {
+    margin: -4px 0 12px;
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.42);
+  }
+
+  /* ---- Activity dropdown ---- */
+  .ask__picker {
+    position: relative;
+    margin-bottom: 26px;
+    max-width: 42rem;
+  }
+
+  .ask__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    width: 100%;
+    padding: 15px 20px;
+    border-radius: 999px;
+    border: 1px solid var(--border-dark);
+    background: rgba(255, 255, 255, 0.07);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: rgba(255, 255, 255, 0.5);
+    text-align: left;
+    cursor: pointer;
+    transition: border-color var(--dur-fast) ease, color var(--dur-fast) ease;
+  }
+
+  .ask__trigger:hover,
+  .ask__trigger[aria-expanded='true'] {
+    border-color: var(--color-primary);
+  }
+
+  /* Once something is picked the button carries the answer, so it stops
+     looking like a placeholder. */
+  .ask__trigger.is-on {
+    color: var(--color-white);
+    font-weight: 600;
+  }
+
+  .ask__caret {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: var(--color-primary);
+    transition: transform var(--dur-fast) ease;
+  }
+
+  .ask__trigger[aria-expanded='true'] .ask__caret {
+    transform: rotate(180deg);
+  }
+
+  .ask__panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    z-index: 20;
+    padding: 20px;
+    border-radius: var(--radius);
+    background: #211f1d;
+    border: 1px solid var(--border-dark);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  }
+
+  .ask__families {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+  }
+
+  /* The two families, labelled as on the home page. */
+  .ask__family {
+    display: grid;
+    gap: 2px;
+    align-content: start;
+  }
+
+  .ask__familyname {
+    margin-bottom: 6px;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  .ask__opt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 8px;
+    border-radius: 10px;
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.82);
+    cursor: pointer;
+  }
+
+  .ask__opt:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--color-white);
+  }
+
+  .ask__opt input {
+    flex-shrink: 0;
+    width: 17px;
+    height: 17px;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+  }
+
+  .ask__opt:has(input:checked) {
+    color: var(--color-white);
+    font-weight: 600;
+  }
+
+  .ask__done {
+    margin-top: 16px;
+    padding: 11px 26px;
+    border: none;
+    border-radius: 100px;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .ask__done:hover {
+    background: var(--accent-hover);
+  }
+
+  @media (max-width: 560px) {
+    .ask__families {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .ask__panel {
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+  }
+
+  .ask.is-locked .ask__field {
+    opacity: 0.45;
+  }
+
+  .ask__field {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 42rem;
+    padding: 6px 8px 6px 18px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid var(--border-dark);
+    transition: border-color var(--dur-fast) ease, background-color var(--dur-fast) ease;
+  }
+
+  .ask__field:focus-within {
+    border-color: var(--color-primary);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .ask__icon {
+    flex-shrink: 0;
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    color: var(--color-primary);
+  }
+
+  .ask__input {
+    flex: 1;
+    min-width: 0;
+    padding: 14px 0;
+    border: none;
+    background: none;
+    font-family: var(--font-body);
+    font-size: var(--text-md);
+    color: var(--color-white);
+  }
+
+  .ask__input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .ask__input:focus {
+    outline: none;
+  }
+
+  /* The native search clear button is inconsistent across browsers, so this
+     replaces it with one that matches the field. */
+  .ask__input::-webkit-search-cancel-button {
+    display: none;
+  }
+
+  .ask__clear {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-white);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .ask__clear:hover {
+    background: var(--color-primary);
+  }
+
+  .ask__hint {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 6px;
+    margin: 14px 0 0;
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  /* The chips are re-rendered by the script when the activity changes, and
+     scripted markup carries no scope attribute — so these have to be global,
+     or the rebuilt chips come out as default grey browser buttons. */
+  .ask__chip,
+  .ask__hint :global(.ask__chip) {
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 87, 1, 0.4);
+  }
+
+  .ask__chip:hover,
+  .ask__hint :global(.ask__chip:hover) {
+    text-decoration-color: var(--color-primary);
+  }
+
+  .ask__hint :global(span) {
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  .ask__results {
+    display: grid;
+    gap: 12px;
+    margin-top: 22px;
+  }
+
+  .ask__results:empty {
+    margin-top: 0;
+  }
+
+  /* ---- Answers, as an exchange ---- */
+  .ask__results :global(.chat__q) {
+    margin: 0 0 10px;
+    padding: 14px 18px;
+    border-radius: 16px 16px 16px 4px;
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 34rem;
+  }
+
+  /* Mirrored corner and the brand tint: the reply reads as coming from the
+     other side of the conversation without needing avatars. */
+  .ask__results :global(.chat__a) {
+    max-width: 40rem;
+    margin-left: auto;
+    padding: 20px 22px;
+    border-radius: 16px 16px 4px 16px;
+    background: rgba(255, 87, 1, 0.12);
+    border: 1px solid rgba(255, 87, 1, 0.35);
+  }
+
+  .ask__results :global(.chat__a--none) {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--border-dark);
+  }
+
+  .ask__results :global(.chat__who) {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin-bottom: 6px;
+  }
+
+  .ask__results :global(.chat__q .chat__who) {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  /* The short answer: larger and lighter than the explanation under it. */
+  /* Which of the four things on this page the answer came from. */
+  .ask__results :global(.chat__kind) {
+    margin-left: 8px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    font-size: var(--text-2xs);
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  /* Shown only for the two activities that answer the same question
+     differently, so it never competes with the kind badge for attention. */
+  .ask__results :global(.chat__area) {
+    margin-left: 6px;
+    font-size: var(--text-2xs);
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .ask__results :global(.chat__widen) {
+    padding: 0;
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .ask__results :global(.chat__title) {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: var(--text-lg);
+    color: var(--color-white) !important;
+    margin-bottom: 8px !important;
+  }
+
+  .ask__results :global(.chat__alsokind) {
+    margin-left: 5px;
+    font-size: var(--text-2xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .ask__results :global(.chat__facts) {
+    font-size: var(--text-md);
+    font-weight: 500;
+    color: var(--color-white) !important;
+    margin-bottom: 10px !important;
+  }
+
+  .ask__results :global(.chat__a p) {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  .ask__results :global(.chat__a a) {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .ask__results :global(.chat__link) {
+    display: inline-block;
+    margin-top: 14px;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .ask__results :global(.chat__link:hover) {
+    text-decoration: underline;
+  }
+
+  .ask__results :global(.chat__ask) {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 10px 18px;
+    border: 1px solid var(--color-primary);
+    border-radius: 999px;
+    background: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .ask__results :global(.chat__ask:hover) {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .ask__results :global(.chat__escape .chat__ask) {
+    margin-top: 0;
+  }
+
+  /* Outside the bubbles, under the whole exchange: the offer only makes sense
+     once an answer has been read and found wanting. */
+  .ask__results :global(.chat__escape) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border-dark);
+  }
+
+  .ask__results :global(.chat__escape-lead) {
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .ask__results :global(.chat__also) {
+    margin: 14px 0 0;
+    text-align: right;
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  .ask__results :global(.chat__also a) {
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .ask__results :global(.chat__also a:hover) {
+    color: var(--color-primary);
+    text-decoration-color: var(--color-primary);
+  }
+
+  @media (max-width: 560px) {
+    .ask__results :global(.chat__a) {
+      margin-left: 0;
+    }
+
+    .ask__results :global(.chat__also) {
+      text-align: left;
+    }
+  }
+
+  /* Two columns of folded categories. */
   .hd__groups {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 40px 44px;
+    gap: 14px 24px;
     align-items: start;
+  }
+
+  .hdg {
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.04);
+    overflow: hidden;
+  }
+
+  .hdg[open] {
+    background: rgba(255, 255, 255, 0.06);
   }
 
   .hdg__head {
     display: flex;
-    align-items: baseline;
-    gap: 12px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border-dark);
+    align-items: center;
+    gap: 14px;
+    padding: 20px 22px;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .hdg__head::-webkit-details-marker {
+    display: none;
+  }
+
+  .hdg__text {
+    flex: 1;
+    min-width: 0;
   }
 
   .hdg__name {
-    font-size: var(--text-xl);
-  }
-
-  /* How many articles are behind the heading, so the column's weight is
-     visible before scanning it. */
-  .hdg__count {
+    display: block;
     font-family: var(--font-heading);
-    font-size: var(--text-md);
-    color: var(--color-primary);
+    text-transform: uppercase;
+    font-size: var(--text-xl);
+    letter-spacing: -0.01em;
   }
 
   .hdg__blurb {
-    margin: 12px 0 16px;
+    display: block;
+    margin-top: 4px;
     font-size: var(--text-sm);
     color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* How many articles are folded in there, so the weight is visible closed. */
+  .hdg__count {
+    flex-shrink: 0;
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    color: var(--color-primary);
+  }
+
+  .hdg__mark {
+    flex-shrink: 0;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--color-primary);
+    transition: transform var(--dur-base) var(--ease-out-crit);
+  }
+
+  .hdg[open] .hdg__mark {
+    transform: rotate(45deg);
   }
 
   .hdg__list {
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 0 22px 8px;
   }
 
   .hdl {
     display: block;
     padding: 13px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
   }
 
   .hdl:hover .hdl__title {

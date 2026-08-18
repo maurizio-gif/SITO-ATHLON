@@ -7,6 +7,12 @@ image: "/wp-content/uploads/2024/08/WM_08332-scaled.jpg"
 imageAlt: "Sala corsi durante una lezione di gruppo ad Athlon Club"
 ctaLabel: "Vedi il planning"
 ctaHref: "/planning"
+attivita:
+  - corsi-fitness
+  - group-reformer
+  - scuola-nuoto-bambini
+  - nuoto-libero
+  - aqua-fitness
 ---
 
 Il nuovo planning è pubblicato: **180 lezioni ogni settimana** distribuite fra le tre sale corsi e le due vasche, più la Gym Floor aperta tutti i giorni dalle 6:00.

@@ -3,7 +3,7 @@ title: "Masterclass Aqua Fitness"
 kicker: "Masterclass"
 date: 2026-09-27
 time: "09:30 – 13:00"
-image: "/wp-content/uploads/2025/03/Athlon95-scaled.jpg"
+image: "/wp-content/uploads/2025/11/ATHLON88-scaled.jpg"
 imageAlt: "Lezione di aqua fitness in vasca ad Athlon Club"
 excerpt: "Una mattina in acqua, gratuita e aperta anche a chi non è iscritto: quattro lezioni di fila fra Vasca Grande e Vasca Media."
 free: true
@@ -20,6 +20,8 @@ program:
     slots:
       - { time: "11:10", lesson: "Hydrobike", trainer: "Arianna" }
       - { time: "12:00", lesson: "Aqua Soft", trainer: "Alice" }
+attivita:
+  - aqua-fitness
 ---
 
 Il mondo Athlon Community si prepara a una mattina in acqua. Quattro lezioni una dopo l'altra, nelle due vasche, con i nostri istruttori a spiegare ogni format dal principio: **puoi seguirne una sola o restare per tutte**.

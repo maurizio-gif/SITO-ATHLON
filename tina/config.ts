@@ -1,4 +1,18 @@
 import { defineConfig } from 'tinacms';
+import { ACTIVITY_TAGS } from '../src/data/activities';
+
+// Le attività sono definite una volta sola in src/data/activities.ts: lo stesso
+// elenco valida il frontmatter, popola questa tendina e disegna il primo passo
+// del box dell'Help Desk. Aggiungerne una lì la fa comparire in tutti e tre.
+const attivitaField = {
+  type: 'string' as const,
+  name: 'attivita',
+  label: 'Attività di riferimento (lascia vuoto se vale per tutte)',
+  description:
+    'Serve al box dell’Help Desk: chi cerca sceglie prima l’attività, e questi tag portano in cima la risposta giusta. Vuoto = vale per ogni attività.',
+  list: true,
+  options: ACTIVITY_TAGS.map((a) => ({ value: a.id, label: a.label })),
+};
 
 // Credenziali TinaCloud — da aggiungere come variabili d'ambiente:
 //   TINA_CLIENT_ID  →  Vercel: Project Settings > Environment Variables
@@ -175,6 +189,7 @@ export default defineConfig({
             name: 'ctaHref',
             label: 'Link del pulsante',
           },
+          attivitaField,
           {
             type: 'boolean',
             name: 'draft',
@@ -217,6 +232,7 @@ export default defineConfig({
             options: ['Generali', 'Adulti – Club', 'Scuola Nuoto Bambini', 'News'],
           },
           { type: 'string', name: 'tags', label: 'Tag', list: true },
+          attivitaField,
           {
             type: 'number',
             name: 'order',

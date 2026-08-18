@@ -4,6 +4,8 @@ description: "Prenotazione, modalità di accesso e piani di allenamento per la s
 area: "Adulti – Club"
 order: 4
 tags: ["gym floor", "sala pesi", "prenotazione", "personal training", "trainer"]
+attivita:
+  - gym-floor
 ---
 
 <div class="ci-hero">

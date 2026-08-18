@@ -4,6 +4,9 @@ description: "Regole di ingresso, accompagnatori e spogliatoi per i corsi di nuo
 area: "Scuola Nuoto Bambini"
 order: 5
 tags: ["accesso", "accompagnatore", "spogliatoio", "ingresso", "bambini"]
+attivita:
+  - scuola-nuoto-bambini
+  - baby-nuoto
 ---
 
 <div class="ci-hero">

@@ -4,6 +4,9 @@ description: "Come prenotare un recupero, lista d'attesa e scadenza dei recuperi
 area: "Scuola Nuoto Bambini"
 order: 4
 tags: ["recupero", "lezione", "disdetta", "bambini", "nuoto", "lista attesa"]
+attivita:
+  - scuola-nuoto-bambini
+  - baby-nuoto
 ---
 
 <div class="ci-hero">
@@ -54,8 +57,16 @@ Se il corso di recupero è al completo puoi iscriverti in lista d'attesa. La lis
 - Recupero prenotabile solo con **abbonamento attivo** e pagamenti in regola
 - In caso di **disdetta del contratto** i recuperi vengono persi
 - I recuperi non possono essere prenotati **oltre la scadenza del corso**
+- La stagione termina il **31 maggio**: i recuperi vanno utilizzati entro quella data, non si trasferiscono all'anno successivo
 - Durante la **settimana dei Brevetti** non sono previsti recuperi
 
 Per verificare i recuperi disponibili: accedi al tuo account → **"Prodotti"**
+
+</details>
+
+<details>
+<summary><strong>Ho superato i termini: posso recuperare comunque?</strong></summary>
+
+Le richieste fuori termine vengono valutate caso per caso e **non costituiscono un diritto**. Se hai un motivo, [scrivici](/club-life#help-desk) indicando la lezione persa e il turno in cui vorresti recuperare: verifichiamo se c'è margine.
 
 </details>

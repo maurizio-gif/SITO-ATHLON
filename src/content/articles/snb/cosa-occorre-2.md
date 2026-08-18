@@ -4,6 +4,9 @@ description: "Cosa portare per i corsi di nuoto bambini: attrezzatura e document
 area: "Scuola Nuoto Bambini"
 order: 1
 tags: ["attrezzatura", "cuffia", "costume", "certificato", "badge", "primo giorno"]
+attivita:
+  - scuola-nuoto-bambini
+  - baby-nuoto
 ---
 
 <div class="ci-hero">

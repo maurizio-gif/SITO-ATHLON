@@ -14,6 +14,9 @@ tags:
   - prezzi
   - quota attivazione
 draft: false
+attivita:
+  - scuola-nuoto-bambini
+  - baby-nuoto
 ---
 <div class="ci-hero">
   🟢 Preiscrizioni attive dal <strong>1 Maggio</strong> al <strong>31 Luglio 2026</strong><br>

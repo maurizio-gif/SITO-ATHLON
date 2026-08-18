@@ -4,6 +4,7 @@ description: "Come accedere e scaricare i tuoi contratti e le ricevute di pagame
 area: "Generali"
 order: 3
 tags: ["documenti", "contratti", "ricevute", "pagamenti", "portale", "download"]
+attivita: []
 ---
 
 <div class="ci-hero">

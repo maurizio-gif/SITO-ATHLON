@@ -3,14 +3,29 @@ title: "Cambio Abbonamento"
 description: "Come fare l'upgrade del tuo abbonamento: credito residuo, procedura e tempistiche."
 area: "Adulti – Club"
 order: 2
-tags: ["cambio abbonamento", "upgrade", "credito", "adulti"]
+tags:
+  - cambio abbonamento
+  - upgrade
+  - credito
+  - reformer
+  - doppio addebito
+  - adulti
+attivita:
+  - gym-floor
+  - corsi-fitness
+  - group-reformer
+  - nuoto-libero
+  - aqua-fitness
+  - scuola-nuoto-adulti
 ---
 
 <div class="ci-hero">
   🔁 Cambio possibile solo verso abbonamenti di valore superiore · Il credito residuo viene scalato automaticamente
 </div>
 
-Il cambio abbonamento avviene chiudendo il contratto attuale, calcolando il **credito residuo** e applicandolo al nuovo abbonamento.
+Il cambio abbonamento avviene chiudendo il contratto attuale, calcolando il **credito residuo** e applicandolo al nuovo abbonamento. **Si richiede sempre dal modulo qui sotto**: le istruzioni per proseguire arrivano via email dopo la compilazione.
+
+> ℹ️ **Aggiungere un'attività** — per esempio il Group Reformer — non è un acquisto a parte: è un upgrade del profilo abbonamento, e si richiede con questo stesso modulo.
 
 ## Come funziona
 
@@ -45,6 +60,13 @@ Rispondi alla nostra email con una conferma scritta. Provvederemo a:
 <summary><strong>Passo 4 — Sottoscrivi il nuovo abbonamento</strong></summary>
 
 Accedi alla tua area riservata e sottoscrivi il nuovo abbonamento. L'importo verrà automaticamente **ridotto del credito generato**.
+
+</details>
+
+<details>
+<summary><strong>Mi sono arrivati due addebiti</strong></summary>
+
+Succede quando la data di decorrenza indicata non è quella corretta. [Scrivici](/club-life#help-desk) allegando lo screenshot degli addebiti: verifichiamo e sistemiamo.
 
 </details>
 

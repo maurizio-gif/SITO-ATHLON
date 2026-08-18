@@ -4,6 +4,9 @@ description: "Come richiedere un cambio di turno per i corsi di scuola nuoto bam
 area: "Scuola Nuoto Bambini"
 order: 7
 tags: ["cambio orario", "turno", "frequenza", "bisettimanale", "monosettimanale"]
+attivita:
+  - scuola-nuoto-bambini
+  - baby-nuoto
 ---
 
 <div class="ci-hero">
@@ -23,8 +26,10 @@ Possibile all'interno dello stesso contratto (bisettimanale↔bisettimanale, mon
    - [Nati 2019-20](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=12&vacancies=1)
    - [Nati 2016-17-18](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=13&vacancies=1)
    - [Nati 2013-14-15](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=14&vacancies=1)
-2. Contattaci tramite **"Richiedi Assistenza"** indicando il turno desiderato
+2. Contattaci tramite **"Richiedi Assistenza"** indicando **2-3 turni di interesse** tra quelli disponibili
 3. Se idoneo, il cambio viene effettuato dalla Segreteria
+
+> ℹ️ Il cambio **non è automatico**: indicare più di un turno evita un secondo giro di email se il primo si riempie nel frattempo. Attendi la conferma prima di considerarlo fatto.
 
 </details>
 

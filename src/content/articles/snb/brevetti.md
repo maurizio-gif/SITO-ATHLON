@@ -13,6 +13,8 @@ tags:
   - fotografi
   - libretto
 draft: false
+attivita:
+  - scuola-nuoto-bambini
 ---
 <div class="ci-hero">
   🎓 Scuola Nuoto: 11–16 Maggio · Baby Nuoto: 16–17 Maggio · Fotografi presenti · Diploma e Libretto

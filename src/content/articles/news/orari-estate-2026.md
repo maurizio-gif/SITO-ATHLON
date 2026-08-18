@@ -4,10 +4,19 @@ description: "Luglio e agosto: vasca grande in ristrutturazione, lezioni attive,
 area: ["News", "Adulti – Club"]
 order: 0
 tags: ["estate", "ristrutturazione", "vasca", "luglio", "agosto", "sospensione", "reformer", "orari"]
+attivita:
+  - nuoto-libero
+  - aqua-fitness
+  - scuola-nuoto-adulti
+  - gestanti
+  - baby-nuoto
+  - scuola-nuoto-bambini
+  - pallanuoto
+  - nuoto-agonistico
 ---
 
 <div class="ci-cta">
-  <a href="https://planning.athlonroma.it/" target="_blank" rel="noopener noreferrer" class="ci-btn-primary" style="color:#000 !important">CONSULTA IL PLANNING COMPLETO</a>
+  <a href="/planning" class="ci-btn-primary" style="color:#000 !important">CONSULTA IL PLANNING COMPLETO</a>
 </div>
 
 ## Ristrutturazione vasca grande — luglio e agosto 2026
@@ -77,5 +86,5 @@ Se il tuo abbonamento comprende l'uso della **Piscina Grande**, puoi **sospender
 ---
 
 <div class="ci-cta">
-  <a href="https://planning.athlonroma.it/" target="_blank" rel="noopener noreferrer" class="ci-btn-primary" style="color:#000 !important">CONSULTA IL PLANNING COMPLETO</a>
+  <a href="/planning" class="ci-btn-primary" style="color:#000 !important">CONSULTA IL PLANNING COMPLETO</a>
 </div>

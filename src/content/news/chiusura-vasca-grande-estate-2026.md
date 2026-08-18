@@ -7,6 +7,15 @@ image: "/wp-content/uploads/2025/03/Athlon85-scaled.jpg"
 imageAlt: "La vasca grande da 25 metri di Athlon Club"
 ctaLabel: "Leggi i dettagli"
 ctaHref: "/wikiathlon/news/orari-estate-2026/"
+attivita:
+  - nuoto-libero
+  - aqua-fitness
+  - scuola-nuoto-adulti
+  - gestanti
+  - baby-nuoto
+  - scuola-nuoto-bambini
+  - pallanuoto
+  - nuoto-agonistico
 ---
 
 Athlon non smette mai di migliorare: in 53 anni abbiamo rinnovato la struttura anno dopo anno. Nei mesi di **luglio e agosto** la piscina grande resta chiusa per un intervento su vasca, bordo vasca, rivestimenti e volte.

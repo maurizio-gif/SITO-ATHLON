@@ -1,0 +1,545 @@
+---
+/**
+ * Termini e Condizioni, su /regolamento — l'indirizzo che le email del club
+ * usano già. Il testo
+ * arriva da data/termini.ts, la stessa fonte che alimenta le risposte
+ * dell'Help Desk — così una clausola non può dire due cose diverse a seconda
+ * di dove la leggi.
+ *
+ * Ogni clausola ha la sua ancora (#c7-7): è quello che permette all'Help Desk
+ * di aprire la pagina esattamente sul punto che risponde alla domanda, e il
+ * punto arrivato si evidenzia da solo.
+ */
+import Layout from '../layouts/Layout.astro';
+import FloatingHelp from '../components/FloatingHelp.astro';
+import { TERMINI, TERMINI_VERSIONE, anchorClausola, totaleClausole } from '../data/termini';
+import { ACTIVITY_LABEL } from '../data/activities';
+---
+
+{/* Senza header e footer, come il resto dei documenti del club: la pagina si
+    legge da sola, e la via d'uscita e' il rimando all'Help Desk in fondo. */}
+<Layout
+  title="Termini e Condizioni | Athlon Club Roma Talenti"
+  description="Le condizioni generali di contratto di Athlon Club: abbonamenti, pagamenti, sospensioni, disdette, certificato medico e regole per ogni attività del club."
+  chrome={false}
+>
+  <!-- HERO -->
+  <section class="tc-hero">
+    <div class="container-narrow">
+      <span class="eyebrow" data-anim="from-left">Documenti del club</span>
+      <h1 class="tc-hero__title">Termini e <em class="accent">condizioni</em></h1>
+      <p class="tc-hero__lede">
+        Le condizioni generali di contratto che regolano abbonamenti, corsi e accessi al club.
+        Sono {totaleClausole()} punti in {TERMINI.length} sezioni: quella che ti riguarda dipende
+        dall'attività che frequenti.
+      </p>
+      <p class="tc-hero__meta">
+        Versione {TERMINI_VERSIONE} · Point 2000 Srl Società Sportiva Dilettantistica
+      </p>
+    </div>
+  </section>
+
+  {/* Filtro. Novantuno punti sono troppi da scorrere per trovare "sospensione":
+      questo li riduce a quelli che contengono le parole cercate, e mette in
+      evidenza le parole stesse dentro il testo. Sticky, perché serve anche a
+      metà documento. */}
+  <div class="tcf" data-tcf>
+    <div class="container-narrow tcf__inner">
+      <label class="tcf__label" for="tc-search">Cerca nel regolamento</label>
+      <div class="tcf__field">
+        <input
+          type="search"
+          id="tc-search"
+          class="tcf__input"
+          data-tcf-input
+          placeholder="Es. sospensione, certificato medico, disdetta, armadietti"
+          autocomplete="off"
+        />
+        <button type="button" class="tcf__clear" data-tcf-clear hidden aria-label="Cancella">×</button>
+      </div>
+      <p class="tcf__count" data-tcf-count role="status" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <!-- SOMMARIO -->
+  <nav class="tc-toc" aria-label="Sommario" data-tc-toc>
+    <div class="container-narrow">
+      <h2 class="tc-toc__title">Sommario</h2>
+      <ol class="tc-toc__list">
+        {TERMINI.map((s) => (
+          <li>
+            <a href={`#s${s.numero}`}>
+              <span class="tc-toc__num u-display">{s.numero}</span>
+              <span class="tc-toc__label">{s.titolo}</span>
+              <span class="tc-toc__count">{s.clausole.length} punti</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </nav>
+
+  <!-- TESTO -->
+  <div class="tc">
+    <div class="container-narrow">
+      {TERMINI.map((s) => (
+        <section class="tcs" id={`s${s.numero}`}>
+          <header class="tcs__head">
+            <span class="tcs__num u-display">{s.numero}</span>
+            <h2 class="tcs__title">{s.titolo}</h2>
+            {s.attivita.length > 0 && (
+              <p class="tcs__for">
+                Si applica a: {s.attivita.map((a) => ACTIVITY_LABEL[a] ?? a).join(' · ')}
+              </p>
+            )}
+          </header>
+
+          <div class="tcs__body">
+            {s.clausole.map((c) => (
+              <article class="tcc" id={anchorClausola(c.id)}>
+                <h3 class="tcc__head">
+                  {/* Il numero è anche il permalink del punto. */}
+                  <a class="tcc__num" href={`#${anchorClausola(c.id)}`} aria-label={`Punto ${c.id}`}>
+                    {c.id}
+                  </a>
+                  <span class="tcc__title">{c.titolo}</span>
+                </h3>
+                <p class="tcc__text">{c.testo}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      ))}
+
+      <p class="tc__empty" data-tcf-empty hidden>
+        Nessun punto del regolamento contiene queste parole. Prova con una parola sola, oppure
+        chiedi all'<a href="/club-life#help-desk">Help Desk</a>: risponde anche con le nostre
+        schede, non solo col contratto.
+      </p>
+
+      <p class="tc__foot">
+        Fanno parte del contratto anche il Regolamento Interno e la cartellonistica esposta nel
+        club. Per le procedure operative — come si prenota, come si sospende, come si disdice —
+        l'<a href="/club-life#help-desk">Help Desk</a> le spiega passo per passo.
+      </p>
+    </div>
+  </div>
+
+  {/* Il regolamento dice la regola; l'Help Desk spiega come si fa. */}
+  <FloatingHelp href="/club-life#help-desk" revealAfter=".tc-hero" />
+</Layout>
+
+<script>
+  const input = document.querySelector<HTMLInputElement>('[data-tcf-input]');
+  const clear = document.querySelector<HTMLButtonElement>('[data-tcf-clear]');
+  const count = document.querySelector<HTMLElement>('[data-tcf-count]');
+  const empty = document.querySelector<HTMLElement>('[data-tcf-empty]');
+  const toc = document.querySelector<HTMLElement>('[data-tc-toc]');
+
+  /** Accenti e punteggiatura sono rumore: "attività" e "attivita" sono la stessa parola. */
+  const norm = (s: string) =>
+    s
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+  const escape = (s: string) =>
+    s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
+
+  // Il testo originale viene messo da parte una volta sola: le evidenziazioni si
+  // ricostruiscono sempre da qui, così non si annidano a ogni battuta.
+  const clauses = Array.from(document.querySelectorAll<HTMLElement>('.tcc')).map((el) => {
+    const body = el.querySelector<HTMLElement>('.tcc__text')!;
+    const head = el.querySelector<HTMLElement>('.tcc__title')!;
+    return {
+      el,
+      body,
+      head,
+      testo: body.textContent || '',
+      titolo: head.textContent || '',
+      cerca: norm(`${el.id} ${head.textContent} ${body.textContent}`),
+    };
+  });
+
+  const sections = Array.from(document.querySelectorAll<HTMLElement>('.tcs'));
+
+  function paint(el: HTMLElement, testo: string, terms: string[]) {
+    if (terms.length === 0) {
+      el.textContent = testo;
+      return;
+    }
+    // Su testo già neutralizzato: i <mark> sono l'unico markup che entra.
+    const pattern = terms
+      .map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('|');
+    el.innerHTML = escape(testo).replace(
+      new RegExp(`(${pattern})`, 'gi'),
+      '<mark>$1</mark>'
+    );
+  }
+
+  function run(q: string) {
+    const terms = norm(q).split(' ').filter((t) => t.length > 1);
+    const filtering = terms.length > 0;
+
+    if (clear) clear.hidden = q.trim().length === 0;
+    if (toc) toc.hidden = filtering;
+
+    let hits = 0;
+    for (const c of clauses) {
+      const match = !filtering || terms.every((t) => c.cerca.includes(t));
+      c.el.hidden = filtering && !match;
+      if (match) hits++;
+      paint(c.body, c.testo, match && filtering ? terms : []);
+      paint(c.head, c.titolo, match && filtering ? terms : []);
+    }
+
+    // Una sezione senza punti visibili sparisce con la sua intestazione.
+    for (const s of sections) {
+      s.hidden = filtering && !s.querySelector('.tcc:not([hidden])');
+    }
+
+    if (empty) empty.hidden = !filtering || hits > 0;
+    if (count) {
+      count.textContent = !filtering
+        ? ''
+        : hits === 0
+          ? 'Nessun punto trovato'
+          : `${hits} ${hits === 1 ? 'punto' : 'punti'} su ${clauses.length}`;
+    }
+  }
+
+  let timer: number | undefined;
+  input?.addEventListener('input', () => {
+    window.clearTimeout(timer);
+    timer = window.setTimeout(() => run(input.value), 140);
+  });
+
+  clear?.addEventListener('click', () => {
+    if (!input) return;
+    input.value = '';
+    run('');
+    input.focus();
+  });
+
+  // Arrivando da un link dell'Help Desk (#c7-7) il punto è già puntato: il
+  // filtro deve restare fuori dai piedi.
+  if (location.hash && input) input.value = '';
+</script>
+
+<style>
+  /* ---- Hero ---- */
+  .tc-hero {
+    padding: var(--space-section-lg) 0 var(--space-section-sm);
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .tc-hero__title {
+    font-size: var(--text-3xl);
+    letter-spacing: var(--tracking-2xl);
+    margin: 12px 0 14px;
+  }
+
+  .tc-hero__title .accent {
+    font-style: normal;
+    color: var(--color-primary);
+  }
+
+  .tc-hero__lede {
+    max-width: 40rem;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.68);
+  }
+
+  .tc-hero__meta {
+    margin: 18px 0 0;
+    font-size: var(--text-xs);
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  /* ---- Filtro ---- */
+  .tcf {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 14px 0;
+    background: rgba(23, 21, 20, 0.94);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-dark);
+  }
+
+  .tcf__label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .tcf__field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px 4px 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-dark);
+  }
+
+  .tcf__field:focus-within {
+    border-color: var(--color-primary);
+  }
+
+  .tcf__input {
+    flex: 1;
+    min-width: 0;
+    padding: 11px 0;
+    border: none;
+    background: none;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--color-white);
+  }
+
+  .tcf__input::placeholder {
+    color: rgba(255, 255, 255, 0.38);
+  }
+
+  .tcf__input:focus {
+    outline: none;
+  }
+
+  .tcf__input::-webkit-search-cancel-button {
+    display: none;
+  }
+
+  .tcf__clear {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--color-white);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .tcf__clear:hover {
+    background: var(--color-primary);
+  }
+
+  .tcf__count {
+    margin: 9px 0 0;
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .tcf__count:empty {
+    display: none;
+  }
+
+  /* Nascosti dal filtro, non dal CSS della pagina. */
+  .tcc[hidden],
+  .tcs[hidden] {
+    display: none;
+  }
+
+  .tcc__text :global(mark) {
+    padding: 0 2px;
+    border-radius: 3px;
+    background: rgba(255, 87, 1, 0.22);
+    color: var(--color-dark);
+  }
+
+  .tc__empty {
+    margin: var(--space-section-sm) 0;
+    color: var(--text-muted);
+  }
+
+  .tc__empty a {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  /* ---- Sommario ---- */
+  .tc-toc {
+    padding: var(--space-section-md) 0;
+    background: var(--color-cream);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tc-toc__title {
+    font-size: var(--text-xs);
+    font-family: var(--font-body);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin: 0 0 16px;
+  }
+
+  .tc-toc__list {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tc-toc__list a {
+    display: grid;
+    grid-template-columns: 2.4rem 1fr auto;
+    align-items: baseline;
+    gap: 12px;
+    padding: 11px 12px;
+    border-radius: 12px;
+    transition: background-color var(--dur-fast) ease;
+  }
+
+  .tc-toc__list a:hover {
+    background: rgba(23, 21, 20, 0.05);
+  }
+
+  .tc-toc__num {
+    font-family: var(--font-heading);
+    font-size: var(--text-md);
+    color: var(--color-primary);
+  }
+
+  .tc-toc__label {
+    font-weight: 500;
+  }
+
+  .tc-toc__count {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  /* ---- Sezioni ---- */
+  .tc {
+    padding: var(--space-section-md) 0 var(--space-section-lg);
+  }
+
+  .tcs {
+    /* Le ancore non devono finire sotto l'header fisso. */
+    scroll-margin-top: 96px;
+    padding-top: var(--space-section-sm);
+  }
+
+  .tcs__head {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    align-items: baseline;
+    gap: 0 14px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--color-dark);
+  }
+
+  .tcs__num {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    --lh: 1;
+    color: var(--color-primary);
+  }
+
+  .tcs__title {
+    font-size: var(--text-xl);
+    margin: 0;
+  }
+
+  .tcs__for {
+    grid-column: 2;
+    margin: 8px 0 0;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  .tcs__body {
+    display: grid;
+    gap: 22px;
+    margin-top: 24px;
+  }
+
+  /* ---- Clausole ---- */
+  .tcc {
+    scroll-margin-top: 96px;
+    padding: 4px 14px;
+    border-left: 2px solid var(--border-strong);
+    border-radius: 0 10px 10px 0;
+    transition: background-color var(--dur-base) ease, border-color var(--dur-base) ease;
+  }
+
+  /* Arrivando da un link dell'Help Desk, il punto giusto si fa riconoscere. */
+  .tcc:target {
+    background: rgba(255, 87, 1, 0.07);
+    border-left-color: var(--color-primary);
+  }
+
+  .tcc__head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 0 0 6px;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .tcc__num {
+    flex-shrink: 0;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  .tcc__num:hover {
+    text-decoration: underline;
+  }
+
+  .tcc__text {
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  .tc__foot {
+    margin: var(--space-section-md) 0 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .tc__foot a {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .tc__foot a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 640px) {
+    .tc-toc__list a {
+      grid-template-columns: 2rem 1fr;
+    }
+
+    .tc-toc__count {
+      display: none;
+    }
+
+    .tcs__head {
+      grid-template-columns: 2.2rem 1fr;
+    }
+  }
+</style>

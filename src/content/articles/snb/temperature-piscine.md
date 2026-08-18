@@ -4,6 +4,15 @@ description: "Temperature garantite dell'acqua e dell'ambiente nelle piscine di 
 area: ["Scuola Nuoto Bambini", "Generali"]
 order: 9
 tags: ["temperatura", "piscina", "acqua", "neonatale", "grande", "media"]
+attivita:
+  - nuoto-libero
+  - aqua-fitness
+  - scuola-nuoto-adulti
+  - gestanti
+  - baby-nuoto
+  - scuola-nuoto-bambini
+  - pallanuoto
+  - nuoto-agonistico
 ---
 
 <div class="ci-hero">

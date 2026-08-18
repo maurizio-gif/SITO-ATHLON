@@ -25,6 +25,9 @@ program:
       - { time: "09:30", lesson: "Group Reformer — livello base", trainer: "Alessandra" }
       - { time: "10:20", lesson: "Group Reformer — livello intermedio", trainer: "Alessandra" }
       - { time: "11:10", lesson: "Group Reformer — postura", trainer: "Giulia" }
+attivita:
+  - group-reformer
+  - corsi-fitness
 ---
 
 Una mattina dedicata alle discipline del controllo: **postura, respirazione, mobilità e forza profonda**. Nelle tre sale girano in parallelo Pilates, Yoga, Antigravity, Motr e il Group Reformer sui dieci Reformer Balanced Body della Sala C.

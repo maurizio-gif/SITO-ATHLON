@@ -3,7 +3,16 @@ title: "Certificato Medico"
 description: "Quando serve il certificato medico, chi può rilasciarlo e dove inviarlo."
 area: "Generali"
 order: 2
-tags: ["certificato medico", "idoneità", "agonistico", "non agonistico", "6 anni", "obbligatorio"]
+tags:
+  - certificato medico
+  - idoneità
+  - agonistico
+  - non agonistico
+  - ECG
+  - scadenza
+  - rinnovo temporaneo
+  - obbligatorio
+attivita: []
 ---
 
 <div class="ci-hero">
@@ -17,6 +26,24 @@ Entro **15 giorni dall'inizio** dell'attività è obbligatorio inviare copia del
 - Medico di medicina generale (per i propri assistiti)
 - Pediatra di libera scelta (per i propri assistiti)
 - Medico specialista in medicina dello sport / CONI
+
+## Controlla queste tre cose prima di inviarlo
+
+Sono i motivi per cui un certificato viene respinto, e fanno perdere giorni:
+
+- [ ] È redatto da un **medico sportivo** oppure dal **medico curante**
+- [ ] Se lo firma il medico curante, c'è il **timbro della ASL** di riferimento con il **codice regionale**
+- [ ] Sul certificato è riportata la dicitura **"ECG eseguito in data.."**
+
+## Se è scaduto
+
+Le prenotazioni si bloccano: senza certificato valido non puoi prenotare né accedere ([tutte le cause di blocco](/wikiathlon/generali/prenotazioni-problemi/)).
+
+Se hai già la visita in programma c'è una tolleranza:
+
+> una volta scaduto il certificato medico, lo staff del desk provvederà a inserire un rinnovo temporaneo di **14 giorni**. Ti basterà quindi fermarti in segreteria per attivarlo una volta che ti recherai in sede.
+
+> ℹ️ **Le visite non si effettuano in struttura.** Abbiamo una convenzione attiva con il Centro Medico Tiziano.
 
 ## Validità
 

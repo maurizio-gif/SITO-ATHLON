@@ -4,6 +4,7 @@ import EventiPreview from '../components/eventi/EventiPreview.astro';
 import NewsPreview from '../components/clublife/NewsPreview.astro';
 import HelpDesk from '../components/clublife/HelpDesk.astro';
 import Servizi from '../components/clublife/Servizi.astro';
+import FloatingHelp from '../components/FloatingHelp.astro';
 import { upcomingEvents } from '../data/eventi';
 import { getCollection } from 'astro:content';
 
@@ -14,21 +15,41 @@ const news = (await getCollection('news')).filter((n) => !n.data.draft);
 const articles = (await getCollection('articles')).filter((a) => !a.data.draft);
 const servizi = (await getCollection('servizi')).filter((s) => !s.data.draft);
 
+// Same order as the sections below, so the strip reads as a table of contents.
 const sections = [
   { id: 'eventi', label: 'Eventi', count: events.length },
   { id: 'news', label: 'News', count: news.length },
-  { id: 'help-desk', label: 'Help Desk', count: articles.length },
   { id: 'servizi', label: 'Servizi', count: servizi.length },
+  { id: 'help-desk', label: 'Help Desk', count: articles.length },
 ];
 ---
 
 <Layout
   title="Club Life | Athlon Club Roma Talenti"
   description="La vita del club: eventi e masterclass, news, l'Help Desk con tutte le risposte su iscrizioni e prenotazioni, e i servizi compresi nell'abbonamento."
+  chrome={false}
 >
   <!-- HERO -->
   <section class="cl-hero">
-    <div class="container">
+    {/* The most "together" photograph the club has: a whole aqua class moving in
+        unison. It is a portrait frame, so the crop is pinned high on purpose —
+        centred it would fill the band with water and lose the group. */}
+    <img
+      class="cl-hero__bg"
+      src="/wp-content/uploads/2025/03/Athlon95-scaled.jpg"
+      alt="Un gruppo durante una lezione di aqua fitness ad Athlon Club"
+    />
+    <div class="cl-hero__scrim" aria-hidden="true"></div>
+
+    <img
+      class="cl-hero__mark"
+      src="/wp-content/uploads/2025/08/Pittogramma.png"
+      alt="Athlon Club"
+      width="72"
+      height="58"
+    />
+
+    <div class="container cl-hero__inner">
       <span class="eyebrow">Athlon Community</span>
       <h1 class="cl-hero__title">Club <em class="accent">life</em></h1>
       <p class="cl-hero__lede">
@@ -36,19 +57,21 @@ const sections = [
       </p>
     </div>
 
-    {/* Anchor nav, sticky under the header: on a page this long it is the only
-        way to see the whole shape at once. */}
-    <nav class="cl-menu" aria-label="Sezioni di Club Life">
-      <div class="container cl-menu__inner">
-        {sections.map((s) => (
-          <a href={`#${s.id}`} class="cl-menu__item">
-            {s.label}
-            <span class="cl-menu__count">{s.count}</span>
-          </a>
-        ))}
-      </div>
-    </nav>
   </section>
+
+  {/* Anchor nav, a sibling of the hero rather than a child: sticky only holds
+      for the rest of the page if the bar is not trapped inside the hero's box.
+      On a phone the hero is sized so the two together fill exactly one screen. */}
+  <nav class="cl-menu" aria-label="Sezioni di Club Life">
+    <div class="container cl-menu__inner">
+      {sections.map((s) => (
+        <a href={`#${s.id}`} class="cl-menu__item">
+          {s.label}
+          <span class="cl-menu__count u-display">{s.count}</span>
+        </a>
+      ))}
+    </div>
+  </nav>
 
   <div id="eventi">
     <EventiPreview
@@ -67,47 +90,77 @@ const sections = [
     sub="Comunicazioni, variazioni e novità della struttura."
   />
 
-  <HelpDesk id="help-desk" />
-
   <Servizi id="servizi" />
 
-  <!-- CONTATTI -->
-  <section class="cl-contact">
-    <div class="container cl-contact__inner">
-      <div>
-        <span class="eyebrow" data-anim="from-left">Non hai trovato la risposta?</span>
-        <h2 class="cl-contact__title" data-anim="reveal">Parla con noi</h2>
-        <p class="cl-contact__sub">
-          Lo staff è in struttura dalle 6:00 alle 22:00. Per le pratiche —
-          certificati, sospensioni, disdette — la via più rapida è l'email.
-        </p>
-      </div>
-      <div class="cl-contact__actions">
-        <a href="/contatti" class="btn btn-primary" data-anim="pop">Contattaci →</a>
-        <a href="mailto:staff@athlonroma.it" class="cl-contact__mail">staff@athlonroma.it</a>
-      </div>
-    </div>
-  </section>
+  {/* Last on the page: it is the deepest of the four, and it closes with its own
+      way out — the chat's "scrivi al team" button. */}
+  <HelpDesk id="help-desk" />
+
+  {/* Shortcut to the Help Desk, now that it sits at the bottom. */}
+  <FloatingHelp revealAfter=".cl-hero" hideWhenVisible="#help-desk" />
 </Layout>
 
 <style>
   /* ---- Hero ---- */
   .cl-hero {
+    --cl-menu-h: 58px;
+    position: relative;
+    /* Hero plus the bar under it fill exactly one screen, at every width. svh
+       rather than vh so the mobile browser's collapsing toolbar cannot push the
+       bar below the fold on first paint. */
+    min-height: calc(100svh - var(--cl-menu-h));
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
     background: var(--color-dark);
     color: var(--color-white);
-    padding-top: var(--space-section-lg);
+    overflow: hidden;
   }
 
-  .cl-hero .container {
+  .cl-hero__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* High crop: keeps the raised arms and faces in frame. */
+    object-position: center 22%;
+  }
+
+  /* Heavy enough for white display type over a bright pool, and darkest at the
+     bottom where the anchor bar sits. */
+  .cl-hero__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      rgba(23, 21, 20, 0.62) 0%,
+      rgba(23, 21, 20, 0.72) 45%,
+      rgba(23, 21, 20, 0.9) 100%
+    );
+  }
+
+  .cl-hero__mark {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    z-index: 2;
+    width: clamp(52px, 6vw, 76px);
+    height: auto;
+    filter: drop-shadow(0 3px 14px rgba(23, 21, 20, 0.5));
+  }
+
+  .cl-hero__inner {
+    position: relative;
+    z-index: 1;
+    padding-top: var(--space-section-lg);
     padding-bottom: var(--space-section-sm);
   }
 
   .cl-hero__title {
     font-size: var(--text-4xl);
-    line-height: var(--leading-4xl);
+    --lh: var(--leading-4xl);
     letter-spacing: var(--tracking-4xl);
     margin: 14px 0 0;
-    padding: 0.08em 0 0.06em;
   }
 
   .cl-hero__title .accent {
@@ -130,8 +183,9 @@ const sections = [
   /* ---- Anchor menu ---- */
   .cl-menu {
     position: sticky;
-    /* Clears the site header, which is 72px on desktop. */
-    top: 72px;
+    /* No site header on this page, so the bar sits at the very top. */
+    top: 0;
+    /* Above the hero photo, and above the sections it scrolls over. */
     z-index: 5;
     background: rgba(23, 21, 20, 0.92);
     backdrop-filter: blur(12px);
@@ -179,61 +233,38 @@ const sections = [
     color: var(--color-primary);
   }
 
-  /* ---- Contatti ---- */
-  .cl-contact {
-    padding: var(--space-section-lg) 0;
-    background: var(--color-cream);
-  }
-
-  .cl-contact__inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 30px;
-  }
-
-  .cl-contact__title {
-    font-size: var(--text-3xl);
-    letter-spacing: var(--tracking-2xl);
-    margin: 10px 0 8px;
-  }
-
-  .cl-contact__sub {
-    max-width: 34rem;
-    margin: 0;
-    color: var(--text-muted);
-  }
-
-  .cl-contact__actions {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .cl-contact__mail {
-    font-size: var(--text-sm);
-    color: var(--color-primary);
-    font-weight: 600;
-  }
-
-  .cl-contact__mail:hover {
-    text-decoration: underline;
-  }
-
   /* Anchored sections must not land under the sticky bars. */
   :global(#eventi),
   :global(#news),
   :global(#help-desk),
   :global(#servizi) {
-    scroll-margin-top: 130px;
+    scroll-margin-top: 74px;
   }
 
-  @media (max-width: 960px) {
-    .cl-menu {
-      /* The mobile header bar is shorter. */
-      top: 60px;
+
+
+  @media (max-width: 760px) {
+    .cl-hero__inner {
+      padding-top: var(--space-section-md);
+    }
+
+    /* All four have to be visible at once: a bar that scrolls sideways hides
+       the last item, and on this page the last item is a whole section. */
+    .cl-menu__inner {
+      justify-content: space-between;
+      gap: 2px;
+      overflow-x: visible;
+    }
+
+    .cl-menu__item {
+      padding: 9px 8px;
+      font-size: var(--text-2xs);
+      letter-spacing: 0.06em;
+      gap: 5px;
+    }
+
+    .cl-menu__count {
+      font-size: var(--text-xs);
     }
   }
 </style>

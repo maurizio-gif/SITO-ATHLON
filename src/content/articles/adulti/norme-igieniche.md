@@ -4,6 +4,7 @@ description: "Regole di igiene obbligatorie in palestra e in piscina per tutti g
 area: "Adulti – Club"
 order: 5
 tags: ["igiene", "palestra", "piscina", "pulizia", "asciugamano", "regole"]
+attivita: []
 ---
 
 <div class="ci-hero">

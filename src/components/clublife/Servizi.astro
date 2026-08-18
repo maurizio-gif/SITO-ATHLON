@@ -29,9 +29,9 @@ const items = (await getCollection('servizi'))
         <li class="svi" data-anim="fade" data-anim-delay={String(i * 70)}>
           <details class="svi__box">
             <summary class="svi__head">
-              <span class="svi__num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="svi__num u-display">{String(i + 1).padStart(2, '0')}</span>
               <span class="svi__text">
-                <span class="svi__name">{s.data.title}</span>
+                <span class="svi__name u-display">{s.data.title}</span>
                 <span class="svi__desc">{s.data.desc}</span>
               </span>
               <span class="svi__mark" aria-hidden="true">+</span>

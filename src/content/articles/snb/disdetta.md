@@ -4,6 +4,9 @@ description: "Come e quando disdire l'abbonamento mensile della scuola nuoto bam
 area: "Scuola Nuoto Bambini"
 order: 6
 tags: ["disdetta", "mensile", "bambini", "email", "10 giorni", "rinnovo"]
+attivita:
+  - scuola-nuoto-bambini
+  - baby-nuoto
 ---
 
 <div class="ci-hero">

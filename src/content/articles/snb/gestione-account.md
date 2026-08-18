@@ -4,6 +4,7 @@ description: "Come accedere al Portale Athlon e gestire prenotazioni, pagamenti 
 area: "Scuola Nuoto Bambini"
 order: 8
 tags: ["account", "portale", "app", "prenotazioni", "pagamenti", "brevetti", "famiglia"]
+attivita: []
 ---
 
 <div class="ci-hero">

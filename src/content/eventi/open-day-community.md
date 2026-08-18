@@ -23,6 +23,7 @@ program:
   - room: "Vasca Grande"
     slots:
       - { time: "10:30", lesson: "Prova di nuoto libero assistito", trainer: "Staff tecnico" }
+attivita: []
 ---
 
 Una mattina con **tutto il club aperto**: la Gym Floor da 400 mq, le tre sale corsi, il Reformer Studio e le due vasche. Niente iscrizione, niente prenotazione obbligatoria per il tour — ti presenti e giri con noi.

@@ -4,6 +4,9 @@ description: "Come sono organizzati i gruppi, come seguire la progressione didat
 area: "Scuola Nuoto Bambini"
 order: 3
 tags: ["istruttori", "brevetti", "livelli", "didattica", "progressione"]
+attivita:
+  - scuola-nuoto-bambini
+  - nuoto-agonistico
 ---
 
 <div class="ci-hero">

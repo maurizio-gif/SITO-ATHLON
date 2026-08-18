@@ -4,6 +4,7 @@ description: "Come impostare, cambiare o eliminare il metodo di pagamento per gl
 area: "Generali"
 order: 4
 tags: ["pagamento", "carta", "conto corrente", "IBAN", "abbonamento"]
+attivita: []
 ---
 
 <div class="ci-hero">

@@ -4,6 +4,9 @@ description: "Prenota un appuntamento telefonico con il Direttore Tecnico per se
 area: "Scuola Nuoto Bambini"
 order: 10
 tags: ["direttore tecnico", "appuntamento", "progressione", "didattica", "famiglia", "chiamata"]
+attivita:
+  - scuola-nuoto-bambini
+  - nuoto-agonistico
 ---
 
 <div class="ci-hero">

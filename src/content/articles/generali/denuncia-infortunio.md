@@ -4,6 +4,7 @@ description: "Procedura per aprire un sinistro assicurativo in caso di infortuni
 area: "Generali"
 order: 3
 tags: ["infortunio", "sinistro", "assicurazione", "denuncia", "ASI"]
+attivita: []
 ---
 
 <div class="ci-hero">

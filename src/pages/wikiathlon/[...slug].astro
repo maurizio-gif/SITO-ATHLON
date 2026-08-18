@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection, render } from 'astro:content';
 import { AREA_LABELS } from '../../data/helpdesk';
+import { ACTIVITY_LABEL } from '../../data/activities';
 
 export async function getStaticPaths() {
   const articles = await getCollection('articles', ({ data }) => !data.draft);
@@ -20,9 +21,22 @@ const d = entry.data;
 const areas = Array.isArray(d.area) ? d.area : [d.area];
 const folder = entry.id.split('/')[0];
 const areaLabel = AREA_LABELS[folder]?.label ?? areas[0];
+
+/* Le attività della scheda, in chiaro. Sono le stesse che il box dell'Help Desk
+   usa per portare in cima la risposta giusta: mostrarle qui dice al socio se la
+   scheda parla della sua attività, e a chi scrive le schede che il tag c'è.
+   Nessun tag significa "vale per tutte", e va detto invece che lasciato in
+   bianco. */
+const attivita = d.attivita ?? [];
 ---
 
-<Layout title={`${d.title} | Help Desk Athlon Club`} description={d.description}>
+{/* No site header or footer, like the Club Life hub these articles hang off:
+    the breadcrumb at the top and the link at the bottom are the way back. */}
+<Layout
+  title={`${d.title} | Help Desk Athlon Club`}
+  description={d.description}
+  chrome={false}
+>
   <article class="wa">
     <div class="container-narrow">
       <nav class="wa__crumbs" aria-label="Percorso">
@@ -37,6 +51,15 @@ const areaLabel = AREA_LABELS[folder]?.label ?? areas[0];
       <div class="wa__meta">
         {areas.map((a) => <span class="wa__area">{a}</span>)}
         {d.updatedDate && <span class="wa__updated">Aggiornato il {d.updatedDate}</span>}
+      </div>
+
+      <div class="wa__tags">
+        <span class="wa__tagslabel">Attività</span>
+        {attivita.length === 0 ? (
+          <span class="wa__tag wa__tag--all">Tutte le attività</span>
+        ) : (
+          attivita.map((a) => <span class="wa__tag">{ACTIVITY_LABEL[a] ?? a}</span>)
+        )}
       </div>
 
       <div class="wa__body">
@@ -67,6 +90,43 @@ const areaLabel = AREA_LABELS[folder]?.label ?? areas[0];
 
   .wa__crumbs a {
     color: var(--color-primary);
+  }
+
+  /* ---- Tag attività ---- */
+  .wa__tags {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 18px 0 0;
+    padding: 14px 0 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .wa__tagslabel {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-right: 4px;
+  }
+
+  .wa__tag {
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(255, 87, 1, 0.1);
+    border: 1px solid rgba(255, 87, 1, 0.28);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  /* Trasversale: si distingue, perché non è una attività ma la loro somma. */
+  .wa__tag--all {
+    background: rgba(23, 21, 20, 0.05);
+    border-color: var(--border-strong);
+    color: var(--text-muted);
   }
 
   .wa__title {

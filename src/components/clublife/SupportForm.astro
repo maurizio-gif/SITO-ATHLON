@@ -1,0 +1,523 @@
+---
+/**
+ * "Write to us" form, the way out of the Q&A flow when no article answers.
+ *
+ * Where it posts: the "HELP DESK ATHLON" automation on n8n. That webhook sends
+ * the request to desk@athlonroma.it via SendGrid, sends the person a
+ * confirmation, and files the row on Supabase (project app-athlon, table
+ * richieste_help_desk). The field names below are the contract with it — rename
+ * one here and it stops arriving in the email and in the database.
+ */
+const SUPPORT_ENDPOINT = 'https://automazione.n8ndevelop.it/webhook/help-desk-athlon';
+
+/** The five standard campaign parameters, captured as-is when present. */
+const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+---
+
+<div class="supm" id="assistenza" data-support data-endpoint={SUPPORT_ENDPOINT} aria-hidden="true">
+  <div class="supm__backdrop" data-support-close></div>
+
+  <div class="sup" role="dialog" aria-modal="true" aria-labelledby="sup-title">
+    <button type="button" class="sup__close" data-support-close aria-label="Chiudi">×</button>
+
+    <div class="sup__head">
+      <span class="sup__eyebrow">Scrivi all'assistenza</span>
+      <h3 class="sup__title u-display" id="sup-title">Parla con il nostro team</h3>
+      <p class="sup__lede">
+        Mandaci la domanda: ti risponde una persona del club, via email, in breve tempo.
+      </p>
+    </div>
+
+  <form class="sup__form" data-support-form novalidate>
+    {/* Not a field: the activity comes from the first step of the Help Desk box,
+        which is where the choice belongs. Shown so nobody wonders whether we
+        know what they are asking about. */}
+    <div class="fld">
+      <span class="fld__label">Attività di interesse <span class="fld__req">*</span></span>
+      <p class="sup__activity" data-support-activity-label></p>
+    </div>
+
+    <div class="fld">
+      <label class="fld__label" for="sup-message">La tua domanda <span class="fld__req">*</span></label>
+      <textarea
+        class="fld__input fld__input--area"
+        id="sup-message"
+        name="message"
+        rows="5"
+        required
+        placeholder="Scrivi qui la tua domanda, con più dettagli possibile."
+        data-support-message></textarea>
+    </div>
+
+    {/* The name is the member's, not necessarily the sender's: a parent writes
+        for a child, and the desk looks the account up by that name. */}
+    <div class="sup__row">
+      <div class="fld">
+        <label class="fld__label" for="sup-first">Nome <span class="fld__req">*</span></label>
+        <input
+          class="fld__input"
+          id="sup-first"
+          name="firstName"
+          type="text"
+          required
+          autocomplete="given-name"
+          aria-describedby="sup-first-hint"
+        />
+        <p class="fld__hint" id="sup-first-hint">
+          Nome dell'utente per il quale si richiede assistenza
+        </p>
+      </div>
+
+      <div class="fld">
+        <label class="fld__label" for="sup-last">Cognome <span class="fld__req">*</span></label>
+        <input
+          class="fld__input"
+          id="sup-last"
+          name="lastName"
+          type="text"
+          required
+          autocomplete="family-name"
+          aria-describedby="sup-last-hint"
+        />
+        <p class="fld__hint" id="sup-last-hint">
+          Cognome dell'utente per il quale si richiede assistenza
+        </p>
+      </div>
+    </div>
+
+    <div class="sup__row">
+      <div class="fld">
+        <label class="fld__label" for="sup-email">Email <span class="fld__req">*</span></label>
+        <input
+          class="fld__input"
+          id="sup-email"
+          name="email"
+          type="email"
+          required
+          autocomplete="email"
+          inputmode="email"
+          aria-describedby="sup-email-hint"
+        />
+        <p class="fld__hint" id="sup-email-hint">Ci serve per risponderti</p>
+      </div>
+    </div>
+
+    {/* Filled from the URL when the link carries them — a member arriving from
+        an app or newsletter link does not have to type any of this. */}
+    <input type="hidden" name="userId" data-prefill="userid,userId,user_id" />
+    <input type="hidden" name="userNumber" data-prefill="usernumber,userNumber,user_number" />
+    {UTM_FIELDS.map((f) => <input type="hidden" name={f} data-prefill={f} />)}
+    {/* Context the person answering will want: which page, and what was typed
+        into the search before giving up on it. */}
+    <input type="hidden" name="pagina" data-support-page />
+    <input type="hidden" name="ricercaEffettuata" data-support-query />
+
+    {/* The activity chosen in the first step of the Help Desk box. */}
+    <input type="hidden" name="attivita" data-support-activity />
+
+    {/* The answer the Help Desk had already given, filled in by the chat when
+        the form is opened from an answer. It goes back to the person in the
+        confirmation email, and tells the desk what did not convince them. */}
+    <input type="hidden" name="rispostaTipo" data-support-answer-kind />
+    <input type="hidden" name="rispostaTitolo" data-support-answer-title />
+    <input type="hidden" name="rispostaTesto" data-support-answer-text />
+    <input type="hidden" name="rispostaLink" data-support-answer-url />
+
+    <p class="sup__note">
+      <span class="fld__req">*</span> Tutti i campi sono obbligatori. Usiamo questi dati solo per
+      risponderti: nessun altro uso, nessuna lista.
+    </p>
+
+    <button type="submit" class="sup__submit">Invia la domanda →</button>
+
+    <p class="sup__status" data-support-status role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-support]');
+  const form = document.querySelector<HTMLFormElement>('[data-support-form]');
+  const message = document.querySelector<HTMLTextAreaElement>('[data-support-message]');
+  const status = document.querySelector<HTMLElement>('[data-support-status]');
+  const activityField = document.querySelector<HTMLInputElement>('[data-support-activity]');
+  const activityLabel = document.querySelector<HTMLElement>('[data-support-activity-label]');
+
+  if (root && form) {
+    const params = new URLSearchParams(location.search);
+
+    /** First of several accepted spellings that is actually in the URL. */
+    const fromUrl = (names: string) => {
+      for (const n of names.split(',')) {
+        const v = params.get(n.trim());
+        if (v) return v;
+      }
+      return '';
+    };
+
+    // Hidden fields: campaign parameters and member identifiers.
+    root.querySelectorAll<HTMLInputElement>('[data-prefill]').forEach((el) => {
+      el.value = fromUrl(el.dataset.prefill || '');
+    });
+
+    // Email is a visible field, so it is only filled if the URL carries one and
+    // the person has not started typing their own.
+    const email = form.querySelector<HTMLInputElement>('#sup-email');
+    const urlEmail = fromUrl('email,Email,user_email');
+    if (email && urlEmail && !email.value) email.value = urlEmail;
+
+    // A URL usually carries one name string; split it across the two fields.
+    const first = form.querySelector<HTMLInputElement>('#sup-first');
+    const last = form.querySelector<HTMLInputElement>('#sup-last');
+    const urlFirst = fromUrl('firstname,firstName,nome,name');
+    const urlLast = fromUrl('lastname,lastName,cognome,surname');
+    if (first && urlFirst && !first.value) first.value = urlFirst.split(' ')[0];
+    if (last && !last.value) {
+      last.value = urlLast || urlFirst.split(' ').slice(1).join(' ');
+    }
+
+    const pageField = form.querySelector<HTMLInputElement>('[data-support-page]');
+    if (pageField) pageField.value = location.pathname + location.search;
+
+    let lastFocus: HTMLElement | null = null;
+
+    const openModal = () => {
+      lastFocus = document.activeElement as HTMLElement;
+      // The Help Desk box fills the hidden field just before opening this.
+      if (activityLabel) activityLabel.textContent = activityField?.value || '—';
+      root.classList.add('open');
+      root.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('supm-locked');
+      // Straight into the message box: the question is usually already there.
+      window.setTimeout(() => message?.focus(), 80);
+    };
+
+    const closeModal = () => {
+      root.classList.remove('open');
+      root.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('supm-locked');
+      lastFocus?.focus();
+    };
+
+    // The chat flow opens it; keeping the handle on window avoids coupling the
+    // two components through the DOM.
+    (window as any).__athlonOpenSupport = openModal;
+
+    root.querySelectorAll('[data-support-close]').forEach((el) =>
+      el.addEventListener('click', closeModal)
+    );
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && root.classList.contains('open')) closeModal();
+    });
+
+  const say = (text: string, kind: 'ok' | 'err' | '') => {
+      if (!status) return;
+      status.textContent = text;
+      status.dataset.kind = kind;
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Validated here rather than by the browser so the messages are in the
+      // page's own voice and appear in one place.
+      // Mandatory, and it cannot be fixed from in here: it is step 1 of the box.
+      if (!activityField?.value.trim())
+        return say(
+          'Manca l’attività di interesse: scegliela nel box qui sopra, poi riprova.',
+          'err'
+        );
+      if (!message?.value.trim()) return say('Scrivi la tua domanda prima di inviare.', 'err');
+      if (!first?.value.trim()) return say('Manca il nome.', 'err');
+      if (!last?.value.trim()) return say('Manca il cognome.', 'err');
+      const emailValue = email?.value.trim() || '';
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailValue))
+        return say('Controlla l’indirizzo email: senza quello non possiamo risponderti.', 'err');
+
+      const endpoint = root.dataset.endpoint || '';
+      if (!endpoint) {
+        // Better to say it plainly than to pretend the message was sent.
+        return say(
+          'Il form non è ancora collegato all’assistenza. Segnalalo a chi cura il sito.',
+          'err'
+        );
+      }
+
+      const btn = form.querySelector<HTMLButtonElement>('.sup__submit');
+      if (btn) btn.disabled = true;
+      say('Invio in corso…', '');
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(Object.fromEntries(new FormData(form) as any)),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        form.reset();
+        say('Ricevuta. Ti rispondiamo via email in breve tempo.', 'ok');
+      } catch {
+        say('Non è stato possibile inviare. Riprova fra poco.', 'err');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    });
+  }
+</script>
+
+<style is:global>
+  body.supm-locked {
+    overflow: hidden;
+  }
+</style>
+
+<style>
+  .supm {
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .supm.open {
+    display: flex;
+  }
+
+  .supm__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 13, 12, 0.82);
+    backdrop-filter: blur(4px);
+  }
+
+  .sup {
+    position: relative;
+    width: 100%;
+    max-width: 44rem;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 30px 32px;
+    border-radius: var(--radius);
+    background: #211f1d;
+    border: 1px solid var(--border-dark);
+    animation: supm-in 0.32s var(--ease-out-crit);
+  }
+
+  @keyframes supm-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .sup__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-white);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .sup__close:hover {
+    background: var(--color-primary);
+  }
+
+  .sup__eyebrow {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .sup__title {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: var(--text-xl);
+    margin: 8px 0 6px;
+  }
+
+  .sup__lede {
+    margin: 0 0 22px;
+    max-width: 40rem;
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  .sup__form {
+    display: grid;
+    gap: 16px;
+    max-width: 46rem;
+  }
+
+  .sup__row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .fld__label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .fld__input {
+    width: 100%;
+    padding: 13px 15px;
+    border-radius: 12px;
+    border: 1px solid var(--border-dark);
+    background: rgba(0, 0, 0, 0.25);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--color-white);
+    transition: border-color var(--dur-fast) ease;
+  }
+
+  .fld__input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  .fld__input--area {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
+  }
+
+  /* The native dropdown arrow is invisible on this ground. */
+  .fld select.fld__input,
+  select.fld__input {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, 0.6) 50%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.6) 50%, transparent 50%);
+    background-position: calc(100% - 20px) 50%, calc(100% - 14px) 50%;
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+    padding-right: 40px;
+  }
+
+  select.fld__input option {
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .fld__req {
+    color: var(--color-primary);
+  }
+
+  .fld__hint {
+    margin: 7px 0 0;
+    font-size: var(--text-xs);
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.38);
+  }
+
+  /* Reads as a stated fact, not as an empty input. */
+  .sup__activity {
+    margin: 0;
+    padding: 13px 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 87, 1, 0.35);
+    background: rgba(255, 87, 1, 0.1);
+    font-weight: 600;
+    color: var(--color-white);
+  }
+
+  .sup__note {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .sup__submit {
+    justify-self: start;
+    padding: 17px 34px;
+    border: none;
+    border-radius: 100px;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .sup__submit:hover:not(:disabled) {
+    background: var(--accent-hover);
+  }
+
+  .sup__submit:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  .sup__status {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .sup__status[data-kind='ok'] {
+    color: #6fcf97;
+  }
+
+  .sup__status[data-kind='err'] {
+    color: #ff8a5c;
+  }
+
+  .sup__status:empty {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sup {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .supm {
+      padding: 0;
+      align-items: flex-end;
+    }
+
+    /* Bottom sheet on a phone, like the lesson panel on the planning page. */
+    .sup {
+      max-width: none;
+      max-height: 92vh;
+      border-radius: var(--radius) var(--radius) 0 0;
+      padding: 24px 18px 28px;
+    }
+
+    .sup__row {
+      grid-template-columns: 1fr;
+    }
+
+    .sup__submit {
+      justify-self: stretch;
+      text-align: center;
+    }
+  }
+</style>

@@ -4,6 +4,8 @@ description: "Corsi intensivi di nuoto per bambini dai 3 ai 12 anni. Dal 1 al 30
 area: ["News", "Scuola Nuoto Bambini"]
 order: 1
 tags: ["corsi intensivi", "estate", "2026", "bambini", "nuoto", "giugno"]
+attivita:
+  - scuola-nuoto-bambini
 ---
 
 <div class="ci-hero">
