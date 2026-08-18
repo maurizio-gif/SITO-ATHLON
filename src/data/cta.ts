@@ -79,17 +79,34 @@ export function trialCta(ctx: CtaContext) {
 }
 
 /**
- * Le CTA che chiedono di parlare con una persona — «Parla con noi», «Prenota
- * una telefonata», «Prenota un appuntamento in sede» — aspettano il modal
- * contatto. Finché `available` è `false` non vanno in pagina: una CTA senza
- * destinazione è peggio di una CTA che non c'è. Quando il modal esiste, si
- * mette `true` qui e i punti che la prevedono la mostrano.
+ * «Contattaci»: mettersi in contatto con una persona del club.
+ *
+ * La destinazione è l'Help Desk, che è dove la richiesta finisce davvero — si
+ * scrive la domanda, la risposta arriva dalle schede o dal regolamento, e se
+ * non basta il modulo di assistenza mette in contatto con il team. Non è una
+ * pagina di cortesia con un indirizzo stampato sopra: è il canale che il club
+ * usa, ed è già la destinazione di «Richiedi assistenza» e dei rimandi del
+ * regolamento.
+ *
+ * Quando il modal contatto esisterà — lascia un messaggio · prenota una
+ * telefonata · prenota un appuntamento in sede — si cambia `href` qui e
+ * cambiano tutti i punti del sito. L'intento è già `contact`, quindi il modal
+ * sa da dove arriva la persona senza chiederlo.
  */
 export const TALK = {
-  available: false,
-  label: 'Parla con noi',
+  label: 'Contattaci',
+  href: '/club-life#help-desk',
   intent: 'contact',
 } as const;
+
+/** La CTA di contatto: etichetta, destinazione e contesto di partenza. */
+export function talkCta(ctx: CtaContext) {
+  return {
+    label: TALK.label,
+    href: TALK.href,
+    attrs: ctaAttrs('talk', TALK.intent, ctx),
+  };
+}
 
 /** Gli intenti che il modal della prossima fase dovrà saper gestire. */
 export const INTENTS = {

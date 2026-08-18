@@ -1,9 +1,13 @@
 ---
-import { trialCta } from '../data/cta';
+import { trialCta, talkCta } from '../data/cta';
 
 /* La prova è un prodotto solo e vale per tutto il club, quindi qui non porta
    nessuna attività: la pagina di provenienza è l'header, su qualunque pagina. */
 const prova = trialCta({ source: 'header' });
+
+/* Contattaci sta in fondo alla barra e, su mobile, come pastiglia al centro:
+   da qualunque pagina si arriva a chiedere qualcosa a una persona. */
+const contatta = talkCta({ source: 'header' });
 
 /* I corsi fitness sono il secondo livello del menu, in ordine alfabetico —
    ordinati qui e non a mano, così aggiungerne uno non richiede di rimetterli
@@ -156,8 +160,12 @@ const accountBlocks = [
         <a href={l.href} class="nav-link">{l.label}</a>
       ))}
 
-      <a href="/abbonamenti" class="nav-cta">Abbonamenti</a>
+      <a href={contatta.href} class="nav-cta" {...contatta.attrs}>{contatta.label}</a>
     </nav>
+
+    {/* Solo su mobile: la barra non ha spazio per la riga di navigazione, e
+        chiedere qualcosa non deve richiedere di aprire il menu. */}
+    <a href={contatta.href} class="header-contact-mobile" {...contatta.attrs}>{contatta.label}</a>
 
     <div class="header-actions">
       <button
@@ -530,6 +538,9 @@ const accountBlocks = [
   }
 
   /* Mobile-only pill in the bar — desktop keeps the CTA inside the nav. */
+  .header-contact-mobile {
+    display: none;
+  }
 
   .main-nav {
     display: flex;
@@ -1125,6 +1136,27 @@ const accountBlocks = [
       height: auto;
     }
 
+    /* Sta sopra l'overlay come il logo e l'hamburger: col menu aperto resta
+       toccabile, perché è da lì che si chiede qualcosa. */
+    .header-contact-mobile {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      padding: 10px 14px;
+      border: 1px solid var(--color-primary);
+      border-radius: 20px;
+      background: var(--color-white);
+      color: var(--color-primary);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 1.25px;
+      line-height: 1;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
 
     .header-actions {
       gap: 14px;
