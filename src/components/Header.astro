@@ -1166,9 +1166,14 @@ const accountBlocks = [
       transform: translateY(-4.5px) rotate(-45deg);
     }
 
-    /* Logo and pill sit above the overlay so the bar stays intact while the
-       menu is open. */
-    .logo,
+    /* Il pittogramma sta sopra l'overlay, così la barra resta intera mentre il
+       menu è aperto. La regola è sua e va tenuta separata da .mobile-panel: se
+       finisce nella stessa lista di selettori il logo prende inset:0 e
+       opacity:0, e in alto a sinistra non c'è più niente. */
+    .logo {
+      position: relative;
+      z-index: 2;
+    }
 
     /* Full-screen translucent overlay rather than an inline accordion that
        pushes the page down — keeps the menu short and the page still. */
