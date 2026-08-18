@@ -148,7 +148,7 @@ const social = [
       <button
         class="acct-btn"
         type="button"
-        id="acct-open"
+        data-acct-open
         aria-label="Il tuo club"
         aria-haspopup="dialog"
         aria-expanded="false"
@@ -416,29 +416,35 @@ const social = [
   // so there is nothing left to toggle inside it.
 
   // ---- Account panel ----
+  // Any [data-acct-open] opens it: the header icon, and the "Accedi" icon
+  // beside the hero's CTA.
   const acct = document.getElementById('acct-modal');
-  const acctOpen = document.getElementById('acct-open');
+  const acctTriggers = Array.from(document.querySelectorAll<HTMLElement>('[data-acct-open]'));
+  let acctLast: HTMLElement | null = null;
 
   function closeAcct() {
     acct?.classList.remove('open');
     acct?.setAttribute('aria-hidden', 'true');
-    acctOpen?.setAttribute('aria-expanded', 'false');
+    acctTriggers.forEach((t) => t.setAttribute('aria-expanded', 'false'));
     document.body.classList.remove('acct-locked');
-    // Send focus back to the icon, so keyboard users don't lose their place.
-    acctOpen?.focus();
+    // Back to whichever trigger opened it, so keyboard users don't lose place.
+    acctLast?.focus();
   }
 
-  acctOpen?.addEventListener('click', () => {
-    if (!acct) return;
-    // The menu and the panel are both full-screen overlays on a phone; never
-    // show them stacked.
-    document.getElementById('site-header')?.classList.remove('menu-open');
-    document.body.classList.remove('nav-mobile-locked');
-    acct.classList.add('open');
-    acct.setAttribute('aria-hidden', 'false');
-    acctOpen.setAttribute('aria-expanded', 'true');
-    document.body.classList.add('acct-locked');
-    acct.querySelector<HTMLElement>('.acct__close')?.focus();
+  acctTriggers.forEach((trigger) => {
+    trigger.addEventListener('click', () => {
+      if (!acct) return;
+      acctLast = trigger;
+      // The menu and the panel are both full-screen overlays on a phone; never
+      // show them stacked.
+      document.getElementById('site-header')?.classList.remove('menu-open');
+      document.body.classList.remove('nav-mobile-locked');
+      acct.classList.add('open');
+      acct.setAttribute('aria-hidden', 'false');
+      trigger.setAttribute('aria-expanded', 'true');
+      document.body.classList.add('acct-locked');
+      acct.querySelector<HTMLElement>('.acct__close')?.focus();
+    });
   });
 
   acct?.querySelectorAll('[data-acct-close]').forEach((el) =>
