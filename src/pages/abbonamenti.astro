@@ -54,6 +54,21 @@ const activityInfo: Record<string, { title: string; body: string; href?: string 
   },
 };
 
+/* One glyph per activity, so the included list reads as an inventory rather
+   than a ragged row of pills — the old site's treatment. Line icons in
+   currentColor, so they take the card's ink on Smart and Premium alike.
+   Anything without an entry falls back to a plain bullet. */
+const activityIcon: Record<string, string> = {
+  'Athlon TV': `<rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/>`,
+  'Gym Floor': `<path d="M6.5 6.5v11"/><path d="M17.5 6.5v11"/><path d="M3.5 9v6"/><path d="M20.5 9v6"/><path d="M6.5 12h11"/>`,
+  'Corsi Fitness': `<circle cx="9" cy="7" r="3"/><path d="M2 21v-1.5A4.5 4.5 0 0 1 6.5 15h5A4.5 4.5 0 0 1 16 19.5V21"/><circle cx="18" cy="8" r="2.5"/><path d="M22 21v-1a3.5 3.5 0 0 0-3-3.46"/>`,
+  'Group Reformer': `<path d="M3 17h18"/><path d="M6 17v-3.5A2.5 2.5 0 0 1 8.5 11h7a2.5 2.5 0 0 1 2.5 2.5V17"/><circle cx="12" cy="6" r="2.5"/>`,
+  'Aqua Fitness': `<path d="M2 8.5c2.5-2 4.5 2 7 0s4.5 2 7 0 3.5 1 4 1.2"/><path d="M2 14c2.5-2 4.5 2 7 0s4.5 2 7 0 3.5 1 4 1.2"/><path d="M2 19.5c2.5-2 4.5 2 7 0s4.5 2 7 0 3.5 1 4 1.2"/>`,
+  'Scuola Nuoto Adulti': `<circle cx="17" cy="7" r="2"/><path d="M3 14c1.8-1.6 3.6 1.6 5.4 0s3.6 1.6 5.4 0 3-.4 4.2.6"/><path d="M6 10.5 11 8l4 3"/>`,
+  'Nuoto Libero Assistito': `<circle cx="7" cy="8" r="2"/><path d="M10 11.5 15.5 9 21 12"/><path d="M2 17c1.8-1.6 3.6 1.6 5.4 0s3.6 1.6 5.4 0 3.6 1.6 5.4 0 1.4-.6 1.8-.9"/>`,
+  'Corso Gestanti': `<path d="M12 21s-7-4.3-7-9.4A4.1 4.1 0 0 1 12 8.6a4.1 4.1 0 0 1 7 3c0 5.1-7 9.4-7 9.4Z"/><circle cx="12" cy="4" r="1.6"/>`,
+};
+
 const plans = [
   {
     id: 'smart',
@@ -230,14 +245,30 @@ const trust = [
               <p class="plan__desc">{p.desc}</p>
             </div>
 
+            {/* One activity per line with its own glyph, as on the old site —
+                a wrapped row of pills made a long Premium list hard to scan.
+                Each row is still the button that opens the detail modal. */}
             <div class="plan__activities">
-              <span class="plan__activities-title">Attività incluse — tocca per i dettagli</span>
+              <span class="plan__activities-title">
+                Attività comprese
+                <em>tocca per i dettagli</em>
+              </span>
               <ul>
                 {p.activities.map((a) => (
                   <li>
-                    <button type="button" class="activity-chip" data-activity={a}>
-                      {a}
-                      <span class="activity-chip__mark" aria-hidden="true">?</span>
+                    <button type="button" class="activity-row" data-activity={a}>
+                      <span class="activity-row__icon" aria-hidden="true">
+                        {activityIcon[a] ? (
+                          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" set:html={activityIcon[a]} />
+                        ) : (
+                          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                            <circle cx="12" cy="12" r="3" />
+                          </svg>
+                        )}
+                      </span>
+                      <span class="activity-row__label">{a}</span>
+                      <span class="activity-row__mark" aria-hidden="true">?</span>
                     </button>
                   </li>
                 ))}
@@ -792,19 +823,33 @@ const trust = [
   }
 
   .plan__activities-title {
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
     font-size: var(--text-xs);
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    margin-bottom: 12px;
+    margin-bottom: 6px;
+    color: var(--color-primary);
   }
 
-  .plan.smart .plan__activities-title {
-    color: rgba(255, 255, 255, 0.8);
+  /* The tap hint is guidance, not part of the heading — quieter and not caps. */
+  .plan__activities-title em {
+    font-style: normal;
+    font-weight: 500;
+    font-size: var(--text-2xs);
+    letter-spacing: 0.06em;
+    text-transform: none;
+    opacity: 0.75;
   }
 
-  .plan.premium .plan__activities-title {
+  .plan.smart .plan__activities-title em {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .plan.premium .plan__activities-title em {
     color: var(--text-muted);
   }
 
@@ -813,70 +858,102 @@ const trust = [
     margin: 0;
     padding: 0;
     display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+    flex-direction: column;
+    /* Capped: the cards run the full container width, and a row stretched over
+       1100px left the "?" marooned a screen away from its label. */
+    max-width: 32rem;
   }
 
   .plan__activities li {
     display: flex;
   }
 
-  .activity-chip {
-    display: inline-flex;
+  /* A row, not a pill: icon in a fixed gutter so every label starts on the same
+     vertical line however long the name is. Still a button — the whole row is
+     the tap target for the detail modal. */
+  .activity-row {
+    display: flex;
     align-items: center;
-    gap: 7px;
-    font-family: var(--font-body);
-    font-size: var(--text-xs);
-    font-weight: 500;
-    padding: 6px 10px 6px 12px;
+    gap: 12px;
+    width: 100%;
+    /* 44px so the row is a proper finger target on a phone and on the kiosk —
+       the rows are the only way into the activity details. */
+    min-height: 44px;
+    padding: 8px 0;
     border: none;
-    border-radius: 999px;
+    background: none;
+    text-align: left;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: background-color var(--dur-fast) ease, transform var(--dur-fast) var(--ease-out-crit);
+    transition: color var(--dur-fast) ease;
   }
 
-  .activity-chip:active {
-    transform: scale(0.96);
-    transition-duration: var(--dur-press);
+  /* Each row is wrapped in its own li, so the divider keys off the list items
+     rather than the buttons — they are never adjacent siblings. */
+  .plan__activities li + li .activity-row {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  /* Small marker so it reads as "there's more here", not a dead label. */
-  .activity-chip__mark {
+  .plan.premium .plan__activities li + li .activity-row {
+    border-top-color: rgba(39, 36, 35, 0.1);
+  }
+
+  .activity-row__icon {
+    flex-shrink: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 15px;
-    height: 15px;
+    width: 22px;
+    color: var(--color-primary);
+  }
+
+  .activity-row__label {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Small marker so it reads as "there's more here", not a dead label. */
+  .activity-row__mark {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     font-size: 9px;
     font-weight: 800;
     line-height: 1;
+    transition: background-color var(--dur-fast) ease;
   }
 
-  .plan.smart .activity-chip {
-    background: rgba(255, 255, 255, 0.12);
+  .plan.smart .activity-row {
     color: var(--color-white);
   }
 
-  .plan.smart .activity-chip:hover {
-    background: rgba(255, 255, 255, 0.22);
-  }
-
-  .plan.smart .activity-chip__mark {
-    background: rgba(255, 255, 255, 0.25);
+  .plan.smart .activity-row__mark {
+    background: rgba(255, 255, 255, 0.2);
     color: var(--color-white);
   }
 
-  .plan.premium .activity-chip {
-    background: rgba(255, 87, 1, 0.12);
+  .plan.smart .activity-row:hover .activity-row__mark {
+    background: var(--color-primary);
+  }
+
+  .plan.premium .activity-row {
     color: var(--color-dark);
   }
 
-  .plan.premium .activity-chip:hover {
-    background: rgba(255, 87, 1, 0.22);
+  .plan.premium .activity-row__mark {
+    background: rgba(39, 36, 35, 0.12);
+    color: var(--color-dark);
   }
 
-  .plan.premium .activity-chip__mark {
+  .plan.premium .activity-row:hover .activity-row__mark {
     background: var(--color-primary);
     color: var(--color-white);
   }
