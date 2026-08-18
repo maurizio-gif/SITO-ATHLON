@@ -373,11 +373,11 @@ const trust = [
           <div class="modo__prices">
             <div class="pricebox">
               <span class="pricebox__label">Iscritti</span>
-              <p class="pricebox__value"><span class="pricebox__cur">€</span>45</p>
+              <p class="pricebox__value u-display"><span class="pricebox__cur u-display">€</span>45</p>
             </div>
             <div class="pricebox">
               <span class="pricebox__label">Esterni</span>
-              <p class="pricebox__value"><span class="pricebox__cur">€</span>55</p>
+              <p class="pricebox__value u-display"><span class="pricebox__cur u-display">€</span>55</p>
             </div>
           </div>
 
@@ -482,10 +482,10 @@ const trust = [
 
   .pt-hero__title {
     font-size: var(--text-4xl);
-    line-height: var(--leading-4xl);
+    --lh: var(--leading-4xl);
     letter-spacing: var(--tracking-4xl);
     margin: 14px 0 22px;
-    padding: 0.08em 0 0.06em;
+    padding-bottom: 0.06em;
     clip-path: inset(0 0 100% 0);
     animation: hero-reveal 0.9s var(--ease-spring) 0.4s forwards;
   }
@@ -987,10 +987,7 @@ const trust = [
     margin: 0;
     font-family: var(--font-heading);
     font-size: clamp(2.6rem, 5vw, 3.4rem);
-    /* Sub-1 leading puts the box below even the corrected ascent, so the € —
-       which rises past the caps — needs the headroom back by hand. */
-    line-height: 0.9;
-    padding-top: 0.05em;
+    --lh: 0.9;
     letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
     color: var(--color-primary);
