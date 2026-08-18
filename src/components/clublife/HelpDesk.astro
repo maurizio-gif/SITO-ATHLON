@@ -1,0 +1,164 @@
+---
+/**
+ * The Help Desk: the whole wiki, grouped by the folder each article lives in.
+ *
+ * Links go to /wikiathlon/<area>/<slug> — the same paths the standalone wiki
+ * served, which is why external links and the articles' own cross-references
+ * keep working.
+ */
+import { getCollection } from 'astro:content';
+import { AREA_LABELS, AREA_ORDER } from '../../data/helpdesk';
+
+interface Props {
+  id?: string;
+}
+
+const { id = 'help-desk' } = Astro.props;
+
+const articles = (await getCollection('articles')).filter((a) => !a.data.draft);
+
+const groups = AREA_ORDER.map((folder) => ({
+  folder,
+  meta: AREA_LABELS[folder],
+  items: articles
+    .filter((a) => a.id.split('/')[0] === folder)
+    .sort((a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title)),
+})).filter((g) => g.items.length > 0);
+---
+
+<section class="hd" id={id}>
+  <div class="container">
+    <span class="eyebrow" data-anim="from-left">Help Desk</span>
+    <h2 class="hd__title" data-anim="reveal">Le risposte, senza chiamare</h2>
+    <p class="hd__sub">
+      {articles.length} schede su iscrizioni, prenotazioni, certificati, abbonamenti e organizzazione
+      dei corsi. Se non trovi quello che cerchi,
+      <a href="/contatti">scrivi allo staff</a>.
+    </p>
+
+    <div class="hd__groups">
+      {groups.map((g, gi) => (
+        <div class="hdg" data-anim="fade" data-anim-delay={String(gi * 80)}>
+          <div class="hdg__head">
+            <h3 class="hdg__name">{g.meta.label}</h3>
+            <span class="hdg__count">{g.items.length}</span>
+          </div>
+          <p class="hdg__blurb">{g.meta.blurb}</p>
+
+          <ul class="hdg__list">
+            {g.items.map((a) => (
+              <li>
+                <a href={`/wikiathlon/${a.id}/`} class="hdl">
+                  <span class="hdl__title">{a.data.title}</span>
+                  <span class="hdl__desc">{a.data.description}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .hd {
+    padding: var(--space-section-lg) 0;
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .hd__title {
+    font-size: var(--text-3xl);
+    letter-spacing: var(--tracking-2xl);
+    margin: 10px 0 8px;
+  }
+
+  .hd__sub {
+    max-width: 46rem;
+    color: rgba(255, 255, 255, 0.62);
+    margin-bottom: 40px;
+  }
+
+  .hd__sub a {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .hd__sub a:hover {
+    text-decoration: underline;
+  }
+
+  .hd__groups {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px 44px;
+    align-items: start;
+  }
+
+  .hdg__head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-dark);
+  }
+
+  .hdg__name {
+    font-size: var(--text-xl);
+  }
+
+  /* How many articles are behind the heading, so the column's weight is
+     visible before scanning it. */
+  .hdg__count {
+    font-family: var(--font-heading);
+    font-size: var(--text-md);
+    color: var(--color-primary);
+  }
+
+  .hdg__blurb {
+    margin: 12px 0 16px;
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .hdg__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .hdl {
+    display: block;
+    padding: 13px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .hdl:hover .hdl__title {
+    color: var(--color-primary);
+  }
+
+  .hdl__title {
+    display: block;
+    font-size: var(--text-md);
+    font-weight: 500;
+    transition: color var(--dur-fast) ease;
+  }
+
+  /* The article's own one-liner: enough to pick the right one without opening
+     three of them. */
+  .hdl__desc {
+    display: block;
+    margin-top: 3px;
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  @media (max-width: 820px) {
+    .hd__groups {
+      grid-template-columns: 1fr;
+      gap: 34px;
+    }
+  }
+</style>

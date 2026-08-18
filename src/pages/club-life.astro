@@ -1,0 +1,239 @@
+---
+import Layout from '../layouts/Layout.astro';
+import EventiPreview from '../components/eventi/EventiPreview.astro';
+import NewsPreview from '../components/clublife/NewsPreview.astro';
+import HelpDesk from '../components/clublife/HelpDesk.astro';
+import Servizi from '../components/clublife/Servizi.astro';
+import { upcomingEvents } from '../data/eventi';
+import { getCollection } from 'astro:content';
+
+// Counts drive the anchor menu labels, so the nav says how much is behind each
+// section instead of promising something empty.
+const events = await upcomingEvents();
+const news = (await getCollection('news')).filter((n) => !n.data.draft);
+const articles = (await getCollection('articles')).filter((a) => !a.data.draft);
+const servizi = (await getCollection('servizi')).filter((s) => !s.data.draft);
+
+const sections = [
+  { id: 'eventi', label: 'Eventi', count: events.length },
+  { id: 'news', label: 'News', count: news.length },
+  { id: 'help-desk', label: 'Help Desk', count: articles.length },
+  { id: 'servizi', label: 'Servizi', count: servizi.length },
+];
+---
+
+<Layout
+  title="Club Life | Athlon Club Roma Talenti"
+  description="La vita del club: eventi e masterclass, news, l'Help Desk con tutte le risposte su iscrizioni e prenotazioni, e i servizi compresi nell'abbonamento."
+>
+  <!-- HERO -->
+  <section class="cl-hero">
+    <div class="container">
+      <span class="eyebrow">Athlon Community</span>
+      <h1 class="cl-hero__title">Club <em class="accent">life</em></h1>
+      <p class="cl-hero__lede">
+        Tutto quello che succede nel club, e tutto quello che serve saperne.
+      </p>
+    </div>
+
+    {/* Anchor nav, sticky under the header: on a page this long it is the only
+        way to see the whole shape at once. */}
+    <nav class="cl-menu" aria-label="Sezioni di Club Life">
+      <div class="container cl-menu__inner">
+        {sections.map((s) => (
+          <a href={`#${s.id}`} class="cl-menu__item">
+            {s.label}
+            <span class="cl-menu__count">{s.count}</span>
+          </a>
+        ))}
+      </div>
+    </nav>
+  </section>
+
+  <div id="eventi">
+    <EventiPreview
+      limit={3}
+      eyebrow="In programma"
+      title="Eventi e masterclass"
+      sub="Giornate aperte anche a chi non è iscritto. Quasi sempre gratuite."
+    />
+  </div>
+
+  <NewsPreview
+    id="news"
+    limit={4}
+    eyebrow="Dal club"
+    title="News"
+    sub="Comunicazioni, variazioni e novità della struttura."
+  />
+
+  <HelpDesk id="help-desk" />
+
+  <Servizi id="servizi" />
+
+  <!-- CONTATTI -->
+  <section class="cl-contact">
+    <div class="container cl-contact__inner">
+      <div>
+        <span class="eyebrow" data-anim="from-left">Non hai trovato la risposta?</span>
+        <h2 class="cl-contact__title" data-anim="reveal">Parla con noi</h2>
+        <p class="cl-contact__sub">
+          Lo staff è in struttura dalle 6:00 alle 22:00. Per le pratiche —
+          certificati, sospensioni, disdette — la via più rapida è l'email.
+        </p>
+      </div>
+      <div class="cl-contact__actions">
+        <a href="/contatti" class="btn btn-primary" data-anim="pop">Contattaci →</a>
+        <a href="mailto:staff@athlonroma.it" class="cl-contact__mail">staff@athlonroma.it</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* ---- Hero ---- */
+  .cl-hero {
+    background: var(--color-dark);
+    color: var(--color-white);
+    padding-top: var(--space-section-lg);
+  }
+
+  .cl-hero .container {
+    padding-bottom: var(--space-section-sm);
+  }
+
+  .cl-hero__title {
+    font-size: var(--text-4xl);
+    line-height: var(--leading-4xl);
+    letter-spacing: var(--tracking-4xl);
+    margin: 14px 0 0;
+    padding: 0.08em 0 0.06em;
+  }
+
+  .cl-hero__title .accent {
+    font-style: normal;
+    color: var(--color-primary);
+  }
+
+  /* Same pairing as the home hero: display caps, then the serif italic. */
+  .cl-hero__lede {
+    max-width: 34rem;
+    margin: 10px 0 0;
+    font-size: var(--text-2xl);
+    line-height: 1.05;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  /* ---- Anchor menu ---- */
+  .cl-menu {
+    position: sticky;
+    /* Clears the site header, which is 72px on desktop. */
+    top: 72px;
+    z-index: 5;
+    background: rgba(23, 21, 20, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border-dark);
+    border-bottom: 1px solid var(--border-dark);
+  }
+
+  .cl-menu__inner {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .cl-menu__inner::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cl-menu__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    padding: 9px 16px;
+    border-radius: 999px;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.65);
+    transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
+  }
+
+  .cl-menu__item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-white);
+  }
+
+  .cl-menu__count {
+    font-family: var(--font-heading);
+    font-size: var(--text-sm);
+    color: var(--color-primary);
+  }
+
+  /* ---- Contatti ---- */
+  .cl-contact {
+    padding: var(--space-section-lg) 0;
+    background: var(--color-cream);
+  }
+
+  .cl-contact__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 30px;
+  }
+
+  .cl-contact__title {
+    font-size: var(--text-3xl);
+    letter-spacing: var(--tracking-2xl);
+    margin: 10px 0 8px;
+  }
+
+  .cl-contact__sub {
+    max-width: 34rem;
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  .cl-contact__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .cl-contact__mail {
+    font-size: var(--text-sm);
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .cl-contact__mail:hover {
+    text-decoration: underline;
+  }
+
+  /* Anchored sections must not land under the sticky bars. */
+  :global(#eventi),
+  :global(#news),
+  :global(#help-desk),
+  :global(#servizi) {
+    scroll-margin-top: 130px;
+  }
+
+  @media (max-width: 960px) {
+    .cl-menu {
+      /* The mobile header bar is shorter. */
+      top: 60px;
+    }
+  }
+</style>

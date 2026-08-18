@@ -8,6 +8,7 @@ import ActivityGrid from '../components/home/ActivityGrid.astro';
 import Struttura from '../components/home/Struttura.astro';
 import AppSection from '../components/home/AppSection.astro';
 import EventiPreview from '../components/eventi/EventiPreview.astro';
+import NewsPreview from '../components/clublife/NewsPreview.astro';
 
 const adultiItems = [
   { title: 'Gym Floor', image: '/wp-content/uploads/2024/08/IMG_2065-scaled.jpg', desc: '400 mq di sala pesi e cardio di ultima generazione.', href: '/gym-floor' },
@@ -47,5 +48,11 @@ const juniorItems = [
     eyebrow="Athlon Community"
     title="I nostri eventi"
     sub="Masterclass gratuite e giornate aperte anche a chi non è ancora iscritto."
+  />
+  <NewsPreview
+    limit={2}
+    eyebrow="Dal club"
+    title="News"
+    sub="Comunicazioni e novità della struttura."
   />
 </Layout>

@@ -1,0 +1,174 @@
+---
+/**
+ * Club services — the things that are neither an activity nor a subscription.
+ * One line each, the rest behind a disclosure so the list stays scannable.
+ */
+import { getCollection } from 'astro:content';
+
+interface Props {
+  id?: string;
+}
+
+const { id = 'servizi' } = Astro.props;
+
+const items = (await getCollection('servizi'))
+  .filter((s) => !s.data.draft)
+  .sort((a, b) => a.data.order - b.data.order);
+---
+
+<section class="sv" id={id}>
+  <div class="container">
+    <span class="eyebrow" data-anim="from-left">Compresi nel club</span>
+    <h2 class="sv__title" data-anim="reveal">Servizi</h2>
+    <p class="sv__sub">
+      Quello che trovi oltre alle attività: l'app, gli allenamenti on demand, gli spazi e le pratiche.
+    </p>
+
+    <ul class="sv__list">
+      {items.map((s, i) => (
+        <li class="svi" data-anim="fade" data-anim-delay={String(i * 70)}>
+          <details class="svi__box">
+            <summary class="svi__head">
+              <span class="svi__num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="svi__text">
+                <span class="svi__name">{s.data.title}</span>
+                <span class="svi__desc">{s.data.desc}</span>
+              </span>
+              <span class="svi__mark" aria-hidden="true">+</span>
+            </summary>
+
+            <div class="svi__detail">
+              <p>{s.data.detail}</p>
+              {s.data.href && (
+                <a href={s.data.href} class="svi__link">
+                  {s.data.hrefLabel ?? 'Scopri di più'} →
+                </a>
+              )}
+            </div>
+          </details>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .sv {
+    padding: var(--space-section-lg) 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sv__title {
+    font-size: var(--text-3xl);
+    letter-spacing: var(--tracking-2xl);
+    margin: 10px 0 8px;
+  }
+
+  .sv__sub {
+    max-width: 46rem;
+    color: var(--text-muted);
+    margin-bottom: 30px;
+  }
+
+  .sv__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .svi__box {
+    border-top: 1px solid var(--border);
+  }
+
+  .sv__list li:last-child .svi__box {
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* <details> rather than scripted accordions: no JavaScript, and it still
+     opens for anyone who lands here with search-in-page. */
+  .svi__head {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    padding: 20px 0;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .svi__head::-webkit-details-marker {
+    display: none;
+  }
+
+  .svi__num {
+    flex-shrink: 0;
+    font-family: var(--font-heading);
+    font-size: var(--text-md);
+    color: var(--color-primary);
+  }
+
+  .svi__text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .svi__name {
+    display: block;
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: var(--text-xl);
+    letter-spacing: -0.01em;
+  }
+
+  .svi__desc {
+    display: block;
+    margin-top: 4px;
+    color: var(--text-muted);
+  }
+
+  .svi__mark {
+    flex-shrink: 0;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--color-primary);
+    transition: transform var(--dur-base) var(--ease-out-crit);
+  }
+
+  .svi__box[open] .svi__mark {
+    transform: rotate(45deg);
+  }
+
+  .svi__detail {
+    /* Aligned with the title, clear of the number column. */
+    padding: 0 0 24px 40px;
+    max-width: 46rem;
+  }
+
+  .svi__detail p {
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  .svi__link {
+    display: inline-block;
+    margin-top: 14px;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .svi__link:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 560px) {
+    .svi__head {
+      gap: 12px;
+    }
+
+    .svi__detail {
+      padding-left: 0;
+    }
+  }
+</style>

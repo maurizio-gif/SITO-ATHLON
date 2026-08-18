@@ -76,4 +76,47 @@ const eventi = defineCollection({
   }),
 });
 
-export const collections = { articles, eventi };
+/**
+ * Club news — short announcements with a date, the sort of thing that used to
+ * go out only on social. Dated so the newest surfaces first and the archive
+ * keeps itself in order.
+ */
+const news = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/news' }),
+  schema: z.object({
+    title: z.string(),
+    date: z.coerce.date(),
+    /** Small label on the card, e.g. "Struttura" or "Corsi". */
+    category: z.string().default('Club'),
+    excerpt: z.string(),
+    image: z.string().optional(),
+    imageAlt: z.string().optional(),
+    ctaLabel: z.string().optional(),
+    ctaHref: z.string().optional(),
+    draft: z.boolean().optional().default(false),
+  }),
+});
+
+/**
+ * Club services — the things that are neither an activity nor a subscription:
+ * the app, the changing rooms, the guest pass. Each carries a short line for
+ * the list and a longer one behind it.
+ */
+const servizi = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/servizi' }),
+  schema: z.object({
+    title: z.string(),
+    /** Lower sorts first. */
+    order: z.number().default(99),
+    /** One line, always visible. */
+    desc: z.string(),
+    /** The rest, revealed on demand. */
+    detail: z.string(),
+    /** Where to send someone who wants it — a page or an external link. */
+    href: z.string().optional(),
+    hrefLabel: z.string().optional(),
+    draft: z.boolean().optional().default(false),
+  }),
+});
+
+export const collections = { articles, eventi, news, servizi };
