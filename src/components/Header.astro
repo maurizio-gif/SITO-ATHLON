@@ -60,17 +60,17 @@ const juniorMenu = {
   ],
 };
 
+const PG = 'https://athlon.perfectgym.com/ClientPortal2';
+
+/* Portal, app and planning used to be repeated in both mega-menu CTA rows and
+   again in the mobile menu. They now live only in the user panel behind the
+   header's account icon, so the menus stay the site index and the panel is the
+   "my club" shelf. What is left here is marketing, not utility. */
 const adultiCtas = [
   { label: 'Scopri gli Abbonamenti', href: '/abbonamenti', accent: true, arrow: true },
-  { label: 'Athlon Club', href: 'https://onelink.to/athlon', sub: "Scarica l'app →" },
-  { label: 'Orari Corsi', href: '/planning' },
 ];
 
-const juniorCtas = [
-  { label: 'Accedi al tuo account', href: 'https://athlon.perfectgym.com/ClientPortal2/#/Login', accent: true, arrow: true },
-  { label: 'Athlon Club', href: 'https://onelink.to/athlon', sub: "Scarica l'app →" },
-  { label: 'Scopri gli orari dei corsi', href: '/planning' },
-];
+const juniorCtas = [];
 
 const menus = [
   { id: 'adulti', label: 'Attività Adulti', data: adultiMenu, ctas: adultiCtas },
@@ -83,6 +83,25 @@ const flatLinks = [
   { label: 'Planning', href: '/planning' },
   { label: 'Abbonamenti', href: '/abbonamenti' },
   { label: 'Contatti', href: '/contatti' },
+];
+
+// The account panel behind the header's user icon: everything a member needs
+// once they are already a member, in two blocks — account, then bookings.
+const accountBlocks = [
+  {
+    eyebrow: 'Il tuo club',
+    links: [
+      { label: 'Accedi da web', href: `${PG}/#/Login`, solid: true },
+      { label: 'Accedi da app', href: 'https://onelink.to/athlon', external: true },
+    ],
+  },
+  {
+    eyebrow: 'Prenotazioni',
+    links: [
+      { label: 'Prenota una lezione', href: `${PG}/#/Classes/1/List` },
+      { label: 'Orari e planning', href: '/planning' },
+    ],
+  },
 ];
 
 // Official brand glyphs (Simple Icons paths), drawn in currentColor.
@@ -126,8 +145,21 @@ const social = [
     </nav>
 
     <div class="header-actions">
-      <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="header-link">Accedi</a>
-      <a href="https://athlon.perfectgym.com/ClientPortal2/#/Registration" class="header-link strong">Iscriviti</a>
+      <button
+        class="acct-btn"
+        type="button"
+        id="acct-open"
+        aria-label="Il tuo club"
+        aria-haspopup="dialog"
+        aria-expanded="false"
+      >
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+      </button>
+      <a href={`${PG}/#/Registration`} class="header-link strong">Iscriviti</a>
       <button class="burger" aria-label="Menu" aria-expanded="false" id="burger">
         <span></span><span></span><span></span>
       </button>
@@ -156,6 +188,7 @@ const social = [
         </div>
       </div>
 
+      {m.ctas.length > 0 && (
       <div class="mega-cta">
         {m.ctas.map((c) => (
           <a
@@ -168,6 +201,7 @@ const social = [
           </a>
         ))}
       </div>
+      )}
 
       <div class="mega-social">
         <div class="container mega-social-inner">
@@ -222,15 +256,46 @@ const social = [
       ))}
     </ul>
 
-    <div class="mobile-secondary">
-      <a class="mobile-secondary-btn" href="https://onelink.to/athlon">Scarica l'app</a>
-      <a class="mobile-secondary-btn" href="/planning">Orari Corsi</a>
-      <a class="mobile-secondary-btn" href="https://athlon.perfectgym.com/ClientPortal2/#/Login">Accedi</a>
-    </div>
-
+    {/* No app / planning / login row here any more — those live in the account
+        panel behind the header's user icon, reachable without opening the menu. */}
     <div class="mobile-ctas">
       <a class="btn btn-primary mobile-cta" href="/abbonamenti">Scopri gli Abbonamenti</a>
-      <a class="btn btn-outline-dark mobile-cta" href="https://athlon.perfectgym.com/ClientPortal2/#/Registration">Iscriviti</a>
+      <a class="btn btn-outline-dark mobile-cta" href={`${PG}/#/Registration`}>Iscriviti</a>
+    </div>
+  </div>
+
+  <!-- Account panel — opened by the user icon in the header -->
+  <div class="acct" id="acct-modal" aria-hidden="true">
+    <div class="acct__backdrop" data-acct-close></div>
+    <div class="acct__panel" role="dialog" aria-modal="true" aria-labelledby="acct-title">
+      <button class="acct__close" type="button" data-acct-close aria-label="Chiudi">×</button>
+
+      <span class="acct__eyebrow">Il tuo club</span>
+      <h2 class="acct__title" id="acct-title">Il tuo club<br />a portata di click</h2>
+      <p class="acct__sub">Gestisci il tuo abbonamento</p>
+
+      {accountBlocks.map((b, i) => (
+        <>
+          {i > 0 && (
+            <>
+              <hr class="acct__rule" />
+              <span class="acct__eyebrow">{b.eyebrow}</span>
+            </>
+          )}
+          <div class="acct__row">
+            {b.links.map((l) => (
+              <a
+                class:list={['acct__btn', { 'acct__btn--solid': l.solid }]}
+                href={l.href}
+                target={l.external ? '_blank' : undefined}
+                rel={l.external ? 'noopener' : undefined}
+              >
+                {l.label}
+              </a>
+            ))}
+          </div>
+        </>
+      ))}
     </div>
   </div>
 </header>
@@ -349,6 +414,40 @@ const social = [
 
   // No second level any more: once a group is open its links are all visible,
   // so there is nothing left to toggle inside it.
+
+  // ---- Account panel ----
+  const acct = document.getElementById('acct-modal');
+  const acctOpen = document.getElementById('acct-open');
+
+  function closeAcct() {
+    acct?.classList.remove('open');
+    acct?.setAttribute('aria-hidden', 'true');
+    acctOpen?.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('acct-locked');
+    // Send focus back to the icon, so keyboard users don't lose their place.
+    acctOpen?.focus();
+  }
+
+  acctOpen?.addEventListener('click', () => {
+    if (!acct) return;
+    // The menu and the panel are both full-screen overlays on a phone; never
+    // show them stacked.
+    document.getElementById('site-header')?.classList.remove('menu-open');
+    document.body.classList.remove('nav-mobile-locked');
+    acct.classList.add('open');
+    acct.setAttribute('aria-hidden', 'false');
+    acctOpen.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('acct-locked');
+    acct.querySelector<HTMLElement>('.acct__close')?.focus();
+  });
+
+  acct?.querySelectorAll('[data-acct-close]').forEach((el) =>
+    el.addEventListener('click', closeAcct)
+  );
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && acct?.classList.contains('open')) closeAcct();
+  });
 </script>
 
 <style>
@@ -463,6 +562,184 @@ const social = [
 
   .header-link.strong {
     color: var(--color-primary);
+  }
+
+  /* ---- Account icon + panel ---- */
+  .acct-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: var(--color-white);
+    cursor: pointer;
+    transition: background-color var(--dur-fast) var(--ease-out-crit),
+      transform var(--dur-fast) var(--ease-out-crit);
+  }
+
+  .acct-btn:hover {
+    background: var(--accent-hover);
+  }
+
+  .acct-btn:active {
+    transform: scale(0.92);
+    transition-duration: var(--dur-press);
+  }
+
+  .acct-btn svg {
+    display: block;
+  }
+
+  .acct {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-fast) ease;
+  }
+
+  .acct.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .acct__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 8, 0.55);
+  }
+
+  .acct__panel {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 30rem;
+    padding: 40px;
+    border-radius: var(--radius);
+    background: var(--color-cream);
+    color: var(--color-dark);
+    transform: scale(0.97);
+    transition: transform var(--dur-base) var(--ease-out-crit);
+    box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.45);
+  }
+
+  .acct.open .acct__panel {
+    transform: scale(1);
+  }
+
+  .acct__close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-dark);
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .acct__close:hover {
+    background: rgba(39, 36, 35, 0.06);
+  }
+
+  .acct__eyebrow {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin-bottom: 14px;
+  }
+
+  .acct__title {
+    font-size: var(--text-xl);
+    --lh: 1.05;
+    margin-bottom: 6px;
+  }
+
+  .acct__sub {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin: 0 0 22px;
+  }
+
+  .acct__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .acct__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 15px 12px;
+    border: 1px solid var(--color-primary);
+    font-family: var(--font-body);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    line-height: 1.25;
+    transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
+  }
+
+  .acct__btn--solid,
+  .acct__btn:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .acct__btn--solid:hover {
+    background: var(--accent-hover);
+  }
+
+  .acct__rule {
+    border: none;
+    border-top: 1px solid var(--border-strong);
+    margin: 26px 0 20px;
+  }
+
+  body.acct-locked {
+    overflow: hidden;
+  }
+
+  @media (max-width: 480px) {
+    .acct {
+      padding: 16px;
+    }
+    .acct__panel {
+      padding: 32px 20px 24px;
+    }
+    /* Two per row even here, as on the TCA panel this mirrors — the labels wrap
+       to a second line rather than the pairs breaking apart. */
+    .acct__row {
+      gap: 10px;
+    }
+    .acct__btn {
+      padding: 13px 8px;
+      letter-spacing: 0.06em;
+    }
   }
 
   /* ---- Mega menu ---- */
@@ -744,7 +1021,16 @@ const social = [
     }
 
     .header-actions {
-      gap: 0;
+      gap: 14px;
+    }
+
+    /* Above the full-screen menu overlay, like the logo, the pill and the
+       burger — tapping the account icon has to work with the menu open. */
+    .acct-btn {
+      position: relative;
+      z-index: 2;
+      width: 34px;
+      height: 34px;
     }
 
     .burger {
