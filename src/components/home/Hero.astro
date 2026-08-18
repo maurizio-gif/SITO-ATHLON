@@ -12,9 +12,33 @@
     <span class="eyebrow hero-eyebrow">Club Sportivo · Roma Talenti</span>
     <h1 class="hero-title">Athlon Club <em class="accent">4.0</em></h1>
     <p class="hero-lede">Innovare è la nostra<br />miglior tradizione.</p>
-    <a href="https://athlon.perfectgym.com/ClientPortal2/#/Registration" class="btn btn-primary">
-      Iscriviti ora <span aria-hidden="true">→</span>
-    </a>
+
+    <div class="hero-actions">
+      <a href="https://athlon.perfectgym.com/ClientPortal2/#/Registration" class="btn btn-primary">
+        Iscriviti ora <span aria-hidden="true">→</span>
+      </a>
+
+      {/* Members already signed up go the other way: straight into the account
+          panel the header icon opens. Same trigger hook, so one panel serves
+          both. */}
+      <span class="hero-login">
+        <span class="hero-login__hint">Accedi <span aria-hidden="true">→</span></span>
+        <button
+          type="button"
+          class="hero-login__btn"
+          data-acct-open
+          aria-label="Accedi — il tuo club"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+        </button>
+      </span>
+    </div>
   </div>
 
   <div class="scroll-down">
@@ -108,6 +132,59 @@
     text-shadow: 0 2px 18px rgba(0, 0, 0, 0.5);
   }
 
+  /* CTA and the members' way in, side by side. */
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px 18px;
+  }
+
+  .hero-login {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hero-login__hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-white);
+    white-space: nowrap;
+  }
+
+  .hero-login__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: var(--color-white);
+    cursor: pointer;
+    transition: background-color var(--dur-fast) var(--ease-out-crit),
+      transform var(--dur-fast) var(--ease-out-crit);
+  }
+
+  .hero-login__btn:hover {
+    background: var(--accent-hover);
+  }
+
+  .hero-login__btn:active {
+    transform: scale(0.92);
+    transition-duration: var(--dur-press);
+  }
+
   .scroll-down {
     position: absolute;
     left: 24px;
@@ -171,7 +248,7 @@
     animation: hero-rise 0.6s var(--ease-out-crit) 0.85s forwards;
   }
 
-  .hero-content .btn {
+  .hero-actions {
     opacity: 0;
     animation: hero-rise 0.6s var(--ease-out-crit) 1.05s forwards;
   }
@@ -181,11 +258,16 @@
      instead — a normal text block on top, a height-constrained video
      below that stays close to its native aspect ratio. ---- */
   @media (max-width: 900px) {
+    /* The whole hero — video, title, lede and both CTAs — has to fit between
+       the header and the bottom of the screen, so nothing lands below the
+       fold. The copy block takes its natural height and the video absorbs
+       whatever is left; 72px is the mobile header height set in Header.astro. */
     .hero {
       display: flex;
       flex-direction: column;
       align-items: stretch;
-      min-height: auto;
+      height: calc(100svh - 72px);
+      min-height: 0;
     }
 
     .hero-scrim,
@@ -199,22 +281,23 @@
       position: static;
       z-index: auto;
       max-width: 100%;
-      min-height: 44svh;
+      flex: 0 0 auto;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 2.75rem 1.5rem;
+      padding: 1.4rem 1.5rem 1.6rem;
       color: var(--color-dark);
     }
 
     .hero-eyebrow {
       text-shadow: none;
+      margin-bottom: 10px;
     }
 
     .hero-title {
       color: var(--color-dark);
       text-shadow: none;
-      font-size: clamp(4.125rem, 19.5vw, 5.625rem);
+      font-size: clamp(3.25rem, 16vw, 5rem);
     }
 
     /* The mobile hero puts this copy on a light ground, so it cannot stay
@@ -223,21 +306,41 @@
       color: var(--color-dark);
       opacity: 1;
       text-shadow: none;
+      margin: 6px 0 20px;
+      font-size: var(--text-xl);
     }
 
+    .hero-login__hint {
+      color: var(--color-dark);
+    }
+
+    /* Shrinks to the leftover space instead of holding a fixed ratio, which is
+       what used to push the CTA off screen. It crops rather than letterboxes. */
     .hero-bg {
       order: 1;
       position: relative;
       inset: auto;
       width: 100%;
+      flex: 1 1 auto;
+      min-height: 0;
       height: auto;
-      aspect-ratio: 4 / 3;
+      aspect-ratio: auto;
+      object-fit: cover;
     }
   }
 
-  @media (max-width: 480px) {
-    .hero-bg {
-      aspect-ratio: 1 / 1;
+  /* Short phones: the copy block alone would eat the screen, so tighten it
+     further and let the video keep a usable band. */
+  @media (max-width: 900px) and (max-height: 700px) {
+    .hero-content {
+      padding: 1rem 1.5rem 1.2rem;
+    }
+    .hero-title {
+      font-size: clamp(2.5rem, 12vw, 3.5rem);
+    }
+    .hero-lede {
+      font-size: var(--text-md);
+      margin: 4px 0 14px;
     }
   }
 </style>
