@@ -398,3 +398,16 @@ img {
     filter: none !important;
   }
 }
+
+/* ---- Video: nessun pulsante play sopra il poster --------------------------
+   iOS Safari disegna un grande pulsante play al centro di ogni video non
+   ancora avviato, controlli o meno. Quando l'autoplay viene concesso non lo si
+   vede mai, ma nei casi in cui iOS lo rifiuta — Risparmio Energetico, rete
+   lenta, risparmio dati — quel glifo fa sembrare il video una foto da cliccare,
+   e il sito si presenta con un player fermo. Lo nascondiamo: il primo tocco
+   in pagina fa ripartire i video da sé (scripts/video-autoplay.ts), e dove i
+   controlli ci sono restano raggiungibili nella loro barra. */
+video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
