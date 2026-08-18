@@ -22,7 +22,7 @@ const { eyebrow, accent, variant, items, trackId } = Astro.props;
     <div class="activity-head">
       <h2 data-anim="reveal">
         <span class="head-kicker">{eyebrow}</span>
-        <span class="head-word">{accent}</span>
+        <span class="head-word u-display">{accent}</span>
       </h2>
       <div class="carousel-nav">
         <button class="carousel-btn" data-dir="-1" data-track={trackId} aria-label="Precedente">←</button>
@@ -45,7 +45,7 @@ const { eyebrow, accent, variant, items, trackId } = Astro.props;
             <div class="card__scrim"></div>
             <div class="card__body">
               <span class="card__num">{String(i + 1).padStart(2, '0')}</span>
-              <strong class="card__name">{item.title}</strong>
+              <strong class="card__name u-display">{item.title}</strong>
               <div class="card__hover">
                 <p class="card__desc">{item.desc}</p>
                 <span class="card__more">Scopri di più →</span>
@@ -179,21 +179,21 @@ const { eyebrow, accent, variant, items, trackId } = Astro.props;
     display: block;
     position: relative;
     font-size: var(--text-3xl);
-    /* Leading this tight sits below even the corrected Tusker ascent (see the
-       @font-face note in global.css), so the caps need the headroom by hand —
-       without it the top of ADULTI / JUNIOR was being shaved off. */
-    line-height: 0.88;
-    padding-top: 0.06em;
+    /* Leading only — the headroom the .u-display rule needs comes from this. */
+    --lh: 0.88;
     letter-spacing: var(--tracking-4xl);
     padding-left: 22px;
   }
 
-  /* A short accent rule anchored to the left edge of the word. */
+  /* A short accent rule anchored to the left edge of the word. Deliberately
+     stops short of the cap feet. Offset from --display-headroom rather than
+     from the box top, so it keeps its place against the letters if --lh is
+     ever retuned. */
   .head-word::before {
     content: '';
     position: absolute;
     left: 0;
-    top: 0.1em;
+    top: calc(var(--display-headroom) - 0.06em);
     bottom: 0.18em;
     width: 6px;
     border-radius: 3px;
@@ -371,8 +371,7 @@ const { eyebrow, accent, variant, items, trackId } = Astro.props;
     font-family: var(--font-heading);
     text-transform: uppercase;
     letter-spacing: -0.015em;
-    line-height: 0.95;
-    padding-top: 0.04em;
+    --lh: 0.95;
     font-weight: 700;
     font-size: clamp(1.75rem, 2.4vw, 2.4rem);
     color: var(--color-white);

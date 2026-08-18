@@ -248,13 +248,13 @@ const trust = [
               {p.options.map((o) => (
                 <div class="pcard">
                   <div class="pcard__head">
-                    <span class="pcard__title">{o.title}</span>
+                    <span class="pcard__title u-display">{o.title}</span>
                     <span class="pcard__sub">{o.sub}</span>
                   </div>
 
                   <div class="pcard__price">
                     <span class="pcard__currency">€</span>
-                    <span class="pcard__amount">{o.amount}</span>
+                    <span class="pcard__amount u-display">{o.amount}</span>
                     <span class="pcard__period">{o.period.replace('€', '')}</span>
                   </div>
 
@@ -294,7 +294,7 @@ const trust = [
       <div class="guest" data-anim="scale">
         <div class="guest__main">
           <span class="guest__pre">Guest Pass — 7 giorni</span>
-          <p class="guest__price">19 <span>€</span></p>
+          <p class="guest__price u-display">19 <span>€</span></p>
           <p class="guest__body">
             Accesso completo a tutte le attività per 1 settimana. Solo per chi non ha mai avuto un abbonamento
             Athlon dal 2021.
@@ -562,10 +562,10 @@ const trust = [
 
   .ab-hero__title {
     font-size: var(--text-4xl);
-    line-height: var(--leading-4xl);
+    --lh: var(--leading-4xl);
     letter-spacing: var(--tracking-4xl);
     margin: 14px 0 22px;
-    padding: 0.08em 0 0.06em;
+    padding-bottom: 0.06em;
     /* Same curtain reveal as the home hero. */
     clip-path: inset(0 0 100% 0);
     animation: hero-reveal 0.9s var(--ease-spring) 0.4s forwards;
@@ -754,10 +754,7 @@ const trust = [
 
   .plan__name {
     font-size: clamp(3.2rem, 5.5vw, 4.6rem);
-    /* Below 1, so it sits under even the corrected Tusker ascent (see the
-       @font-face note in global.css) and needs the headroom by hand. */
-    line-height: 0.92;
-    padding-top: 0.04em;
+    --lh: 0.92;
     letter-spacing: var(--tracking-4xl);
     margin-bottom: 12px;
   }
@@ -904,7 +901,7 @@ const trust = [
     display: block;
     font-family: var(--font-heading);
     font-size: clamp(1.9rem, 2.6vw, 2.6rem);
-    line-height: 0.95;
+    --lh: 0.95;
     letter-spacing: -0.01em;
     text-transform: uppercase;
   }
@@ -951,8 +948,7 @@ const trust = [
   .pcard__amount {
     font-family: var(--font-heading);
     font-size: clamp(3.4rem, 5.5vw, 4.6rem);
-    line-height: 0.9;
-    padding-top: 0.04em;
+    --lh: 0.9;
     letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
   }
@@ -1114,7 +1110,7 @@ const trust = [
   .guest__price {
     font-family: var(--font-heading);
     font-size: clamp(3rem, 6vw, 4rem);
-    line-height: 1;
+    --lh: 1;
     margin: 0 0 10px;
   }
 

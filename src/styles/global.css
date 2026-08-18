@@ -2,12 +2,16 @@
 
 /* ascent-override on all three faces, and it is load-bearing: Tusker declares
    a 0.90em ascent but draws caps up to 0.95em and accented caps (À, È) up to
-   1.04em. The line box is built from the declared metric, so that extra ink
-   fell outside the box and was shaved off the top of every heading — the
-   accent on "MODALITÀ" vanished completely. Overriding the metric fixes it
-   once for everything set in this font (headings, prices, menu items) instead
-   of needing padding on each one. Safari below 17 ignores this and keeps the
-   old clipping; nothing else regresses there. */
+   1.047em, so the declared metric alone builds a line box too short to hold
+   its own ink. Raising it to 105% makes the content area (1.152em) contain
+   every glyph.
+
+   That is only half the fix: the design sets display leading between 0.8 and
+   1.08, all tighter than 1.152, so the half-leading stays negative and the ink
+   still lands above the line box. The "Display-face headroom" rule below is
+   what actually stops the clipping — the two work together, so do not drop
+   either. Safari below 17 ignores ascent-override; there the headroom rule
+   still applies but the metric is short, so accents can clip. */
 @font-face {
   font-family: 'Tusker-Grotesk';
   font-style: normal;
@@ -127,13 +131,55 @@ body {
 h1, h2, h3, h4 {
   font-family: var(--font-heading);
   text-transform: uppercase;
-  line-height: 1.02;
   letter-spacing: -0.02em;
   margin: 0;
 }
 
 h3, h4 {
   letter-spacing: -0.01em;
+}
+
+/* ---- Display-face headroom — PROJECT RULE --------------------------------
+   Tusker's content area is 1.152em (ascent 1.05 after the override above,
+   descent 0.102), but accented caps draw up to 1.047em above the baseline —
+   and Italian display copy is full of them: MODALITÀ, ATTIVITÀ, PIÙ, PERCHÉ.
+   Any leading tighter than ~1.15 makes the half-leading negative and pushes
+   that ink above the line box, where it collides with the eyebrow above and
+   gets shaved off by every clipping ancestor (rounded cards, the app splash,
+   overflow:hidden rows). Every display leading in this project is between
+   0.8 and 1.08, so this always applies.
+
+   ONE KNOB: set --lh. The leading and exactly the headroom it needs both
+   follow from it:
+
+       padding-top = 0.600em - (--lh / 2)      reaching 0 at --lh 1.2
+
+   The 0.600 is 0.573 (= ink ascent 1.047 - ascent/2 + descent/2) plus 0.027
+   of slack: browsers report glyph bounds in whole device pixels, and at small
+   sizes that rounding — plus antialiasing bleed on accents, worst on the Ù in
+   PIÙ — costs up to 0.6px, which would leave the invariant just negative.
+
+   Sized for accented caps, so it holds whatever the copy turns out to be.
+   Plain caps only reach 0.953em, so this spends ~0.09em of headroom they do
+   not need; that is the price of one rule that cannot be caught out by an
+   accent appearing in a heading later.
+
+   Writing new pages:
+     - h1-h4 get this automatically. To tighten the leading set --lh, never
+       line-height, or the headroom stops tracking it.
+     - Display text in a span/strong/div needs class="u-display" to opt in.
+     - Never hand-tune padding-top on display text to stop clipping; that is
+       what this rule is for, and a fixed px/em patch goes stale the moment
+       the leading or the copy changes. */
+h1, h2, h3, h4,
+.u-display {
+  --lh: 1.02;
+  /* Exposed so decorations positioned against the box — accent rules, bars,
+     badges — can offset by the same amount instead of drifting the next time
+     --lh changes. See .head-word::before in ActivityGrid for the pattern. */
+  --display-headroom: max(0em, calc(0.600em - var(--lh) * 0.5em));
+  line-height: var(--lh);
+  padding-top: var(--display-headroom);
 }
 
 /* Project rule: body copy is always the same size everywhere (cards, intros,

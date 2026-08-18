@@ -80,13 +80,12 @@
   .hero-title {
     font-size: calc(var(--text-4xl) * 1.5);
     letter-spacing: var(--tracking-4xl);
-    line-height: var(--leading-4xl);
+    --lh: var(--leading-4xl);
     color: var(--color-white);
     text-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
-    /* Tusker's caps overshoot the line box at this size, and the reveal
-       animation clips to the border box — without this breathing room the
-       tops of the letters get shaved off. */
-    padding: 0.08em 0 0.06em;
+    /* The reveal animation clips to the border box, so the headroom the
+       .u-display rule reserves is what keeps the caps intact. */
+    padding-bottom: 0.06em;
   }
 
   .hero-title .accent {
