@@ -78,10 +78,27 @@ has it) is the safety net for what those attributes cannot do:
 - a clip a mobile browser **paused on its own** (scrolled away, stalled
   network), which otherwise stays frozen for the rest of the visit.
 
-It deliberately leaves three cases alone: a video the visitor is driving
-(`controls` on, or fullscreen — the hero expand button, the only place sound is
-allowed), a video that is not rendered (a closed modal must not play to nobody),
-and anything marked `data-no-autoplay`.
+It deliberately leaves three cases alone: a clip the visitor stopped or took
+fullscreen, a clip that is not rendered (a closed modal must not play to
+nobody), and anything marked `data-no-autoplay`.
+
+A pause within a second of touching the video counts as the visitor's and
+sticks — which is what lets a clip ship with `controls` (the Reformer carousel)
+and still be kept alive otherwise. Presence of `controls` is **not** the signal;
+code that takes a video over for a while says so with
+`v.dataset.videoHandsOff = '1'` and clears it when done, because iOS fullscreen
+is the system player and `document.fullscreenElement` stays null there.
+
+Embedded players are the same rule with the provider's own switches. Vimeo:
+
+```html
+<iframe src="…?autoplay=1&muted=1&loop=1" loading="lazy"
+        allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+```
+
+`allow="autoplay"` is required as well as the parameter — the parameter alone is
+refused. Keep `loading="lazy"` on a page with several: each starts as its card
+comes into view instead of all of them pulling a stream at once.
 
 - **Never turn a video's sound on at load.** Autoplay with audio is refused by
   every browser, and the whole clip stays black.
