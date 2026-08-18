@@ -75,8 +75,10 @@
     if (!heroVideo) return;
     heroVideo.controls = false;
     heroVideo.muted = true;
-    // Pausing with the fullscreen controls must not leave the background frozen
-    // on the way out.
+    // Back to being a background loop: the site-wide autoplay script may keep
+    // it alive again, and a pause taken with the fullscreen controls must not
+    // leave the hero frozen on the way out.
+    delete heroVideo.dataset.videoHandsOff;
     void heroVideo.play().catch(() => {});
   };
 
@@ -84,6 +86,10 @@
     if (!heroVideo) return;
     heroVideo.controls = true;
     heroVideo.muted = false;
+    // For as long as this is the visitor's video, nothing else touches it —
+    // iOS fullscreen is the system player, where document.fullscreenElement
+    // stays null and a pause of theirs would otherwise be undone.
+    heroVideo.dataset.videoHandsOff = '1';
 
     const v = heroVideo as HTMLVideoElement & {
       webkitEnterFullscreen?: () => void;

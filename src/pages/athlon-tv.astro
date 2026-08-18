@@ -11,8 +11,12 @@
  * I player partono da 45 secondi (`#t=45s`): il primo fotogramma di queste
  * lezioni è il trainer che sistema il tappetino, e da lì la pagina sembrava
  * spenta. A 45 secondi la lezione è cominciata, e si capisce cosa si guarda.
- * Nessun player parte da solo: quattro video in autoplay sono un dispetto a chi
- * apre la pagina dal telefono.
+ *
+ * Le anteprime partono da sole, senza audio e in loop, come ogni video del sito
+ * (vedi AGENTS.md). Non partono però tutte insieme: `loading="lazy"` tiene ogni
+ * iframe fermo finché la sua card non si avvicina allo schermo, così chi apre
+ * la pagina dal telefono si porta dietro un player alla volta e non quattro.
+ * Vimeo richiede `autoplay` fra i permessi dell'iframe, oltre al parametro.
  */
 import Layout from '../layouts/Layout.astro';
 import Faq from '../components/Faq.astro';
@@ -71,7 +75,10 @@ const RACCOLTE: Raccolta[] = [
 
 /** L'indirizzo del player, con l'anteprima che parte a lezione iniziata. */
 function player(id: string): string {
-  return `https://player.vimeo.com/video/${id}?title=0&byline=0&portrait=0&dnt=1#t=${DA}`;
+  return (
+    `https://player.vimeo.com/video/${id}` +
+    `?title=0&byline=0&portrait=0&dnt=1&autoplay=1&muted=1&loop=1#t=${DA}`
+  );
 }
 
 const [inEvidenza, ...altre] = RACCOLTE;
@@ -151,7 +158,7 @@ const faqs: FaqEntry[] = await faqConSchede([
           src={player(inEvidenza.video.id)}
           title={inEvidenza.video.titolo}
           loading="lazy"
-          allow="fullscreen; picture-in-picture"
+          allow="autoplay; fullscreen; picture-in-picture"
           allowfullscreen
         ></iframe>
       </div>
@@ -184,7 +191,7 @@ const faqs: FaqEntry[] = await faqConSchede([
                 src={player(r.video.id)}
                 title={r.video.titolo}
                 loading="lazy"
-                allow="fullscreen; picture-in-picture"
+                allow="autoplay; fullscreen; picture-in-picture"
                 allowfullscreen
               ></iframe>
             </div>

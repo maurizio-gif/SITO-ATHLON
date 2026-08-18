@@ -16,11 +16,14 @@
  *    stalled network — which otherwise stays frozen for the rest of the visit;
  *  - a clip left paused by its own controls on the way out of fullscreen.
  *
- * Three things are deliberately left alone: a video the visitor is driving
- * (`controls` on, or fullscreen — that is the hero expand button, the one
- * place sound is allowed), a video that is not rendered (a closed modal must
- * not play to nobody), and anything marked `data-no-autoplay`.
+ * Three things are deliberately left alone: a clip the visitor paused or took
+ * fullscreen (some carry `controls`, and a pause of their own must stick), a
+ * clip that is not rendered (a closed modal must not play to nobody), and
+ * anything marked `data-no-autoplay`.
  */
+
+/** How long after touching a video its pause still counts as the visitor's. */
+const GESTURE_WINDOW = 1000;
 
 const isManaged = (v: HTMLVideoElement) => !v.hasAttribute('data-no-autoplay');
 
@@ -33,9 +36,16 @@ const hasSource = (v: HTMLVideoElement) =>
   v.networkState !== v.NETWORK_EMPTY ||
   Boolean(v.getAttribute('src') || v.querySelector('source[src]'));
 
-/** The visitor is in charge of this one: sound is on, or it fills the screen. */
+/**
+ * The visitor is in charge of this one — it fills the screen, or they stopped
+ * it themselves. Note this is not inferred from `controls`: a clip can ship
+ * with controls and still be a background loop (the Reformer carousel).
+ */
 const isVisitorDriven = (v: HTMLVideoElement) =>
-  v.controls || document.fullscreenElement === v;
+  document.fullscreenElement === v || v.dataset.videoHandsOff === '1';
+
+const justTouched = (v: HTMLVideoElement) =>
+  performance.now() - Number(v.dataset.videoTouchedAt || 0) < GESTURE_WINDOW;
 
 const isRendered = (v: HTMLVideoElement) =>
   typeof v.checkVisibility === 'function'
@@ -51,14 +61,33 @@ function prime(v: HTMLVideoElement) {
   v.loop = true;
   v.autoplay = true;
   v.playsInline = true;
-  if (!v.dataset.autoplayBound) {
-    v.dataset.autoplayBound = '1';
-    // Whenever there are frames to show, and whenever something stopped it.
-    v.addEventListener('loadeddata', () => kick(v));
-    v.addEventListener('canplay', () => kick(v));
-    v.addEventListener('pause', () => kick(v));
-    v.addEventListener('stalled', () => kick(v));
-  }
+  if (v.dataset.autoplayBound) return;
+  v.dataset.autoplayBound = '1';
+
+  // A pause moments after touching this clip is the visitor's own, and sticks
+  // until they start it again.
+  const touch = () => {
+    v.dataset.videoTouchedAt = String(performance.now());
+  };
+  v.addEventListener('pointerdown', touch, { passive: true });
+  v.addEventListener('keydown', touch);
+  // A play they asked for hands it back; one from the system player during
+  // iOS fullscreen (no gesture on the element) does not, which is why the hero
+  // sets the flag itself while it owns the video.
+  v.addEventListener('play', () => {
+    if (justTouched(v)) delete v.dataset.videoHandsOff;
+  });
+  v.addEventListener('pause', () => {
+    if (justTouched(v)) {
+      v.dataset.videoHandsOff = '1';
+      return;
+    }
+    kick(v);
+  });
+  // Whenever there are frames to show, and whenever the network gives up.
+  v.addEventListener('loadeddata', () => kick(v));
+  v.addEventListener('canplay', () => kick(v));
+  v.addEventListener('stalled', () => kick(v));
 }
 
 function kick(v: HTMLVideoElement) {
@@ -67,7 +96,6 @@ function kick(v: HTMLVideoElement) {
   if (document.hidden) return;
   if (!isManaged(v) || !hasSource(v) || isVisitorDriven(v) || !isRendered(v)) return;
   if (!v.paused && !v.ended) return;
-  v.muted = true;
   void v.play().catch(() => {
     /* Refused for now; the retries below are the second chance. */
   });
