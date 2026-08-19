@@ -9,7 +9,7 @@ import {
   getBand,
   countLessons,
   roomsOf,
-  ROOM_COLORS,
+  roomColor,
   getLessonCard,
 } from '../../data/planning';
 
@@ -42,7 +42,7 @@ const rooms = roomsOf(band);
     <ul class="legend">
       {rooms.map((r) => (
         <li class="legend__item">
-          <span class="legend__dot" style={`background:${ROOM_COLORS[r]}`}></span>
+          <span class="legend__dot" style={`background:${roomColor(r, variant)}`}></span>
           {r}
         </li>
       ))}
@@ -62,7 +62,7 @@ const rooms = roomsOf(band);
           {day.classes.map((c) => {
             const card = getLessonCard(c.name);
             const style = c.sala
-              ? `--room:${ROOM_COLORS[c.sala] ?? 'var(--color-primary)'}`
+              ? `--room:${roomColor(c.sala, variant) ?? 'var(--color-primary)'}`
               : undefined;
             const inner = (
               <>
