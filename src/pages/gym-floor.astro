@@ -326,9 +326,28 @@ const faqs: FaqEntry[] = [
         ))}
       </ul>
 
-      {/* The hours themselves rather than a link to them. Comes from the shared
-          planning data, so editing that updates this section too. */}
-      <OpeningHours href={`${PG}/#/Classes/1/Calendar?categoryId=6`} />
+      {/* Gli orari e il video, due quadrati affiancati. Il video mostra un
+          trainer che apre l'app e scorre i piani: sta qui, in alto, e non nella
+          sezione dei programmi, perche' e' la prima cosa che risponde a «e io
+          cosa faccio quando entro». Su schermo stretto il quadrato si scioglie
+          e la clip scende sotto la tabella. */}
+      <div class="gf-duo">
+        <div class="gf-duo__orari">
+          <OpeningHours href={`${PG}/#/Classes/1/Calendar?categoryId=6`} />
+        </div>
+
+        <video
+          class="gf-duo__video"
+          autoplay
+          muted
+          loop
+          playsinline
+          poster={`${U}/2026/08/Gym-Floor-Piani-di-Allenamento-poster.jpg`}
+          data-anim="scale"
+        >
+          <source src={`${U}/2026/08/Gym-Floor-Piani-di-Allenamento.mp4`} type="video/mp4" />
+        </video>
+      </div>
     </div>
   </section>
 
@@ -400,45 +419,25 @@ const faqs: FaqEntry[] = [
         Up</strong>: si comincia da lì e si passa ai percorsi principali quando è il momento.
       </p>
 
-      <div class="gf-piani">
-        <div class="gf-piani__testo">
-          <div class="wk">
-            {workouts.map((w) => (
-              <div class="wk__item" data-wk-item>
-                <button class="wk__q" type="button" aria-expanded="false" data-wk-trigger>
-                  <span>{w.name}</span>
-                  <span class="wk__icon" aria-hidden="true">+</span>
-                </button>
-                <div class="wk__a">
-                  <div class="wk__a-inner">
-                    {w.body.map((par) => (<p>{par}</p>))}
-                  </div>
-                </div>
+      <div class="wk">
+        {workouts.map((w) => (
+          <div class="wk__item" data-wk-item>
+            <button class="wk__q" type="button" aria-expanded="false" data-wk-trigger>
+              <span>{w.name}</span>
+              <span class="wk__icon" aria-hidden="true">+</span>
+            </button>
+            <div class="wk__a">
+              <div class="wk__a-inner">
+                {w.body.map((par) => (<p>{par}</p>))}
               </div>
-            ))}
+            </div>
           </div>
-
-          <a href="https://onelink.to/athlon" class="btn btn-primary gf-block-cta" data-anim="pop">
-            Scarica l'app →
-          </a>
-        </div>
-
-        {/* I piani non si spiegano: si guardano. Il video mostra un trainer che
-            apre l'app e scorre i programmi, che e' esattamente cio' di cui
-            parla questa sezione. Parte da solo, muto e in loop, come ogni clip
-            del sito; il poster copre il tempo di buffering. */}
-        <video
-          class="gf-piani__video"
-          autoplay
-          muted
-          loop
-          playsinline
-          poster={`${U}/2026/08/Gym-Floor-Piani-di-Allenamento-poster.jpg`}
-          data-anim="scale"
-        >
-          <source src={`${U}/2026/08/Gym-Floor-Piani-di-Allenamento.mp4`} type="video/mp4" />
-        </video>
+        ))}
       </div>
+
+      <a href="https://onelink.to/athlon" class="btn btn-primary gf-block-cta" data-anim="pop">
+        Scarica l'app →
+      </a>
     </div>
   </section>
 
@@ -1043,24 +1042,49 @@ const faqs: FaqEntry[] = [
     grid-template-rows: 1fr;
   }
 
-  .gf-piani {
+  /* Due quadrati della stessa misura: la tabella degli orari e la clip. Il
+     limite di larghezza e' quello che la tabella aveva gia' da sola (34rem),
+     raddoppiato piu' lo spazio in mezzo, cosi' la coppia non si allarga fino a
+     diventare due manifesti. */
+  .gf-duo {
     display: grid;
-    grid-template-columns: 1.15fr 1fr;
-    gap: 34px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+    max-width: 69.5rem;
+    /* La coppia e' piu' stretta del container: centrata, invece che appoggiata
+       a sinistra con tutto il vuoto a destra. */
+    margin-inline: auto;
     align-items: start;
   }
 
-  .gf-piani__testo {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+  .gf-duo__orari {
+    aspect-ratio: 1 / 1;
   }
 
-  /* Riquadro quadrato con gli angoli del sito, come il carosello del Reformer.
-     Il file e' 9:16 con i sottotitoli impressi in basso: `cover` in un quadrato
-     taglia sopra e sotto, quindi la finestra e' spostata verso il basso perche'
-     le scritte restino dentro insieme al soggetto. */
-  .gf-piani__video {
+  /* La tabella e' un componente condiviso: da qui le si dice solo di riempire
+     il quadrato e di distribuire le sue tre parti, senza toccare il resto. */
+  .gf-duo__orari > :global(.hours) {
+    height: 100%;
+    max-width: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Le tre righe prendono lo spazio che avanza e ci stanno in mezzo: con il
+     solo `space-between` sul contenitore restavano appiccicate al titolo, con
+     un buco in mezzo alla card. */
+  .gf-duo__orari > :global(.hours) :global(.hours__list) {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* Stesso riquadro del carosello del Reformer. Il file e' 9:16 con i
+     sottotitoli impressi in basso: `cover` in un quadrato taglia sopra e sotto,
+     quindi la finestra e' spostata verso il basso perche' le scritte restino
+     dentro insieme al soggetto. */
+  .gf-duo__video {
     width: 100%;
     aspect-ratio: 1 / 1;
     object-fit: cover;
@@ -1097,14 +1121,21 @@ const faqs: FaqEntry[] = [
   /* + totem: vedi «Il totem verticale del club» in global.css */
   @media (max-width: 1000px),
     (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
-    /* + totem: una colonna sola, il video sotto l'elenco dei piani */
-    .gf-piani {
+    /* + totem: una colonna sola, il video subito sotto gli orari. Il quadrato
+       lo tiene solo la clip: la tabella torna alta quanto le sue righe. */
+    .gf-duo {
       grid-template-columns: minmax(0, 1fr);
-      gap: 26px;
+      gap: 1.25rem;
+      max-width: 34rem;
+      margin-inline: auto;
     }
 
-    .gf-piani__video {
-      max-width: 26rem;
+    .gf-duo__orari {
+      aspect-ratio: auto;
+    }
+
+    .gf-duo__orari > :global(.hours) {
+      display: block;
     }
 
     .gf-simili {
