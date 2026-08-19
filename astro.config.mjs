@@ -22,8 +22,13 @@ export default defineConfig({
   /* Il vecchio indirizzo della scuola nuoto bambini finiva con "-3", un residuo
      di WordPress. L'indirizzo giusto è senza, ma quello vecchio è in giro nei
      link condivisi e nei risultati di ricerca: resta buono e porta al nuovo. */
+  /* La ginnastica posturale ha cambiato nome: in palinsesto e in pagina è
+     ginnastica strutturale, e l'indirizzo l'ha seguita. Quello vecchio è nei
+     link condivisi, nei risultati di ricerca e nel menu di chi ha la pagina
+     aperta da ieri: resta buono e porta al nuovo. */
   redirects: {
     '/scuola-nuoto-bambini-3': '/scuola-nuoto-bambini',
+    '/ginnastica-posturale': '/ginnastica-strutturale',
   },
 
   integrations: [
@@ -33,7 +38,9 @@ export default defineConfig({
          `/diagnostica-schermo` nemmeno: è lo strumento che dice cosa dichiara il
          browser del totem, non una pagina del club. */
       filter: (page) =>
-        !page.includes('/scuola-nuoto-bambini-3') && !page.includes('/diagnostica-schermo'),
+        !page.includes('/scuola-nuoto-bambini-3') &&
+        !page.includes('/ginnastica-posturale') &&
+        !page.includes('/diagnostica-schermo'),
 
       /* Priorità e frequenza sono suggerimenti, e Google li ignora — restano
          per gli altri crawler. Quello che conta è che ci siano tutte le pagine

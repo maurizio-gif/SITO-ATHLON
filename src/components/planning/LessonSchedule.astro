@@ -23,10 +23,17 @@ interface Props {
   nome: string;
   /** Come chiamare una seduta: il nuoto libero ha turni, non lezioni. */
   unita?: { s: string; p: string };
+  /**
+   * Contare le ore invece delle sedute. Il nuoto libero sono corsie aperte in
+   * fasce da una o più ore: diciotto «turni» stanno per quarantaquattro ore
+   * d'acqua, e il numero che conta è il secondo. La regola su quali attività
+   * si contano così sta in `data/planning.ts`.
+   */
+  ore?: boolean;
   variant?: 'light' | 'dark';
 }
 
-const { lezioni, nome, unita = { s: 'lezione', p: 'lezioni' }, variant = 'light' } = Astro.props;
+const { lezioni, nome, unita = { s: 'lezione', p: 'lezioni' }, ore = false, variant = 'light' } = Astro.props;
 
 /* Cerco in tutte le fasce, non solo nei corsi fitness: così lo stesso
    componente serve anche a un corso che venisse spostato di fascia. */
@@ -43,6 +50,21 @@ const giorni = bands
   .map((d) => ({ ...d, slots: d.slots.sort((a, b) => a.time.localeCompare(b.time)) }));
 
 const totale = giorni.reduce((n, d) => n + d.slots.length, 0);
+
+/* Le ore mostrate sono quelle delle fasce in elenco, non quelle della banda:
+   se un giorno la scheda filtrasse per corsia, il numero seguirebbe. */
+const oreTotali = Math.floor(
+  giorni.reduce(
+    (n, d) =>
+      n +
+      d.slots.reduce((m, s) => {
+        const [da, a] = s.time.replace(/^[A-Za-z]{3}\s*/, '').replace(/\s/g, '').split(/[–-]/);
+        const min = (t: string) => Number(t.split(':')[0]) * 60 + Number(t.split(':')[1]);
+        return m + (min(a) - min(da));
+      }, 0),
+    0
+  ) / 60
+);
 /* Il nome della lezione si mostra solo quando ce n'è più di uno: su Yoga
    distingue Hatha, Power e Yogassè; su Pilates sarebbe una ripetizione. */
 const nomiDistinti = new Set(giorni.flatMap((d) => d.slots.map((s) => s.name)));
@@ -54,7 +76,7 @@ const mostraNome = nomiDistinti.size > 1;
     <span class="sched__eyebrow">Orari della settimana</span>
     {totale > 0 && (
       <span class="sched__count">
-        {totale} {totale === 1 ? unita.s : unita.p} a settimana
+        {ore ? `${oreTotali} ore a settimana` : `${totale} ${totale === 1 ? unita.s : unita.p} a settimana`}
       </span>
     )}
   </div>

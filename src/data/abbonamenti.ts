@@ -8,6 +8,62 @@ import { PG } from './cta';
  * offerte e `/llms.txt`. Un prezzo scritto in tre posti è un prezzo che prima o
  * poi diverge in due, quindi sta qui.
  */
+/**
+ * La riga che spiega ogni attività compresa, per il modale dietro i chip
+ * «attività incluse». La leggono la pagina abbonamenti e la landing /promo:
+ * stessa attività, stessa spiegazione, un posto solo.
+ */
+export const activityInfo: Record<string, { title: string; body: string; href?: string }> = {
+  'Gym Floor': {
+    title: 'Gym Floor',
+    body:
+      '400 mq di sala accessibile dalle 6:00 alle 22:00: area cardio Matrix 4.0 con macchinari connessi all\'app, area isotonica, area funzionale Ziva con rig da 8 metri, manubri fino a 50 kg e area cavi e carico libero.',
+    href: '/gym-floor',
+  },
+  'Nuoto Libero Assistito': {
+    title: 'Nuoto Libero Assistito',
+    body:
+      'Nuoto libero nella vasca da 25 metri a 5 corsie, con assistenza bagnino sempre presente. Corsie divise per ritmo, temperatura costante fra 28 °C e 28,5 °C.',
+    href: '/nuoto-libero',
+  },
+  'Athlon TV': {
+    title: 'Athlon TV',
+    body:
+      'La piattaforma di allenamenti on demand inclusa nell\'abbonamento: sessioni da seguire quando vuoi, anche da casa, direttamente dall\'app Athlon Club.',
+    href: '/athlon-tv',
+  },
+  'Corsi Fitness': {
+    title: 'Corsi Fitness',
+    body:
+      'Oltre 80 corsi a settimana in tre sale dedicate: attività aerobiche, olistiche e di tonificazione, HIIT in Sala B e Group Reformer in Sala C. Prenoti dall\'app fino a 3 giorni prima.',
+    href: '/corsi-fitness',
+  },
+  'Group Reformer': {
+    title: 'Group Reformer',
+    body:
+      'Pilates Reformer in piccoli gruppi da 10 persone con istruttore dedicato, nella nuova Sala C da 80 mq. Lavoro su postura, forza e mobilità.',
+    href: '/reformer',
+  },
+  'Aqua Fitness': {
+    title: 'Aqua Fitness',
+    body:
+      'Allenamento cardio a basso impatto in acqua: Aqua Gym e Hydrobike nella vasca da 12 metri, con temperatura fra 30 °C e 31,8 °C. Ideale anche per chi cerca un carico dolce sulle articolazioni.',
+    href: '/aqua-fitness',
+  },
+  'Scuola Nuoto Adulti': {
+    title: 'Scuola Nuoto Adulti',
+    body:
+      'Corsi su tre livelli — base, intermedio e avanzato — con istruttori federali. Dal primo approccio all\'acqua al perfezionamento dei quattro stili.',
+    href: '/scuola-nuoto-adulti',
+  },
+  'Corso Gestanti': {
+    title: 'Corso Gestanti',
+    body:
+      'Attività in acqua pensata per la gravidanza, seguita da personale specializzato, nella vasca a temperatura più alta. Lavoro dolce su respirazione, mobilità e scarico del peso.',
+    href: '/gestanti',
+  },
+};
+
 export const plans = [
   {
     id: 'smart',
@@ -91,6 +147,21 @@ export const plans = [
     ],
   },
 ];
+
+/**
+ * La sospensione: illimitata, a pagamento, un mese solare per volta.
+ *
+ * È il dato che toglie la paura di firmare un annuale — «e se mi fermo?» — e
+ * per questo compare in tre punti: le schede dei piani sulla landing della
+ * promo, la nota sotto il listino e la f.a.q. degli abbonamenti. Il prezzo sta
+ * qui, così non diverge fra i tre.
+ */
+export const SOSPENSIONE = {
+  prezzo: '15',
+  /** Il preavviso, in giorni, rispetto al primo del mese. */
+  preavviso: 10,
+  scheda: '/wikiathlon/adulti/sospensione/',
+} as const;
 
 /**
  * Il Guest Pass: la prova del club. Sette giorni, un prezzo, un requisito e un

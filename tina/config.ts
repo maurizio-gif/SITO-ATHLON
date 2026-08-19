@@ -243,6 +243,156 @@ export default defineConfig({
           { type: 'rich-text', name: 'body', label: 'Contenuto', isBody: true },
         ],
       },
+
+      // ─── PROMO ─────────────────────────────────────────────────────────────
+      // La landing /promo, che cambia ogni mese. È un documento solo: non si
+      // crea e non si cancella, si riscrive. Da qui si cambiano il titolo, la
+      // scadenza del conto alla rovescia e i passaggi dell'iscrizione.
+      //
+      // I prezzi non ci sono, ed è voluto: la pagina li legge dal listino in
+      // src/data/abbonamenti.ts, l'unico posto dove vivono. Metterli anche qui
+      // vorrebbe dire poterli cambiare in un posto solo dei due.
+      // ───────────────────────────────────────────────────────────────────────
+      {
+        name: 'promo',
+        label: 'Promo del mese (/promo)',
+        path: 'src/content/promo',
+        format: 'md',
+        ui: {
+          allowedActions: { create: false, delete: false },
+        },
+        fields: [
+          {
+            type: 'string',
+            name: 'titolo',
+            label: 'Titolo della promo',
+            description: 'Es. «Promo Agosto 2026». Diventa anche il titolo della pagina nei motori di ricerca.',
+            isTitle: true,
+            required: true,
+          },
+          { type: 'string', name: 'occhiello', label: 'Occhiello sopra il titolo', required: true },
+          {
+            type: 'string',
+            name: 'claim',
+            label: 'L’offerta in una riga',
+            description: 'Es. «Quota di attivazione in omaggio». È la frase arancione sotto il titolo.',
+            required: true,
+          },
+          {
+            type: 'string',
+            name: 'sommario',
+            label: 'Sommario',
+            ui: { component: 'textarea' },
+            required: true,
+          },
+          { type: 'string', name: 'validoSu', label: 'Su cosa è valida', required: true },
+          {
+            type: 'datetime',
+            name: 'scadenza',
+            label: 'Scadenza (il conto alla rovescia arriva a zero qui)',
+            description: 'Passata questa data la pagina lo dice da sola e il conto sparisce.',
+            required: true,
+          },
+          { type: 'string', name: 'scadenzaLabel', label: 'Etichetta sopra il conto alla rovescia', required: true },
+          {
+            type: 'string',
+            name: 'quotaBarrata',
+            label: 'Quota di attivazione barrata (solo il numero)',
+            description: 'Il prezzo che compare sbarrato sulle schede. Senza il simbolo €.',
+            required: true,
+          },
+          { type: 'image', name: 'foto', label: 'Foto di sfondo dell’apertura', required: true },
+
+          {
+            type: 'string',
+            name: 'senzaAccountTitolo',
+            label: 'Chi non ha un account · titolo',
+            required: true,
+          },
+          {
+            type: 'string',
+            name: 'senzaAccountTesto',
+            label: 'Chi non ha un account · testo',
+            ui: { component: 'textarea' },
+            required: true,
+          },
+          { type: 'string', name: 'conAccountTitolo', label: 'Chi ha già un account · titolo', required: true },
+          {
+            type: 'string',
+            name: 'conAccountTesto',
+            label: 'Chi ha già un account · testo',
+            ui: { component: 'textarea' },
+            required: true,
+          },
+
+          { type: 'string', name: 'proceduraTitolo', label: 'Procedura · titolo', required: true },
+          {
+            type: 'string',
+            name: 'proceduraIntro',
+            label: 'Procedura · introduzione (facoltativa)',
+            description: 'Lasciala vuota e sopra i passaggi non compare niente.',
+            ui: { component: 'textarea' },
+          },
+          { type: 'string', name: 'procedura', label: 'Procedura · passaggi', list: true, required: true },
+          {
+            type: 'string',
+            name: 'proceduraNota',
+            label: 'Procedura · nota sul metodo di pagamento',
+            ui: { component: 'textarea' },
+            required: true,
+          },
+
+          { type: 'string', name: 'faqTitolo', label: 'Domande · titolo', required: true },
+          {
+            type: 'object',
+            name: 'faq',
+            label: 'Domande frequenti',
+            list: true,
+            ui: { itemProps: (i) => ({ label: i?.q }) },
+            fields: [
+              { type: 'string', name: 'q', label: 'Domanda', required: true },
+              {
+                type: 'string',
+                name: 'a',
+                label: 'Risposta (ammette link HTML)',
+                ui: { component: 'textarea' },
+                required: true,
+              },
+            ],
+          },
+
+          { type: 'string', name: 'chiSiamoTitolo', label: 'Chi siamo · titolo', required: true },
+          {
+            type: 'string',
+            name: 'chiSiamo',
+            label: 'Chi siamo · capoversi',
+            list: true,
+            ui: { component: 'textarea' },
+            required: true,
+          },
+
+          { type: 'string', name: 'strutturaTitolo', label: 'La struttura · titolo', required: true },
+          {
+            type: 'string',
+            name: 'strutturaTesto',
+            label: 'La struttura · testo',
+            ui: { component: 'textarea' },
+            required: true,
+          },
+          { type: 'string', name: 'struttura', label: 'La struttura · spazi', list: true, required: true },
+
+          { type: 'string', name: 'contattiTitolo', label: 'Contatti · titolo', required: true },
+          {
+            type: 'string',
+            name: 'contattiTesto',
+            label: 'Contatti · testo',
+            ui: { component: 'textarea' },
+            required: true,
+          },
+
+          { type: 'boolean', name: 'draft', label: 'Bozza (la pagina non si pubblica)' },
+        ],
+      },
     ],
   },
 });

@@ -312,7 +312,7 @@ export const JUNIOR: CorsoJunior[] = [
       { slug: 'gym-floor', perche: 'La sala attrezzi affaccia direttamente sulle piscine: ti alleni con la vasca davanti agli occhi.' },
       { slug: 'reformer', perche: 'Cinquanta minuti in Sala C: centro, postura e controllo, in gruppi da dieci.' },
       { slug: 'aqua-fitness', perche: 'Resti in acqua ma tocca a te: lavoro completo e nessun carico sulle articolazioni.' },
-      { slug: 'ginnastica-posturale', perche: 'Per la schiena che ha portato in braccio tutto il giorno.' },
+      { slug: 'ginnastica-strutturale', perche: 'Per la schiena che ha portato in braccio tutto il giorno.' },
     ],
     titolo: 'Baby Nuoto Roma Talenti – Dai 3 mesi | Athlon Club',
     descrizione:
@@ -595,7 +595,7 @@ export const JUNIOR: CorsoJunior[] = [
     ],
     simili: [
       { slug: 'gym-floor', perche: 'La sala attrezzi affaccia direttamente sulle piscine: ti alleni con la vasca davanti agli occhi.' },
-      { slug: 'nuoto-libero', perche: 'Diciotto turni a settimana in vasca grande, con i tecnici a bordo vasca.' },
+      { slug: 'nuoto-libero', perche: 'Quarantaquattro ore di vasca grande a settimana, con i tecnici a bordo vasca.' },
       { slug: 'strenght', perche: 'Forza vera con i pesi, programmata: il corso Les Mills.' },
       { slug: 'hbx', perche: 'Small group ad alta intensità: Boxing o Fusion.' },
     ],

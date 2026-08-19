@@ -10,11 +10,21 @@ const prova = trialCta({ source: '/' });
       video's bottom-right corner in both layouts — over the full-bleed frame on
       desktop, over the cropped band on a phone. */}
   <div class="hero-media">
-    {/* Il poster è il primo fotogramma della clip stessa, 37 kB di webp: la
+    {/* Il poster è il primo fotogramma della clip stessa, 46 kB di webp: la
         fascia si riempie appena arriva l'HTML invece di restare nera finché il
         video non ha abbastanza byte da mostrare qualcosa — su 4G lenta è più di
         un secondo, ed è la prima schermata del sito. Essendo il fotogramma suo,
-        quando il video parte non si vede nessuno scatto. */}
+        quando il video parte non si vede nessuno scatto.
+
+        Va rifatto ogni volta che si cambia la clip, e va preso a tempo zero con
+        tolleranza zero, non con l'anteprima di sistema: `qlmanage` restituisce
+        un fotogramma qualsiasi, rappresentativo, e col fotogramma sbagliato lo
+        scatto all'avvio si vede. Il modo più corto su questo Mac, senza ffmpeg:
+
+          swift frame0.swift clip.mp4 frame0.png   # AVAssetImageGenerator,
+                                                   # requestedTimeTolerance* = .zero
+          node -e "require('sharp')('frame0.png').resize(1152).webp({quality:72})
+                   .toFile('…-poster.webp')"       # 1152px, come gli altri */}
     <video
       class="hero-bg"
       id="hero-video"
@@ -22,9 +32,9 @@ const prova = trialCta({ source: '/' });
       muted
       loop
       playsinline
-      poster="/wp-content/uploads/2025/12/Athlon-Tour-2025-poster.webp"
+      poster="/wp-content/uploads/2026/08/Athlon-Hero-2026-poster.webp"
     >
-      <source src="/wp-content/uploads/2025/12/Athlon-Tour-2025-COMPRESSED.mp4" type="video/mp4" />
+      <source src="/wp-content/uploads/2026/08/Athlon-Hero-2026.mp4" type="video/mp4" />
     </video>
     <button
       type="button"
@@ -91,8 +101,9 @@ const prova = trialCta({ source: '/' });
 
 <script>
   // Fullscreen for the hero video. The inline copy is muted so it can autoplay;
-  // going fullscreen is a deliberate act, so it gets sound and controls, and
-  // both are put back on exit so the background loop stays a background loop.
+  // going fullscreen is a deliberate act, so it gets the controls — but not the
+  // sound: quello lo accende il visitatore, se vuole. Controlli e muto tornano
+  // come prima all'uscita, così lo sfondo resta uno sfondo.
   const heroVideo = document.getElementById('hero-video') as HTMLVideoElement | null;
   const heroExpand = document.getElementById('hero-expand');
 
@@ -109,8 +120,18 @@ const prova = trialCta({ source: '/' });
 
   heroExpand?.addEventListener('click', () => {
     if (!heroVideo) return;
-    heroVideo.controls = true;
-    heroVideo.muted = false;
+    // A schermo intero resta muto: l'audio parte solo se lo accende il
+    // visitatore, dai controlli che a quel punto ha in mano. Ingrandire vuol
+    // dire «guarda meglio», non «alza il volume» — e su un pannello
+    // all'ingresso del club, o in un ufficio, un video che comincia a parlare
+    // da solo perché qualcuno ha toccato una lente è un piccolo incidente.
+    // `restoreHeroVideo` lo rimette muto in ogni caso all'uscita.
+    heroVideo.muted = true;
+    // I controlli **non** si accendono qui: si accendono quando il fullscreen è
+    // davvero entrato, sotto. Messi prima, comparivano per un fotogramma sulla
+    // clip ancora incastonata nella pagina, e ci restavano del tutto se il
+    // browser rifiutava la richiesta — che è quanto succede quando il clic non
+    // conta come gesto dell'utente. Uno sfondo non ha controlli, mai.
     // For as long as this is the visitor's video, nothing else touches it —
     // iOS fullscreen is the system player, where document.fullscreenElement
     // stays null and a pause of theirs would otherwise be undone.
@@ -123,17 +144,25 @@ const prova = trialCta({ source: '/' });
     if (v.requestFullscreen) {
       v.requestFullscreen().catch(restoreHeroVideo);
     } else if (v.webkitEnterFullscreen) {
-      // iOS Safari only ever fullscreens the video element itself.
+      // iOS Safari only ever fullscreens the video element itself, e lì i
+      // controlli sono quelli del player di sistema: non c'è niente da
+      // accendere.
       v.webkitEnterFullscreen();
     } else if (v.webkitRequestFullscreen) {
+      // WebKit vecchio: nessuna promessa da attendere, e nessun
+      // `fullscreenchange` standard — i controlli si accendono qui.
       v.webkitRequestFullscreen();
+      heroVideo.controls = true;
     } else {
       restoreHeroVideo();
     }
   });
 
   document.addEventListener('fullscreenchange', () => {
-    if (!document.fullscreenElement) restoreHeroVideo();
+    // Entrati davvero: solo adesso la clip smette di essere uno sfondo e
+    // diventa un video con i suoi comandi.
+    if (document.fullscreenElement === heroVideo) heroVideo.controls = true;
+    else if (!document.fullscreenElement) restoreHeroVideo();
   });
   // iOS does not fire fullscreenchange; the video reports its own exit.
   heroVideo?.addEventListener('webkitendfullscreen', restoreHeroVideo);

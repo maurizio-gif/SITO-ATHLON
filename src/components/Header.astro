@@ -26,7 +26,7 @@ const corsiFitness = [
   { label: 'Difesa Personale', href: '/difesa-personale' },
   { label: 'GP Coreo', href: '/gpcoreo' },
   { label: 'Ginnastica Dolce', href: '/ginnastica-dolce' },
-  { label: 'Ginnastica Posturale', href: '/ginnastica-posturale' },
+  { label: 'Ginnastica Strutturale', href: '/ginnastica-strutturale' },
   { label: 'HBX', href: '/hbx' },
   { label: 'Motr®', href: '/motr' },
   { label: 'Pilates', href: '/pilates' },
@@ -184,9 +184,18 @@ const accountBlocks = [
       >{contatta.label}</a>
       <a href={iscriviti.href} class="nav-cta" {...iscriviti.attrs}>{iscriviti.label}</a>
 
-      {/* In piccolo, dopo le azioni: le condizioni si trovano senza scendere
-          fino al footer. */}
-      <a href="/regolamento" class="nav-fine">Termini e Condizioni</a>
+      {/* Terza azione, dopo il chiedere e il comprare: la prova. Sta qui e non
+          più in fondo alla barra — era la stessa identica prova, e averla nei
+          due posti a trecento pixel di distanza faceva scegliere due volte la
+          stessa cosa. Al suo posto c'erano le condizioni: sono nel footer e nel
+          menu del telefono, che è dove uno le cerca. */}
+      <a
+        href={prova.href}
+        class="nav-prova"
+        target="_blank"
+        rel="noopener noreferrer"
+        {...prova.attrs}
+      >{prova.label}</a>
     </nav>
 
     {/* Solo su mobile: la barra non ha spazio per la riga di navigazione, e
@@ -214,13 +223,6 @@ const accountBlocks = [
           <circle cx="12" cy="7" r="4" />
         </svg>
       </button>
-      <a
-        href={prova.href}
-        class="header-link strong"
-        target="_blank"
-        rel="noopener noreferrer"
-        {...prova.attrs}
-      >{prova.label}</a>
       <button class="burger" aria-label="Menu" aria-expanded="false" id="burger">
         <span></span><span></span><span></span>
       </button>
@@ -716,36 +718,29 @@ const accountBlocks = [
     color: var(--color-white);
   }
 
-  /* Le condizioni: presenti, non in gara con le due azioni accanto. */
-  .nav-fine {
-    margin-left: 14px;
-    font-size: 0.6875rem;
-    font-weight: 500;
-    letter-spacing: 0.04em;
+  /* La prova: un'azione, quindi arancione e in maiuscoletto come le altre due,
+     ma testo e non pastiglia — tre pastiglie in fila sarebbero tre pesi uguali
+     e nessuna gerarchia. È la misura che aveva in fondo alla barra, spostata
+     qui. */
+  .nav-prova {
+    margin-left: 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
-    color: var(--text-muted);
+    color: var(--color-primary);
     white-space: nowrap;
   }
 
-  .nav-fine:hover {
-    color: var(--color-dark);
+  .nav-prova:hover {
     text-decoration: underline;
+    text-underline-offset: 4px;
   }
 
   .header-actions {
     display: flex;
     align-items: center;
     gap: 18px;
-  }
-
-  .header-link {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-
-  .header-link.strong {
-    color: var(--color-primary);
   }
 
   /* ---- Account icon + panel ---- */
@@ -1265,7 +1260,6 @@ const accountBlocks = [
     }
 
     .main-nav,
-    .header-link,
     .mega,
     .mega-backdrop {
       display: none !important;

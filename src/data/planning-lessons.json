@@ -245,49 +245,7 @@
    }
   ]
  },
- "GINN. POSTURALE": {
-  "desc": "Attività orientata al miglioramento della postura, della mobilità articolare e dell'equilibrio muscolare, con esercizi controllati e progressivi.",
-  "stats": [
-   {
-    "l": "Intensità muscolare",
-    "v": 40
-   },
-   {
-    "l": "Intensità cardiovascolare",
-    "v": 15
-   },
-   {
-    "l": "Coordinazione",
-    "v": 50
-   },
-   {
-    "l": "Flessibilità",
-    "v": 75
-   }
-  ]
- },
- "G. POSTURALE": {
-  "desc": "Attività orientata al miglioramento della postura, della mobilità articolare e dell'equilibrio muscolare, con esercizi controllati e progressivi.",
-  "stats": [
-   {
-    "l": "Intensità muscolare",
-    "v": 40
-   },
-   {
-    "l": "Intensità cardiovascolare",
-    "v": 15
-   },
-   {
-    "l": "Coordinazione",
-    "v": 50
-   },
-   {
-    "l": "Flessibilità",
-    "v": 75
-   }
-  ]
- },
- "POSTURALE": {
+ "GINNASTICA STRUTTURALE": {
   "desc": "Attività orientata al miglioramento della postura, della mobilità articolare e dell'equilibrio muscolare, con esercizi controllati e progressivi.",
   "stats": [
    {

@@ -4,7 +4,7 @@ import OpeningHours from '../components/planning/OpeningHours.astro';
 import PlanningBand from '../components/planning/PlanningBand.astro';
 import LessonModal from '../components/planning/LessonModal.astro';
 import Faq, { type FaqEntry } from '../components/Faq.astro';
-import { bands, countLessons } from '../data/planning';
+import { bands, countLessons, bandHours, ledeOf, siContaAOre, totalLessons } from '../data/planning';
 import { trialCta } from '../data/cta';
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
@@ -24,7 +24,10 @@ const bandPages: Record<string, string> = {
   'aqua-fitness': '/aqua-fitness',
 };
 
-const totalLessons = bands.reduce((n, b) => n + countLessons(b), 0);
+/* Il totale lo conta il planning, non questa pagina: là il nuoto libero è
+   escluso perché sono corsie e non lezioni, e il numero deve essere lo stesso
+   ovunque compaia. */
+const lezioniTotali = totalLessons();
 
 // Booking rules, carried over verbatim from the planning site's own F.A.Q.
 const faqs: FaqEntry[] = [
@@ -53,7 +56,7 @@ const faqs: FaqEntry[] = [
 
 <Layout
   title="Orari e Planning | Athlon Club Roma Talenti"
-  description={`Il planning completo di Athlon Club: ${totalLessons} lezioni a settimana tra corsi fitness, group reformer, scuola nuoto, nuoto libero e aqua fitness, più gli orari di apertura della Gym Floor.`}
+  description={`Il planning completo di Athlon Club: ${lezioniTotali} lezioni a settimana tra corsi fitness, group reformer, scuola nuoto e aqua fitness, più le ore di nuoto libero, più gli orari di apertura della Gym Floor.`}
   breadcrumb={[{ name: 'Orari e Planning', path: '/planning' }]}
 >
   <!-- HERO -->
@@ -62,7 +65,7 @@ const faqs: FaqEntry[] = [
       <span class="eyebrow">La settimana al club</span>
       <h1 class="pl-hero__title">Orari <em class="accent">e planning</em></h1>
       <p class="pl-hero__lede">
-        {totalLessons} lezioni ogni settimana, più la Gym Floor aperta tutti i giorni. Prenoti tutto
+        {lezioniTotali} lezioni ogni settimana, più le ore di nuoto libero e la Gym Floor aperta tutti i giorni. Prenoti tutto
         dall'app o dal portale.
       </p>
       <div class="pl-hero__actions">
@@ -100,11 +103,13 @@ const faqs: FaqEntry[] = [
     <section class:list={['pl-sec', i % 2 === 0 ? 'pl-sec--dark' : 'pl-sec--alt']}>
       <div class="container">
         <span class="eyebrow" data-anim="from-left">
-          {countLessons(band)} lezioni a settimana
+          {siContaAOre(band.id)
+            ? `${bandHours(band)} ore a settimana`
+            : `${countLessons(band)} lezioni a settimana`}
         </span>
         <h2 class="pl-sec__title" data-anim="reveal">{band.title}</h2>
         <p class="pl-sec__sub">
-          {band.lede}
+          {ledeOf(band)}
           {bandPages[band.id] && (
             <> <a href={bandPages[band.id]}>Scopri l'attività →</a></>
           )}

@@ -3,6 +3,11 @@ import { urlPiccola } from '../../data/foto';
 const cards = [
   {
     variant: 'dark',
+    /* La sala com'è davvero, sotto un velo scuro: la card era un rettangolo di
+       colore pieno accanto a due che una foto ce l'avevano. La foto è un campo
+       largo senza un soggetto al centro — qui fa da fondale, non da soggetto, e
+       il testo le sta sopra. */
+    image: '/wp-content/uploads/2024/08/ACK2162Giacomo-lattanzio_-1-1024x683.jpg',
     title: 'Abbonamenti',
     html: 'Scopri i nuovi <strong>Abbonamenti Smart</strong> e <strong>Premium</strong>, con pagamento mensile o annuale.',
     link: '/abbonamenti',
@@ -10,10 +15,10 @@ const cards = [
   },
   {
     variant: 'photo',
-    image: '/wp-content/uploads/2026/04/P1000616-scaled.jpg',
+    image: '/wp-content/uploads/2024/08/ACK2362Giacomo-lattanzio_-1024x683.jpg',
     title: 'Promo Agosto',
     html: 'Scopri la nostra promozione riservata agli <strong>Abbonamenti Annuali</strong>. Entro il <strong>31/08/2026</strong>',
-    link: 'https://www.athlonroma.it/promo/',
+    link: '/promo',
     cta: 'Vedi la promo',
   },
   {
@@ -90,8 +95,21 @@ const cards = [
   }
 
   .card.dark {
-    background: var(--color-dark);
+    background: var(--bg-image) center / cover no-repeat, var(--color-dark);
     color: var(--color-white);
+  }
+
+  /* Il velo scuro sopra la foto. È una sfumatura e non un colore piatto perché
+     il testo sta in basso: sotto è più fitto dove servono le lettere, si apre
+     in alto dove la sala si deve vedere. Le due quantità sono il minimo che
+     tiene il bianco sopra il 4,5:1 anche nel caso peggiore, cioè se sotto
+     capitasse un pezzo di foto completamente bianco: 5,2:1 in cima e 8,6:1 in
+     fondo. */
+  .card.dark::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(39, 36, 35, 0.68), rgba(39, 36, 35, 0.9));
   }
 
   .card.dark .btn-outline-dark {

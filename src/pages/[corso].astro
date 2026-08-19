@@ -18,7 +18,7 @@ import Faq from '../components/Faq.astro';
 import { faqConSchede, type FaqEntry } from '../data/faq';
 import { CORSI, mediaVariante, type Corso } from '../data/corsi';
 import { scheda } from '../data/pagine';
-import { getBand, bands } from '../data/planning';
+import { getBand, bands, bandHours, siContaAOre } from '../data/planning';
 import { trialCta } from '../data/cta';
 import { serviceSchema } from '../data/club';
 import { fotoHero } from '../data/foto';
@@ -74,8 +74,15 @@ const labelPrenota = unita.s === 'turno' ? 'Prenota il tuo allenamento' : `Preno
    planning dà agli spazi, non da un campo in più da tenere aggiornato. */
 const spazi = sale.every((s) => s.startsWith('Vasca')) ? 'vasche' : 'sale';
 
+/* Il nuoto libero si racconta in ore: la regola sta nel planning e vale per
+   tutto il sito, qui si legge soltanto. */
+const aOre = siContaAOre(BANDA);
+const oreSettimana = aOre ? bandHours(getBand(BANDA)) : 0;
+
 const facts = [
-  slots.length > 0 && `${slots.length} ${slots.length === 1 ? unita.s : unita.p} a settimana`,
+  aOre
+    ? `${oreSettimana} ore a settimana`
+    : slots.length > 0 && `${slots.length} ${slots.length === 1 ? unita.s : unita.p} a settimana`,
   min && `${unita.p.charAt(0).toUpperCase()}${unita.p.slice(1)} da ${min} minuti`,
   sale.length === 1 ? sale[0] : sale.length > 1 ? `${sale.length} ${spazi}` : null,
   `Compreso nell'abbonamento ${pianiTesto}`,
@@ -331,7 +338,7 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
       <span class="eyebrow" data-anim="from-left">Ogni settimana</span>
       <h2 class="co-sec__title" data-anim="reveal">Quando c’è {corso.nome}</h2>
 
-      <LessonSchedule lezioni={corso.lezioni} nome={corso.nome} unita={unita} />
+      <LessonSchedule lezioni={corso.lezioni} nome={corso.nome} unita={unita} ore={aOre} />
 
       <div class="co-cta">
         <a href={PRENOTA} class="btn btn-primary">Prenota una lezione →</a>

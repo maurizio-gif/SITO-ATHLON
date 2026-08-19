@@ -229,7 +229,12 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
             )}
 
             {/* Livello, orari e frequenza: sono le tre cose che un genitore
-                cerca prima di tutto, quindi stanno in evidenza e non nel testo. */}
+                cerca prima di tutto, quindi stanno in evidenza e non nel testo.
+                La griglia si stampa solo se c'è almeno un riquadro: vuota
+                restava comunque nel flusso col suo margine, e apriva un buco in
+                mezzo alla scheda della scuola nuoto, che di riquadri non ne ha
+                nessuno. */}
+            {(c.livello || c.orari || c.allenamenti) && (
             <div class="ju-griglia">
               {c.livello && (
                 <div class="ju-box">
@@ -269,6 +274,7 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
                 </div>
               )}
             </div>
+            )}
 
             {c.extra?.map((e) => (
               <div class="ju-extra">
@@ -282,6 +288,9 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
               </div>
             ))}
 
+            {/* Come sopra: senza prova d'ingresso né certificato la lista era
+                un elemento vuoto con 22px di margine sopra. */}
+            {(c.prova || c.certificato) && (
             <ul class="ju-note">
               {c.prova && <li>{c.prova}</li>}
               {c.certificato && (
@@ -295,6 +304,7 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
                 </li>
               )}
             </ul>
+            )}
 
             {/* La chiamata all'azione della scheda è un pulsante, non un link di
                 testo: su queste pagine è l'unico modo per sapere turni e costi,
@@ -715,6 +725,14 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
   .ju-lista li {
     position: relative;
     padding-left: 20px;
+    /* Voci brevi che vanno a capo: l'ultima riga restava di una parola sola —
+       «...con l'accompagnamento di un / genitore», 819px contro 145 — e una
+       coda mozza in fondo a una voce è ciò che fa sembrare disordinato un
+       elenco anche quando le colonne sono giuste. `balance` divide le righe in
+       parti uguali: la stessa voce misura 468 e 496. Non `pretty`, che qui la
+       lasciava com'era. Sulle voci troppo lunghe il browser smette da sé e
+       torna a capo normale, quindi non c'è un limite da sorvegliare. */
+    text-wrap: balance;
   }
 
   .ju-lista li::before {
@@ -734,16 +752,17 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
   }
 
   /* Sei voci brevi in colonna sarebbero una lista lunga e magra: su schermo
-     largo stanno su due colonne e si leggono in un colpo d'occhio. */
+     largo stanno su due colonne e si leggono in un colpo d'occhio.
+     Due colonne finché ci stanno, però, non due sempre: sul totem le due
+     colonne valevano 477px con dentro testo da 27px, e tutte e sei le voci
+     andavano a capo — venticinque caratteri per riga, una lista di monconi.
+     La soglia in rem le tiene affiancate dove la riga regge (su desktop restano
+     i due terzi di riga di prima) e le mette in colonna unica sul pannello,
+     dove 984px bastano a far stare ogni voce su una riga sola. Il `min` serve a
+     non far sbordare la soglia sul telefono. */
   .ju-lista--due {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px 30px;
-  }
-
-  @media (max-width: 700px) {
-    .ju-lista--due {
-      grid-template-columns: 1fr;
-    }
+    grid-template-columns: repeat(auto-fit, minmax(min(24rem, 100%), 1fr));
+    gap: 12px 30px;
   }
 
   /* ---- Schede dei corsi ---- */
@@ -780,22 +799,35 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
   }
 
   /* ---- Dati in coppia ---- */
+  /* Questa è la sezione che un genitore legge per prima — durata, età, turni,
+     brevetto — ed era la meno leggibile della pagina: righe con l'etichetta in
+     una colonna fissa da 190px e il valore lungo tutto il resto della scheda,
+     cioè 950px, centoventi caratteri per riga. Sei righe uguali, separate solo
+     da un filo, tutte dello stesso peso: per trovare un dato bisognava
+     attraversarle tutte.
+     Ora ogni dato è una scheda, etichetta sopra e valore sotto — la stessa
+     forma dei riquadri di livello e orari qui sotto, così la sezione ha una
+     grammatica sola. La colonna era l'unica cosa che cambiava fra telefono e
+     desktop; adesso la forma è la stessa ovunque e cambia solo quante ne stanno
+     in riga. `auto-fit` con la soglia in rem lo decide da sé: tre sul desktop,
+     due sul tablet, una sul telefono e una sul totem, dove un rem vale 27px e
+     due colonne darebbero trentacinque caratteri per riga. Nessuna media query,
+     e il valore resta fra i 45 e i 73 caratteri a ogni scala. */
   .ju-dati {
-    margin: 18px 0 0;
+    margin: 22px 0 0;
     display: grid;
-    gap: 0;
+    /* `min(22rem, 100%)` e non `22rem`: una soglia più larga dello spazio
+       disponibile non si comprime, tiene la sua misura e fa scorrere la pagina
+       di lato — su un telefono da 375px la scheda ha 295px dentro, e 22rem sono
+       352. Col `min` la soglia si arrende alla larghezza vera. */
+    grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr));
+    gap: 14px;
   }
 
   .ju-dato {
-    display: grid;
-    grid-template-columns: 190px 1fr;
-    gap: 16px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border-dark);
-  }
-
-  .ju-dato:first-child {
-    border-top: 1px solid var(--border-dark);
+    padding: 16px 18px 18px;
+    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.28);
   }
 
   .ju-dato dt {
@@ -807,7 +839,7 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
   }
 
   .ju-dato dd {
-    margin: 0;
+    margin: 6px 0 0;
     color: rgba(255, 255, 255, 0.85);
   }
 
@@ -1216,11 +1248,6 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
       padding: 24px 20px;
     }
 
-    .ju-dato {
-      grid-template-columns: 1fr;
-      gap: 4px;
-    }
-
     .ju-facts__inner {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1235,6 +1262,31 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
 
     .ju-facts__item:not(:last-child)::after {
       content: none;
+    }
+  }
+
+  /* Sul totem i dati restano su una colonna sola, e devono: la scheda è larga
+     984px, due colonne ne darebbero 485 e lì «Dal 14 settembre 2026 al 20 giugno
+     2027» si spezza in due righe da venti caratteri — misurato, la mediana
+     scende a 26, sotto la soglia dei trenta. Ma con una colonna sola l'etichetta
+     sopra il valore spreca una riga per ogni dato breve, e sei schede in fila
+     tornano a somigliare all'elenco di prima.
+     Qui l'etichetta va a sinistra: le sei etichette incolonnate sono la guida
+     per l'occhio che scorre il pannello dall'alto, il valore tiene fra i 27 e i
+     45 caratteri per riga — meglio di entrambe le alternative — e la sezione
+     perde 144px. La colonna è in rem perché a 150% di scala Windows deve
+     crescere col testo. */
+  /* + totem: vedi «Il totem verticale del club» in global.css */
+  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
+    .ju-dato {
+      display: grid;
+      grid-template-columns: 12rem 1fr;
+      column-gap: 18px;
+      align-items: baseline;
+    }
+
+    .ju-dato dd {
+      margin: 0;
     }
   }
 

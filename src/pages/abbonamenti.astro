@@ -1,9 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import AttivitaModal from '../components/AttivitaModal.astro';
 
 import { trialCta } from '../data/cta';
 import { offerSchema } from '../data/club';
-import { plans, GUEST_PASS } from '../data/abbonamenti';
+import { plans, GUEST_PASS, SOSPENSIONE, activityInfo } from '../data/abbonamenti';
 /* Il dominio di produzione, per gli @id assoluti degli schemi. */
 const SITE = 'https://www.athlonroma.it';
 
@@ -14,56 +15,6 @@ const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 const prova = trialCta({ activity: 'membership', source: '/abbonamenti' });
 
 // Shown in the quick modal behind each "attività incluse" chip.
-const activityInfo: Record<string, { title: string; body: string; href?: string }> = {
-  'Gym Floor': {
-    title: 'Gym Floor',
-    body:
-      '400 mq di sala accessibile dalle 6:00 alle 22:00: area cardio Matrix 4.0 con macchinari connessi all\'app, area isotonica, area funzionale Ziva con rig da 8 metri, manubri fino a 50 kg e area cavi e carico libero.',
-    href: '/gym-floor',
-  },
-  'Nuoto Libero Assistito': {
-    title: 'Nuoto Libero Assistito',
-    body:
-      'Nuoto libero nella vasca da 25 metri a 5 corsie, con assistenza bagnino sempre presente. Corsie divise per ritmo, temperatura costante fra 28 °C e 28,5 °C.',
-    href: '/nuoto-libero',
-  },
-  'Athlon TV': {
-    title: 'Athlon TV',
-    body:
-      'La piattaforma di allenamenti on demand inclusa nell\'abbonamento: sessioni da seguire quando vuoi, anche da casa, direttamente dall\'app Athlon Club.',
-    href: '/athlon-tv',
-  },
-  'Corsi Fitness': {
-    title: 'Corsi Fitness',
-    body:
-      'Oltre 80 corsi a settimana in tre sale dedicate: attività aerobiche, olistiche e di tonificazione, HIIT in Sala B e Group Reformer in Sala C. Prenoti dall\'app fino a 3 giorni prima.',
-    href: '/corsi-fitness',
-  },
-  'Group Reformer': {
-    title: 'Group Reformer',
-    body:
-      'Pilates Reformer in piccoli gruppi da 10 persone con istruttore dedicato, nella nuova Sala C da 80 mq. Lavoro su postura, forza e mobilità.',
-    href: '/reformer',
-  },
-  'Aqua Fitness': {
-    title: 'Aqua Fitness',
-    body:
-      'Allenamento cardio a basso impatto in acqua: Aqua Gym e Hydrobike nella vasca da 12 metri, con temperatura fra 30 °C e 31,8 °C. Ideale anche per chi cerca un carico dolce sulle articolazioni.',
-    href: '/aqua-fitness',
-  },
-  'Scuola Nuoto Adulti': {
-    title: 'Scuola Nuoto Adulti',
-    body:
-      'Corsi su tre livelli — base, intermedio e avanzato — con istruttori federali. Dal primo approccio all\'acqua al perfezionamento dei quattro stili.',
-    href: '/scuola-nuoto-adulti',
-  },
-  'Corso Gestanti': {
-    title: 'Corso Gestanti',
-    body:
-      'Attività in acqua pensata per la gravidanza, seguita da personale specializzato, nella vasca a temperatura più alta. Lavoro dolce su respirazione, mobilità e scarico del peso.',
-    href: '/gestanti',
-  },
-};
 
 /* One glyph per activity, so the included list reads as an inventory rather
    than a ragged row of pills — the old site's treatment. Line icons in
@@ -135,7 +86,7 @@ const faqs = [
   },
   {
     q: "Posso sospendere l'abbonamento?",
-    a: 'Sì, le sospensioni sono illimitate al costo di €15 al mese. Partono dal primo giorno del mese e vanno richieste almeno 10 giorni prima. <a href="https://wiki.athlonroma.it/wikiathlon/adulti/sospensione/" target="_blank" rel="noopener">Come fare →</a>',
+    a: `Sì, le sospensioni sono illimitate al costo di €${SOSPENSIONE.prezzo} al mese. Partono dal primo giorno del mese e vanno richieste almeno ${SOSPENSIONE.preavviso} giorni prima. <a href="${SOSPENSIONE.scheda}">Come fare →</a>`,
   },
   {
     q: 'Come disdico il rinnovo automatico?',
@@ -271,7 +222,7 @@ const trust = [
       <p class="ab-note">
         <strong>Quota di attivazione:</strong> €50 una tantum, per tutti i piani. Include il badge di accesso e
         l'attivazione dell'account. Non è richiesta in caso di rinnovo.
-        · <strong>Sospensioni:</strong> illimitate, €15/mese · <strong>Certificato medico:</strong> non
+        · <strong>Sospensioni:</strong> illimitate, €{SOSPENSIONE.prezzo}/mese · <strong>Certificato medico:</strong> non
         agonistico, entro 2 settimane dalla prima lezione.
       </p>
     </div>
@@ -430,83 +381,11 @@ const trust = [
     </div>
   </section>
 
-  <!-- Quick explainer for each included activity -->
-  <div class="amodal" id="activity-modal" aria-hidden="true">
-    <div class="amodal__backdrop" data-amodal-close></div>
-    <div class="amodal__panel" role="dialog" aria-modal="true" aria-labelledby="amodal-title">
-      <button type="button" class="amodal__close" data-amodal-close aria-label="Chiudi">×</button>
-      <span class="amodal__eyebrow">Attività inclusa</span>
-      <h3 class="amodal__title" id="amodal-title"></h3>
-      <p class="amodal__body"></p>
-      {/* Parte nascosto e senza destinazione: l'href lo mette lo script quando
-          l'attività ha una pagina, e resta nascosto quando non ce l'ha. Un
-          href="#" in pagina è un link che non porta da nessuna parte. */}
-      <a class="amodal__link btn btn-primary" data-cta="explore" hidden>Vedi la pagina →</a>
-    </div>
-  </div>
-
-  <script is:inline set:html={`window.__ATHLON_ACTIVITIES__ = ${JSON.stringify(activityInfo)};`} />
+  {/* Il modale dietro ogni chip «attività incluse». */}
+  <AttivitaModal />
 </Layout>
 
 <script>
-  // ---- Activity explainer modal ----
-  type ActivityInfo = { title: string; body: string; href?: string };
-  const info = ((window as any).__ATHLON_ACTIVITIES__ || {}) as Record<string, ActivityInfo>;
-
-  const modal = document.getElementById('activity-modal');
-  const mTitle = modal?.querySelector<HTMLElement>('.amodal__title');
-  const mBody = modal?.querySelector<HTMLElement>('.amodal__body');
-  const mLink = modal?.querySelector<HTMLAnchorElement>('.amodal__link');
-  let lastTrigger: HTMLElement | null = null;
-
-  function closeModal() {
-    modal?.classList.remove('open');
-    modal?.setAttribute('aria-hidden', 'true');
-    document.body.classList.remove('amodal-locked');
-    // Send focus back where it came from, so keyboard users don't lose place.
-    lastTrigger?.focus();
-  }
-
-  function openModal(name: string, trigger: HTMLElement) {
-    const data = info[name];
-    if (!data || !modal) return;
-    lastTrigger = trigger;
-    if (mTitle) mTitle.textContent = data.title;
-    if (mBody) mBody.textContent = data.body;
-    if (mLink) {
-      // Not every activity has a page yet — hide the CTA rather than link nowhere.
-      if (data.href) {
-        mLink.href = data.href;
-        mLink.hidden = false;
-      } else {
-        mLink.hidden = true;
-      }
-    }
-    modal.classList.add('open');
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('amodal-locked');
-    /* Chiuso il modale è `visibility: hidden`, e `focus()` rifiuta un elemento
-       invisibile: la classe è appena stata aggiunta, la lettura di `offsetWidth`
-       fa ricalcolare lo stile prima di chiedere il focus. */
-    const chiudi = modal.querySelector<HTMLElement>('.amodal__close');
-    if (chiudi) {
-      void chiudi.offsetWidth;
-      chiudi.focus();
-    }
-  }
-
-  document.querySelectorAll<HTMLButtonElement>('[data-activity]').forEach((btn) => {
-    btn.addEventListener('click', () => openModal(btn.dataset.activity || '', btn));
-  });
-
-  modal?.querySelectorAll('[data-amodal-close]').forEach((el) =>
-    el.addEventListener('click', closeModal)
-  );
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal?.classList.contains('open')) closeModal();
-  });
-
   // Copy the guest-pass code, with the button itself confirming the result.
   document.querySelectorAll<HTMLButtonElement>('[data-copy-code]').forEach((btn) => {
     const code = btn.dataset.copyCode || '';
@@ -1506,11 +1385,33 @@ const trust = [
   }
 
   /* Three across while there is room, then stacked. */
-  /* + totem: vedi «Il totem verticale del club» in global.css */
-  @media (max-width: 820px),
-    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
+  @media (max-width: 820px) {
     .plan__options {
       grid-template-columns: 1fr;
+    }
+  }
+
+  /* Sul totem due, non una e non tre.
+     Impilate erano tre schede da 486px larghe 982 per contenere una riga di
+     prezzo: 1478px di card, e per arrivare dal Premium allo Smart si scorreva
+     mezzo pannello di aria. Tre affiancate stanno in 318px l'una e lì
+     «Iscriviti a Smart →» va a capo dentro il pulsante e la nota sul rinnovo
+     prende quattro righe: è l'accordéon che il totem produce ogni volta che una
+     colonna scende sotto i trenta caratteri. Due danno schede da 484px — la
+     scritta lunga resta sulle stesse tre righe che faceva a 982 — e tolgono
+     400px per abbonamento, cioè poco meno di uno schermo sui due. */
+  /* + totem: vedi «Il totem verticale del club» in global.css */
+  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
+    .plan__options {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Le formule sono tre: due per riga lasciano l'ultima da sola con un buco
+       largo mezza card accanto. Se è dispari occupa la riga intera — che è poi
+       la lettura giusta, «annuale nei due modi, oppure mensile». Con un numero
+       pari di formule la regola non scatta e restano due colonne piene. */
+    .plan__options .pcard:nth-child(odd):last-child {
+      grid-column: 1 / -1;
     }
   }
 
@@ -1534,123 +1435,6 @@ const trust = [
     }
     .planning {
       padding: 20px 18px;
-    }
-    .amodal {
-      padding: 16px;
-    }
-    .amodal__panel {
-      padding: 28px 20px 24px;
-    }
-  }
-
-  /* ---- Activity modal ---- */
-  .amodal {
-    position: fixed;
-    inset: 0;
-    z-index: 300;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    opacity: 0;
-    pointer-events: none;
-    /* Chiuso non deve stare nell'ordine di tabulazione: `opacity: 0` lo
-       nasconde agli occhi, `visibility` anche alla tastiera. Durata zero e
-       ritardo solo in chiusura: in apertura il valore calcolato deve essere già
-       `visible` quando lo script sposta il focus sul pulsante di chiusura. */
-    visibility: hidden;
-    transition: opacity var(--dur-fast) ease, visibility 0s var(--dur-fast);
-  }
-
-  .amodal.open {
-    opacity: 1;
-    pointer-events: auto;
-    visibility: visible;
-    transition: opacity var(--dur-fast) ease, visibility 0s;
-  }
-
-  .amodal__backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(10, 10, 8, 0.6);
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
-  }
-
-  .amodal__panel {
-    position: relative;
-    z-index: 1;
-    width: min(30rem, 100%);
-    padding: 32px 30px 30px;
-    border-radius: var(--radius);
-    background: var(--color-white);
-    box-shadow: 0 30px 70px -18px rgba(0, 0, 0, 0.5);
-    transform: translateY(10px) scale(0.98);
-    transition: transform var(--dur-base) var(--ease-out-crit);
-  }
-
-  .amodal.open .amodal__panel {
-    transform: none;
-  }
-
-  .amodal__close {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    border-radius: 50%;
-    background: var(--color-cream);
-    color: var(--color-dark);
-    font-size: 1.25rem;
-    line-height: 1;
-    cursor: pointer;
-    transition: background-color var(--dur-fast) ease;
-  }
-
-  .amodal__close:hover {
-    background: var(--color-primary);
-    color: var(--color-white);
-  }
-
-  .amodal__eyebrow {
-    display: block;
-    font-size: var(--text-2xs);
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--color-primary);
-    margin-bottom: 10px;
-  }
-
-  .amodal__title {
-    font-size: var(--text-2xl);
-    letter-spacing: var(--tracking-2xl);
-    margin-bottom: 14px;
-  }
-
-  .amodal__body {
-    color: var(--text-muted);
-    margin-bottom: 22px;
-  }
-
-  .amodal__link {
-    width: 100%;
-    justify-content: center;
-  }
-
-  :global(body.amodal-locked) {
-    overflow: hidden;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .amodal,
-    .amodal__panel {
-      transition: none;
     }
   }
 </style>

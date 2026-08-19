@@ -84,8 +84,28 @@ export function countLessons(band: Band): number {
 }
 
 /**
- * Tutte le lezioni della settimana, in tutte le fasce: corsi fitness, group
- * reformer, scuola nuoto adulti, nuoto libero e aqua fitness.
+ * Le fasce che si contano in ore e non in lezioni.
+ *
+ * Il nuoto libero non ha lezioni: ha corsie aperte in fasce da una o più ore, e
+ * chiamarle lezioni dice il numero sbagliato — diciotto «lezioni» per
+ * quarantaquattro ore d'acqua. Vale ovunque nel sito: l'occhiello del planning,
+ * la landing della promo, la scheda orari della pagina dell'attività e il
+ * totale qui sotto, che quelle diciotto non le somma più.
+ *
+ * Una fascia sola oggi, ma è un insieme e non un `if`: il giorno che si apre
+ * una seconda vasca a ingresso libero, si aggiunge qui e la seguono tutti.
+ */
+export const FASCE_A_ORE = new Set(['nuoto-libero']);
+
+/** Se questa fascia si racconta in ore invece che in lezioni. */
+export function siContaAOre(id: string): boolean {
+  return FASCE_A_ORE.has(id);
+}
+
+/**
+ * Tutte le lezioni della settimana: corsi fitness, group reformer, scuola nuoto
+ * adulti e aqua fitness. Il nuoto libero **non** ci sta dentro — sono corsie,
+ * non lezioni, e le sue ore si contano con `bandHours`.
  *
  * Esiste perché il numero girava scritto a mano in tre posti diversi e in tre
  * unità diverse — «200+ corsi a settimana» sulla home, «180 lezioni» in una
@@ -93,7 +113,7 @@ export function countLessons(band: Band): number {
  * qui si conta quella, e chi la mostra la chiama col suo nome.
  */
 export function totalLessons(): number {
-  return bands.reduce((n, b) => n + countLessons(b), 0);
+  return bands.filter((b) => !siContaAOre(b.id)).reduce((n, b) => n + countLessons(b), 0);
 }
 
 /** Minuti di un intervallo del planning: `07:40–08:30`, o `Dom 09:30–12:30`. */
@@ -111,7 +131,39 @@ function durata(time: string): number {
  * di un totale di N,9 è vero, il contrario no.
  */
 export function totalHours(): number {
-  return Math.floor(bands.reduce((n, b) => n + b.days.reduce((m, d) => m + d.classes.reduce((k, c) => k + durata(c.time), 0), 0), 0) / 60);
+  return Math.floor(bands.reduce((n, b) => n + minuti(b), 0) / 60);
+}
+
+/** Minuti di palinsesto in una fascia. */
+function minuti(band: Band): number {
+  return band.days.reduce((n, d) => n + d.classes.reduce((m, c) => m + durata(c.time), 0), 0);
+}
+
+/**
+ * Ore di palinsesto in una fascia, arrotondate per difetto come il totale.
+ *
+ * Serve dove contare le lezioni direbbe il numero sbagliato: il nuoto libero
+ * non ha lezioni ma corsie aperte in fasce da una o più ore, e diciotto
+ * «lezioni» stanno per quarantaquattro ore d'acqua.
+ */
+export function bandHours(band: Band): number {
+  return Math.floor(minuti(band) / 60);
+}
+
+/**
+ * Il testo di presentazione di una fascia, coi numeri sostituiti da quelli veri.
+ *
+ * Il palinsesto cambia ogni mese, i numeri scritti a mano dentro il testo no: i
+ * corsi fitness hanno dichiarato «80 lezioni» sotto un occhiello che ne contava
+ * 79, cioè lo stesso dato in due versioni nella stessa schermata. Nel JSON il
+ * testo porta i segnaposto `{n}` — le lezioni della fascia — e `{ore}`, le sue
+ * ore; qui diventano il conteggio del momento. Aggiungendo o togliendo una
+ * lezione dal palinsesto si aggiornano da soli, come l'occhiello.
+ */
+export function ledeOf(band: Band): string {
+  return band.lede
+    .replace(/\{n\}/g, String(countLessons(band)))
+    .replace(/\{ore\}/g, String(bandHours(band)));
 }
 
 /**

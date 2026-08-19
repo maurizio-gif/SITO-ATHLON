@@ -28,7 +28,7 @@
       "planTags": [
         "premium"
       ],
-      "lede": "80 lezioni ogni settimana, tra discipline olistiche, funzionali e musicali: un'offerta per ogni livello e ogni gusto.",
+      "lede": "{n} lezioni ogni settimana, tra discipline olistiche, funzionali e musicali: un'offerta per ogni livello e ogni gusto.",
       "days": [
         {
           "short": "Lun",
@@ -41,7 +41,7 @@
             },
             {
               "time": "09:30–10:20",
-              "name": "G. Posturale",
+              "name": "Ginnastica Strutturale",
               "sala": "Sala A"
             },
             {
@@ -142,7 +142,7 @@
             },
             {
               "time": "13:30–14:20",
-              "name": "Pilates",
+              "name": "Pilates Matwork",
               "sala": "Sala A"
             },
             {
@@ -157,7 +157,7 @@
             },
             {
               "time": "16:50–17:40",
-              "name": "Posturale",
+              "name": "Ginnastica Strutturale",
               "sala": "Sala A"
             },
             {
@@ -218,7 +218,7 @@
             },
             {
               "time": "10:30–11:20",
-              "name": "G. Posturale",
+              "name": "Ginnastica Strutturale",
               "sala": "Sala A"
             },
             {
@@ -314,7 +314,7 @@
             },
             {
               "time": "16:40–17:30",
-              "name": "Posturale",
+              "name": "Ginnastica Strutturale",
               "sala": "Sala A"
             },
             {
@@ -436,7 +436,7 @@
             },
             {
               "time": "09:30–10:20",
-              "name": "Pilates",
+              "name": "Pilates Matwork",
               "sala": "Sala A"
             },
             {
@@ -469,7 +469,7 @@
       "planTags": [
         "premium"
       ],
-      "lede": "34 sessioni ogni settimana su 10 Reformer Balanced Body Allegro: allenamento guidato per tonificare, migliorare postura, controllo e flessibilità.",
+      "lede": "{n} sessioni ogni settimana su 10 Reformer Balanced Body Allegro: allenamento guidato per tonificare, migliorare postura, controllo e flessibilità.",
       "days": [
         {
           "short": "Lun",
@@ -685,7 +685,7 @@
       "planTags": [
         "premium"
       ],
-      "lede": "15 lezioni a settimana tra cui scegliere, divise per livello — Base, Intermedio e Avanzato. Puoi prenotare in uno qualsiasi degli orari: alla prima lezione l'istruttore ti assegnerà il livello definitivo, nel quale potrai prenotare le lezioni successive.",
+      "lede": "{n} lezioni a settimana tra cui scegliere, divise per livello — Base, Intermedio e Avanzato. Puoi prenotare in uno qualsiasi degli orari: alla prima lezione l'istruttore ti assegnerà il livello definitivo, nel quale potrai prenotare le lezioni successive.",
       "days": [
         {
           "short": "Lun",
@@ -806,7 +806,7 @@
         "smart",
         "premium"
       ],
-      "lede": "44 ore di nuoto libero a settimana tra cui scegliere, con tutte le corsie a disposizione e turni da 60 minuti. Ideale per livelli natatori intermedi e avanzati.",
+      "lede": "{ore} ore di nuoto libero a settimana tra cui scegliere, con tutte le corsie a disposizione e turni da 60 minuti. Ideale per livelli natatori intermedi e avanzati.",
       "days": [
         {
           "short": "Lun",
@@ -942,7 +942,7 @@
       "planTags": [
         "premium"
       ],
-      "lede": "34 lezioni ogni settimana in Vasca Grande (25 metri) o nella Vasca Piccola, con attività di aqua fitness per tutti i gusti.",
+      "lede": "{n} lezioni ogni settimana in Vasca Grande (25 metri) o nella Vasca Piccola, con attività di aqua fitness per tutti i gusti.",
       "days": [
         {
           "short": "Lun",

@@ -85,12 +85,25 @@ const CLIP = [
     audio: false,
   },
   {
-    src: 'public/wp-content/uploads/2025/12/Athlon-Tour-2025-COMPRESSED.mp4',
+    src: 'public/wp-content/uploads/2026/08/Athlon-Hero-2026.mp4',
     /* A tutta pagina, ma sotto uno scrim che va dal 50 al 92% di nero: il
-       dettaglio fine non si vede, e il bitrate può stare basso. */
+       dettaglio fine non si vede, e il bitrate può stare basso. Su questo
+       contenuto — sala attrezzi, parete a doghe, molte persone in movimento —
+       il CRF chiedeva più del tetto, quindi la clip viaggia esattamente a
+       1300k dall'inizio alla fine. Confrontati i fotogrammi col sorgente: la
+       parete a doghe, che è il dettaglio più difficile, regge.
+
+       Il sorgente arrivava in **HEVC**, che è la ragione per cui questa riga
+       esiste: Firefox non lo decodifica e Chrome solo con supporto hardware, e
+       lì la hero sarebbe un rettangolo nero. Vale anche per il totem del club,
+       che gira su Edge in Windows.
+
+       Unica clip con l'audio, e l'unica che può averlo: è l'unica che il
+       visitatore porta a schermo intero, e lì `Hero.astro` toglie il muto di
+       proposito. Il sorgente precedente non aveva traccia audio, questo sì. */
     crf: 30,
     maxrate: '1300k',
-    audio: false,
+    audio: true,
   },
   {
     src: 'public/wp-content/uploads/2025/12/solo-sala-pesi_H3BXNqoj.mp4',

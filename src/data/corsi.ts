@@ -16,7 +16,7 @@
  * casi in cui la scheda lezione non c'è, perché il corso non è in palinsesto
  * questo mese.
  *
- * Tre corsi — Balli di Gruppo, Ginnastica Dolce e Ginnastica Posturale — nel
+ * Tre corsi — Balli di Gruppo, Ginnastica Dolce e Ginnastica Strutturale — nel
  * backup hanno una pagina vuota: nessun testo, nessuna foto, nessun video. Per
  * loro il testo è la descrizione della scheda lezione, che è nostra e
  * verificata, e non un testo inventato per riempire la pagina.
@@ -333,7 +333,7 @@ export const CORSI: Corso[] = [
     lezioni: ['Ginnastica Dolce'],
     attrezzatura: 'Abbigliamento comodo, scarpe da ginnastica, un asciugamano personale e acqua.',
     simili: [
-      { slug: 'ginnastica-posturale', perche: 'Lo stesso ritmo, con il lavoro mirato su postura e allungamento.' },
+      { slug: 'ginnastica-strutturale', perche: 'Lo stesso ritmo, con il lavoro mirato su postura e allungamento.' },
       { slug: 'pilates', perche: 'Un passo più strutturato, restando a bassa intensità.' },
       { slug: 'balli-di-gruppo', perche: 'Muoversi a tempo di musica, sempre senza sovraccarichi.' },
     ],
@@ -341,8 +341,8 @@ export const CORSI: Corso[] = [
       'Ginnastica dolce ad Athlon Club Roma Talenti: mobilità articolare e tonificazione leggera, a bassa intensità. Orari della settimana.',
   },
   {
-    slug: 'ginnastica-posturale',
-    nome: 'Ginnastica Posturale',
+    slug: 'ginnastica-strutturale',
+    nome: 'Ginnastica Strutturale',
     claim: 'Un’ora sul controllo della postura.',
     hero: `${U}/2024/08/P1160261-1536x865.jpg`,
     fuoco: '62% 44%',
@@ -351,9 +351,9 @@ export const CORSI: Corso[] = [
       'La lezione è adatta a tutte le età e a tutti i livelli. Se hai un problema specifico segnalalo all’istruttore all’inizio della lezione: gli esercizi si adattano.',
     ],
     varianti: [
-      { nome: null, testo: '', lezione: 'Posturale', poster: `${U}/2024/08/P1160261-1536x865.jpg` },
+      { nome: null, testo: '', lezione: 'Ginnastica Strutturale', poster: `${U}/2024/08/P1160261-1536x865.jpg` },
     ],
-    lezioni: ['Posturale', 'G. Posturale'],
+    lezioni: ['Ginnastica Strutturale'],
     attrezzatura: 'Abbigliamento comodo, un asciugamano personale e acqua. Si lavora sul tappetino, a piedi nudi o con calzini antiscivolo.',
     simili: [
       { slug: 'pilates', perche: 'Gli stessi principi, con una progressione più tecnica.' },
@@ -361,7 +361,7 @@ export const CORSI: Corso[] = [
       { slug: 'motr', perche: 'Lo stesso lavoro di controllo, con l’aiuto dell’attrezzo.' },
     ],
     descrizione:
-      'Ginnastica posturale ad Athlon Club Roma Talenti: allungamento, mobilità e rinforzo del core con esercizi controllati. Orari e caratteristiche.',
+      'Ginnastica strutturale ad Athlon Club Roma Talenti: allungamento, mobilità e rinforzo del core con esercizi controllati. Orari e caratteristiche.',
   },
   {
     slug: 'gpcoreo',
@@ -439,7 +439,7 @@ export const CORSI: Corso[] = [
     attrezzatura: 'Abbigliamento sportivo, un asciugamano personale e acqua. Si lavora con calzini antiscivolo.',
     simili: [
       { slug: 'pilates', perche: 'Gli stessi principi, a terra sul tappetino.' },
-      { slug: 'ginnastica-posturale', perche: 'Controllo e mobilità, con un ritmo più lento.' },
+      { slug: 'ginnastica-strutturale', perche: 'Controllo e mobilità, con un ritmo più lento.' },
       { slug: 'antigravity', perche: 'Un altro attrezzo che cambia il modo di lavorare sul corpo.' },
     ],
     descrizione:
@@ -458,12 +458,12 @@ export const CORSI: Corso[] = [
     varianti: [
       { nome: null, testo: '', lezione: 'Pilates Matwork', poster: `${U}/2024/08/IMG_2547-1-scaled.jpg` },
     ],
-    lezioni: ['Pilates Matwork', 'Pilates'],
+    lezioni: ['Pilates Matwork'],
     attrezzatura:
       'Abbigliamento sportivo aderente, un asciugamano personale e acqua. Si lavora sul tappetino, a piedi nudi o con calzini antiscivolo.',
     simili: [
       { slug: 'motr', perche: 'Gli stessi principi, con un attrezzo che aggiunge equilibrio e resistenza.' },
-      { slug: 'ginnastica-posturale', perche: 'Se cerchi soprattutto postura e allungamento.' },
+      { slug: 'ginnastica-strutturale', perche: 'Se cerchi soprattutto postura e allungamento.' },
       { slug: 'yoga', perche: 'Respirazione e mobilità, con la parte mentale in primo piano.' },
     ],
     descrizione:
@@ -663,7 +663,7 @@ export const CORSI: Corso[] = [
     simili: [
       { slug: 'aqua-fitness', perche: 'Le lezioni in acqua, con l’istruttore che guida il lavoro.' },
       { slug: 'scuola-nuoto-adulti', perche: 'Se stile libero e dorso non sono ancora sicuri, si comincia da qui.' },
-      { slug: 'ginnastica-posturale', perche: 'Allungamento e mobilità: il complemento a terra di chi nuota molto.' },
+      { slug: 'ginnastica-strutturale', perche: 'Allungamento e mobilità: il complemento a terra di chi nuota molto.' },
     ],
     titolo: 'Nuoto Libero Assistito in piscina a Roma Talenti | Athlon Club',
     descrizione:
@@ -773,7 +773,7 @@ export const CORSI: Corso[] = [
     simili: [
       { slug: 'aqua-fitness', perche: 'Dopo il parto, per tornare a muoverti senza carico sulle articolazioni.' },
       { slug: 'baby-nuoto', perche: 'Dai 3 mesi del bambino, in acqua con te: la vasca la conosci già.' },
-      { slug: 'ginnastica-posturale', perche: 'A terra, per la postura e la schiena.' },
+      { slug: 'ginnastica-strutturale', perche: 'A terra, per la postura e la schiena.' },
     ],
     titolo: 'Corso Gestanti in piscina a Roma Talenti | Athlon Club',
     descrizione:

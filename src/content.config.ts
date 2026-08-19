@@ -146,4 +146,63 @@ const servizi = defineCollection({
   }),
 });
 
-export const collections = { articles, eventi, news, servizi };
+/**
+ * La landing della promozione del mese: /promo.
+ *
+ * È una collezione di un documento solo, non una lista. Sta qui e non in un
+ * file di dati perché la promo cambia ogni mese e a cambiarla è chi la decide,
+ * non chi tocca il codice: da Tina si riscrive il titolo, la scadenza del
+ * conto alla rovescia e i passaggi dell'iscrizione, e la pagina segue.
+ *
+ * I prezzi **non** stanno qui: la pagina legge i piani annuali da
+ * `data/abbonamenti.ts`, che è già l'unico posto dove vivono. Un listino
+ * ricopiato in una landing è un listino che diverge al primo ritocco.
+ */
+const promo = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/promo' }),
+  schema: z.object({
+    titolo: z.string(),
+    occhiello: z.string(),
+    claim: z.string(),
+    sommario: z.string(),
+    validoSu: z.string(),
+    /** Il momento in cui il conto alla rovescia arriva a zero. */
+    scadenza: z.coerce.date(),
+    scadenzaLabel: z.string(),
+    /** La quota di attivazione barrata, in euro e senza simbolo. */
+    quotaBarrata: z.string(),
+    foto: z.string(),
+    /* Le due vie per arrivare all'abbonamento. Sono due perché il portale ne
+       ha due davvero: chi non è registrato crea l'account dentro l'iscrizione,
+       chi lo è già entra e attiva da dentro — e sono i cinque passi qui sotto,
+       che valgono solo per lui. */
+    senzaAccountTitolo: z.string(),
+    senzaAccountTesto: z.string(),
+    conAccountTitolo: z.string(),
+    conAccountTesto: z.string(),
+    proceduraTitolo: z.string(),
+    /* Facoltativa: i quattro passi si spiegano da soli, e una riga di
+       introduzione sopra un elenco numerato è spesso solo un'altra cosa da
+       leggere. Resta il campo, così tornare a metterla è scrivere in Tina. */
+    proceduraIntro: z.string().optional().default(''),
+    procedura: z.array(z.string()),
+    /** La riga in fondo ai passaggi: cosa si accetta come metodo di pagamento. */
+    proceduraNota: z.string(),
+    faqTitolo: z.string(),
+    /* Le domande che uno si fa prima di firmare, non dopo: il pro-rata, il
+       certificato, la disdetta. Stanno qui e non in un componente perché sono
+       la parte della pagina che cambia col listino e con le regole, e a
+       cambiarla è chi le conosce. */
+    faq: z.array(z.object({ q: z.string(), a: z.string() })),
+    chiSiamoTitolo: z.string(),
+    chiSiamo: z.array(z.string()),
+    strutturaTitolo: z.string(),
+    strutturaTesto: z.string(),
+    struttura: z.array(z.string()),
+    contattiTitolo: z.string(),
+    contattiTesto: z.string(),
+    draft: z.boolean().optional().default(false),
+  }),
+});
+
+export const collections = { articles, eventi, news, promo, servizi };

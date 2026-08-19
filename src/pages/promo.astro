@@ -1,0 +1,1132 @@
+---
+/**
+ * /promo — la landing della promozione del mese.
+ *
+ * Rifà la pagina che stava su WordPress, con gli stessi contenuti e nell'ordine
+ * in cui li aveva, ma nella veste del sito: stessa faccia display, stesso
+ * arancione, stessa alternanza crema/scuro, stesse animazioni d'ingresso.
+ *
+ * Due cose la tengono viva senza toccare il codice:
+ *
+ *  - i **testi** vengono dalla collezione `promo` (un documento solo), quindi
+ *    da Tina si cambiano titolo, scadenza del conto alla rovescia e passaggi
+ *    dell'iscrizione;
+ *  - i **prezzi** no: quelli li legge da `data/abbonamenti.ts`, dove già
+ *    vivono. Un listino ricopiato in una landing diverge al primo ritocco, e
+ *    qui il numero sbagliato è quello che una persona paga.
+ *
+ * La promozione, in concreto, è la quota di attivazione in omaggio: le schede
+ * qui sotto sono le stesse della pagina abbonamenti, con i €50 barrati e il
+ * link che porta dritto all'iscrizione del piano.
+ */
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import AttivitaModal from '../components/AttivitaModal.astro';
+import SpacesGallery from '../components/home/SpacesGallery.astro';
+import Faq from '../components/Faq.astro';
+import { plans, SOSPENSIONE } from '../data/abbonamenti';
+import { bands, countLessons, bandHours, totalLessons, totalHours, openHours, siContaAOre, gymFloor } from '../data/planning';
+import { talkCta } from '../data/cta';
+import { urlPiccola } from '../data/foto';
+
+const voci = await getCollection('promo', ({ data }) => !data.draft);
+const promo = voci[0]?.data;
+// Rumoroso di proposito: senza il documento la pagina non ha niente da dire, e
+// una landing vuota in produzione è peggio di un errore in fase di build.
+if (!promo) throw new Error('Nessun documento in src/content/promo: la pagina /promo non ha contenuti.');
+
+/* I due piani con le sole formule annuali: la promo vale su quelle, e mostrare
+   anche la mensile qui vorrebbe dire mettere in vetrina l'unica che lo sconto
+   non ce l'ha.
+
+   Raggruppati per piano e non appiattiti in quattro schede: le attività
+   comprese sono del piano, non della formula di pagamento, e ripeterle quattro
+   volte le farebbe leggere come se cambiassero. Prima si sceglie cosa si vuole
+   fare, poi come si paga. */
+const piani = plans.map((p) => ({
+  ...p,
+  annuali: p.options.filter((o) => o.title === 'Annuale'),
+}));
+
+/* La misura del club, contata dal palinsesto vero e non scritta a mano: se il
+   planning cambia, cambiano questi numeri. È l'argomento più forte che questa
+   pagina ha — 180 lezioni a settimana non è una frase, è un fatto — e finché
+   restava dentro la parola «Premium» non lo vedeva nessuno.
+
+   Il nuoto libero conta le ore e non le lezioni: la regola sta in
+   `data/planning.ts` e vale per tutto il sito. */
+const fasce = bands.map((b) => ({
+  titolo: b.title,
+  n: siContaAOre(b.id) ? bandHours(b) : countLessons(b),
+  unita: siContaAOre(b.id) ? 'ore a settimana' : 'lezioni a settimana',
+}));
+
+const contatta = talkCta({ source: '/promo' });
+const PG = 'https://athlon.perfectgym.com/ClientPortal2';
+---
+
+<Layout
+  title={`${promo.titolo} | Athlon Club Roma Talenti`}
+  description={promo.sommario}
+  image={promo.foto}
+  imageAlt="Athlon Club Roma Talenti"
+  breadcrumb={[{ name: promo.titolo, path: '/promo' }]}
+  chrome={false}
+>
+  <!-- HERO -->
+  <section class="pr-hero" style={`--foto: url(${urlPiccola(promo.foto)})`}>
+    <div class="container pr-hero__inner">
+      {/* La landing sta in piedi da sola, senza la barra del sito: il marchio
+          serve lo stesso — è quello che dice di chi è l'offerta — e riporta
+          alla home chi vuole guardarsi intorno prima di decidere. */}
+      <a href="/" class="pr-logo" aria-label="Athlon Club — vai al sito">
+        <img src="/wp-content/uploads/2025/08/Logo-oriz-full-2.png" alt="Athlon Club 4.0" width="834" height="159" />
+      </a>
+      <span class="eyebrow pr-hero__eyebrow" data-anim="from-left">{promo.occhiello}</span>
+      <h1 class="pr-hero__title" data-anim="reveal">{promo.titolo}</h1>
+      <p class="pr-hero__claim u-display" data-anim data-anim-delay="80">{promo.claim}</p>
+      <p class="pr-hero__lede" data-anim data-anim-delay="140">{promo.sommario}</p>
+
+      {/* Il conto alla rovescia: la scadenza arriva dal documento, il conto lo
+          fa il browser. Server-side sarebbe sbagliato — la pagina è statica e
+          il numero si congelerebbe al momento del build. */}
+      <div class="countdown" data-scadenza={promo.scadenza.toISOString()} data-anim="pop" data-anim-delay="200">
+        <span class="countdown__label">{promo.scadenzaLabel}</span>
+        <div class="countdown__cifre" role="timer" aria-live="off">
+          <span class="cd"><b class="cd__n u-display" data-cd="g">–</b><span class="cd__l">giorni</span></span>
+          <span class="cd"><b class="cd__n u-display" data-cd="h">–</b><span class="cd__l">ore</span></span>
+          <span class="cd"><b class="cd__n u-display" data-cd="m">–</b><span class="cd__l">minuti</span></span>
+          <span class="cd"><b class="cd__n u-display" data-cd="s">–</b><span class="cd__l">secondi</span></span>
+        </div>
+        <p class="countdown__finita" hidden>La promozione è terminata. Gli abbonamenti restano attivi: <a href="/abbonamenti">vedi i piani →</a></p>
+      </div>
+
+      <div class="pr-hero__actions" data-anim data-anim-delay="260">
+        <a href="#piani" class="btn btn-primary">Vedi gli abbonamenti in promo →</a>
+        <a
+          href={contatta.href}
+          class="btn btn-outline"
+          target="_blank"
+          rel="noopener noreferrer"
+          {...contatta.attrs}
+        >{contatta.label}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PIANI IN PROMO -->
+  <section class="pr-sec" id="piani">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">{promo.validoSu}</span>
+      <h2 class="pr-sec__title" data-anim="reveal">Attiva il tuo abbonamento</h2>
+      <p class="pr-sec__sub">
+        Lo sconto è già applicato: scegli la formula e prosegui sul portale. La quota di attivazione,
+        normalmente €{promo.quotaBarrata} una tantum, in promozione non si paga.
+      </p>
+
+      {/* Le due vie, prima delle schede e non dopo: sono la domanda che uno si
+          fa guardandole — «devo registrarmi prima?». La risposta è no, e vale
+          la pena dirla dove la domanda nasce. Chi un account ce l'ha già entra
+          da qui e trova la sua procedura più sotto: i cinque passi sono dentro
+          il portale, quindi sono roba sua e non di chi si iscrive adesso. */}
+      <div class="vie">
+        <article class="via via--nuovo" data-anim="fade">
+          <span class="via__kicker">{promo.senzaAccountTitolo}</span>
+          <p class="via__testo">{promo.senzaAccountTesto}</p>
+          <a href="#formule" class="via__cta">Scegli il piano ↓</a>
+        </article>
+
+        <article class="via" data-anim="fade" data-anim-delay="80">
+          <span class="via__kicker">{promo.conAccountTitolo}</span>
+          <p class="via__testo">{promo.conAccountTesto}</p>
+          <div class="via__azioni">
+            <a href={`${PG}/#/Login`} class="via__cta" data-cta="member">Accedi al portale →</a>
+            <a href={`${PG}/#/ForgotPassword`} class="via__reset">Reimposta la password</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="piani" id="formule">
+        {piani.map((p, i) => (
+          <article class:list={['piano', `piano--${p.id}`]} data-anim="scale" data-anim-delay={String(i * 90)}>
+            <header class="piano__head">
+              <span class="piano__badge">{p.badge}</span>
+              <h3 class="piano__nome">Abbonamento <span>{p.name}</span></h3>
+              <p class="piano__claim">{p.claim}</p>
+            </header>
+
+            {/* Le attività comprese, con la stessa spiegazione della pagina
+                abbonamenti dietro ognuna: qui uno decide fra due piani, e la
+                differenza fra i due è esattamente questo elenco. */}
+            <ul class="piano__attivita">
+              {p.activities.map((a) => (
+                <li>
+                  <button type="button" class="att" data-activity={a}>
+                    <span class="att__label">{a}</span>
+                    <span class="att__mark" aria-hidden="true">?</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            {/* Vale per tutti e due i piani e per tutte e due le formule, quindi
+                sta qui e non dentro le schede del prezzo: è la risposta alla
+                domanda che ferma la mano prima di firmare un annuale — «e se mi
+                fermo?». Illimitate, non "fino a N": è il punto. */}
+            <p class="sospensione">
+              <span class="sospensione__k">Sospensioni illimitate</span>
+              <span class="sospensione__v">€{SOSPENSIONE.prezzo} al mese, quante volte vuoi</span>
+              <a class="sospensione__l" href={SOSPENSIONE.scheda}>Come funziona →</a>
+            </p>
+
+            <div class="formule">
+              {p.annuali.map((o) => (
+                <div class="formula">
+                  <span class="formula__sub">{o.sub}</span>
+
+                  <p class="formula__prezzo">
+                    <span class="formula__valuta">€</span>
+                    <span class="formula__cifra u-display">{o.amount}</span>
+                    <span class="formula__periodo">{o.period.replace('€', '')}</span>
+                  </p>
+
+                  {o.savings && <span class="formula__risparmio">{o.savings}</span>}
+
+                  {/* Il cuore della promo: la quota c'è, si vede, ed è barrata.
+                      Un «gratis» senza il prezzo accanto non dice quanto vale. */}
+                  <p class="formula__omaggio">
+                    <s class="formula__omaggio-vecchio">€{promo.quotaBarrata}</s>
+                    <span class="formula__omaggio-nuovo">Attivazione in omaggio</span>
+                  </p>
+
+                  <p class="formula__nota">{o.note}</p>
+
+                  <a href={o.href} class="btn btn-primary formula__cta" data-cta="buy">
+                    Iscriviti a {p.name} →
+                  </a>
+                </div>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PROCEDURA -->
+  <section class="pr-sec pr-sec--alt">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Se hai già un account</span>
+      <h2 class="pr-sec__title" data-anim="reveal">{promo.proceduraTitolo}</h2>
+      {promo.proceduraIntro && <p class="pr-sec__sub">{promo.proceduraIntro}</p>}
+
+      <ol class="passi">
+        {promo.procedura.map((p, i) => (
+          <li class="passo" data-anim data-anim-delay={String(i * 60)}>
+            <span class="passo__n u-display">{i + 1}</span>
+            <span class="passo__t">{p}</span>
+          </li>
+        ))}
+      </ol>
+
+      <p class="passi__nota">{promo.proceduraNota}</p>
+    </div>
+  </section>
+
+  <!-- QUANTO PALINSESTO C'È -->
+  <section class="pr-sec pr-sec--dark">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Ogni settimana, tutto l'anno</span>
+      <h2 class="pr-sec__title" data-anim="reveal">{totalLessons()} lezioni a settimana</h2>
+      <p class="pr-sec__sub">
+        {totalHours()} ore di palinsesto fra corsi, vasche e nuoto libero. Prenoti dall'app, cambi
+        idea ogni settimana: l'abbonamento è lo stesso.
+      </p>
+
+      <ul class="fasce">
+        {fasce.map((f, i) => (
+          <li class="fascia" data-anim="pop" data-anim-delay={String(i * 60)}>
+            <span class="fascia__n u-display">{f.n}</span>
+            <span class="fascia__u">{f.unita}</span>
+            <span class="fascia__t">{f.titolo}</span>
+          </li>
+        ))}
+      </ul>
+
+      {/* Gli orari di apertura in chiaro, e non dentro una frase: è la prima
+          cosa che uno controlla — «a che ora apre?» — e finché stava in mezzo
+          al testo bisognava cercarla. Vengono dal planning come tutto il resto. */}
+      <div class="orari">
+        <span class="orari__k">La sala è aperta</span>
+        <ul class="orari__lista">
+          {gymFloor.hours.map((h) => (
+            <li class="orario">
+              <span class="orario__g">{h.label}</span>
+              <span class="orario__o u-display">{h.hours}</span>
+            </li>
+          ))}
+        </ul>
+        <span class="orari__tot">{openHours()} ore a settimana di sala aperta</span>
+      </div>
+
+      <div class="pr-cta">
+        <a href="/planning" class="btn btn-primary">Guarda il planning della settimana →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHI SIAMO -->
+  <section class="pr-sec">
+    <div class="container pr-chi">
+      <div>
+        <span class="eyebrow" data-anim="from-left">Dal 1973</span>
+        <h2 class="pr-sec__title" data-anim="reveal">{promo.chiSiamoTitolo}</h2>
+      </div>
+      <div class="pr-chi__testi" data-anim data-anim-delay="90">
+        {promo.chiSiamo.map((t) => <p class="pr-testo">{t}</p>)}
+      </div>
+    </div>
+  </section>
+
+  <!-- LA STRUTTURA -->
+  {/* Le quattro parole — Gym Floor, Sala Fitness, Piscine, Spogliatoi — dicevano
+      molto meno delle foto, che ci sono già: è la stessa striscia della home,
+      con la sua lightbox. Restano nel documento perché è da lì che si sceglie
+      cosa raccontare, ma qui le porta la didascalia di ogni foto. */}
+  <section class="pr-sec pr-sec--dark">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">I nostri spazi</span>
+      <h2 class="pr-sec__title" data-anim="reveal">{promo.strutturaTitolo}</h2>
+      <p class="pr-sec__sub">{promo.strutturaTesto}</p>
+    </div>
+    <SpacesGallery hint="Trascina o usa le frecce" divider={false} />
+  </section>
+
+  <!-- DOMANDE -->
+  <section class="pr-sec">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Senza sorprese</span>
+      <h2 class="pr-sec__title" data-anim="reveal">{promo.faqTitolo}</h2>
+      <p class="pr-sec__sub">
+        Le cose che conviene sapere prima di firmare, dette prima. Se ne resta una fuori, scrivici.
+      </p>
+
+      <Faq entries={promo.faq} />
+    </div>
+  </section>
+
+  <!-- CONTATTI -->
+  <section class="pr-sec pr-sec--alt">
+    <div class="container pr-contatti">
+      <div>
+        <h2 class="pr-sec__title" data-anim="reveal">{promo.contattiTitolo}</h2>
+        <p class="pr-sec__sub">{promo.contattiTesto}</p>
+      </div>
+      <a
+        href={contatta.href}
+        class="btn btn-primary"
+        target="_blank"
+        rel="noopener noreferrer"
+        {...contatta.attrs}
+      >Contattaci →</a>
+    </div>
+
+    {/* La landing gira senza il footer del sito, quindi le condizioni non
+        avrebbero nessun'altra strada per farsi trovare: chi sta per firmare
+        deve poterle leggere da qui. */}
+    <div class="container pr-legale">
+      <a href="/regolamento">Termini e condizioni</a>
+      <span aria-hidden="true">·</span>
+      <a href="/privacy">Privacy policy</a>
+    </div>
+  </section>
+  {/* Il modale dietro ogni attività compresa. */}
+  <AttivitaModal />
+</Layout>
+
+<script>
+  /* Il conto alla rovescia. Un solo intervallo, e si ferma da solo a zero:
+     un timer che continua a girare su una promozione scaduta consuma batteria
+     per aggiornare un numero che nessuno guarda. */
+  const box = document.querySelector<HTMLElement>('.countdown');
+  const scadenza = box?.dataset.scadenza ? new Date(box.dataset.scadenza).getTime() : 0;
+  const campi = {
+    g: box?.querySelector<HTMLElement>('[data-cd="g"]'),
+    h: box?.querySelector<HTMLElement>('[data-cd="h"]'),
+    m: box?.querySelector<HTMLElement>('[data-cd="m"]'),
+    s: box?.querySelector<HTMLElement>('[data-cd="s"]'),
+  };
+  const cifre = box?.querySelector<HTMLElement>('.countdown__cifre');
+  const finita = box?.querySelector<HTMLElement>('.countdown__finita');
+
+  const due = (n: number) => String(n).padStart(2, '0');
+
+  const tick = () => {
+    if (!box || !scadenza) return true;
+    const resta = scadenza - Date.now();
+    if (resta <= 0) {
+      cifre?.setAttribute('hidden', '');
+      finita?.removeAttribute('hidden');
+      return true;
+    }
+    const s = Math.floor(resta / 1000);
+    if (campi.g) campi.g.textContent = String(Math.floor(s / 86400));
+    if (campi.h) campi.h.textContent = due(Math.floor(s / 3600) % 24);
+    if (campi.m) campi.m.textContent = due(Math.floor(s / 60) % 60);
+    if (campi.s) campi.s.textContent = due(s % 60);
+    return false;
+  };
+
+  if (box && scadenza && !tick()) {
+    const id = window.setInterval(() => {
+      if (tick()) window.clearInterval(id);
+    }, 1000);
+  }
+</script>
+
+<style>
+  /* ---- Hero ---- */
+  .pr-hero {
+    position: relative;
+    background: var(--color-dark);
+    color: var(--color-white);
+    padding: var(--space-section-lg) 0 var(--space-section-md);
+    overflow: hidden;
+  }
+
+  /* La foto sta sotto un velo che scurisce verso il basso: sopra si riconosce
+     la sala, in fondo — dove stanno il conto alla rovescia e i pulsanti — il
+     bianco ha il fondo che gli serve. */
+  .pr-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--foto) center / cover no-repeat;
+    opacity: 0.5;
+  }
+
+  .pr-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(39, 36, 35, 0.55), rgba(39, 36, 35, 0.92));
+  }
+
+  .pr-hero__inner {
+    position: relative;
+    z-index: 1;
+  }
+
+  .pr-hero__eyebrow {
+    color: var(--color-primary);
+  }
+
+  .pr-hero__title {
+    font-size: var(--text-4xl);
+    --lh: var(--leading-4xl);
+    letter-spacing: var(--tracking-4xl);
+    margin: 14px 0 0;
+  }
+
+  .pr-hero__claim {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    --lh: 1.05;
+    letter-spacing: var(--tracking-2xl);
+    color: var(--color-primary);
+    margin: 10px 0 0;
+  }
+
+  .pr-hero__lede {
+    max-width: 42rem;
+    margin: 18px 0 0;
+    font-size: var(--text-md);
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .pr-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  /* ---- Conto alla rovescia ---- */
+  .countdown {
+    margin-top: 30px;
+    padding: 20px 22px;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.34);
+    border: 1px solid var(--border-dark);
+    display: inline-block;
+  }
+
+  .countdown__label {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  .countdown__cifre {
+    display: flex;
+    gap: 22px;
+    margin-top: 12px;
+  }
+
+  .cd {
+    display: flex;
+    flex-direction: column;
+    min-width: 3.4rem;
+  }
+
+  .cd__n {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    --lh: 1;
+    color: var(--color-white);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cd__l {
+    font-size: var(--text-2xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .countdown__finita {
+    margin: 10px 0 0;
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .countdown__finita a {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  /* ---- Sezioni ---- */
+  .pr-sec {
+    padding: var(--space-section-lg) 0;
+  }
+
+  .pr-sec--alt {
+    background: var(--color-cream);
+  }
+
+  .pr-sec--dark {
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .pr-sec__title {
+    font-size: var(--text-3xl);
+    letter-spacing: var(--tracking-2xl);
+    margin: 10px 0 8px;
+  }
+
+  .pr-sec__sub {
+    max-width: 48rem;
+    color: var(--text-muted);
+    margin-bottom: 30px;
+  }
+
+  .pr-sec--dark .pr-sec__sub {
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  /* ---- Le due vie ---- */
+  .vie {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(21rem, 100%), 1fr));
+    gap: 14px;
+    margin-bottom: 26px;
+  }
+
+  .via {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 22px 22px;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    background: var(--color-cream);
+  }
+
+  /* Quella di chi si iscrive adesso porta il segno del marchio: è la via che
+     la pagina sta chiedendo di prendere. L'altra è un servizio per chi c'è già,
+     e non deve competere. */
+  .via--nuovo {
+    border-color: rgba(255, 87, 1, 0.4);
+    background: rgba(255, 87, 1, 0.06);
+  }
+
+  .via__kicker {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .via__testo {
+    margin: 10px 0 16px;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .via__azioni {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin-top: auto;
+  }
+
+  .via__cta {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    margin-top: auto;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .via__azioni .via__cta {
+    margin-top: 0;
+  }
+
+  .via__cta:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .via__reset {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .via__reset:hover {
+    color: var(--color-dark);
+  }
+
+  /* ---- I due piani ---- */
+  .piani {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(26rem, 100%), 1fr));
+    gap: 20px;
+    align-items: start;
+  }
+
+  .piano {
+    padding: 26px 24px 24px;
+    border-radius: 22px;
+    background: var(--color-cream);
+    border: 1px solid var(--border);
+  }
+
+  .piano--premium {
+    background: var(--color-dark);
+    color: var(--color-white);
+    border-color: rgba(255, 87, 1, 0.35);
+  }
+
+  .piano__badge {
+    display: inline-block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .piano--premium .piano__badge {
+    color: var(--color-primary);
+  }
+
+  .piano__nome {
+    font-size: var(--text-2xl);
+    letter-spacing: var(--tracking-2xl);
+    margin: 8px 0 0;
+  }
+
+  .piano__nome span {
+    color: var(--color-primary);
+  }
+
+  .piano__claim {
+    margin: 6px 0 0;
+    font-size: var(--text-md);
+    color: var(--text-muted);
+  }
+
+  .piano--premium .piano__claim {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* ---- Le attività comprese ---- */
+  .piano__attivita {
+    list-style: none;
+    margin: 18px 0 22px;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .att {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 2.5rem;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--color-white);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    color: inherit;
+    cursor: pointer;
+    transition: border-color var(--dur-fast) ease, background-color var(--dur-fast) ease;
+  }
+
+  .piano--premium .att {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--border-dark);
+  }
+
+  .att:hover {
+    border-color: var(--color-primary);
+  }
+
+  /* Il punto di domanda dice che sotto c'è dell'altro: senza, i chip sembrano
+     etichette e nessuno li tocca. */
+  .att__mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: 50%;
+    background: rgba(255, 87, 1, 0.14);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent-text);
+  }
+
+  .piano--premium .att__mark {
+    background: rgba(255, 87, 1, 0.24);
+    color: var(--color-primary);
+  }
+
+  /* ---- La sospensione ---- */
+  .sospensione {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin: 0 0 16px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(255, 87, 1, 0.09);
+    border: 1px solid rgba(255, 87, 1, 0.3);
+  }
+
+  .sospensione__k {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .piano--premium .sospensione__k {
+    color: var(--color-primary);
+  }
+
+  .sospensione__v {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .piano--premium .sospensione__v {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .sospensione__l {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    margin-left: auto;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--accent-text);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .piano--premium .sospensione__l {
+    color: var(--color-primary);
+  }
+
+  /* ---- Le due formule annuali di ogni piano ---- */
+  .formule {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr));
+    gap: 12px;
+  }
+
+  .formula {
+    display: flex;
+    flex-direction: column;
+    padding: 18px 18px 18px;
+    border-radius: 16px;
+    background: var(--color-white);
+  }
+
+  .piano--premium .formula {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .formula__sub {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .piano--premium .formula__sub {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .formula__prezzo {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+    margin: 10px 0 0;
+  }
+
+  .formula__valuta {
+    font-family: var(--font-heading);
+    font-size: var(--text-md);
+    color: var(--color-primary);
+  }
+
+  .formula__cifra {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    --lh: 1;
+    color: var(--color-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .formula__periodo {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  .piano--premium .formula__periodo {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .formula__risparmio {
+    align-self: flex-start;
+    margin-top: 8px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(255, 87, 1, 0.12);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .piano--premium .formula__risparmio {
+    background: rgba(255, 87, 1, 0.2);
+    color: var(--color-primary);
+  }
+
+  .formula__omaggio {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 14px 0 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .piano--premium .formula__omaggio {
+    border-top-color: var(--border-dark);
+  }
+
+  .formula__omaggio-vecchio {
+    font-size: var(--text-md);
+    color: var(--text-muted);
+    text-decoration-thickness: 2px;
+  }
+
+  .piano--premium .formula__omaggio-vecchio {
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .formula__omaggio-nuovo {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .piano--premium .formula__omaggio-nuovo {
+    color: var(--color-primary);
+  }
+
+  .formula__nota {
+    margin: 10px 0 16px;
+    font-size: var(--text-2xs);
+    line-height: 1.5;
+    color: var(--text-muted);
+  }
+
+  .piano--premium .formula__nota {
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .formula__cta {
+    margin-top: auto;
+    text-align: center;
+  }
+
+  /* ---- Passaggi ---- */
+  .passi {
+    list-style: none;
+    margin: 26px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+  }
+
+  .passo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px;
+    border-radius: 16px;
+    background: var(--color-white);
+  }
+
+  .passo__n {
+    flex: 0 0 auto;
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    --lh: 1;
+    color: var(--color-primary);
+    min-width: 1.6rem;
+  }
+
+  .passo__t {
+    font-size: var(--text-md);
+  }
+
+  /* ---- Attività comprese ---- */
+  /* ---- Le fasce del planning ---- */
+  .fasce {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
+    gap: 14px;
+  }
+
+  .fascia {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 20px 18px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-dark);
+  }
+
+  .fascia__n {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    --lh: 1;
+    color: var(--color-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fascia__u {
+    margin-top: 4px;
+    font-size: var(--text-2xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .fascia__t {
+    margin-top: 10px;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-white);
+  }
+
+  .pr-cta {
+    margin-top: 28px;
+  }
+
+  /* ---- Gli orari di apertura ---- */
+  .orari {
+    margin-top: 26px;
+    padding: 22px 24px 20px;
+    border-radius: 18px;
+    background: rgba(255, 87, 1, 0.1);
+    border: 1px solid rgba(255, 87, 1, 0.32);
+  }
+
+  .orari__k {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .orari__lista {
+    list-style: none;
+    margin: 14px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+    gap: 12px 24px;
+  }
+
+  .orario {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .orario__g {
+    font-size: var(--text-2xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .orario__o {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    --lh: 1;
+    color: var(--color-white);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .orari__tot {
+    display: block;
+    margin-top: 16px;
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* ---- Chi siamo ---- */
+  .pr-chi {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
+    gap: 24px 48px;
+    align-items: start;
+  }
+
+  .pr-chi__testi {
+    max-width: 44ch;
+  }
+
+  .pr-testo {
+    margin: 0 0 12px;
+    color: var(--text-muted);
+  }
+
+
+  .passi__nota {
+    margin: 18px 0 0;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  /* Il marchio, al posto della barra del sito che questa pagina non ha. */
+  .pr-logo {
+    display: inline-block;
+    margin-bottom: 28px;
+  }
+
+  .pr-logo img {
+    height: 2.5rem;
+    width: auto;
+  }
+
+  .pr-legale {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin-top: 34px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: var(--text-2xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .pr-legale a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    color: var(--text-muted);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .pr-legale a:hover {
+    color: var(--color-dark);
+  }
+
+  /* ---- Contatti ---- */
+  .pr-contatti {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .pr-contatti .pr-sec__sub {
+    margin-bottom: 0;
+  }
+
+  /* + totem: vedi «Il totem verticale del club» in global.css */
+  @media (max-width: 700px),
+    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
+    .countdown {
+      display: block;
+    }
+
+    .countdown__cifre {
+      gap: 14px;
+    }
+  }
+</style>

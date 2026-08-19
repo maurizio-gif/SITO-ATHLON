@@ -1,0 +1,213 @@
+---
+/**
+ * Il modale che spiega un'attività compresa nell'abbonamento.
+ *
+ * Stava dentro `abbonamenti.astro`, e ci è rimasto finché lo usava solo quella
+ * pagina. Da quando anche la landing `/promo` mostra le attività di Smart e
+ * Premium, lo usano in due: markup, script e stili in un posto solo, e i testi
+ * arrivano da `data/abbonamenti.ts`, che è dove vive già il listino.
+ *
+ * Si usa così: mettere questo componente una volta nella pagina, e dare a ogni
+ * comando che deve aprirlo `data-activity="<nome dell'attività>"` — lo stesso
+ * nome con cui l'attività compare in `activityInfo`.
+ */
+import { activityInfo } from '../data/abbonamenti';
+---
+
+  <div class="amodal" id="activity-modal" aria-hidden="true">
+    <div class="amodal__backdrop" data-amodal-close></div>
+    <div class="amodal__panel" role="dialog" aria-modal="true" aria-labelledby="amodal-title">
+      <button type="button" class="amodal__close" data-amodal-close aria-label="Chiudi">×</button>
+      <span class="amodal__eyebrow">Attività inclusa</span>
+      <h3 class="amodal__title" id="amodal-title"></h3>
+      <p class="amodal__body"></p>
+      {/* Parte nascosto e senza destinazione: l'href lo mette lo script quando
+          l'attività ha una pagina, e resta nascosto quando non ce l'ha. Un
+          href="#" in pagina è un link che non porta da nessuna parte. */}
+      <a class="amodal__link btn btn-primary" data-cta="explore" hidden>Vedi la pagina →</a>
+    </div>
+  </div>
+
+  <script is:inline set:html={`window.__ATHLON_ACTIVITIES__ = ${JSON.stringify(activityInfo)};`} />
+
+<script>
+  // ---- Activity explainer modal ----
+  type ActivityInfo = { title: string; body: string; href?: string };
+  const info = ((window as any).__ATHLON_ACTIVITIES__ || {}) as Record<string, ActivityInfo>;
+
+  const modal = document.getElementById('activity-modal');
+  const mTitle = modal?.querySelector<HTMLElement>('.amodal__title');
+  const mBody = modal?.querySelector<HTMLElement>('.amodal__body');
+  const mLink = modal?.querySelector<HTMLAnchorElement>('.amodal__link');
+  let lastTrigger: HTMLElement | null = null;
+
+  function closeModal() {
+    modal?.classList.remove('open');
+    modal?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('amodal-locked');
+    // Send focus back where it came from, so keyboard users don't lose place.
+    lastTrigger?.focus();
+  }
+
+  function openModal(name: string, trigger: HTMLElement) {
+    const data = info[name];
+    if (!data || !modal) return;
+    lastTrigger = trigger;
+    if (mTitle) mTitle.textContent = data.title;
+    if (mBody) mBody.textContent = data.body;
+    if (mLink) {
+      // Not every activity has a page yet — hide the CTA rather than link nowhere.
+      if (data.href) {
+        mLink.href = data.href;
+        mLink.hidden = false;
+      } else {
+        mLink.hidden = true;
+      }
+    }
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('amodal-locked');
+    /* Chiuso il modale è `visibility: hidden`, e `focus()` rifiuta un elemento
+       invisibile: la classe è appena stata aggiunta, la lettura di `offsetWidth`
+       fa ricalcolare lo stile prima di chiedere il focus. */
+    const chiudi = modal.querySelector<HTMLElement>('.amodal__close');
+    if (chiudi) {
+      void chiudi.offsetWidth;
+      chiudi.focus();
+    }
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-activity]').forEach((btn) => {
+    btn.addEventListener('click', () => openModal(btn.dataset.activity || '', btn));
+  });
+
+  modal?.querySelectorAll('[data-amodal-close]').forEach((el) =>
+    el.addEventListener('click', closeModal)
+  );
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('open')) closeModal();
+  });
+</script>
+
+<style>
+  /* ---- Activity modal ---- */
+  .amodal {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    /* Chiuso non deve stare nell'ordine di tabulazione: `opacity: 0` lo
+       nasconde agli occhi, `visibility` anche alla tastiera. Durata zero e
+       ritardo solo in chiusura: in apertura il valore calcolato deve essere già
+       `visible` quando lo script sposta il focus sul pulsante di chiusura. */
+    visibility: hidden;
+    transition: opacity var(--dur-fast) ease, visibility 0s var(--dur-fast);
+  }
+
+  .amodal.open {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+    transition: opacity var(--dur-fast) ease, visibility 0s;
+  }
+
+  .amodal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 8, 0.6);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
+  .amodal__panel {
+    position: relative;
+    z-index: 1;
+    width: min(30rem, 100%);
+    padding: 32px 30px 30px;
+    border-radius: var(--radius);
+    background: var(--color-white);
+    box-shadow: 0 30px 70px -18px rgba(0, 0, 0, 0.5);
+    transform: translateY(10px) scale(0.98);
+    transition: transform var(--dur-base) var(--ease-out-crit);
+  }
+
+  .amodal.open .amodal__panel {
+    transform: none;
+  }
+
+  .amodal__close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: var(--color-cream);
+    color: var(--color-dark);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) ease;
+  }
+
+  .amodal__close:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .amodal__eyebrow {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin-bottom: 10px;
+  }
+
+  .amodal__title {
+    font-size: var(--text-2xl);
+    letter-spacing: var(--tracking-2xl);
+    margin-bottom: 14px;
+  }
+
+  .amodal__body {
+    color: var(--text-muted);
+    margin-bottom: 22px;
+  }
+
+  .amodal__link {
+    width: 100%;
+    justify-content: center;
+  }
+
+  :global(body.amodal-locked) {
+    overflow: hidden;
+  }
+  @media (max-width: 640px) {
+    .amodal {
+      padding: 16px;
+    }
+    .amodal__panel {
+      padding: 28px 20px 24px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .amodal,
+    .amodal__panel {
+      transition: none;
+    }
+  }
+
+</style>

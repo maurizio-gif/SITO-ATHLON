@@ -125,8 +125,9 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
   </section>
 
   <!-- Link -->
+  <div class="footer-main">
   <div class="container footer-grid">
-    <div class="footer-brand">
+    <div class="footer-brand" data-anim="from-left">
       {/* Dimensioni intrinseche del file, non quelle a schermo: servono al
           browser per riservare il posto giusto prima di averlo scaricato. L'altezza
           vera la decide il CSS, e la larghezza segue le proporzioni. */}
@@ -169,14 +170,14 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
       </div>
     </div>
 
-    <div class="footer-col">
+    <div class="footer-col" data-anim data-anim-delay="80">
       <p class="footer-heading">Attività Adulti</p>
       <ul>
         {attivitaAdulti.map((l) => (<li><a href={l.href}>{l.label}</a></li>))}
       </ul>
     </div>
 
-    <div class="footer-col">
+    <div class="footer-col" data-anim data-anim-delay="160">
       <p class="footer-heading">Corsi Junior</p>
       <ul>
         {corsiJunior.map((l) => (<li><a href={l.href}>{l.label}</a></li>))}
@@ -193,7 +194,7 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
       </ul>
     </div>
 
-    <div class="footer-col">
+    <div class="footer-col" data-anim data-anim-delay="240">
       <p class="footer-heading">Risorse</p>
       <ul>
         {risorse.map((l) => (
@@ -205,6 +206,7 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
         ))}
       </ul>
     </div>
+  </div>
   </div>
 
   <!-- Affiliazioni e partner -->
@@ -367,7 +369,40 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
     background: var(--accent-fill);
   }
 
-  /* ---- Link grid ---- */
+  /* ---- Link grid ----
+     La fascia dei link era un rettangolo di un colore solo, con dentro quattro
+     colonne di grigio: l'unico arancione compariva al passaggio del mouse, e
+     l'unica cosa che si muoveva in tutto il footer era il nastro dei loghi.
+     Tre strati, nessuno dei quali tocca il testo:
+
+     - il filo in cima, che segna il taglio fra la crema del «Dove siamo» e lo
+       scuro e si spegne verso destra invece di correre da bordo a bordo;
+     - un alone caldo dietro il marchio, in alto a sinistra, che dà una
+       provenienza alla luce;
+     - un fondo che si scurisce scendendo, così la fascia legale in fondo
+       sembra il fondo di un pozzo e non un secondo rettangolo appoggiato lì.
+
+     L'alone schiarisce il fondo, e il fondo qui è tarato al pixel: le
+     intestazioni delle colonne stavano a `rgba(255,255,255,0.47)`, che su
+     `--color-dark` dà esattamente 4,5:1. Con l'alone al suo massimo scendevano
+     a 4,36 — sotto soglia — quindi salgono a 0,55, che riporta il rapporto a
+     5,3:1 nel punto più chiaro e a 5,8 dove l'alone non arriva. Il resto del
+     testo sta a 0,72 e non era in discussione. */
+  .footer-main {
+    position: relative;
+    background:
+      radial-gradient(78% 68% at 8% 0%, rgba(255, 87, 1, 0.09), transparent 60%),
+      linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, 0.28));
+  }
+
+  .footer-main::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-primary), rgba(255, 87, 1, 0) 58%);
+  }
+
   .footer-grid {
     display: grid;
     grid-template-columns: 1.7fr 1fr 1fr 1fr;
@@ -437,13 +472,22 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
     font-size: var(--text-xs);
     font-weight: 600;
     color: rgba(255, 255, 255, 0.85);
-    transition: background-color var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
+    transition: background-color var(--dur-fast) ease, border-color var(--dur-fast) ease,
+      color var(--dur-fast) ease, transform var(--dur-fast) var(--ease-out-crit);
   }
 
+  /* Lo stesso sollevamento delle lezioni nel planning: il colore da solo
+     cambiava sotto il dito senza che il pulsante rispondesse. */
   .social-btn:hover {
     background: var(--color-primary);
     border-color: var(--color-primary);
     color: var(--color-white);
+    transform: translateY(-2px);
+  }
+
+  .social-btn:active {
+    transform: scale(0.98);
+    transition-duration: var(--dur-press);
   }
 
   .social-btn__icon {
@@ -458,12 +502,25 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    /* 0.47 è la soglia: sotto, su questo fondo, il contrasto non arriva a
-       4,5:1 e queste intestazioni sono testo piccolo. */
-    color: rgba(255, 255, 255, 0.47);
+    /* Era 0.47, la soglia esatta del 4,5:1 su `--color-dark`. Ora il fondo
+       porta l'alone caldo di `.footer-main`, che lo schiarisce: vedi lì il
+       conto. */
+    color: rgba(255, 255, 255, 0.55);
     padding-bottom: 12px;
     margin-bottom: 18px;
-    border-bottom: 1px solid var(--border-dark);
+    /* Il filo sotto l'intestazione partiva da bordo a bordo tutto uguale, e
+       quattro righe identiche facevano sembrare la fascia una tabella. Qui
+       comincia con un trattino arancione — lo stesso segno che compare a
+       sinistra dei link al passaggio del mouse — e sfuma prima di arrivare in
+       fondo. */
+    border-bottom: 1px solid transparent;
+    border-image: linear-gradient(
+        90deg,
+        var(--color-primary) 0 1.125rem,
+        rgba(255, 255, 255, 0.16) 1.125rem 62%,
+        rgba(255, 255, 255, 0)
+      )
+      1;
   }
 
   .footer-heading--spaced {
