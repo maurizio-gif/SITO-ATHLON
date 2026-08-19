@@ -21,6 +21,7 @@
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import ProvaModal from '../components/ProvaModal.astro';
 import { CLUB, clubSchema, breadcrumbSchema } from '../data/club';
 
 interface Props {
@@ -146,6 +147,9 @@ const graph = [
       <slot />
     </main>
     {chrome && <Footer />}
+    {/* Il form della prova: presente ovunque perche' ogni pagina ha almeno una
+        CTA "Prova Athlon", ed e' lui a intercettarla. */}
+    {chrome && <ProvaModal />}
   </body>
 </html>
 
@@ -153,6 +157,12 @@ const graph = [
   // Every <video> on the site autoplays, muted, on loop — see the script for
   // the cases the markup attributes alone do not cover.
   import '../scripts/video-autoplay';
+</script>
+
+<script>
+  // UTM/click-id del primo tocco e id del visitatore: li mette in ogni payload
+  // che il form della prova manda a n8n.
+  import '../scripts/attribuzione';
 </script>
 
 <script>

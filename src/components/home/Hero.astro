@@ -62,8 +62,6 @@ const prova = trialCta({ source: '/' });
       <a
         href={prova.href}
         class="btn btn-primary"
-        target="_blank"
-        rel="noopener noreferrer"
         {...prova.attrs}
       >
         {prova.label} <span aria-hidden="true">→</span>
@@ -264,7 +262,11 @@ const prova = trialCta({ source: '/' });
   }
 
   .hero-title {
-    font-size: calc(var(--text-4xl) * 1.5);
+    /* La scala tipografica del sito arriva a --text-4xl; qui la si supera di
+       poco perche' e' il titolo della home. Era 1.5 e su un desktop largo
+       diventava alto quanto mezza finestra, spingendo lede e comandi in fondo:
+       1.15 resta il testo piu' grande del sito senza mangiarsi la hero. */
+    font-size: calc(var(--text-4xl) * 1.15);
     letter-spacing: var(--tracking-4xl);
     --lh: var(--leading-4xl);
     color: var(--color-white);

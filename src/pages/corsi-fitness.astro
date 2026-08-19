@@ -160,7 +160,7 @@ const faqs: FaqEntry[] = await faqConSchede([
   },
   {
     q: 'Si può provare un corso fitness senza abbonarsi?',
-    a: `Sì, in due modi. Puoi <a href="${prova.href}">richiedere un Guest Pass Premium di una settimana</a> e provare tutte le nostre attività, corsi fitness compresi. Oppure prenoti e paghi la singola lezione, senza quota di attivazione.`,
+    a: `Sì, in due modi. Puoi <a href="${prova.href}" data-cta="trial">richiedere un Guest Pass Premium di una settimana</a> e provare tutte le nostre attività, corsi fitness compresi. Oppure prenoti e paghi la singola lezione, senza quota di attivazione.`,
   },
   {
     q: 'Che livello serve per iniziare un corso fitness?',
@@ -347,8 +347,6 @@ const faqs: FaqEntry[] = await faqConSchede([
           <a
             href={prova.href}
             class="btn btn-primary"
-            target="_blank"
-            rel="noopener noreferrer"
             {...prova.attrs}
           >{prova.label} →</a>
         </div>

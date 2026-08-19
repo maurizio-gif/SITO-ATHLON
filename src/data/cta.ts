@@ -29,12 +29,20 @@ export const APP = 'https://onelink.to/athlon';
 /**
  * La prova è un prodotto solo, trasversale: il Guest Pass Premium, sette
  * giorni. Non esiste «prova la Gym Floor» o «prova il Reformer» — esiste
- * conoscere il club per una settimana con l'esperienza Premium. Il form è
- * quello che genera già il lead; l'attività di provenienza viaggia nel
- * parametro `medium`, e resterà come contesto quando al posto del form ci sarà
- * il modal.
+ * conoscere il club per una settimana con l'esperienza Premium.
+ *
+ * Dietro c'era un form ospitato da n8n, aperto in una scheda nuova. Ora c'è
+ * `ProvaModal.astro`, che sta nel Layout e intercetta ogni comando con
+ * `data-cta="trial"`: la persona non lascia più la pagina da cui è partita, e
+ * l'attività di provenienza gliela leggiamo dal markup invece di passarla in
+ * query string.
+ *
+ * L'`href` qui sotto è il ripiego per chi non ha JavaScript, e per il click
+ * con il tasto centrale che apre una scheda: porta alla sezione Guest Pass
+ * degli abbonamenti, dove ci sono lo stesso codice e lo stesso prezzo. Non è
+ * più un indirizzo esterno — il percorso della prova vive dentro al sito.
  */
-const TRIAL_FORM = 'https://automazione.n8ndevelop.it/form/40cc4d53-8515-4657-b6ae-6bb0fa1acf77';
+const TRIAL_FALLBACK = '/abbonamenti#guest-pass';
 
 export const TRIAL = {
   label: 'Prova Athlon',
@@ -67,13 +75,12 @@ export function ctaAttrs(kind: CtaKind, intent: string, ctx: CtaContext) {
 
 /** La CTA di prova: etichetta, destinazione temporanea e contesto. */
 export function trialCta(ctx: CtaContext) {
-  const medium = ctx.activity ?? (ctx.source.replace(/^\//, '') || 'home');
   return {
     label: TRIAL.label,
     micro: TRIAL.micro,
-    href: `${TRIAL_FORM}?source=SitoWeb&medium=${encodeURIComponent(medium)}`,
-    /** Il form è esterno: si apre in una scheda nuova finché è un form. */
-    external: true,
+    href: TRIAL_FALLBACK,
+    /** Il modal è nel sito: niente scheda nuova, niente `target`. */
+    external: false,
     attrs: ctaAttrs('trial', TRIAL.intent, ctx),
   };
 }

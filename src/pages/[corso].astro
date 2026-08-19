@@ -132,7 +132,7 @@ const faqs: FaqEntry[] = await faqConSchede([
     : []),
   {
     q: `Posso provare ${corso.nome} prima di iscrivermi?`,
-    a: `Sì. Puoi richiedere un <strong>Guest Pass Premium di una settimana</strong> e provare tutte le nostre attività, ${corso.nome} compreso. <a href="${prova.href}" target="_blank" rel="noopener">Richiedilo qui</a>. Se preferisci una volta sola, puoi prenotare e pagare ${singola}.`,
+    a: `Sì. Puoi richiedere un <strong>Guest Pass Premium di una settimana</strong> e provare tutte le nostre attività, ${corso.nome} compreso. <a href="${prova.href}" data-cta="trial">Richiedilo qui</a>. Se preferisci una volta sola, puoi prenotare e pagare ${singola}.`,
   },
 ]);
 
@@ -199,8 +199,6 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
         <a
           href={prova.href}
           class="btn btn-primary co-hero__cta"
-          target="_blank"
-          rel="noopener noreferrer"
           {...prova.attrs}
         >{prova.label} →</a>
         <a href={corso.ctaOrienta?.href ?? '#orari'} class="co-hero__link" data-cta="explore">
@@ -415,8 +413,6 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
         href={prova.href}
         class="btn btn-primary"
         data-anim="pop"
-        target="_blank"
-        rel="noopener noreferrer"
         {...prova.attrs}
       >
         {prova.label} →

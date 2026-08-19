@@ -44,24 +44,29 @@ const prova = trialCta({ activity: 'gym-floor', source: '/gym-floor' });
    sono le due modalità prenotabili (articolo `adulti/gym-floor` e f.a.q. di
    questa pagina); il collegamento dei Matrix all'account è quello che la
    sezione app della home già racconta. */
+/* Le tre schede raccontavano «tre modi di usare la sala», e la prima si
+   chiamava Libero: letta da chi non e' mai entrato in una sala pesi suonava
+   come «entri e arrangiati», che e' esattamente la paura da togliere. Adesso
+   dicono le tre cose che il club mette, nell'ordine in cui servono: il piano,
+   qualcuno a cui chiedere, i numeri che restano. */
 const sistema = [
   {
-    nome: 'Libero',
-    titolo: 'Entri e fai la tua parte.',
+    nome: 'Il piano',
+    titolo: 'Trenta programmi, e il tuo lo scegliamo insieme.',
     testo:
-      'Prenoti la fascia Allenamento Libero e ti alleni in autonomia con il tuo programma. La sala è aperta dalle 6:00 alle 22:00.',
+      'Tonificazione, dimagrimento, ipertrofia e i percorsi Start Up per chi riparte da fermo. Sono sull’app Athlon Club, li hanno scritti i nostri trainer, e al primo ingresso c’è un trainer che ti aiuta a capire da quale partire.',
   },
   {
-    nome: 'Assistito',
-    titolo: 'C’è un trainer in sala, e puoi chiedere.',
+    nome: 'L’assistenza',
+    titolo: 'In sala c’è qualcuno a cui chiedere.',
     testo:
-      'Nelle fasce Con Assistenza un nostro trainer è in sala per quella sessione: gli chiedi un esercizio, un carico, una correzione.',
+      'Nelle fasce Con Assistenza un nostro trainer è in sala per tutta la sessione: gli chiedi un esercizio, un carico, una correzione. Nelle altre ti alleni con il piano che hai già sull’app, senza doverti inventare niente.',
   },
   {
-    nome: 'Connesso',
-    titolo: 'Quando torni, ritrovi il tuo percorso.',
+    nome: 'I progressi',
+    titolo: 'La sala si ricorda dove eri arrivato.',
     testo:
-      'I macchinari Matrix 4.0 dell’area cardio sono collegati al tuo account nell’app Athlon Club.',
+      'I macchinari Matrix 4.0 sono collegati al tuo account: carichi, tempi e sessioni restano nell’app, e alla visita dopo riprendi dal punto giusto invece che dai ricordi.',
   },
 ];
 
@@ -203,7 +208,7 @@ const workouts = [
   },
 ];
 
-const facts = ['400 mq di sala', 'Aperti dalle 6:00 alle 22:00', 'Matrix 4.0 connesso all\'app', 'Vista sulle piscine'];
+const facts = ['400 mq di sala', 'Aperti dalle 6:00 alle 22:00', '30 piani di allenamento', 'Matrix 4.0 connesso all\'app', 'Vista sulle piscine'];
 
 const WIKI = 'https://wiki.athlonroma.it/wikiathlon';
 
@@ -269,18 +274,16 @@ const faqs: FaqEntry[] = [
     <div class="gf-hero__scrim"></div>
 
     <div class="container gf-hero__inner">
-      <span class="eyebrow">Sala pesi · 400 mq</span>
+      <span class="eyebrow">Sala pesi premium · 400 mq</span>
       {/* One line with an orange 4.0, same construction as the home hero. The
           tagline is its own element rather than an <em> inside the heading, so
           the gap under the title is a margin instead of a line box. */}
       <h1 class="gf-hero__title">Gym Floor <em class="accent">4.0</em></h1>
-      <p class="gf-hero__lede">Allenati come preferisci.<br />Non allenarti mai a caso.</p>
+      <p class="gf-hero__lede">Attrezzi di ultima generazione,<br />in un ambiente che non alza la voce.</p>
       <div class="gf-hero__actions">
         <a
           href={prova.href}
           class="btn btn-primary gf-hero__cta"
-          target="_blank"
-          rel="noopener noreferrer"
           {...prova.attrs}
         >{prova.label} →</a>
         <a href="/abbonamenti" class="gf-hero__link">Scopri gli abbonamenti</a>
@@ -297,16 +300,20 @@ const faqs: FaqEntry[] = [
   <!-- INTRO -->
   <section class="gf-sec">
     <div class="container">
-      <span class="eyebrow" data-anim="from-left">Il sistema</span>
-      <h2 class="gf-sec__title" data-anim="reveal">Tre modi di usare la sala</h2>
-      {/* The backup's copy said "train whenever you like, no booking" — the
-          wiki and the planning F.A.Q. both say the opposite, so this follows
-          them: booking is required, and you pick one of two modes. */}
+      <span class="eyebrow" data-anim="from-left">Come ti seguiamo</span>
+      <h2 class="gf-sec__title" data-anim="reveal">Entri sapendo già cosa fare</h2>
+      {/* Il vecchio testo del backup diceva «allenati quando vuoi, senza
+          prenotare»: la wiki e le F.A.Q. del planning dicono il contrario, e la
+          prenotazione qui non e' un vincolo da scusare ma il motivo per cui la
+          sala non si riempie oltre la sua capienza. Da li' parte il paragrafo. */}
       <p class="gf-sec__sub">
-        Quattrocento metri quadri con la vista sulle piscine. Prima di entrare scegli come vuoi
-        allenarti e prenoti la fascia da app o portale: <strong>Allenamento Libero</strong>, in
-        autonomia con il tuo programma, oppure <strong>Con Assistenza</strong>, con un trainer
-        presente in sala.
+        Quattrocento metri quadri con la vista sulle piscine, e un posto per volta: la fascia si
+        prenota da app o portale, quindi quando arrivi il tuo spazio c’è e le macchine non si fanno
+        la fila. Sull’app trovi <strong>trenta piani di allenamento</strong> scritti dai nostri
+        trainer, e sono loro ad aiutarti a scegliere quello giusto — la prima volta e ogni volta che
+        cambia l’obiettivo. Le due fasce, <strong>Con Assistenza</strong> e <strong>Allenamento
+        Libero</strong>, cambiano solo questo: se il trainer è in sala con te o se segui il piano
+        che hai già in tasca.
       </p>
 
       <ul class="gf-sistema">
@@ -626,7 +633,10 @@ const faqs: FaqEntry[] = [
      face e il beneficio come titolo in corpo testo. */
   .gf-sistema {
     list-style: none;
-    margin: 34px 0 0;
+    /* Il margine sotto lo mette la lista, non la tabella degli orari: quella
+       e' un componente condiviso e non deve portarsi dietro la spaziatura di
+       questa pagina. Senza, il riquadro degli orari toccava le tre colonne. */
+    margin: 34px 0 3.75rem;
     padding: 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -742,8 +752,10 @@ const faqs: FaqEntry[] = [
     margin: 10px 0 8px;
   }
 
+  /* Nessun limite di larghezza: il testo di sezione tiene la misura del
+     `.container`, come i titoli sopra. La riga viene lunga su un desktop
+     largo, ed e' voluto — la pagina si legge a blocchi, non a colonna. */
   .gf-sec__sub {
-    max-width: 46rem;
     color: var(--text-muted);
     margin-bottom: 32px;
   }
@@ -784,7 +796,6 @@ const faqs: FaqEntry[] = [
 
   .area__lede {
     margin: 0;
-    max-width: 34rem;
     color: rgba(255, 255, 255, 0.7);
   }
 
@@ -1015,7 +1026,6 @@ const faqs: FaqEntry[] = [
   .wk__a-inner {
     overflow: hidden;
     min-height: 0;
-    max-width: 46rem;
     color: var(--text-muted);
   }
 

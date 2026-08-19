@@ -229,7 +229,7 @@ const trust = [
   </section>
 
   <!-- GUEST PASS -->
-  <section class="ab-sec ab-sec--alt">
+  <section class="ab-sec ab-sec--alt" id="guest-pass">
     <div class="container">
       <span class="eyebrow" data-anim="from-left">Non sei ancora sicuro?</span>
       <h2 class="ab-sec__title" data-anim="reveal">Prova Athlon.</h2>
@@ -249,8 +249,6 @@ const trust = [
           <a
             href={prova.href}
             class="btn btn-primary"
-            target="_blank"
-            rel="noopener noreferrer"
             {...prova.attrs}
           >{prova.label} →</a>
         </div>
