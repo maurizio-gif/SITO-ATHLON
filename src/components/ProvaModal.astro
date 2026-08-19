@@ -16,20 +16,7 @@
  * la verifica mentre la persona compila e il lead completo alla fine. Nessuna
  * chiave nel browser, nessuna route server, il sito resta statico.
  */
-import { PG } from '../data/cta';
-
-/** Dove si incolla il codice: la registrazione del portale, non la home. */
-const REGISTRAZIONE = `${PG}/#/Registration`;
-
-/** I sei passi dell'attivazione, gli stessi dell'email che manda n8n oggi. */
-const PASSI = [
-  'Clicca su <strong>Abbonamenti</strong>',
-  'Scegli una categoria e clicca su <strong>Ho un codice promozionale</strong>',
-  'Clicca su <strong>Avanti</strong> e scegli il giorno di inizio del Pass',
-  'Nel riepilogo trovi il pagamento di <strong>19 €</strong>',
-  'Accetta il regolamento, firma e clicca su <strong>Attiva Abbonamento</strong>',
-  'Inserisci il metodo di pagamento: carta o conto corrente',
-];
+import { REGISTRAZIONE, PASSI_ATTIVAZIONE as PASSI } from '../data/guestPass';
 ---
 
 <div class="pf" id="prova-modal" aria-hidden="true">
@@ -41,6 +28,7 @@ const PASSI = [
     <section class="pf__step" id="pf-step-email">
       <span class="pf__eyebrow">Guest Pass · 7 giorni</span>
       <h3 class="pf__title" id="pf-titolo-corrente" tabindex="-1" data-pf-fuoco>Prova Athlon.</h3>
+      <p class="pf__claim">Senza impegno, senza rinnovo automatico: provi, poi decidi.</p>
       <p class="pf__lead">
         Una settimana con accesso a tutto il club, a 19 €. Iniziamo dalla tua email: controlliamo che il
         Guest Pass sia attivabile.
@@ -285,6 +273,13 @@ const PASSI = [
   .pf__title:focus,
   .pf__title:focus-visible {
     outline: none;
+  }
+
+  .pf__claim {
+    font-weight: 700;
+    font-size: var(--text-sm);
+    color: var(--color-primary);
+    margin: 0 0 0.75rem;
   }
 
   .pf__lead {

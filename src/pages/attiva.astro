@@ -1,0 +1,461 @@
+---
+/**
+ * /attiva — la landing del codice, non il form.
+ *
+ * Non la trova nessuno per caso: non ha voce nel menu, non è in sitemap, ed è
+ * `noindex`. Ci arriva solo chi ha già compilato «Prova Athlon» ed è il link
+ * che email e WhatsApp mandano subito dopo, al posto del solo testo — così
+ * anche mesi dopo, se il messaggio si è perso di vista, il codice e i passaggi
+ * restano a un indirizzo solo.
+ *
+ * Il codice è lo stesso per tutti (`GUEST_PASS.codice`, da `data/abbonamenti`)
+ * e i sei passi vengono da `data/guestPass`, la stessa lista che usa il modal
+ * `ProvaModal.astro`: un solo posto da aggiornare se il portale cambia un
+ * passaggio.
+ *
+ * Ferma da sola, come `/promo`: nessuna barra del sito, solo il marchio in
+ * alto che riporta alla home.
+ */
+import Layout from '../layouts/Layout.astro';
+import Faq, { type FaqEntry } from '../components/Faq.astro';
+import { CLUB } from '../data/club';
+import { GUEST_PASS } from '../data/abbonamenti';
+import { REGISTRAZIONE, PASSI_ATTIVAZIONE } from '../data/guestPass';
+import { talkCta } from '../data/cta';
+
+const contatta = talkCta({ source: '/attiva' });
+
+const fatti = [
+  { n: `${GUEST_PASS.giorni} giorni`, t: 'Accesso completo a tutto il club' },
+  { n: `${GUEST_PASS.prezzo} €`, t: 'Una tantum, niente altri addebiti' },
+  { n: 'Zero', t: 'Rinnovi automatici alla fine della settimana' },
+  { n: '15 giorni', t: 'Per portare il certificato medico, non subito' },
+];
+
+const faqs: FaqEntry[] = [
+  {
+    q: 'La prova mi impegna a qualcosa?',
+    a: `No. Il Guest Pass dura ${GUEST_PASS.giorni} giorni e si conclude da solo: nessun rinnovo
+      automatico, nessun addebito oltre i ${GUEST_PASS.prezzo} € iniziali. Alla fine decidi tu se
+      iscriverti, con calma — anche a distanza di settimane.`,
+  },
+  {
+    q: 'Serve il certificato medico per iniziare?',
+    a: `Non subito. Ti alleni dal primo giorno con il certificato di idoneità sportiva <strong>non
+      agonistica</strong> — lo rilascia anche il tuo medico di base — e hai <strong>15 giorni
+      dall'inizio dell'allenamento</strong> per inviarlo a <a
+      href="mailto:${CLUB.email}">${CLUB.email}</a>. Anche se la prova dura una settimana, ti resta
+      un'altra settimana buona per portarlo.`,
+  },
+  {
+    q: 'Cosa è compreso nei sette giorni?',
+    a: 'Tutto il club, agli stessi orari di un abbonamento Premium: sala pesi, corsi fitness, piscine, aqua fitness e nuoto libero.',
+  },
+  {
+    q: 'Chi può attivare il Guest Pass?',
+    a: `Solo chi non ha e non ha avuto un abbonamento Athlon dal ${GUEST_PASS.dal}. Se in passato sei
+      già stato socio, scrivici: troviamo insieme la formula giusta.`,
+  },
+  {
+    q: 'Il codice non si applica sul portale, cosa faccio?',
+    a: 'Controlla di averlo incollato al passo <strong>Ho un codice promozionale</strong>, prima di scegliere il giorno di inizio. Se risulta comunque scaduto o non valido, scrivici e lo sistemiamo da qui.',
+  },
+  {
+    q: 'Posso prenotare le lezioni prima di iniziare?',
+    a: 'Sì, dall\'app Athlon Club o dal portale appena il Pass è attivo, come qualunque iscritto.',
+  },
+];
+---
+
+<Layout
+  title="Attiva il tuo Guest Pass | Athlon Club"
+  description="Il codice, i passaggi e tutto quello che serve sapere per attivare la settimana di prova Athlon."
+  breadcrumb={[{ name: 'Attiva', path: '/attiva' }]}
+  chrome={false}
+  noindex
+>
+  <!-- HERO + CODICE -->
+  <section class="at-hero">
+    <div class="container at-hero__inner">
+      <a href="/" class="at-logo" aria-label="Athlon Club — vai al sito">
+        <img src={CLUB.logo} alt="Athlon Club 4.0" width="834" height="159" />
+      </a>
+
+      <span class="eyebrow at-hero__eyebrow" data-anim="from-left">Guest Pass · {GUEST_PASS.giorni} giorni</span>
+      <h1 class="at-hero__title" data-anim="reveal">Il tuo codice è pronto.</h1>
+      <p class="at-hero__claim u-display" data-anim data-anim-delay="80">
+        Senza impegno, senza rinnovo automatico: provi, poi decidi.
+      </p>
+      <p class="at-hero__lede" data-anim data-anim-delay="140">
+        Ecco il codice, i passaggi per attivarlo e le risposte alle domande più comuni. Le stesse
+        istruzioni te le abbiamo già mandate via email e WhatsApp: questa pagina resta qui se un
+        giorno vuoi ritrovarle.
+      </p>
+
+      <div class="at-codice" data-anim="scale" data-anim-delay="200">
+        <span class="at-codice__pre">Il tuo codice</span>
+        <button type="button" class="at-codice__btn u-display" data-copy-code={GUEST_PASS.codice}>
+          {GUEST_PASS.codice} · copia
+        </button>
+        <a
+          href={REGISTRAZIONE}
+          class="btn btn-primary at-codice__cta"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-cta="member"
+        >Vai all'iscrizione →</a>
+        <p class="at-codice__nota">Il Pass si attiva entro 30 giorni dalla richiesta.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- I QUATTRO FATTI -->
+  <section class="at-sec at-sec--alt">
+    <div class="container">
+      <ul class="at-fatti">
+        {fatti.map((f, i) => (
+          <li class="at-fatto" data-anim="pop" data-anim-delay={String(i * 70)}>
+            <span class="at-fatto__n u-display">{f.n}</span>
+            <span class="at-fatto__t">{f.t}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- COME SI ATTIVA -->
+  <section class="at-sec">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Sul portale</span>
+      <h2 class="at-sec__title" data-anim="reveal">Come si attiva</h2>
+      <p class="at-sec__sub">Sei passaggi, cinque minuti. Il codice si incolla al terzo.</p>
+
+      <ol class="at-passi">
+        {PASSI_ATTIVAZIONE.map((p, i) => (
+          <li class="at-passo" data-anim data-anim-delay={String(i * 60)}>
+            <span class="at-passo__n u-display">{i + 1}</span>
+            <span class="at-passo__t" set:html={p} />
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="at-sec at-sec--alt">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Prima di iniziare</span>
+      <h2 class="at-sec__title" data-anim="reveal">Domande frequenti</h2>
+      <p class="at-sec__sub">Quello che chiediamo di più a chi sta per attivare il Pass.</p>
+
+      <Faq entries={faqs} />
+    </div>
+  </section>
+
+  <!-- CONTATTI -->
+  <section class="at-sec">
+    <div class="container at-contatti">
+      <div>
+        <h2 class="at-sec__title" data-anim="reveal">Qualcosa non torna?</h2>
+        <p class="at-sec__sub">Scrivici e sistemiamo il codice o l'iscrizione da qui.</p>
+      </div>
+      <a
+        href={contatta.href}
+        class="btn btn-primary"
+        target="_blank"
+        rel="noopener noreferrer"
+        {...contatta.attrs}
+      >{contatta.label}</a>
+    </div>
+
+    {/* La landing gira senza il footer del sito: le condizioni non avrebbero
+        nessun'altra strada per farsi trovare da qui. */}
+    <div class="container at-legale">
+      <a href="/abbonamenti">Vedi tutti gli abbonamenti</a>
+      <span aria-hidden="true">·</span>
+      <a href="/regolamento">Termini e condizioni</a>
+      <span aria-hidden="true">·</span>
+      <a href="/privacy">Privacy policy</a>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // Copia del codice: stessa meccanica di /abbonamenti e del modal della prova.
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-code]').forEach((btn) => {
+    const code = btn.dataset.copyCode || '';
+    const original = btn.textContent;
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(code);
+        btn.textContent = `${code} · copiato ✓`;
+        btn.classList.add('copied');
+      } catch {
+        btn.textContent = `${code} · copia a mano`;
+      }
+      window.setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  });
+</script>
+
+<style>
+  /* ---- Hero + codice ---- */
+  .at-hero {
+    position: relative;
+    background: var(--color-dark);
+    color: var(--color-white);
+    padding: var(--space-section-lg) 0 var(--space-section-md);
+    overflow: hidden;
+  }
+
+  .at-hero::after {
+    content: 'ATHLON';
+    position: absolute;
+    right: -20px;
+    bottom: 40px;
+    font-family: var(--font-heading);
+    font-size: clamp(120px, 20vw, 260px);
+    line-height: 0.8;
+    color: rgba(255, 255, 255, 0.03);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .at-hero__inner {
+    position: relative;
+    z-index: 1;
+  }
+
+  .at-logo {
+    display: inline-block;
+    margin-bottom: 28px;
+  }
+
+  .at-logo img {
+    height: 2.5rem;
+    width: auto;
+  }
+
+  .at-hero__eyebrow {
+    color: var(--color-primary);
+  }
+
+  .at-hero__title {
+    font-size: var(--text-4xl);
+    --lh: var(--leading-4xl);
+    letter-spacing: var(--tracking-4xl);
+    margin: 14px 0 0;
+  }
+
+  .at-hero__claim {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    --lh: 1.15;
+    letter-spacing: var(--tracking-2xl);
+    color: var(--color-primary);
+    margin: 12px 0 0;
+  }
+
+  .at-hero__lede {
+    max-width: 42rem;
+    margin: 16px 0 0;
+    font-size: var(--text-md);
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  /* Il riquadro del codice: la ragione per cui questa pagina esiste, quindi
+     sopra la piega e distinto dal resto del testo dell'hero. */
+  .at-codice {
+    margin-top: 32px;
+    padding: 24px 26px 22px;
+    max-width: 30rem;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.34);
+    border: 1px solid var(--border-dark);
+  }
+
+  .at-codice__pre {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.62);
+    margin-bottom: 12px;
+  }
+
+  .at-codice__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 3.5rem;
+    margin-bottom: 14px;
+    border: 1px dashed var(--color-primary);
+    border-radius: 0.75rem;
+    background: rgba(255, 87, 1, 0.12);
+    color: var(--color-primary);
+    font-size: var(--text-lg);
+    --lh: 1;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
+  }
+
+  .at-codice__btn:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .at-codice__btn.copied {
+    background: var(--color-white);
+    border-color: var(--color-white);
+    color: var(--color-dark);
+  }
+
+  .at-codice__cta {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .at-codice__nota {
+    margin: 14px 0 0;
+    text-align: center;
+    font-size: var(--text-2xs);
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  /* ---- Sezioni ---- */
+  .at-sec {
+    padding: var(--space-section-lg) 0;
+  }
+
+  .at-sec--alt {
+    background: var(--color-cream);
+  }
+
+  .at-sec__title {
+    font-size: var(--text-3xl);
+    letter-spacing: var(--tracking-2xl);
+    margin: 10px 0 8px;
+  }
+
+  .at-sec__sub {
+    max-width: 44rem;
+    color: var(--text-muted);
+    margin-bottom: 30px;
+  }
+
+  /* ---- I quattro fatti ---- */
+  .at-fatti {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
+    gap: 20px;
+  }
+
+  .at-fatto {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .at-fatto__n {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    --lh: 1;
+    color: var(--color-primary);
+  }
+
+  .at-fatto__t {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  /* ---- Passaggi ---- */
+  .at-passi {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+    max-width: 40rem;
+  }
+
+  .at-passo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px;
+    border-radius: 16px;
+    background: var(--color-cream);
+  }
+
+  .at-passo__n {
+    flex: 0 0 auto;
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    --lh: 1;
+    color: var(--color-primary);
+    min-width: 1.6rem;
+  }
+
+  .at-passo__t {
+    font-size: var(--text-md);
+  }
+
+  .at-passo__t :global(strong) {
+    color: var(--color-dark);
+  }
+
+  /* ---- Contatti ---- */
+  .at-contatti {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .at-contatti .at-sec__sub {
+    margin-bottom: 0;
+  }
+
+  .at-legale {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin-top: 34px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: var(--text-2xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .at-legale a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    color: var(--text-muted);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .at-legale a:hover {
+    color: var(--color-dark);
+  }
+
+  @media (max-width: 640px) {
+    .at-codice {
+      max-width: none;
+    }
+  }
+</style>
