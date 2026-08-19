@@ -260,15 +260,20 @@ misurato è 20 ms.
 - **`total-byte-weight`, 4 MB.** È il video della hero. È la pagina.
 - **`max-potential-fid`, 230 ms.** Metrica deprecata e non pesata nel punteggio;
   quella che conta, il Total Blocking Time, è 20 ms.
-- **`color-contrast`.** L'arancione del marchio, `#ff5701`, dà 3,17:1 su bianco e
-  2,65:1 su crema: sotto il 4,5:1 che serve al testo piccolo. Riguarda le
-  sopralinee, il pulsante Contattaci su mobile, le etichette del footer e il
-  testo bianco sui pulsanti pieni. Non è una decisione tecnica — servirebbe
-  scurire l'arancione dei testi piccoli a `#d14701` su bianco e `#ba4001` su
-  crema, tenendo `#ff5701` per i fondi e i titoli grandi, dove 3:1 basta. In
-  attesa di conferma. I tre grigi che mancavano il 4,5:1 per un soffio (le
-  intestazioni del footer, il suggerimento delle gallerie, la riga sotto i
-  loghi) sono stati alzati: stesso colore, un filo più di opacità.
+- **`color-contrast`: resta rosso per scelta.** L'arancione del marchio,
+  `#ff5701`, dà 3,17:1 su bianco e 2,65:1 su crema, sotto il 4,5:1 che serve al
+  testo piccolo: riguarda le sopralinee, il pulsante Contattaci su mobile, le
+  etichette del footer e il testo bianco sui pulsanti pieni. Non è un problema
+  tecnico ed è stato deciso di **tenere l'arancione com'è**, in ogni suo uso.
+  Chi ci tornasse sopra: la soglia si raggiunge scurendo i soli testi piccoli a
+  `#d14701` su bianco e `#ba4001` su crema, lasciando `#ff5701` ai fondi e ai
+  titoli grandi, dove 3:1 basta — ma sui pulsanti pieni vorrebbe dire scurire il
+  fondo, e quello si vede. Non farlo senza chiedere.
+
+  I tre grigi che mancavano il 4,5:1 per un soffio, invece, sono stati alzati —
+  le intestazioni del footer, il suggerimento delle gallerie, la riga sotto i
+  loghi: stesso colore, un filo più di opacità, nessun colore del marchio in
+  mezzo.
 
 ### Accessibilità: gli overlay chiusi erano tabulabili
 
