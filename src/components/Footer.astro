@@ -303,12 +303,20 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
     padding-left: 24px;
   }
 
+  /* Le etichette e la sopralinea del blocco «Dove siamo» sono arancione scuro:
+     undici pixel e mezzo sulla crema, dove `#ff5701` dà 2,65:1 contro il 4,5:1
+     che serve. Sono le righe con l'indirizzo, gli orari e l'email — quelle che
+     uno cerca quando deve venire qui davvero. */
+  .find-us__label,
+  .find-us .eyebrow {
+    color: var(--accent-text);
+  }
+
   .find-us__label {
     font-size: var(--text-2xs);
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--color-primary);
     margin-bottom: 8px;
   }
 
@@ -350,6 +358,13 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
     flex-wrap: wrap;
     gap: 12px;
     margin-top: 32px;
+  }
+
+  /* Anche il pieno di Contattaci: quattordici pixel di bianco sull'arancione del
+     marchio sono 3,17:1, e col fondo scuro diventano 4,55:1. Vale solo qui, non
+     per tutti i `.btn-primary` del sito. */
+  .find-us__cta .btn-primary {
+    background: var(--accent-fill);
   }
 
   /* ---- Link grid ---- */

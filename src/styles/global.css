@@ -93,6 +93,24 @@
   --accent-on-dark: var(--color-primary);
   --accent-hover: #e14e00;
 
+  /* Le due varianti scure dell'arancione, per i punti dove il marchio pieno non
+     regge il contrasto: `#ff5701` dà 3,17:1 sul bianco e 2,65:1 sulla crema, e a
+     un testo piccolo serve 4,5:1.
+
+     Non sono un secondo colore del marchio: sono la soglia, calcolata. Il primo
+     copre entrambi i fondi chiari (4,55:1 sulla crema, 5,46:1 sul bianco) e vale
+     anche per un bordo, dove basterebbe 3:1. Il secondo è per i fondi pieni, col
+     bianco sopra.
+
+     Si usano solo dove qualcuno deve *leggere*: etichette, pastiglie, i comandi
+     del pannello account. Titoli e numeri grandi restano `#ff5701`, perché sopra
+     i 24px (o 18,66 in grassetto) la soglia scende a 3:1 e il marchio la passa
+     così com'è. Dove cambiarlo si vedrebbe troppo, si è scelto di ingrandire il
+     testo invece di scurirlo — la CTA della hero fa così. */
+  --accent-text: #bb4001;
+  --accent-fill: #d14701;
+  --accent-fill-hover: #b03c00;
+
   --text-muted: rgba(39, 36, 35, 0.65);
 
   /* Semi-transparent borders adapt to whatever they sit on */

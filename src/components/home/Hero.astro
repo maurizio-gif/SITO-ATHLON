@@ -274,6 +274,20 @@ const prova = trialCta({ source: '/' });
     gap: 14px 18px;
   }
 
+  /* Il testo del pulsante è più grande e più pesante qui che altrove, e la
+     ragione è il contrasto. Il bianco sull'arancione del marchio dà 3,17:1: per
+     un testo piccolo serve 4,5:1, ma sopra i 18,66px in grassetto la soglia
+     scende a 3:1 e quel 3,17 basta. Così il pieno resta `#ff5701` — è il
+     pulsante più visibile del sito e scurirlo si sarebbe visto — e a guadagnarci
+     è anche chi legge senza problemi di vista: 19px invece di 14 su una CTA che
+     è la prima cosa che si fa in questa pagina.
+
+     Se qualcuno rimpicciolisce questo testo, il pulsante torna fuori norma. */
+  .hero-actions .btn {
+    font-size: 19px;
+    font-weight: 700;
+  }
+
   /* Secondaria dell'hero: un link, non un secondo pulsante — la gerarchia fra
      provare e leggere i piani deve restare leggibile a colpo d'occhio. */
   .hero-secondary {
