@@ -703,17 +703,20 @@ video:not([controls])::-webkit-media-controls-panel {
    su tutte e tre le misure, e giusta anche su un 4K: quello dichiara 3840 px CSS
    e con `vw` alza la radice invece di dimezzare i caratteri.
 
-   **L'impaginazione, al contrario del totem, si tocca pochissimo.** Sul pannello
-   verticale ogni griglia a tre colonne doveva scendere a due, da cui le ~32
-   media query marcate «+ totem». Qui lo schermo è largo come un desktop e le
-   tre colonne restano. Scendono a due **solo le griglie più fitte di tre** —
-   misurate, non supposte: a quattro e a cinque colonne il testo scendeva a
-   22-26 caratteri per riga, sotto i 30 che sono il fondo leggibile. Sono
-   quattro punti in tutto (il footer con le sue due griglie, le cinque colonne
-   dei Classes, le quattro del metodo junior) e portano questa condizione
-   accanto a quella del totem, con un commento «+ tv». Le griglie a tre stanno
-   fra i 30 e i 40 caratteri e restano come sono: farle scendere avrebbe
-   allungato ogni pagina del doppio, che su un televisore è il difetto peggiore.
+   **L'impaginazione si tocca molto meno che sul totem, ma si tocca.** Là ogni
+   griglia doveva scendere di una colonna, da cui le ~32 media query marcate
+   «+ totem». Qui lo schermo è largo come un desktop, e chi scende è **solo chi
+   la misura ha trovato sotto i 30 caratteri per riga**, che è il fondo
+   leggibile: le griglie a quattro e cinque colonne (22-26 caratteri) e le
+   schede a tre delle pagine corso (26-28), che da sole erano 23 dei 42
+   paragrafi fuori soglia. Sono cinque punti in tutto — il footer con le sue due
+   griglie, le cinque colonne dei Classes, le quattro del metodo junior, le tre
+   schede dei corsi — e portano questa condizione accanto a quella del totem,
+   con un commento «+ tv».
+
+   Le altre griglie a tre restano, e non è pigrizia: ogni colonna in meno è una
+   riga in più da scorrere, e su un televisore lo scorrimento è il difetto
+   peggiore che ci sia. Si scende dove la riga è illeggibile, non dove è stretta.
 
    Restano da ritarare a mano le due categorie che con la radice non crescono:
    quello che è scritto in px (i margini del contenitore, il pieno dei pulsanti,
@@ -725,23 +728,36 @@ video:not([controls])::-webkit-media-controls-panel {
    larghezza. `/diagnostica-schermo` dice sul posto quale condizione non passa. */
 @media (min-width: 1700px) and (min-height: 1020px) and (max-aspect-ratio: 37/20) {
   :root {
-    /* 1,28vw fa 24,6px su 1920. Il valore esce dalla distanza, non dal gusto:
-       su un 55" quei 24,6px misurano 15,6 mm di vetro, cioè si leggono da 2,3 m
-       — e la stessa dichiarazione dà 12,4 mm su un 43" (2 m) e 18,5 mm su un 65"
-       (2,8 m), che sono le distanze da cui quei tre apparecchi si guardano
-       davvero. Oggi, senza questo blocco, il corpo del testo su un 55" misura
-       10 mm: si legge da un metro e mezzo, cioè da seduti sulla scrivania e non
-       dal divano. */
-    font-size: 1.28vw;
+    /* Davanti al televisore si sta **fra i due e i quattro metri**: è il dato di
+       partenza, e da lì esce tutto il resto. 1,64vw fa 31,5px su 1920, che su un
+       55" sono 20 mm di vetro — i 3 m del centro della forcella, con la stessa
+       regola della cartellonistica del totem (altezza ≈ distanza / 150).
+
+       Il centro e non il fondo, ed è una scelta: a 4 m quella regola vorrebbe
+       27 mm, cioè 42px di radice, e a quel punto lo schermo tiene 42rem di
+       contenuto — le colonne scendono a venti caratteri per riga e la pagina
+       diventa illeggibile per stare larga. Su 1920 px non si può avere insieme
+       il testo da manifesto per 4 m e righe di lunghezza umana: è aritmetica.
+
+       Vale qui lo stesso argomento del totem, dove 8 mm hanno battuto 10: a 4 m
+       parlano i titoli, che sono tre o quattro volte il corpo e si leggono da in
+       fondo alla stanza; il testo lo si legge da 3 m o meno, che è dove ci si
+       mette quando si legge davvero. Sotto, a 2 m, 20 mm sono abbondanti — ed è
+       il verso giusto in cui sbagliare.
+
+       Le altre due misure di apparecchio seguono da sole, perché la radice è in
+       `vw` e la distanza cresce con la diagonale: 15,6 mm su un 43" (2,3 m) e
+       23,6 su un 65" (3,5 m). */
+    font-size: 1.64vw;
 
     /* Lo spazio non segue la radice. A scala piena `--space-section-lg` passava
-       da 104 a 168px e la home diventava il doppio più lunga di quello che è:
-       su un televisore nessuno scorre volentieri, e spesso non scorre affatto.
-       Questi tre valori tengono le sezioni un filo più arieggiate del desktop in
-       pixel veri invece che una volta e mezza. */
-    --space-section-sm: 2.6rem;
-    --space-section-md: 3.6rem;
-    --space-section-lg: 4.6rem;
+       da 104 a 205px e la home diventava un chilometro: su un televisore nessuno
+       scorre volentieri, e spesso non scorre affatto. Questi tre valori tengono
+       le sezioni un filo più arieggiate del desktop in pixel veri invece che al
+       doppio. */
+    --space-section-sm: 2.1rem;
+    --space-section-md: 2.9rem;
+    --space-section-lg: 3.7rem;
 
     /* Il fondo della scala si alza, e qui il televisore si separa dal totem.
        Sul totem le due misure più piccole potevano restare basse perché una
@@ -749,9 +765,10 @@ video:not([controls])::-webkit-media-controls-panel {
        è la distanza da cui le didascalie si leggono davvero». Davanti a un
        televisore non ci si avvicina: etichette, occhielli e note si leggono
        dalla stessa poltrona da cui si legge tutto il resto, quindi la scala si
-       comprime in basso invece di allargarsi. 0,82 e 0,88rem fanno 20 e 22px,
-       cioè 13 e 14 mm su un 55": la nota resta leggibile dove si legge il testo.
-       Restano comunque sotto il corpo, o la gerarchia sparirebbe del tutto. */
+       comprime in basso invece di allargarsi. 0,82 e 0,88rem fanno 26 e 28px,
+       cioè 16 e 18 mm su un 55": la nota si legge da 2,5 m, dentro la forcella,
+       invece che da 1,7. Restano comunque sotto il corpo, o la gerarchia
+       sparirebbe del tutto. */
     --text-2xs: 0.82rem;
     --text-xs: 0.88rem;
 
@@ -759,27 +776,32 @@ video:not([controls])::-webkit-media-controls-panel {
        decide tutto: **i caratteri per riga dipendono solo da quanto è largo il
        contenitore misurato in rem**, non dalla scala. Alzare la radice e basta
        non stringe niente; lasciare il contenitore a 1320px mentre la radice
-       cresce sì, perché 1320px scendono da 82rem a 51.
+       cresce sì, perché 1320px scendono da 82rem a 41.
 
-       70rem sono 1722px su 1920: il massimo che lo schermo concede lasciando un
-       margine, e riportano le colonne delle griglie a tre in una misura che si
-       legge. Più di così non si può — a caratteri grandi lo schermo tiene meno
-       caratteri, ed è aritmetica, non impaginazione. Gli altri due contenitori
-       erano già in rem e si sono adattati da soli. */
-    --container-width: 70rem;
+       58rem sono 1827px su 1920, e sono il massimo che lo schermo concede
+       lasciando il margine di sicurezza qui sotto. È anche il punto in cui la
+       taratura si morde la coda: alzando la radice per la distanza, lo schermo
+       tiene meno rem, quindi ogni millimetro guadagnato in altezza del carattere
+       si paga in lunghezza di riga. A 3 m il conto torna; oltre no, ed è la
+       ragione per cui la radice si ferma dove si ferma. Gli altri due
+       contenitori erano già in rem e si sono adattati da soli. */
+    --container-width: 58rem;
 
     --radius: 1rem;
   }
 
-  /* 24px su 1920 sono un filo, e non è solo estetica: un televisore di consumo
-     può ancora tagliare il bordo dell'immagine (overscan), storicamente fino al
-     5%. 2rem fanno 52px, cioè il 2,7% per lato: il testo resta dentro anche su
-     un apparecchio che ritaglia, e le sezioni a tutta larghezza restano a tutta
-     larghezza invece di scoprire due bande bianche ai lati. */
+  /* Il margine di sicurezza, e non è estetica: un televisore di consumo può
+     ancora tagliare il bordo dell'immagine (overscan), storicamente fino al 5%.
+     Fra i 46px che il contenitore lascia fuori e gli 1,25rem (39px) di questo
+     pieno, il testo comincia a 85px dal bordo, cioè al 4,4%: resta dentro anche
+     su un apparecchio che ritaglia. Il pieno scende da 2rem a 1,25 perché a
+     radice 31px 2rem sarebbero 63px sottratti alla riga, e la riga è la cosa
+     che qui scarseggia. Le sezioni a tutta larghezza restano a tutta larghezza,
+     invece di scoprire due bande vuote ai lati. */
   .container,
   .container-narrow,
   .container-wide {
-    padding: 0 2rem;
+    padding: 0 1.25rem;
   }
 
   /* Il pieno del pulsante era in px: il testo passava da 14 a 23px dentro la

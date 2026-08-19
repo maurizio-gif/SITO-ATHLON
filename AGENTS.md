@@ -332,33 +332,46 @@ far away the person is sitting. Someone browsing fullscreen on a large monitor
 gets television-sized text — that is this rule, not a bug. The common case, a
 maximised window, is untouched.
 
-**The root is in `vw`, and here it does an extra job.** A television is watched
-from a distance that grows with the diagonal: whoever buys a 65" puts it further
-away than whoever buys a 43". `1.28vw` gives 24.6 px on 1920, and those 24.6 px
-measure 12.4 mm on a 43" (2 m), 15.6 mm on a 55" (2.3 m) and 18.5 mm on a 65"
-(2.8 m) — the distances those three sets are actually watched from, by the same
-signage rule the totem uses. One declaration, correct on all three, and still
-correct on a 4K set, which declares 3840 CSS px and raises the root instead of
-halving the characters.
+**A television is watched from two to four metres.** That is the input the whole
+block is derived from. `1.64vw` gives 31.5 px on 1920, which on a 55" set is
+20 mm of glass — the 3 m at the centre of that range, by the same signage rule
+the totem uses (height ≈ distance / 150). The root is in `vw`, so the other sizes
+follow on their own, because viewing distance grows with the diagonal: 15.6 mm on
+a 43" (2.3 m) and 23.6 mm on a 65" (3.5 m). A 4K set declares 3840 CSS px and
+raises the root instead of halving the characters.
+
+**The centre of the range and not the far end, deliberately.** At 4 m that rule
+wants 27 mm, which is a 42 px root, and at that point the screen holds 42 rem of
+content: columns fall to twenty characters a line and the page becomes unreadable
+in order to be large. On 1920 px you cannot have both poster-grade text for 4 m
+and human line lengths — it is arithmetic. The same argument the totem settles
+with (8 mm beating 10) applies here: at 4 m the headings speak, since they are
+three to four times body size; the copy is read from 3 m or closer, which is
+where people stand when they actually read. Below that, at 2 m, 20 mm is generous
+— and that is the right direction to be wrong in.
 
 **Characters per line depend only on how wide the container is measured in
 `rem`** — not on the scale. This is the one thing that is easy to get wrong:
 raising the root alone narrows nothing, but leaving `--container-width` at
-1320 px while the root grows does, because 1320 px falls from 82 rem to 51. It is
-set to `70 rem` here — 1722 px on 1920, the most the screen allows while keeping
-a margin. Beyond that there is nothing to win: at larger characters the screen
-holds fewer of them, and that is arithmetic, not layout.
+1320 px while the root grows does, because 1320 px falls from 82 rem to 41. It is
+set to `58 rem` — 1827 px on 1920, the most the screen allows while keeping the
+overscan margin. This is also where the tuning bites its own tail: raising the
+root for distance leaves the screen holding fewer rem, so every millimetre gained
+in character height is paid for in line length. At 3 m the trade still works; past
+it, it does not — which is why the root stops where it stops.
 
 What follows when writing a page:
 
-- **Layout barely changes, unlike the totem.** The screen is as wide as a
-  desktop, so three-column grids stay. **Only grids denser than three drop to
-  two** — measured, not assumed: at four and five columns the text fell to 22–26
-  characters per line, below the 30 that is the readable floor. There are four
-  such places (the footer's two grids, the five Classes columns, the four junior
-  method columns) and they carry this condition next to the totem's, with a
-  `/* + tv */` comment. Dropping the three-column grids too would have doubled
-  every page's length, which on a television is the worse fault.
+- **Layout changes far less than on the totem, but it does change.** There every
+  grid had to lose a column; here only what **measured** under 30 characters per
+  line does — the readable floor. That is the four- and five-column grids (22–26)
+  and the course pages' three cards (26–28), which alone were 23 of the 42
+  paragraphs out of bounds. Five places (the footer's two grids, the five Classes
+  columns, the four junior method columns, the three course cards), each carrying
+  this condition next to the totem's with a `/* + tv */` comment. The other
+  three-column grids stay, and that is not laziness: every column dropped is a
+  row added to scroll, and on a television scrolling is the worst fault there is.
+  Drop a grid where the line is unreadable, not where it is narrow.
 - **A size outside the type scale is what breaks first.** Both offenders the
   sweep found were exactly that: the footer credit at `0.6875rem` and the
   header's trial CTA at `0.75rem`. Anything written outside `--text-*` stays
@@ -367,22 +380,26 @@ What follows when writing a page:
   the totem.** On the totem the smallest labels could stay at 6 mm because a
   caption is read by stepping closer. Nobody steps closer to a television:
   labels, eyebrows and fine print are read from the same armchair as everything
-  else, so `--text-2xs` and `--text-xs` are raised to 0.82 and 0.88 rem (20 and
-  22 px, 13 and 14 mm on a 55") — compressing the scale at the bottom instead of
+  else, so `--text-2xs` and `--text-xs` are raised to 0.82 and 0.88 rem (26 and
+  28 px, 16 and 18 mm on a 55") — compressing the scale at the bottom instead of
   widening it, while staying under body copy so the hierarchy survives.
 - **Give the page a margin: consumer sets still overscan**, historically up to
-  5%. The container gutter is `2rem` (52 px, 2.7% a side), so copy stays inside
-  on a set that crops, while full-bleed sections stay full-bleed.
+  5%. Between the 46 px the container leaves outside and its `1.25rem` (39 px)
+  gutter, copy starts 85 px from the edge — 4.4% a side — so it stays inside on a
+  set that crops, while full-bleed sections stay full-bleed.
 
 To verify, sweep every built page at 1920×1080 — the full height is what turns
 the mode on, so a widened desktop window will not reproduce it — and check: no
-horizontal overflow, no text under 19 px (which is 12 mm on a 55"), and
-characters per line per paragraph. The last run was 80 pages: no overflow
-anywhere, median 41 on the home page and 65 on the course pages against a target
-of 38, and the worst tail (25–28) no worse than what desktop already ships. Two
-elements report as bleeding — `.nav-item`, which holds the absolutely-positioned
-mega-menu, and `.splash__mark` by 3 px — and both do the same at 1400×900, so
-they are pre-existing and not this mode's doing.
+horizontal overflow, no text under 19 px, and characters per line per paragraph.
+The last run was 80 pages: no overflow anywhere, nothing under 19 px, and 19
+paragraphs below 30 characters a line, several of which are artefacts of the
+counter (a paragraph broken by hand with `<br>`, a flex row read as one string).
+Expect the line-length figures to be **worse** than the smaller tuning that came
+before, and that is the trade being made on purpose: text readable at 3 m costs
+line length, and a beautifully set line nobody can read from the sofa is worth
+nothing. Two elements report as bleeding — `.nav-item`, which holds the
+absolutely-positioned mega-menu, and `.splash__mark` by 3 px — and both do the
+same at 1400×900, so they are pre-existing and not this mode's doing.
 
 `/diagnostica-schermo` reads back both modes' conditions from `data-test` and
 says on the screen itself which one is failing and how many millimetres the body
