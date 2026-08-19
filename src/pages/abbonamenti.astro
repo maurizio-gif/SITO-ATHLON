@@ -919,10 +919,10 @@ const trust = [
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 16px;
-    height: 16px;
+    width: 1rem;
+    height: 1rem;
     border-radius: 50%;
-    font-size: 9px;
+    font-size: 0.5625rem;
     font-weight: 800;
     line-height: 1;
     transition: background-color var(--dur-fast) ease;
@@ -930,6 +930,17 @@ const trust = [
 
   .plan.smart .activity-row {
     color: var(--color-white);
+  }
+
+  /* Totem: il pallino è in rem e cresce, il «?» dentro no — 19px di glifo a un
+     metro e mezzo sono un puntino. Non è testo per un lettore di schermo
+     (aria-hidden), ma per chi guarda distingue «incluso» da «su richiesta». */
+  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 5/8) {
+    .activity-row__mark {
+      width: 1.25rem;
+      height: 1.25rem;
+      font-size: var(--text-2xs);
+    }
   }
 
   .plan.smart .activity-row__mark {
@@ -1406,7 +1417,7 @@ const trust = [
 
   .faq__icon {
     flex-shrink: 0;
-    font-size: 20px;
+    font-size: 1.25rem;
     line-height: 1;
     color: var(--color-primary);
     transition: transform var(--dur-base) var(--ease-out-crit);
@@ -1587,7 +1598,7 @@ const trust = [
     border-radius: 50%;
     background: var(--color-cream);
     color: var(--color-dark);
-    font-size: 20px;
+    font-size: 1.25rem;
     line-height: 1;
     cursor: pointer;
     transition: background-color var(--dur-fast) ease;

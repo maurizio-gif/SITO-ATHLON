@@ -365,6 +365,21 @@ const evento = {
     text-decoration: underline;
   }
 
+  /* Totem verticale: `auto-fit` faceva tre colonne da 335px e dentro ognuna una
+     tabella da tre colonne a scala doppia, che sfondava i 1080. Una sala per
+     riga — su uno schermo 9:16 è anche l'ordine di lettura giusto. */
+  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 5/8) {
+    .prog {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .prog__table {
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+
   @media (max-width: 640px) {
     .evd__hero {
       min-height: 54vh;

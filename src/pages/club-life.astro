@@ -110,7 +110,12 @@ const sections = [
 <style>
   /* ---- Hero ---- */
   .cl-hero {
-    --cl-menu-h: 58px;
+    /* In rem, non in px: la barra qui sotto è fatta di testo e di padding, e
+       sul totem verticale il testo raddoppia — con 58px fissi la riserva era
+       giusta sul telefono (barra 54) e corta sul totem (barra 117), e gli
+       ultimi sedici pixel delle pillole finivano sotto il bordo dello schermo,
+       cioè l'unica navigazione della pagina restava mezza nascosta. */
+    --cl-menu-h: 3.75rem;
     position: relative;
     /* Hero plus the bar under it fill exactly one screen, at every width. svh
        rather than vh so the mobile browser's collapsing toolbar cannot push the
@@ -211,11 +216,13 @@ const sections = [
 
   .cl-menu__inner {
     display: flex;
-    gap: 6px;
+    gap: 0.375rem;
     overflow-x: auto;
     scrollbar-width: none;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    /* Vedi `--cl-menu-h`: se questo resta in px la barra non scala insieme alla
+       riserva che le ha lasciato la hero. */
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
   }
 
   .cl-menu__inner::-webkit-scrollbar {
@@ -225,9 +232,9 @@ const sections = [
   .cl-menu__item {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 0.5rem;
     flex-shrink: 0;
-    padding: 9px 16px;
+    padding: 0.5625rem 1rem;
     border-radius: 999px;
     font-size: var(--text-xs);
     font-weight: 700;

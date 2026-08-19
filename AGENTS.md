@@ -197,6 +197,73 @@ that headless Chromium here has **no H.264 decoder**
 (`canPlayType('video/mp4; codecs="avc1.42E01E"')` is `''`), so the site's own
 MP4s never advance in it; measure frames with a VP8/WebM clip instead.
 
+## The club's kiosk is a third form factor, and it is not a phone
+
+A 27" portrait panel (9:16, Windows, Edge or Chrome) stands in the club's
+entrance and is read from about a metre and a half away. It broke both of the
+site's assumptions at once: it is 1080 px wide, so it got the hover-only desktop
+menu no finger can open, and its text was sized for a phone held at arm's
+length, so from the doorway it was unreadable.
+
+**Detect it by the shape of the screen, never by the pointer.** Windows presents
+the touch panel to browsers as a machine with a mouse — `pointer: fine`,
+`hover: hover` — so `pointer: coarse` never fires there. Three conditions
+together, and all three are needed:
+
+```css
+@media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 5/8)
+```
+
+`min-width` rules out a phone, `min-height` rules out a short desktop window,
+and `max-aspect-ratio` lets 9:16 (0.5625) through while a 3:4 tablet (0.75)
+stays out. The same three measures appear in `global.css` (the type scale and
+the shared controls), in `Header.astro` (the touch bar), and in the few
+components with sizes of their own. **Keep them identical**, and add
+`/diagnostica-schermo` to the list of places to check if they ever change —
+that page reads them back from `data-test` and says on the panel itself which
+condition is failing.
+
+**The root is in `vw`, not px, and that is the whole trick.** The panel is
+physical and fixed; what changes is how many CSS pixels Windows declares — 1080
+at 100 % scaling, 1440 at 150 %. `font-size: 3.15vw` gives 34 px on 1080 and
+45 px on 1440, and in both cases body text measures about 10 mm on the glass:
+signage wants character height ≈ viewing distance / 150, so 10 mm at 1.5 m.
+Spacing does **not** double — the three `--space-section-*` variables are
+retuned inside the block, or the home page becomes a kilometre of scrolling.
+
+What follows from all this, when writing a page:
+
+- **Sizes in rem, not px, for anything a finger touches or an eye reads.** At a
+  16 px root a rem *is* a px, so phones and desktops are unchanged to the pixel;
+  on the kiosk the same declaration scales. This is how the header bar, the
+  gallery arrows and the club-life anchor strip were fixed — none of them needed
+  a kiosk rule, only the right unit. A control still measured in px is a control
+  that stays phone-sized on the panel.
+- **A magic number that stands for another element's height is a bug waiting for
+  the kiosk.** `calc(100svh - 72px)` in the hero and `--cl-menu-h: 58px` in
+  club-life were both correct at a 16 px root and both wrong on the panel, by
+  81 px and 63 px — enough to push the CTA and the only navigation the page has
+  below the bottom edge. Express it in the same unit as the thing it tracks.
+- **A table that does not fit scrolls inside itself**, like the planning week:
+  `display: block; overflow-x: auto`. The page must never scroll sideways.
+- **A grid column is `minmax(0, 1fr)`, not `auto`.** At double scale one long
+  cited URL in the terms and conditions widened its column past its own
+  container and the whole page scrolled. Pair it with `overflow-wrap: anywhere`
+  on the prose so the string breaks instead of the layout.
+- **Secondary link-CTAs get their tap height from the shared list** in
+  `global.css` — `.co-link`, `.wa__back`, `.sched__link` and the rest. It is an
+  explicit list on purpose: `a:not(p a)` would also catch the cards that are one
+  big link, and `display: inline-flex` on those breaks the grids. A new
+  link-shaped command goes in that list.
+
+To verify, sweep every built page at 1080×1920 with `hasTouch: false` — that is
+what the panel reports — and check four things per page: no text under 24 px, no
+control whose smaller side is under 48 px, no horizontal overflow, and at least
+one finger-sized command inside the first screen. Links inside running text
+(`p`, `li`, `td`, `th`) are text, not targets, and don't count. The sweep is
+what turned "the characters are a bit small" into a bounded list; the last run
+was 77 pages, nothing to fix.
+
 ## Documentation
 
 Full documentation: https://docs.astro.build
