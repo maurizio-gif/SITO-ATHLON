@@ -1013,10 +1013,17 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
   }
 
   /* + totem: vedi «Il totem verticale del club» in global.css */
+  /* + tv: vedi «Il televisore 16:9» in global.css. Tarato per i 3 m, il corpo
+     del testo arriva a 31px e queste tre schede scendevano a 26-28 caratteri
+     per riga — erano il rilievo più diffuso di tutto lo sweep, 23 paragrafi su
+     42. A due colonne tornano sopra i 40, al prezzo di una riga di scorrimento
+     in più. */
 
   @media (max-width: 1000px),
 
-    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
+    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10),
+
+    (min-width: 1700px) and (min-height: 1020px) and (max-aspect-ratio: 37/20) {
     .co-plans,
     .co-simili {
       grid-template-columns: 1fr 1fr;

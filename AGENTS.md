@@ -197,7 +197,7 @@ that headless Chromium here has **no H.264 decoder**
 (`canPlayType('video/mp4; codecs="avc1.42E01E"')` is `''`), so the site's own
 MP4s never advance in it; measure frames with a VP8/WebM clip instead.
 
-## The club's kiosk is a third form factor, and it is not a phone
+## The club's kiosk is a form factor of its own, and it is not a phone
 
 A 27" portrait panel (9:16, Windows, Edge or Chrome) stands in the club's
 entrance and is read from about a metre and a half away. It broke both of the
@@ -298,6 +298,113 @@ measures 49. Three "findings" were that artifact and nothing else.
 
 The sweep is what turned "the characters are a bit small" into a bounded list;
 the last run was 77 pages, nothing to fix.
+
+## The 16:9 television is the kiosk's landscape twin
+
+The site is also shown on an ordinary Full HD television — a consumer set, not a
+professional panel — and desktop mode is wrong there for one reason: distance.
+At a 16 px root, body copy on a 55" set measures 10 mm of glass, which reads at
+1.5 m. That is a desk, not a sofa.
+
+**The trap is that 1920×1080 is both a television and the most common desktop
+monitor there is.** Width distinguishes nothing. What distinguishes is the
+**usable height**, because on a television the browser fills the screen and on a
+desk it does not: a maximised window on a 1080p monitor leaves ~937 px (tabs,
+address bar and taskbar take 143), and the most that was measured with the
+taskbar hidden is 993. A television gives the full 1080.
+
+```css
+@media (min-width: 1700px) and (min-height: 1020px) and (max-aspect-ratio: 37/20)
+```
+
+`min-width` rules out a laptop, `min-height` is the condition that does the work,
+and `max-aspect-ratio` rules out a maximised window on a large monitor — those
+sit between 1.90 and 2.05, while 16:9 is 1.778. **37/20 (1.85) and not `16/9`,**
+which is the true ratio: `max-aspect-ratio: 16/9` is a pixel-exact comparison,
+and a 1920×1079 viewport — one pixel of chrome, a thin bar the set draws — makes
+1.7794 and falls out. 1.85 leaves room for forty pixels of frame and still
+excludes a maximised 1440p window.
+
+**The price, measured: a fullscreen 16:9 screen is indistinguishable from a
+television, because it genuinely is.** 2560×1440 in F11 on a desk and a 1440p
+signal on a television declare the same numbers, and no media query can know how
+far away the person is sitting. Someone browsing fullscreen on a large monitor
+gets television-sized text — that is this rule, not a bug. The common case, a
+maximised window, is untouched.
+
+**A television is watched from two to four metres.** That is the input the whole
+block is derived from. `1.64vw` gives 31.5 px on 1920, which on a 55" set is
+20 mm of glass — the 3 m at the centre of that range, by the same signage rule
+the totem uses (height ≈ distance / 150). The root is in `vw`, so the other sizes
+follow on their own, because viewing distance grows with the diagonal: 15.6 mm on
+a 43" (2.3 m) and 23.6 mm on a 65" (3.5 m). A 4K set declares 3840 CSS px and
+raises the root instead of halving the characters.
+
+**The centre of the range and not the far end, deliberately.** At 4 m that rule
+wants 27 mm, which is a 42 px root, and at that point the screen holds 42 rem of
+content: columns fall to twenty characters a line and the page becomes unreadable
+in order to be large. On 1920 px you cannot have both poster-grade text for 4 m
+and human line lengths — it is arithmetic. The same argument the totem settles
+with (8 mm beating 10) applies here: at 4 m the headings speak, since they are
+three to four times body size; the copy is read from 3 m or closer, which is
+where people stand when they actually read. Below that, at 2 m, 20 mm is generous
+— and that is the right direction to be wrong in.
+
+**Characters per line depend only on how wide the container is measured in
+`rem`** — not on the scale. This is the one thing that is easy to get wrong:
+raising the root alone narrows nothing, but leaving `--container-width` at
+1320 px while the root grows does, because 1320 px falls from 82 rem to 41. It is
+set to `58 rem` — 1827 px on 1920, the most the screen allows while keeping the
+overscan margin. This is also where the tuning bites its own tail: raising the
+root for distance leaves the screen holding fewer rem, so every millimetre gained
+in character height is paid for in line length. At 3 m the trade still works; past
+it, it does not — which is why the root stops where it stops.
+
+What follows when writing a page:
+
+- **Layout changes far less than on the totem, but it does change.** There every
+  grid had to lose a column; here only what **measured** under 30 characters per
+  line does — the readable floor. That is the four- and five-column grids (22–26)
+  and the course pages' three cards (26–28), which alone were 23 of the 42
+  paragraphs out of bounds. Five places (the footer's two grids, the five Classes
+  columns, the four junior method columns, the three course cards), each carrying
+  this condition next to the totem's with a `/* + tv */` comment. The other
+  three-column grids stay, and that is not laziness: every column dropped is a
+  row added to scroll, and on a television scrolling is the worst fault there is.
+  Drop a grid where the line is unreadable, not where it is narrow.
+- **A size outside the type scale is what breaks first.** Both offenders the
+  sweep found were exactly that: the footer credit at `0.6875rem` and the
+  header's trial CTA at `0.75rem`. Anything written outside `--text-*` stays
+  behind wherever the root grows, on the totem and here alike.
+- **The bottom of the scale rises, and this is where the television parts from
+  the totem.** On the totem the smallest labels could stay at 6 mm because a
+  caption is read by stepping closer. Nobody steps closer to a television:
+  labels, eyebrows and fine print are read from the same armchair as everything
+  else, so `--text-2xs` and `--text-xs` are raised to 0.82 and 0.88 rem (26 and
+  28 px, 16 and 18 mm on a 55") — compressing the scale at the bottom instead of
+  widening it, while staying under body copy so the hierarchy survives.
+- **Give the page a margin: consumer sets still overscan**, historically up to
+  5%. Between the 46 px the container leaves outside and its `1.25rem` (39 px)
+  gutter, copy starts 85 px from the edge — 4.4% a side — so it stays inside on a
+  set that crops, while full-bleed sections stay full-bleed.
+
+To verify, sweep every built page at 1920×1080 — the full height is what turns
+the mode on, so a widened desktop window will not reproduce it — and check: no
+horizontal overflow, no text under 19 px, and characters per line per paragraph.
+The last run was 80 pages: no overflow anywhere, nothing under 19 px, and 19
+paragraphs below 30 characters a line, several of which are artefacts of the
+counter (a paragraph broken by hand with `<br>`, a flex row read as one string).
+Expect the line-length figures to be **worse** than the smaller tuning that came
+before, and that is the trade being made on purpose: text readable at 3 m costs
+line length, and a beautifully set line nobody can read from the sofa is worth
+nothing. Two elements report as bleeding — `.nav-item`, which holds the
+absolutely-positioned mega-menu, and `.splash__mark` by 3 px — and both do the
+same at 1400×900, so they are pre-existing and not this mode's doing.
+
+`/diagnostica-schermo` reads back both modes' conditions from `data-test` and
+says on the screen itself which one is failing and how many millimetres the body
+copy measures. Keep the three numbers identical between `global.css`, that page,
+and every `/* + tv */` query.
 
 ## Documentation
 

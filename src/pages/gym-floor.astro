@@ -340,12 +340,13 @@ const faqs = await faqPagina([
 
         <video
           class="gf-duo__video"
-          autoplay
           muted
           loop
           playsinline
           poster={`${U}/2026/08/Gym-Floor-Piani-di-Allenamento-poster.jpg`}
           data-anim="scale"
+          data-no-autoplay
+          data-scroll-play
         >
           <source src={`${U}/2026/08/Gym-Floor-Piani-di-Allenamento.mp4`} type="video/mp4" />
         </video>
@@ -512,6 +513,26 @@ const faqs = await faqPagina([
 </Layout>
 
 <script>
+  // Il video dei piani di allenamento porta `data-no-autoplay`: lo esclude dal
+  // comportamento globale (che lo farebbe partire subito al caricamento) perché
+  // nei primi fotogrammi c'è una scritta che deve restare leggibile finché il
+  // visitatore non ci scorre sopra. Parte una sola volta, al primo ingresso in
+  // viewport.
+  const scrollPlayVideo = document.querySelector<HTMLVideoElement>('[data-scroll-play]');
+  if (scrollPlayVideo) {
+    const playOnArrival = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          void scrollPlayVideo.play().catch(() => {});
+          playOnArrival.unobserve(scrollPlayVideo);
+        });
+      },
+      { threshold: 0.4 }
+    );
+    playOnArrival.observe(scrollPlayVideo);
+  }
+
   // Workout accordion — one open at a time, as on the other pages.
   const items = Array.from(document.querySelectorAll<HTMLElement>('[data-wk-item]'));
   items.forEach((item) => {
