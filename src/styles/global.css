@@ -656,3 +656,137 @@ video:not([controls])::-webkit-media-controls-panel {
     max-height: 58svh;
   }
 }
+
+/* ---- Il televisore 16:9 — PROJECT RULE -----------------------------------
+   Il sito finisce anche su un televisore: Full HD, 16:9, orizzontale, un
+   apparecchio di consumo e non un pannello professionale. È il fratello
+   orizzontale del totem e nasce dallo stesso equivoco: 1920×1080 è la misura
+   di un televisore **e** la misura del monitor da scrivania più diffuso che
+   esista, quindi la larghezza non distingue niente. Quello che distingue è
+   **l'altezza utile**, e la ragione è che sul televisore il browser riempie lo
+   schermo mentre sulla scrivania no:
+
+     · un 1080p da scrivania, finestra ingrandita, lascia ~937px di viewport —
+       fra schede, barra degli indirizzi e taskbar se ne vanno 143;
+     · lo stesso schermo a schermo intero, e un televisore, ne danno 1080.
+
+   Da lì le tre condizioni:
+
+     · `min-width: 1700px`      non è un portatile né un tablet;
+     · `min-height: 1020px`     il browser riempie lo schermo: nessuna finestra
+                                ingrandita su un 1080p ci arriva (il massimo
+                                misurato è 993 senza taskbar), un televisore sì;
+     · `max-aspect-ratio: 37/20` è 16:9 (1,778) e non una finestra ingrandita su
+                                un monitor grande, che sta fra 1,90 e 2,05.
+
+   Perché 1,85 e non 16/9 esatto, che è la proporzione vera: `max-aspect-ratio:
+   16/9` è un confronto al pixel, e un viewport 1920×1079 — un pixel di bordo,
+   una barra sottile che il televisore disegna — fa 1,7794 e resta fuori. A 1,85
+   ci stanno quaranta pixel di cornice in più, e una finestra ingrandita su un
+   1440p (1,925) resta comunque esclusa.
+
+   Il prezzo, misurato: **uno schermo 16:9 a schermo intero è indistinguibile da
+   un televisore**, perché lo è davvero — 2560×1440 in F11 su una scrivania e un
+   segnale 1440p su un televisore dichiarano gli stessi numeri, e nessuna media
+   query può sapere a che distanza sta la persona. Chi naviga a schermo intero su
+   un monitor grande trova il sito a caratteri da televisore: ha trovato questo,
+   non un bug. Il caso comune — finestra ingrandita, non a schermo intero — non è
+   toccato, ed è quello che vede la quasi totalità dei visitatori da desktop.
+
+   **La radice è in `vw`, come sul totem, e qui fa un lavoro in più.** Il
+   televisore si guarda da lontano, e la distanza cresce con la diagonale: chi
+   compra un 65" lo mette più lontano di chi ne compra uno da 43". 1,28vw dà
+   24,6px su 1920, e quei 24,6px valgono 12,2 mm su un 43", 15,6 su un 55" e 18,4
+   su un 65" — cioè 1,8 m, 2,3 m e 2,8 m, che sono le distanze da cui quei tre
+   apparecchi si guardano davvero, secondo la stessa regola della cartellonistica
+   usata per il totem (altezza ≈ distanza / 150). Una dichiarazione sola, giusta
+   su tutte e tre le misure, e giusta anche su un 4K: quello dichiara 3840 px CSS
+   e con `vw` alza la radice invece di dimezzare i caratteri.
+
+   **L'impaginazione, al contrario del totem, si tocca pochissimo.** Sul pannello
+   verticale ogni griglia a tre colonne doveva scendere a due, da cui le ~32
+   media query marcate «+ totem». Qui lo schermo è largo come un desktop e le
+   tre colonne restano. Scendono a due **solo le griglie più fitte di tre** —
+   misurate, non supposte: a quattro e a cinque colonne il testo scendeva a
+   22-26 caratteri per riga, sotto i 30 che sono il fondo leggibile. Sono
+   quattro punti in tutto (il footer con le sue due griglie, le cinque colonne
+   dei Classes, le quattro del metodo junior) e portano questa condizione
+   accanto a quella del totem, con un commento «+ tv». Le griglie a tre stanno
+   fra i 30 e i 40 caratteri e restano come sono: farle scendere avrebbe
+   allungato ogni pagina del doppio, che su un televisore è il difetto peggiore.
+
+   Restano da ritarare a mano le due categorie che con la radice non crescono:
+   quello che è scritto in px (i margini del contenitore, il pieno dei pulsanti,
+   il raggio) e quello che con la radice cresce troppo (lo spazio fra le
+   sezioni). Sono le dichiarazioni qui sotto, e sono tutto il blocco.
+
+   Chi tocca questo blocco: verifica su un viewport 1920×1080 pieno, non su una
+   finestra desktop allargata — è l'altezza che accende la modalità, non la
+   larghezza. `/diagnostica-schermo` dice sul posto quale condizione non passa. */
+@media (min-width: 1700px) and (min-height: 1020px) and (max-aspect-ratio: 37/20) {
+  :root {
+    /* 1,28vw fa 24,6px su 1920. Il valore esce dalla distanza, non dal gusto:
+       su un 55" quei 24,6px misurano 15,6 mm di vetro, cioè si leggono da 2,3 m
+       — e la stessa dichiarazione dà 12,4 mm su un 43" (2 m) e 18,5 mm su un 65"
+       (2,8 m), che sono le distanze da cui quei tre apparecchi si guardano
+       davvero. Oggi, senza questo blocco, il corpo del testo su un 55" misura
+       10 mm: si legge da un metro e mezzo, cioè da seduti sulla scrivania e non
+       dal divano. */
+    font-size: 1.28vw;
+
+    /* Lo spazio non segue la radice. A scala piena `--space-section-lg` passava
+       da 104 a 168px e la home diventava il doppio più lunga di quello che è:
+       su un televisore nessuno scorre volentieri, e spesso non scorre affatto.
+       Questi tre valori tengono le sezioni un filo più arieggiate del desktop in
+       pixel veri invece che una volta e mezza. */
+    --space-section-sm: 2.6rem;
+    --space-section-md: 3.6rem;
+    --space-section-lg: 4.6rem;
+
+    /* Il fondo della scala si alza, e qui il televisore si separa dal totem.
+       Sul totem le due misure più piccole potevano restare basse perché una
+       didascalia la si legge avvicinandosi — «6 mm, leggibili a un braccio, che
+       è la distanza da cui le didascalie si leggono davvero». Davanti a un
+       televisore non ci si avvicina: etichette, occhielli e note si leggono
+       dalla stessa poltrona da cui si legge tutto il resto, quindi la scala si
+       comprime in basso invece di allargarsi. 0,82 e 0,88rem fanno 20 e 22px,
+       cioè 13 e 14 mm su un 55": la nota resta leggibile dove si legge il testo.
+       Restano comunque sotto il corpo, o la gerarchia sparirebbe del tutto. */
+    --text-2xs: 0.82rem;
+    --text-xs: 0.88rem;
+
+    /* Il contenitore era l'unico dei tre scritto in px, e qui è la variabile che
+       decide tutto: **i caratteri per riga dipendono solo da quanto è largo il
+       contenitore misurato in rem**, non dalla scala. Alzare la radice e basta
+       non stringe niente; lasciare il contenitore a 1320px mentre la radice
+       cresce sì, perché 1320px scendono da 82rem a 51.
+
+       70rem sono 1722px su 1920: il massimo che lo schermo concede lasciando un
+       margine, e riportano le colonne delle griglie a tre in una misura che si
+       legge. Più di così non si può — a caratteri grandi lo schermo tiene meno
+       caratteri, ed è aritmetica, non impaginazione. Gli altri due contenitori
+       erano già in rem e si sono adattati da soli. */
+    --container-width: 70rem;
+
+    --radius: 1rem;
+  }
+
+  /* 24px su 1920 sono un filo, e non è solo estetica: un televisore di consumo
+     può ancora tagliare il bordo dell'immagine (overscan), storicamente fino al
+     5%. 2rem fanno 52px, cioè il 2,7% per lato: il testo resta dentro anche su
+     un apparecchio che ritaglia, e le sezioni a tutta larghezza restano a tutta
+     larghezza invece di scoprire due bande bianche ai lati. */
+  .container,
+  .container-narrow,
+  .container-wide {
+    padding: 0 2rem;
+  }
+
+  /* Il pieno del pulsante era in px: il testo passava da 14 a 23px dentro la
+     stessa pastiglia, e la scritta arrivava a toccare il bordo. In rem la
+     pastiglia cresce con quello che contiene. */
+  .btn {
+    padding: 1.25rem 2rem;
+    font-size: 0.875rem;
+  }
+}
