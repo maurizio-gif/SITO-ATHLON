@@ -6,6 +6,19 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://www.athlonroma.it',
 
+  build: {
+    /* Il CSS del sito sta in quattro o cinque file per pagina, tutti bloccanti:
+       il browser non dipinge niente finché non li ha tutti, e sono richieste da
+       1,5 a 6 kB — il costo è il giro di rete, non il peso. Inlinearli li fa
+       arrivare con l'HTML.
+
+       Si perde la cache condivisa tra pagine: chi ne visita cinque riscarica lo
+       stesso CSS cinque volte, dentro l'HTML. Su misura vale la pena comunque,
+       perché il totale è ~14 kB e comprime a poco più di 4, mentre le quattro
+       richieste in fila valevano un secondo di rendering bloccato su 4G lenta. */
+    inlineStylesheets: 'always',
+  },
+
   /* Il vecchio indirizzo della scuola nuoto bambini finiva con "-3", un residuo
      di WordPress. L'indirizzo giusto è senza, ma quello vecchio è in giro nei
      link condivisi e nei risultati di ricerca: resta buono e porta al nuovo. */

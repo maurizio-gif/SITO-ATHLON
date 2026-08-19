@@ -364,7 +364,9 @@ const meta = Array.from({ length: copie }, () => photos).flat();
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.45);
+    /* 0.47, non 0.45: sotto quel valore il contrasto su fondo scuro scende a
+       4,29:1 e il testo piccolo non arriva al 4,5:1 che serve per leggerlo. */
+    color: rgba(255, 255, 255, 0.47);
   }
 
   .sg__nav {

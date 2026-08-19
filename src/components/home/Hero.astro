@@ -10,7 +10,20 @@ const prova = trialCta({ source: '/' });
       video's bottom-right corner in both layouts — over the full-bleed frame on
       desktop, over the cropped band on a phone. */}
   <div class="hero-media">
-    <video class="hero-bg" id="hero-video" autoplay muted loop playsinline>
+    {/* Il poster è il primo fotogramma della clip stessa, 37 kB di webp: la
+        fascia si riempie appena arriva l'HTML invece di restare nera finché il
+        video non ha abbastanza byte da mostrare qualcosa — su 4G lenta è più di
+        un secondo, ed è la prima schermata del sito. Essendo il fotogramma suo,
+        quando il video parte non si vede nessuno scatto. */}
+    <video
+      class="hero-bg"
+      id="hero-video"
+      autoplay
+      muted
+      loop
+      playsinline
+      poster="/wp-content/uploads/2025/12/Athlon-Tour-2025-poster.webp"
+    >
       <source src="/wp-content/uploads/2025/12/Athlon-Tour-2025-COMPRESSED.mp4" type="video/mp4" />
     </video>
     <button

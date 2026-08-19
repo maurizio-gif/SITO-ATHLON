@@ -485,7 +485,14 @@ const trust = [
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('amodal-locked');
-    modal.querySelector<HTMLElement>('.amodal__close')?.focus();
+    /* Chiuso il modale è `visibility: hidden`, e `focus()` rifiuta un elemento
+       invisibile: la classe è appena stata aggiunta, la lettura di `offsetWidth`
+       fa ricalcolare lo stile prima di chiedere il focus. */
+    const chiudi = modal.querySelector<HTMLElement>('.amodal__close');
+    if (chiudi) {
+      void chiudi.offsetWidth;
+      chiudi.focus();
+    }
   }
 
   document.querySelectorAll<HTMLButtonElement>('[data-activity]').forEach((btn) => {
@@ -1522,12 +1529,19 @@ const trust = [
     padding: 24px;
     opacity: 0;
     pointer-events: none;
-    transition: opacity var(--dur-fast) ease;
+    /* Chiuso non deve stare nell'ordine di tabulazione: `opacity: 0` lo
+       nasconde agli occhi, `visibility` anche alla tastiera. Durata zero e
+       ritardo solo in chiusura: in apertura il valore calcolato deve essere già
+       `visible` quando lo script sposta il focus sul pulsante di chiusura. */
+    visibility: hidden;
+    transition: opacity var(--dur-fast) ease, visibility 0s var(--dur-fast);
   }
 
   .amodal.open {
     opacity: 1;
     pointer-events: auto;
+    visibility: visible;
+    transition: opacity var(--dur-fast) ease, visibility 0s;
   }
 
   .amodal__backdrop {

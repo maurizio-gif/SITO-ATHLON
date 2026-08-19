@@ -21,6 +21,7 @@ import { scheda } from '../data/pagine';
 import { getBand, bands } from '../data/planning';
 import { trialCta } from '../data/cta';
 import { serviceSchema } from '../data/club';
+import { fotoHero } from '../data/foto';
 
 /* Il dominio di produzione, per gli @id assoluti degli schemi. */
 const SITE = 'https://www.athlonroma.it';
@@ -179,6 +180,7 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
       src={corso.hero}
       alt={`Una lezione di ${corso.nome} ad Athlon Club`}
       style={`object-position:${corso.fuoco}`}
+      {...fotoHero(corso.hero)}
     />
     <div class="co-hero__scrim"></div>
 

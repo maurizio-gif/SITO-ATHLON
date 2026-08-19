@@ -1,4 +1,45 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+/* Inter sta qui dentro, non su Google Fonts, e la differenza si misura in
+   giri di rete. Un `@import` dentro un foglio di stile che blocca il rendering
+   blocca a sua volta: il browser deve scaricare questo file, leggerlo, scoprire
+   l'import, aprire una connessione verso fonts.googleapis.com, prendere il CSS,
+   e solo lì scoprire su fonts.gstatic.com i woff2 da scaricare. Quattro tappe
+   in fila prima che una lettera possa comparire, con due handshake TLS verso
+   domini terzi in mezzo: PageSpeed lo contava come 1930 ms di blocco del
+   rendering, e la catena più lunga della pagina passava da qui.
+
+   Serviti dal nostro dominio i file arrivano sulla connessione già aperta, e
+   `Layout.astro` li chiede in `preload` mentre l'HTML è ancora in lettura.
+
+   È il file variabile (un solo file per tutti i pesi da 400 a 800), nei due
+   subset latini. `unicode-range` fa il resto: chi legge italiano scarica solo
+   `latin`, 48 kB, e `latin-ext` resta lì per un nome polacco o baltico che
+   nessuna pagina contiene oggi. Per aggiornarli:
+
+     curl -H 'User-Agent: <un Chrome recente>' \
+       'https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap'
+
+   e si scaricano gli url dei due blocchi latini, tenendo qui gli stessi
+   `unicode-range` che quel CSS dichiara. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/inter-v20-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/inter-v20-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7,
+    U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+    U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
 
 /* ascent-override on all three faces, and it is load-bearing: Tusker declares
    a 0.90em ascent but draws caps up to 0.95em and accented caps (À, È) up to

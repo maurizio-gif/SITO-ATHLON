@@ -7,6 +7,7 @@ import Servizi from '../components/clublife/Servizi.astro';
 import FloatingHelp from '../components/FloatingHelp.astro';
 import { upcomingEvents } from '../data/eventi';
 import { getCollection } from 'astro:content';
+import { fotoHero } from '../data/foto';
 
 // Counts drive the anchor menu labels, so the nav says how much is behind each
 // section instead of promising something empty.
@@ -39,6 +40,7 @@ const sections = [
       class="cl-hero__bg"
       src="/wp-content/uploads/2025/03/Athlon95-scaled.jpg"
       alt="Un gruppo durante una lezione di aqua fitness ad Athlon Club"
+      {...fotoHero('/wp-content/uploads/2025/03/Athlon95-scaled.jpg')}
     />
     <div class="cl-hero__scrim" aria-hidden="true"></div>
 

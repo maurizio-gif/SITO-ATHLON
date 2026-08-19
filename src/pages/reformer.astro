@@ -17,6 +17,7 @@ import { getBand, getLessonCard, countLessons } from '../data/planning';
 import { getCorso } from '../data/corsi';
 import { trialCta } from '../data/cta';
 import { serviceSchema } from '../data/club';
+import { urlPiccola, fotoHero } from '../data/foto';
 /* Il dominio di produzione, per gli @id assoluti degli schemi. */
 const SITE = 'https://www.athlonroma.it';
 
@@ -137,6 +138,7 @@ const faqs: FaqEntry[] = [
       class="rf-hero__bg"
       src={`${U}/2025/03/Athlon130-scaled.jpg`}
       alt="Una lezione di Group Reformer in Sala C"
+      {...fotoHero(`${U}/2025/03/Athlon130-scaled.jpg`)}
     />
     <div class="rf-hero__scrim"></div>
 
@@ -210,17 +212,19 @@ const faqs: FaqEntry[] = [
       <h2 class="rf-sec__title" data-anim="reveal">Guarda com’è una lezione</h2>
 
       <div class="rf-car">
-        {/* Come sulla pagina attuale: parte da solo, muto e in loop. I controlli
-            restano perché il file è pesante e uno deve poterlo fermare; il
-            poster copre il tempo di buffering. Nessun `preload`: il video parte
-            quando arriva sullo schermo, quindi non serve trattenerlo. */}
+        {/* Come sulla pagina attuale: parte da solo, muto e in loop, e il poster
+            copre il tempo di buffering. Nessun `preload`: il video parte quando
+            arriva sullo schermo, quindi non serve trattenerlo.
+
+            Il poster passa da `urlPiccola`: l'originale è un file da 480 kB per
+            una scheda larga 662 px, la variante ne pesa 73. */}
         <video
           class="rf-car__video"
           autoplay
           muted
           loop
           playsinline
-          poster={`${U}/2025/03/Athlon143-scaled.jpg`}
+          poster={urlPiccola(`${U}/2025/03/Athlon143-scaled.jpg`)}
         >
           <source src={`${U}/2025/03/Video-Reformer-Compresso-per-Sito.mp4`} type="video/mp4" />
         </video>

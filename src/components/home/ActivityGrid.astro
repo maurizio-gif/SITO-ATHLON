@@ -123,7 +123,14 @@ const { eyebrow, accent, variant, items, trackId } = Astro.props;
         },
         { passive: true }
       );
-      activateCentered();
+      /* Il primo giro dopo il carico, non durante: legge la posizione di ogni
+         card, e chiamato mentre la pagina si sta ancora costruendo costringeva
+         il primo layout in anticipo — Lighthouse lo contava come oltre cento
+         millisecondi di adattamento dinamico forzato, tutto attribuito a questa
+         riga. A pagina caricata il layout è già fatto e la lettura non costa
+         niente. Nessuno può aver scorrito la striscia prima. */
+      if (document.readyState === 'complete') requestAnimationFrame(activateCentered);
+      else window.addEventListener('load', () => requestAnimationFrame(activateCentered), { once: true });
     }
   });
 </script>
