@@ -164,7 +164,11 @@ const blocchi = [
     text-decoration: underline;
   }
 
-  @media (max-width: 900px) {
+  /* + totem: vedi «Il totem verticale del club» in global.css */
+
+  @media (max-width: 900px),
+
+    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
     .come__grid {
       grid-template-columns: 1fr;
       gap: 26px;

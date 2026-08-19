@@ -211,25 +211,51 @@ the touch panel to browsers as a machine with a mouse — `pointer: fine`,
 together, and all three are needed:
 
 ```css
-@media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 5/8)
+@media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10)
 ```
 
 `min-width` rules out a phone, `min-height` rules out a short desktop window,
-and `max-aspect-ratio` lets 9:16 (0.5625) through while a 3:4 tablet (0.75)
-stays out. The same three measures appear in `global.css` (the type scale and
-the shared controls), in `Header.astro` (the touch bar), and in the few
-components with sizes of their own. **Keep them identical**, and add
-`/diagnostica-schermo` to the list of places to check if they ever change —
-that page reads them back from `data-test` and says on the panel itself which
-condition is failing.
+and `max-aspect-ratio` lets a 9:16 panel (0.5625) through while a 3:4 tablet
+(0.75) stays out. The ratio is **7/10 and not 5/8**, which is the panel's own
+shape, because the browser on it is not fullscreen: measured on the real kiosk,
+tabs plus address bar plus the Windows taskbar leave a 1064×1725 viewport, ratio
+0.617 — inside a 0.625 limit by eight thousandths. An open bookmarks bar would
+have switched the whole mode off. The three measures appear in `global.css`, in
+`Header.astro`, in the components with sizes of their own, and in ~32 media
+queries marked `/* + totem */`. **Keep them identical**, and check
+`/diagnostica-schermo` if they ever change — that page reads them back from
+`data-test` and says on the panel itself which condition is failing.
 
 **The root is in `vw`, not px, and that is the whole trick.** The panel is
 physical and fixed; what changes is how many CSS pixels Windows declares — 1080
-at 100 % scaling, 1440 at 150 %. `font-size: 3.15vw` gives 34 px on 1080 and
-45 px on 1440, and in both cases body text measures about 10 mm on the glass:
-signage wants character height ≈ viewing distance / 150, so 10 mm at 1.5 m.
-Spacing does **not** double — the three `--space-section-*` variables are
+at 100 % scaling, 1440 at 150 %. `font-size: 2.5vw` gives 27 px on 1080 and
+36 px on 1440, and in both cases body text measures about 8 mm on the glass.
+Spacing does **not** scale with it — the three `--space-section-*` variables are
 retuned inside the block, or the home page becomes a kilometre of scrolling.
+
+**8 mm, not the 10 mm the signage rule asks for at 1.5 m.** The first tuning did
+follow that rule — `3.15vw`, body at 32 px — and on the real panel it failed, for
+a reason that is about width, not height: 1080 px less the margins is 1048, so a
+three-column grid gives 322 px columns, and 32 px text in 322 px is twenty
+characters a line. Two words. The column stretches like an accordion and the
+title breaks out of its card. Measured over six pages, the median was 23
+characters per line against the 45–75 that read comfortably. 8 mm is the same
+10 mm moved to 1.2 m — where a person actually stops in front of the totem,
+while 1.5 m is where they *notice* it, and at that distance the headings speak.
+
+**Type has two tiers on the panel, not one.** Body copy ~26 px (8 mm, comfortable
+at 1.2 m); the smallest supporting label `--text-2xs` at 19 px (6 mm, readable at
+arm's length, which is where captions get read). A single 24 px floor for
+everything is what produced the accordion.
+
+**Half the fix is not typographic: the kiosk inherits the layout the site already
+uses below 1000 px** — three columns becoming two. Every media query from 820 px
+up carries the three conditions as a second, OR'd term, with a one-line
+`/* + totem */` comment above it. The phone breakpoints (700 px and under) do
+**not**: one 1048 px column would give 65-character lines, which read fine, but
+the page would become a ribbon. Grids that size themselves — `repeat(auto-fit,
+minmax(…, 1fr))` — need no media query at all once the floor is in rem: it rises
+with the root and the grid drops a column by itself.
 
 What follows from all this, when writing a page:
 
@@ -257,12 +283,21 @@ What follows from all this, when writing a page:
   link-shaped command goes in that list.
 
 To verify, sweep every built page at 1080×1920 with `hasTouch: false` — that is
-what the panel reports — and check four things per page: no text under 24 px, no
+what the panel reports — and check four things per page: no text under 19 px, no
 control whose smaller side is under 48 px, no horizontal overflow, and at least
 one finger-sized command inside the first screen. Links inside running text
-(`p`, `li`, `td`, `th`) are text, not targets, and don't count. The sweep is
-what turned "the characters are a bit small" into a bounded list; the last run
-was 77 pages, nothing to fix.
+(`p`, `li`, `td`, `th`) are text, not targets, and don't count. Then measure
+**characters per line**, which is the check that caught what the pixel sweep
+could not: text length divided by line count, per paragraph. Under 30 means a
+column too narrow to read; the target median is 38 or better.
+
+Measure a control with `offsetWidth`/`offsetHeight`, never
+`getBoundingClientRect()` — the rect is the *transformed* box, and a card
+carrying a `scale(0.978)` entrance animation reported 47.5 px for a control that
+measures 49. Three "findings" were that artifact and nothing else.
+
+The sweep is what turned "the characters are a bit small" into a bounded list;
+the last run was 77 pages, nothing to fix.
 
 ## Documentation
 

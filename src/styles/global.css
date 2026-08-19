@@ -516,30 +516,60 @@ video:not([controls])::-webkit-media-controls-panel {
 
      · `min-width: 900px`     non è un telefono;
      · `min-height: 1200px`   è un pannello grande, non una finestra alta;
-     · `max-aspect-ratio: 5/8` 9:16 fa 0,5625 e passa; un tablet 3:4 fa 0,75 e no.
+     · `max-aspect-ratio: 7/10` 9:16 fa 0,5625 e passa; un tablet 3:4 fa 0,75 e no.
 
    Tutte e tre insieme, o un telefono verticale o un iPad finirebbero qui dentro.
+
+   Perché 7/10 e non 5/8, che è la proporzione vera di un 9:16: sul totem del
+   club il browser non è a schermo intero. Fra schede, barra degli indirizzi e
+   taskbar di Windows il viewport misurato è ~1064×1725, cioè 0,617 — dentro il
+   limite di 0,625 per otto millesimi. Bastava la barra dei preferiti aperta e
+   la modalità si spegneva tutta. A 0,7 c'è margine per duecento pixel di
+   cornice in più, e un iPad verticale (0,75) resta comunque fuori.
+
+   Il prezzo, misurato: una finestra 1080×1600 fa 0,675 e finisce qui dentro. Su
+   un monitor normale non ci sta (a 1080 di larghezza l'altezza utile non arriva
+   a 1600), su un 4K sì. Chi si trova il sito a caratteri da 27px in una finestra
+   stretta e alta ha trovato questo, non un bug — ed è meglio così che un totem
+   in versione desktop per otto millesimi di proporzione.
 
    **La radice è in `vw`, non in px, e non è un vezzo.** Il pannello è fisico e
    non cambia: quello che cambia è quanti pixel CSS Windows dichiara — 1080 al
    100%, 1440 se qualcuno mette la scalatura al 150%. Con la radice in vw la
    stessa regola dà la stessa dimensione *in millimetri* in entrambi i casi.
-   3,15vw fa 34px su 1080 e 45px su 1440: in entrambi i casi il corpo del testo
-   misura circa 10 mm sul vetro.
+   2,5vw fa 27px su 1080 e 36px su 1440: in entrambi i casi il corpo del testo
+   misura circa 8 mm sul vetro.
 
-   Perché 10 mm: la cartellonistica vuole l'altezza del carattere ≈ distanza di
-   lettura / 150 per leggere comodi, cioè 10 mm a un metro e mezzo. Il corpo
-   passa da 14,4px a 32, i titoli di sezione da 25 a 55.
+   Perché 8 mm e non 10. La regola della cartellonistica — altezza del carattere
+   ≈ distanza / 150 — dà 10 mm per un metro e mezzo, e quella era la prima
+   taratura: 3,15vw, corpo a 32px. Sul pannello vero non regge, e la ragione è
+   la larghezza, non l'altezza: 1080px meno i margini fanno 1048, e una griglia
+   a tre colonne dà colonne da 322px. Un testo da 32px in 322px sono venti
+   caratteri per riga, cioè due parole: la colonna si allunga a fisarmonica e il
+   titolo esce dalla card. Misurato su sei pagine, la mediana era 23 caratteri
+   per riga contro i 45-75 che si leggono comodi.
 
-   Lo spazio, invece, **non** raddoppia: le sezioni sono in rem e a scala doppia
-   la home diventava un chilometro di scroll. Le tre variabili qui sotto lo
-   riportano a una misura umana.
+   8 mm sono i 10 mm a 1,2 m invece che a 1,5: la distanza a cui una persona si
+   ferma davvero davanti al totem, mentre il metro e mezzo è la distanza da cui
+   lo *nota* — e a quella distanza parlano i titoli, che restano enormi perché
+   sono in rem sopra questa radice.
+
+   L'altra metà della correzione non è tipografica: **il totem eredita
+   l'impaginazione che il sito usa già sotto i 1000px**, tre colonne che
+   diventano due. In tutto il progetto le media query da 820px in su portano
+   anche queste tre condizioni, con un commento «+ totem» sopra. Le soglie da
+   telefono (700 e sotto) no: una colonna sola larga 1048px farebbe righe da 65
+   caratteri, che si leggono, ma la pagina diventerebbe un nastro.
+
+   Lo spazio, infine, **non** cresce come il testo: le sezioni sono in rem e a
+   scala doppia la home diventava un chilometro di scroll. Le tre variabili qui
+   sotto lo riportano a una misura umana.
 
    Chi tocca questo blocco: verifica su un viewport 1080×1920, non su una
    finestra desktop rimpicciolita — il rapporto conta più della larghezza. */
-@media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 5/8) {
+@media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
   :root {
-    font-size: 3.15vw;
+    font-size: 2.5vw;
 
     --space-section-sm: 1.6rem;
     --space-section-md: 2.1rem;
@@ -592,6 +622,11 @@ video:not([controls])::-webkit-media-controls-panel {
   .sched__link,
   .hours__cta,
   .rf-plan__cta,
+  .co-plan__cta,
+  .nwcard__cta,
+  .coach__cta,
+  .ju-via__cta,
+  .guest__code,
   .tcc__num,
   .hero-secondary,
   .co-hero__link,
@@ -601,7 +636,10 @@ video:not([controls])::-webkit-media-controls-panel {
   .rf-hero__link {
     display: inline-flex;
     align-items: center;
-    min-height: 1.6rem;
+    /* 1,8rem e non 2 come i `.btn`: questi sono richiami secondari e non devono
+       pesare come un pulsante. Alla radice da 27px fanno 49, appena sopra i 48
+       che serve a un dito. */
+    min-height: 1.8rem;
   }
 
   /* La hero: senza tetto la fascia video si prendeva tutto lo spazio avanzato e

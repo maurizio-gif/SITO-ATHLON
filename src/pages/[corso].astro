@@ -648,7 +648,11 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    /* Soglia in rem, non in px: a radice 16 è lo stesso numero di prima, sul
+       totem (radice 27) sale con il testo e la griglia scende da tre colonne a
+       due invece di dare colonne da 280px con dentro venti caratteri per riga.
+       Una `auto-fit` con la soglia in rem si tara da sé a qualunque scala. */
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
     gap: 14px;
     counter-reset: none;
   }
@@ -853,7 +857,11 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
   /* ---- Punti ---- */
   .co-punti {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    /* Soglia in rem, non in px: a radice 16 è lo stesso numero di prima, sul
+       totem (radice 27) sale con il testo e la griglia scende da tre colonne a
+       due invece di dare colonne da 280px con dentro venti caratteri per riga.
+       Una `auto-fit` con la soglia in rem si tara da sé a qualunque scala. */
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
     gap: 30px;
   }
 
@@ -998,14 +1006,22 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
     color: var(--color-primary);
   }
 
-  @media (max-width: 1000px) {
+  /* + totem: vedi «Il totem verticale del club» in global.css */
+
+  @media (max-width: 1000px),
+
+    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
     .co-plans,
     .co-simili {
       grid-template-columns: 1fr 1fr;
     }
   }
 
-  @media (max-width: 900px) {
+  /* + totem: vedi «Il totem verticale del club» in global.css */
+
+  @media (max-width: 900px),
+
+    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
     .co-car,
     .co-plans,
     .co-simili {

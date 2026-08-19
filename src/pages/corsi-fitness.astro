@@ -547,7 +547,11 @@ const faqs: FaqEntry[] = await faqConSchede([
     margin-top: 6px;
   }
 
-  @media (max-width: 1100px) {
+  /* + totem: vedi «Il totem verticale del club» in global.css */
+
+  @media (max-width: 1100px),
+
+    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
     .cf-fam {
       grid-template-columns: repeat(2, 1fr);
     }
@@ -708,7 +712,11 @@ const faqs: FaqEntry[] = await faqConSchede([
     text-underline-offset: 3px;
   }
 
-  @media (max-width: 900px) {
+  /* + totem: vedi «Il totem verticale del club» in global.css */
+
+  @media (max-width: 900px),
+
+    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
     .cf-prova {
       grid-template-columns: 1fr;
       gap: 22px;
@@ -813,13 +821,21 @@ const faqs: FaqEntry[] = await faqConSchede([
     margin-bottom: 0;
   }
 
-  @media (max-width: 1100px) {
+  /* + totem: vedi «Il totem verticale del club» in global.css */
+
+  @media (max-width: 1100px),
+
+    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
     .cf-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
-  @media (max-width: 900px) {
+  /* + totem: vedi «Il totem verticale del club» in global.css */
+
+  @media (max-width: 900px),
+
+    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
     /* Le quattro voci non stanno su una riga: due colonne, senza separatori. */
     .cf-facts__inner {
       display: grid;

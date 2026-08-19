@@ -122,7 +122,11 @@ const cards = [
     background: rgba(238, 234, 227, 0.75);
   }
 
-  @media (max-width: 960px) {
+  /* + totem: vedi «Il totem verticale del club» in global.css */
+
+  @media (max-width: 960px),
+
+    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
     .grid {
       grid-template-columns: 1fr;
     }

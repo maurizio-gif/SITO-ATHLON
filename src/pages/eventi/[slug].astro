@@ -297,7 +297,11 @@ const evento = {
   /* ---- Programme ---- */
   .prog {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    /* Soglia in rem, non in px: a radice 16 è lo stesso numero di prima, sul
+       totem (radice 27) sale con il testo e la griglia scende da tre colonne a
+       due invece di dare colonne da 280px con dentro venti caratteri per riga.
+       Una `auto-fit` con la soglia in rem si tara da sé a qualunque scala. */
+    grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
     gap: 22px;
     align-items: start;
   }
@@ -368,7 +372,7 @@ const evento = {
   /* Totem verticale: `auto-fit` faceva tre colonne da 335px e dentro ognuna una
      tabella da tre colonne a scala doppia, che sfondava i 1080. Una sala per
      riga — su uno schermo 9:16 è anche l'ordine di lettura giusto. */
-  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 5/8) {
+  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
     .prog {
       grid-template-columns: minmax(0, 1fr);
     }

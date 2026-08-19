@@ -281,7 +281,11 @@ const events = await upcomingEvents(limit);
     text-decoration: underline;
   }
 
-  @media (max-width: 900px) {
+  /* + totem: vedi «Il totem verticale del club» in global.css */
+
+  @media (max-width: 900px),
+
+    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
     .ev__grid {
       grid-template-columns: repeat(2, 1fr);
     }
