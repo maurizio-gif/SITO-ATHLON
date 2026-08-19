@@ -400,25 +400,45 @@ const faqs: FaqEntry[] = [
         Up</strong>: si comincia da lì e si passa ai percorsi principali quando è il momento.
       </p>
 
-      <div class="wk">
-        {workouts.map((w) => (
-          <div class="wk__item" data-wk-item>
-            <button class="wk__q" type="button" aria-expanded="false" data-wk-trigger>
-              <span>{w.name}</span>
-              <span class="wk__icon" aria-hidden="true">+</span>
-            </button>
-            <div class="wk__a">
-              <div class="wk__a-inner">
-                {w.body.map((par) => (<p>{par}</p>))}
+      <div class="gf-piani">
+        <div class="gf-piani__testo">
+          <div class="wk">
+            {workouts.map((w) => (
+              <div class="wk__item" data-wk-item>
+                <button class="wk__q" type="button" aria-expanded="false" data-wk-trigger>
+                  <span>{w.name}</span>
+                  <span class="wk__icon" aria-hidden="true">+</span>
+                </button>
+                <div class="wk__a">
+                  <div class="wk__a-inner">
+                    {w.body.map((par) => (<p>{par}</p>))}
+                  </div>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      <a href="https://onelink.to/athlon" class="btn btn-primary gf-block-cta" data-anim="pop">
-        Scarica l'app →
-      </a>
+          <a href="https://onelink.to/athlon" class="btn btn-primary gf-block-cta" data-anim="pop">
+            Scarica l'app →
+          </a>
+        </div>
+
+        {/* I piani non si spiegano: si guardano. Il video mostra un trainer che
+            apre l'app e scorre i programmi, che e' esattamente cio' di cui
+            parla questa sezione. Parte da solo, muto e in loop, come ogni clip
+            del sito; il poster copre il tempo di buffering. */}
+        <video
+          class="gf-piani__video"
+          autoplay
+          muted
+          loop
+          playsinline
+          poster={`${U}/2026/08/Gym-Floor-Piani-di-Allenamento-poster.jpg`}
+          data-anim="scale"
+        >
+          <source src={`${U}/2026/08/Gym-Floor-Piani-di-Allenamento.mp4`} type="video/mp4" />
+        </video>
+      </div>
     </div>
   </section>
 
@@ -1023,6 +1043,33 @@ const faqs: FaqEntry[] = [
     grid-template-rows: 1fr;
   }
 
+  .gf-piani {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 34px;
+    align-items: start;
+  }
+
+  .gf-piani__testo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Riquadro quadrato con gli angoli del sito, come il carosello del Reformer.
+     Il file e' 9:16 con i sottotitoli impressi in basso: `cover` in un quadrato
+     taglia sopra e sotto, quindi la finestra e' spostata verso il basso perche'
+     le scritte restino dentro insieme al soggetto. */
+  .gf-piani__video {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    object-position: center 58%;
+    border-radius: var(--radius);
+    background: #000;
+    display: block;
+  }
+
   .wk__a-inner {
     overflow: hidden;
     min-height: 0;
@@ -1050,6 +1097,16 @@ const faqs: FaqEntry[] = [
   /* + totem: vedi «Il totem verticale del club» in global.css */
   @media (max-width: 1000px),
     (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
+    /* + totem: una colonna sola, il video sotto l'elenco dei piani */
+    .gf-piani {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 26px;
+    }
+
+    .gf-piani__video {
+      max-width: 26rem;
+    }
+
     .gf-simili {
       grid-template-columns: 1fr 1fr;
     }
