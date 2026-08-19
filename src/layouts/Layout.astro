@@ -1,7 +1,27 @@
 ---
+/**
+ * Il guscio di ogni pagina, e l'unico posto dove sta il `<head>`.
+ *
+ * Tre gruppi di tag, con tre destinatari diversi:
+ *
+ *  - **i motori di ricerca** — titolo, descrizione, canonical, e
+ *    `max-image-preview:large`, senza cui Google mostra la miniatura piccola
+ *    anche quando la foto è buona;
+ *  - **le anteprime dei link** — Open Graph e Twitter card. Servono entrambi:
+ *    WhatsApp, Telegram, LinkedIn e Facebook leggono OG, X legge le sue. Senza
+ *    `og:image` il link condiviso è un rettangolo vuoto col dominio dentro;
+ *  - **gli agenti** — i dati strutturati, che dicono in JSON quello che la
+ *    pagina dice in italiano: che posto è, dove sta, quando è aperto, dove si
+ *    trova questa pagina nel sito.
+ *
+ * Ogni pagina può passare la sua foto come `image`; senza, si usa la card
+ * sociale del club. `schema` prende gli schemi specifici della pagina (un
+ * corso, un evento, un'offerta) che si aggiungono a quelli comuni.
+ */
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { CLUB, clubSchema, breadcrumbSchema } from '../data/club';
 
 interface Props {
   title: string;
@@ -11,9 +31,49 @@ interface Props {
    * Used by pages meant to be embedded or read as a single surface.
    */
   chrome?: boolean;
+  /** Foto per l'anteprima social: percorso assoluto dalla radice del sito. */
+  image?: string;
+  /** Testo alternativo della foto, per chi legge l'anteprima con uno screen reader. */
+  imageAlt?: string;
+  /** Il percorso di navigazione, dalla home esclusa in poi. */
+  breadcrumb?: { name: string; path: string }[];
+  /** Schemi JSON-LD specifici della pagina. */
+  schema?: Record<string, unknown>[];
+  /** `article` per le schede e le news, `website` per il resto. */
+  ogType?: 'website' | 'article';
+  /** Fuori dall'indice: solo per pagine che esistono per reindirizzare. */
+  noindex?: boolean;
 }
 
-const { title, description = '', chrome = true } = Astro.props;
+const {
+  title,
+  description = '',
+  chrome = true,
+  image = CLUB.socialImage,
+  imageAlt,
+  breadcrumb = [],
+  schema = [],
+  ogType = 'website',
+  noindex = false,
+} = Astro.props;
+
+/* `Astro.site` è configurato su www.athlonroma.it: canonical e og:url devono
+   essere assoluti sul dominio di produzione, non sull'anteprima Vercel da cui
+   una pagina può essere servita. */
+const site = Astro.site ?? new URL('https://www.athlonroma.it');
+const canonical = new URL(Astro.url.pathname.replace(/\/+$/, '/') || '/', site).href;
+const ogImage = new URL(image, site).href;
+
+/* Un solo grafo per pagina invece di tanti blocchi slegati: il club, il
+   percorso di navigazione e quello che la pagina è. Gli schemi puntano al club
+   per `@id`, così non lo ripetono. */
+const graph = [
+  clubSchema(site.href),
+  ...(breadcrumb.length
+    ? [breadcrumbSchema(site.href, [{ name: 'Home', path: '/' }, ...breadcrumb])]
+    : []),
+  ...schema,
+];
 ---
 
 <!doctype html>
@@ -22,8 +82,44 @@ const { title, description = '', chrome = true } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="/wp-content/uploads/2025/08/Pittogramma.png" />
+    <link rel="canonical" href={canonical} />
+
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
+    <meta
+      name="robots"
+      content={noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1'}
+    />
+
+    {/* Anteprima del link condiviso. `og:image:width/height` evitano che
+        Facebook e LinkedIn mostrino la card piccola alla prima condivisione,
+        prima di aver scaricato la foto. */}
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={CLUB.brand} />
+    <meta property="og:locale" content="it_IT" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt ?? title} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    {description && <meta name="twitter:description" content={description} />}
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={imageAlt ?? title} />
+
+    <meta name="theme-color" content="#ff5701" />
+    <meta name="author" content={CLUB.name} />
+
+    {/* Il font del corpo arriva da Google Fonts via @import nel CSS: il
+        preconnect evita che la connessione parta solo a foglio di stile letto. */}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })} />
   </head>
   <body>
     {chrome && <Header />}

@@ -15,9 +15,42 @@ const d = entry.data;
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 const isPast = d.date < today;
+
+/* Questo sì che è un evento: ha una data, un posto e un modo di partecipare.
+   `startDate` in ISO, il luogo e l'organizzatore puntano al club per `@id` così
+   indirizzo e orari non si ripetono. Il prezzo compare solo come lo dichiara la
+   scheda: quando è gratuito, `price: '0'` è un'informazione, non un'assenza. */
+const SITE = 'https://www.athlonroma.it';
+const gratuito = !d.price || /gratuit/i.test(d.price);
+const evento = {
+  '@type': 'Event',
+  name: d.title,
+  description: d.excerpt,
+  startDate: d.date.toISOString().slice(0, 10),
+  eventStatus: 'https://schema.org/EventScheduled',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  location: { '@id': `${SITE}/#club` },
+  organizer: { '@id': `${SITE}/#club` },
+  image: `${SITE}${d.image}`,
+  url: `${SITE}/eventi/${entry.id}/`,
+  offers: {
+    '@type': 'Offer',
+    url: d.ctaHref,
+    ...(gratuito ? { price: '0', priceCurrency: 'EUR' } : { description: d.price }),
+    availability: isPast ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
+  },
+};
 ---
 
-<Layout title={`${d.title} | Eventi Athlon Club`} description={d.excerpt}>
+<Layout
+  title={`${d.title} | Eventi Athlon Club`}
+  description={d.excerpt}
+  image={d.image}
+  imageAlt={d.imageAlt ?? d.title}
+  ogType="article"
+  breadcrumb={[{ name: 'Eventi', path: '/eventi' }, { name: d.title, path: `/eventi/${entry.id}/` }]}
+  schema={[evento]}
+>
   <article class="evd">
     <header class="evd__hero">
       <img class="evd__img" src={d.image} alt={d.imageAlt ?? d.title} />

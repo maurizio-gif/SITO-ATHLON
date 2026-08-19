@@ -5,6 +5,10 @@ import Faq, { type FaqEntry } from '../components/Faq.astro';
 import SpacesGallery from '../components/home/SpacesGallery.astro';
 import { getCorso } from '../data/corsi';
 import { trialCta } from '../data/cta';
+import { serviceSchema } from '../data/club';
+/* Il dominio di produzione, per gli @id assoluti degli schemi. */
+const SITE = 'https://www.athlonroma.it';
+
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 const U = '/wp-content/uploads';
@@ -239,6 +243,16 @@ const faqs: FaqEntry[] = [
 <Layout
   title="Sala Pesi Roma Talenti – Gym Floor 400mq | Athlon Club"
   description="La Gym Floor 4.0 di Athlon Club: 400 mq di sala pesi a Roma Talenti con area cardio Matrix connessa all'app, isotonica, funzionale e carico libero. Aperti dalle 6:00."
+  image={`${U}/2025/11/ATHLON81-scaled.jpg`}
+  imageAlt="La Gym Floor di Athlon Club, area funzionale"
+  breadcrumb={[{ name: 'Gym Floor', path: '/gym-floor' }]}
+  schema={[serviceSchema(SITE, {
+    name: 'Gym Floor',
+    description: 'Sala pesi di 400 mq con area cardio connessa all\'app, isotonica, funzionale e carico libero.',
+    path: '/gym-floor',
+    image: `${U}/2025/11/ATHLON81-scaled.jpg`,
+    type: 'Sala pesi',
+  })]}
 >
   <!-- HERO -->
   <section class="gf-hero">

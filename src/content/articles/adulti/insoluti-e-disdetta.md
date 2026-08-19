@@ -1,5 +1,6 @@
 ---
 title: "Non ho pagato e non ho frequentato: l'abbonamento si disdice da solo?"
+seoTitle: "L'abbonamento si disdice da solo se non pago?"
 description: "No. Cosa succede in caso di ritardo nei pagamenti, come si chiude la posizione e come recuperare i mesi non frequentati per infortunio."
 area: "Adulti – Club"
 order: 3

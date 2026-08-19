@@ -27,6 +27,13 @@ const articles = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/articles' }),
   schema: z.object({
     title: z.string(),
+    /**
+     * Il titolo per i motori, quando quello della pagina è una domanda troppo
+     * lunga per starci. La pagina continua a mostrare `title`: le domande scritte
+     * come le si fanno sono buone intestazioni, e non vanno accorciate per stare
+     * in un tag. Serve solo dove il `<title>` supererebbe i sessanta caratteri.
+     */
+    seoTitle: z.string().optional(),
     description: z.string(),
     // One article can belong to more than one area, so this is a string or a list.
     area: z.union([z.string(), z.array(z.string())]),

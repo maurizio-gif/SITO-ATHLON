@@ -6,10 +6,27 @@
 import Layout from '../layouts/Layout.astro';
 import PaginaJunior from '../components/junior/PaginaJunior.astro';
 import { getJunior } from '../data/junior';
+import { serviceSchema } from '../data/club';
+/* Il dominio di produzione, per gli @id assoluti degli schemi. */
+const SITE = 'https://www.athlonroma.it';
+
 
 const corso = getJunior('scuola-nuoto-bambini');
 ---
 
-<Layout title={corso.titolo} description={corso.descrizione}>
+<Layout
+  title={corso.titolo}
+  description={corso.descrizione}
+  image={corso.hero}
+  imageAlt={`Scuola Nuoto Bambini ad Athlon Club Roma Talenti`}
+  breadcrumb={[{ name: 'Scuola Nuoto Bambini', path: '/scuola-nuoto-bambini' }]}
+  schema={[serviceSchema(SITE, {
+    name: corso.nome,
+    description: corso.descrizione,
+    path: '/scuola-nuoto-bambini',
+    image: corso.hero,
+    type: 'Corso per bambini',
+  })]}
+>
   <PaginaJunior corso={corso} />
 </Layout>

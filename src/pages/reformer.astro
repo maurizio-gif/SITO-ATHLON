@@ -16,6 +16,10 @@ import Faq, { type FaqEntry } from '../components/Faq.astro';
 import { getBand, getLessonCard, countLessons } from '../data/planning';
 import { getCorso } from '../data/corsi';
 import { trialCta } from '../data/cta';
+import { serviceSchema } from '../data/club';
+/* Il dominio di produzione, per gli @id assoluti degli schemi. */
+const SITE = 'https://www.athlonroma.it';
+
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 const U = '/wp-content/uploads';
@@ -116,6 +120,16 @@ const faqs: FaqEntry[] = [
 <Layout
   title="Group Reformer Roma Talenti – Pilates Reformer | Athlon Club"
   description={`Group Reformer ad Athlon Club Roma Talenti: ${sessioni} sessioni a settimana su dieci Reformer Balanced Body Allegro, per tonificare, migliorare postura, controllo e flessibilità. Aperto a tutti i livelli.`}
+  image={`${U}/2025/03/Athlon130-scaled.jpg`}
+  imageAlt="Una lezione di Group Reformer in Sala C"
+  breadcrumb={[{ name: 'Group Reformer', path: '/reformer' }]}
+  schema={[serviceSchema(SITE, {
+    name: 'Group Reformer',
+    description: `Pilates sul Reformer in gruppi da dieci: ${sessioni} sessioni a settimana su dieci Reformer Balanced Body Allegro.`,
+    path: '/reformer',
+    image: `${U}/2025/03/Athlon130-scaled.jpg`,
+    type: 'Pilates Reformer',
+  })]}
 >
   <!-- HERO -->
   <section class="rf-hero">

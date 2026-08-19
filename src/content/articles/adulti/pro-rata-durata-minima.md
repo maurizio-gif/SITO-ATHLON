@@ -1,5 +1,6 @@
 ---
 title: "Pro-rata e durata minima: perché il mio abbonamento scade un mese dopo"
+seoTitle: "Pro-rata e durata minima dell'abbonamento"
 description: "Se attivi a metà mese la scadenza minima non è il mese successivo, ma quello dopo. Con esempi e date."
 area: "Adulti – Club"
 order: 2

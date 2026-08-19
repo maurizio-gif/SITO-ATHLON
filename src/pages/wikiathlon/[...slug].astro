@@ -28,14 +28,37 @@ const areaLabel = AREA_LABELS[folder]?.label ?? areas[0];
    Nessun tag significa "vale per tutte", e va detto invece che lasciato in
    bianco. */
 const attivita = d.attivita ?? [];
+
+/* La scheda come articolo di assistenza. `TechArticle` e non `Article`: sono
+   istruzioni operative — come si disdice, come si prenota, cosa serve — e dirlo
+   aiuta chi le cerca per risolvere un problema, non per leggere una notizia.
+
+   `dateModified` solo dove la scheda dichiara `updatedDate`, che oggi è nessuna:
+   una data di aggiornamento inventata è la cosa che i motori imparano a non
+   credere per prime. */
+const SITE = 'https://www.athlonroma.it';
+const scheda = {
+  '@type': 'TechArticle',
+  headline: d.title,
+  description: d.description,
+  url: `${SITE}/wikiathlon/${entry.id}/`,
+  inLanguage: 'it',
+  articleSection: areaLabel,
+  ...(d.updatedDate ? { dateModified: d.updatedDate } : {}),
+  publisher: { '@id': `${SITE}/#club` },
+  isPartOf: { '@type': 'WebSite', '@id': `${SITE}/#website`, name: 'Athlon Club', url: `${SITE}/` },
+};
 ---
 
 {/* No site header or footer, like the Club Life hub these articles hang off:
     the breadcrumb at the top and the link at the bottom are the way back. */}
 <Layout
-  title={`${d.title} | Help Desk Athlon Club`}
+  title={`${d.seoTitle ?? d.title} | Athlon Club`}
   description={d.description}
   chrome={false}
+  ogType="article"
+  breadcrumb={[{ name: 'Help Desk', path: '/club-life#help-desk' }, { name: d.title, path: `/wikiathlon/${entry.id}/` }]}
+  schema={[scheda]}
 >
   <article class="wa">
     <div class="container-narrow">

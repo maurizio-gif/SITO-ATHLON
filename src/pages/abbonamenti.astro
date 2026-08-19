@@ -2,6 +2,11 @@
 import Layout from '../layouts/Layout.astro';
 
 import { trialCta } from '../data/cta';
+import { offerSchema } from '../data/club';
+import { plans, GUEST_PASS } from '../data/abbonamenti';
+/* Il dominio di produzione, per gli @id assoluti degli schemi. */
+const SITE = 'https://www.athlonroma.it';
+
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 /* La prova, dalla configurazione condivisa: qui il contesto è l'abbonamento,
@@ -75,89 +80,7 @@ const activityIcon: Record<string, string> = {
   'Corso Gestanti': `<path d="M12 21s-7-4.3-7-9.4A4.1 4.1 0 0 1 12 8.6a4.1 4.1 0 0 1 7 3c0 5.1-7 9.4-7 9.4Z"/><circle cx="12" cy="4" r="1.6"/>`,
 };
 
-const plans = [
-  {
-    id: 'smart',
-    badge: 'Autonomia',
-    name: 'Smart',
-    claim: 'Allenati in autonomia.',
-    desc: 'Gym Floor e Nuoto Libero Assistito tutti i giorni, più Athlon TV: costruisci la tua routine fra sala e vasca, senza dipendere dal palinsesto dei corsi.',
-    activities: ['Gym Floor', 'Nuoto Libero Assistito', 'Athlon TV'],
-    options: [
-      {
-        title: 'Annuale',
-        sub: 'Pagamento mensile',
-        note: 'Rinnovo automatico annuale · disdetta via email entro 10 giorni dalla fine dell\'abbonamento',
-        savings: 'Risparmio €138 vs Flex',
-        amount: '75',
-        period: '€/mese',
-        href: `${PG}/Registration/Start?clubID=1&PaymentPlanId=263`,
-      },
-      {
-        title: 'Annuale',
-        sub: 'Pagamento unico',
-        note: 'Rinnovo automatico annuale · disdetta via email entro 10 giorni dalla fine dell\'abbonamento',
-        savings: 'Risparmio €438 vs Flex annuo',
-        amount: '750',
-        period: '€/anno',
-        href: `${PG}/Registration/Start?clubID=1&PaymentPlanId=264`,
-      },
-      {
-        title: 'Mensile',
-        sub: 'Flex, senza vincoli',
-        note: 'Minimo 1 mese · disdetta via App entro 10 giorni dalla fine del mese',
-        amount: '99',
-        period: '€/mese',
-        href: `${PG}/Registration/Start?clubID=1&PaymentPlanId=254`,
-      },
-    ],
-  },
-  {
-    id: 'premium',
-    badge: 'Consigliato · Tutto il club',
-    name: 'Premium',
-    claim: 'Vivi tutto il club.',
-    desc: 'Corsi fitness, Group Reformer, Aqua Fitness, Scuola Nuoto Adulti e Corso Gestanti, oltre a Gym Floor, nuoto libero e Athlon TV: entri nel palinsesto completo e scegli ogni settimana cosa fare.',
-    activities: [
-      'Gym Floor',
-      'Corsi Fitness',
-      'Group Reformer',
-      'Aqua Fitness',
-      'Scuola Nuoto Adulti',
-      'Nuoto Libero Assistito',
-      'Corso Gestanti',
-      'Athlon TV',
-    ],
-    options: [
-      {
-        title: 'Annuale',
-        sub: 'Pagamento mensile',
-        note: 'Rinnovo automatico annuale · disdetta via email entro 10 giorni dalla fine dell\'abbonamento',
-        savings: 'Risparmio €288 vs Flex',
-        amount: '95',
-        period: '€/mese',
-        href: `${PG}/Registration/Start?clubID=1&PaymentPlanId=252`,
-      },
-      {
-        title: 'Annuale',
-        sub: 'Pagamento unico',
-        note: 'Rinnovo automatico annuale · disdetta via email entro 10 giorni dalla fine dell\'abbonamento',
-        savings: 'Risparmio €488 vs Flex annuo',
-        amount: '950',
-        period: '€/anno',
-        href: `${PG}/Registration/Start?clubID=1&PaymentPlanId=249`,
-      },
-      {
-        title: 'Mensile',
-        sub: 'Flex, senza vincoli',
-        note: 'Minimo 1 mese · disdetta via App entro 10 giorni dalla fine del mese',
-        amount: '119',
-        period: '€/mese',
-        href: `${PG}/Registration/Start?clubID=1&PaymentPlanId=253`,
-      },
-    ],
-  },
-];
+
 
 const singoli = [
   { name: 'Gym Floor', note: 'Accesso 90 minuti', price: '€20' },
@@ -173,6 +96,29 @@ const ptPackages = [
   { label: '4 sedute al mese', price: '€140' },
   { label: '8 sedute al mese', price: '€280' },
 ];
+
+/**
+ * I due piani in forma leggibile da una macchina. I prezzi non sono scritti qui:
+ * escono da `plans`, che è quello che la pagina mostra. Un agente che chiede
+ * «quanto costa» legge la stessa cifra che legge una persona, e se il listino
+ * cambia cambiano insieme.
+ */
+const offerte = {
+  '@type': 'ItemList',
+  name: 'Abbonamenti Athlon Club',
+  itemListElement: plans.flatMap((p) =>
+    p.options.map((o) => ({
+      '@type': 'ListItem',
+      item: offerSchema(SITE, {
+        name: `${p.name} — ${o.title}${o.sub ? ` (${o.sub})` : ''}`,
+        description: p.desc,
+        price: o.amount,
+        unit: o.period.includes('anno') ? 'ANN' : 'MON',
+        url: o.href,
+      }),
+    }))
+  ),
+};
 
 const faqs = [
   {
@@ -212,6 +158,8 @@ const trust = [
 <Layout
   title="Abbonamenti Palestra e Piscina a Roma Talenti | Athlon Club"
   description="Scegli il tuo abbonamento Athlon Club: piani Smart e Premium, accessi singoli, personal training e Guest Pass da 7 giorni. Iscrizione online immediata."
+  breadcrumb={[{ name: 'Abbonamenti', path: '/abbonamenti' }]}
+  schema={[offerte]}
 >
   <!-- HERO -->
   <section class="ab-hero">
