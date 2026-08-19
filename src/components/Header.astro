@@ -1286,13 +1286,13 @@ const accountBlocks = [
       justify-content: center;
       margin: 0 auto;
       padding: 10px 14px;
-      /* L'arancione scuro: dodici pixel di testo sul bianco, dove `#ff5701` dà
-         3,17:1 contro il 4,5:1 che serve. È la pastiglia che su un telefono sta
-         in mezzo alla barra e si legge prima di tutto il resto. */
-      border: 1px solid var(--accent-text);
+      /* Arancione del marchio, per scelta: dodici pixel di testo sul bianco
+         danno 3,17:1 contro il 4,5:1 che servirebbe, e resta così. Non
+         sostituirlo con `--accent-text` senza chiedere. */
+      border: 1px solid var(--color-primary);
       border-radius: 20px;
       background: var(--color-white);
-      color: var(--accent-text);
+      color: var(--color-primary);
       font-size: 12px;
       font-weight: 500;
       letter-spacing: 1.25px;

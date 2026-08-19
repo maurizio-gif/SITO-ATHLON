@@ -102,15 +102,16 @@
      anche per un bordo, dove basterebbe 3:1. Il secondo è per i fondi pieni, col
      bianco sopra.
 
-     Si usano solo dove qualcuno deve *leggere*: etichette, pastiglie, i comandi
-     del pannello account, il pieno di Contattaci nel footer. Titoli e numeri
-     grandi restano `#ff5701`, perché sopra i 24px (o 18,66 in grassetto) la
-     soglia scende a 3:1 e il marchio la passa così com'è.
+     Si usano in tre posti, e solo lì: le etichette e la sopralinea di «Dove
+     siamo», il pieno di Contattaci nel footer, i comandi del pannello account.
+     Titoli e numeri grandi restano `#ff5701` comunque, perché sopra i 24px (o
+     18,66 in grassetto) la soglia scende a 3:1 e il marchio la passa così com'è.
 
-     Il resto del sito tiene `#ff5701` anche dove il contrasto non basta — la
-     sopralinea della hero, il suo pulsante «Prova Athlon», il link del planning:
-     è una scelta, registrata in docs/seo.md. Non estendere questi due token a
-     quei punti senza chiedere. */
+     Tutto il resto tiene `#ff5701` anche dove il contrasto non basta — la
+     sopralinea della hero, il suo pulsante «Prova Athlon», la pastiglia
+     Contattaci nella barra mobile, il link del planning: è una scelta, presa
+     punto per punto e registrata in docs/seo.md. Non estendere questi due token
+     a quei punti senza chiedere. */
   --accent-text: #bb4001;
   --accent-fill: #d14701;
   --accent-fill-hover: #b03c00;
