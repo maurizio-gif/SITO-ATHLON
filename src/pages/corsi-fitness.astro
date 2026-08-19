@@ -14,6 +14,12 @@ import Faq from '../components/Faq.astro';
 import { faqConSchede, type FaqEntry } from '../data/faq';
 import { getBand, countLessons, roomsOf } from '../data/planning';
 import { trialCta, ctaAttrs } from '../data/cta';
+import { serviceSchema } from '../data/club';
+import { GUEST_PASS } from '../data/abbonamenti';
+import { fotoPiccola } from '../data/foto';
+/* Il dominio di produzione, per gli @id assoluti degli schemi. */
+const SITE = 'https://www.athlonroma.it';
+
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 const U = '/wp-content/uploads';
@@ -173,6 +179,16 @@ const faqs: FaqEntry[] = await faqConSchede([
 <Layout
   title="Corsi Fitness Roma Talenti – 80+ corsi a settimana | Athlon Club"
   description={`I corsi fitness di Athlon Club a Roma Talenti: ${lezioni} lezioni a settimana in ${sale.length} sale, da Antigravity a HBX, yoga, pilates, posturale e tonificazione. Compresi negli abbonamenti.`}
+  image={`${U}/2024/01/IMG_0351-1-1024x683.jpg`}
+  imageAlt="Una lezione di corso fitness ad Athlon Club"
+  breadcrumb={[{ name: 'Corsi Fitness', path: '/corsi-fitness' }]}
+  schema={[serviceSchema(SITE, {
+    name: 'Corsi Fitness',
+    description: `${corsi.length} corsi fitness, ${lezioni} lezioni a settimana in ${sale.length} sale.`,
+    path: '/corsi-fitness',
+    image: `${U}/2024/01/IMG_0351-1-1024x683.jpg`,
+    type: 'Corsi fitness',
+  })]}
 >
   <!-- HERO -->
   <section class="cf-hero">
@@ -263,7 +279,7 @@ const faqs: FaqEntry[] = await faqConSchede([
           <article class="cfc" data-anim="fade" data-anim-delay={String((i % 4) * 60)}>
             <a class="cfc__hit" href={c.href}>
               <span class="cfc__media">
-                <img src={c.foto} alt={c.nome} loading="lazy" />
+                <img src={c.foto} alt={c.nome} loading="lazy" decoding="async" {...fotoPiccola(c.foto)} />
               </span>
               <span class="cfc__body">
                 <span class="cfc__name u-display">{c.nome}</span>
@@ -318,14 +334,14 @@ const faqs: FaqEntry[] = await faqConSchede([
 
       <div class="cf-prova" data-anim="scale">
         <ul class="cf-prova__facts">
-          <li><strong class="u-display">7</strong> giorni</li>
-          <li><strong class="u-display">19</strong> euro</li>
+          <li><strong class="u-display">{GUEST_PASS.giorni}</strong> giorni</li>
+          <li><strong class="u-display">{GUEST_PASS.prezzo}</strong> euro</li>
           <li><strong class="u-display">{corsi.length}</strong> corsi da provare</li>
         </ul>
         <div class="cf-prova__side">
           <p class="cf-prova__nota">
             Accesso completo a tutte le attività, con l'esperienza Premium. Riservato a chi non ha
-            avuto un abbonamento Athlon dal 2021.
+            avuto un abbonamento Athlon dal {GUEST_PASS.dal}.
           </p>
           <a
             href={prova.href}

@@ -20,6 +20,8 @@
  * `bleed` and `divider` are the two bits of home-page chrome, on by default:
  * the strip running past the container, and the rule above it.
  */
+import { fotoPiccola } from '../../data/foto';
+
 interface Props {
   photos?: { image: string; caption: string }[];
   /** The small label above the arrows. */
@@ -101,7 +103,13 @@ const meta = Array.from({ length: copie }, () => photos).flat();
             aria-hidden={isClone ? 'true' : undefined}
             tabindex={isClone ? -1 : undefined}
           >
-            <img src={item.image} alt={isClone ? '' : item.caption} loading="lazy" />
+            <img
+              src={item.image}
+              alt={isClone ? '' : item.caption}
+              loading="lazy"
+              decoding="async"
+              {...fotoPiccola(item.image)}
+            />
             <span class="struttura-gallery__scrim" aria-hidden="true"></span>
             <span class="struttura-gallery__num">{String(orig + 1).padStart(2, '0')}</span>
             <span class="struttura-gallery__caption">{item.caption}</span>

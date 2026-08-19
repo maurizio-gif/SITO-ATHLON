@@ -21,6 +21,10 @@
 import Layout from '../layouts/Layout.astro';
 import Faq from '../components/Faq.astro';
 import { faqConSchede, type FaqEntry } from '../data/faq';
+import { serviceSchema } from '../data/club';
+/* Il dominio di produzione, per gli @id assoluti degli schemi. */
+const SITE = 'https://www.athlonroma.it';
+
 
 const APP = 'https://onelink.to/athlon';
 /* Da dove ripartono le anteprime: la lezione è già iniziata. */
@@ -121,6 +125,13 @@ const faqs: FaqEntry[] = await faqConSchede([
 <Layout
   title="Athlon TV – Le lezioni del club dove sei tu | Athlon Club Roma Talenti"
   description="Athlon TV è compresa in tutti gli abbonamenti Athlon Club: lezioni intere con i nostri trainer — Power Pilates, Booty Workout, Calisthenics, Power Yoga — dall'app Athlon Club, anche da casa."
+  breadcrumb={[{ name: 'Athlon TV', path: '/athlon-tv' }]}
+  schema={[serviceSchema(SITE, {
+    name: 'Athlon TV',
+    description: 'Lezioni intere con i trainer del club, dall\'app Athlon Club. Compresa in tutti gli abbonamenti.',
+    path: '/athlon-tv',
+    type: 'Lezioni on demand',
+  })]}
 >
   <!-- HERO -->
   <section class="tv-hero">

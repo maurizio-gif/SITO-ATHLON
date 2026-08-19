@@ -20,6 +20,10 @@ import { CORSI, mediaVariante, type Corso } from '../data/corsi';
 import { scheda } from '../data/pagine';
 import { getBand, bands } from '../data/planning';
 import { trialCta } from '../data/cta';
+import { serviceSchema } from '../data/club';
+
+/* Il dominio di produzione, per gli @id assoluti degli schemi. */
+const SITE = 'https://www.athlonroma.it';
 
 export function getStaticPaths() {
   return CORSI.map((c) => ({ params: { corso: c.slug }, props: { corso: c } }));
@@ -138,6 +142,16 @@ const altri = CORSI.filter((c) => c.slug !== corso.slug && !corso.simili.some((s
   (a, b) => a.nome.localeCompare(b.nome, 'it')
 );
 
+/* I quindici corsi fitness stanno sotto /corsi-fitness; le attività in acqua
+   non hanno una pagina indice, quindi si fermano alla home. Il discriminante è
+   la fascia del planning, che è già il modo in cui la pagina sa dove leggere gli
+   orari — non una seconda lista da tenere allineata. */
+const fitness = (corso.banda ?? 'corsi-fitness') === 'corsi-fitness';
+const breadcrumb = [
+  ...(fitness ? [{ name: 'Corsi Fitness', path: '/corsi-fitness' }] : []),
+  { name: corso.nome, path: `/${corso.slug}` },
+];
+
 const varianti = corso.varianti.map((v) => ({ ...v, media: mediaVariante(v) }));
 const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
 ---
@@ -145,6 +159,16 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
 <Layout
   title={corso.titolo ?? `${corso.nome} Roma Talenti – Corso Fitness | Athlon Club`}
   description={corso.descrizione}
+  image={corso.hero}
+  imageAlt={`${corso.nome} ad Athlon Club Roma Talenti`}
+  breadcrumb={breadcrumb}
+  schema={[serviceSchema(SITE, {
+    name: corso.nome,
+    description: corso.descrizione,
+    path: `/${corso.slug}`,
+    image: corso.hero,
+    type: fitness ? 'Corso fitness' : 'Attività in acqua',
+  })]}
 >
   <!-- HERO -->
   <section class="co-hero">

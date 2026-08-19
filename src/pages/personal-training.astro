@@ -2,6 +2,10 @@
 import Layout from '../layouts/Layout.astro';
 import AppSection from '../components/home/AppSection.astro';
 import Faq, { type FaqEntry } from '../components/Faq.astro';
+import { serviceSchema } from '../data/club';
+/* Il dominio di produzione, per gli @id assoluti degli schemi. */
+const SITE = 'https://www.athlonroma.it';
+
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 const bookPT = (trainerId: string | null) =>
@@ -251,6 +255,13 @@ const trust = [
 <Layout
   title="Personal Trainer Roma Talenti – Allenamento su misura | Athlon Club"
   description="Personal Training ad Athlon Club, Roma Talenti: schede personalizzate, percorsi su misura e lezioni individuali di Reformer e Fitness con 6 trainer qualificati."
+  breadcrumb={[{ name: 'Personal Training', path: '/personal-training' }]}
+  schema={[serviceSchema(SITE, {
+    name: 'Personal Training',
+    description: 'Allenamento individuale con sei trainer qualificati: postura, ipertrofia, dimagrimento, recupero funzionale, gravidanza e post parto.',
+    path: '/personal-training',
+    type: 'Allenamento individuale',
+  })]}
 >
   <!-- HERO -->
   <section class="pt-hero">
