@@ -38,8 +38,9 @@ const hasSource = (v: HTMLVideoElement) =>
 
 /**
  * The visitor is in charge of this one — it fills the screen, or they stopped
- * it themselves. Note this is not inferred from `controls`: a clip can ship
- * with controls and still be a background loop (the Reformer carousel).
+ * it themselves. Deliberately not inferred from `controls`: the hero adds that
+ * attribute for the length of a fullscreen visit, so reading it here would be
+ * circular, and a clip could ship with controls and still be a background loop.
  */
 const isVisitorDriven = (v: HTMLVideoElement) =>
   document.fullscreenElement === v || v.dataset.videoHandsOff === '1';

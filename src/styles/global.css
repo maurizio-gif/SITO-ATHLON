@@ -411,3 +411,30 @@ video::-webkit-media-controls-start-playback-button {
   display: none !important;
   -webkit-appearance: none;
 }
+
+/* ---- Un video di sfondo non si comanda -----------------------------------
+   Le clip del sito sono scenografia: partono da sole, girano in loop, mute.
+   Togliere l'attributo `controls` non basta, perché il video resta un
+   bersaglio: un clic lo mette in pausa su alcuni browser, un tasto destro o un
+   tocco lungo aprono il menu del player con «mostra controlli», e su iOS il
+   pannello nativo può comparire comunque. `pointer-events: none` lo rende
+   inerte: il puntatore lo attraversa e finisce sulla pagina, che è quello che
+   deve succedere quando ci si clicca sopra.
+
+   Il selettore è la parte che conta. Vale per i video **senza** `controls`,
+   quindi la hero della home resta l'eccezione senza un caso speciale: il suo
+   script mette `controls` sul video prima di aprirlo a schermo pieno, e in quel
+   momento questa regola smette di valere da sé — i controlli nativi tornano
+   cliccabili. All'uscita rimette `controls` a false e il video torna inerte.
+
+   Vale anche al contrario: rimettere `controls` su una clip la rende di nuovo
+   comandabile, senza toccare questo file. */
+video:not([controls]) {
+  pointer-events: none;
+}
+
+video:not([controls])::-webkit-media-controls,
+video:not([controls])::-webkit-media-controls-panel {
+  display: none !important;
+  -webkit-appearance: none;
+}
