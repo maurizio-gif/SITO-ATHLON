@@ -1595,7 +1595,11 @@ window.__ATHLON_ACTIVITIES__ = ${JSON.stringify(ACTIVITY_TAGS)};`}
     color: rgba(255, 255, 255, 0.45);
   }
 
-  @media (max-width: 820px) {
+  /* + totem: vedi «Il totem verticale del club» in global.css */
+
+  @media (max-width: 820px),
+
+    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
     .hd__groups {
       grid-template-columns: 1fr;
       gap: 34px;

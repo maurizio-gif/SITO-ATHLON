@@ -1104,14 +1104,20 @@ const trust = [
   /* ---- Responsive ---- */
   /* Narrower cards wrap the lists onto more lines, so the card has to grow as
      the column count drops — not shrink. */
-  @media (max-width: 1000px) {
+  /* + totem: vedi «Il totem verticale del club» in global.css */
+  @media (max-width: 1000px),
+    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
     .coaches {
       --coach-h: 560px;
       grid-template-columns: repeat(2, 1fr);
     }
   }
 
-  @media (max-width: 900px) {
+  /* + totem: vedi «Il totem verticale del club» in global.css */
+
+  @media (max-width: 900px),
+
+    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
     .casi {
       grid-template-columns: 1fr;
     }
