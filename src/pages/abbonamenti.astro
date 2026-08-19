@@ -789,7 +789,13 @@ const trust = [
     font-size: var(--text-md);
     font-weight: 600;
     letter-spacing: -0.01em;
-    color: var(--color-white);
+    /* L'inchiostro della card, non il bianco: le due card hanno fondi opposti —
+       Smart è scura, Premium è crema — e qui c'era `--color-white` fisso, senza
+       la variante per la chiara che tutti gli altri pezzi hanno. Su Premium
+       faceva bianco su crema: 1,2:1, cioè «Vivi tutto il club.» non si vedeva.
+       Con `inherit` la riga prende il colore che la card dichiara per sé, e sta
+       giusta anche su una terza card che oggi non esiste. */
+    color: inherit;
   }
 
   .plan__name span {
