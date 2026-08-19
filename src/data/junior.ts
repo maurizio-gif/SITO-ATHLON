@@ -13,6 +13,8 @@
  * prova di inserimento. Tutto viene dalle pagine del sito precedente (post 4275,
  * 4279, 4283, 4285); niente è aggiunto per riempire.
  */
+import type { RichiestaFaq } from './faq';
+
 const U = '/wp-content/uploads';
 
 /**
@@ -124,7 +126,10 @@ export interface CorsoJunior {
   titoloCorsi?: string;
   corsi?: CorsoStagione[];
   spazi?: SpazioJunior[];
-  faq: { q: string; a: string; scheda?: string; rimando?: string }[];
+  /* Id del registro condiviso in `data/faq.ts`, voci scritte qui, o un id con
+     la domanda riformulata: le pagine junior chiedono «Serve il certificato per
+     la scuola nuoto bambini?», che è come la cerca un genitore. */
+  faq: RichiestaFaq[];
   /**
    * Cosa proporre al genitore mentre il figlio è in vasca: qui non vanno altri
    * corsi per bambini — chi legge sta già scegliendo quello — ma le attività che
@@ -451,10 +456,8 @@ export const JUNIOR: CorsoJunior[] = [
         rimando: 'Come e quando si disdice',
       },
       {
+        id: 'certificato-junior',
         q: 'Serve il certificato medico per la scuola nuoto bambini?',
-        a: 'Per i bambini dai 6 anni compiuti sì: serve il certificato di idoneità all’attività sportiva non agonistica. Puoi inviarlo via email entro e non oltre 14 giorni dall’inizio dell’attività.',
-        scheda: 'generali/certificato-medico',
-        rimando: 'Requisiti e modello',
       },
       {
         q: 'Da che età si può cominciare la scuola nuoto?',
@@ -574,14 +577,8 @@ export const JUNIOR: CorsoJunior[] = [
       },
     ],
     faq: [
-      {
-        q: 'La frequenza agli allenamenti settimanali è obbligatoria?',
-        a: 'No, la frequenza non è obbligatoria. Si suggerisce però un impegno settimanale di 2 giorni: sotto quella soglia la progressione si ferma.',
-      },
-      {
-        q: 'Quali sono i criteri delle convocazioni a gare, partite e manifestazioni?',
-        a: 'La convocazione è un’attestazione di merito e un momento di crescita per l’atleta: ogni atleta avrà la possibilità di confrontarsi quando il tecnico responsabile lo riterrà opportuno.',
-      },
+      'frequenza-agonistica',
+      { id: 'convocazioni', q: 'Quali sono i criteri delle convocazioni a gare, partite e manifestazioni?' },
       {
         q: 'Il kit tecnico è obbligatorio?',
         a: 'Sì: il tesserato ha l’obbligo di indossare il kit istituzionale durante le manifestazioni sportive a cui la società partecipa.',
@@ -682,14 +679,8 @@ export const JUNIOR: CorsoJunior[] = [
       },
     ],
     faq: [
-      {
-        q: 'La frequenza agli allenamenti settimanali è obbligatoria?',
-        a: 'No, la frequenza non è obbligatoria. Si suggerisce però un impegno settimanale di 2 giorni: sotto quella soglia la progressione si ferma.',
-      },
-      {
-        q: 'Quali sono i criteri delle convocazioni alle gare e manifestazioni?',
-        a: 'La convocazione è un’attestazione di merito e un momento di crescita per l’atleta: ogni atleta avrà la possibilità di confrontarsi quando il tecnico responsabile lo riterrà opportuno.',
-      },
+      'frequenza-agonistica',
+      { id: 'convocazioni', q: 'Quali sono i criteri delle convocazioni alle gare e manifestazioni?' },
       {
         q: 'Come funzionano le gare del Circuito ASI?',
         a: 'Quattro tappe regionali da novembre a maggio e la finale nazionale a giugno. Gli atleti sono divisi per fascia d’età e anno di nascita, e si può scegliere a quante gare iscriversi.',

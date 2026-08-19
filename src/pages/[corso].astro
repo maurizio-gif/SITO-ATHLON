@@ -15,7 +15,7 @@
 import Layout from '../layouts/Layout.astro';
 import LessonSchedule from '../components/planning/LessonSchedule.astro';
 import Faq from '../components/Faq.astro';
-import { faqConSchede, type FaqEntry } from '../data/faq';
+import { faqPagina, voce, type FaqEntry } from '../data/faq';
 import { CORSI, mediaVariante, type Corso } from '../data/corsi';
 import { scheda } from '../data/pagine';
 import { getBand, bands, bandHours, siContaAOre } from '../data/planning';
@@ -96,18 +96,18 @@ const facts = [
  * dei dettagli, e chi li vuole li trova aggiornati in un posto solo. Le domande
  * portano dentro il nome del corso perché è così che vengono cercate.
  */
-const faqs: FaqEntry[] = await faqConSchede([
+const faqs: FaqEntry[] = await faqPagina([
   {
     q: `${corso.nome} è adatto a chi comincia adesso?`,
     a:
       corso.faqAdatto ??
       `Sì. Le lezioni sono aperte a tutti i livelli e l'istruttore propone la versione adatta a te: se è la tua prima volta, o se hai un problema fisico da tenere presente, diglielo all'inizio della lezione — è la cosa che gli serve sapere.`,
   },
+  /* La risposta viene dal registro, la domanda no: porta dentro il nome del
+     corso perché è così che viene cercata. */
   {
+    id: 'certificato',
     q: `Serve il certificato medico per ${corso.faqSoggetto ?? `il corso di ${corso.nome}`}?`,
-    a: `Sì, sempre: serve il certificato di idoneità all'attività sportiva non agonistica, da inviare entro le prime due settimane. Vale anche se prenoti e paghi una singola lezione — è un obbligo di legge, non una condizione dell'abbonamento.`,
-    scheda: 'generali/certificato-medico',
-    rimando: 'Requisiti e modello',
   },
   {
     q: `${corso.nome} è compreso nell'abbonamento?`,
@@ -116,11 +116,10 @@ const faqs: FaqEntry[] = await faqConSchede([
       `Sì: è compreso nell'abbonamento <strong>${pianiTesto}</strong>, senza nessun costo aggiuntivo. In alternativa puoi prenotare e pagare ${singola}, senza quota di attivazione.`,
   },
   {
+    id: 'prenotazione-come',
     q: `Come si prenota ${unita.s === 'turno' ? 'un turno' : 'una lezione'} di ${corso.nome}?`,
-    a: `Da app o dall'area riservata, a partire da tre giorni prima. Se poi non puoi venire, disdici entro un'ora dall'inizio: il posto va a chi è in lista d'attesa e a te non resta nulla in sospeso.`,
-    scheda: 'generali/prenotazioni',
-    rimando: 'Regole complete',
   },
+  'disdetta-lezione',
   ...(corso.faqExtra ?? []),
   ...(corso.attrezzatura
     ? [
@@ -130,9 +129,13 @@ const faqs: FaqEntry[] = await faqConSchede([
         },
       ]
     : []),
+  /* Prezzo e requisito del Guest Pass vengono dal registro — prima la risposta
+     li taceva, e chi era già stato iscritto lo scopriva alla fine. La CTA no:
+     porta con sé l'attività di provenienza, che è di questa pagina. */
   {
+    ...voce('guest-pass'),
     q: `Posso provare ${corso.nome} prima di iscrivermi?`,
-    a: `Sì. Puoi richiedere un <strong>Guest Pass Premium di una settimana</strong> e provare tutte le nostre attività, ${corso.nome} compreso. <a href="${prova.href}" data-cta="trial">Richiedilo qui</a>. Se preferisci una volta sola, puoi prenotare e pagare ${singola}.`,
+    a: `${voce('guest-pass').a} <a href="${prova.href}" data-cta="trial">Richiedi il Guest Pass</a>.`,
   },
 ]);
 

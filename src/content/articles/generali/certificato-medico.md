@@ -19,7 +19,7 @@ attivita: []
   📋 Obbligatorio dai 6 anni · Invia a desk@athlonroma.it · Solo formato digitale
 </div>
 
-Entro **15 giorni dall'inizio** dell'attività è obbligatorio inviare copia del Certificato di Idoneità all'Attività Sportiva **NON AGONISTICA** a [desk@athlonroma.it](mailto:desk@athlonroma.it). Non accettiamo più il formato cartaceo.
+Entro **14 giorni dall'inizio** dell'attività è obbligatorio inviare copia del Certificato di Idoneità all'Attività Sportiva **NON AGONISTICA** a [desk@athlonroma.it](mailto:desk@athlonroma.it). Non accettiamo più il formato cartaceo.
 
 ## Chi può rilasciarlo
 

@@ -1,7 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import OpeningHours from '../components/planning/OpeningHours.astro';
-import Faq, { type FaqEntry } from '../components/Faq.astro';
+import Faq from '../components/Faq.astro';
+import { faqPagina } from '../data/faq';
 import SpacesGallery from '../components/home/SpacesGallery.astro';
 import { getCorso } from '../data/corsi';
 import { trialCta } from '../data/cta';
@@ -210,30 +211,31 @@ const workouts = [
 
 const facts = ['400 mq di sala', 'Aperti dalle 6:00 alle 22:00', '30 piani di allenamento', 'Matrix 4.0 connesso all\'app', 'Vista sulle piscine'];
 
-const WIKI = 'https://wiki.athlonroma.it/wikiathlon';
-
 /**
  * Written for someone deciding whether to come, not for a member looking up a
  * rule: the facts come from the wiki but the framing is reassuring rather than
  * procedural, and the full procedures stay one link away.
+ *
+ * Le regole comuni — certificato, prenotazione, sospensione — vengono dal
+ * registro in `data/faq.ts`, che è l'unico posto in cui sono scritte. Qui resta
+ * ciò che è della sala: i percorsi Start Up, il prezzo del singolo accesso, il
+ * lucchetto, le fasce di affluenza.
  */
-const faqs: FaqEntry[] = [
+const faqs = await faqPagina([
   {
     q: 'Non mi sono mai allenato in sala pesi: è adatta anche a me?',
     a: "Sì. Nell'app trovi due percorsi <strong>Start Up</strong> pensati esattamente per chi parte da zero o riprende dopo una lunga pausa, e in sala c'è sempre qualcuno a cui chiedere. Se preferisci essere seguito passo a passo, c'è il <a href=\"/personal-training\">personal training</a>.",
   },
   {
     q: 'Devo prenotare per allenarmi?',
-    a: "Sì, l'accesso si prenota dall'app Athlon Club o dal portale, fino a 3 giorni prima. Serve a garantirti che in sala ci sia posto: scegli l'orario e la modalità — <strong>Con Assistenza</strong>, con un trainer presente, o <strong>Allenamento Libero</strong>.",
+    a: "Sì, l'accesso si prenota come le lezioni: scegli l'orario e la modalità — <strong>Con Assistenza</strong>, con un trainer presente, o <strong>Allenamento Libero</strong>. Serve a garantirti che in sala ci sia posto.",
   },
+  'prenotazione-come',
   {
     q: 'Posso allenarmi senza abbonamento?',
     a: 'Sì. Il singolo accesso alla Gym Floor costa <strong>€20</strong> per 90 minuti, più €5 una tantum per il badge. Se poi decidi di iscriverti, la sala è compresa in entrambi i piani, <a href="/abbonamenti">Smart e Premium</a>.',
   },
-  {
-    q: 'Serve il certificato medico?',
-    a: `Sì, quello di idoneità sportiva <strong>non agonistica</strong> — lo rilascia anche il tuo medico di base. Hai <strong>15 giorni</strong> dall'inizio dell'attività per inviarlo, quindi non è qualcosa da risolvere prima di cominciare. <a href="${WIKI}/generali/certificato-medico/" target="_blank" rel="noopener">Tutti i dettagli qui →</a>`,
-  },
+  'certificato',
   {
     q: 'Cosa devo portare la prima volta?',
     a: "Scarpe da cambiare all'ingresso della sala, un asciugamano da appoggiare sulle macchine e un lucchetto per l'armadietto (diametro 30, non lo forniamo noi). Docce, phon e spogliatoi sono gratuiti.",
@@ -242,7 +244,7 @@ const faqs: FaqEntry[] = [
     q: "Qual è l'orario meno affollato?",
     a: 'La sala è aperta dalle 6:00 alle 22:00 e le fasce più tranquille sono la prima mattina e il primo pomeriggio; il picco è fra le 18:00 e le 20:00. Prenotando vedi in tempo reale quanti posti restano per ogni orario.',
   },
-];
+]);
 ---
 
 <Layout

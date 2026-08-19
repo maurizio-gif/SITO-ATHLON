@@ -1,6 +1,9 @@
 ---
 title: Iscrizione Corsi 2026/27
 description: Prezzi, modalità e procedura di iscrizione per la stagione 2026/2027.
+# È la destinazione del percorso junior della chat: ci si arriva dopo aver
+# lasciato i dati, non da una ricerca su Google.
+noindex: true
 area:
   - Scuola Nuoto Bambini
   - News
@@ -126,7 +129,7 @@ La nostra Società Sportiva Dilettantistica è affiliata ad ASI (Associazioni Sp
 <details>
 <summary><strong>4.3 – Riprese Fotografiche</strong></summary>
 
-Durante l'anno potranno essere effettuate riprese fotografiche o video. La comunicazione ufficiale verrà pubblicata con almeno **10 giorni di preavviso** su wiki.athlonroma.it. Point 2000 non è titolare del trattamento dei dati fotografici, gestiti in autonomia dallo studio fotografico incaricato (titolare ai sensi del GDPR). I file saranno conservati per massimo **90 giorni**. L'utente può esercitare i diritti di accesso, opposizione o cancellazione direttamente presso lo studio fotografico. La partecipazione agli eventi comporta consenso tacito, salvo opposizione scritta preventiva.
+Durante l'anno potranno essere effettuate riprese fotografiche o video. La comunicazione ufficiale verrà pubblicata con almeno **10 giorni di preavviso** su www.athlonroma.it. Point 2000 non è titolare del trattamento dei dati fotografici, gestiti in autonomia dallo studio fotografico incaricato (titolare ai sensi del GDPR). I file saranno conservati per massimo **90 giorni**. L'utente può esercitare i diritti di accesso, opposizione o cancellazione direttamente presso lo studio fotografico. La partecipazione agli eventi comporta consenso tacito, salvo opposizione scritta preventiva.
 
 </details>
 

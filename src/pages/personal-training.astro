@@ -1,7 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import AppSection from '../components/home/AppSection.astro';
-import Faq, { type FaqEntry } from '../components/Faq.astro';
+import Faq from '../components/Faq.astro';
+import { faqPagina } from '../data/faq';
 import { serviceSchema } from '../data/club';
 /* Il dominio di produzione, per gli @id assoluti degli schemi. */
 const SITE = 'https://www.athlonroma.it';
@@ -209,15 +210,18 @@ const pacchetti = [
   { sedute: '8', prezzo: '280' },
 ];
 
-const WIKI = 'https://wiki.athlonroma.it/wikiathlon';
-
 /**
  * Rebalanced towards someone still deciding: what it costs, what happens in the
  * first session, how to pick a trainer. The purely procedural entries from the
  * old page (how to cancel, when sessions are credited) were written for people
  * who had already bought, so only the parts that affect the decision survive.
+ *
+ * Il certificato viene dal registro in `data/faq.ts`: questa pagina diceva che
+ * per la seduta singola non serve, e le pagine dei corsi che serve sempre. La
+ * seconda è quella giusta — la clausola 10.1 lo impone anche per le lezioni
+ * singole e i pacchetti.
  */
-const faqs: FaqEntry[] = [
+const faqs = await faqPagina([
   {
     q: 'Quanto costa una seduta di personal training?',
     a: 'La seduta singola costa <strong>€45</strong> per gli iscritti e <strong>€55</strong> per gli esterni. Se ti alleni con continuità, gli iscritti possono aggiungere all\'abbonamento un pacchetto mensile da 2, 4 o 8 sedute, da €80 a €280.',
@@ -238,11 +242,11 @@ const faqs: FaqEntry[] = [
     q: 'Come scelgo il trainer giusto per me?',
     a: 'Qui sopra trovi i sei profili con laurea, specializzazioni e servizi di ciascuno: scegli chi lavora su quello che ti interessa — postura, ipertrofia, dimagrimento, recupero post infortunio, gravidanza — e prenoti direttamente la sua disponibilità.',
   },
-  {
-    q: 'Serve il certificato medico?',
-    a: `Per una <strong>seduta singola</strong> no. Se invece ti iscrivi al club serve quello di idoneità sportiva non agonistica, che rilascia anche il tuo medico di base, e hai 15 giorni di tempo dall'inizio dell'attività. <a href="${WIKI}/generali/certificato-medico/" target="_blank" rel="noopener">Dettagli qui →</a>`,
-  },
-];
+  'certificato',
+  /* Il personal training è una lezione individuale, quindi la finestra di
+     disdetta è quella lunga: due ore, non una. */
+  'disdetta-lezione',
+]);
 
 const trust = [
   'Schede di allenamento personalizzate',

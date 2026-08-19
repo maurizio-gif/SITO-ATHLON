@@ -13,7 +13,7 @@
  */
 import Faq from '../Faq.astro';
 import SpacesGallery from '../home/SpacesGallery.astro';
-import { faqConSchede, type FaqEntry } from '../../data/faq';
+import { faqPagina, type FaqEntry } from '../../data/faq';
 import { formDi, type CorsoJunior } from '../../data/junior';
 import { scheda, PAGINE_ADULTI } from '../../data/pagine';
 import { ctaAttrs } from '../../data/cta';
@@ -36,7 +36,7 @@ const CTA_ATTRS = ctaAttrs('resolve', corso.ctaIntent ?? 'junior_info', {
   source: `/${corso.slug}`,
 });
 
-const faqs: FaqEntry[] = await faqConSchede(corso.faq);
+const faqs: FaqEntry[] = await faqPagina(corso.faq);
 
 const consigliati = corso.simili
   .map((s) => ({ ...s, pagina: scheda(s.slug) }))

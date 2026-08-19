@@ -11,7 +11,7 @@ import Layout from '../layouts/Layout.astro';
 import PlanningBand from '../components/planning/PlanningBand.astro';
 import LessonModal from '../components/planning/LessonModal.astro';
 import Faq from '../components/Faq.astro';
-import { faqConSchede, type FaqEntry } from '../data/faq';
+import { faqPagina, voce, type FaqEntry } from '../data/faq';
 import { getBand, countLessons, roomsOf } from '../data/planning';
 import { trialCta, ctaAttrs } from '../data/cta';
 import { serviceSchema } from '../data/club';
@@ -133,7 +133,7 @@ const elencoCorsi = corsi
  * Il componente Faq emette anche il JSON-LD FAQPage, che è ciò che rende queste
  * risposte candidabili nei risultati arricchiti.
  */
-const faqs: FaqEntry[] = await faqConSchede([
+const faqs: FaqEntry[] = await faqPagina([
   {
     q: 'Quali corsi fitness si possono fare ad Athlon Club a Roma Talenti?',
     a: `${corsi.length} corsi diversi, per ${lezioni} lezioni a settimana: ${elencoCorsi}. Ogni corso ha la sua pagina con orari e caratteristiche della lezione.`,
@@ -146,32 +146,23 @@ const faqs: FaqEntry[] = await faqConSchede([
     q: 'Ci sono corsi fitness la sera o la mattina presto?',
     a: `Sì. I corsi vanno dalle ${prima} alle ${ultima}, su ${giorni} giorni a settimana, in due sale. La prima lezione è prima del lavoro, l'ultima finisce alle ${ultima}.`,
   },
+  { id: 'certificato', q: 'Serve il certificato medico per i corsi fitness?' },
+  { id: 'prenotazione-come', q: 'Come si prenota una lezione di un corso fitness?' },
+  /* Il Guest Pass dal registro, con il prezzo e il requisito che questa
+     risposta taceva; la CTA resta qui perché porta l'attività di provenienza. */
   {
-    q: 'Serve il certificato medico per i corsi fitness?',
-    a: `Sì: serve il certificato di idoneità all'attività sportiva non agonistica, da inviare via email entro le prime due settimane. Lo rilascia il tuo medico di base o un medico sportivo.`,
-    scheda: 'generali/certificato-medico',
-    rimando: 'Requisiti e modello',
-  },
-  {
-    q: 'Come si prenota una lezione di un corso fitness?',
-    a: `Dall'app Athlon Club o dal portale, a partire da tre giorni prima della lezione. I posti in sala sono limitati, quindi la prenotazione serve a garantirti il posto.`,
-    scheda: 'generali/prenotazioni',
-    rimando: 'Come funziona',
-  },
-  {
+    ...voce('guest-pass'),
     q: 'Si può provare un corso fitness senza abbonarsi?',
-    a: `Sì, in due modi. Puoi <a href="${prova.href}" data-cta="trial">richiedere un Guest Pass Premium di una settimana</a> e provare tutte le nostre attività, corsi fitness compresi. Oppure prenoti e paghi la singola lezione, senza quota di attivazione.`,
+    a: `${voce('guest-pass').a} <a href="${prova.href}" data-cta="trial">Richiedi il Guest Pass</a>.`,
   },
   {
     q: 'Che livello serve per iniziare un corso fitness?',
     a: `Nessuno in particolare. I corsi coprono intensità molto diverse, dalla ginnastica dolce all'HBX, e gli istruttori adattano gli esercizi a chi hanno davanti. Se non sai da dove partire, chiedi in accoglienza: ti indichiamo la lezione giusta.`,
   },
-  {
-    q: 'Se poi devo fermarmi, posso sospendere o disdire?',
-    a: `Sì. Gli abbonamenti mensili si disdicono dalla tua area riservata, e se ti serve una pausa puoi sospendere un mese. Lo fai da solo, senza passare dalla segreteria.`,
-    scheda: 'adulti/sospensione',
-    rimando: 'Come si sospende',
-  },
+  /* La sospensione la diceva gratuita, immediata e di un mese solo: è a
+     pagamento, va chiesta in anticipo ed è illimitata. */
+  { id: 'sospensione', q: 'Se poi devo fermarmi, posso sospendere?' },
+  'disdetta-abbonamento',
 ]);
 
 ---

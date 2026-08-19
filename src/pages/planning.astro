@@ -3,8 +3,9 @@ import Layout from '../layouts/Layout.astro';
 import OpeningHours from '../components/planning/OpeningHours.astro';
 import PlanningBand from '../components/planning/PlanningBand.astro';
 import LessonModal from '../components/planning/LessonModal.astro';
-import Faq, { type FaqEntry } from '../components/Faq.astro';
-import { bands, countLessons, bandHours, ledeOf, siContaAOre, totalLessons } from '../data/planning';
+import Faq from '../components/Faq.astro';
+import { bands, gymFloor, countLessons, bandHours, ledeOf, siContaAOre, totalLessons } from '../data/planning';
+import { faqPagina } from '../data/faq';
 import { trialCta } from '../data/cta';
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
@@ -29,29 +30,24 @@ const bandPages: Record<string, string> = {
    ovunque compaia. */
 const lezioniTotali = totalLessons();
 
-// Booking rules, carried over verbatim from the planning site's own F.A.Q.
-const faqs: FaqEntry[] = [
+/* Le regole di prenotazione stanno nel registro delle f.a.q., perché non sono
+   di questa pagina: le stesse cinque risposte servono agli abbonamenti, alla
+   sala e a ognuna delle diciannove pagine dei corsi. Qui resta solo la prima,
+   che elenca le attività di *questo* palinsesto e altrove non avrebbe senso. */
+const faqs = await faqPagina([
   {
     q: 'Devo prenotare per partecipare alle attività?',
-    a: 'Sì, tutte le attività — Gym Floor, Corsi Fitness, Group Reformer, Aqua Fitness, Scuola Nuoto Adulti e Nuoto Libero Assistito — richiedono la prenotazione obbligatoria tramite app o portale web.',
+    /* La sala non è una fascia del palinsesto e da `bands` non esce: va
+       nominata a parte, o l'elenco delle attività da prenotare la perde
+       proprio mentre la pagina spiega come si prenota. */
+    a: `Sì, tutte le attività — ${[gymFloor.title, ...bands.map((b) => b.title)].join(', ')} — richiedono la prenotazione obbligatoria tramite app o portale web.`,
   },
-  {
-    q: 'Quando posso prenotare e fino a quando posso disdire?',
-    a: "Puoi prenotare fino a <strong>3 giorni prima</strong> (72 ore) e disdire fino a <strong>1 ora</strong> dall'inizio della lezione. Se hai acquistato una singola lezione e disdici in tempo, viene riaccreditata per una nuova prenotazione.",
-  },
-  {
-    q: 'Quante prenotazioni attive posso avere contemporaneamente?',
-    a: 'Massimo <strong>3 prenotazioni attive</strong> per Corsi Fitness, Aqua Fitness e Scuola Nuoto Adulti; massimo <strong>1 prenotazione attiva</strong> per il Group Reformer.',
-  },
-  {
-    q: "Come funziona la lista d'attesa?",
-    a: "Se il corso è al completo puoi iscriverti in lista d'attesa: in caso di disdetta di un prenotato, il subentro avviene in ordine cronologico con avviso via email, fino a 1 ora dall'inizio della lezione.",
-  },
-  {
-    q: 'Cosa succede se non mi presento o disdico in ritardo?',
-    a: 'Se non disdici e non sei presente per più di <strong>2 volte in 30 giorni</strong>, la funzione prenotazione viene bloccata per 3 giorni.',
-  },
-];
+  'prenotazione-come',
+  'disdetta-lezione',
+  'prenotazioni-attive',
+  'lista-attesa',
+  'no-show',
+]);
 ---
 
 <Layout

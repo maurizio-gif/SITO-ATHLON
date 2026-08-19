@@ -1,0 +1,956 @@
+---
+/**
+ * L'assistente dell'Help Desk, in un modal.
+ *
+ * Il box qui accanto cerca fra le schede a parole chiave: è istantaneo, gratis
+ * e funziona senza rete. Questo è un'altra cosa — una conversazione che sa chi
+ * sta scrivendo, e che a seconda di quello cambia tono, contenuti e obiettivo.
+ * Per questo è un modal e non un pezzo di pagina: chiede l'email, mostra dei
+ * form, e vuole lo spazio e l'attenzione che una sezione in fondo non dà.
+ *
+ * La meccanica del guscio è quella di `ProvaModal`: `visibility: hidden` da
+ * chiuso — così non resta nell'ordine di tabulazione — scroll bloccato, Escape
+ * per uscire e il focus che torna sul comando che l'ha aperto.
+ *
+ * La logica sta in `lib/chatAssistente.client.js` per la stessa ragione per cui
+ * ci sta quella della prova: il giorno che l'assistente serve anche altrove —
+ * l'header, una pagina corso — le due copie divergerebbero al primo bug corretto
+ * in una sola delle due.
+ */
+---
+
+<div class="ca" id="chat-assistente" aria-hidden="true">
+  <div class="ca__backdrop" data-ca-close></div>
+
+  <div class="ca__panel" role="dialog" aria-modal="true" aria-labelledby="ca-titolo">
+    {/* La testata di una chat: chi risponde, e in che modo. L'iniziale nel
+        pallino al posto di un'icona generica — è il club che parla. */}
+    <header class="ca__head">
+      {/* Lo stesso pittogramma dell'header, non quello della favicon: è il
+          marchio con cui il club si presenta in cima a ogni pagina. È un PNG
+          già arancione, quindi il cerchio sotto è crema — colorarlo di
+          arancione lo renderebbe invisibile. Proporzioni vere 316×256: la
+          larghezza la fissa il CSS, l'altezza segue il rapporto. */}
+      <span class="ca__avatar" aria-hidden="true">
+        <img src="/wp-content/uploads/2025/08/Pittogramma.png" alt="" width="316" height="256" />
+      </span>
+      <span class="ca__chi">
+        <span class="ca__nome">Athlon Club</span>
+        <span class="ca__stato" data-ca-intestazione>Help Desk</span>
+      </span>
+      <button type="button" class="ca__close" data-ca-close aria-label="Chiudi">×</button>
+    </header>
+
+    {/* ── 1. L'email ─────────────────────────────────────────────────────
+        Prima di tutto, perché è quello che decide il resto: chi ha un
+        abbonamento in casa riceve l'assistenza, chi non ce l'ha riceve il
+        club raccontato. Chiederlo dopo vorrebbe dire cambiare tono a metà. */}
+    <section class="ca__step" data-ca-step="email">
+      <h3 class="ca__title" id="ca-titolo" tabindex="-1" data-ca-fuoco>Come possiamo aiutarti?</h3>
+      <p class="ca__lead">
+        Iniziamo dalla tua email: serve a capire se sei già dei nostri, così ti do le risposte
+        giuste invece di quelle generiche.
+      </p>
+
+      <div class="ca__campo">
+        <label class="ca__label" for="ca-email">La tua email</label>
+        <input
+          class="ca__input"
+          id="ca-email"
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          placeholder="nome@esempio.it"
+          data-ca-email
+        />
+      </div>
+
+      <p class="ca__errore" data-ca-email-errore hidden></p>
+
+      <button type="button" class="ca__btn" data-ca-email-invia>
+        Continua
+        <span class="ca__spinner" aria-hidden="true"></span>
+      </button>
+
+      {/* Qui non c'è la nota sul consenso, ed è voluto: questo passo **verifica**
+          uno stato, non raccoglie dati per comunicazioni commerciali. La nota
+          sta sul form dei dati completi, che è il momento in cui quel consenso
+          serve davvero — anticiparla qui la trasformerebbe in rumore letto da
+          nessuno, che è il modo migliore per rendere inutile un'informativa. */}
+    </section>
+
+    {/* ── 2. Adulti o junior ─────────────────────────────────────────────
+        Una scelta a due vie chiesta a parole è solo un'occasione per
+        fraintendere: sono due pulsanti. E cambia molto — la conoscenza che
+        l'assistente può usare, il tono, e cosa gli si chiede di ottenere. */}
+    <section class="ca__step" data-ca-step="ambito" hidden>
+      <h3 class="ca__title" tabindex="-1" data-ca-fuoco>Per chi cerchi informazioni?</h3>
+      <p class="ca__lead">Così ti parlo della cosa giusta.</p>
+
+      <div class="ca__scelte">
+        <button type="button" class="ca__scelta" data-ca-ambito="adulti">
+          <span class="ca__scelta-nome">Per me</span>
+          <span class="ca__scelta-nota">Sala pesi, corsi, piscina, abbonamenti</span>
+        </button>
+        <button type="button" class="ca__scelta" data-ca-ambito="junior">
+          <span class="ca__scelta-nome">Per un bambino</span>
+          <span class="ca__scelta-nota">Baby nuoto, scuola nuoto, pallanuoto, agonistica</span>
+        </button>
+      </div>
+    </section>
+
+    {/* ── 3. Quale corso junior ──────────────────────────────────────────
+        I quattro corsi sono percorsi diversi con requisiti diversi, e sapere
+        quale interessa è ciò che permette di non parlare degli altri tre. */}
+    <section class="ca__step" data-ca-step="junior" hidden>
+      <h3 class="ca__title" tabindex="-1" data-ca-fuoco>Quale corso ti interessa?</h3>
+      <div class="ca__scelte" data-ca-junior></div>
+      <button type="button" class="ca__link" data-ca-indietro>← Torna indietro</button>
+    </section>
+
+    {/* ── 4. La conversazione ────────────────────────────────────────────── */}
+    <section class="ca__step ca__step--chat" data-ca-step="chat" hidden>
+      <div class="ca__conversazione" data-ca-conversazione aria-live="polite" tabindex="-1" data-ca-fuoco></div>
+
+      <div class="ca__barra">
+        <textarea
+          class="ca__domanda"
+          rows="1"
+          placeholder="Scrivi la tua domanda…"
+          aria-label="Scrivi la tua domanda"
+          data-ca-domanda></textarea>
+        <button type="button" class="ca__invia" data-ca-invia disabled aria-label="Invia">→</button>
+      </div>
+    </section>
+
+    {/* ── 5. I dati ──────────────────────────────────────────────────────
+        Un form, non una raccolta a domande: i campi hanno una forma, una
+        validazione e un'etichetta. Un'anagrafica su PerfectGym nata da un dato
+        interpretato dal parlato è un'anagrafica che prima o poi è sbagliata, e
+        quella la corregge una persona a mano.
+
+        I campi del bambino compaiono solo nel ramo junior. */}
+    <section class="ca__step" data-ca-step="dati" hidden>
+      <h3 class="ca__title" tabindex="-1" data-ca-fuoco data-ca-dati-titolo>I tuoi dati</h3>
+      <p class="ca__lead" data-ca-dati-lead>
+        Lasciaci come raggiungerti: ti richiamiamo noi.
+      </p>
+
+      <div class="ca__griglia">
+        <div class="ca__campo">
+          <label class="ca__label" for="ca-nome">Nome</label>
+          <input class="ca__input" id="ca-nome" type="text" autocomplete="given-name" data-ca-f="nome" />
+        </div>
+        <div class="ca__campo">
+          <label class="ca__label" for="ca-cognome">Cognome</label>
+          <input class="ca__input" id="ca-cognome" type="text" autocomplete="family-name" data-ca-f="cognome" />
+        </div>
+      </div>
+
+      <div class="ca__griglia">
+        <div class="ca__campo">
+          <label class="ca__label" for="ca-cellulare">Cellulare</label>
+          <input
+            class="ca__input"
+            id="ca-cellulare"
+            type="tel"
+            inputmode="tel"
+            autocomplete="tel"
+            placeholder="3XX XXXXXXX"
+            data-ca-f="cellulare"
+          />
+        </div>
+        <div class="ca__campo">
+          <label class="ca__label" for="ca-nascita">Data di nascita</label>
+          <input class="ca__input" id="ca-nascita" type="date" data-ca-f="nascita" />
+        </div>
+      </div>
+
+      {/* Il blocco del bambino: nel ramo junior servono due anagrafiche, e la
+          seconda si crea sotto la prima. */}
+      <div class="ca__bimbo" data-ca-bimbo hidden>
+        <span class="ca__sezione">E il bambino</span>
+
+        <div class="ca__griglia">
+          <div class="ca__campo">
+            <label class="ca__label" for="ca-bnome">Nome</label>
+            <input class="ca__input" id="ca-bnome" type="text" data-ca-f="bnome" />
+          </div>
+          <div class="ca__campo">
+            <label class="ca__label" for="ca-bcognome">Cognome</label>
+            <input class="ca__input" id="ca-bcognome" type="text" data-ca-f="bcognome" />
+          </div>
+        </div>
+
+        <div class="ca__campo">
+          <label class="ca__label" for="ca-bnascita">Data di nascita</label>
+          <input class="ca__input" id="ca-bnascita" type="date" data-ca-f="bnascita" />
+        </div>
+
+        {/* Spunta esplicita e non consenso implicito all'invio: qui i dati sono
+            di un minore, e la differenza fra le due forme conta. */}
+        <label class="ca__consenso">
+          <input type="checkbox" data-ca-f="consenso" />
+          <span>
+            Sono il genitore o chi esercita la responsabilità genitoriale, e acconsento al
+            trattamento dei dati miei e di mio figlio da parte di Point 2000 SSDrl.
+            <a href="/privacy" target="_blank" rel="noopener">Informativa privacy</a>.
+          </span>
+        </label>
+      </div>
+
+      <p class="ca__errore" data-ca-dati-errore hidden></p>
+
+      <button type="button" class="ca__btn" data-ca-dati-invia>
+        Invia
+        <span class="ca__spinner" aria-hidden="true"></span>
+      </button>
+
+      <p class="ca__privacy" data-ca-dati-privacy>
+        Inviando accetti che i dati siano trasmessi a Point 2000 SSDrl, che potrà usarli per
+        comunicazioni su prodotti e servizi. Puoi revocare quando vuoi.
+        <a href="/privacy" target="_blank" rel="noopener">Informativa privacy</a>.
+      </p>
+
+      <button type="button" class="ca__link" data-ca-dati-annulla>← Torna alla conversazione</button>
+    </section>
+
+    {/* ── 6. Fatto ──────────────────────────────────────────────────────── */}
+    <section class="ca__step" data-ca-step="fatto" hidden>
+      <h3 class="ca__title" tabindex="-1" data-ca-fuoco>Ci siamo.</h3>
+      <p class="ca__lead" data-ca-fatto-lead></p>
+      <a class="ca__btn ca__btn--link" data-ca-fatto-cta href="/" target="_blank" rel="noopener" hidden></a>
+      <button type="button" class="ca__link" data-ca-fatto-chiudi>Chiudi</button>
+    </section>
+  </div>
+</div>
+
+<script>
+  import { initChatAssistente } from '../../lib/chatAssistente.client.js';
+
+  const modal = document.querySelector<HTMLElement>('#chat-assistente');
+
+  if (modal) {
+    let ultimoComando: HTMLElement | null = null;
+
+    const chat = initChatAssistente(modal, { onChiudi: () => chiudi() });
+
+    function chiudi() {
+      modal!.classList.remove('open');
+      modal!.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('amodal-locked');
+      ultimoComando?.focus();
+    }
+
+    function apri(comando: HTMLElement) {
+      ultimoComando = comando;
+      modal!.classList.add('open');
+      modal!.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('amodal-locked');
+      chat.apri(location.pathname);
+    }
+
+    /* Delegato al documento, come per la prova: un comando che apre
+       l'assistente può comparire dentro una risposta generata, quindi dopo il
+       caricamento della pagina. */
+    document.addEventListener('click', (e) => {
+      const cta = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-cta="assistente"]');
+      if (!cta) return;
+      e.preventDefault();
+      apri(cta);
+    });
+
+    modal.querySelectorAll('[data-ca-close]').forEach((el) => el.addEventListener('click', chiudi));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('open')) chiudi();
+    });
+  }
+</script>
+
+<style>
+  /* Il guscio segue ProvaModal e AttivitaModal: pannello CHIARO su fondo scuro,
+     `visibility: hidden` da chiuso — così non resta nell'ordine di tabulazione —
+     durata zero e ritardo solo in chiusura, perché in apertura lo script sposta
+     subito il focus e un elemento invisibile lo rifiuterebbe. */
+  .ca {
+    position: fixed;
+    inset: 0;
+    z-index: 320;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--dur-fast) ease, visibility 0s var(--dur-fast);
+  }
+
+  .ca.open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity var(--dur-fast) ease, visibility 0s;
+  }
+
+  .ca__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(39, 36, 35, 0.55);
+    backdrop-filter: blur(2px);
+  }
+
+  .ca__panel {
+    position: relative;
+    z-index: 1;
+    width: min(32rem, 100%);
+    height: min(40rem, calc(100svh - 3rem));
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--radius);
+    background: var(--color-white);
+    box-shadow: 0 30px 70px -18px rgba(0, 0, 0, 0.5);
+    transform: translateY(10px) scale(0.98);
+    transition: transform var(--dur-base) var(--ease-out-crit);
+  }
+
+  .ca.open .ca__panel {
+    transform: none;
+  }
+
+  /* ---- La testata ----
+     Come quella di un'app di messaggi: un pallino con l'iniziale, il nome di chi
+     risponde e sotto una riga che dice in che modo. */
+  .ca__head {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid rgba(39, 36, 35, 0.1);
+    background: var(--color-white);
+  }
+
+  .ca__avatar {
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 2.75rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--color-cream);
+  }
+
+  .ca__avatar img {
+    display: block;
+    width: 1.6rem;
+    height: auto;
+  }
+
+  .ca__chi {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .ca__nome {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-dark);
+  }
+
+  .ca__stato {
+    font-size: var(--text-2xs);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .ca__stato::before {
+    content: '';
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: #3fbf5f;
+  }
+
+  .ca__close {
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: grid;
+    place-items: center;
+    border: none;
+    border-radius: 50%;
+    background: var(--color-cream);
+    color: var(--color-dark);
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background var(--dur-fast) ease;
+  }
+
+  .ca__close:hover {
+    background: var(--color-sand);
+  }
+
+  /* ---- I passi ----
+     Tutti dentro la stessa area, che scorre. Il passo della chat invece non
+     scorre da sé: scorre la conversazione, e la barra di scrittura resta giù. */
+  .ca__step {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 1.5rem 1.25rem;
+  }
+
+  .ca__step--chat {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .ca__title {
+    margin: 0 0 0.6rem;
+    font-size: var(--text-xl);
+    letter-spacing: var(--tracking-2xl);
+    color: var(--color-dark);
+  }
+
+  /* Il titolo raccoglie il focus a ogni cambio di schermata per chi usa uno
+     screen reader, ma non è un comando: l'anello arancione intorno sarebbe
+     rumore, e il cambio di schermata è già il segnale visivo. */
+  .ca__title:focus,
+  .ca__title:focus-visible {
+    outline: none;
+  }
+
+  .ca__lead {
+    margin: 0 0 1.25rem;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+  }
+
+  .ca__label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-size: var(--text-2xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .ca__input {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(39, 36, 35, 0.18);
+    border-radius: 0.75rem;
+    background: var(--color-white);
+    color: var(--color-dark);
+    font-family: var(--font-body);
+    /* 1rem tondo: sotto i 16px iOS ingrandisce la pagina al focus. */
+    font-size: 1rem;
+    transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+  }
+
+  .ca__input::placeholder {
+    color: rgba(39, 36, 35, 0.38);
+  }
+
+  .ca__input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(255, 87, 1, 0.15);
+  }
+
+  .ca__errore {
+    margin: 0.6rem 0 0;
+    color: #c0341a;
+    font-size: var(--text-xs);
+  }
+
+  .ca__btn {
+    margin-top: 1rem;
+    width: 100%;
+    min-height: 3.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: none;
+    border-radius: 0.75rem;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform var(--dur-press) ease, opacity var(--dur-fast) ease;
+  }
+
+  .ca__btn:active {
+    transform: scale(0.99);
+  }
+
+  .ca__btn:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+
+  .ca__spinner {
+    display: none;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: var(--color-white);
+    border-radius: 50%;
+    animation: caGira 0.7s linear infinite;
+  }
+
+  .ca__btn--attesa .ca__spinner {
+    display: inline-block;
+  }
+
+  @keyframes caGira {
+    to { transform: rotate(360deg); }
+  }
+
+  .ca__privacy {
+    margin: 1rem 0 0;
+    color: var(--text-muted);
+    font-size: var(--text-2xs);
+    line-height: 1.6;
+  }
+
+  .ca__privacy a {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  /* ---- Le scelte ---- */
+  .ca__scelte {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .ca__scelte :global(.ca__scelta) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-height: 3.5rem;
+    padding: 0.9rem 1rem;
+    text-align: left;
+    border: 1px solid rgba(39, 36, 35, 0.14);
+    border-radius: 0.85rem;
+    background: var(--color-white);
+    color: var(--color-dark);
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease,
+      transform var(--dur-press) ease;
+  }
+
+  .ca__scelte :global(.ca__scelta:hover) {
+    border-color: var(--color-primary);
+    background: var(--color-cream);
+  }
+
+  .ca__scelte :global(.ca__scelta:active) {
+    transform: scale(0.995);
+  }
+
+  .ca__scelte :global(.ca__scelta-nome) {
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  .ca__scelte :global(.ca__scelta-nota) {
+    font-size: var(--text-2xs);
+    color: var(--text-muted);
+  }
+
+  .ca__link {
+    margin-top: 0.9rem;
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    border: none;
+    background: none;
+    color: var(--text-muted);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    cursor: pointer;
+  }
+
+  .ca__link:hover {
+    color: var(--color-dark);
+  }
+
+  /* ---- La conversazione ----
+     Fondo crema con una trama appena accennata: è quello che rende una lista di
+     paragrafi una *chat* invece che un documento. Le bolle non hanno bordo, si
+     staccano dal fondo per colore e ombra, e hanno l'angolo del lato di chi
+     parla squadrato — la coda, senza disegnarne una. */
+  .ca__conversazione {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1.25rem 1rem;
+    background-color: var(--color-cream);
+    background-image: radial-gradient(rgba(39, 36, 35, 0.045) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+
+  .ca__conversazione:focus {
+    outline: none;
+  }
+
+  .ca__conversazione :global(.ca__msg) {
+    max-width: 82%;
+    padding: 0.65rem 0.85rem;
+    font-size: var(--text-sm);
+    line-height: 1.55;
+    box-shadow: 0 1px 1px rgba(39, 36, 35, 0.08);
+    animation: caEntra var(--dur-fast) var(--ease-out-crit);
+  }
+
+  .ca__conversazione :global(.ca__msg p) {
+    margin: 0;
+  }
+
+  .ca__conversazione :global(.ca__msg--bot) {
+    align-self: flex-start;
+    background: var(--color-white);
+    color: var(--color-dark);
+    border-radius: 1rem 1rem 1rem 0.2rem;
+  }
+
+  .ca__conversazione :global(.ca__msg--utente) {
+    align-self: flex-end;
+    /* Non l'arancione pieno: su un messaggio lungo è troppo, e il marchio non è
+       il colore di chi scrive. Una sua velatura calda, con il testo scuro. */
+    background: #ffe6d8;
+    color: var(--color-dark);
+    border-radius: 1rem 1rem 0.2rem 1rem;
+  }
+
+  :global(@keyframes caEntra) {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* I tre puntini di chi sta scrivendo, come in una chat. */
+  .ca__conversazione :global(.ca__pensa) {
+    display: inline-flex;
+    gap: 0.22rem;
+    padding: 0.15rem 0;
+  }
+
+  .ca__conversazione :global(.ca__pensa span) {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: rgba(39, 36, 35, 0.35);
+    animation: caPunti 1.2s ease-in-out infinite;
+  }
+
+  .ca__conversazione :global(.ca__pensa span:nth-child(2)) { animation-delay: 0.16s; }
+  .ca__conversazione :global(.ca__pensa span:nth-child(3)) { animation-delay: 0.32s; }
+
+  :global(@keyframes caPunti) {
+    0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-0.2rem); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ca__conversazione :global(.ca__msg) { animation: none; }
+    .ca__conversazione :global(.ca__pensa span) { animation: none; opacity: 0.5; }
+    .ca__panel { transition: none; }
+  }
+
+  .ca__conversazione :global(.ca__fonti) {
+    margin: 0.5rem 0 0;
+    font-size: var(--text-2xs);
+    line-height: 1.5;
+  }
+
+  .ca__conversazione :global(.ca__fonti a) {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .ca__conversazione :global(.ca__fonti a:hover) {
+    text-decoration: underline;
+  }
+
+  /* La via d'uscita, sotto ogni risposta: discreta ma sempre lì, perché «non mi
+     hai convinto» è un giudizio della persona, non del modello. */
+  .ca__conversazione :global(.ca__uscita) {
+    margin-top: 0.6rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(39, 36, 35, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .ca__conversazione :global(.ca__uscita-lead) {
+    font-size: var(--text-2xs);
+    color: var(--text-muted);
+  }
+
+  .ca__conversazione :global(.ca__uscita-btn) {
+    min-height: 2rem;
+    padding: 0 0.75rem;
+    border: 1px solid rgba(255, 87, 1, 0.5);
+    border-radius: 999px;
+    background: none;
+    color: var(--color-primary);
+    font-family: var(--font-body);
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--dur-fast) ease, color var(--dur-fast) ease;
+  }
+
+  .ca__conversazione :global(.ca__uscita-btn:hover) {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .ca__conversazione :global(.ca__uscita-btn--pieno) {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .ca__conversazione :global(.ca__uscita-btn--pieno:hover) {
+    opacity: 0.9;
+  }
+
+  /* ---- Il form dei dati ---- */
+  .ca__griglia {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .ca__campo {
+    margin-bottom: 0.9rem;
+    min-width: 0;
+  }
+
+  .ca__input--errore {
+    border-color: #c0341a;
+  }
+
+  .ca__bimbo {
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(39, 36, 35, 0.12);
+  }
+
+  .ca__sezione {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-size: var(--text-2xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  /* Spunta esplicita, non consenso implicito: qui i dati sono di un minore.
+     Il bersaglio è tutta la riga, non solo il quadratino. */
+  .ca__consenso {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    background: var(--color-cream);
+    font-size: var(--text-2xs);
+    line-height: 1.55;
+    color: var(--color-dark);
+    cursor: pointer;
+  }
+
+  .ca__consenso input {
+    flex-shrink: 0;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-top: 0.1rem;
+    accent-color: var(--color-primary);
+  }
+
+  .ca__consenso a {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .ca__btn--link {
+    text-decoration: none;
+  }
+
+  @media (max-width: 460px) {
+    .ca__griglia {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+  }
+
+  /* Il modulo del ticket si apre dentro la conversazione, sotto la risposta che
+     non è bastata: così resta chiaro a cosa si riferisce. */
+  .ca__conversazione :global(.ca__ticket) {
+    align-self: stretch;
+    margin: 0.35rem 0;
+    padding: 0.9rem;
+    border-radius: 1rem;
+    background: var(--color-white);
+    border: 1px solid rgba(255, 87, 1, 0.35);
+    box-shadow: 0 1px 1px rgba(39, 36, 35, 0.08);
+  }
+
+  .ca__conversazione :global(.ca__ticket-lead) {
+    margin: 0 0 0.6rem;
+    font-size: var(--text-xs);
+    color: var(--color-dark);
+    font-weight: 600;
+  }
+
+  .ca__conversazione :global(.ca__ticket-testo) {
+    width: 100%;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid rgba(39, 36, 35, 0.18);
+    border-radius: 0.6rem;
+    background: var(--color-white);
+    color: var(--color-dark);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    resize: vertical;
+  }
+
+  .ca__conversazione :global(.ca__ticket-testo:focus) {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(255, 87, 1, 0.15);
+  }
+
+  .ca__conversazione :global(.ca__ticket-azioni) {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .ca__conversazione :global(.ca__ticket-azioni .ca__btn) {
+    width: auto;
+    min-height: 2.75rem;
+    padding: 0 1.2rem;
+  }
+
+  .ca__conversazione :global(.ca__ticket-azioni .ca__link) {
+    margin-top: 1rem;
+  }
+
+  .ca__conversazione :global(.ca__ticket-fatto) {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--color-dark);
+  }
+
+  .ca__conversazione :global(.ca__ticket-errore) {
+    margin: 0.6rem 0 0;
+    color: #c0341a;
+    font-size: var(--text-xs);
+  }
+
+  /* ---- La barra di scrittura ----
+     Ferma in fondo, staccata dalla conversazione da un filo di bordo: è la
+     stessa gerarchia di un'app di messaggi, dove il campo non scorre via. */
+  .ca__barra {
+    flex-shrink: 0;
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-end;
+    padding: 0.75rem;
+    border-top: 1px solid rgba(39, 36, 35, 0.1);
+    background: var(--color-white);
+  }
+
+  .ca__domanda {
+    flex: 1;
+    min-height: 2.75rem;
+    max-height: 7rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid rgba(39, 36, 35, 0.18);
+    border-radius: 1.4rem;
+    background: var(--color-white);
+    color: var(--color-dark);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.4;
+    resize: none;
+  }
+
+  .ca__domanda::placeholder {
+    color: rgba(39, 36, 35, 0.38);
+  }
+
+  .ca__domanda:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(255, 87, 1, 0.15);
+  }
+
+  .ca__invia {
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 2.75rem;
+    display: grid;
+    place-items: center;
+    border: none;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-size: 1.15rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: opacity var(--dur-fast) ease, transform var(--dur-press) ease;
+  }
+
+  .ca__invia:active {
+    transform: scale(0.94);
+  }
+
+  .ca__invia:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  /* A schermo stretto il modal prende tutto: una chat a metà pagina, su un
+     telefono, è una chat scomoda. */
+  @media (max-width: 700px) {
+    .ca {
+      padding: 0;
+    }
+
+    .ca__panel {
+      width: 100%;
+      height: 100svh;
+      border-radius: 0;
+    }
+  }
+</style>
