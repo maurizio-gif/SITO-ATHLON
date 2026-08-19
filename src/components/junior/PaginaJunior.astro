@@ -17,6 +17,7 @@ import { faqConSchede, type FaqEntry } from '../../data/faq';
 import { formDi, type CorsoJunior } from '../../data/junior';
 import { scheda, PAGINE_ADULTI } from '../../data/pagine';
 import { ctaAttrs } from '../../data/cta';
+import { fotoHero } from '../../data/foto';
 
 interface Props {
   corso: CorsoJunior;
@@ -55,6 +56,7 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
     src={corso.hero}
     alt={`Una lezione di ${corso.nome} ad Athlon Club`}
     style={`object-position:${corso.fuoco}`}
+    {...fotoHero(corso.hero)}
   />
   <div class="ju-hero__scrim"></div>
 

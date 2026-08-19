@@ -43,6 +43,14 @@ interface Props {
   ogType?: 'website' | 'article';
   /** Fuori dall'indice: solo per pagine che esistono per reindirizzare. */
   noindex?: boolean;
+  /**
+   * L'immagine più grande della prima schermata, se la pagina ne ha una: viene
+   * chiesta in `preload` con priorità alta. Serve dove quell'immagine non è un
+   * `<img>` che il browser trova subito — il poster di un video, per esempio,
+   * che scopre solo quando è arrivato al tag. È l'elemento su cui si misura
+   * l'LCP, quindi anticiparlo di un giro di rete si vede nel numero.
+   */
+  lcpImage?: string;
 }
 
 const {
@@ -55,6 +63,7 @@ const {
   schema = [],
   ogType = 'website',
   noindex = false,
+  lcpImage,
 } = Astro.props;
 
 /* `Astro.site` è configurato su www.athlonroma.it: canonical e og:url devono
@@ -114,10 +123,20 @@ const graph = [
     <meta name="theme-color" content="#ff5701" />
     <meta name="author" content={CLUB.name} />
 
-    {/* Il font del corpo arriva da Google Fonts via @import nel CSS: il
-        preconnect evita che la connessione parta solo a foglio di stile letto. */}
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    {/* I due caratteri che disegnano la prima schermata, chiesti mentre l'HTML è
+        ancora in lettura. Senza, la loro esistenza si scopre solo a CSS scaricato
+        e letto: un giro di rete in più prima della prima lettera, e l'elemento
+        LCP di quasi ogni pagina è un titolo in Tusker.
+
+        Solo questi due, e non tutti e cinque i file: un preload è una promessa
+        di uso immediato, e chiedere anche quelli che servono più in basso
+        sposterebbe banda via da questi. Gli altri li scopre il CSS.
+
+        `crossorigin` va messo anche se il file è nostro — senza, il browser fa
+        due richieste, una per il preload e una per il font. */}
+    <link rel="preload" href="/wp-content/uploads/2024/07/TuskerGrotesk-3700Bold.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-v20-latin.woff2" as="font" type="font/woff2" crossorigin />
+    {lcpImage && <link rel="preload" href={lcpImage} as="image" fetchpriority="high" />}
 
     <script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })} />
   </head>

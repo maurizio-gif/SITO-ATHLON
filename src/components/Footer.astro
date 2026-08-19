@@ -127,7 +127,10 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
   <!-- Link -->
   <div class="container footer-grid">
     <div class="footer-brand">
-      <img src="/wp-content/uploads/2025/08/Logo-oriz-full-2.png" alt="Athlon Club 4.0" height="44" />
+      {/* Dimensioni intrinseche del file, non quelle a schermo: servono al
+          browser per riservare il posto giusto prima di averlo scaricato. L'altezza
+          vera la decide il CSS, e la larghezza segue le proporzioni. */}
+      <img src="/wp-content/uploads/2025/08/Logo-oriz-full-2.png" alt="Athlon Club 4.0" width="834" height="159" />
       <p class="footer-blurb">
         Da oltre cinquant'anni palestra e piscina a <strong>Roma Nord Talenti</strong>: oltre 3000 mq
         dedicati allo sport, per ogni età.
@@ -235,7 +238,7 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
     </div>
     <a class="footer-credit" href="https://www.ready2digital.it" target="_blank" rel="noopener">
       <span>Powered by</span>
-      <img src="/wp-content/uploads/2026/04/logo-ready2digital_54x.png" alt="Ready 2 Digital" height="18" loading="lazy" />
+      <img src="/wp-content/uploads/2026/04/logo-ready2digital_54x.png" alt="Ready 2 Digital" width="993" height="192" loading="lazy" />
     </a>
   </div>
 </footer>
@@ -440,7 +443,9 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.42);
+    /* 0.47 è la soglia: sotto, su questo fondo, il contrasto non arriva a
+       4,5:1 e queste intestazioni sono testo piccolo. */
+    color: rgba(255, 255, 255, 0.47);
     padding-bottom: 12px;
     margin-bottom: 18px;
     border-bottom: 1px solid var(--border-dark);
@@ -511,7 +516,8 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
     letter-spacing: 0.12em;
     line-height: 1.6;
     text-transform: uppercase;
-    color: rgba(39, 36, 35, 0.55);
+    /* 0.63: la soglia del 4,5:1 su fondo bianco per un testo di questa misura. */
+    color: rgba(39, 36, 35, 0.63);
   }
 
   .logo-marquee {

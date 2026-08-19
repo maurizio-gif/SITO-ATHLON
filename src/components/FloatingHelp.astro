@@ -87,19 +87,27 @@ const {
     border: 1px solid rgba(255, 255, 255, 0.16);
     box-shadow: 0 10px 30px rgba(23, 21, 20, 0.28);
     color: var(--color-white);
-    /* Fuori dai piedi finché lo script non dice altro: mai sopra la hero. */
+    /* Fuori dai piedi finché lo script non dice altro: mai sopra la hero.
+       `visibility` insieme all'opacità, perché un link invisibile ma
+       tabulabile è peggio di uno assente: si arriva su un pulsante che non si
+       vede, all'inizio della pagina, dove questo non deve esistere ancora. */
     opacity: 0;
+    visibility: hidden;
     transform: translateY(14px);
     pointer-events: none;
     transition: opacity var(--dur-base) var(--ease-out-crit),
-      transform var(--dur-base) var(--ease-out-crit),
+      transform var(--dur-base) var(--ease-out-crit), visibility 0s var(--dur-base),
       background-color var(--dur-fast) ease, border-color var(--dur-fast) ease;
   }
 
   .fh.is-on {
     opacity: 1;
+    visibility: visible;
     transform: none;
     pointer-events: auto;
+    transition: opacity var(--dur-base) var(--ease-out-crit),
+      transform var(--dur-base) var(--ease-out-crit), visibility 0s,
+      background-color var(--dur-fast) ease, border-color var(--dur-fast) ease;
   }
 
   .fh:hover {

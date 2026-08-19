@@ -222,8 +222,6 @@ const accountBlocks = [
     </div>
   </div>
 
-  <div class="mega-backdrop" data-mega-backdrop></div>
-
   <!-- Mobile / tablet full-screen menu -->
   <div class="mobile-panel" id="mobile-panel">
     <span class="mobile-eyebrow">Menu</span>
@@ -306,6 +304,15 @@ const accountBlocks = [
   <!-- Account panel — opened by the user icon in the header -->
 </header>
 
+{/* La tenda che raccoglie i clic fuori dai menu sta fuori dall'header, e questa
+    è la ragione: è `position: fixed; inset: 0`, quindi copre lo schermo, e da
+    dentro l'header il puntatore risultava sempre "dentro l'header" — così
+    `mouseleave`, che è ciò che chiude i pannelli, non scattava mai. Un menu
+    aperto restava aperto finché non ci si cliccava sopra o non si premeva Esc.
+    Da fuori, l'header (z-index 100) le sta sopra: le voci della barra tornano
+    raggiungibili col puntatore, e passare da un menu al successivo funziona. */}
+<div class="mega-backdrop" data-mega-backdrop></div>
+
 {/* Il pannello account sta FUORI dall'header, e deve restarci: .site-header ha
     un backdrop-filter, e un filtro rende l'elemento il blocco di contenimento
     dei figli in position:fixed. Da dentro, "inset: 0" copriva i 73px
@@ -353,13 +360,34 @@ const accountBlocks = [
   const navItems = Array.from(document.querySelectorAll<HTMLElement>('[data-nav-item]'));
   /* L'altezza dell'header cambia con la larghezza (59px in desktop, 72-73 sotto):
      la pubblica come variabile CSS, così le hero a schermo intero la sottraggono
-     esatta invece di tenerne una copia indovinata. */
-  const misuraHeader = () => {
-    const h = document.getElementById('site-header');
-    if (h) document.documentElement.style.setProperty('--header-h', `${Math.round(h.getBoundingClientRect().height)}px`);
+     esatta invece di tenerne una copia indovinata.
+
+     La misura arriva dall'entry del ResizeObserver, non da una lettura del DOM.
+     Leggere `getBoundingClientRect()` dentro il callback costringeva un layout
+     sincrono, e la scrittura del custom property subito dopo lo invalidava di
+     nuovo: Lighthouse contava 102 ms di adattamento dinamico forzato, tutti qui.
+     `borderBoxSize` è l'equivalente esatto di quella lettura — bordo compreso,
+     che è ciò che le hero sottraggono. E se il valore non cambia non si scrive:
+     riscrivere lo stesso pixel invaliderebbe il layout per niente. */
+  let altezzaPubblicata = -1;
+  const pubblicaAltezza = (px: number) => {
+    const h = Math.round(px);
+    if (h === altezzaPubblicata) return;
+    altezzaPubblicata = h;
+    document.documentElement.style.setProperty('--header-h', `${h}px`);
   };
-  misuraHeader();
-  new ResizeObserver(misuraHeader).observe(document.getElementById('site-header')!);
+  if (header) {
+    /* Nessuna misura di partenza: `observe()` fa scattare il callback una prima
+       volta da sé, appena il layout è pronto, e la misura ce l'ha dentro. Una
+       lettura qui invece costringeva il primo layout della pagina prima del
+       tempo — cento millisecondi di adattamento forzato, tutti attribuiti a
+       questa riga. Il buco tra il caricamento e il primo callback lo copre il
+       valore di ripiego dichiarato nel CSS, `var(--header-h, 73px)`. */
+    new ResizeObserver((entries) => {
+      const box = entries[entries.length - 1]?.borderBoxSize?.[0];
+      pubblicaAltezza(box ? box.blockSize : header.offsetHeight);
+    }).observe(header);
+  }
 
   const megaPanels = Array.from(document.querySelectorAll<HTMLElement>('[data-mega]'));
   const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -525,7 +553,18 @@ const accountBlocks = [
       acct.setAttribute('aria-hidden', 'false');
       trigger.setAttribute('aria-expanded', 'true');
       document.body.classList.add('acct-locked');
-      acct.querySelector<HTMLElement>('.acct__close')?.focus();
+      /* Il pannello chiuso è `visibility: hidden` — è così che i suoi comandi
+         stanno fuori dall'ordine di tabulazione — e `focus()` rifiuta un
+         elemento invisibile. La classe è appena stata aggiunta, quindi lo stile
+         è sporco: la lettura di `offsetWidth` lo fa ricalcolare prima di
+         chiedere il focus. Il resto lo fa il CSS, che commuta `visibility` in
+         apertura senza durata. Un reflow su un clic non costa niente, e il
+         focus resta dentro il gesto dell'utente. */
+      const chiudi = acct.querySelector<HTMLElement>('.acct__close');
+      if (chiudi) {
+        void chiudi.offsetWidth;
+        chiudi.focus();
+      }
     });
   });
 
@@ -744,12 +783,28 @@ const accountBlocks = [
     padding: 24px;
     opacity: 0;
     pointer-events: none;
-    transition: opacity var(--dur-fast) ease;
+    /* `visibility` fa una cosa che `opacity: 0` non fa: toglie il pulsante di
+       chiusura e i due link dall'ordine di tabulazione. Senza, il pannello
+       chiuso è invisibile ma raggiungibile — si tabula dentro un modale che non
+       c'è, e siccome porta `aria-hidden="true"` chi usa uno screen reader
+       arriva su comandi che non gli vengono nemmeno annunciati. È il controllo
+       che fa fallire l'albero di accessibilità su PageSpeed.
+
+       `visibility` non si dissolve, si commuta: durata zero, e un ritardo pari
+       alla dissolvenza solo in chiusura, così il pannello resta visibile mentre
+       sfuma e sparisce alla fine. In apertura il ritardo è zero — dandogli una
+       durata, il valore calcolato resta `hidden` per l'istante in cui lo script
+       sposta il focus sul pulsante di chiusura, e `focus()` rifiuta un elemento
+       invisibile: il focus restava sul pulsante che ha aperto. */
+    visibility: hidden;
+    transition: opacity var(--dur-fast) ease, visibility 0s var(--dur-fast);
   }
 
   .acct.open {
     opacity: 1;
     pointer-events: auto;
+    visibility: visible;
+    transition: opacity var(--dur-fast) ease, visibility 0s;
   }
 
   .acct__backdrop {
@@ -915,12 +970,21 @@ const accountBlocks = [
     opacity: 0;
     transform: translate(-50%, -8px);
     pointer-events: none;
-    transition: opacity var(--dur-base) var(--ease-out-crit), transform var(--dur-base) var(--ease-out-crit);
+    /* Chiuso resta fuori dall'ordine di tabulazione: sono nove pannelli con
+       oltre cento link in tutto, e senza questo si tabula per tutti prima di
+       entrare nella pagina. I pannelli si aprono col mouse o col clic, non col
+       focus, quindi nessuno di quei percorsi ci passa attraverso. */
+    visibility: hidden;
+    transition: opacity var(--dur-base) var(--ease-out-crit), transform var(--dur-base) var(--ease-out-crit),
+      visibility 0s var(--dur-base);
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
   }
 
   .mega.is-visible {
     opacity: 1;
+    visibility: visible;
+    transition: opacity var(--dur-base) var(--ease-out-crit), transform var(--dur-base) var(--ease-out-crit),
+      visibility 0s;
     transform: translate(-50%, 0);
     pointer-events: auto;
   }
@@ -1282,11 +1346,19 @@ const accountBlocks = [
       -webkit-backdrop-filter: blur(24px) saturate(160%);
       opacity: 0;
       pointer-events: none;
-      transition: opacity var(--dur-base) ease;
+      /* Come per il modale dell'account: chiuso non deve stare nell'ordine di
+         tabulazione. Qui dentro ci sono oltre cento link — senza `visibility`,
+         su un telefono si tabula per tutto il menu chiuso prima di arrivare al
+         contenuto della pagina. Durata zero e ritardo solo in chiusura, come
+         per il pannello dell'account. */
+      visibility: hidden;
+      transition: opacity var(--dur-base) ease, visibility 0s var(--dur-base);
     }
 
     .menu-open .mobile-panel {
       opacity: 1;
+      visibility: visible;
+      transition: opacity var(--dur-base) ease, visibility 0s;
       pointer-events: auto;
     }
 

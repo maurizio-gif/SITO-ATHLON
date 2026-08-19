@@ -16,7 +16,7 @@ import { getBand, countLessons, roomsOf } from '../data/planning';
 import { trialCta, ctaAttrs } from '../data/cta';
 import { serviceSchema } from '../data/club';
 import { GUEST_PASS } from '../data/abbonamenti';
-import { fotoPiccola } from '../data/foto';
+import { fotoPiccola, fotoHero } from '../data/foto';
 /* Il dominio di produzione, per gli @id assoluti degli schemi. */
 const SITE = 'https://www.athlonroma.it';
 
@@ -196,6 +196,7 @@ const faqs: FaqEntry[] = await faqConSchede([
       class="cf-hero__bg"
       src={`${U}/2024/01/IMG_0351-1-1024x683.jpg`}
       alt="Una lezione di corso fitness ad Athlon Club"
+      {...fotoHero(`${U}/2024/01/IMG_0351-1-1024x683.jpg`)}
     />
     <div class="cf-hero__scrim"></div>
 

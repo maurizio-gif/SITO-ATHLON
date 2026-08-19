@@ -44,6 +44,67 @@ below its own padding-box top. Measure with canvas `TextMetrics` —
 `padding-top + (line-height - (fontBoundingBoxAscent + fontBoundingBoxDescent)) / 2
 + fontBoundingBoxAscent - actualBoundingBoxAscent` must be `>= 0`.
 
+## Fonts are served from this repo, and stay that way
+
+Both faces are ours: Tusker in `public/wp-content/uploads/2024/07/`, Inter — the
+variable file, latin and latin-ext subsets — in `public/fonts/`. Inter used to
+come from Google Fonts through an `@import` in `global.css`, and that one line
+was the longest network chain on the site: download the stylesheet, parse it,
+discover the import, open a connection to a third-party host, fetch a second
+stylesheet, and only then discover the woff2 to fetch. 1930 ms of blocked
+rendering, per PageSpeed.
+
+- **Never add an `@import` for a font, or any other render-blocking cross-origin
+  request.** Add the file to `public/`, declare it with `@font-face`, done. The
+  refresh recipe for Inter is written above its declarations in `global.css`.
+- **`Layout.astro` preloads exactly two files** — Tusker 3700 and Inter latin,
+  the faces that draw the first screen. Adding a third takes bandwidth from
+  those two; measured, dropping to one costs 0.3 s of FCP.
+- **`unicode-range` is what keeps Inter at 48 kB.** An Italian page never fetches
+  latin-ext. Before adding a subset, check whether any page needs it — the check
+  is a character sweep over `dist`, and today nothing outside `latin` is used
+  except emoji and arrows, which come from the system font either way.
+
+## A hidden overlay must be hidden from the keyboard too
+
+`opacity: 0` and `pointer-events: none` hide an overlay from the eyes and the
+mouse, not from the tab key: a closed panel with `aria-hidden="true"` and
+reachable links is what makes Lighthouse report a malformed accessibility tree,
+and what makes a phone visitor tab through 33 invisible menu links before
+reaching the page. Every closed overlay on the site is `visibility: hidden`.
+
+Two details the form requires, and both have bitten:
+
+- **`visibility` does not fade, it switches.** Zero duration, and a delay equal
+  to the fade only when closing:
+  ```css
+  .panel      { visibility: hidden;  transition: opacity .2s ease, visibility 0s .2s; }
+  .panel.open { visibility: visible; transition: opacity .2s ease, visibility 0s; }
+  ```
+  Give it a duration instead and the computed value stays `hidden` for the
+  instant the script moves focus into the panel — `focus()` refuses an invisible
+  element, and focus silently stays on the button that opened it.
+- **Flush the style before asking for focus.** The class has just been added, so
+  the style is dirty; read `offsetWidth` first (`Header.astro` and
+  `abbonamenti.astro` both do).
+
+Overlays that use `display: none` when closed — the lightbox, the lesson modal —
+already behave; nothing to change there.
+
+## Photos: the box decides the file
+
+Photos live in `public/` and are referenced as strings, so Astro's image
+optimiser never sees them. `scripts/varianti-foto.mjs` writes the variants and
+`src/data/foto.ts` offers them:
+
+- **A photo in a small box** gets `{...fotoPiccola(src)}`, or `urlPiccola(src)`
+  for a CSS background, where `srcset` cannot reach.
+- **A full-bleed hero photo** gets `{...fotoHero(src)}` — it is the LCP element
+  of the page, and the original is half a megabyte.
+- **Add new photos to the script's source list and re-run it.** It is not in the
+  build pipeline on purpose: on Vercel it would pull sharp on every deploy to
+  regenerate files that never change.
+
 ## Whitespace around inline tags
 
 Astro trims the line break on **both** sides of an inline tag, so a wrapped

@@ -64,7 +64,7 @@ const features = [
           <span class="splash__veil" aria-hidden="true"></span>
 
           <span class="splash__mark">
-            <img src="/wp-content/uploads/2025/08/Pittogramma.png" alt="" />
+            <img src="/wp-content/uploads/2025/08/Pittogramma.png" alt="" width="316" height="256" />
             <span class="splash__version">4.0</span>
           </span>
           <span class="splash__word u-display">Athlon</span>
@@ -336,6 +336,11 @@ const features = [
   /* Already the orange mark on transparency — no recolouring needed. */
   .splash__mark img {
     width: 52cqw;
+    /* Serve perché il tag porta `width`/`height` intrinseci: l'attributo
+       `height` vale come regola CSS a specificità minima, quindi da solo
+       imporrebbe 256px veri accanto a una larghezza fluida — il pittogramma
+       veniva stirato. Con `auto` la proporzione la dà il rapporto intrinseco. */
+    height: auto;
     filter: drop-shadow(0 4px 16px rgba(23, 21, 20, 0.5));
   }
 
