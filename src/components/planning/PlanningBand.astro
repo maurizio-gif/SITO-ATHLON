@@ -221,6 +221,14 @@ const rooms = roomsOf(band);
     color: var(--text-muted);
   }
 
+  /* `--text-muted` è inchiostro scuro, pensato per un fondo chiaro: sulla banda
+     scura «Chiuso» era grigio scuro su grigio scuro, 1:1, cioè non c'era. Un
+     giorno di chiusura è un'informazione, non una decorazione. Bianco al 55%
+     come la legenda qui sopra: 5,17:1 sulla card del giorno. */
+  .band--dark .day__empty {
+    color: rgba(255, 255, 255, 0.55);
+  }
+
   .day__list li {
     display: flex;
   }
