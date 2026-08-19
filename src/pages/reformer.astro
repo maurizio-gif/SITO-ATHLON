@@ -12,7 +12,8 @@
 import Layout from '../layouts/Layout.astro';
 import PlanningBand from '../components/planning/PlanningBand.astro';
 import LessonModal from '../components/planning/LessonModal.astro';
-import Faq, { type FaqEntry } from '../components/Faq.astro';
+import Faq from '../components/Faq.astro';
+import { faqPagina } from '../data/faq';
 import { getBand, getLessonCard, countLessons } from '../data/planning';
 import { getCorso } from '../data/corsi';
 import { trialCta } from '../data/cta';
@@ -92,30 +93,23 @@ const simili = [
   },
 ];
 
-// Le cinque domande della pagina vecchia, verbatim nelle risposte. L'unico
-// cambio: il link alle prenotazioni ora è quello interno.
-const faqs: FaqEntry[] = [
-  {
-    q: 'Ho bisogno del certificato medico?',
-    a: 'Sì, sempre: anche per una singola lezione acquistata. È un obbligo di legge, non una condizione dell\'abbonamento. Requisiti e scadenze nella scheda <a href="/wikiathlon/generali/certificato-medico/">Certificato Medico</a>.',
-  },
+/* Quattro delle cinque domande della pagina vecchia sono regole del club, non
+   del Reformer: vengono dal registro in `data/faq.ts`. Le domande restano quelle
+   di allora — è la formulazione con cui le persone le cercano — e cambia solo
+   la risposta, che ora è la stessa di tutto il sito. */
+const faqs = await faqPagina([
+  { id: 'certificato', q: 'Ho bisogno del certificato medico?' },
   {
     q: 'Posso prenotare una lezione senza essere iscritto?',
     a: 'Certamente. Puoi prenotare e pagare la singola lezione: in questo caso non è richiesta la quota di attivazione.',
   },
+  { id: 'prenotazione-come', q: 'Come posso prenotare la lezione?' },
   {
+    id: 'disdetta-lezione',
     q: 'Ho acquistato una lezione singola: cosa succede in caso di disdetta?',
-    a: 'Potrai disdire la tua prenotazione entro un’ora dall’inizio della lezione. Il prodotto acquistato ti verrà riaccreditato e ti permetterà una nuova prenotazione in futuro.',
   },
-  {
-    q: 'Come posso prenotare la lezione?',
-    a: 'Dal Portale Web o dall’App Athlon Club, a partire da tre giorni prima della lezione.',
-  },
-  {
-    q: 'Quante lezioni posso prenotare per volta?',
-    a: 'Una per volta: terminata la precedente, potrai prenotare la successiva. Trovi tutte le modalità nella scheda <a href="/wikiathlon/generali/prenotazioni/">Prenotazioni</a>.',
-  },
-];
+  { id: 'prenotazioni-attive', q: 'Quante lezioni posso prenotare per volta?' },
+]);
 ---
 
 <Layout

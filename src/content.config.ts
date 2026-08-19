@@ -41,6 +41,16 @@ const articles = defineCollection({
     order: z.number().optional().default(99),
     attivita,
     draft: z.boolean().optional().default(false),
+    /**
+     * Fuori dai motori di ricerca, pur restando pubblicata.
+     *
+     * Serve alle schede che sono la destinazione di un percorso — la chat manda
+     * qui il genitore che ha appena lasciato i dati — e che si vogliono
+     * raggiungere solo da lì. La pagina emette `noindex` **e** sparisce dalla
+     * sitemap: dichiarare una pagina nella sitemap e poi dirle di non
+     * indicizzarla è una contraddizione che i motori segnalano.
+     */
+    noindex: z.boolean().optional().default(false),
     updatedDate: z.string().optional(),
   }),
 });

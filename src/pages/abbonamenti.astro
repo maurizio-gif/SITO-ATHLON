@@ -1,6 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import AttivitaModal from '../components/AttivitaModal.astro';
+import Faq from '../components/Faq.astro';
+import { faqPagina } from '../data/faq';
 
 import { trialCta } from '../data/cta';
 import { offerSchema } from '../data/club';
@@ -71,32 +73,24 @@ const offerte = {
   ),
 };
 
-const faqs = [
-  {
-    q: 'Come posso pagare?',
-    a: 'Accettiamo addebito su carta di credito/debito e addebito diretto su conto corrente (IBAN). <a href="https://wiki.athlonroma.it/wikiathlon/generali/metodo-di-pagamento/" target="_blank" rel="noopener">Tutti i dettagli qui →</a>',
-  },
-  {
-    q: 'Ho bisogno del certificato medico?',
-    a: 'Sì, è richiesto il certificato di idoneità alla pratica sportiva non agonistica. Va inviato a <a href="mailto:desk@athlonroma.it">desk@athlonroma.it</a> entro 2 settimane dalla prima lezione. <a href="https://wiki.athlonroma.it/wikiathlon/generali/certificato-medico/" target="_blank" rel="noopener">Info qui →</a>',
-  },
-  {
-    q: 'Come si prenota una lezione?',
-    a: "Tutte le prenotazioni si fanno dall'app Athlon Club o dal portale web. Puoi prenotare fino a 3 giorni prima della lezione. <a href=\"https://wiki.athlonroma.it/wikiathlon/generali/prenotazioni/\" target=\"_blank\" rel=\"noopener\">Guida completa →</a>",
-  },
-  {
-    q: "Posso sospendere l'abbonamento?",
-    a: `Sì, le sospensioni sono illimitate al costo di €${SOSPENSIONE.prezzo} al mese. Partono dal primo giorno del mese e vanno richieste almeno ${SOSPENSIONE.preavviso} giorni prima. <a href="${SOSPENSIONE.scheda}">Come fare →</a>`,
-  },
-  {
-    q: 'Come disdico il rinnovo automatico?',
-    a: '<strong>Mensile Flex:</strong> direttamente dall\'area riservata → Abbonamenti → Disdici rinnovo automatico.<br /><strong>Annuale:</strong> via email a <a href="mailto:disdetta@athlonroma.it">disdetta@athlonroma.it</a> almeno 10 giorni prima del rinnovo.',
-  },
+/* Le sei domande di questa pagina erano tutte regole del club, e tutte scritte
+   qui a mano: il certificato «entro 2 settimane dalla prima lezione», la
+   prenotazione «fino a 3 giorni prima» — cioè la regola opposta a quella vera —
+   e tre link che portavano fuori sito, sul vecchio sottodominio del wiki.
+   Vengono dal registro; resta qui solo l'infortunio, che è una procedura a sé. */
+const faqs = await faqPagina([
+  'pagamenti',
+  'certificato',
+  'prenotazione-come',
+  { id: 'sospensione', q: "Posso sospendere l'abbonamento?" },
+  'disdetta-abbonamento',
   {
     q: 'Cosa succede in caso di infortunio?',
-    a: 'È possibile sospendere l\'abbonamento presentando documentazione medica di una struttura sanitaria nazionale. Richiesta via email a desk@athlonroma.it, sospensione minima 2 mesi.',
+    a: "È possibile sospendere l'abbonamento presentando documentazione medica di una struttura sanitaria nazionale. La richiesta si fa via email e la sospensione è di almeno 2 mesi.",
+    scheda: 'adulti/sospensione',
+    rimando: 'Sospensione per inabilità',
   },
-];
+]);
 
 const trust = [
   'Iscrizione online immediata',
@@ -346,17 +340,7 @@ const trust = [
       <span class="eyebrow" data-anim="from-left">Domande frequenti</span>
       <h2 class="ab-sec__title" data-anim="reveal">FAQ</h2>
 
-      <div class="faq">
-        {faqs.map((f) => (
-          <div class="faq__item" data-faq-item>
-            <button class="faq__q" type="button" aria-expanded="false" data-faq-trigger>
-              <span>{f.q}</span>
-              <span class="faq__icon" aria-hidden="true">+</span>
-            </button>
-            <div class="faq__a"><div class="faq__a-inner" set:html={f.a} /></div>
-          </div>
-        ))}
-      </div>
+      <Faq entries={faqs} />
 
       {/* Le f.a.q. rispondono ai casi; il regolamento è il testo che vale.
           Sta qui e non solo nel footer: è la pagina dove si decide di pagare. */}
@@ -405,22 +389,9 @@ const trust = [
     });
   });
 
-  // FAQ accordion — one open at a time.
-  const items = Array.from(document.querySelectorAll<HTMLElement>('[data-faq-item]'));
-  items.forEach((item) => {
-    const trigger = item.querySelector<HTMLButtonElement>('[data-faq-trigger]');
-    trigger?.addEventListener('click', () => {
-      const willOpen = !item.classList.contains('open');
-      items.forEach((other) => {
-        other.classList.remove('open');
-        other.querySelector('[data-faq-trigger]')?.setAttribute('aria-expanded', 'false');
-      });
-      if (willOpen) {
-        item.classList.add('open');
-        trigger.setAttribute('aria-expanded', 'true');
-      }
-    });
-  });
+  /* L'accordion delle f.a.q. non è più qui: lo porta il componente Faq, con il
+     suo script e il suo JSON-LD FAQPage — che questa pagina non emetteva, ed è
+     la pagina su cui si decide di pagare. */
 </script>
 
 <style>
@@ -1259,87 +1230,10 @@ const trust = [
     color: rgba(255, 255, 255, 0.5);
   }
 
-  /* ---- FAQ ---- */
-  .faq {
-    max-width: none;
-  }
-
-  .faq__item {
-    border-top: 1px solid var(--border);
-  }
-
-  .faq__item:last-child {
-    border-bottom: 1px solid var(--border);
-  }
-
-  .faq__q {
-    width: 100%;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 20px 0;
-    background: none;
-    border: none;
-    cursor: pointer;
-    text-align: left;
-    font-family: var(--font-body);
-    font-size: var(--text-md);
-    font-weight: 500;
-    color: var(--color-dark);
-    transition: color var(--dur-fast) ease;
-  }
-
-  .faq__q:hover {
-    color: var(--color-primary);
-  }
-
-  .faq__icon {
-    flex-shrink: 0;
-    font-size: 1.25rem;
-    line-height: 1;
-    color: var(--color-primary);
-    transition: transform var(--dur-base) var(--ease-out-crit);
-  }
-
-  .faq__item.open .faq__icon {
-    transform: rotate(45deg);
-  }
-
-  /* grid-rows 0fr -> 1fr animates to auto height without measuring in JS */
-  .faq__a {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows var(--dur-base) var(--ease-out-crit);
-  }
-
-  .faq__item.open .faq__a {
-    grid-template-rows: 1fr;
-  }
-
-  .faq__a-inner {
-    overflow: hidden;
-    min-height: 0;
-    font-size: var(--text-sm);
-    line-height: 1.7;
-    color: var(--text-muted);
-  }
-
-  .faq__item.open .faq__a-inner {
-    padding-bottom: 20px;
-  }
-
-  .faq__a-inner :global(a) {
-    color: var(--color-primary);
-  }
-
-  .faq__a-inner :global(a:hover) {
-    text-decoration: underline;
-  }
-
-  .faq__a-inner :global(strong) {
-    color: var(--color-dark);
-  }
+  /* Le regole dell'accordion stanno nel componente Faq, con il suo markup.
+     Qui restava una copia che se ne discostava in un punto — niente
+     `max-width` sul testo della risposta — e che quindi si sarebbe allontanata
+     ancora al primo ritocco fatto da una parte sola. */
 
   /* ---- Contatti ---- */
   /* Sotto le f.a.q.: presente e leggibile, senza il tono del piè di pagina. */

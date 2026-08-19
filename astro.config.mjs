@@ -1,6 +1,26 @@
 // @ts-check
+import { readdirSync, readFileSync } from 'node:fs';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+
+/**
+ * Le schede marcate `noindex: true` nel frontmatter, lette qui perché la
+ * sitemap va costruita prima che le content collection esistano.
+ *
+ * Il flag sta in un posto solo — il file della scheda — e da lì decide sia il
+ * `<meta name="robots">` della pagina sia la sua presenza qui: una pagina
+ * dichiarata nella sitemap e poi marcata noindex è una contraddizione che i
+ * motori segnalano, ed è esattamente ciò che succederebbe tenendo due elenchi.
+ */
+const schedeNoindex = readdirSync('./src/content/articles', { withFileTypes: true })
+  .filter((d) => d.isDirectory())
+  .flatMap((d) =>
+    readdirSync(`./src/content/articles/${d.name}`)
+      .filter((f) => f.endsWith('.md'))
+      .map((f) => ({ id: `${d.name}/${f.replace(/\.md$/, '')}`, path: `./src/content/articles/${d.name}/${f}` }))
+  )
+  .filter(({ path }) => /^noindex:\s*true\s*$/m.test(readFileSync(path, 'utf8').split(/^---$/m)[1] ?? ''))
+  .map(({ id }) => id);
 
 // https://astro.build/config
 export default defineConfig({
@@ -40,7 +60,8 @@ export default defineConfig({
       filter: (page) =>
         !page.includes('/scuola-nuoto-bambini-3') &&
         !page.includes('/ginnastica-posturale') &&
-        !page.includes('/diagnostica-schermo'),
+        !page.includes('/diagnostica-schermo') &&
+        !schedeNoindex.some((id) => page.includes(`/wikiathlon/${id}/`)),
 
       /* Priorità e frequenza sono suggerimenti, e Google li ignora — restano
          per gli altri crawler. Quello che conta è che ci siano tutte le pagine

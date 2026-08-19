@@ -20,8 +20,9 @@ import { JUNIOR } from '../data/junior';
 import { bands, gymFloor, countLessons, totalLessons, totalHours, openHours } from '../data/planning';
 import { CLUB } from '../data/club';
 import { plans, GUEST_PASS } from '../data/abbonamenti';
+import { SITE } from '../data/sito';
 
-const SITE = 'https://www.athlonroma.it';
+
 
 /** Il nome della fascia come lo mostra il planning, con le sue lezioni. */
 function fasce() {

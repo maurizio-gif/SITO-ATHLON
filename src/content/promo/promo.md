@@ -48,7 +48,7 @@ faq:
     a: >-
       Sì, quello di idoneità alla pratica sportiva <strong>non agonistica</strong>
       — lo stesso che serve in qualunque palestra. Puoi cominciare ad allenarti
-      subito e portarlo entro due settimane dalla prima lezione.
+      subito e inviarlo entro 14 giorni dall'inizio dell'attività.
       <a href="/wikiathlon/generali/certificato-medico/">Requisiti e modulo →</a>
   - q: E se mi fermo un periodo?
     a: >-

@@ -8,6 +8,7 @@ tags:
   - errori
   - booking blocked due to blocking node
   - hai troppe prenotazioni
+  - online booking limit exceeded
   - non soddisfa i requisiti d'età
   - lista attesa
   - blocco
@@ -94,9 +95,13 @@ Oppure non riesci a prenotare anche se vedi posti liberi.
 
 ## 5. Hai raggiunto il massimo di prenotazioni attive
 
+### Messaggio che vedi
+
+> Online booking limit exceeded
+
 ### Perché appare
 
-Ogni attività ha un limite di prenotazioni contemporanee:
+Hai superato il limite di prenotazioni attive. Ogni attività ha un limite di prenotazioni contemporanee:
 
 | Attività | Prenotazioni attive |
 |:---|:---:|

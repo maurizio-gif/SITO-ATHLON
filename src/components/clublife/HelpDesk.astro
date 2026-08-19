@@ -11,7 +11,9 @@ import { AREA_LABELS, AREA_ORDER } from '../../data/helpdesk';
 import { ACTIVITY_TAGS } from '../../data/activities';
 import { clausole, urlClausola } from '../../data/termini';
 import { formatEventDate } from '../../data/eventi';
+import { toPlain, clamp } from '../../data/testo';
 import SupportForm from './SupportForm.astro';
+import ChatModal from './ChatModal.astro';
 
 interface Props {
   id?: string;
@@ -34,59 +36,11 @@ const groups = AREA_ORDER.map((folder) => ({
    cambiare o eliminare il metodo di pagamento"), which is not an answer. The
    articles carry two better things: a .ci-hero strip of key facts, and an
    opening paragraph. Both are lifted here at build time so the box can answer
-   directly instead of describing. */
+   directly instead of describing.
 
-/* The domain part is spelled out label-by-label rather than as [\w.]+ so the
-   pattern cannot swallow the full stop that ends the sentence — which turned
-   "a desk@athlonroma.it. Non accettiamo" into "a Non accettiamo". */
-const EMAIL = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/;
-
-/**
- * Emails are stripped: this page deliberately shows none. Removing just the
- * address leaves the phrase that introduced it dangling — "Invia a · Solo
- * formato digitale" — so the whole clause goes, not only the address.
- */
-function stripEmails(s: string): string {
-  let out = s.replace(/\[([^\]]+)\]\(mailto:[^)]+\)/gi, '$1');
-
-  // The facts strip is a list of clauses; drop any clause that named an inbox.
-  if (out.includes('·')) {
-    out = out
-      .split('·')
-      .filter((part) => !EMAIL.test(part))
-      .join(' · ');
-  }
-
-  return out
-    /* The preposition that introduced the address goes with it: dropping the
-       address alone left "invia un'email a dall'indirizzo registrato". */
-    .replace(new RegExp('(?:\\b(?:ad?|all’|all\')\\s+)?' + EMAIL.source, 'gi'), '')
-    // Tidy what the removal left behind: a trailing preposition, doubled
-    // separators, space before punctuation.
-    .replace(/\s+\ba\b\s*(?=[.,;:]|$)/gi, '')
-    .replace(/·\s*·/g, '·')
-    .replace(/\s+([.,;:])/g, '$1')
-    .replace(/^\s*·\s*|\s*·\s*$/g, '');
-}
-
-const toPlain = (s: string) =>
-  stripEmails(s)
-    // Markdown link → its text; bold/italic markers dropped.
-    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
-    .replace(/[*_`]+/g, '')
-    .replace(/<[^>]+>/g, '')
-    // Leading pictogram on the facts strip — the rest of the site has none.
-    .replace(/^[\p{Extended_Pictographic}️\s]+/u, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-/** Trim to a whole sentence rather than mid-word. */
-function clamp(s: string, max: number) {
-  if (s.length <= max) return s;
-  const cut = s.slice(0, max);
-  const stop = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('? '), cut.lastIndexOf('! '));
-  return stop > max * 0.5 ? cut.slice(0, stop + 1) : cut.replace(/\s+\S*$/, '') + '…';
-}
+   `toPlain` e `clamp` — e lo spoglio degli indirizzi email, che questa sezione
+   non mostra mai — stanno in `data/testo.ts`, perché li usa anche `/kb.json`
+   per servire le stesse schede all'assistente. */
 
 function extract(body: string) {
   const hero = body.match(/<div class="ci-hero">([\s\S]*?)<\/div>/);
@@ -251,6 +205,14 @@ const SUGGESTIONS: Record<string, string[]> = {
       dal regolamento. Se non ti basta, ti mettiamo in contatto con il nostro team.
     </p>
 
+    {/* La via lunga, accanto a quella corta: il box qui sotto cerca fra le
+        schede, l'assistente parla. Sono due mestieri diversi e stanno bene
+        vicini — chi sa già cosa cerca usa la ricerca, chi non lo sa chiede. */}
+    <button type="button" class="hd__assistente" data-cta="assistente">
+      Parla con l'assistente
+      <span class="hd__assistente-nota">Ti aiuta a trovare la risposta giusta</span>
+    </button>
+
     {/* Ask-a-question box, in two steps: the activity, then the question.
         Matching runs in the browser against an index built at compile time — no
         request, no back end, and it works offline once the page is loaded. */}
@@ -365,6 +327,7 @@ const SUGGESTIONS: Record<string, string[]> = {
     </div>
 
     <SupportForm />
+    <ChatModal />
   </div>
 </section>
 
@@ -1254,6 +1217,39 @@ window.__ATHLON_ACTIVITIES__ = ${JSON.stringify(ACTIVITY_TAGS)};`}
 
   .ask__clear:hover {
     background: var(--color-primary);
+  }
+
+  /* Il comando che apre l'assistente: pieno, perché è la via principale per
+     chi non sa cosa cercare. In rem, così cresce sul totem come il resto. */
+  .hd__assistente {
+    margin: 0 0 1.5rem;
+    min-height: 3.25rem;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.15rem;
+    padding: 0.7rem 1.4rem;
+    border: none;
+    border-radius: 0.75rem;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: opacity var(--dur-fast) ease;
+  }
+
+  .hd__assistente:hover {
+    opacity: 0.9;
+  }
+
+  .hd__assistente-nota {
+    font-weight: 400;
+    font-size: var(--text-2xs);
+    opacity: 0.85;
   }
 
   .ask__hint {

@@ -1,517 +1,517 @@
 [
- {
-  "numero": "1",
-  "titolo": "Sottoscrizione del contratto di abbonamento",
-  "clausole": [
-   {
-    "id": "1.1",
-    "titolo": "Validità e decorrenza delle presenti Condizioni Generali",
-    "testo": "Le presenti Condizioni Generali di Contratto (“Condizioni Generali”), salvo accordi specifici riferiti a singoli casi, disciplinano i rapporti tra Point 2000 Srl Società Sportiva Dilettantistica Unipersonale (“Point 2000”) e ogni persona che, a qualsiasi titolo, acquisti o usufruisca dei servizi offerti dal Club (“Utente”), ivi inclusi gli Abbonati, i Tesserati, gli Utenti occasionali e coloro che accedono a corsi, lezioni singole o pacchetti. Le Condizioni Generali costituiscono parte integrante di ogni contratto, domanda di abbonamento o acquisto di singoli servizi. Fanno inoltre parte del presente contratto il Regolamento Interno e la cartellonistica esposta nei locali del Club o comunicata tramite canali ufficiali. Con la sottoscrizione di un abbonamento o con l'acquisto anche occasionale di servizi, l’Utente accetta integralmente le presenti Condizioni Generali e si impegna a rispettare tutte le prescrizioni regolamentari. I diritti derivanti dai servizi acquistati sono strettamente personali e non cedibili a terzi"
-   },
-   {
-    "id": "1.2",
-    "titolo": "Tesseramento e assicurazione",
-    "testo": "La nostra Società Sportiva Dilettantistica è affiliata ASI e svolge attività didattica e competitiva con tale ente di promozione sportiva. Per accedere ai nostri Corsi sportivi come Abbonato è necessario essere in possesso del Tesserino Asi come Atleta. All’atto dell'iscrizione ne verrà da noi verificato il possesso (sul Database ASI) ed in caso non sia già presente, verrà immediatamente effettuato un nuovo tesseramento ad ASI di Tipo “B”. Con il tesseramento è comprensa la polizza infortunistica personale (http://www.asinazionale.it/servizi/polizze-assicurative)"
-   },
-   {
-    "id": "1.3",
-    "titolo": "Contratto di abbonamento. Diritto di recesso (ripensamento)",
-    "testo": "Il Contratto di Abbonamento si perfeziona nel momento in cui l’utente sottoscrive On Line (cliccando su “Acquista Abbonamento” e accettando i Termini e Condizioni). L’utente può recedere dal Contratto di Abbonamento, senza obbligo di motivazione, inviando comunicazione scritta entro il termine di 14 (quattordici) giorni decorrenti dalla data di sottoscrizione del Contratto di Abbonamento (il termine per il recesso sarà rispettato con la ricevuta di invio di PEC entro il quattordicesimo giorno). L’eventuale recesso dell’utente dovrà essere inviato, a mezzo PEC, all’indirizzo point2000srl@pec.it, avendo cura di segnalare in oggetto il numero utente, il nome dell’abbonamento e la data di sottoscrizione. In caso di recesso da parte dell’utente non verranno rimborsate le quote dell’abbonamento delle quali l’utente abbia usufruito (o avrebbe potuto usufruire) sino all’esercizio del recesso ed €10 a titolo di costi amministrativi. Eguale diritto competerà a Point 2000, che vi provvederà mediante l’invio di raccomandata A.R. all’indirizzo comunicato dall’utente al momento della sottoscrizione del Contratto di Abbonamento, da consegnarsi al servizio postale entro il termine di 14 (quattordici) giorni dalla data della suddetta sottoscrizione"
-   },
-   {
-    "id": "1.4",
-    "titolo": "Badge di accesso",
-    "testo": "Per accedere al club, sia in caso di abbonamento che di acquisto di singole lezioni sarà necessario acquistare il Badge di Accesso fisico (che verrà consegnato al primo accesso) o scaricare quello virtuale sul proprio smartphone. Il Badge è strettamente personale e non utilizzabile da altri soggetti al di fuori del suo intestatario"
-   },
-   {
-    "id": "1.5",
-    "titolo": "Minori di età",
-    "testo": "I minori di anni 18 (diciotto) potranno accedere al portale web o app solo attraverso il collegamento dell’account di un tutore legale ovvero del soggetto esercente la potestà genitoriale. Il genitore titolare dell’account associato sarà l’unico interlocutore autorizzato ad agire in nome e per conto del minore"
-   },
-   {
-    "id": "1.6",
-    "titolo": "Chiusure Eventuali",
-    "testo": "nelle ipotesi di chiusura del Club a causa di ristrutturazione o a seguito di misure sanitarie imposte o altri impedimenti per periodi superiori a 14 giorni consecutivi, sarà garantito all’iscritto la possibilità di sospendere l’abbonamento; il recupero del periodo di sospensione delle attività potrà avvenire, a discrezione di Point 2000, a mezzo emissione di voucher del relativo importo o traslazione della scadenza dell’abbonamento"
-   },
-   {
-    "id": "1.7",
-    "titolo": "Modifiche alle Condizioni e ai Corrispettivi",
-    "testo": "Point 2000 si riserva la facoltà di modificare, in qualsiasi momento, le presenti Condizioni Generali di Contratto, nonché i costi dei servizi e degli abbonamenti, per sopravvenute esigenze organizzative, tecnico-operative o economiche. Tali modifiche non avranno effetto retroattivo e si applicheranno esclusivamente a partire dal successivo ciclo di rinnovo contrattuale (mensile o annuale), con riferimento alla data di decorrenza prevista per l’addebito. Le modifiche saranno comunicate all’Utente con un preavviso minimo di 30 (trenta) giorni rispetto alla data di rinnovo dell’abbonamento, mediante pubblicazione nell’area riservata personale o invio di e-mail all’indirizzo associato all’account. Nel caso in cui l’Utente non intenda accettare le nuove condizioni economiche, potrà esercitare il diritto di disdetta entro 10 (dieci) giorni dalla data di decorrenza del nuovo ciclo contrattuale, con efficacia alla scadenza del ciclo precedente. In assenza di disdetta entro i termini, le modifiche si intenderanno accettate e troveranno automatica applicazione sul nuovo periodo contrattuale. Le modifiche di tipo editoriale, tecnico o non sostanziale (es. aggiornamenti formali, rinumerazione, miglioramento dell’accessibilità del testo) non daranno diritto al recesso gratuito, né comporteranno obblighi di preavviso"
-   },
-   {
-    "id": "1.8",
-    "titolo": "Subentro di altra società nella gestione del Club",
-    "testo": "Point 2000 si riserva la facoltà di trasferire a terzi la gestione operativa del Club e/o la titolarità dei contratti in essere, ivi inclusi i contratti di abbonamento attivi, i rapporti di tesseramento, i metodi di pagamento salvati e gli obblighi connessi. In tal caso, l’Utente sarà informato con un preavviso minimo di 30 (trenta) giorni a mezzo e-mail o mediante comunicazione visibile nella propria area riservata. Qualora non intenda accettare il subentro del nuovo gestore, l’Utente avrà facoltà di recedere dal contratto senza penali né costi aggiuntivi, con effetto dalla data di decorrenza della nuova gestione, mediante invio di comunicazione scritta all’indirizzo disdetta@athlonroma.it. In assenza di recesso esercitato nei termini, il subentro sarà considerato accettato e i rapporti contrattuali, inclusi i mandati di pagamento ricorrenti, continueranno automaticamente in capo al nuovo gestore"
-   }
-  ]
- },
- {
-  "numero": "2",
-  "titolo": "Obblighi dell’utente",
-  "clausole": [
-   {
-    "id": "2.1.1",
-    "titolo": "Pagamento del corrispettivo ed effetti dell’inadempimento",
-    "testo": "L’UTENTE, con la sottoscrizione del Contratto di Abbonamento, si impegna al pagamento degli importi concordati con Point 2000 entro e non oltre le scadenze convenute. Per il caso in cui sia stato previsto un pagamento ricorrente dell’abbonamento mediante sistemi automatici di addebito delle rate o del costo dell’abbonamento periodico (prelievo da carta di credito o RID bancario), l’utente si impegna a garantire il buon esito di ciascun addebito. In particolare, sarà cura dell’utente: a) nel caso della carta di credito, controllare che essa non sia scaduta e altresì disponga di fondi sufficienti e di un limite di credito idoneo; b) nel caso del RID bancario, mantenere il conto corrente attivo e capiente. L’utente accetta che il ritardo nei pagamenti sarà sempre considerato una sua responsabilità e lo obbligherà alla rifusione senza ritardo, in favore di Point 2000, di tutti i costi e gli esborsi connessi al mancato o tardivo incasso della rata e alle attività di eventuale recupero coattivo della stessa, oltre agli interessi moratori, salvi i soli comprovati casi di forza maggiore; ciò, per specifica pattuizione tra le Parti, affinché tenga indenne la Società dalle conseguenze dell’inadempimento"
-   },
-   {
-    "id": "2.1.2",
-    "titolo": "Effetti del Ritardo nei Pagamenti",
-    "testo": "L’utente accetta inoltre che il ritardo nei pagamenti determinerà: - Dal primo giorno di ritardo, l’immediata sospensione dei servizi erogati da Point 2000 presso il centro sportivo fin quando la morosità non venga sanata, ai sensi e per gli effetti dell’art. 1460 del Codice civile. La Società invierà una comunicazione contenente la descrizione della ragione del mancato saldo con l’invito a provvedere (di seguito anche solo “Comunicazione”); - Decorsi 15 giorni di ritardo dal giorno previsto per l’addebito, l’addebito automatico all’utente di una penale di 10,00 (dieci/00) euro per il ritardo che andrà ad aggiungersi all’importo della rata insoluta; - Dal giorno 16 del mese in avanti, l’invio di un sollecito ultimativo al saldo spontaneo della morosità entro e non oltre il termine di 15 giorni dal suo ricevimento, con l’avvertenza che, a fronte del persistere della morosità, avranno luogo la risoluzione di diritto del Contratto di Abbonamento in danno dell’utente, ai sensi dell’articolo 1456 del codice civile, senza necessità di ulteriori avvisi o comunicazioni e l’avvio delle azioni giudiziali necessarie al recupero del credito, anche in tal caso senza necessità di ulteriori solleciti e avvertenze, con l’ulteriore aggravio di costi per lo stesso utente descritti al punto 2.1.1., ultimo capoverso"
-   },
-   {
-    "id": "2.1.3",
-    "titolo": "Uso del Badge fisico di Accesso",
-    "testo": "Conseguenze per il caso di smarrimento. Riguardo all’uso, alla conservazione e alla custodia del Badge, l’utente è tenuto a osservare la massima diligenza. In caso di smarrimento del Badge, l’utente sarà tenuto a darne immediata comunicazione scritta alla reception via e-mail a desk@athlonroma.it. Alla ricezione della comunicazione di smarrimento, la funzione propria del Badge smarrito verrà disattivata e solo a partire da tale momento l’utente non sarà più soggetto al rischio di eventuale uso fraudolento del Badge fisico da parte di terzi e potrà richiedere il rilascio del duplicato previo il pagamento di €5,00"
-   },
-   {
-    "id": "2.2",
-    "titolo": "Indicazione indirizzo e-mail e modifica dati utente",
-    "testo": ""
-   },
-   {
-    "id": "2.2.1",
-    "titolo": "Obbligo di un indirizzo e-mail valido",
-    "testo": "L’utente, al momento della sottoscrizione del Contratto di Abbonamento, ha l’obbligo di fornire a Point 2000 un indirizzo E-mail valido e attivo attraverso il quale possano avvenire le comunicazioni da parte di Point 2000 stessa e che possa essere associato all’account univoco per l’accesso all’area riservata personale dell’utente. L’utente si dichiara espressamente concorde a ricevere comunicazioni legalmente rilevanti da parte di Point 2000 (ad es. solleciti, modifiche alle Condizioni Generali di Contratto, etc.) a mezzo E-mail"
-   },
-   {
-    "id": "2.2.2",
-    "titolo": "Comunicazione delle variazioni dei dati",
-    "testo": "L’utente ha l’obbligo di comunicare a Point 2000, senza ritardo, ogni intervenuta modifica dei riferimenti personali precedentemente resi ai fini del Contratto di Abbonamento (quali, ad esempio: nome, cognome, indirizzo, telefono, indirizzo E-mail) tramite area riservata sul sito internet. I dati bancari potranno essere modificati tramite la sottoscrizione di un nuovo mandato SEPA online. L’utente accetta che il ritardo nella comunicazione di tali modifiche sarà sempre considerato una sua responsabilità e determinerà l’addebito di tutti i costi e/o gli esborsi connessi all’anzidetta tardiva trasmissione, oltre agli interessi moratori. Sono salvi i soli comprovati casi di forza maggiore"
-   },
-   {
-    "id": "2.3",
-    "titolo": "Divieto di Cessione del Contratto di Abbonamento e del Badge",
-    "testo": "Penale e danno ulteriore. I diritti dell’utente derivanti dal Contratto di Abbonamento, nonché dal Badge, devono intendersi strettamente personali e non cedibili a terzi. L’utente è pertanto obbligato a utilizzare il Badge solo personalmente e a non trasferirlo o cederlo a terzi (inclusi altri Abbonati) nemmeno temporaneamente. Point 2000 si riserva il diritto di verificare l’identità dell’utente in Palestra chiedendo l’esibizione di un documento d’identità. Per l’ipotesi di violazione della presente disposizione, ferme le eventuali responsabilità conseguenti alla commissione di illeciti penalmente rilevanti, l’utente sarà tenuto a corrispondere a titolo di penale a Point 2000 la somma di €100,00, salvo il diritto di Point 2000 al risarcimento del danno ulteriore"
-   },
-   {
-    "id": "2.4",
-    "titolo": "Attività e Prodotti Vietati",
-    "testo": "Sanzione. Penale e danno ulteriore. Nel Club è vietato fumare, introdurre armi, introdurre e/o consumare bevande alcoliche nonché fare uso di stupefacenti e di sostanze farmacologiche al di fuori di prescrizione medica. È altresì vietato introdurre o portare con sé all’interno del Club eventuali sostanze che incrementano le prestazioni fisiche dell’utente (per es. le c.d. sostanze anabolizzanti). Parimenti è vietato offrire, mettere a disposizione, cedere e trasferire a terzi nonché acquisire e acquistare da altri Abbonati o terzi – dietro compenso o a titolo gratuito – tali sostanze. L’inosservanza di tali disposizioni da parte dell’utente, ferme anche in tal caso le eventuali responsabilità conseguenti alla commissione di illeciti penalmente rilevanti, determinerà la risoluzione del Contratto di Abbonamento in base all’art. 1456 cod. civ. e darà diritto a Point 2000 di pretendere da ciascun utente coinvolto, in caso di violazione del divieto di fumare, una sanzione amministrativa da € 27,50 a € 275,00 (la misura della sanzione è raddoppiata qualora la violazione sia commessa in presenza di una donna in evidente stato di gravidanza o in presenza di lattanti o bambini fino a dodici anni) ai sensi dell’art. 51 L. 16.01.2003, n. 3 e successive modifiche ed integrazioni, e, negli altri casi, a titolo di penale una somma di €100,00, salvo il diritto di Point 2000 al risarcimento del danno ulteriore"
-   },
-   {
-    "id": "2.5",
-    "titolo": "Divieto di offerta di servizi di Personal Trainer",
-    "testo": "Penale e facoltà di risoluzione È vietata, all’interno del Club, l’offerta, a titolo oneroso o gratuito, di servizi di personal trainer, coaching, lezioni o consulenze individuali non autorizzate, da parte di un utente nei confronti di altro/i utente/i. La violazione del presente divieto comporterà, a discrezione della Direzione: l’immediata sospensione dell’accesso al Club; la risoluzione del contratto ai sensi dell’art. 1456 c.c.; il pagamento, da parte dell’utente responsabile, di una penale pari a €150,00, salvo il diritto di Point 2000 al risarcimento di ogni eventuale danno ulteriore"
-   },
-   {
-    "id": "2.6",
-    "titolo": "Utilizzo degli armadietti",
-    "testo": "Gli armadietti dotati di chiusura, messi a disposizione da Point 2000, possono essere utilizzati dall’utente esclusivamente durante la propria permanenza all’interno del Club. È fatto espresso divieto di lasciare effetti personali negli armadietti al di fuori dell’orario di permanenza presso il Club; per tale motivo, Point 2000 si riserva il diritto di aprire gli armadietti che risultino occupati oltre il tempo consentito. Gli utenti sono tenuti a utilizzare correttamente gli armadietti e a chiuderli con l’apposito sistema di sicurezza. È fortemente sconsigliato introdurre nel Club oggetti di valore, somme di denaro elevate o dispositivi elettronici particolarmente costosi. Point 2000 non è in alcun modo responsabile per eventuali furti, danni e/o smarrimenti di beni personali, sia all’interno del Club che degli armadietti, salvo che tali eventi siano direttamente imputabili a dolo o colpa grave della Società, e comunque nei soli limiti previsti dalla legge"
-   },
-   {
-    "id": "2.7",
-    "titolo": "Condizioni fisiche utente",
-    "testo": "L’Utente dichiara, sotto la propria responsabilità, di trovarsi in stato di buona salute e di essere fisicamente idoneo alla pratica dell’attività sportiva; di non essere mai stato ritenuto non idoneo nel corso di precedenti visite mediche; di non aver subito eventi invalidanti che possano compromettere la sicurezza o la propria incolumità nello svolgimento di attività sportiva presso il Club. L’Utente si impegna, in tal senso, a produrre all’atto dell’iscrizione il Certificato Medico di Idoneità all’Attività Sportiva NON AGONISTICA (o Agonistica, nei casi esplicitamente richiesti). In caso di mancata consegna del certificato, Point 2000 si riserva il diritto di sospendere l’accesso dell’Utente a tutte le attività, senza che ciò comporti alcun diritto al rimborso delle quote versate o al risarcimento di eventuali danni. Nessuna responsabilità potrà essere imputata a Point 2000 per conseguenze fisiche o patrimoniali derivanti dalla partecipazione alle attività sportive all’interno del Club. In caso di sopravvenuta inidoneità fisica, l’Utente ha l’obbligo di sospendere immediatamente ogni attività e di astenersi dall’utilizzo dei servizi, rimanendo personalmente responsabile di ogni conseguenza connessa alla violazione di tale obbligo"
-   },
-   {
-    "id": "2.8",
-    "titolo": "Norme di comportamento",
-    "testo": "La Direzione del Club, tramite il personale incaricato, ha facoltà di rifiutare l’ingresso o di espellere, anche in via definitiva, l’utente che, con parole, atti o comportamenti, arrechi disturbo, offesa o disagio ad altri utenti, agli operatori o al normale svolgimento delle attività del Club. In particolare, saranno oggetto di provvedimenti immediati: schiamazzi, giochi pericolosi, comportamenti aggressivi o minacciosi, linguaggio volgare o offensivo, atti contrari alla morale o alla convivenza civile, nonché rimostranze o contestazioni che superino i limiti della buona educazione. La Direzione si riserva inoltre il diritto di rifiutare l’ingresso o di allontanare chiunque arrechi danni alla struttura, agli arredi o agli impianti. In tali casi, l’utente responsabile sarà obbligato al risarcimento integrale dei danni arrecati, materiali e/o patrimoniali, ivi comprese le eventuali spese di ripristino, sospensione delle attività o sostituzione di beni danneggiati. La Direzione potrà altresì disporre la sospensione o la risoluzione del contratto ai sensi dell’art. 1456 c.c"
-   },
-   {
-    "id": "2.9",
-    "titolo": "Infortuni",
-    "testo": "In caso di infortunio l’utente è tenuto ad informare immediatamente la direzione inviando un’email a desk@athlonroma.it ed, in caso l’utente sia tesserato, a seguire la procedura prevista dall’ente di promozione sportiva o federazione per l’apertura del sinistro. La Società è esentata da ogni responsabilità in merito ad infortuni o lesioni che si verifichino nel corso delle attività o all’interno del Centro per utilizzi impropri o non conformi delle attrezzature e/o rischi connaturati alle specifiche attività svolte o per uso non compatibile con lo stato fisico dell’utente, salvo l’eventuale risarcimento previsto da parte della società assicuratrice"
-   }
-  ]
- },
- {
-  "numero": "3",
-  "titolo": "Pagamento",
-  "clausole": [
-   {
-    "id": "3.1",
-    "titolo": "Definizioni",
-    "testo": ""
-   },
-   {
-    "id": "3.1.1",
-    "titolo": "Quota di Attivazione",
-    "testo": "quota relativa ai diritti di segreteria richiesta all’inizio di ogni nuovo abbonamento. In caso di cancellazione dell’abbonamento e successiva nuova adesione la quota verrà nuovamente chiesta per intero"
-   },
-   {
-    "id": "3.1.2",
-    "titolo": "Quota di Abbonamento",
-    "testo": "quota relativa al periodo di corso/i e attività prescelto/i"
-   },
-   {
-    "id": "3.1.3",
-    "titolo": "Pro-rata",
-    "testo": "(per gli abbonamenti mensili) qualora la data di inizio del contratto non coincidesse con il primo giorno del mese verrà calcolato il pro rata: la quota di abbonamento relativa al periodo dalla data di partenza dell’abbonamento alla fine del mese"
-   },
-   {
-    "id": "3.1.4",
-    "titolo": "Lezione",
-    "testo": "quota relativa all’accesso ad una singola lezione"
-   },
-   {
-    "id": "3.1.5",
-    "titolo": "Durata Minima Contrattuale",
-    "testo": "è il periodo di impegno minimo contrattuale. Durante tale periodo il pagamento delle quote previste deve essere sempre garantito. Qualora durante tale periodo fossero inserite delle sospensioni, le stesse andranno a traslare la scadenza del periodo minimo contrattuale. Nel caso in cui la data di inizio dell’abbonamento non fosse il giorno 1 del mese, la durata minima contrattuale sarà data dalla porzione di mese intercorrente fra la data di iscrizione e la fine del mese (pro rata) + il valore indicato nel contratto"
-   },
-   {
-    "id": "3.2",
-    "titolo": "Modalità ed utilizzo dei mezzi di Pagamento",
-    "testo": "le modalità di pagamento previste sono esclusivamente l’Addebito su Carta di Credito o su Conto Corrente. I dati dello strumento di pagamento scelto verranno salvati e gestiti in sicurezza dai nostri partner: Adyen (https://www.adyen.com/it_IT/) e GoCardless (https://gocardless.com/), e verranno utilizzati per l’elaborazione dei pagamenti ricorrenti"
-   }
-  ]
- },
- {
-  "numero": "4",
-  "titolo": "Scuola Nuoto Bambini",
-  "clausole": [
-   {
-    "id": "4.1",
-    "titolo": "Certificato Medico",
-    "testo": "Prima dell’inizio dell’attività è obbligatorio inviare in allegato via e-mail copia del Certificato Medico di idoneità all’attività sportiva non agonistica. Sono esentati i soli bambini fino ai 5 anni di età. Nel caso in cui questo non avvenga, verrà tenuto sospeso il Badge personale fino a quando l’Iscritto non invierà il Certificato Medico dovuto"
-   },
-   {
-    "id": "4.2",
-    "titolo": "Tesseramento",
-    "testo": "La nostra Società Sportiva Dilettantistica è affiliata ad ASI (Associazioni Sportive e Sociali Italiane) e svolge attività didattica e competitiva nell’ambito di tale ente di promozione sportiva. Per accedere ai nostri Corsi Sportivi in qualità di utente è obbligatorio essere in possesso del Tesserino ASI come Atleta. Al momento dell’iscrizione, verificheremo il possesso del tesseramento sul database ASI. In caso non risulti attivo, provvederemo automaticamente all’emissione di un nuovo tesseramento ASI (Tipologia B), comprensivo di copertura assicurativa per infortuni personali. Qualora l’Utente desiderasse optare per una tipologia di tesseramento diversa, con caratteristiche assicurative differenti, dovrà comunicarlo espressamente via e-mail a desk@athlonroma.it prima dell’attivazione del tesseramento"
-   },
-   {
-    "id": "4.3",
-    "titolo": "Riprese Fotografiche",
-    "testo": "Durante l’anno, in occasione di eventi didattici, sportivi o promozionali, potranno essere effettuate riprese fotografiche o video all’interno del Club. Per ogni evento in cui sia prevista la presenza di un fotografo, la comunicazione ufficiale verrà pubblicata con almeno 10 (dieci) giorni di preavviso sul sito wiki.athlonroma.it, considerata a tutti gli effetti valida e vincolante come notifica. L’avviso specificherà la data dell’evento e le modalità di accesso alle immagini (consultazione, selezione, acquisto). Le immagini saranno scattate in ambienti comuni e in contesti di gruppo, nei limiti di quanto consentito dalla normativa vigente in materia di privacy. Point 2000 non è titolare del trattamento dei dati raccolti in occasione delle riprese fotografiche, le quali sono gestite in piena autonomia dallo studio fotografico incaricato, che agisce in qualità di autonomo titolare del trattamento ai sensi del Regolamento UE 679/2016 (GDPR). I file digitali e i provini verranno conservati dallo studio fotografico per un periodo massimo di 90 (novanta) giorni e successivamente eliminati, salvo diverso accordo diretto tra l’utente e lo studio stesso. In ogni momento, l’utente ripreso potrà esercitare i propri diritti di accesso, opposizione o cancellazione delle immagini esclusivamente nei confronti dello studio fotografico incaricato. Point 2000 declina ogni responsabilità per l’uso delle immagini effettuato dal fotografo in violazione della normativa o degli accordi contrattuali. La partecipazione agli eventi durante i quali sono effettuate riprese comporta consenso tacito salvo opposizione espressa delle condizioni sopra indicate, fermo restando il diritto dell’utente di non partecipare o di opporsi preventivamente con comunicazione scritta"
-   },
-   {
-    "id": "4.4",
-    "titolo": "Il Corso",
-    "testo": "va dal 01 Settembre 2025 al 31 Maggio 2026. La durata delle lezioni è di 40’ in Vasca Media e di 50’ in Vasca Grande. La strutturazione dei corsi è riferita alle diverse età e livelli didattici degli allievi. I brevetti prendono varie denominazioni e gli obiettivi ed i livelli sono uniformati alle direttive federali. La suddivisione degli allievi si basa su criteri di omogeneità per quanto concerne l’età e il livello tecnico. La Direzione Tecnica si riserva il diritto di cambiare l’insegnante assegnato a seconda delle diverse esigenze didattiche"
-   },
-   {
-    "id": "4.5",
-    "titolo": "Accesso al Corso",
-    "testo": "L’accesso agli spogliatoi è consentito esclusivamente a partire da 10 minuti prima dell’orario di inizio della lezione. È severamente vietato l’ingresso agli spogliatoi agli accompagnatori di bambini di età superiore a 8 anni. Per i bambini fino agli 8 anni compiuti è ammesso l’ingresso di un solo accompagnatore, il quale sarà responsabile della sorveglianza e della cura del minore per tutta la durata della permanenza nel centro sportivo. L’accompagnatore ha l’obbligo di accompagnare personalmente il minore fino all’ingresso dello spogliatoio dedicato. Eventuali danni arrecati a strutture, attrezzature o beni del Club – anche nel corso di attività svolte con il supporto di istruttori – saranno addebitati a chi ne è responsabile, inclusi gli accompagnatori"
-   },
-   {
-    "id": "4.6",
-    "titolo": "Direzione Tecnica",
-    "testo": "per informazioni, chiarimenti tecnici e cambi di turno il Direttore Tecnico riceve previo appuntamento Telefonico"
-   },
-   {
-    "id": "4.7",
-    "titolo": "Recuperi",
-    "testo": "È concessa la possibilità di recuperare le lezioni perse, a condizione che l’assenza venga comunicata in anticipo mediante cancellazione della prenotazione, da effettuare esclusivamente attraverso il proprio account personale via web o app. Questa è l’unica modalità prevista per la registrazione dell’assenza e l’abilitazione al recupero. I recuperi potranno essere effettuati solo con abbonamento attivo, in regola con i pagamenti, e dovranno essere utilizzati entro la fine del corso al quale si riferiscono"
-   },
-   {
-    "id": "4.8",
-    "titolo": "Brevetto",
-    "testo": "La prova di brevetto è gratuita e si svolge l’ultimo mese di corso. Durante l'anno potranno essere effettuate una o più verifiche intermedie al fine di uniformare la didattica nei gruppi e valutare i progressi effettuati"
-   },
-   {
-    "id": "4.9",
-    "titolo": "Gare",
-    "testo": "durante la stagione sarà possibile partecipare a Gare di Nuoto del circuito ASI, presso il nostro impianto sportivo o altri nel comune di Roma. La partecipazione alle Gare è facoltativa e a pagamento"
-   },
-   {
-    "id": "4.10",
-    "titolo": "Inabilità Temporanea alla Pratica Sportiva",
-    "testo": "in caso di malattia o infortunio che comporti una documentata inidoneità alla pratica sportiva per un periodo continuativo di almeno 60 (sessanta) giorni, è possibile richiedere la sospensione del corso. La richiesta dovrà essere effettuata inviando via e-mail a desk@athlonroma.it un certificato medico rilasciato da struttura sanitaria pubblica o privata, attestante chiaramente l’inidoneità temporanea e la relativa durata. La sospensione potrà essere concessa esclusivamente a partire dalla data di ricezione della documentazione e comporterà l’inibizione dell’accesso al centro per tutta la durata indicata nel certificato. La richiesta di sospensione è alternativa al recupero delle lezioni: scegliendo questa modalità, non sarà possibile recuperare le lezioni perse tramite il meccanismo previsto al punto 4.7. Durante il periodo di sospensione, il pagamento delle quote mensili rimarrà comunque dovuto. Il recupero avverrà mediante la generazione di un credito pari ad almeno 2 mensilità regolarmente pagate, utilizzabile esclusivamente dall’intestatario entro e non oltre 6 (sei) mesi dalla fine del corso. Il credito non è trasferibile né cedibile a terzi"
-   },
-   {
-    "id": "4.11",
-    "titolo": "Modalità di Adesione Mensile con Rinnovo Automatico",
-    "testo": "Piano di pagamento mensile, con rinnovo ogni giorno 1 del mese. E’ possibile disdire il pagamento e cancellare l'abbonamento, inviando un'email a disdetta@athlonroma.it entro 10 giorni dal successivo ciclo di pagamento. In caso di disdetta e successiva iscrizione, si sarà tenuti al pagamento di una nuova quota di attivazione. NB 10 giorni equivalgono a 240 ore prima della mezzanotte del 1 giorno del mese. ● Mese con 31 Giorni la disdetta va effettuata entro la mezzanotte del 21 ● Mese con 30 Giorni la disdetta va effettuata entro la mezzanotte del 20 ● Mese con 28 Giorni la disdetta va effettuata entro la mezzanotte del 18"
-   }
-  ]
- },
- {
-  "numero": "6",
-  "titolo": "Settore agonistico, preagonistico e pallanuoto",
-  "clausole": [
-   {
-    "id": "6.1",
-    "titolo": "Durata del Corso",
-    "testo": "dal 01/09/2025 al 31/05/2026"
-   },
-   {
-    "id": "6.2",
-    "titolo": "Certificato Medico",
-    "testo": "prima dell’inizio dell’attività è obbligatorio consegnare all’Allenatore copia originale del Certificato Medico di Idoneità all’Attività Sportiva AGONISTICA/NON AGONISTICA (fare riferimento all’allenatore per la tipologia richiesta)"
-   },
-   {
-    "id": "6.3",
-    "titolo": "Assicurazione e Tesseramento",
-    "testo": "tutti gli atleti saranno tesserati ad ASI (o altro EPS relativo all’attività competitiva scelta), con la quale è già compresa una polizza infortunistica come disposto dall’art.51 della legge 27-12-2002 n°289 e dal comma 205 dell’art.4 della legge 24-12-2003 n°350. Tale costo è compreso nella quota versata"
-   },
-   {
-    "id": "6.4",
-    "titolo": "Gare",
-    "testo": "sono comprese nella quota tutte le gare svolte con il nostro Ente di Promozione Sportiva ASI (sono esclusi gli eventuali Meeting) e il campionato per la Pallanuoto"
-   },
-   {
-    "id": "6.5",
-    "titolo": "Materiale Tecnico",
-    "testo": "è OBBLIGATORIO indossare il Kit Ufficiale della squadra. Il kit può essere acquistato a parte nella propria area riservata"
-   },
-   {
-    "id": "6.6",
-    "titolo": "Frequenza",
-    "testo": "gli orari e la sede degli allenamenti sono stabiliti nel foglio del programma delle attività agonistiche/pre agonistiche, ogni variazione rimane a discrezione del Responsabile Tecnico"
-   },
-   {
-    "id": "6.7",
-    "titolo": "Inabilità Temporanea alla Pratica Sportiva",
-    "testo": "in caso di malattia o infortunio che comporti una documentata inidoneità alla pratica sportiva per un periodo continuativo di almeno 60 (sessanta) giorni, è possibile richiedere la sospensione del corso. La richiesta dovrà essere effettuata inviando via e-mail a desk@athlonroma.it un certificato medico rilasciato da struttura sanitaria pubblica o privata, attestante chiaramente l’inidoneità temporanea e la relativa durata. La sospensione potrà essere concessa esclusivamente a partire dalla data di ricezione della documentazione e comporterà l’inibizione dell’accesso al centro per tutta la durata indicata nel certificato. Durante il periodo di sospensione, il pagamento delle quote mensili rimarrà comunque dovuto. Il recupero avverrà mediante la generazione di un credito pari ad almeno 2 mensilità regolarmente pagate, utilizzabile esclusivamente dall’intestatario entro e non oltre 6 (sei) mesi dalla fine del corso. Il credito non è trasferibile né cedibile a terzi"
-   },
-   {
-    "id": "6.8",
-    "titolo": "Modalità di Adesione Mensile con Rinnovo Automatico",
-    "testo": "Piano di pagamento mensile, con rinnovo ogni giorno 1 del mese. E’ possibile disdire il pagamento e cancellare l'abbonamento, inviando un'email a disdetta@athlonroma.it entro 10 giorni dal successivo ciclo di pagamento. In caso di disdetta e successiva iscrizione si sarà nuovamente tenuti al pagamento di una nuova quota di attivazione. NB 10 giorni equivalgono a 240 ore prima della mezzanotte del 1 giorno del mese. ● Mese con 31 Giorni la disdetta va effettuata entro la mezzanotte del 21 ● Mese con 30 Giorni la disdetta va effettuata entro la mezzanotte del 20 ● Mese con 28 Giorni la disdetta va effettuata entro la mezzanotte del 18"
-   },
-   {
-    "id": "6.9",
-    "titolo": "Recuperi",
-    "testo": "non è ammesso il recupero delle lezioni perse"
-   }
-  ]
- },
- {
-  "numero": "7",
-  "titolo": "Attività adulti (fitness, nuoto libero, scuola nuoto adulti, aqua fitness, group reformer)",
-  "clausole": [
-   {
-    "id": "7.1",
-    "titolo": "Certificato Medico",
-    "testo": "Prima dell’inizio dell’attività è obbligatorio inviare in allegato via e-mail copia del Certificato Medico di idoneità all’attività sportiva non agonistica. In assenza di tale documentazione, il Badge personale verrà sospeso e l’accesso al centro non sarà consentito fino all’invio del Certificato Medico richiesto. Si precisa che l’eventuale sospensione dell’accesso per mancata presentazione del Certificato Medico non dà diritto ad alcun rimborso, proroga, recupero o compensazione economica, in quanto trattasi di obbligo previsto dalla normativa vigente e noto all’Utente al momento dell’iscrizione"
-   },
-   {
-    "id": "7.2",
-    "titolo": "Tesseramento",
-    "testo": "La nostra Società Sportiva Dilettantistica è affiliata ad ASI (Associazioni Sportive e Sociali Italiane) e svolge attività didattica e competitiva nell’ambito di tale ente di promozione sportiva. Per accedere ai nostri Corsi Sportivi in qualità di Abbonato è obbligatorio essere in possesso del Tesserino ASI come Atleta. Al momento dell’iscrizione, verificheremo il possesso del tesseramento sul database ASI. In caso non risulti attivo, provvederemo automaticamente all’emissione di un nuovo tesseramento ASI (Tipologia B), comprensivo di copertura assicurativa per infortuni personali. Qualora l’Utente desiderasse optare per una tipologia di tesseramento diversa, con caratteristiche assicurative differenti, dovrà comunicarlo espressamente via e-mail a desk@athlonroma.it prima dell’attivazione del tesseramento"
-   },
-   {
-    "id": "7.3",
-    "titolo": "Attività Sportive Comprese nell’Abbonamento",
-    "testo": "Abbonamento Club: Corsi Fitness Live, Athlon TV, Gym Floor (pesistica), Aqua Fitness, Nuoto Libero Assistito, Scuola Nuoto Adulti, Nuoto Master, Acqua Gestanti. Abbonamento Fitness: Corsi Fitness Live, Athlon TV. Gym Floor (pesistica). Abbonamento Acqua: Athlon TV, Aqua Fitness, Nuoto Libero Assistito, Scuola Nuoto Adulti, Nuoto Master, Acqua Gestanti. Abbonamento Gym Floor: Gym Floor (pesistica) e Athlon TV. Abbonamento Gold: Corsi Fitness Live, Athlon TV, Gym Floor (pesistica), Aqua Fitness, Nuoto Libero Assistito, Scuola Nuoto Adulti, Nuoto Master, Acqua Gestanti. Abbonamento Silver Acqua: Athlon TV, Aqua Fitness, Nuoto Libero Assistito, Scuola Nuoto Adulti, Nuoto Master, Acqua Gestanti. Abbonamento Silver Fitness: Corsi Fitness Live, Athlon TV. Gym Floor (pesistica). Abbonamento Bronze: Gym Floor, Athlon TV e Nuoto Libero Assistito. Abbonamento Premium: Corsi Fitness Live, Athlon TV, Gym Floor (pesistica), Aqua Fitness, Nuoto Libero Assistito, Scuola Nuoto Adulti, Nuoto Master, Group Reformer. Abbonamento Smart (o Bronze): Gym Floor (Sala Pesi) e Nuoto Libero"
-   },
-   {
-    "id": "7.4",
-    "titolo": "Orari di Accesso",
-    "testo": "l’abbonamento OPEN permette l’accesso a tutte le attività senza limitazioni di orario. L’abbonamento SHORT permette l’accesso alle attività con orario di inizio entro le ore 16:00 dal Lunedì al Venerdì e senza limitazioni il Sabato e la Domenica"
-   },
-   {
-    "id": "7.5",
-    "titolo": "Orari Attività",
-    "testo": "gli orari di apertura e il calendario delle lezioni sono aggiornati con cadenza mensile e sempre visibili sull’APP Athlon Club e sul sito internet www.athlonroma.it/planning. Per il periodo estivo, che va da giugno a settembre, è previsto un planning orario e giorni di attività ridotti. L’abbonamento rimane comunque attivo e valido. La Direzione si riserva la facoltà di modificare i programmi anche senza preavviso, e senza che questo comporti alcun onere nei confronti degli iscritti o alcun rimborso delle quote o parte di esse"
-   },
-   {
-    "id": "7.6",
-    "titolo": "Prenotazioni",
-    "testo": "La prenotazione di corsi, lezioni, servizi o attività similari deve essere effettuata direttamente dall’Utente, esclusivamente tramite il proprio account personale (via browser o APP). In caso di ripetute mancate disdette (pari o superiori a 3 nell’arco di 1 mese), potrà essere temporaneamente sospesa la possibilità di effettuare nuove prenotazioni per un periodo di 4 giorni. Le modalità operative, i termini temporali e le eventuali limitazioni (es. numero massimo di prenotazioni attive, finestra temporale di prenotazione o disdetta, ecc.) sono pubblicate e costantemente aggiornate all’interno della sezione dedicata sul sito web, al seguente link: https://wiki.athlonroma.it/wikiathlon/generali/prenotazioni/ L’Utente è tenuto a prenderne visione e a rispettarne il contenuto in ogni sua parte"
-   },
-   {
-    "id": "7.7",
-    "titolo": "Sospensioni a Pagamento",
-    "testo": "Per tutti gli abbonamenti è possibile richiedere la sospensione dell’abbonamento per periodi di 1 mese solare intero, sempre a partire dal 1° giorno del mese. Le sospensioni sono a pagamento e possono essere acquistate direttamente dall’area riservata dell’Utente, dove saranno visibili gli slot disponibili. La richiesta di sospensione deve essere inserita con almeno 10 giorni di anticipo rispetto al mese che si desidera sospendere, accedendo al portale Athlon e seguendo il percorso: Abbonamenti > Seleziona il tuo Abbonamento > Sospensioni. Le scadenze per la richiesta sono le seguenti: ● Mese di 31 giorni: entro la mezzanotte del 21 ● Mese di 30 giorni: entro la mezzanotte del 20 ● Mese di 28 giorni: entro la mezzanotte del 18 In caso di richiesta correttamente inserita e saldata, la sospensione trasla in avanti sia la scadenza del pagamento successivo che il relativo periodo di validità dell’abbonamento, inclusa la durata contrattuale minima residua.La sospensione trasla la scadenza del successivo pagamento e del relativo periodo la durata minima contrattuale"
-   },
-   {
-    "id": "7.8",
-    "titolo": "Inabilità Fisica Temporanea alla Frequenza dell’Attività Sportiva",
-    "testo": "in caso di grave infortunio o malattia che pregiudichino l’idoneità all’attività sportiva non agonistica è possibile richiedere la sospensione dell’abbonamento. La richiesta dovrà essere corredata da idonea documentazione medica di una struttura sanitaria nazionale (ad es. Ospedale) e dovrà indicare con chiarezza l’inidoneità ed il termine del periodo di non idoneità. E’ possibile il recupero da un minimo di 2 mesi ad un massimo di 6 mesi (no recuperi per periodi inferiori a 2 mesi). Il recupero sarà concesso per mezzo della traslazione della scadenza dell’abbonamento del numero di mesi pari alla sospensione. Per richiedere la sospensione inviare la richiesta con la documentazione allegata a desk@athlonroma.it e attendere la conferma via e-mail (una volta visionata la documentazione verrà eliminata)"
-   },
-   {
-    "id": "7.9",
-    "titolo": "Piani di Pagamento – Rinnovo Automatico",
-    "testo": "L’abbonamento decorre dalla data di partenza indicata in fase di iscrizione e si rinnova automaticamente secondo la formula scelta, salvo disdetta da parte dell’Utente (v. punto 7.10). Tutti gli addebiti avvengono in automatico, con cadenza mensile o annuale, in base al piano selezionato"
-   },
-   {
-    "id": "7.9.1",
-    "titolo": "Mensile Flex",
-    "testo": "È un piano di pagamento mensile con rinnovo automatico: l’addebito avviene ogni 1° giorno del mese e la durata minima è di un mese intero. In caso di attivazione in corso mese, viene calcolato un pro-rata a cui segue il mese intero"
-   },
-   {
-    "id": "7.9.2",
-    "titolo": "Annuale – Soluzione Unica",
-    "testo": "È un piano annuale a rinnovo automatico con addebito in un’unica soluzione ogni 12 mesi. L’abbonamento si rinnova per altri 12 mesi interi, salvo disdetta entro i termini previsti. La durata minima è di 12 mesi"
-   },
-   {
-    "id": "7.9.3",
-    "titolo": "Mensile – Formula 12",
-    "testo": "È un piano mensile a rinnovo automatico che prevede un impegno minimo di 12 mesi consecutivi (12 mensilità pagate per intero). Anche in questo caso, se l’attivazione non coincide con il primo giorno del mese, si applica un pro-rata iniziale. Al termine del periodo minimo, l’abbonamento continua a rinnovarsi mese per mese, salvo disdetta"
-   },
-   {
-    "id": "7.9.4",
-    "titolo": "Annuale – Rateizzato",
-    "testo": "È un piano annuale con pagamento frazionato su base mensile. Anche qui, in caso di attivazione in corso mese, si applica un pro-rata iniziale. L’impegno minimo è di 12 mesi interi e, al termine, l’abbonamento si rinnova automaticamente per un altro anno intero (12 mesi), salvo disdetta. A differenza della Formula 12, il rinnovo avviene sempre su base annuale"
-   },
-   {
-    "id": "7.10",
-    "titolo": "Modalità di Disdetta",
-    "testo": "La disdetta dell’abbonamento consente di evitare il rinnovo automatico al termine del proprio periodo di validità. Le modalità variano a seconda del piano sottoscritto. Per gli abbonamenti Mensile e Mensile – Formula 12, la disdetta può essere effettuata direttamente dalla propria area riservata, accedendo alla sezione Abbonamenti e selezionando l’opzione Disdici Rinnovo Automatico. Per gli abbonamenti Annuale – Soluzione Unica e Annuale – Rateizzato, è invece necessario inviare un’e-mail all’indirizzo disdetta@athlonroma.it, specificando nome, cognome e codice fiscale, e indicando chiaramente l’intenzione di non rinnovare il contratto. In tutti i casi, la disdetta deve essere effettuata almeno 10 giorni prima del termine del ciclo di pagamento o del periodo di impegno contrattuale previsto. Qualora l’abbonamento sia soggetto a una durata minima, la disdetta avrà effetto dalla prima scadenza utile successiva al termine del periodo di impegno. In caso di disdetta e successiva iscrizione, l’Utente sarà tenuto al versamento di una nuova quota di attivazione, secondo le condizioni contrattuali in vigore al momento della nuova iscrizione. La disdetta non interrompe l’obbligo di pagamento in presenza di un impegno contrattuale minimo ancora in corso"
-   }
-  ]
- },
- {
-  "numero": "8",
-  "titolo": "Baby Nuoto (3-36 mesi)",
-  "clausole": [
-   {
-    "id": "8.1",
-    "titolo": "Tesseramento",
-    "testo": "La nostra Società Sportiva Dilettantistica è affiliata ad ASI (Associazioni Sportive e Sociali Italiane) e svolge attività didattica e competitiva nell’ambito di tale ente di promozione sportiva. Per accedere ai nostri Corsi Sportivi in qualità di Abbonato è obbligatorio essere in possesso del Tesserino ASI come Atleta. Al momento dell’iscrizione, verificheremo il possesso del tesseramento sul database ASI. In caso non risulti attivo, provvederemo automaticamente all’emissione di un nuovo tesseramento ASI (Tipologia B), comprensivo di copertura assicurativa per infortuni personali. Qualora l’Utente desiderasse optare per una tipologia di tesseramento diversa, con caratteristiche assicurative differenti, dovrà comunicarlo espressamente via e-mail a desk@athlonroma.it prima dell’attivazione del tesseramento"
-   },
-   {
-    "id": "8.2",
-    "titolo": "Attività Sportive Comprese nell’Abbonamento",
-    "testo": "con l’abbonamento Baby Nuoto è possibile accedere e partecipare alle attività di Baby Nuoto, previa prenotazione"
-   },
-   {
-    "id": "8.3",
-    "titolo": "Orari Lezioni",
-    "testo": "gli orari delle lezioni sono sempre visibili sull’APP o Portale di prenotazione Athlon. La Direzione si riserva la facoltà di modificare i programmi anche senza preavviso, e senza che questo comporti alcun onere nei confronti degli iscritti o alcun rimborso delle quote o parte di esse"
-   },
-   {
-    "id": "8.4",
-    "titolo": "Prenotazioni",
-    "testo": "lLa prenotazione di corsi, lezioni, servizi o attività similari deve essere effettuata direttamente dall’Utente, esclusivamente tramite il proprio account personale (via browser o APP). In caso di ripetute mancate disdette (pari o superiori a 3 nell’arco di 1 mese), potrà essere temporaneamente sospesa la possibilità di effettuare nuove prenotazioni per un periodo di 4 giorni. Le modalità operative, i termini temporali e le eventuali limitazioni (es. numero massimo di prenotazioni attive, finestra temporale di prenotazione o disdetta, ecc.) sono pubblicate e costantemente aggiornate all’interno della sezione dedicata sul sito web, al seguente link: https://wiki.athlonroma.it/wikiathlon/generali/prenotazioni/ L’Utente è tenuto a prenderne visione e a rispettarne il contenuto in ogni sua parte"
-   },
-   {
-    "id": "8.5",
-    "titolo": "Sospensioni a Pagamento",
-    "testo": "Per tutti gli abbonamenti è possibile richiedere la sospensione dell’abbonamento per periodi di 1 mese solare intero, sempre a partire dal 1° giorno del mese. Le sospensioni sono a pagamento e possono essere acquistate direttamente dall’area riservata dell’Utente, dove saranno visibili gli slot disponibili. La richiesta di sospensione deve essere inserita con almeno 10 giorni di anticipo rispetto al mese che si desidera sospendere, accedendo al portale Athlon e seguendo il percorso: Abbonamenti > Seleziona il tuo Abbonamento > Sospensioni. Le scadenze per la richiesta sono le seguenti: ● Mese di 31 giorni: entro la mezzanotte del 21 ● Mese di 30 giorni: entro la mezzanotte del 20 ● Mese di 28 giorni: entro la mezzanotte del 18"
-   },
-   {
-    "id": "8.6",
-    "titolo": "Inabilità Fisica Temporanea alla Frequenza dell’Attività Sportiva",
-    "testo": "in caso di grave infortunio o malattia che pregiudichino l’idoneità all’attività sportiva non agonistica è possibile richiedere la sospensione dell’abbonamento. La richiesta dovrà essere corredata da idonea documentazione medica di una struttura sanitaria nazionale (ad es. Ospedale) e dovrà indicare con chiarezza l’inidoneità ed il termine del periodo di non idoneità. E’ possibile il recupero da un minimo di 2 mesi ad un massimo di 6 mesi (no recuperi per periodi inferiori a 2 mesi). Il recupero sarà concesso per mezzo della traslazione della scadenza dell’abbonamento del numero di mesi pari alla sospensione. Per richiedere la sospensione inviare la richiesta con la documentazione allegata a desk@athlonroma.it e attendere la conferma via e-mail (una volta visionata la documentazione verrà eliminata)"
-   },
-   {
-    "id": "8.7",
-    "titolo": "Piani di pagamento",
-    "testo": "L’abbonamento decorre dalla data di partenza indicata in fase di iscrizione. Qualora il primo periodo di pagamento non coincidesse con un mese solare pieno, verrà calcolato in automatico l’importo del pro-rata (vedi punto 3.1.3.) e verrà richiesto come primo pagamento. L’importo del ciclo di pagamento scelto verrà addebitato il successivo giorno 1 del mese"
-   },
-   {
-    "id": "8.7.1",
-    "titolo": "Mensile",
-    "testo": "Piano di Pagamento Mensile a rinnovo automatico, l’addebito avviene ogni giorno 1 del mese. La durata dell’abbonamento è di almeno un mese. Nel caso sia presente il pro-rata, la durata minima sarà il pro-rata + 1 mese. L’abbonamento si rinnoverà in modo automatico, mensilmente, salvo disdetta (v. punto 8.8)"
-   },
-   {
-    "id": "8.8",
-    "titolo": "Disdetta",
-    "testo": "per annullare il rinnovo automatico dell’abbonamento è possibile effettuare la disdetta direttamente dalla propria area riservata cliccando su > Abbonamenti > Disdici Rinnovo Automatico. La disdetta può essere effettuata almeno 10 giorni prima del successivo ciclo di pagamento NB 10 giorni equivalgono a 240 ore prima della mezzanotte del 1 giorno del mese. ● Mese con 31 Giorni la disdetta va effettuata entro la mezzanotte del 21 ● Mese con 30 Giorni la disdetta va effettuata entro la mezzanotte del 20 ● Mese con 28 Giorni la disdetta va effettuata entro la mezzanotte del 18 In caso di disdetta e successiva iscrizione si sarà tenuti al pagamento di una nuova quota di attivazione e alle nuove condizioni contrattuali del momento"
-   }
-  ]
- },
- {
-  "numero": "9",
-  "titolo": "Abbonamenti aggiuntivi: lezioni individuali (personal)",
-  "clausole": [
-   {
-    "id": "9.1",
-    "titolo": "Attività Sportive Comprese nell’Abbonamento",
-    "testo": "2 Sedute al Mese: 2 Sedute di Personal Training utilizzabili nel mese solare (dal 1 a fine mese). 4 Sedute al Mese: 4 Sedute di Personal Training utilizzabili nel mese solare (dal 1 a fine mese). 8 Sedute al Mese: 8 Sedute di Personal Training utilizzabili nel mese solare (dal 1 a fine mese). Le sedute vengono caricate in automatico il 1 giorno del mese e possono essere utilizzate entro o non oltre il mese stesso. Nel caso il contratto cominci a mese iniziato, verrà richiesto il pagamento del mese per intero e verranno caricate il numero totale di sedute previste dal pacchetto, che potranno essere consumate entro la fine del mese solare di inizio abbonamento (Es. inizio contratto 20/10, importo del mese richiesto per intero, numero di lezioni caricate per intero, utilizzabili entro il 31/10)"
-   },
-   {
-    "id": "9.2",
-    "titolo": "Piani di pagamento – mensile",
-    "testo": "L’abbonamento decorre dalla data di partenza indicata in fase di iscrizione. Piano di Pagamento Mensile a rinnovo automatico, l’addebito avviene ogni giorno 1 del mese. La durata dell’abbonamento è di almeno un mese. L’abbonamento si rinnoverà in modo automatico, mensilmente, salvo disdetta (v. punto 9.3)"
-   },
-   {
-    "id": "9.3",
-    "titolo": "Disdetta",
-    "testo": "per annullare il rinnovo automatico dell’abbonamento è possibile effettuare la disdetta direttamente dalla propria area riservata cliccando su > Abbonamenti > Disdici Rinnovo Automatico. La disdetta può essere effettuata almeno 10 giorni prima del successivo ciclo di pagamento NB 10 giorni equivalgono a 240 ore prima della mezzanotte del 1 giorno del mese. ● Mese con 31 Giorni la disdetta va effettuata entro la mezzanotte del 21 ● Mese con 30 Giorni la disdetta va effettuata entro la mezzanotte del 20 ● Mese con 28 Giorni la disdetta va effettuata entro la mezzanotte del 18 In caso di disdetta e successiva iscrizione si sarà tenuti al pagamento di una nuova quota di attivazione e alle nuove condizioni contrattuali del momento"
-   },
-   {
-    "id": "9.4",
-    "titolo": "Prenotazioni",
-    "testo": "a seconda del pacchetto scelto sarà possibile prenotare un certo numero di sedute di allenamento individuale nell’arco del mese solare. Le lezioni individuali devono essere prenotate e fruite nel mese di competenza. Non è possibile recuperare le lezioni del mese precedente. Le prenotazioni devono essere effettuate in anticipo attraverso il Portale/APP Athlon, scegliendo tra la disponibilità visibile dell’istruttore. Le lezioni verranno caricate alla mezzanotte del 1 giorno del mese, e da quel momento sarà possibile effettuare la prenotazione"
-   }
-  ]
- },
- {
-  "numero": "10",
-  "titolo": "Lezioni singole e pacchetti",
-  "clausole": [
-   {
-    "id": "10.1",
-    "titolo": "Certificato Medico",
-    "testo": "Per partecipare alle attività sportive, di gruppo o individuali, è obbligatorio per tutti gli utenti di età superiore ai 6 anni inviare via e-mail copia del Certificato Medico di idoneità all’attività sportiva non agonistica. In assenza di tale documentazione, il Badge personale verrà sospeso e l’accesso al Club sarà inibito. La mancata presentazione del certificato non dà diritto ad alcun rimborso o proroga dei prodotti acquistati"
-   },
-   {
-    "id": "10.2",
-    "titolo": "Prenotazioni",
-    "testo": "Tutte le attività sportive, sia di gruppo che individuali, prevedono obbligatoriamente la prenotazione da parte dell’Utente. Senza prenotazione non sarà possibile accedere al servizio. Le modalità e i termini di prenotazione sono disponibili nella sezione dedicata del nostro sito"
-   },
-   {
-    "id": "10.3",
-    "titolo": "Disdetta Prenotazione",
-    "testo": "È possibile disdire una prenotazione entro 1 ora dall’inizio per le lezioni di gruppo e entro 2 ore dall’inizio per le lezioni individuali. In caso di disdetta effettuata nei tempi previsti, l’accesso acquistato verrà riaccreditato sull’account e potrà essere utilizzato entro 14 giorni dalla data della prenotazione originaria"
-   },
-   {
-    "id": "10.4",
-    "titolo": "Durata e Scadenza di Lezioni e Pacchetti",
-    "testo": "Tutte le lezioni singole e i pacchetti acquistati hanno una validità temporale limitata, chiaramente indicata al momento dell’acquisto. Una volta raggiunta la data di scadenza, gli accessi non utilizzati verranno automaticamente annullati e non sarà possibile recuperarli, prorogarli o convertirli in altri servizi. L’Utente è tenuto a verificare la durata di validità dei pacchetti acquistati nella propria area riservata"
-   },
-   {
-    "id": "10.5",
-    "titolo": "Rimborsi",
-    "testo": "Non è previsto alcun rimborso per prodotti o accessi acquistati, salvo nei casi espressamente previsti dalla normativa vigente"
-   },
-   {
-    "id": "10.6",
-    "titolo": "Accesso al Club",
-    "testo": "Per accedere al Club è necessario aver acquistato un Tesserino o Braccialetto identificativo, strettamente personale e non cedibile"
-   }
-  ]
- },
- {
-  "numero": "11",
-  "titolo": "Corsi intensivi estivi",
-  "clausole": [
-   {
-    "id": "11.1",
-    "titolo": "Certificato Medico",
-    "testo": "Prima dell’inizio dell’attività è obbligatorio inviare in allegato via e-mail copia del Certificato Medico di idoneità all’attività sportiva non agonistica. Sono esentati i soli bambini fino ai 5 anni di età. Nel caso in cui questo non avvenga, verrà tenuto sospeso il Badge personale fino a quando l’Iscritto non invierà il Certificato Medico dovuto. Sono esclusi da tale obbligo i bambini di età fino ai 6 anni compresi"
-   },
-   {
-    "id": "11.2",
-    "titolo": "Tesseramento",
-    "testo": "La nostra Società Sportiva Dilettantistica è affiliata ASI e svolge attività didattica e competitiva con tale ente di promozione sportiva. Per accedere ai nostri Corsi Sportivi come Abbonato è necessario essere in possesso del Tesserino Asi come Atleta. All’atto dell'iscrizione ne verrà da noi verificato il possesso (sul Database ASI) ed in caso non sia già presente, verrà immediatamente effettuato un nuovo tesseramento ad ASI (Tipo B) comprensivo di Assicurazione Infortunistica Personale"
-   },
-   {
-    "id": "11.3",
-    "titolo": "Il Corso",
-    "testo": "I corsi si svolgono dal lunedì al venerdì su prenotazione. La durata delle lezioni è di 50’. La suddivisione degli allievi, all’interno dell’orario scelto, si basa su criteri di omogeneità per quanto concerne l’età e il livello tecnico. La Direzione Tecnica si riserva il diritto di cambiare l’insegnante assegnato a seconda delle diverse esigenze didattiche"
-   },
-   {
-    "id": "11.4",
-    "titolo": "Accesso al Corso",
-    "testo": "è permesso l’accesso agli spogliatoi soltanto 10 minuti prima dell’orario di lezione. E’ assolutamente vietato l’accesso agli spogliatoi agli accompagnatori dei bambini di età superiore a 8 anni. Sarà ammesso l’accesso negli spogliatoi dei bambini fino ai 7 anni di una sola persona accompagnatrice. Nel caso in cui la persona accompagnatrice non sia il genitore stesso devono essere comunicati i dati anagrafici della persona incaricata (familiari, baby-sitter, ecc..) in Segreteria. L’accompagnatore del bambino frequentante avrà cura e stretta sorveglianza del minore nel periodo di permanenza nel centro e sarà unico responsabile in caso di incidente alla persona o alle cose dell’Impianto stesso. L’accompagnatore del bambino è tenuto a portare personalmente il minore all’ingresso dello spogliatoio dedicato. Tutti i danni alle strutture o ai beni della Società, anche se nell’esercizio di attività svolte con istruttori, saranno a carico di chi li avrà cagionati"
-   },
-   {
-    "id": "11.5",
-    "titolo": "Direzione Tecnica",
-    "testo": "per informazioni e chiarimenti tecnici il Direttore Tecnico riceve previo appuntamento Telefonico"
-   },
-   {
-    "id": "11.6",
-    "titolo": "Modalità di Adesione",
-    "testo": "Sono previsti pacchetti di Lezioni a prenotazione da 1, 5, 10 o 20 lezioni. Da consumare entro e non oltre il termine del 31/07/2025"
-   },
-   {
-    "id": "11.7",
-    "titolo": "Modalità di Prenotazione",
-    "testo": "Sarà possibile effettuare la prenotazione esclusivamente tramite Portale Web o APP a partire da 3 giorni prima della lezione"
-   },
-   {
-    "id": "11.8",
-    "titolo": "Disdetta prenotazione",
-    "testo": "E’ concessa la possibilità di disdire la prenotazione entro 1 ora dal suo inizio. In caso di disdetta verrà riaccreditato il prodotto acquistato e sarà possibile effettuare una nuova prenotazione entro il termine dei corsi intensivi"
-   },
-   {
-    "id": "11.9",
-    "titolo": "Rimborsi",
-    "testo": "Non sono mai previsti rimborsi dei prodotti acquistati"
-   },
-   {
-    "id": "11.10",
-    "titolo": "Accesso",
-    "testo": "per l’accesso al Club è necessario l’acquisto del Tesserino o Braccialetto. L’utilizzo è strettamente personale"
-   }
-  ]
- }
+  {
+    "numero": "1",
+    "titolo": "Sottoscrizione del contratto di abbonamento",
+    "clausole": [
+      {
+        "id": "1.1",
+        "titolo": "Validità e decorrenza delle presenti Condizioni Generali",
+        "testo": "Le presenti Condizioni Generali di Contratto (“Condizioni Generali”), salvo accordi specifici riferiti a singoli casi, disciplinano i rapporti tra Point 2000 Srl Società Sportiva Dilettantistica Unipersonale (“Point 2000”) e ogni persona che, a qualsiasi titolo, acquisti o usufruisca dei servizi offerti dal Club (“Utente”), ivi inclusi gli Abbonati, i Tesserati, gli Utenti occasionali e coloro che accedono a corsi, lezioni singole o pacchetti. Le Condizioni Generali costituiscono parte integrante di ogni contratto, domanda di abbonamento o acquisto di singoli servizi. Fanno inoltre parte del presente contratto il Regolamento Interno e la cartellonistica esposta nei locali del Club o comunicata tramite canali ufficiali. Con la sottoscrizione di un abbonamento o con l'acquisto anche occasionale di servizi, l’Utente accetta integralmente le presenti Condizioni Generali e si impegna a rispettare tutte le prescrizioni regolamentari. I diritti derivanti dai servizi acquistati sono strettamente personali e non cedibili a terzi"
+      },
+      {
+        "id": "1.2",
+        "titolo": "Tesseramento e assicurazione",
+        "testo": "La nostra Società Sportiva Dilettantistica è affiliata ASI e svolge attività didattica e competitiva con tale ente di promozione sportiva. Per accedere ai nostri Corsi sportivi come Abbonato è necessario essere in possesso del Tesserino Asi come Atleta. All’atto dell'iscrizione ne verrà da noi verificato il possesso (sul Database ASI) ed in caso non sia già presente, verrà immediatamente effettuato un nuovo tesseramento ad ASI di Tipo “B”. Con il tesseramento è comprensa la polizza infortunistica personale (http://www.asinazionale.it/servizi/polizze-assicurative)"
+      },
+      {
+        "id": "1.3",
+        "titolo": "Contratto di abbonamento. Diritto di recesso (ripensamento)",
+        "testo": "Il Contratto di Abbonamento si perfeziona nel momento in cui l’utente sottoscrive On Line (cliccando su “Acquista Abbonamento” e accettando i Termini e Condizioni). L’utente può recedere dal Contratto di Abbonamento, senza obbligo di motivazione, inviando comunicazione scritta entro il termine di 14 (quattordici) giorni decorrenti dalla data di sottoscrizione del Contratto di Abbonamento (il termine per il recesso sarà rispettato con la ricevuta di invio di PEC entro il quattordicesimo giorno). L’eventuale recesso dell’utente dovrà essere inviato, a mezzo PEC, all’indirizzo point2000srl@pec.it, avendo cura di segnalare in oggetto il numero utente, il nome dell’abbonamento e la data di sottoscrizione. In caso di recesso da parte dell’utente non verranno rimborsate le quote dell’abbonamento delle quali l’utente abbia usufruito (o avrebbe potuto usufruire) sino all’esercizio del recesso ed €10 a titolo di costi amministrativi. Eguale diritto competerà a Point 2000, che vi provvederà mediante l’invio di raccomandata A.R. all’indirizzo comunicato dall’utente al momento della sottoscrizione del Contratto di Abbonamento, da consegnarsi al servizio postale entro il termine di 14 (quattordici) giorni dalla data della suddetta sottoscrizione"
+      },
+      {
+        "id": "1.4",
+        "titolo": "Badge di accesso",
+        "testo": "Per accedere al club, sia in caso di abbonamento che di acquisto di singole lezioni sarà necessario acquistare il Badge di Accesso fisico (che verrà consegnato al primo accesso) o scaricare quello virtuale sul proprio smartphone. Il Badge è strettamente personale e non utilizzabile da altri soggetti al di fuori del suo intestatario"
+      },
+      {
+        "id": "1.5",
+        "titolo": "Minori di età",
+        "testo": "I minori di anni 18 (diciotto) potranno accedere al portale web o app solo attraverso il collegamento dell’account di un tutore legale ovvero del soggetto esercente la potestà genitoriale. Il genitore titolare dell’account associato sarà l’unico interlocutore autorizzato ad agire in nome e per conto del minore"
+      },
+      {
+        "id": "1.6",
+        "titolo": "Chiusure Eventuali",
+        "testo": "nelle ipotesi di chiusura del Club a causa di ristrutturazione o a seguito di misure sanitarie imposte o altri impedimenti per periodi superiori a 14 giorni consecutivi, sarà garantito all’iscritto la possibilità di sospendere l’abbonamento; il recupero del periodo di sospensione delle attività potrà avvenire, a discrezione di Point 2000, a mezzo emissione di voucher del relativo importo o traslazione della scadenza dell’abbonamento"
+      },
+      {
+        "id": "1.7",
+        "titolo": "Modifiche alle Condizioni e ai Corrispettivi",
+        "testo": "Point 2000 si riserva la facoltà di modificare, in qualsiasi momento, le presenti Condizioni Generali di Contratto, nonché i costi dei servizi e degli abbonamenti, per sopravvenute esigenze organizzative, tecnico-operative o economiche. Tali modifiche non avranno effetto retroattivo e si applicheranno esclusivamente a partire dal successivo ciclo di rinnovo contrattuale (mensile o annuale), con riferimento alla data di decorrenza prevista per l’addebito. Le modifiche saranno comunicate all’Utente con un preavviso minimo di 30 (trenta) giorni rispetto alla data di rinnovo dell’abbonamento, mediante pubblicazione nell’area riservata personale o invio di e-mail all’indirizzo associato all’account. Nel caso in cui l’Utente non intenda accettare le nuove condizioni economiche, potrà esercitare il diritto di disdetta entro 10 (dieci) giorni dalla data di decorrenza del nuovo ciclo contrattuale, con efficacia alla scadenza del ciclo precedente. In assenza di disdetta entro i termini, le modifiche si intenderanno accettate e troveranno automatica applicazione sul nuovo periodo contrattuale. Le modifiche di tipo editoriale, tecnico o non sostanziale (es. aggiornamenti formali, rinumerazione, miglioramento dell’accessibilità del testo) non daranno diritto al recesso gratuito, né comporteranno obblighi di preavviso"
+      },
+      {
+        "id": "1.8",
+        "titolo": "Subentro di altra società nella gestione del Club",
+        "testo": "Point 2000 si riserva la facoltà di trasferire a terzi la gestione operativa del Club e/o la titolarità dei contratti in essere, ivi inclusi i contratti di abbonamento attivi, i rapporti di tesseramento, i metodi di pagamento salvati e gli obblighi connessi. In tal caso, l’Utente sarà informato con un preavviso minimo di 30 (trenta) giorni a mezzo e-mail o mediante comunicazione visibile nella propria area riservata. Qualora non intenda accettare il subentro del nuovo gestore, l’Utente avrà facoltà di recedere dal contratto senza penali né costi aggiuntivi, con effetto dalla data di decorrenza della nuova gestione, mediante invio di comunicazione scritta all’indirizzo disdetta@athlonroma.it. In assenza di recesso esercitato nei termini, il subentro sarà considerato accettato e i rapporti contrattuali, inclusi i mandati di pagamento ricorrenti, continueranno automaticamente in capo al nuovo gestore"
+      }
+    ]
+  },
+  {
+    "numero": "2",
+    "titolo": "Obblighi dell’utente",
+    "clausole": [
+      {
+        "id": "2.1.1",
+        "titolo": "Pagamento del corrispettivo ed effetti dell’inadempimento",
+        "testo": "L’UTENTE, con la sottoscrizione del Contratto di Abbonamento, si impegna al pagamento degli importi concordati con Point 2000 entro e non oltre le scadenze convenute. Per il caso in cui sia stato previsto un pagamento ricorrente dell’abbonamento mediante sistemi automatici di addebito delle rate o del costo dell’abbonamento periodico (prelievo da carta di credito o RID bancario), l’utente si impegna a garantire il buon esito di ciascun addebito. In particolare, sarà cura dell’utente: a) nel caso della carta di credito, controllare che essa non sia scaduta e altresì disponga di fondi sufficienti e di un limite di credito idoneo; b) nel caso del RID bancario, mantenere il conto corrente attivo e capiente. L’utente accetta che il ritardo nei pagamenti sarà sempre considerato una sua responsabilità e lo obbligherà alla rifusione senza ritardo, in favore di Point 2000, di tutti i costi e gli esborsi connessi al mancato o tardivo incasso della rata e alle attività di eventuale recupero coattivo della stessa, oltre agli interessi moratori, salvi i soli comprovati casi di forza maggiore; ciò, per specifica pattuizione tra le Parti, affinché tenga indenne la Società dalle conseguenze dell’inadempimento"
+      },
+      {
+        "id": "2.1.2",
+        "titolo": "Effetti del Ritardo nei Pagamenti",
+        "testo": "L’utente accetta inoltre che il ritardo nei pagamenti determinerà: - Dal primo giorno di ritardo, l’immediata sospensione dei servizi erogati da Point 2000 presso il centro sportivo fin quando la morosità non venga sanata, ai sensi e per gli effetti dell’art. 1460 del Codice civile. La Società invierà una comunicazione contenente la descrizione della ragione del mancato saldo con l’invito a provvedere (di seguito anche solo “Comunicazione”); - Decorsi 15 giorni di ritardo dal giorno previsto per l’addebito, l’addebito automatico all’utente di una penale di 10,00 (dieci/00) euro per il ritardo che andrà ad aggiungersi all’importo della rata insoluta; - Dal giorno 16 del mese in avanti, l’invio di un sollecito ultimativo al saldo spontaneo della morosità entro e non oltre il termine di 15 giorni dal suo ricevimento, con l’avvertenza che, a fronte del persistere della morosità, avranno luogo la risoluzione di diritto del Contratto di Abbonamento in danno dell’utente, ai sensi dell’articolo 1456 del codice civile, senza necessità di ulteriori avvisi o comunicazioni e l’avvio delle azioni giudiziali necessarie al recupero del credito, anche in tal caso senza necessità di ulteriori solleciti e avvertenze, con l’ulteriore aggravio di costi per lo stesso utente descritti al punto 2.1.1., ultimo capoverso"
+      },
+      {
+        "id": "2.1.3",
+        "titolo": "Uso del Badge fisico di Accesso",
+        "testo": "Conseguenze per il caso di smarrimento. Riguardo all’uso, alla conservazione e alla custodia del Badge, l’utente è tenuto a osservare la massima diligenza. In caso di smarrimento del Badge, l’utente sarà tenuto a darne immediata comunicazione scritta alla reception via e-mail a desk@athlonroma.it. Alla ricezione della comunicazione di smarrimento, la funzione propria del Badge smarrito verrà disattivata e solo a partire da tale momento l’utente non sarà più soggetto al rischio di eventuale uso fraudolento del Badge fisico da parte di terzi e potrà richiedere il rilascio del duplicato previo il pagamento di €5,00"
+      },
+      {
+        "id": "2.2",
+        "titolo": "Indicazione indirizzo e-mail e modifica dati utente",
+        "testo": ""
+      },
+      {
+        "id": "2.2.1",
+        "titolo": "Obbligo di un indirizzo e-mail valido",
+        "testo": "L’utente, al momento della sottoscrizione del Contratto di Abbonamento, ha l’obbligo di fornire a Point 2000 un indirizzo E-mail valido e attivo attraverso il quale possano avvenire le comunicazioni da parte di Point 2000 stessa e che possa essere associato all’account univoco per l’accesso all’area riservata personale dell’utente. L’utente si dichiara espressamente concorde a ricevere comunicazioni legalmente rilevanti da parte di Point 2000 (ad es. solleciti, modifiche alle Condizioni Generali di Contratto, etc.) a mezzo E-mail"
+      },
+      {
+        "id": "2.2.2",
+        "titolo": "Comunicazione delle variazioni dei dati",
+        "testo": "L’utente ha l’obbligo di comunicare a Point 2000, senza ritardo, ogni intervenuta modifica dei riferimenti personali precedentemente resi ai fini del Contratto di Abbonamento (quali, ad esempio: nome, cognome, indirizzo, telefono, indirizzo E-mail) tramite area riservata sul sito internet. I dati bancari potranno essere modificati tramite la sottoscrizione di un nuovo mandato SEPA online. L’utente accetta che il ritardo nella comunicazione di tali modifiche sarà sempre considerato una sua responsabilità e determinerà l’addebito di tutti i costi e/o gli esborsi connessi all’anzidetta tardiva trasmissione, oltre agli interessi moratori. Sono salvi i soli comprovati casi di forza maggiore"
+      },
+      {
+        "id": "2.3",
+        "titolo": "Divieto di Cessione del Contratto di Abbonamento e del Badge",
+        "testo": "Penale e danno ulteriore. I diritti dell’utente derivanti dal Contratto di Abbonamento, nonché dal Badge, devono intendersi strettamente personali e non cedibili a terzi. L’utente è pertanto obbligato a utilizzare il Badge solo personalmente e a non trasferirlo o cederlo a terzi (inclusi altri Abbonati) nemmeno temporaneamente. Point 2000 si riserva il diritto di verificare l’identità dell’utente in Palestra chiedendo l’esibizione di un documento d’identità. Per l’ipotesi di violazione della presente disposizione, ferme le eventuali responsabilità conseguenti alla commissione di illeciti penalmente rilevanti, l’utente sarà tenuto a corrispondere a titolo di penale a Point 2000 la somma di €100,00, salvo il diritto di Point 2000 al risarcimento del danno ulteriore"
+      },
+      {
+        "id": "2.4",
+        "titolo": "Attività e Prodotti Vietati",
+        "testo": "Sanzione. Penale e danno ulteriore. Nel Club è vietato fumare, introdurre armi, introdurre e/o consumare bevande alcoliche nonché fare uso di stupefacenti e di sostanze farmacologiche al di fuori di prescrizione medica. È altresì vietato introdurre o portare con sé all’interno del Club eventuali sostanze che incrementano le prestazioni fisiche dell’utente (per es. le c.d. sostanze anabolizzanti). Parimenti è vietato offrire, mettere a disposizione, cedere e trasferire a terzi nonché acquisire e acquistare da altri Abbonati o terzi – dietro compenso o a titolo gratuito – tali sostanze. L’inosservanza di tali disposizioni da parte dell’utente, ferme anche in tal caso le eventuali responsabilità conseguenti alla commissione di illeciti penalmente rilevanti, determinerà la risoluzione del Contratto di Abbonamento in base all’art. 1456 cod. civ. e darà diritto a Point 2000 di pretendere da ciascun utente coinvolto, in caso di violazione del divieto di fumare, una sanzione amministrativa da € 27,50 a € 275,00 (la misura della sanzione è raddoppiata qualora la violazione sia commessa in presenza di una donna in evidente stato di gravidanza o in presenza di lattanti o bambini fino a dodici anni) ai sensi dell’art. 51 L. 16.01.2003, n. 3 e successive modifiche ed integrazioni, e, negli altri casi, a titolo di penale una somma di €100,00, salvo il diritto di Point 2000 al risarcimento del danno ulteriore"
+      },
+      {
+        "id": "2.5",
+        "titolo": "Divieto di offerta di servizi di Personal Trainer",
+        "testo": "Penale e facoltà di risoluzione È vietata, all’interno del Club, l’offerta, a titolo oneroso o gratuito, di servizi di personal trainer, coaching, lezioni o consulenze individuali non autorizzate, da parte di un utente nei confronti di altro/i utente/i. La violazione del presente divieto comporterà, a discrezione della Direzione: l’immediata sospensione dell’accesso al Club; la risoluzione del contratto ai sensi dell’art. 1456 c.c.; il pagamento, da parte dell’utente responsabile, di una penale pari a €150,00, salvo il diritto di Point 2000 al risarcimento di ogni eventuale danno ulteriore"
+      },
+      {
+        "id": "2.6",
+        "titolo": "Utilizzo degli armadietti",
+        "testo": "Gli armadietti dotati di chiusura, messi a disposizione da Point 2000, possono essere utilizzati dall’utente esclusivamente durante la propria permanenza all’interno del Club. È fatto espresso divieto di lasciare effetti personali negli armadietti al di fuori dell’orario di permanenza presso il Club; per tale motivo, Point 2000 si riserva il diritto di aprire gli armadietti che risultino occupati oltre il tempo consentito. Gli utenti sono tenuti a utilizzare correttamente gli armadietti e a chiuderli con l’apposito sistema di sicurezza. È fortemente sconsigliato introdurre nel Club oggetti di valore, somme di denaro elevate o dispositivi elettronici particolarmente costosi. Point 2000 non è in alcun modo responsabile per eventuali furti, danni e/o smarrimenti di beni personali, sia all’interno del Club che degli armadietti, salvo che tali eventi siano direttamente imputabili a dolo o colpa grave della Società, e comunque nei soli limiti previsti dalla legge"
+      },
+      {
+        "id": "2.7",
+        "titolo": "Condizioni fisiche utente",
+        "testo": "L’Utente dichiara, sotto la propria responsabilità, di trovarsi in stato di buona salute e di essere fisicamente idoneo alla pratica dell’attività sportiva; di non essere mai stato ritenuto non idoneo nel corso di precedenti visite mediche; di non aver subito eventi invalidanti che possano compromettere la sicurezza o la propria incolumità nello svolgimento di attività sportiva presso il Club. L’Utente si impegna, in tal senso, a produrre all’atto dell’iscrizione il Certificato Medico di Idoneità all’Attività Sportiva NON AGONISTICA (o Agonistica, nei casi esplicitamente richiesti). In caso di mancata consegna del certificato, Point 2000 si riserva il diritto di sospendere l’accesso dell’Utente a tutte le attività, senza che ciò comporti alcun diritto al rimborso delle quote versate o al risarcimento di eventuali danni. Nessuna responsabilità potrà essere imputata a Point 2000 per conseguenze fisiche o patrimoniali derivanti dalla partecipazione alle attività sportive all’interno del Club. In caso di sopravvenuta inidoneità fisica, l’Utente ha l’obbligo di sospendere immediatamente ogni attività e di astenersi dall’utilizzo dei servizi, rimanendo personalmente responsabile di ogni conseguenza connessa alla violazione di tale obbligo"
+      },
+      {
+        "id": "2.8",
+        "titolo": "Norme di comportamento",
+        "testo": "La Direzione del Club, tramite il personale incaricato, ha facoltà di rifiutare l’ingresso o di espellere, anche in via definitiva, l’utente che, con parole, atti o comportamenti, arrechi disturbo, offesa o disagio ad altri utenti, agli operatori o al normale svolgimento delle attività del Club. In particolare, saranno oggetto di provvedimenti immediati: schiamazzi, giochi pericolosi, comportamenti aggressivi o minacciosi, linguaggio volgare o offensivo, atti contrari alla morale o alla convivenza civile, nonché rimostranze o contestazioni che superino i limiti della buona educazione. La Direzione si riserva inoltre il diritto di rifiutare l’ingresso o di allontanare chiunque arrechi danni alla struttura, agli arredi o agli impianti. In tali casi, l’utente responsabile sarà obbligato al risarcimento integrale dei danni arrecati, materiali e/o patrimoniali, ivi comprese le eventuali spese di ripristino, sospensione delle attività o sostituzione di beni danneggiati. La Direzione potrà altresì disporre la sospensione o la risoluzione del contratto ai sensi dell’art. 1456 c.c"
+      },
+      {
+        "id": "2.9",
+        "titolo": "Infortuni",
+        "testo": "In caso di infortunio l’utente è tenuto ad informare immediatamente la direzione inviando un’email a desk@athlonroma.it ed, in caso l’utente sia tesserato, a seguire la procedura prevista dall’ente di promozione sportiva o federazione per l’apertura del sinistro. La Società è esentata da ogni responsabilità in merito ad infortuni o lesioni che si verifichino nel corso delle attività o all’interno del Centro per utilizzi impropri o non conformi delle attrezzature e/o rischi connaturati alle specifiche attività svolte o per uso non compatibile con lo stato fisico dell’utente, salvo l’eventuale risarcimento previsto da parte della società assicuratrice"
+      }
+    ]
+  },
+  {
+    "numero": "3",
+    "titolo": "Pagamento",
+    "clausole": [
+      {
+        "id": "3.1",
+        "titolo": "Definizioni",
+        "testo": ""
+      },
+      {
+        "id": "3.1.1",
+        "titolo": "Quota di Attivazione",
+        "testo": "quota relativa ai diritti di segreteria richiesta all’inizio di ogni nuovo abbonamento. In caso di cancellazione dell’abbonamento e successiva nuova adesione la quota verrà nuovamente chiesta per intero"
+      },
+      {
+        "id": "3.1.2",
+        "titolo": "Quota di Abbonamento",
+        "testo": "quota relativa al periodo di corso/i e attività prescelto/i"
+      },
+      {
+        "id": "3.1.3",
+        "titolo": "Pro-rata",
+        "testo": "(per gli abbonamenti mensili) qualora la data di inizio del contratto non coincidesse con il primo giorno del mese verrà calcolato il pro rata: la quota di abbonamento relativa al periodo dalla data di partenza dell’abbonamento alla fine del mese"
+      },
+      {
+        "id": "3.1.4",
+        "titolo": "Lezione",
+        "testo": "quota relativa all’accesso ad una singola lezione"
+      },
+      {
+        "id": "3.1.5",
+        "titolo": "Durata Minima Contrattuale",
+        "testo": "è il periodo di impegno minimo contrattuale. Durante tale periodo il pagamento delle quote previste deve essere sempre garantito. Qualora durante tale periodo fossero inserite delle sospensioni, le stesse andranno a traslare la scadenza del periodo minimo contrattuale. Nel caso in cui la data di inizio dell’abbonamento non fosse il giorno 1 del mese, la durata minima contrattuale sarà data dalla porzione di mese intercorrente fra la data di iscrizione e la fine del mese (pro rata) + il valore indicato nel contratto"
+      },
+      {
+        "id": "3.2",
+        "titolo": "Modalità ed utilizzo dei mezzi di Pagamento",
+        "testo": "le modalità di pagamento previste sono esclusivamente l’Addebito su Carta di Credito o su Conto Corrente. I dati dello strumento di pagamento scelto verranno salvati e gestiti in sicurezza dai nostri partner: Adyen (https://www.adyen.com/it_IT/) e GoCardless (https://gocardless.com/), e verranno utilizzati per l’elaborazione dei pagamenti ricorrenti"
+      }
+    ]
+  },
+  {
+    "numero": "4",
+    "titolo": "Scuola Nuoto Bambini",
+    "clausole": [
+      {
+        "id": "4.1",
+        "titolo": "Certificato Medico",
+        "testo": "Entro 14 giorni dall’inizio dell’attività è obbligatorio inviare in allegato via e-mail copia del Certificato Medico di idoneità all’attività sportiva non agonistica. Sono esentati i soli bambini fino ai 5 anni di età. Nel caso in cui questo non avvenga, verrà tenuto sospeso il Badge personale fino a quando l’Iscritto non invierà il Certificato Medico dovuto"
+      },
+      {
+        "id": "4.2",
+        "titolo": "Tesseramento",
+        "testo": "La nostra Società Sportiva Dilettantistica è affiliata ad ASI (Associazioni Sportive e Sociali Italiane) e svolge attività didattica e competitiva nell’ambito di tale ente di promozione sportiva. Per accedere ai nostri Corsi Sportivi in qualità di utente è obbligatorio essere in possesso del Tesserino ASI come Atleta. Al momento dell’iscrizione, verificheremo il possesso del tesseramento sul database ASI. In caso non risulti attivo, provvederemo automaticamente all’emissione di un nuovo tesseramento ASI (Tipologia B), comprensivo di copertura assicurativa per infortuni personali. Qualora l’Utente desiderasse optare per una tipologia di tesseramento diversa, con caratteristiche assicurative differenti, dovrà comunicarlo espressamente via e-mail a desk@athlonroma.it prima dell’attivazione del tesseramento"
+      },
+      {
+        "id": "4.3",
+        "titolo": "Riprese Fotografiche",
+        "testo": "Durante l’anno, in occasione di eventi didattici, sportivi o promozionali, potranno essere effettuate riprese fotografiche o video all’interno del Club. Per ogni evento in cui sia prevista la presenza di un fotografo, la comunicazione ufficiale verrà pubblicata con almeno 10 (dieci) giorni di preavviso sul sito www.athlonroma.it, considerata a tutti gli effetti valida e vincolante come notifica. L’avviso specificherà la data dell’evento e le modalità di accesso alle immagini (consultazione, selezione, acquisto). Le immagini saranno scattate in ambienti comuni e in contesti di gruppo, nei limiti di quanto consentito dalla normativa vigente in materia di privacy. Point 2000 non è titolare del trattamento dei dati raccolti in occasione delle riprese fotografiche, le quali sono gestite in piena autonomia dallo studio fotografico incaricato, che agisce in qualità di autonomo titolare del trattamento ai sensi del Regolamento UE 679/2016 (GDPR). I file digitali e i provini verranno conservati dallo studio fotografico per un periodo massimo di 90 (novanta) giorni e successivamente eliminati, salvo diverso accordo diretto tra l’utente e lo studio stesso. In ogni momento, l’utente ripreso potrà esercitare i propri diritti di accesso, opposizione o cancellazione delle immagini esclusivamente nei confronti dello studio fotografico incaricato. Point 2000 declina ogni responsabilità per l’uso delle immagini effettuato dal fotografo in violazione della normativa o degli accordi contrattuali. La partecipazione agli eventi durante i quali sono effettuate riprese comporta consenso tacito salvo opposizione espressa delle condizioni sopra indicate, fermo restando il diritto dell’utente di non partecipare o di opporsi preventivamente con comunicazione scritta"
+      },
+      {
+        "id": "4.4",
+        "titolo": "Il Corso",
+        "testo": "va dal 01 Settembre 2025 al 31 Maggio 2026. La durata delle lezioni è di 40’ in Vasca Media e di 50’ in Vasca Grande. La strutturazione dei corsi è riferita alle diverse età e livelli didattici degli allievi. I brevetti prendono varie denominazioni e gli obiettivi ed i livelli sono uniformati alle direttive federali. La suddivisione degli allievi si basa su criteri di omogeneità per quanto concerne l’età e il livello tecnico. La Direzione Tecnica si riserva il diritto di cambiare l’insegnante assegnato a seconda delle diverse esigenze didattiche"
+      },
+      {
+        "id": "4.5",
+        "titolo": "Accesso al Corso",
+        "testo": "L’accesso agli spogliatoi è consentito esclusivamente a partire da 10 minuti prima dell’orario di inizio della lezione. È severamente vietato l’ingresso agli spogliatoi agli accompagnatori di bambini di età superiore a 8 anni. Per i bambini fino agli 8 anni compiuti è ammesso l’ingresso di un solo accompagnatore, il quale sarà responsabile della sorveglianza e della cura del minore per tutta la durata della permanenza nel centro sportivo. L’accompagnatore ha l’obbligo di accompagnare personalmente il minore fino all’ingresso dello spogliatoio dedicato. Eventuali danni arrecati a strutture, attrezzature o beni del Club – anche nel corso di attività svolte con il supporto di istruttori – saranno addebitati a chi ne è responsabile, inclusi gli accompagnatori"
+      },
+      {
+        "id": "4.6",
+        "titolo": "Direzione Tecnica",
+        "testo": "per informazioni, chiarimenti tecnici e cambi di turno il Direttore Tecnico riceve previo appuntamento Telefonico"
+      },
+      {
+        "id": "4.7",
+        "titolo": "Recuperi",
+        "testo": "È concessa la possibilità di recuperare le lezioni perse, a condizione che l’assenza venga comunicata in anticipo mediante cancellazione della prenotazione, da effettuare esclusivamente attraverso il proprio account personale via web o app. Questa è l’unica modalità prevista per la registrazione dell’assenza e l’abilitazione al recupero. I recuperi potranno essere effettuati solo con abbonamento attivo, in regola con i pagamenti, e dovranno essere utilizzati entro la fine del corso al quale si riferiscono"
+      },
+      {
+        "id": "4.8",
+        "titolo": "Brevetto",
+        "testo": "La prova di brevetto è gratuita e si svolge l’ultimo mese di corso. Durante l'anno potranno essere effettuate una o più verifiche intermedie al fine di uniformare la didattica nei gruppi e valutare i progressi effettuati"
+      },
+      {
+        "id": "4.9",
+        "titolo": "Gare",
+        "testo": "durante la stagione sarà possibile partecipare a Gare di Nuoto del circuito ASI, presso il nostro impianto sportivo o altri nel comune di Roma. La partecipazione alle Gare è facoltativa e a pagamento"
+      },
+      {
+        "id": "4.10",
+        "titolo": "Inabilità Temporanea alla Pratica Sportiva",
+        "testo": "in caso di malattia o infortunio che comporti una documentata inidoneità alla pratica sportiva per un periodo continuativo di almeno 60 (sessanta) giorni, è possibile richiedere la sospensione del corso. La richiesta dovrà essere effettuata inviando via e-mail a desk@athlonroma.it un certificato medico rilasciato da struttura sanitaria pubblica o privata, attestante chiaramente l’inidoneità temporanea e la relativa durata. La sospensione potrà essere concessa esclusivamente a partire dalla data di ricezione della documentazione e comporterà l’inibizione dell’accesso al centro per tutta la durata indicata nel certificato. La richiesta di sospensione è alternativa al recupero delle lezioni: scegliendo questa modalità, non sarà possibile recuperare le lezioni perse tramite il meccanismo previsto al punto 4.7. Durante il periodo di sospensione, il pagamento delle quote mensili rimarrà comunque dovuto. Il recupero avverrà mediante la generazione di un credito pari ad almeno 2 mensilità regolarmente pagate, utilizzabile esclusivamente dall’intestatario entro e non oltre 6 (sei) mesi dalla fine del corso. Il credito non è trasferibile né cedibile a terzi"
+      },
+      {
+        "id": "4.11",
+        "titolo": "Modalità di Adesione Mensile con Rinnovo Automatico",
+        "testo": "Piano di pagamento mensile, con rinnovo ogni giorno 1 del mese. E’ possibile disdire il pagamento e cancellare l'abbonamento, inviando un'email a disdetta@athlonroma.it entro 10 giorni dal successivo ciclo di pagamento. In caso di disdetta e successiva iscrizione, si sarà tenuti al pagamento di una nuova quota di attivazione. NB 10 giorni equivalgono a 240 ore prima della mezzanotte del 1 giorno del mese. ● Mese con 31 Giorni la disdetta va effettuata entro la mezzanotte del 21 ● Mese con 30 Giorni la disdetta va effettuata entro la mezzanotte del 20 ● Mese con 28 Giorni la disdetta va effettuata entro la mezzanotte del 18"
+      }
+    ]
+  },
+  {
+    "numero": "6",
+    "titolo": "Settore agonistico, preagonistico e pallanuoto",
+    "clausole": [
+      {
+        "id": "6.1",
+        "titolo": "Durata del Corso",
+        "testo": "dal 01/09/2025 al 31/05/2026"
+      },
+      {
+        "id": "6.2",
+        "titolo": "Certificato Medico",
+        "testo": "prima dell’inizio dell’attività è obbligatorio consegnare all’Allenatore copia originale del Certificato Medico di Idoneità all’Attività Sportiva AGONISTICA/NON AGONISTICA (fare riferimento all’allenatore per la tipologia richiesta)"
+      },
+      {
+        "id": "6.3",
+        "titolo": "Assicurazione e Tesseramento",
+        "testo": "tutti gli atleti saranno tesserati ad ASI (o altro EPS relativo all’attività competitiva scelta), con la quale è già compresa una polizza infortunistica come disposto dall’art.51 della legge 27-12-2002 n°289 e dal comma 205 dell’art.4 della legge 24-12-2003 n°350. Tale costo è compreso nella quota versata"
+      },
+      {
+        "id": "6.4",
+        "titolo": "Gare",
+        "testo": "sono comprese nella quota tutte le gare svolte con il nostro Ente di Promozione Sportiva ASI (sono esclusi gli eventuali Meeting) e il campionato per la Pallanuoto"
+      },
+      {
+        "id": "6.5",
+        "titolo": "Materiale Tecnico",
+        "testo": "è OBBLIGATORIO indossare il Kit Ufficiale della squadra. Il kit può essere acquistato a parte nella propria area riservata"
+      },
+      {
+        "id": "6.6",
+        "titolo": "Frequenza",
+        "testo": "gli orari e la sede degli allenamenti sono stabiliti nel foglio del programma delle attività agonistiche/pre agonistiche, ogni variazione rimane a discrezione del Responsabile Tecnico"
+      },
+      {
+        "id": "6.7",
+        "titolo": "Inabilità Temporanea alla Pratica Sportiva",
+        "testo": "in caso di malattia o infortunio che comporti una documentata inidoneità alla pratica sportiva per un periodo continuativo di almeno 60 (sessanta) giorni, è possibile richiedere la sospensione del corso. La richiesta dovrà essere effettuata inviando via e-mail a desk@athlonroma.it un certificato medico rilasciato da struttura sanitaria pubblica o privata, attestante chiaramente l’inidoneità temporanea e la relativa durata. La sospensione potrà essere concessa esclusivamente a partire dalla data di ricezione della documentazione e comporterà l’inibizione dell’accesso al centro per tutta la durata indicata nel certificato. Durante il periodo di sospensione, il pagamento delle quote mensili rimarrà comunque dovuto. Il recupero avverrà mediante la generazione di un credito pari ad almeno 2 mensilità regolarmente pagate, utilizzabile esclusivamente dall’intestatario entro e non oltre 6 (sei) mesi dalla fine del corso. Il credito non è trasferibile né cedibile a terzi"
+      },
+      {
+        "id": "6.8",
+        "titolo": "Modalità di Adesione Mensile con Rinnovo Automatico",
+        "testo": "Piano di pagamento mensile, con rinnovo ogni giorno 1 del mese. E’ possibile disdire il pagamento e cancellare l'abbonamento, inviando un'email a disdetta@athlonroma.it entro 10 giorni dal successivo ciclo di pagamento. In caso di disdetta e successiva iscrizione si sarà nuovamente tenuti al pagamento di una nuova quota di attivazione. NB 10 giorni equivalgono a 240 ore prima della mezzanotte del 1 giorno del mese. ● Mese con 31 Giorni la disdetta va effettuata entro la mezzanotte del 21 ● Mese con 30 Giorni la disdetta va effettuata entro la mezzanotte del 20 ● Mese con 28 Giorni la disdetta va effettuata entro la mezzanotte del 18"
+      },
+      {
+        "id": "6.9",
+        "titolo": "Recuperi",
+        "testo": "non è ammesso il recupero delle lezioni perse"
+      }
+    ]
+  },
+  {
+    "numero": "7",
+    "titolo": "Attività adulti (fitness, nuoto libero, scuola nuoto adulti, aqua fitness, group reformer)",
+    "clausole": [
+      {
+        "id": "7.1",
+        "titolo": "Certificato Medico",
+        "testo": "Entro 14 giorni dall’inizio dell’attività è obbligatorio inviare in allegato via e-mail copia del Certificato Medico di idoneità all’attività sportiva non agonistica. In assenza di tale documentazione, il Badge personale verrà sospeso e l’accesso al centro non sarà consentito fino all’invio del Certificato Medico richiesto. Si precisa che l’eventuale sospensione dell’accesso per mancata presentazione del Certificato Medico non dà diritto ad alcun rimborso, proroga, recupero o compensazione economica, in quanto trattasi di obbligo previsto dalla normativa vigente e noto all’Utente al momento dell’iscrizione"
+      },
+      {
+        "id": "7.2",
+        "titolo": "Tesseramento",
+        "testo": "La nostra Società Sportiva Dilettantistica è affiliata ad ASI (Associazioni Sportive e Sociali Italiane) e svolge attività didattica e competitiva nell’ambito di tale ente di promozione sportiva. Per accedere ai nostri Corsi Sportivi in qualità di Abbonato è obbligatorio essere in possesso del Tesserino ASI come Atleta. Al momento dell’iscrizione, verificheremo il possesso del tesseramento sul database ASI. In caso non risulti attivo, provvederemo automaticamente all’emissione di un nuovo tesseramento ASI (Tipologia B), comprensivo di copertura assicurativa per infortuni personali. Qualora l’Utente desiderasse optare per una tipologia di tesseramento diversa, con caratteristiche assicurative differenti, dovrà comunicarlo espressamente via e-mail a desk@athlonroma.it prima dell’attivazione del tesseramento"
+      },
+      {
+        "id": "7.3",
+        "titolo": "Attività Sportive Comprese nell’Abbonamento",
+        "testo": "Abbonamento Club: Corsi Fitness Live, Athlon TV, Gym Floor (pesistica), Aqua Fitness, Nuoto Libero Assistito, Scuola Nuoto Adulti, Nuoto Master, Acqua Gestanti. Abbonamento Fitness: Corsi Fitness Live, Athlon TV. Gym Floor (pesistica). Abbonamento Acqua: Athlon TV, Aqua Fitness, Nuoto Libero Assistito, Scuola Nuoto Adulti, Nuoto Master, Acqua Gestanti. Abbonamento Gym Floor: Gym Floor (pesistica) e Athlon TV. Abbonamento Gold: Corsi Fitness Live, Athlon TV, Gym Floor (pesistica), Aqua Fitness, Nuoto Libero Assistito, Scuola Nuoto Adulti, Nuoto Master, Acqua Gestanti. Abbonamento Silver Acqua: Athlon TV, Aqua Fitness, Nuoto Libero Assistito, Scuola Nuoto Adulti, Nuoto Master, Acqua Gestanti. Abbonamento Silver Fitness: Corsi Fitness Live, Athlon TV. Gym Floor (pesistica). Abbonamento Bronze: Gym Floor, Athlon TV e Nuoto Libero Assistito. Abbonamento Premium: Corsi Fitness Live, Athlon TV, Gym Floor (pesistica), Aqua Fitness, Nuoto Libero Assistito, Scuola Nuoto Adulti, Nuoto Master, Group Reformer. Abbonamento Smart (o Bronze): Gym Floor (Sala Pesi) e Nuoto Libero"
+      },
+      {
+        "id": "7.4",
+        "titolo": "Orari di Accesso",
+        "testo": "l’abbonamento OPEN permette l’accesso a tutte le attività senza limitazioni di orario. L’abbonamento SHORT permette l’accesso alle attività con orario di inizio entro le ore 16:00 dal Lunedì al Venerdì e senza limitazioni il Sabato e la Domenica"
+      },
+      {
+        "id": "7.5",
+        "titolo": "Orari Attività",
+        "testo": "gli orari di apertura e il calendario delle lezioni sono aggiornati con cadenza mensile e sempre visibili sull’APP Athlon Club e sul sito internet www.athlonroma.it/planning. Per il periodo estivo, che va da giugno a settembre, è previsto un planning orario e giorni di attività ridotti. L’abbonamento rimane comunque attivo e valido. La Direzione si riserva la facoltà di modificare i programmi anche senza preavviso, e senza che questo comporti alcun onere nei confronti degli iscritti o alcun rimborso delle quote o parte di esse"
+      },
+      {
+        "id": "7.6",
+        "titolo": "Prenotazioni",
+        "testo": "La prenotazione di corsi, lezioni, servizi o attività similari deve essere effettuata direttamente dall’Utente, esclusivamente tramite il proprio account personale (via browser o APP). In caso di ripetute mancate disdette (pari o superiori a 3 nell’arco di 1 mese), potrà essere temporaneamente sospesa la possibilità di effettuare nuove prenotazioni per un periodo di 3 giorni. Le modalità operative, i termini temporali e le eventuali limitazioni (es. numero massimo di prenotazioni attive, finestra temporale di prenotazione o disdetta, ecc.) sono pubblicate e costantemente aggiornate all’interno della sezione dedicata sul sito web, al seguente link: https://www.athlonroma.it/wikiathlon/generali/prenotazioni/ L’Utente è tenuto a prenderne visione e a rispettarne il contenuto in ogni sua parte"
+      },
+      {
+        "id": "7.7",
+        "titolo": "Sospensioni a Pagamento",
+        "testo": "Per tutti gli abbonamenti è possibile richiedere la sospensione dell’abbonamento per periodi di 1 mese solare intero, sempre a partire dal 1° giorno del mese. Le sospensioni sono a pagamento e possono essere acquistate direttamente dall’area riservata dell’Utente, dove saranno visibili gli slot disponibili. La richiesta di sospensione deve essere inserita con almeno 10 giorni di anticipo rispetto al mese che si desidera sospendere, accedendo al portale Athlon e seguendo il percorso: Abbonamenti > Seleziona il tuo Abbonamento > Sospensioni. Le scadenze per la richiesta sono le seguenti: ● Mese di 31 giorni: entro la mezzanotte del 21 ● Mese di 30 giorni: entro la mezzanotte del 20 ● Mese di 28 giorni: entro la mezzanotte del 18 In caso di richiesta correttamente inserita e saldata, la sospensione trasla in avanti sia la scadenza del pagamento successivo che il relativo periodo di validità dell’abbonamento, inclusa la durata contrattuale minima residua.La sospensione trasla la scadenza del successivo pagamento e del relativo periodo la durata minima contrattuale"
+      },
+      {
+        "id": "7.8",
+        "titolo": "Inabilità Fisica Temporanea alla Frequenza dell’Attività Sportiva",
+        "testo": "in caso di grave infortunio o malattia che pregiudichino l’idoneità all’attività sportiva non agonistica è possibile richiedere la sospensione dell’abbonamento. La richiesta dovrà essere corredata da idonea documentazione medica di una struttura sanitaria nazionale (ad es. Ospedale) e dovrà indicare con chiarezza l’inidoneità ed il termine del periodo di non idoneità. E’ possibile il recupero da un minimo di 2 mesi ad un massimo di 6 mesi (no recuperi per periodi inferiori a 2 mesi). Il recupero sarà concesso per mezzo della traslazione della scadenza dell’abbonamento del numero di mesi pari alla sospensione. Per richiedere la sospensione inviare la richiesta con la documentazione allegata a desk@athlonroma.it e attendere la conferma via e-mail (una volta visionata la documentazione verrà eliminata)"
+      },
+      {
+        "id": "7.9",
+        "titolo": "Piani di Pagamento – Rinnovo Automatico",
+        "testo": "L’abbonamento decorre dalla data di partenza indicata in fase di iscrizione e si rinnova automaticamente secondo la formula scelta, salvo disdetta da parte dell’Utente (v. punto 7.10). Tutti gli addebiti avvengono in automatico, con cadenza mensile o annuale, in base al piano selezionato"
+      },
+      {
+        "id": "7.9.1",
+        "titolo": "Mensile Flex",
+        "testo": "È un piano di pagamento mensile con rinnovo automatico: l’addebito avviene ogni 1° giorno del mese e la durata minima è di un mese intero. In caso di attivazione in corso mese, viene calcolato un pro-rata a cui segue il mese intero"
+      },
+      {
+        "id": "7.9.2",
+        "titolo": "Annuale – Soluzione Unica",
+        "testo": "È un piano annuale a rinnovo automatico con addebito in un’unica soluzione ogni 12 mesi. L’abbonamento si rinnova per altri 12 mesi interi, salvo disdetta entro i termini previsti. La durata minima è di 12 mesi"
+      },
+      {
+        "id": "7.9.3",
+        "titolo": "Mensile – Formula 12",
+        "testo": "È un piano mensile a rinnovo automatico che prevede un impegno minimo di 12 mesi consecutivi (12 mensilità pagate per intero). Anche in questo caso, se l’attivazione non coincide con il primo giorno del mese, si applica un pro-rata iniziale. Al termine del periodo minimo, l’abbonamento continua a rinnovarsi mese per mese, salvo disdetta"
+      },
+      {
+        "id": "7.9.4",
+        "titolo": "Annuale – Rateizzato",
+        "testo": "È un piano annuale con pagamento frazionato su base mensile. Anche qui, in caso di attivazione in corso mese, si applica un pro-rata iniziale. L’impegno minimo è di 12 mesi interi e, al termine, l’abbonamento si rinnova automaticamente per un altro anno intero (12 mesi), salvo disdetta. A differenza della Formula 12, il rinnovo avviene sempre su base annuale"
+      },
+      {
+        "id": "7.10",
+        "titolo": "Modalità di Disdetta",
+        "testo": "La disdetta dell’abbonamento consente di evitare il rinnovo automatico al termine del proprio periodo di validità. Le modalità variano a seconda del piano sottoscritto. Per gli abbonamenti Mensile e Mensile – Formula 12, la disdetta può essere effettuata direttamente dalla propria area riservata, accedendo alla sezione Abbonamenti e selezionando l’opzione Disdici Rinnovo Automatico. Per gli abbonamenti Annuale – Soluzione Unica e Annuale – Rateizzato, è invece necessario inviare un’e-mail all’indirizzo disdetta@athlonroma.it, specificando nome, cognome e codice fiscale, e indicando chiaramente l’intenzione di non rinnovare il contratto. In tutti i casi, la disdetta deve essere effettuata almeno 10 giorni prima del termine del ciclo di pagamento o del periodo di impegno contrattuale previsto. Qualora l’abbonamento sia soggetto a una durata minima, la disdetta avrà effetto dalla prima scadenza utile successiva al termine del periodo di impegno. In caso di disdetta e successiva iscrizione, l’Utente sarà tenuto al versamento di una nuova quota di attivazione, secondo le condizioni contrattuali in vigore al momento della nuova iscrizione. La disdetta non interrompe l’obbligo di pagamento in presenza di un impegno contrattuale minimo ancora in corso"
+      }
+    ]
+  },
+  {
+    "numero": "8",
+    "titolo": "Baby Nuoto (3-36 mesi)",
+    "clausole": [
+      {
+        "id": "8.1",
+        "titolo": "Tesseramento",
+        "testo": "La nostra Società Sportiva Dilettantistica è affiliata ad ASI (Associazioni Sportive e Sociali Italiane) e svolge attività didattica e competitiva nell’ambito di tale ente di promozione sportiva. Per accedere ai nostri Corsi Sportivi in qualità di Abbonato è obbligatorio essere in possesso del Tesserino ASI come Atleta. Al momento dell’iscrizione, verificheremo il possesso del tesseramento sul database ASI. In caso non risulti attivo, provvederemo automaticamente all’emissione di un nuovo tesseramento ASI (Tipologia B), comprensivo di copertura assicurativa per infortuni personali. Qualora l’Utente desiderasse optare per una tipologia di tesseramento diversa, con caratteristiche assicurative differenti, dovrà comunicarlo espressamente via e-mail a desk@athlonroma.it prima dell’attivazione del tesseramento"
+      },
+      {
+        "id": "8.2",
+        "titolo": "Attività Sportive Comprese nell’Abbonamento",
+        "testo": "con l’abbonamento Baby Nuoto è possibile accedere e partecipare alle attività di Baby Nuoto, previa prenotazione"
+      },
+      {
+        "id": "8.3",
+        "titolo": "Orari Lezioni",
+        "testo": "gli orari delle lezioni sono sempre visibili sull’APP o Portale di prenotazione Athlon. La Direzione si riserva la facoltà di modificare i programmi anche senza preavviso, e senza che questo comporti alcun onere nei confronti degli iscritti o alcun rimborso delle quote o parte di esse"
+      },
+      {
+        "id": "8.4",
+        "titolo": "Prenotazioni",
+        "testo": "La prenotazione di corsi, lezioni, servizi o attività similari deve essere effettuata direttamente dall’Utente, esclusivamente tramite il proprio account personale (via browser o APP). In caso di ripetute mancate disdette (pari o superiori a 3 nell’arco di 1 mese), potrà essere temporaneamente sospesa la possibilità di effettuare nuove prenotazioni per un periodo di 3 giorni. Le modalità operative, i termini temporali e le eventuali limitazioni (es. numero massimo di prenotazioni attive, finestra temporale di prenotazione o disdetta, ecc.) sono pubblicate e costantemente aggiornate all’interno della sezione dedicata sul sito web, al seguente link: https://www.athlonroma.it/wikiathlon/generali/prenotazioni/ L’Utente è tenuto a prenderne visione e a rispettarne il contenuto in ogni sua parte"
+      },
+      {
+        "id": "8.5",
+        "titolo": "Sospensioni a Pagamento",
+        "testo": "Per tutti gli abbonamenti è possibile richiedere la sospensione dell’abbonamento per periodi di 1 mese solare intero, sempre a partire dal 1° giorno del mese. Le sospensioni sono a pagamento e possono essere acquistate direttamente dall’area riservata dell’Utente, dove saranno visibili gli slot disponibili. La richiesta di sospensione deve essere inserita con almeno 10 giorni di anticipo rispetto al mese che si desidera sospendere, accedendo al portale Athlon e seguendo il percorso: Abbonamenti > Seleziona il tuo Abbonamento > Sospensioni. Le scadenze per la richiesta sono le seguenti: ● Mese di 31 giorni: entro la mezzanotte del 21 ● Mese di 30 giorni: entro la mezzanotte del 20 ● Mese di 28 giorni: entro la mezzanotte del 18"
+      },
+      {
+        "id": "8.6",
+        "titolo": "Inabilità Fisica Temporanea alla Frequenza dell’Attività Sportiva",
+        "testo": "in caso di grave infortunio o malattia che pregiudichino l’idoneità all’attività sportiva non agonistica è possibile richiedere la sospensione dell’abbonamento. La richiesta dovrà essere corredata da idonea documentazione medica di una struttura sanitaria nazionale (ad es. Ospedale) e dovrà indicare con chiarezza l’inidoneità ed il termine del periodo di non idoneità. E’ possibile il recupero da un minimo di 2 mesi ad un massimo di 6 mesi (no recuperi per periodi inferiori a 2 mesi). Il recupero sarà concesso per mezzo della traslazione della scadenza dell’abbonamento del numero di mesi pari alla sospensione. Per richiedere la sospensione inviare la richiesta con la documentazione allegata a desk@athlonroma.it e attendere la conferma via e-mail (una volta visionata la documentazione verrà eliminata)"
+      },
+      {
+        "id": "8.7",
+        "titolo": "Piani di pagamento",
+        "testo": "L’abbonamento decorre dalla data di partenza indicata in fase di iscrizione. Qualora il primo periodo di pagamento non coincidesse con un mese solare pieno, verrà calcolato in automatico l’importo del pro-rata (vedi punto 3.1.3.) e verrà richiesto come primo pagamento. L’importo del ciclo di pagamento scelto verrà addebitato il successivo giorno 1 del mese"
+      },
+      {
+        "id": "8.7.1",
+        "titolo": "Mensile",
+        "testo": "Piano di Pagamento Mensile a rinnovo automatico, l’addebito avviene ogni giorno 1 del mese. La durata dell’abbonamento è di almeno un mese. Nel caso sia presente il pro-rata, la durata minima sarà il pro-rata + 1 mese. L’abbonamento si rinnoverà in modo automatico, mensilmente, salvo disdetta (v. punto 8.8)"
+      },
+      {
+        "id": "8.8",
+        "titolo": "Disdetta",
+        "testo": "per annullare il rinnovo automatico dell’abbonamento è possibile effettuare la disdetta direttamente dalla propria area riservata cliccando su > Abbonamenti > Disdici Rinnovo Automatico. La disdetta può essere effettuata almeno 10 giorni prima del successivo ciclo di pagamento NB 10 giorni equivalgono a 240 ore prima della mezzanotte del 1 giorno del mese. ● Mese con 31 Giorni la disdetta va effettuata entro la mezzanotte del 21 ● Mese con 30 Giorni la disdetta va effettuata entro la mezzanotte del 20 ● Mese con 28 Giorni la disdetta va effettuata entro la mezzanotte del 18 In caso di disdetta e successiva iscrizione si sarà tenuti al pagamento di una nuova quota di attivazione e alle nuove condizioni contrattuali del momento"
+      }
+    ]
+  },
+  {
+    "numero": "9",
+    "titolo": "Abbonamenti aggiuntivi: lezioni individuali (personal)",
+    "clausole": [
+      {
+        "id": "9.1",
+        "titolo": "Attività Sportive Comprese nell’Abbonamento",
+        "testo": "2 Sedute al Mese: 2 Sedute di Personal Training utilizzabili nel mese solare (dal 1 a fine mese). 4 Sedute al Mese: 4 Sedute di Personal Training utilizzabili nel mese solare (dal 1 a fine mese). 8 Sedute al Mese: 8 Sedute di Personal Training utilizzabili nel mese solare (dal 1 a fine mese). Le sedute vengono caricate in automatico il 1 giorno del mese e possono essere utilizzate entro o non oltre il mese stesso. Nel caso il contratto cominci a mese iniziato, verrà richiesto il pagamento del mese per intero e verranno caricate il numero totale di sedute previste dal pacchetto, che potranno essere consumate entro la fine del mese solare di inizio abbonamento (Es. inizio contratto 20/10, importo del mese richiesto per intero, numero di lezioni caricate per intero, utilizzabili entro il 31/10)"
+      },
+      {
+        "id": "9.2",
+        "titolo": "Piani di pagamento – mensile",
+        "testo": "L’abbonamento decorre dalla data di partenza indicata in fase di iscrizione. Piano di Pagamento Mensile a rinnovo automatico, l’addebito avviene ogni giorno 1 del mese. La durata dell’abbonamento è di almeno un mese. L’abbonamento si rinnoverà in modo automatico, mensilmente, salvo disdetta (v. punto 9.3)"
+      },
+      {
+        "id": "9.3",
+        "titolo": "Disdetta",
+        "testo": "per annullare il rinnovo automatico dell’abbonamento è possibile effettuare la disdetta direttamente dalla propria area riservata cliccando su > Abbonamenti > Disdici Rinnovo Automatico. La disdetta può essere effettuata almeno 10 giorni prima del successivo ciclo di pagamento NB 10 giorni equivalgono a 240 ore prima della mezzanotte del 1 giorno del mese. ● Mese con 31 Giorni la disdetta va effettuata entro la mezzanotte del 21 ● Mese con 30 Giorni la disdetta va effettuata entro la mezzanotte del 20 ● Mese con 28 Giorni la disdetta va effettuata entro la mezzanotte del 18 In caso di disdetta e successiva iscrizione si sarà tenuti al pagamento di una nuova quota di attivazione e alle nuove condizioni contrattuali del momento"
+      },
+      {
+        "id": "9.4",
+        "titolo": "Prenotazioni",
+        "testo": "a seconda del pacchetto scelto sarà possibile prenotare un certo numero di sedute di allenamento individuale nell’arco del mese solare. Le lezioni individuali devono essere prenotate e fruite nel mese di competenza. Non è possibile recuperare le lezioni del mese precedente. Le prenotazioni devono essere effettuate in anticipo attraverso il Portale/APP Athlon, scegliendo tra la disponibilità visibile dell’istruttore. Le lezioni verranno caricate alla mezzanotte del 1 giorno del mese, e da quel momento sarà possibile effettuare la prenotazione"
+      }
+    ]
+  },
+  {
+    "numero": "10",
+    "titolo": "Lezioni singole e pacchetti",
+    "clausole": [
+      {
+        "id": "10.1",
+        "titolo": "Certificato Medico",
+        "testo": "Per partecipare alle attività sportive, di gruppo o individuali, è obbligatorio per tutti gli utenti di età superiore ai 6 anni inviare via e-mail, entro 14 giorni dall’inizio dell’attività, copia del Certificato Medico di idoneità all’attività sportiva non agonistica. In assenza di tale documentazione, il Badge personale verrà sospeso e l’accesso al Club sarà inibito. La mancata presentazione del certificato non dà diritto ad alcun rimborso o proroga dei prodotti acquistati"
+      },
+      {
+        "id": "10.2",
+        "titolo": "Prenotazioni",
+        "testo": "Tutte le attività sportive, sia di gruppo che individuali, prevedono obbligatoriamente la prenotazione da parte dell’Utente. Senza prenotazione non sarà possibile accedere al servizio. Le modalità e i termini di prenotazione sono disponibili nella sezione dedicata del nostro sito"
+      },
+      {
+        "id": "10.3",
+        "titolo": "Disdetta Prenotazione",
+        "testo": "È possibile disdire una prenotazione entro 1 ora dall’inizio per le lezioni di gruppo e entro 2 ore dall’inizio per le lezioni individuali. In caso di disdetta effettuata nei tempi previsti, l’accesso acquistato verrà riaccreditato sull’account e potrà essere utilizzato entro 14 giorni dalla data della prenotazione originaria"
+      },
+      {
+        "id": "10.4",
+        "titolo": "Durata e Scadenza di Lezioni e Pacchetti",
+        "testo": "Tutte le lezioni singole e i pacchetti acquistati hanno una validità temporale limitata, chiaramente indicata al momento dell’acquisto. Una volta raggiunta la data di scadenza, gli accessi non utilizzati verranno automaticamente annullati e non sarà possibile recuperarli, prorogarli o convertirli in altri servizi. L’Utente è tenuto a verificare la durata di validità dei pacchetti acquistati nella propria area riservata"
+      },
+      {
+        "id": "10.5",
+        "titolo": "Rimborsi",
+        "testo": "Non è previsto alcun rimborso per prodotti o accessi acquistati, salvo nei casi espressamente previsti dalla normativa vigente"
+      },
+      {
+        "id": "10.6",
+        "titolo": "Accesso al Club",
+        "testo": "Per accedere al Club è necessario aver acquistato un Tesserino o Braccialetto identificativo, strettamente personale e non cedibile"
+      }
+    ]
+  },
+  {
+    "numero": "11",
+    "titolo": "Corsi intensivi estivi",
+    "clausole": [
+      {
+        "id": "11.1",
+        "titolo": "Certificato Medico",
+        "testo": "Entro 14 giorni dall’inizio dell’attività è obbligatorio inviare in allegato via e-mail copia del Certificato Medico di idoneità all’attività sportiva non agonistica. Sono esentati i soli bambini fino ai 5 anni di età. Nel caso in cui questo non avvenga, verrà tenuto sospeso il Badge personale fino a quando l’Iscritto non invierà il Certificato Medico dovuto. Sono esclusi da tale obbligo i bambini di età fino ai 6 anni compresi"
+      },
+      {
+        "id": "11.2",
+        "titolo": "Tesseramento",
+        "testo": "La nostra Società Sportiva Dilettantistica è affiliata ASI e svolge attività didattica e competitiva con tale ente di promozione sportiva. Per accedere ai nostri Corsi Sportivi come Abbonato è necessario essere in possesso del Tesserino Asi come Atleta. All’atto dell'iscrizione ne verrà da noi verificato il possesso (sul Database ASI) ed in caso non sia già presente, verrà immediatamente effettuato un nuovo tesseramento ad ASI (Tipo B) comprensivo di Assicurazione Infortunistica Personale"
+      },
+      {
+        "id": "11.3",
+        "titolo": "Il Corso",
+        "testo": "I corsi si svolgono dal lunedì al venerdì su prenotazione. La durata delle lezioni è di 50’. La suddivisione degli allievi, all’interno dell’orario scelto, si basa su criteri di omogeneità per quanto concerne l’età e il livello tecnico. La Direzione Tecnica si riserva il diritto di cambiare l’insegnante assegnato a seconda delle diverse esigenze didattiche"
+      },
+      {
+        "id": "11.4",
+        "titolo": "Accesso al Corso",
+        "testo": "è permesso l’accesso agli spogliatoi soltanto 10 minuti prima dell’orario di lezione. E’ assolutamente vietato l’accesso agli spogliatoi agli accompagnatori dei bambini di età superiore a 8 anni. Sarà ammesso l’accesso negli spogliatoi dei bambini fino ai 7 anni di una sola persona accompagnatrice. Nel caso in cui la persona accompagnatrice non sia il genitore stesso devono essere comunicati i dati anagrafici della persona incaricata (familiari, baby-sitter, ecc..) in Segreteria. L’accompagnatore del bambino frequentante avrà cura e stretta sorveglianza del minore nel periodo di permanenza nel centro e sarà unico responsabile in caso di incidente alla persona o alle cose dell’Impianto stesso. L’accompagnatore del bambino è tenuto a portare personalmente il minore all’ingresso dello spogliatoio dedicato. Tutti i danni alle strutture o ai beni della Società, anche se nell’esercizio di attività svolte con istruttori, saranno a carico di chi li avrà cagionati"
+      },
+      {
+        "id": "11.5",
+        "titolo": "Direzione Tecnica",
+        "testo": "per informazioni e chiarimenti tecnici il Direttore Tecnico riceve previo appuntamento Telefonico"
+      },
+      {
+        "id": "11.6",
+        "titolo": "Modalità di Adesione",
+        "testo": "Sono previsti pacchetti di Lezioni a prenotazione da 1, 5, 10 o 20 lezioni. Da consumare entro e non oltre il termine del 31/07/2025"
+      },
+      {
+        "id": "11.7",
+        "titolo": "Modalità di Prenotazione",
+        "testo": "Sarà possibile effettuare la prenotazione esclusivamente tramite Portale Web o APP a partire da 3 giorni prima della lezione"
+      },
+      {
+        "id": "11.8",
+        "titolo": "Disdetta prenotazione",
+        "testo": "E’ concessa la possibilità di disdire la prenotazione entro 1 ora dal suo inizio. In caso di disdetta verrà riaccreditato il prodotto acquistato e sarà possibile effettuare una nuova prenotazione entro il termine dei corsi intensivi"
+      },
+      {
+        "id": "11.9",
+        "titolo": "Rimborsi",
+        "testo": "Non sono mai previsti rimborsi dei prodotti acquistati"
+      },
+      {
+        "id": "11.10",
+        "titolo": "Accesso",
+        "testo": "per l’accesso al Club è necessario l’acquisto del Tesserino o Braccialetto. L’utilizzo è strettamente personale"
+      }
+    ]
+  }
 ]
