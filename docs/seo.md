@@ -103,19 +103,50 @@ node scripts/varianti-foto.mjs
 Non è nella pipeline di build di proposito: su Vercel farebbe scaricare `sharp` a
 ogni deploy per rigenerare file che non cambiano.
 
-### Quello che resta da fare, e non è codice
+### I video di sfondo
 
-I video di sfondo sono il peso rimanente, e sono una scelta di prodotto, non un
-bug:
+Erano il peso rimanente, ed erano esportati con impostazioni da montaggio: 28 MB
+per una clip da 57 secondi mostrata in un quadrato da 563 px, 6,2 Mbps a 60 fps
+per una che sta in un quadrato da 662. `scripts/comprimi-video.mjs` le ricodifica
+tutte e quattro.
 
-| Video | Pagina | Peso |
+| Clip | Prima | Dopo | |
+| --- | --- | --- | --- |
+| `Baby-Nuoto-60` | 28,3 MB · 1080p · 4,1 Mbps | **9,3 MB** · 720p · 1,4 Mbps | −67% |
+| `Video-Reformer` | 22,9 MB · 1080×1920 · 60 fps · 6,4 Mbps | **4,0 MB** · 720×1280 · 30 fps · 1,1 Mbps | −83% |
+| `Athlon-Tour` (hero) | 9,2 MB · **HEVC** · 1,5 Mbps | **7,8 MB** · H.264 · 1,3 Mbps | −15% |
+| `solo-sala-pesi` | 5,5 MB · 2,5 Mbps | **3,4 MB** · 1,6 Mbps | −37% |
+| | 65,9 MB | **24,5 MB** | −63% |
+
+Tre cose che questa tabella non dice, e contano più della percentuale:
+
+**La clip della home era in HEVC.** Efficiente come codec, ma Firefox non lo
+decodifica affatto e Chrome solo con supporto hardware: su quei browser lo
+sfondo della hero era un rettangolo nero. Ora è H.264, e pesa meno di prima.
+
+**La risoluzione segue la casella, non il sorgente.** Misurato in browser a 390,
+1280 e 2560 px: le due clip dentro una scheda si vedono al massimo a 563 e 662
+px, quindi 720p le copre col doppio della densità. Le due a tutta pagina restano
+a 1080p, che è già la risoluzione dei file originali.
+
+**Il CRF da solo non bastava.** Il primo tentativo, solo `-crf 28`, sul Baby
+Nuoto ha prodotto un file **più grande dell'originale**: acqua che schizza è
+dettaglio alto su tutto il fotogramma, e quella qualità su quel contenuto costa
+più di 4 Mbps. Per uno sfondo la scelta giusta è opposta — un tetto con
+`-maxrate`, e la qualità che scende dove il contenuto è difficile.
+
+Tutte e quattro hanno `+faststart` (l'indice all'inizio, altrimenti il browser
+scarica fino in fondo prima del primo fotogramma) e `yuv420p`. Verifica con
+`scripts/confronta-video.mjs`: metadati, durata, faststart, e lo stesso istante
+estratto dai due file e affiancato. Che il fotogramma si estragga dimostra anche
+che il file decodifica — Chromium headless qui non ha il decoder H.264, quindi la
+riproduzione in pagina va provata su un browser vero.
+
+Peso delle pagine con video, misurato a 1280px:
+
+| | prima | dopo |
 | --- | --- | --- |
-| `Baby-Nuoto-60.mp4` | `/baby-nuoto` | 28,3 MB |
-| `Video-Reformer-Compresso-per-Sito.mp4` | `/reformer` | 22,9 MB |
-| `Athlon-Tour-2025-COMPRESSED.mp4` | home | 9,2 MB |
-| `solo-sala-pesi.mp4` | `/gym-floor` | 5,5 MB |
-
-Sono clip di sfondo, mute e in loop, larghe al massimo quanto lo schermo: a
-1080p e con un bitrate da sfondo starebbero in un quarto dello spazio senza
-differenza visibile. Serve una ricodifica dei file, che è materiale del club —
-non una modifica al sito.
+| Home | 17,9 MB | **8,9 MB** |
+| Baby Nuoto | ~29 MB | **10,3 MB** |
+| Reformer | ~24 MB | **5,0 MB** |
+| Gym Floor | 5,9 MB | **3,7 MB** |
