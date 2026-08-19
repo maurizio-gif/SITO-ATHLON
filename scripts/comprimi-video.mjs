@@ -38,9 +38,16 @@
  *  - **`-movflags +faststart`**: sposta l'indice all'inizio del file. Senza, il
  *    browser scarica fino in fondo prima del primo fotogramma.
  *  - **`yuv420p`**: l'unico formato che tutti i decoder accettano.
- *  - L'audio resta solo sul Reformer, l'unica clip con i controlli, quindi
- *    l'unica dove qualcuno può alzare il volume. Le altre sono sfondi muti per
- *    definizione, e una traccia che nessuno sentirà è peso.
+ *  - **Nessuna traccia audio, su nessuna clip.** Non c'è più un video con i
+ *    controlli — sono tutte scenografia, mute, e il puntatore non le raggiunge
+ *    nemmeno — quindi non esiste il gesto con cui alzare il volume: una traccia
+ *    che nessuno può sentire è solo peso. Sul Reformer erano 362 kB su 4,2 MB.
+ *    L'unica clip che il visitatore può portare a schermo intero, la hero della
+ *    home, non ha audio nel sorgente.
+ *
+ * Le clip in `public/` sono già il risultato di questo script: rilanciarlo così
+ * com'è ricomprime del già compresso. Per rifare il lavoro servono i sorgenti
+ * originali, che stanno nel montaggio, non nel repository.
  *
  * Si lancia a mano, con i binari presi al volo — non sono dipendenze del sito:
  *
@@ -69,13 +76,13 @@ const CLIP = [
   },
   {
     src: 'public/wp-content/uploads/2025/03/Video-Reformer-Compresso-per-Sito.mp4',
-    /* Verticale, in una scheda da 662 px, e con i controlli: qualcuno la guarda
-       davvero, quindi un po' più di bitrate e un CRF più severo. */
+    /* Verticale, in una scheda da 662 px, e con il movimento più lento e
+       leggibile delle quattro: un po' più di bitrate e un CRF più severo. */
     scala: '-2:1280',
     crf: 28,
     maxrate: '1800k',
     fps: 30,
-    audio: true,
+    audio: false,
   },
   {
     src: 'public/wp-content/uploads/2025/12/Athlon-Tour-2025-COMPRESSED.mp4',

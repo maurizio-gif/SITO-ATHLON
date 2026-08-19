@@ -113,12 +113,12 @@ tutte e quattro.
 | Clip | Prima | Dopo | |
 | --- | --- | --- | --- |
 | `Baby-Nuoto-60` | 28,3 MB · 1080p · 4,1 Mbps | **9,3 MB** · 720p · 1,4 Mbps | −67% |
-| `Video-Reformer` | 22,9 MB · 1080×1920 · 60 fps · 6,4 Mbps | **4,0 MB** · 720×1280 · 30 fps · 1,1 Mbps | −83% |
+| `Video-Reformer` | 22,9 MB · 1080×1920 · 60 fps · 6,4 Mbps | **3,6 MB** · 720×1280 · 30 fps · 1,0 Mbps | −84% |
 | `Athlon-Tour` (hero) | 9,2 MB · **HEVC** · 1,5 Mbps | **7,8 MB** · H.264 · 1,3 Mbps | −15% |
 | `solo-sala-pesi` | 5,5 MB · 2,5 Mbps | **3,4 MB** · 1,6 Mbps | −37% |
-| | 65,9 MB | **24,5 MB** | −63% |
+| | 65,9 MB | **24,1 MB** | −63% |
 
-Tre cose che questa tabella non dice, e contano più della percentuale:
+Quattro cose che questa tabella non dice, e contano più della percentuale:
 
 **La clip della home era in HEVC.** Efficiente come codec, ma Firefox non lo
 decodifica affatto e Chrome solo con supporto hardware: su quei browser lo
@@ -135,6 +135,14 @@ dettaglio alto su tutto il fotogramma, e quella qualità su quel contenuto costa
 più di 4 Mbps. Per uno sfondo la scelta giusta è opposta — un tetto con
 `-maxrate`, e la qualità che scende dove il contenuto è difficile.
 
+**E nessuna ha la traccia audio.** Il Reformer se l'era tenuta perché era la
+sola clip con i controlli, quindi la sola dove qualcuno poteva alzare il volume.
+Togliendo i controlli quel gesto non esiste più su nessuna clip del sito, e una
+traccia che nessuno può sentire è solo peso: 362 kB su 4,2 MB, via con una copia
+di flusso (`-c:v copy -an`), quindi senza ricodificare — il fotogramma a metà
+clip è byte per byte lo stesso di prima. La hero della home, l'unica che si può
+portare a schermo intero, non ha audio nel sorgente.
+
 Tutte e quattro hanno `+faststart` (l'indice all'inizio, altrimenti il browser
 scarica fino in fondo prima del primo fotogramma) e `yuv420p`. Verifica con
 `scripts/confronta-video.mjs`: metadati, durata, faststart, e lo stesso istante
@@ -148,5 +156,5 @@ Peso delle pagine con video, misurato a 1280px:
 | --- | --- | --- |
 | Home | 17,9 MB | **8,9 MB** |
 | Baby Nuoto | ~29 MB | **10,3 MB** |
-| Reformer | ~24 MB | **5,0 MB** |
+| Reformer | ~24 MB | **4,6 MB** |
 | Gym Floor | 5,9 MB | **3,7 MB** |
