@@ -82,7 +82,11 @@
     {/* ── 2. Adulti o junior ─────────────────────────────────────────────
         Una scelta a due vie chiesta a parole è solo un'occasione per
         fraintendere: sono due pulsanti. E cambia molto — la conoscenza che
-        l'assistente può usare, il tono, e cosa gli si chiede di ottenere. */}
+        l'assistente può usare, il tono, e cosa gli si chiede di ottenere.
+
+        Lo vede anche chi è già socio: sapere che è di casa dice come parlargli,
+        non di che cosa sta parlando. Un padre con l'abbonamento che chiede degli
+        orari della scuola nuoto è un socio, e la domanda è junior. */}
     <section class="ca__step" data-ca-step="ambito" hidden>
       <h3 class="ca__title" tabindex="-1" data-ca-fuoco>Per chi cerchi informazioni?</h3>
       <p class="ca__lead">Così ti parlo della cosa giusta.</p>
@@ -99,12 +103,19 @@
       </div>
     </section>
 
-    {/* ── 3. Quale corso junior ──────────────────────────────────────────
-        I quattro corsi sono percorsi diversi con requisiti diversi, e sapere
-        quale interessa è ciò che permette di non parlare degli altri tre. */}
-    <section class="ca__step" data-ca-step="junior" hidden>
-      <h3 class="ca__title" tabindex="-1" data-ca-fuoco>Quale corso ti interessa?</h3>
-      <div class="ca__scelte" data-ca-junior></div>
+    {/* ── 3. Quale attività ──────────────────────────────────────────────
+        Il vocabolario è quello di `activities.ts` — lo stesso dei tag degli
+        articoli e del box qui accanto — quindi la scelta non è una etichetta:
+        seleziona davvero la fetta di conoscenza da cui si risponde. Le quattro
+        junior sono percorsi con requisiti diversi, e saperlo è ciò che permette
+        di non parlare degli altri tre.
+
+        L'elenco lo dipinge lo script, perché dipende dalla scelta del passo
+        prima: titolo, riga di spiegazione e voci cambiano insieme. */}
+    <section class="ca__step" data-ca-step="attivita" hidden>
+      <h3 class="ca__title" tabindex="-1" data-ca-fuoco data-ca-attivita-titolo>Di cosa parliamo?</h3>
+      <p class="ca__lead" data-ca-attivita-lead></p>
+      <div class="ca__scelte" data-ca-attivita></div>
       <button type="button" class="ca__link" data-ca-indietro>← Torna indietro</button>
     </section>
 
@@ -129,7 +140,9 @@
         interpretato dal parlato è un'anagrafica che prima o poi è sbagliata, e
         quella la corregge una persona a mano.
 
-        I campi del bambino compaiono solo nel ramo junior. */}
+        Sta **prima** della conversazione e lo vede solo chi non conosciamo: di
+        un socio l'anagrafica ce l'ha già PerfectGym. I campi del bambino
+        compaiono solo quando si cerca per un bambino. */}
     <section class="ca__step" data-ca-step="dati" hidden>
       <h3 class="ca__title" tabindex="-1" data-ca-fuoco data-ca-dati-titolo>I tuoi dati</h3>
       <p class="ca__lead" data-ca-dati-lead>
@@ -202,8 +215,15 @@
       <p class="ca__errore" data-ca-dati-errore hidden></p>
 
       <button type="button" class="ca__btn" data-ca-dati-invia>
-        Invia
+        Invia e continua
         <span class="ca__spinner" aria-hidden="true"></span>
+      </button>
+
+      {/* Compare solo dopo un invio fallito: se l'automazione è giù, la
+          conversazione non deve morire con lei. Lo script la tiene nascosta
+          finché non serve. */}
+      <button type="button" class="ca__link" data-ca-dati-salta hidden>
+        Continua comunque senza inviare →
       </button>
 
       <p class="ca__privacy" data-ca-dati-privacy>
@@ -212,15 +232,7 @@
         <a href="/privacy" target="_blank" rel="noopener">Informativa privacy</a>.
       </p>
 
-      <button type="button" class="ca__link" data-ca-dati-annulla>← Torna alla conversazione</button>
-    </section>
-
-    {/* ── 6. Fatto ──────────────────────────────────────────────────────── */}
-    <section class="ca__step" data-ca-step="fatto" hidden>
-      <h3 class="ca__title" tabindex="-1" data-ca-fuoco>Ci siamo.</h3>
-      <p class="ca__lead" data-ca-fatto-lead></p>
-      <a class="ca__btn ca__btn--link" data-ca-fatto-cta href="/" target="_blank" rel="noopener" hidden></a>
-      <button type="button" class="ca__link" data-ca-fatto-chiudi>Chiudi</button>
+      <button type="button" class="ca__link" data-ca-dati-annulla>← Torna indietro</button>
     </section>
   </div>
 </div>
@@ -413,6 +425,10 @@
     padding: 0;
     overflow: hidden;
   }
+
+  /* Il passo nascosto lo spegne `[hidden]` in `global.css`: `display: flex` qui
+     sopra scavalcherebbe la regola del browser, e la chat resterebbe in pagina
+     sotto tutti gli altri passi. */
 
   .ca__title {
     margin: 0 0 0.6rem;
@@ -798,10 +814,6 @@
   .ca__consenso a {
     color: var(--color-primary);
     text-decoration: underline;
-  }
-
-  .ca__btn--link {
-    text-decoration: none;
   }
 
   @media (max-width: 460px) {

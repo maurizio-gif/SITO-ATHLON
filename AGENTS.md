@@ -91,6 +91,20 @@ Two details the form requires, and both have bitten:
 Overlays that use `display: none` when closed — the lightbox, the lesson modal —
 already behave; nothing to change there.
 
+And the same trap one level down, for the parts a script switches with the
+`hidden` attribute: `hidden` hides through a rule in the *browser's* stylesheet,
+so any `display` of ours beats it — author origin wins over user-agent origin at
+any specificity. A class carrying `display: flex` or `inline-flex` stays on the
+page with `hidden` on it, and the script that thinks it turned the thing off has
+turned nothing off. Three places had fallen into it: the assistant's chat step
+(its email box and an empty conversation area with its own text field, both on
+screen at once), the activity card's link, the Help Desk's suggestion row.
+`global.css` now declares `[hidden] { display: none !important }` once, for the
+whole site — `!important` because it has to beat classes written after it. An
+element that must stay visible does not carry `hidden`; it carries a class. To
+check a page: every element with the `hidden` attribute must compute to
+`display: none`.
+
 ## Photos: the box decides the file
 
 Photos live in `public/` and are referenced as strings, so Astro's image

@@ -180,6 +180,22 @@
   box-sizing: border-box;
 }
 
+/* `hidden` e' un attributo che nasconde, ma lo fa con una regola del *browser*,
+   e qualunque `display` scritto da noi la scavalca: l'origine d'autore vince su
+   quella dell'agente a qualsiasi specificita'. Una classe con `display: flex` o
+   `inline-flex` — un pulsante, una riga di suggerimenti, un passo di un
+   modal — resta quindi in pagina anche con `hidden` addosso, e lo script che
+   crede di averla spenta non ha spento niente.
+
+   Tre punti del sito ci sono cascati (il passo della chat dell'assistente, il
+   link della scheda attivita', i suggerimenti dell'Help Desk): la si dichiara
+   una volta qui, con `!important` perche' deve battere anche le classi scritte
+   dopo. Un elemento che deve restare visibile non porta `hidden`: usa una
+   classe. */
+[hidden] {
+  display: none !important;
+}
+
 html {
   scroll-behavior: smooth;
 }
