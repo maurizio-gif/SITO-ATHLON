@@ -200,24 +200,55 @@ export function lessonCardsFor(bandIds: string[]): Record<string, LessonCard> {
   return out;
 }
 
-/** Room colours are functional here — they are the timetable's legend. */
+/**
+ * Room colours are functional here — they are the timetable's legend.
+ *
+ * Questi sono i valori per le bande chiare, e il fondo è bianco puro: misurato
+ * su tutte le pagine che le usano, `/planning` e gli orari dentro le attività,
+ * non c'è una crema di mezzo. Il nome della sala è testo da 11,5px, quindi
+ * servono 4,5:1.
+ *
+ * Quattro dei sei colori originali non ci arrivavano — stavano tra 3,0 e 3,4:1 —
+ * e sono stati scuriti col minimo nero che porta a soglia. Due erano già a
+ * norma e non si toccano:
+ *
+ * | sala | originale | prima | ora | contrasto |
+ * | --- | --- | --- | --- | --- |
+ * | Sala A | `#c45010` | 4,66:1 | invariato | 4,66:1 |
+ * | Sala B | `#9a8c18` | 3,42:1 | `#837714` (15% nero) | 4,55:1 |
+ * | Sala C | `#5a9970` | 3,37:1 | `#4c815e` (16%) | 4,56:1 |
+ * | Vasca Media | `#3a9fc4` | 3,03:1 | `#2e7f9d` (20%) | 4,53:1 |
+ * | Vasca Grande | `#2d4f8a` | 8,09:1 | invariato | 8,09:1 |
+ * | Gym Floor | `#ff5701` | 3,17:1 | `#bb4001` | 5,46:1 |
+ *
+ * Il Gym Floor non è stato scurito del suo minimo — sarebbe finito su `#d14701`,
+ * troppo vicino al `#c45010` della Sala A per una legenda — ma porta `#bb4001`,
+ * lo stesso valore di `--accent-text` in global.css, che è l'arancione che il
+ * sito usa già quando il marchio pieno non regge il contrasto. Oggi comunque
+ * nessuna lezione ha «Gym Floor» come sala: il colore serve solo alla legenda.
+ *
+ * Le due tavolozze restano distinguibili dentro ogni banda: le legende che
+ * compaiono davvero accostano Sala A e Sala B (ruggine e oliva) e Vasca Media e
+ * Vasca Grande (foglia di tè e blu).
+ */
 export const ROOM_COLORS: Record<string, string> = {
   'Sala A': '#c45010',
-  'Sala B': '#9a8c18',
-  'Sala C': '#5a9970',
-  'Vasca Media': '#3a9fc4',
+  'Sala B': '#837714',
+  'Sala C': '#4c815e',
+  'Vasca Media': '#2e7f9d',
   'Vasca Grande': '#2d4f8a',
-  'Gym Floor': '#ff5701',
+  'Gym Floor': '#bb4001',
 };
 
 /**
  * Gli stessi colori per la banda scura, dove i primi non si leggono.
  *
- * La tavolozza qui sopra è nata per un fondo chiaro — sul bianco la Vasca
- * Grande fa 8,09:1 — ma il planning e le fasce dentro le pagine delle attività
- * girano anche in versione scura, e lì il nome della sala è testo da 11,5px su
- * una card che risulta `rgb(63,60,59)`: la Vasca Grande scendeva a **1,35:1**,
- * cioè spariva, e nessuna delle sei arrivava al 4,5:1 richiesto.
+ * La tavolozza qui sopra vale sul bianco. Il planning e le fasce dentro le
+ * pagine delle attività girano anche in versione scura, e lì il nome della sala
+ * è testo da 11,5px su una card che risulta `rgb(63,60,59)`: la Vasca Grande
+ * scendeva a **1,35:1**, cioè spariva, e nessuna delle sei arrivava al 4,5:1.
+ * I valori qui sotto partono dai colori originali, non da quelli scuriti per il
+ * bianco: schiarire un colore già scurito perderebbe la tinta due volte.
  *
  * Ogni valore è il colore originale schiarito col bianco della quantità minima
  * che porta a 4,5:1 su quel fondo: dal 19% della Vasca Media al 51% della Vasca

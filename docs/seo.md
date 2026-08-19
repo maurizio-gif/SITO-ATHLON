@@ -300,6 +300,39 @@ su desktop, 52×42 sotto, zero deformazione a tutte le larghezze.
   loghi: stesso colore, un filo più di opacità, nessun colore del marchio in
   mezzo.
 
+### Il testo che non c'era, e i colori delle sale
+
+Tre casi trovati passando **tutte le 76 pagine** in cerca di testo sotto 2:1 —
+una classe di difetto diversa dal contrasto insufficiente: non «si legge male»,
+non si vede. Vengono tutti dalla stessa causa, un colore che dà per scontato un
+fondo che il componente non ha sempre.
+
+| dove | com'era | ora |
+| --- | --- | --- |
+| «Vivi tutto il club.», card Premium | bianco su crema, **1,2:1** | `color: inherit`, 12,9:1 |
+| «Chiuso», banda scura del planning | inchiostro scuro su scuro, **1:1** | bianco al 55%, 5,2:1 |
+| nomi delle sale, banda scura | «Vasca Grande» **1,35:1** | tavolozza dedicata, 4,58–4,66:1 |
+
+I colori delle sale sono la legenda dell'orario e la fascia gira su due fondi,
+quindi ora ci sono **due tavolozze derivate** in `data/planning.ts`, e
+`roomColor(sala, variant)` scegle quella giusta:
+
+- `ROOM_COLORS` per il bianco. Quattro dei sei stavano tra 3,0 e 3,4:1 e sono
+  stati scuriti col minimo nero che porta a 4,5:1 (Sala B, Sala C, Vasca Media,
+  Gym Floor); Sala A e Vasca Grande erano già a norma e non si toccano.
+- `ROOM_COLORS_ON_DARK` per la banda scura. Gli stessi colori originali
+  schiariti col minimo bianco, dal 19% della Vasca Media al 51% della Vasca
+  Grande.
+
+Il minimo per ciascuno, non una quantità uguale per tutti: così ogni tinta resta
+il più vicino possibile alla legenda a cui appartiene. Il Gym Floor sul bianco
+fa eccezione — scurito del suo minimo sarebbe finito a `#d14701`, troppo vicino
+al `#c45010` della Sala A — e porta `#bb4001`, lo stesso valore di
+`--accent-text`.
+
+Dopo: la spazzata sulle 76 pagine torna **zero** elementi sotto 2:1, e ogni
+etichetta di sala e ogni pallino di legenda del sito passa la sua soglia.
+
 ### Accessibilità: gli overlay chiusi erano tabulabili
 
 Il controllo che PageSpeed segnalava come «l'albero di accessibilità non è ben
