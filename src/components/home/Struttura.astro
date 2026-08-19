@@ -72,14 +72,21 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 26px;
-    height: 26px;
+    width: 1.625rem;
+    height: 1.625rem;
     border-radius: 50%;
     background: var(--color-primary);
     color: var(--color-white);
-    font-size: 10px;
+    font-size: 0.625rem;
     /* Optical centring: the triangle glyph sits left of its own box. */
-    padding-left: 2px;
+    padding-left: 0.125rem;
+  }
+
+  /* Totem: come il pallino di abbonamenti, il cerchio cresce e il triangolo no. */
+  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 5/8) {
+    .tour-hint__icon {
+      font-size: var(--text-2xs);
+    }
   }
 
   .tour {

@@ -612,7 +612,7 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
   }
 
   .footer-legal p {
-    font-size: 12px;
+    font-size: 0.75rem;
     line-height: 1.75;
     color: rgba(255, 255, 255, 0.5);
     margin: 0;
@@ -629,7 +629,7 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
     gap: 12px;
     margin: 24px auto 0;
     padding: 18px 24px 30px;
-    font-size: 11px;
+    font-size: 0.6875rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.6);
@@ -678,6 +678,19 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
       width: 112px;
       height: 52px;
       margin-right: 20px;
+    }
+  }
+
+  /* Totem verticale: la firma era l'unico testo del sito rimasto sotto i 24px
+     (0,6875rem fa 23px a questa scala) e il logo accanto, alto 20px fissi,
+     diventava un francobollo in mezzo a caratteri da 32. */
+  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 5/8) {
+    .footer-credit {
+      font-size: var(--text-2xs);
+    }
+
+    .footer-credit img {
+      height: 1.25rem;
     }
   }
 </style>

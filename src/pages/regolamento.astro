@@ -330,7 +330,7 @@ import { ACTIVITY_LABEL } from '../data/activities';
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.12);
     color: var(--color-white);
-    font-size: 18px;
+    font-size: 1.125rem;
     line-height: 1;
     cursor: pointer;
   }
@@ -468,6 +468,7 @@ import { ACTIVITY_LABEL } from '../data/activities';
 
   .tcs__body {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 22px;
     margin-top: 24px;
   }
@@ -505,6 +506,16 @@ import { ACTIVITY_LABEL } from '../data/activities';
     color: var(--color-primary);
   }
 
+  /* Totem: global.css dà a questo link l'altezza di un dito, ma «7.1» resta
+     largo 36px. Una colonna fissa lo rende quadrato — e come effetto secondario
+     allinea i titoli delle clausole, che prima partivano ognuno da un punto
+     diverso a seconda di quante cifre aveva il numero. */
+  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 5/8) {
+    .tcc__num {
+      min-width: 1.6rem;
+    }
+  }
+
   .tcc__num:hover {
     text-decoration: underline;
   }
@@ -512,6 +523,8 @@ import { ACTIVITY_LABEL } from '../data/activities';
   .tcc__text {
     margin: 0;
     color: var(--text-muted);
+    /* Vedi `.tcs__body`: le clausole 7.6 e 8.4 citano un URL intero. */
+    overflow-wrap: anywhere;
   }
 
   .tc__foot {

@@ -1,0 +1,400 @@
+---
+/**
+ * Da aprire sul totem, e solo lì.
+ *
+ * La modalità totem (global.css, «Il totem verticale del club») si accende su
+ * tre misure — larghezza, altezza e proporzione — e quelle tre misure sono
+ * l'unica cosa che il sito sa dello schermo. Su un pannello vero però non le
+ * dichiara il pannello: le dichiara Windows, e cambiano con la scalatura del
+ * display, con la barra delle app, con la finestra a schermo intero o no. Un
+ * kiosk che dichiara 1440 invece di 1080, o 1040 di altezza utile invece di
+ * 1920, non fa scattare niente e la pagina resta in versione desktop.
+ *
+ * Questa pagina dice, sul posto e a caratteri leggibili da lontano, cosa
+ * dichiara quel browser e quale delle tre condizioni non passa. Nessuna misura
+ * è scritta a mano: le legge tutte dal browser.
+ *
+ * Lo scheletro è tutto qui nel markup e lo script scrive solo i valori. Non è
+ * pignoleria: gli stili di un componente Astro sono ad ambito, cioè valgono per
+ * gli elementi che portano il suo attributo, e un nodo creato con
+ * `createElement` non ce l'ha — la prima versione di questa pagina costruiva le
+ * righe da JavaScript e le mostrava senza un filo di stile.
+ *
+ * Fuori dall'indice e fuori dalla sitemap: è uno strumento, non una pagina del
+ * club.
+ */
+import Layout from '../layouts/Layout.astro';
+
+/* Le stesse tre misure della media query in global.css. Se cambiano là, vanno
+   cambiate qui: lo script le rilegge da `data-test`, quindi stanno scritte una
+   volta sola. */
+const CONDIZIONI = [
+  { test: '(min-width: 900px)', perche: 'non è un telefono' },
+  { test: '(min-height: 1200px)', perche: 'è un pannello grande, non una finestra alta' },
+  { test: '(max-aspect-ratio: 5/8)', perche: 'è verticale come un 9:16, non un tablet 3:4' },
+];
+
+/* Le righe dei numeri: etichetta qui, valore dal browser. La chiave lega le due
+   metà. */
+const CAMPI: [string, string][] = [
+  ['viewport', 'Viewport CSS'],
+  ['proporzione', 'Proporzione'],
+  ['schermo', 'Schermo dichiarato'],
+  ['dpr', 'devicePixelRatio'],
+  ['radice', 'Radice del testo'],
+  ['corpo', 'Corpo del testo'],
+  ['distanza', 'Leggibile a'],
+  ['pointer', 'pointer'],
+  ['anyPointer', 'any-pointer'],
+  ['hover', 'hover'],
+  ['anyHover', 'any-hover'],
+  ['tocchi', 'Punti di tocco'],
+  ['orientamento', 'Orientamento'],
+  ['movimento', 'Movimento ridotto'],
+  ['ua', 'User agent'],
+];
+
+/* I quadrati della prova del dito, in rem: sul totem la radice è in vw, quindi
+   misurano davvero quanto misurano i comandi del sito. 1rem è il fondo scala,
+   2rem l'altezza di un `.btn`, 2,75rem le frecce delle gallerie. */
+const QUADRATI = [1, 1.6, 2, 2.75];
+---
+
+<Layout
+  title="Diagnostica schermo | Athlon Club"
+  description="Strumento interno: cosa dichiara questo browser sullo schermo che lo ospita."
+  noindex={true}
+>
+  <main class="dg">
+    <div class="container">
+      <p class="dg__eyebrow">Strumento interno</p>
+      <h1 class="dg__title">Diagnostica schermo</h1>
+      <p class="dg__lede">
+        Cosa dichiara <strong>questo</strong> browser, su <strong>questo</strong> schermo.
+        Da aprire sul totem, a schermo intero, come lo vedono i soci.
+      </p>
+
+      {/* Il verdetto per primo: è la riga per cui la pagina esiste. */}
+      <section class="dg__verdetto" id="verdetto" aria-live="polite">
+        <p class="dg__esito u-display" id="esito">Misurazione in corso…</p>
+        <p class="dg__spiega" id="spiega"></p>
+      </section>
+
+      <h2 class="dg__h2">Le tre condizioni</h2>
+      <ul class="dg__lista">
+        {CONDIZIONI.map((c) => (
+          <li class="dg__c" data-test={c.test}>
+            <span class="dg__segno" aria-hidden="true">·</span>
+            <span class="dg__ctesto">
+              <code>{c.test}</code>
+              <span class="dg__perche">{c.perche}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <h2 class="dg__h2">Cosa dichiara il browser</h2>
+      <dl class="dg__dati">
+        {CAMPI.map(([chiave, etichetta]) => (
+          <>
+            <dt>{etichetta}</dt>
+            <dd data-campo={chiave}>—</dd>
+          </>
+        ))}
+      </dl>
+
+      <h2 class="dg__h2">Prova del dito</h2>
+      <p class="dg__nota">
+        Tocca i quadrati: quello che manchi due volte su tre è troppo piccolo per
+        questo schermo. Ognuno scrive quanti pixel misura davvero.
+      </p>
+      <div class="dg__tocchi">
+        {QUADRATI.map((r) => (
+          <button
+            type="button"
+            class="dg__tocco"
+            style={`width:${r}rem;height:${r}rem`}
+            aria-label={`Quadrato da ${r}rem`}
+          ></button>
+        ))}
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  /* Tutto qui dentro è una proprietà del browser che apre la pagina, non del
+     server che l'ha costruita: si può leggere solo da qui. */
+  const q = (s: string) => window.matchMedia(s).matches;
+
+  const verdetto = document.getElementById('verdetto');
+  const esito = document.getElementById('esito');
+  const spiega = document.getElementById('spiega');
+  const righe = Array.from(document.querySelectorAll<HTMLElement>('.dg__c'));
+  const celle = new Map(
+    Array.from(document.querySelectorAll<HTMLElement>('[data-campo]')).map((e) => [e.dataset.campo, e]),
+  );
+
+  function misura() {
+    if (!verdetto || !esito || !spiega) return;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const radice = parseFloat(getComputedStyle(document.documentElement).fontSize);
+
+    /* ---- Le tre condizioni, e il verdetto che ne segue ---- */
+    const mancano: string[] = [];
+    for (const riga of righe) {
+      const test = riga.dataset.test || '';
+      const ok = q(test);
+      if (!ok) mancano.push(test);
+      riga.classList.toggle('dg__c--si', ok);
+      riga.classList.toggle('dg__c--no', !ok);
+      const segno = riga.querySelector('.dg__segno');
+      if (segno) segno.textContent = ok ? '✓' : '✕';
+    }
+    const totem = mancano.length === 0;
+    verdetto.classList.toggle('dg__verdetto--si', totem);
+    verdetto.classList.toggle('dg__verdetto--no', !totem);
+    esito.textContent = totem ? 'Modalità totem attiva' : 'Modalità totem non attiva';
+
+    /* Un 27" 9:16 è larga 336 mm sul vetro: quanti millimetri vale un pixel CSS
+       dipende solo da quanti pixel CSS il browser dichiara su quella larghezza.
+       Serve per rispondere alla domanda vera — quanto è alto un carattere. */
+    const mmPerPx = 336 / w;
+    const corpo = radice * 0.95;
+    spiega.textContent = totem
+      ? `Il corpo del testo misura ${corpo.toFixed(0)}px, cioè ${(corpo * mmPerPx).toFixed(1)} mm su un pannello da 27 pollici.`
+      : `Non passa: ${mancano.join(', ')}. La pagina è servita in versione desktop.`;
+
+    /* ---- I numeri ---- */
+    const valori: Record<string, string> = {
+      viewport: `${w} × ${h} px`,
+      proporzione: `${(w / h).toFixed(4)}  (9:16 = 0,5625)`,
+      schermo: `${screen.width} × ${screen.height} px`,
+      dpr: String(window.devicePixelRatio),
+      radice: `${radice.toFixed(1)} px`,
+      corpo: `${corpo.toFixed(0)} px ≈ ${(corpo * mmPerPx).toFixed(1)} mm su un 27"`,
+      distanza: `${((corpo * mmPerPx * 150) / 1000).toFixed(1)} m  (altezza carattere × 150)`,
+      pointer: q('(pointer: coarse)') ? 'coarse' : q('(pointer: fine)') ? 'fine' : 'none',
+      anyPointer: q('(any-pointer: coarse)') ? 'coarse' : q('(any-pointer: fine)') ? 'fine' : 'none',
+      hover: q('(hover: hover)') ? 'hover' : 'none',
+      anyHover: q('(any-hover: hover)') ? 'hover' : 'none',
+      tocchi: String(navigator.maxTouchPoints ?? 0),
+      orientamento: q('(orientation: portrait)') ? 'verticale' : 'orizzontale',
+      movimento: q('(prefers-reduced-motion: reduce)') ? 'sì' : 'no',
+      ua: navigator.userAgent,
+    };
+    for (const [chiave, cella] of celle) {
+      if (chiave && valori[chiave] !== undefined) cella.textContent = valori[chiave];
+    }
+  }
+
+  for (const b of document.querySelectorAll<HTMLButtonElement>('.dg__tocco')) {
+    b.addEventListener('click', () => {
+      b.classList.add('dg__tocco--preso');
+      b.textContent = String(Math.round(b.getBoundingClientRect().width));
+    });
+  }
+
+  misura();
+  /* Il totem può essere ruotato o la finestra ridimensionata mentre si guarda:
+     le misure vanno riprese, o si legge un verdetto che non vale più. */
+  window.addEventListener('resize', misura);
+  window.addEventListener('orientationchange', misura);
+</script>
+
+<style>
+  .dg {
+    padding: var(--space-section-md) 0 var(--space-section-lg);
+  }
+
+  .dg__eyebrow {
+    margin: 0 0 0.4rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .dg__title {
+    font-size: var(--text-2xl);
+    letter-spacing: var(--tracking-2xl);
+    --lh: var(--leading-2xl);
+  }
+
+  .dg__lede {
+    margin: 0.6rem 0 2rem;
+    max-width: 44ch;
+    font-size: var(--text-md);
+    color: var(--text-muted);
+  }
+
+  .dg__h2 {
+    margin: 2.4rem 0 0.9rem;
+    font-size: var(--text-lg);
+  }
+
+  .dg__nota {
+    margin: 0 0 1.1rem;
+    max-width: 44ch;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  /* ---- Verdetto ---- */
+  .dg__verdetto {
+    padding: 1.2rem 1.4rem;
+    border-radius: var(--radius);
+    border-left: 4px solid var(--border-strong);
+    background: var(--color-cream);
+  }
+
+  /* Verde e arancione scuro, non il rosso/verde di un semaforo: l'esito è
+     scritto a parole e il colore lo accompagna, non lo sostituisce. */
+  .dg__verdetto--si {
+    border-left-color: #2f7d3f;
+  }
+
+  .dg__verdetto--no {
+    border-left-color: var(--accent-text);
+  }
+
+  .dg__esito {
+    margin: 0;
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: var(--text-xl);
+    --lh: 1;
+  }
+
+  .dg__spiega {
+    margin: 0.5rem 0 0;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .dg__spiega:empty {
+    display: none;
+  }
+
+  /* ---- Le tre condizioni ---- */
+  .dg__lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dg__c {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dg__segno {
+    flex-shrink: 0;
+    width: 1.6rem;
+    height: 1.6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--border-strong);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--color-white);
+  }
+
+  .dg__c--si .dg__segno {
+    background: #2f7d3f;
+  }
+
+  .dg__c--no .dg__segno {
+    background: var(--accent-fill);
+  }
+
+  .dg__ctesto {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .dg__ctesto code {
+    font-size: var(--text-base);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .dg__perche {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  /* ---- I numeri ---- */
+  .dg__dati {
+    margin: 0;
+    display: grid;
+    /* Etichetta e valore in due colonne; il valore può essere lungo come uno
+       user agent, quindi `minmax(0, …)` o la griglia sfonda il contenitore. */
+    grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+    gap: 0.5rem 1.2rem;
+  }
+
+  .dg__dati dt {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+
+  .dg__dati dd {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+
+  /* ---- Prova del dito ---- */
+  .dg__tocchi {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+  }
+
+  .dg__tocco {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 2px solid var(--color-primary);
+    border-radius: 8px;
+    background: var(--color-white);
+    color: var(--color-primary);
+    font-family: var(--font-body);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) ease;
+  }
+
+  .dg__tocco--preso {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  @media (max-width: 640px) {
+    .dg__dati {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.15rem;
+    }
+
+    .dg__dati dd {
+      margin-bottom: 0.7rem;
+    }
+  }
+</style>

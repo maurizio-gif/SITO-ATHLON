@@ -311,7 +311,7 @@ img {
   gap: 10px;
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: 14px;
+  font-size: 0.875rem;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   padding: 20px 32px;
@@ -501,4 +501,120 @@ video:not([controls])::-webkit-media-controls,
 video:not([controls])::-webkit-media-controls-panel {
   display: none !important;
   -webkit-appearance: none;
+}
+
+/* ---- Il totem verticale del club — PROJECT RULE --------------------------
+   Uno schermo da 27" in verticale, 9:16, appeso nel club: si guarda da un metro
+   e mezzo e si usa col dito.
+
+   Non è un telefono — è largo come un desktop, 1080px CSS — e non è un desktop,
+   perché non c'è un mouse. E soprattutto: **non si riconosce dal tocco**.
+   Misurato sul suo browser, Windows lo presenta come una macchina col mouse
+   (`pointer: fine`, `hover: hover`), quindi la regola dell'header che scatta su
+   `(pointer: coarse)` non scattava e il totem si prendeva la barra desktop coi
+   menu ad hover, da usare col dito. Si riconosce dalla forma dello schermo:
+
+     · `min-width: 900px`     non è un telefono;
+     · `min-height: 1200px`   è un pannello grande, non una finestra alta;
+     · `max-aspect-ratio: 5/8` 9:16 fa 0,5625 e passa; un tablet 3:4 fa 0,75 e no.
+
+   Tutte e tre insieme, o un telefono verticale o un iPad finirebbero qui dentro.
+
+   **La radice è in `vw`, non in px, e non è un vezzo.** Il pannello è fisico e
+   non cambia: quello che cambia è quanti pixel CSS Windows dichiara — 1080 al
+   100%, 1440 se qualcuno mette la scalatura al 150%. Con la radice in vw la
+   stessa regola dà la stessa dimensione *in millimetri* in entrambi i casi.
+   3,15vw fa 34px su 1080 e 45px su 1440: in entrambi i casi il corpo del testo
+   misura circa 10 mm sul vetro.
+
+   Perché 10 mm: la cartellonistica vuole l'altezza del carattere ≈ distanza di
+   lettura / 150 per leggere comodi, cioè 10 mm a un metro e mezzo. Il corpo
+   passa da 14,4px a 32, i titoli di sezione da 25 a 55.
+
+   Lo spazio, invece, **non** raddoppia: le sezioni sono in rem e a scala doppia
+   la home diventava un chilometro di scroll. Le tre variabili qui sotto lo
+   riportano a una misura umana.
+
+   Chi tocca questo blocco: verifica su un viewport 1080×1920, non su una
+   finestra desktop rimpicciolita — il rapporto conta più della larghezza. */
+@media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 5/8) {
+  :root {
+    font-size: 3.15vw;
+
+    --space-section-sm: 1.6rem;
+    --space-section-md: 2.1rem;
+    --space-section-lg: 2.7rem;
+  }
+
+  /* Margini laterali proporzionati al pannello: 24px su 1080 sono un filo. */
+  .container,
+  .container-narrow,
+  .container-wide {
+    padding: 0 1rem;
+  }
+
+  /* Il testo lungo su 1080px pieni fa righe da 130 caratteri. Un limite in
+     caratteri, non in pixel, così vale anche se il pannello dichiara 1440. */
+  .container-narrow {
+    max-width: 34ch;
+  }
+
+  /* Un dito copre circa 9 mm di vetro: qui sono 30px, e un comando sotto i 60
+     si sbaglia. I `.btn` erano 14px di testo in una pastiglia alta 49. */
+  .btn {
+    min-height: 2rem;
+    padding: 0.6rem 1.1rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* I comandi che non sono `.btn`. Sul sito quasi tutti i richiami secondari
+     sono link di testo in maiuscoletto — «vedi il planning», «torna all'Help
+     Desk», il numero di una clausola — e restavano alti 30px anche a scala
+     doppia, perché l'altezza gliela dava solo la riga di testo. Su un telefono
+     30px si centrano col pollice, perché il dito appoggia sul vetro e si vede
+     dove; a un metro e mezzo si punta a occhio e da lontano, e un bersaglio
+     così si sbaglia. Qui diventano alti come un `.btn`.
+
+     L'elenco è esplicito e non un selettore furbo: `a:not(p a)` prenderebbe
+     anche le card che sono un link intero, e `display: inline-flex` su quelle
+     rompe le griglie. Chi aggiunge un link-comando nuovo lo aggiunge qui.
+     I comandi con misure proprie (le frecce delle gallerie, il pulsante a
+     schermo intero della hero) stanno nei loro componenti, in rem. */
+  .co-link,
+  .cf-link,
+  .rf-link,
+  .tv-link,
+  .wa__back,
+  .wa__crumbs a,
+  .evd__back,
+  .ev__all,
+  .sched__link,
+  .hours__cta,
+  .rf-plan__cta,
+  .tcc__num,
+  .hero-secondary,
+  .co-hero__link,
+  .cf-hero__link,
+  .gf-hero__link,
+  .pl-hero__link,
+  .rf-hero__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.6rem;
+  }
+
+  /* La hero: senza tetto la fascia video si prendeva tutto lo spazio avanzato e
+     le due azioni finivano a cinquanta pixel dal bordo, cioè si vedevano ma
+     nessuno le avrebbe cercate lì. Il tetto lascia il posto a titolo,
+     sottotitolo e pulsanti nella stessa schermata.
+
+     58svh e non 42: a 42 avanzavano 450px che la hero, centrata, spartiva in due
+     bande bianche vuote da 225 — sopra il video e sotto i pulsanti. Ora ne
+     avanzano 140, il video arriva quasi a toccare la barra e le azioni restano
+     settanta pixel sopra il bordo. La misura è in svh, non in px, perché deve
+     valere identica se Windows dichiara 1080 o 1440. */
+  .hero-media {
+    max-height: 58svh;
+  }
 }

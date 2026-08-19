@@ -168,14 +168,14 @@ const prova = trialCta({ source: '/' });
      otherwise paint over it. */
   .hero-expand {
     position: absolute;
-    right: 20px;
-    bottom: 20px;
+    right: 1.25rem;
+    bottom: 1.25rem;
     z-index: 2;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 46px;
-    height: 46px;
+    width: 2.875rem;
+    height: 2.875rem;
     padding: 0;
     border: 1px solid rgba(255, 255, 255, 0.35);
     border-radius: 50%;
@@ -342,7 +342,7 @@ const prova = trialCta({ source: '/' });
     z-index: 1;
     color: var(--color-white);
     writing-mode: vertical-rl;
-    font-size: 12px;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     opacity: 0.8;
@@ -406,17 +406,30 @@ const prova = trialCta({ source: '/' });
   /* ---- Mobile & tablet: a full-bleed portrait crop of a landscape video
      looks grainy (huge zoom to cover a tall frame). Split the section
      instead — a normal text block on top, a height-constrained video
-     below that stays close to its native aspect ratio. ---- */
-  @media (max-width: 900px) {
+     below that stays close to its native aspect ratio.
+
+     Vale anche per il totem verticale del club, e per la stessa ragione più una:
+     a schermo pieno su 1080×1920 il titolo finiva a due terzi di altezza e le
+     CTA sotto il bordo, cioè la prima schermata era un video e nient'altro.
+     Diviso, la fascia video sta sopra e le due azioni sono subito lì. Le tre
+     misure della condizione sono spiegate in global.css. ---- */
+  @media (max-width: 900px),
+    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 5/8) {
     /* The whole hero — video, title, lede and both CTAs — has to fit between
        the header and the bottom of the screen, so nothing lands below the
        fold. The copy block takes its natural height and the video absorbs
-       whatever is left; 72px is the mobile header height set in Header.astro. */
+       whatever is left.
+
+       La sottrazione è la barra dell'header, ed è la stessa `4.5rem` che le dà
+       Header.astro: era scritta 72px, cioè giusta solo alla radice da 16px. Sul
+       totem la barra è alta 153 e la hero sfondava di ottantadue pixel — le
+       azioni finivano sotto il bordo dello schermo, che è esattamente quello che
+       questa regola esiste per evitare. */
     .hero {
       display: flex;
       flex-direction: column;
       align-items: stretch;
-      height: calc(100svh - 72px);
+      height: calc(100svh - 4.5rem);
       min-height: 0;
     }
 
@@ -481,11 +494,14 @@ const prova = trialCta({ source: '/' });
       min-height: 0;
     }
 
+    /* In rem, non in px: questa regola vale anche per il totem (la media query
+       qui sopra lo include) e a scala doppia un pulsante da 42px in un angolo
+       di un video alto mezzo schermo non si trova. */
     .hero-expand {
-      right: 14px;
-      bottom: 14px;
-      width: 42px;
-      height: 42px;
+      right: 0.875rem;
+      bottom: 0.875rem;
+      width: 2.625rem;
+      height: 2.625rem;
     }
   }
 
