@@ -103,10 +103,14 @@
      bianco sopra.
 
      Si usano solo dove qualcuno deve *leggere*: etichette, pastiglie, i comandi
-     del pannello account. Titoli e numeri grandi restano `#ff5701`, perché sopra
-     i 24px (o 18,66 in grassetto) la soglia scende a 3:1 e il marchio la passa
-     così com'è. Dove cambiarlo si vedrebbe troppo, si è scelto di ingrandire il
-     testo invece di scurirlo — la CTA della hero fa così. */
+     del pannello account, il pieno di Contattaci nel footer. Titoli e numeri
+     grandi restano `#ff5701`, perché sopra i 24px (o 18,66 in grassetto) la
+     soglia scende a 3:1 e il marchio la passa così com'è.
+
+     Il resto del sito tiene `#ff5701` anche dove il contrasto non basta — la
+     sopralinea della hero, il suo pulsante «Prova Athlon», il link del planning:
+     è una scelta, registrata in docs/seo.md. Non estendere questi due token a
+     quei punti senza chiedere. */
   --accent-text: #bb4001;
   --accent-fill: #d14701;
   --accent-fill-hover: #b03c00;

@@ -260,15 +260,28 @@ misurato è 20 ms.
 - **`total-byte-weight`, 4 MB.** È il video della hero. È la pagina.
 - **`max-potential-fid`, 230 ms.** Metrica deprecata e non pesata nel punteggio;
   quella che conta, il Total Blocking Time, è 20 ms.
-- **`color-contrast`: resta rosso per scelta.** L'arancione del marchio,
-  `#ff5701`, dà 3,17:1 su bianco e 2,65:1 su crema, sotto il 4,5:1 che serve al
-  testo piccolo: riguarda le sopralinee, il pulsante Contattaci su mobile, le
-  etichette del footer e il testo bianco sui pulsanti pieni. Non è un problema
-  tecnico ed è stato deciso di **tenere l'arancione com'è**, in ogni suo uso.
-  Chi ci tornasse sopra: la soglia si raggiunge scurendo i soli testi piccoli a
-  `#d14701` su bianco e `#ba4001` su crema, lasciando `#ff5701` ai fondi e ai
-  titoli grandi, dove 3:1 basta — ma sui pulsanti pieni vorrebbe dire scurire il
-  fondo, e quello si vede. Non farlo senza chiedere.
+- **`color-contrast`: resta rosso per scelta, su tre elementi.** L'arancione del
+  marchio, `#ff5701`, dà 3,17:1 sul bianco e 2,65:1 sulla crema, sotto il 4,5:1
+  che serve al testo piccolo. Gli elementi segnalati erano nove; sei sono stati
+  portati a norma con l'arancione scuro — `--accent-text` e `--accent-fill` in
+  `global.css`, che sono la soglia calcolata e non un secondo colore del marchio:
+
+  | dove | prima | dopo |
+  | --- | --- | --- |
+  | i due pulsanti del pannello account | 2,65 e 3,17:1 | 4,55:1 |
+  | pastiglia Contattaci nell'header mobile | 3,17:1 | 5,46:1 |
+  | le quattro etichette di «Dove siamo» e la sopralinea | 2,65:1 | 4,55:1 |
+  | pieno di Contattaci nel footer | 3,17:1 | 4,55:1 |
+
+  I tre che restano tengono `#ff5701` per decisione esplicita: la **sopralinea
+  della hero**, il suo pulsante **«Prova Athlon»** e il link **«Apri il planning
+  della settimana»**. Sul pulsante si era provata l'altra strada — 19px in
+  grassetto, che porta la soglia a 3:1 e lo fa passare senza toccarne il colore —
+  ed è stato riportato a 14px/500 su richiesta. Non estendere i due token a
+  questi tre punti senza chiedere.
+
+  Il punteggio resta **96 comunque**: `color-contrast` è un controllo binario,
+  quindi tre elementi o nove danno lo stesso esito. Serve arrivare a zero.
 
   I tre grigi che mancavano il 4,5:1 per un soffio, invece, sono stati alzati —
   le intestazioni del footer, il suggerimento delle gallerie, la riga sotto i
