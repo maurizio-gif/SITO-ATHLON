@@ -251,6 +251,17 @@ layout per primo paga il primo layout della pagina, e qualcuno deve farlo.
 Rimandarlo vorrebbe dire far partire la hero più tardi. Il Total Blocking Time
 misurato è 20 ms.
 
+### Su desktop
+
+Stessa home, preset desktop: **performance 100, best practice 100, SEO 100,
+accessibilità 96**. Il solo controllo che desktop segnalava e mobile no era
+`image-aspect-ratio`, sul pittogramma dell'header: il tag dichiarava `32×32` su
+un file che è 316×256, e su desktop — dove nessuna regola CSS gli dava una
+misura — quei due numeri erano anche la dimensione a schermo, quindi il marchio
+era schiacciato del 23%. Su mobile no, perché lì il CSS impone `width: 52px;
+height: auto`. Ora il tag porta le proporzioni vere e il CSS l'altezza: 39,5×32
+su desktop, 52×42 sotto, zero deformazione a tutte le larghezze.
+
 ### Cosa resta rosso, e perché
 
 - **`image-delivery`, 78 KiB.** Due foto del carosello della home sarebbero più

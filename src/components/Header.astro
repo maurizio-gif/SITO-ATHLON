@@ -102,7 +102,12 @@ const accountBlocks = [
 <header class="site-header" id="site-header">
   <div class="container header-inner">
     <a href="/" class="logo">
-      <img src="/wp-content/uploads/2025/08/Pittogramma.png" alt="Athlon Club" width="32" height="32" />
+      {/* Le proporzioni vere del file, 316×256. Erano dichiarate 32×32, e su
+          desktop — dove nessuna regola CSS dava una misura — quei due numeri
+          erano anche la dimensione a schermo: il pittogramma veniva schiacciato
+          in un quadrato, del 23%. L'altezza a schermo la decide il CSS qui
+          sotto, la larghezza segue il rapporto. */}
+      <img src="/wp-content/uploads/2025/08/Pittogramma.png" alt="Athlon Club" width="316" height="256" />
     </a>
 
     {/* Una riga piatta: due tendine e tre destinazioni, poi il pulsante. I
@@ -599,6 +604,11 @@ const accountBlocks = [
 
   .logo img {
     display: block;
+    /* L'altezza è quella che deve stare nella barra; la larghezza la calcola il
+       browser dal rapporto intrinseco — 40px, non 32. Nella barra touch qui
+       sotto è il contrario: comanda la larghezza. */
+    height: 32px;
+    width: auto;
     transition: transform var(--dur-fast) var(--ease-out-crit);
   }
 
