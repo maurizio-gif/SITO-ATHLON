@@ -636,3 +636,12 @@ e `min-width: 0` sul componente perché non possa più sfondare un contenitore.
 Verificato in browser su tutte e sei le strisce del sito (quattro sulla Gym
 Floor, home, Baby Nuoto): scorrono da sole, le frecce le muovono, ogni striscia
 apre **la propria** lightbox, la lightbox avanza e si chiude con Escape.
+
+---
+
+## Terza tornata di revisioni
+
+| Cosa | Prima | Ora | Perché |
+| --- | --- | --- | --- |
+| **Controlli sui video** | barra dei controlli su tre clip (Reformer, corso junior, varianti di corso); su tutte, un clic mette in pausa o apre il menu del player | nessuna barra, e il clic passa attraverso: `video:not([controls])` ha `pointer-events: none` | Richiesta. Sono video di sfondo: una barra invita a fermare la scenografia. Unica eccezione la hero della home, dove il pulsante a schermo intero deve funzionare — il suo script mette `controls` sull'elemento prima di andare a schermo intero, così esce dalla regola, e lo toglie all'uscita. |
+| **Traccia audio del Reformer** | aac 96 kbps, 362 kB su 4,2 MB | rimossa, con una copia di flusso: nessuna ricodifica, fotogramma identico byte per byte | Senza controlli non esiste più il gesto con cui alzare il volume, su nessuna clip del sito: quella traccia non era ascoltabile da nessuno. La hero, l'unica che si può aprire a schermo intero, non ha audio nel sorgente. |
