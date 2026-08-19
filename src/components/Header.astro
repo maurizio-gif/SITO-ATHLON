@@ -770,19 +770,12 @@ const accountBlocks = [
   }
 
   .acct {
-    /* Qui dentro l'arancione è più scuro che nel resto del sito, e solo qui.
-       Il pannello non è vetrina: è il comando con cui un socio entra nel suo
-       account, con due pulsanti da undici pixel e mezzo. `#ff5701` su questa
-       crema dà 2,65:1 e col bianco sopra 3,17:1, sotto il 4,5:1 che serve a un
-       testo di quella misura — e il bordo del pulsante non arriva nemmeno al
-       3:1 richiesto al contorno di un componente. I due valori qui sotto sono
-       la soglia esatta, non una tinta scelta a occhio.
-
-       Il marchio resta `#ff5701` in tutto il resto del sito: è una decisione
-       registrata in docs/seo.md, e questo è l'unico posto che se ne discosta. */
-    --acct-arancio: #bb4001; /* testo e bordo sulla crema: 4,55:1 */
-    --acct-arancio-fondo: #d14701; /* fondo, col testo bianco sopra: 4,55:1 */
-    --acct-arancio-fondo-hover: #b03c00; /* 6,01:1 — e si vede che è un hover */
+    /* Qui l'arancione è quello scuro — `--accent-text` e `--accent-fill`, i due
+       token di global.css. Il pannello non è vetrina: è il comando con cui un
+       socio entra nel suo account, con due pulsanti da undici pixel e mezzo, e
+       `#ff5701` su questa crema dà 2,65:1 contro il 4,5:1 che servirebbe. Il
+       bordo del pulsante non arrivava nemmeno al 3:1 chiesto al contorno di un
+       componente. */
     position: fixed;
     inset: 0;
     z-index: 300;
@@ -873,7 +866,7 @@ const accountBlocks = [
     font-weight: 700;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--acct-arancio);
+    color: var(--accent-text);
     margin-bottom: 14px;
   }
 
@@ -901,25 +894,25 @@ const accountBlocks = [
     justify-content: center;
     text-align: center;
     padding: 15px 12px;
-    border: 1px solid var(--acct-arancio);
+    border: 1px solid var(--accent-text);
     font-family: var(--font-body);
     font-size: var(--text-2xs);
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--acct-arancio);
+    color: var(--accent-text);
     line-height: 1.25;
     transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
   }
 
   .acct__btn--solid,
   .acct__btn:hover {
-    background: var(--acct-arancio-fondo);
+    background: var(--accent-fill);
     color: var(--color-white);
   }
 
   .acct__btn--solid:hover {
-    background: var(--acct-arancio-fondo-hover);
+    background: var(--accent-fill-hover);
   }
 
   .acct__rule {
@@ -1283,10 +1276,13 @@ const accountBlocks = [
       justify-content: center;
       margin: 0 auto;
       padding: 10px 14px;
-      border: 1px solid var(--color-primary);
+      /* L'arancione scuro: dodici pixel di testo sul bianco, dove `#ff5701` dà
+         3,17:1 contro il 4,5:1 che serve. È la pastiglia che su un telefono sta
+         in mezzo alla barra e si legge prima di tutto il resto. */
+      border: 1px solid var(--accent-text);
       border-radius: 20px;
       background: var(--color-white);
-      color: var(--color-primary);
+      color: var(--accent-text);
       font-size: 12px;
       font-weight: 500;
       letter-spacing: 1.25px;
