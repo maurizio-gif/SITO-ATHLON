@@ -664,10 +664,14 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
   }
 
   /* + totem: vedi «Il totem verticale del club» in global.css */
+  /* + tv: vedi «Il televisore 16:9» in global.css. Quattro colonne a scala da
+     televisore davano 356px di colonna e 26 caratteri per riga. */
 
   @media (max-width: 1000px),
 
-    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
+    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10),
+
+    (min-width: 1700px) and (min-height: 1020px) and (max-aspect-ratio: 37/20) {
     .ju-metodo {
       grid-template-columns: repeat(2, 1fr);
     }

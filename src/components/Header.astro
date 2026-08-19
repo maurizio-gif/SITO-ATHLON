@@ -1591,6 +1591,19 @@ const accountBlocks = [
     }
   }
 
+  /* + tv: vedi «Il televisore 16:9» in global.css. Sul televisore la barra
+     desktop resta (c'è un puntatore, non un dito), quindi a differenza del
+     totem questo comando si vede — ed era il testo più piccolo di tutto il
+     sito, 0,75rem, una misura fuori dalla scala tipografica: 18px, cioè 11,7 mm
+     su un 55", contro i 13 del gradino più basso della scala. Il richiamo alla
+     prova è la conversione principale della barra e non può essere la scritta
+     meno leggibile della pagina. */
+  @media (min-width: 1700px) and (min-height: 1020px) and (max-aspect-ratio: 37/20) {
+    .nav-prova {
+      font-size: var(--text-xs);
+    }
+  }
+
   :global(body.nav-mobile-locked) {
     overflow: hidden;
   }

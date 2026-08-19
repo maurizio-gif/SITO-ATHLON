@@ -1,18 +1,20 @@
 ---
 /**
- * Da aprire sul totem, e solo lì.
+ * Da aprire sullo schermo di cui si sta parlando, e solo lì.
  *
- * La modalità totem (global.css, «Il totem verticale del club») si accende su
- * tre misure — larghezza, altezza e proporzione — e quelle tre misure sono
- * l'unica cosa che il sito sa dello schermo. Su un pannello vero però non le
- * dichiara il pannello: le dichiara Windows, e cambiano con la scalatura del
- * display, con la barra delle app, con la finestra a schermo intero o no. Un
- * kiosk che dichiara 1440 invece di 1080, o 1040 di altezza utile invece di
- * 1920, non fa scattare niente e la pagina resta in versione desktop.
+ * Il sito ha due modalità oltre al desktop e al telefono — il totem verticale e
+ * il televisore 16:9 (global.css, «Il totem verticale del club» e «Il televisore
+ * 16:9») — e ognuna si accende su tre misure: larghezza, altezza e proporzione.
+ * Quelle tre misure sono l'unica cosa che il sito sa dello schermo. Su un
+ * apparecchio vero però non le dichiara l'apparecchio: le dichiara il sistema, e
+ * cambiano con la scalatura del display, con la barra delle app, con la finestra
+ * a schermo intero o no. Un kiosk che dichiara 1440 invece di 1080, o un
+ * televisore che lascia 990px di altezza utile invece di 1080, non fanno
+ * scattare niente e la pagina resta in versione desktop.
  *
  * Questa pagina dice, sul posto e a caratteri leggibili da lontano, cosa
- * dichiara quel browser e quale delle tre condizioni non passa. Nessuna misura
- * è scritta a mano: le legge tutte dal browser.
+ * dichiara quel browser e quale condizione non passa. Nessuna misura è scritta
+ * a mano: le legge tutte dal browser.
  *
  * Lo scheletro è tutto qui nel markup e lo script scrive solo i valori. Non è
  * pignoleria: gli stili di un componente Astro sono ad ambito, cioè valgono per
@@ -25,13 +27,39 @@
  */
 import Layout from '../layouts/Layout.astro';
 
-/* Le stesse tre misure della media query in global.css. Se cambiano là, vanno
+/* Le stesse misure delle due media query in global.css. Se cambiano là, vanno
    cambiate qui: lo script le rilegge da `data-test`, quindi stanno scritte una
-   volta sola. */
-const CONDIZIONI = [
-  { test: '(min-width: 900px)', perche: 'non è un telefono' },
-  { test: '(min-height: 1200px)', perche: 'è un pannello grande, non una finestra alta' },
-  { test: '(max-aspect-ratio: 7/10)', perche: 'è verticale come un 9:16, non un tablet 3:4' },
+   volta sola.
+
+   Due modalità, due terne. Sono mutuamente esclusive per costruzione — una
+   chiede uno schermo verticale, l'altra uno orizzontale — quindi la pagina può
+   dire un verdetto solo senza doverle mettere in fila. */
+const MODALITA = [
+  {
+    id: 'totem',
+    nome: 'totem',
+    /* Un 27" 9:16 è largo 336 mm di vetro. */
+    larghezzaMm: 336,
+    schermo: 'un pannello da 27 pollici',
+    condizioni: [
+      { test: '(min-width: 900px)', perche: 'non è un telefono' },
+      { test: '(min-height: 1200px)', perche: 'è un pannello grande, non una finestra alta' },
+      { test: '(max-aspect-ratio: 7/10)', perche: 'è verticale come un 9:16, non un tablet 3:4' },
+    ],
+  },
+  {
+    id: 'tv',
+    nome: 'televisore 16:9',
+    /* Un 55" 16:9 è largo 1218 mm di vetro: è la misura di riferimento del
+       blocco in global.css. */
+    larghezzaMm: 1218,
+    schermo: 'un televisore da 55 pollici',
+    condizioni: [
+      { test: '(min-width: 1700px)', perche: 'non è un portatile né un tablet' },
+      { test: '(min-height: 1020px)', perche: 'il browser riempie lo schermo: nessuna finestra ingrandita su un 1080p ci arriva' },
+      { test: '(max-aspect-ratio: 37/20)', perche: 'è 16:9, non una finestra ingrandita su un monitor grande' },
+    ],
+  },
 ];
 
 /* Le righe dei numeri: etichetta qui, valore dal browser. La chiave lega le due
@@ -71,7 +99,7 @@ const QUADRATI = [1, 1.6, 2, 2.75];
       <h1 class="dg__title">Diagnostica schermo</h1>
       <p class="dg__lede">
         Cosa dichiara <strong>questo</strong> browser, su <strong>questo</strong> schermo.
-        Da aprire sul totem, a schermo intero, come lo vedono i soci.
+        Da aprire sul totem o sul televisore, a schermo intero, come lo vedono i soci.
       </p>
 
       {/* Il verdetto per primo: è la riga per cui la pagina esiste. */}
@@ -80,18 +108,22 @@ const QUADRATI = [1, 1.6, 2, 2.75];
         <p class="dg__spiega" id="spiega"></p>
       </section>
 
-      <h2 class="dg__h2">Le tre condizioni</h2>
-      <ul class="dg__lista">
-        {CONDIZIONI.map((c) => (
-          <li class="dg__c" data-test={c.test}>
-            <span class="dg__segno" aria-hidden="true">·</span>
-            <span class="dg__ctesto">
-              <code>{c.test}</code>
-              <span class="dg__perche">{c.perche}</span>
-            </span>
-          </li>
-        ))}
-      </ul>
+      {MODALITA.map((m) => (
+        <>
+          <h2 class="dg__h2">Modalità {m.nome}</h2>
+          <ul class="dg__lista" data-modalita={m.id} data-mm={String(m.larghezzaMm)} data-schermo={m.schermo}>
+            {m.condizioni.map((c) => (
+              <li class="dg__c" data-test={c.test}>
+                <span class="dg__segno" aria-hidden="true">·</span>
+                <span class="dg__ctesto">
+                  <code>{c.test}</code>
+                  <span class="dg__perche">{c.perche}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
+      ))}
 
       <h2 class="dg__h2">Cosa dichiara il browser</h2>
       <dl class="dg__dati">
@@ -130,7 +162,7 @@ const QUADRATI = [1, 1.6, 2, 2.75];
   const verdetto = document.getElementById('verdetto');
   const esito = document.getElementById('esito');
   const spiega = document.getElementById('spiega');
-  const righe = Array.from(document.querySelectorAll<HTMLElement>('.dg__c'));
+  const gruppi = Array.from(document.querySelectorAll<HTMLElement>('[data-modalita]'));
   const celle = new Map(
     Array.from(document.querySelectorAll<HTMLElement>('[data-campo]')).map((e) => [e.dataset.campo, e]),
   );
@@ -141,39 +173,53 @@ const QUADRATI = [1, 1.6, 2, 2.75];
     const h = window.innerHeight;
     const radice = parseFloat(getComputedStyle(document.documentElement).fontSize);
 
-    /* ---- Le tre condizioni, e il verdetto che ne segue ---- */
-    const mancano: string[] = [];
-    for (const riga of righe) {
-      const test = riga.dataset.test || '';
-      const ok = q(test);
-      if (!ok) mancano.push(test);
-      riga.classList.toggle('dg__c--si', ok);
-      riga.classList.toggle('dg__c--no', !ok);
-      const segno = riga.querySelector('.dg__segno');
-      if (segno) segno.textContent = ok ? '✓' : '✕';
-    }
-    const totem = mancano.length === 0;
-    verdetto.classList.toggle('dg__verdetto--si', totem);
-    verdetto.classList.toggle('dg__verdetto--no', !totem);
-    esito.textContent = totem ? 'Modalità totem attiva' : 'Modalità totem non attiva';
+    /* ---- Le condizioni di ogni modalità, e il verdetto che ne segue ---- */
+    let attiva: HTMLElement | null = null;
+    /* Quella che ci è andata più vicino: se nessuna passa, è di lei che ha senso
+       dire quale condizione manca — elencare quelle dell'altra, che su questo
+       schermo non c'entra, sarebbe rumore. */
+    let miglior: { gruppo: HTMLElement; mancano: string[] } | null = null;
 
-    /* Un 27" 9:16 è larga 336 mm sul vetro: quanti millimetri vale un pixel CSS
-       dipende solo da quanti pixel CSS il browser dichiara su quella larghezza.
-       Serve per rispondere alla domanda vera — quanto è alto un carattere. */
-    const mmPerPx = 336 / w;
+    for (const gruppo of gruppi) {
+      const mancano: string[] = [];
+      for (const riga of Array.from(gruppo.querySelectorAll<HTMLElement>('.dg__c'))) {
+        const test = riga.dataset.test || '';
+        const ok = q(test);
+        if (!ok) mancano.push(test);
+        riga.classList.toggle('dg__c--si', ok);
+        riga.classList.toggle('dg__c--no', !ok);
+        const segno = riga.querySelector('.dg__segno');
+        if (segno) segno.textContent = ok ? '✓' : '✕';
+      }
+      if (mancano.length === 0) attiva = gruppo;
+      if (!miglior || mancano.length < miglior.mancano.length) miglior = { gruppo, mancano };
+    }
+
+    verdetto.classList.toggle('dg__verdetto--si', Boolean(attiva));
+    verdetto.classList.toggle('dg__verdetto--no', !attiva);
+    esito.textContent = attiva
+      ? `Modalità ${attiva.dataset.modalita === 'tv' ? 'televisore 16:9' : 'totem'} attiva`
+      : 'Nessuna modalità attiva — versione desktop';
+
+    /* Quanti millimetri vale un pixel CSS dipende solo da quanti pixel CSS il
+       browser dichiara sulla larghezza del vetro. Serve per rispondere alla
+       domanda vera — quanto è alto un carattere — e la larghezza di riferimento
+       è quella della modalità di cui stiamo parlando. */
+    const rif = attiva ?? miglior?.gruppo ?? gruppi[0];
+    const mmPerPx = Number(rif?.dataset.mm ?? 336) / w;
     const corpo = radice * 0.95;
-    spiega.textContent = totem
-      ? `Il corpo del testo misura ${corpo.toFixed(0)}px, cioè ${(corpo * mmPerPx).toFixed(1)} mm su un pannello da 27 pollici.`
-      : `Non passa: ${mancano.join(', ')}. La pagina è servita in versione desktop.`;
+    spiega.textContent = attiva
+      ? `Il corpo del testo misura ${corpo.toFixed(0)}px, cioè ${(corpo * mmPerPx).toFixed(1)} mm su ${rif.dataset.schermo}.`
+      : `Più vicina: ${rif?.dataset.modalita === 'tv' ? 'televisore' : 'totem'}. Non passa: ${miglior?.mancano.join(', ')}. La pagina è servita in versione desktop.`;
 
     /* ---- I numeri ---- */
     const valori: Record<string, string> = {
       viewport: `${w} × ${h} px`,
-      proporzione: `${(w / h).toFixed(4)}  (9:16 = 0,5625)`,
+      proporzione: `${(w / h).toFixed(4)}  (9:16 verticale = 0,5625 · 16:9 orizzontale = 1,7778)`,
       schermo: `${screen.width} × ${screen.height} px`,
       dpr: String(window.devicePixelRatio),
       radice: `${radice.toFixed(1)} px`,
-      corpo: `${corpo.toFixed(0)} px ≈ ${(corpo * mmPerPx).toFixed(1)} mm su un 27"`,
+      corpo: `${corpo.toFixed(0)} px ≈ ${(corpo * mmPerPx).toFixed(1)} mm su ${rif?.dataset.schermo ?? 'un 27"'}`,
       distanza: `${((corpo * mmPerPx * 150) / 1000).toFixed(1)} m  (altezza carattere × 150)`,
       pointer: q('(pointer: coarse)') ? 'coarse' : q('(pointer: fine)') ? 'fine' : 'none',
       anyPointer: q('(any-pointer: coarse)') ? 'coarse' : q('(any-pointer: fine)') ? 'fine' : 'none',

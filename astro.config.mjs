@@ -36,11 +36,14 @@ export default defineConfig({
       /* Il reindirizzo non è una pagina: la sua stessa pagina generata porta
          `noindex` e il canonical del bersaglio, quindi nella sitemap non ci va.
          `/diagnostica-schermo` nemmeno: è lo strumento che dice cosa dichiara il
-         browser del totem, non una pagina del club. */
+         browser del totem, non una pagina del club. `/attiva` è `noindex` per
+         lo stesso motivo: è il link che email e WhatsApp mandano dopo la prova,
+         non una pagina da far trovare a chi cerca. */
       filter: (page) =>
         !page.includes('/scuola-nuoto-bambini-3') &&
         !page.includes('/ginnastica-posturale') &&
-        !page.includes('/diagnostica-schermo'),
+        !page.includes('/diagnostica-schermo') &&
+        !page.includes('/attiva'),
 
       /* Priorità e frequenza sono suggerimenti, e Google li ignora — restano
          per gli altri crawler. Quello che conta è che ci siano tutte le pagine

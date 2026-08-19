@@ -547,6 +547,17 @@ const faqs: FaqEntry[] = await faqConSchede([
 
   /* + totem: vedi «Il totem verticale del club» in global.css */
 
+  /* + tv: vedi «Il televisore 16:9» in global.css. Cinque colonne sono la
+     griglia più fitta del sito: a scala da televisore davano colonne da 281px
+     con dentro 22 caratteri per riga. Qui scendono a tre e non a due come sul
+     totem — lo schermo è largo il doppio, e cinque voci in tre colonne stanno
+     in due righe invece che in tre. */
+  @media (min-width: 1700px) and (min-height: 1020px) and (max-aspect-ratio: 37/20) {
+    .cf-fam {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
   @media (max-width: 1100px),
 
     (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {

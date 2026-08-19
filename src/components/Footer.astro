@@ -699,10 +699,17 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
   }
 
   /* + totem: vedi «Il totem verticale del club» in global.css */
+  /* + tv: vedi «Il televisore 16:9» in global.css. Sono le due griglie più
+     fitte che il sito abbia su ogni pagina, e a scala da televisore erano il
+     rilievo più diffuso di tutto lo sweep: la colonna «Zona» scendeva a 23
+     caratteri per riga e il sommario del marchio a 28. A due colonne tornano
+     sopra i 50. */
 
   @media (max-width: 1000px),
 
-    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
+    (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10),
+
+    (min-width: 1700px) and (min-height: 1020px) and (max-aspect-ratio: 37/20) {
     .footer-grid {
       grid-template-columns: 1fr 1fr;
       gap: 32px;
@@ -744,14 +751,30 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
 
   /* Totem verticale: la firma era l'unico testo del sito rimasto sotto i 24px
      (0,6875rem fa 23px a questa scala) e il logo accanto, alto 20px fissi,
-     diventava un francobollo in mezzo a caratteri da 32. */
-  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
+     diventava un francobollo in mezzo a caratteri da 32.
+
+     + tv: identica sul televisore, e per la stessa ragione — 0,6875rem è una
+     misura fuori dalla scala tipografica, quindi è l'unico testo che resta
+     indietro ovunque la radice cresca. */
+  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10),
+    (min-width: 1700px) and (min-height: 1020px) and (max-aspect-ratio: 37/20) {
     .footer-credit {
       font-size: var(--text-2xs);
     }
 
     .footer-credit img {
       height: 1.25rem;
+    }
+  }
+
+  /* + tv: vedi «Il televisore 16:9» in global.css. Stessa storia della firma
+     qui sopra: 0,75rem è un'altra misura fuori scala, e su un televisore restava
+     il testo più piccolo della pagina. È il testo di legge — partita IVA e
+     affiliazioni — cioè quello che si legge di rado ma, quando serve, va letto
+     dalla stessa distanza di tutto il resto. */
+  @media (min-width: 1700px) and (min-height: 1020px) and (max-aspect-ratio: 37/20) {
+    .footer-legal p {
+      font-size: var(--text-2xs);
     }
   }
 </style>
