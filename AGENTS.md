@@ -83,11 +83,10 @@ fullscreen, a clip that is not rendered (a closed modal must not play to
 nobody), and anything marked `data-no-autoplay`.
 
 A pause within a second of touching the video counts as the visitor's and
-sticks — which is what lets a clip ship with `controls` (the Reformer carousel)
-and still be kept alive otherwise. Presence of `controls` is **not** the signal;
-code that takes a video over for a while says so with
-`v.dataset.videoHandsOff = '1'` and clears it when done, because iOS fullscreen
-is the system player and `document.fullscreenElement` stays null there.
+sticks. Presence of `controls` is **not** the signal; code that takes a video
+over for a while says so with `v.dataset.videoHandsOff = '1'` and clears it when
+done, because iOS fullscreen is the system player and `document.fullscreenElement`
+stays null there.
 
 Embedded players are the same rule with the provider's own switches. Vimeo:
 
@@ -111,6 +110,13 @@ comes into view instead of all of them pulling a stream at once.
   leaves the background frozen (`restoreHeroVideo` in `Hero.astro`).
 - **A clip that must not start on its own opts out with `data-no-autoplay`.**
   Nothing on the site does today.
+- **No `controls` on a background clip, and no clicking one either.** They are
+  scenery: `global.css` gives every `video:not([controls])` `pointer-events:
+  none`, so a click passes through to the page instead of pausing the clip or
+  opening the player's menu. The selector is the whole mechanism — the home hero
+  sets `controls` on the element before going fullscreen, which takes it out of
+  the rule and hands the native controls back, and clears it on the way out. To
+  make a clip controllable, give it `controls`; nothing else to change.
 
 Two things make a clip below the fold behave. Mobile Safari grants an autoplay
 only once the element is on screen, so the script retries at several

@@ -108,7 +108,7 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
             niente e su mobile lascia il poster col tasto play. Parte da sé
             quando entra nello schermo. */}
         {corso.video ? (
-          <video class="ju-video" autoplay muted loop playsinline controls poster={corso.poster}>
+          <video class="ju-video" autoplay muted loop playsinline poster={corso.poster}>
             <source src={corso.video} type="video/mp4" />
           </video>
         ) : (
