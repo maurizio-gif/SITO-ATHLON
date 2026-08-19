@@ -209,3 +209,44 @@ export const ROOM_COLORS: Record<string, string> = {
   'Vasca Grande': '#2d4f8a',
   'Gym Floor': '#ff5701',
 };
+
+/**
+ * Gli stessi colori per la banda scura, dove i primi non si leggono.
+ *
+ * La tavolozza qui sopra è nata per un fondo chiaro — sul bianco la Vasca
+ * Grande fa 8,09:1 — ma il planning e le fasce dentro le pagine delle attività
+ * girano anche in versione scura, e lì il nome della sala è testo da 11,5px su
+ * una card che risulta `rgb(63,60,59)`: la Vasca Grande scendeva a **1,35:1**,
+ * cioè spariva, e nessuna delle sei arrivava al 4,5:1 richiesto.
+ *
+ * Ogni valore è il colore originale schiarito col bianco della quantità minima
+ * che porta a 4,5:1 su quel fondo: dal 19% della Vasca Media al 51% della Vasca
+ * Grande. Il minimo, non una quantità uguale per tutte, perché la tinta resta
+ * più vicina possibile a quella della legenda:
+ *
+ * | sala | originale | su fondo scuro | schiarito | contrasto |
+ * | --- | --- | --- | --- | --- |
+ * | Sala A | `#c45010` | 2,34:1 | `#dc9872` (41%) | 4,57:1 |
+ * | Sala B | `#9a8c18` | 3,20:1 | `#b3a952` (25%) | 4,54:1 |
+ * | Sala C | `#5a9970` | 3,24:1 | `#82b192` (24%) | 4,50:1 |
+ * | Vasca Media | `#3a9fc4` | 3,61:1 | `#5fb1cf` (19%) | 4,52:1 |
+ * | Vasca Grande | `#2d4f8a` | 1,35:1 | `#98a9c6` (51%) | 4,59:1 |
+ * | Gym Floor | `#ff5701` | 3,44:1 | `#ff8648` (28%) | 4,56:1 |
+ *
+ * Aggiungendo una sala, il valore scuro si calcola così: si mischia col bianco
+ * finché il contrasto su `rgb(63,60,59)` non passa 4,5:1, e si tiene il primo
+ * che ce la fa.
+ */
+export const ROOM_COLORS_ON_DARK: Record<string, string> = {
+  'Sala A': '#dc9872',
+  'Sala B': '#b3a952',
+  'Sala C': '#82b192',
+  'Vasca Media': '#5fb1cf',
+  'Vasca Grande': '#98a9c6',
+  'Gym Floor': '#ff8648',
+};
+
+/** Il colore della sala per il fondo su cui va: chiaro o scuro. */
+export function roomColor(sala: string, variant: 'light' | 'dark' = 'light'): string | undefined {
+  return (variant === 'dark' ? ROOM_COLORS_ON_DARK : ROOM_COLORS)[sala];
+}

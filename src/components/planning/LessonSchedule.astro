@@ -14,7 +14,7 @@
  * Quando l'elenco è vuoto — il corso esiste ma questo mese non è in palinsesto —
  * il componente lo dice, invece di mostrare una tabella vuota.
  */
-import { bands, ROOM_COLORS } from '../../data/planning';
+import { bands, roomColor } from '../../data/planning';
 
 interface Props {
   /** Nomi con cui il corso compare nel planning. */
@@ -69,7 +69,7 @@ const mostraNome = nomiDistinti.size > 1;
           </span>
           <span class="row__slots">
             {d.slots.map((s) => (
-              <span class="slot" style={s.sala ? `--room:${ROOM_COLORS[s.sala] ?? 'var(--color-primary)'}` : undefined}>
+              <span class="slot" style={s.sala ? `--room:${roomColor(s.sala, variant) ?? 'var(--color-primary)'}` : undefined}>
                 <span class="slot__time">{s.time}</span>
                 {mostraNome && <span class="slot__name">{s.name}</span>}
                 {s.sala && <span class="slot__room">{s.sala}</span>}
