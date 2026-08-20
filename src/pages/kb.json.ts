@@ -511,7 +511,7 @@ export const GET: APIRoute = async () => {
     attivita: [],
     testo: blocchi(
       'Si puo\u2019 entrare senza abbonamento: si prenota e si paga una lezione o un accesso alla volta, dall\u2019app o dal portale.',
-      `**Non esistono carnet**, ne\u2019 pacchetti di ingressi da comprare in anticipo: si paga volta per volta. Una tantum, la prima volta, il badge di accesso costa ${SINGOLI.badge} \u20ac.`,
+      `**Non c\u2019e\u2019 un carnet di ingressi** per la sala e per i corsi: si paga volta per volta, non si compra un blocco di accessi in anticipo. I pacchetti mensili esistono solo per il personal training. Una tantum, la prima volta, il badge di accesso costa ${SINGOLI.badge} \u20ac.`,
       SINGOLI.voci.map((v) => `${v.nome} \u2014 ${v.nota}: ${v.prezzo} \u20ac per accesso.`).join('\n')
     ),
   });
