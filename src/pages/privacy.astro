@@ -8,15 +8,15 @@
  * Tre parti, e solo una è un documento legale. L'informativa arriva da
  * `data/privacy.ts` e la scrive il club; **cosa il sito scrive nel browser** e
  * **dove finiscono i dati** sono fatti verificabili dal codice, tenuti in pari
- * col codice; la **dichiarazione dei cookie** la genera Cookiebot e si aggiorna
- * da sé alla scansione successiva.
+ * col codice; l'elenco dettagliato dei cookie lo genera CookieYes dal suo
+ * pannello, e da lì si tiene aggiornato.
  *
  * `chrome={false}` come gli altri documenti del club: la pagina si legge da
  * sola. `noindex` no — un'informativa deve poter essere trovata.
  */
 import Layout from '../layouts/Layout.astro';
 import '../styles/prosa.css';
-import { COOKIEBOT_CBID } from '../data/sito';
+import { COOKIEYES_KEY } from '../data/sito';
 import { TITOLARE, STORAGE, DESTINATARI, INFORMATIVA } from '../data/privacy';
 
 const categoria = {
@@ -94,7 +94,7 @@ const categoria = {
       </tbody>
     </table>
     {
-      COOKIEBOT_CBID ? (
+      COOKIEYES_KEY ? (
         <p>
           I due marcati «Marketing» sono scritti <strong>solo dopo il tuo consenso</strong>. Se lo
           neghi, il sito funziona identico e i moduli si inviano allo stesso modo: manca soltanto
@@ -132,7 +132,7 @@ const categoria = {
       </thead>
       <tbody>
         {
-          DESTINATARI.filter((d) => !d.soloConBanner || COOKIEBOT_CBID).map((d) => (
+          DESTINATARI.filter((d) => !d.soloConBanner || COOKIEYES_KEY).map((d) => (
             <tr>
               <td>{d.nome}<br /><small><code>{d.dominio}</code></small></td>
               <td>{d.perche}</td>
@@ -143,38 +143,34 @@ const categoria = {
     </table>
 
     {
-      COOKIEBOT_CBID && (
+      COOKIEYES_KEY && (
         <>
-          <h2 id="cookie">Dichiarazione dei cookie</h2>
+          <h2 id="cookie">L'elenco dei cookie</h2>
           <p>
-            L'elenco qui sotto è generato e aggiornato automaticamente dalla scansione del sito.
+            L'elenco completo, con nome, scopo e durata di ciascuno, è quello che trovi nel
+            pannello delle preferenze qui sotto: è generato dalla scansione del sito e si
+            aggiorna da sé.
           </p>
-          {/* Lo script di Cookiebot scrive l'elenco al posto di se stesso: va
-              messo dove l'elenco deve comparire, non nel <head>. */}
-          <script
-            id="CookieDeclaration"
-            src={`https://consent.cookiebot.com/${COOKIEBOT_CBID}/cd.js`}
-            type="text/javascript"
-            async
-            is:inline
-          />
 
           <h2 id="cambia-scelta">Cambiare idea</h2>
           <p>
-            Puoi rivedere o revocare il consenso quando vuoi, e non serve svuotare niente:
+            Puoi rivedere o revocare il consenso quando vuoi, e non serve svuotare niente.
           </p>
           <p>
-            {/* `Cookiebot.renew()` riapre il banner. È un requisito, non una
-                cortesia: revocare deve costare quanto acconsentire. */}
-            <button type="button" class="pv-rinnova" data-cookiebot-rinnova>
+            {/* `cky-banner-element` è l'aggancio dichiarativo di CookieYes: una
+                classe su qualunque elemento riapre il centro preferenze, senza
+                una riga di JavaScript nostro. Va confermato su una pagina vera
+                — da qui il CDN di CookieYes non è raggiungibile — e la
+                diagnostica `window.athlonStatoConsenso()` dice cosa
+                l'adattatore vede.
+
+                Revocare deve costare quanto acconsentire: è un requisito, non
+                una cortesia, e per questo è un comando e non un link in fondo
+                a un capoverso. */}
+            <button type="button" class="pv-rinnova cky-banner-element">
               Rivedi le tue scelte sui cookie
             </button>
           </p>
-          <script is:inline>
-            document.querySelector('[data-cookiebot-rinnova]')?.addEventListener('click', function () {
-              if (window.Cookiebot && window.Cookiebot.renew) window.Cookiebot.renew();
-            });
-          </script>
         </>
       )
     }

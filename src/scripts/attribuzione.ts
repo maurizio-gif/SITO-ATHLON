@@ -41,50 +41,122 @@
  *    cambia: il consenso cookie governa cosa si scrive nel browser, non se una
  *    persona può chiedere una prova.
  *
- * Finché `COOKIEBOT_CBID` è vuoto non c'è banner, e allora si memorizza come si
+ * Finché `COOKIEYES_KEY` è vuoto non c'è banner, e allora si memorizza come si
  * è sempre fatto: negare il consenso quando nessuno può concederlo perderebbe i
  * dati senza rendere il sito più corretto di un millimetro.
  */
 
-import { COOKIEBOT_CBID } from '../data/sito';
+import { COOKIEYES_KEY } from '../data/sito';
 
 const KEY_UTM = 'athlon_utm';
 const KEY_VID = 'athlon_vid';
 
 /* ── Consenso ───────────────────────────────────────────────────────────────
-   Cookiebot pubblica lo stato in `window.Cookiebot.consent` e lo annuncia con
-   eventi sul documento. Li ascoltiamo tutti e tre: `Ready` copre il visitatore
-   che ha già scelto in una visita precedente — arriva senza che nessuno
-   clicchi — mentre `Accept` e `Decline` coprono la scelta di adesso. Solo
-   `Accept` non basterebbe: chi ha accettato la settimana scorsa non clicca
-   niente, e resterebbe senza attribuzione. */
-type Cookiebot = { consent?: { marketing?: boolean } };
+   CookieYes, e la categoria che ci riguarda si chiama **advertisement**: non
+   `marketing`, che è il nome di un altro fornitore. Le categorie sono
+   necessary, functional, analytics, performance, advertisement.
 
-function consensoMarketing(): boolean {
-  if (!COOKIEBOT_CBID) return true; // nessun banner: vale il comportamento di prima
-  const cb = (window as unknown as { Cookiebot?: Cookiebot }).Cookiebot;
-  return Boolean(cb?.consent?.marketing);
+   L'identificatore del browser sta sotto advertisement e non sotto analytics,
+   benché serva anche a misurare: viene allegato ai dati di contatto per
+   riattaccare una richiesta a una persona, e quello è marketing. Chi accetta
+   solo le statistiche non lo riceve, ed è corretto così anche se costa
+   attribuzione.
+
+   **Tre segnali e non uno**, e la ragione è dichiarata: il comportamento dello
+   script di CookieYes non è verificabile da questo repository — il suo CDN non
+   è raggiungibile dall'ambiente in cui il codice viene scritto e provato — così
+   la lettura non dipende dall'aver indovinato un nome:
+
+     1. `getCkyConsent()`, se lo espone;
+     2. il cookie `cookieyes-consent`, che porta le categorie in chiaro;
+     3. un controllo periodico dei due, limitato nel tempo, per il caso in cui
+        l'evento si chiami diversamente da come lo aspettiamo.
+
+   Il default è **negato**: se nessuno dei tre dice sì, non si scrive. Un
+   fornitore che non risponde non è un consenso.
+
+   Quando l'API sarà confermata su una pagina vera — `window.athlonStatoConsenso()`
+   la stampa — il controllo periodico si può togliere. È l'unico pezzo qui che
+   esiste per prudenza e non per necessità. */
+type Categorie = Record<string, boolean>;
+
+/** Le cinque categorie di CookieYes. Il cookie ne porta anche altre chiavi. */
+const CATEGORIE = ['necessary', 'functional', 'analytics', 'performance', 'advertisement'];
+
+/** Lo stato secondo la funzione globale di CookieYes, se c'è. */
+function daFunzione(): Categorie | null {
+  const g = (window as unknown as { getCkyConsent?: () => { categories?: Categorie } }).getCkyConsent;
+  if (typeof g !== 'function') return null;
+  try {
+    return g()?.categories ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Lo stato secondo il cookie: `...,analytics:yes,advertisement:no`. */
+function daCookie(): Categorie | null {
+  try {
+    const trovato = /(?:^|;\s*)cookieyes-consent=([^;]+)/.exec(document.cookie);
+    if (!trovato) return null;
+    const out: Categorie = {};
+    decodeURIComponent(trovato[1])
+      .split(',')
+      .forEach((pezzo) => {
+        const [k, v] = pezzo.split(':');
+        /* Solo le categorie: nel cookie ci sono anche `consentid` e `action`,
+           che non sono sì/no e letti come tali direbbero «no» a sproposito. */
+        if (k && v && CATEGORIE.includes(k.trim())) out[k.trim()] = v.trim() === 'yes';
+      });
+    return Object.keys(out).length ? out : null;
+  } catch {
+    return null;
+  }
+}
+
+function consensoPubblicita(): boolean {
+  if (!COOKIEYES_KEY) return true; // nessun banner: vale il comportamento di prima
+  const stato = daFunzione() ?? daCookie();
+  return Boolean(stato?.advertisement);
 }
 
 /** Le `set` che il consenso ha rimandato, da rifare quando arriva. */
 const rimandate: (() => void)[] = [];
 
 function scrivi(azione: () => void): void {
-  if (consensoMarketing()) azione();
+  if (consensoPubblicita()) azione();
   else rimandate.push(azione);
 }
 
-if (COOKIEBOT_CBID) {
+/** Cosa vede l'adattatore, per confermare l'API su una pagina vera. */
+(window as unknown as { athlonStatoConsenso: () => unknown }).athlonStatoConsenso = () => ({
+  chiaveConfigurata: Boolean(COOKIEYES_KEY),
+  daFunzione: daFunzione(),
+  daCookie: daCookie(),
+  pubblicitaConsentita: consensoPubblicita(),
+  scrittureInAttesa: rimandate.length,
+});
+
+if (COOKIEYES_KEY) {
   const rivaluta = () => {
-    if (!consensoMarketing()) {
-      rimandate.length = 0; // rifiutato: non si tiene una coda che non partirà
-      return;
-    }
+    if (!consensoPubblicita()) return; // può ancora arrivare: la coda resta
     while (rimandate.length) rimandate.shift()!();
   };
-  ['CookiebotOnConsentReady', 'CookiebotOnAccept', 'CookiebotOnDecline'].forEach((e) =>
-    window.addEventListener(e, rivaluta)
-  );
+
+  /* Sul documento e sulla finestra: quale dei due porti l'evento dipende dal
+     fornitore, ascoltarli entrambi non costa niente. */
+  ['cookieyes_consent_update', 'cookieyes_banner_load'].forEach((e) => {
+    document.addEventListener(e, rivaluta);
+    window.addEventListener(e, rivaluta);
+  });
+
+  /* La rete di sicurezza descritta sopra: venti secondi, poi smette. Chi
+     acconsente più tardi lo dice comunque con l'evento o col ricarico. */
+  let tentativi = 0;
+  const orologio = setInterval(() => {
+    rivaluta();
+    if (++tentativi >= 40 || !rimandate.length) clearInterval(orologio);
+  }, 500);
 }
 
 /** Quello che vale la pena raccogliere: campagna, click-id delle due piattaforme. */

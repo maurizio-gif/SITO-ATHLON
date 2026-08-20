@@ -93,28 +93,33 @@ solo dai due `meta` **e dal banner del consenso**, e il `<noscript>` è il primo
 figlio del `<body>`. In un browser, `window.dataLayer` è un array con dentro
 l'evento `gtm.js` e lo script iniettato porta `async`.
 
-### Il consenso è un interruttore solo, e si chiama `COOKIEBOT_CBID`
+### Il consenso è un interruttore solo, e si chiama `COOKIEYES_KEY`
 
-Sopra GTM sta Cookiebot, perché Consent Mode vuole lo stato di default — tutto
+Sopra GTM sta CookieYes, perché Consent Mode vuole lo stato di default — tutto
 negato — prima che `gtm.js` parta. **Nel layout e non come tag dentro GTM**,
 benché GTM lo permetta: un blocco pubblicitario che ferma
 `googletagmanager.com` fermerebbe anche il banner, e chi non vede il banner non
 può acconsentire. Questo sito ha storage suo da governare, quindi il segnale
 deve arrivare anche quando GTM non arriva.
 
-L'identificativo del gruppo di domini sta in `data/sito.ts`, in chiaro come il
-client id di Tina e per la stessa ragione. **Athlon ha un solo account
-Cookiebot**: il sito Astro è destinato a *essere* `www.athlonroma.it`, che è già
-nel gruppo del sito WordPress — stesso dominio, stesso identificativo, e la
-scelta già data non si ripresenta al cambio di piattaforma.
+La chiave del sito sta in `data/sito.ts`, in chiaro come il client id di Tina e
+per la stessa ragione — si legge già nel sorgente di athlonroma.it. **Athlon ha
+un solo account CookieYes**: il sito Astro è destinato a *essere*
+`www.athlonroma.it`, quindi si copia la chiave del sito WordPress e non se ne
+crea un'altra.
+
+Il fornitore è **CookieYes e non Cookiebot**, e la differenza non è il nome:
+cambiano l'URL dello script, l'API del consenso e il nome della categoria — è
+`advertisement`, non `marketing`. La prima stesura di questo blocco era scritta
+per Cookiebot; se trovi `window.Cookiebot` da qualche parte, è un residuo.
 
 Vuoto è uno stato legittimo, e comanda tre cose insieme:
 
-| | `COOKIEBOT_CBID` vuoto | impostato |
+| | `COOKIEYES_KEY` vuoto | impostato |
 | --- | --- | --- |
 | banner | non scritto in pagina | in cima al `<head>` |
-| `vid` e UTM | memorizzati, come sempre | memorizzati **solo col consenso** |
-| `/privacy` | dice che il banner è in arrivo | descrive il consenso e mostra la dichiarazione dei cookie |
+| `vid` e UTM | memorizzati, come sempre | memorizzati **solo con `advertisement`** |
+| `/privacy` | dice che il banner è in arrivo | descrive il consenso e apre il centro preferenze |
 
 Un interruttore e non tre, perché lo stato intermedio — nessun banner e già
 niente attribuzione — perderebbe i dati senza rendere il sito più corretto di un
@@ -141,10 +146,19 @@ della chat e il passo dell'Help Desk sono **necessari** — sono lo stato del
 servizio che la persona ha chiesto, durano la sessione e non profilano.
 Bloccarli romperebbe la chat.
 
-`data-blockingmode="auto"` fa il resto: Cookiebot trattiene gli iframe di terzi
-finché non c'è consenso. Su questo sito sono la mappa di Google nel footer — che
-sta in **ogni** pagina — il tour di my.mpskin, i player Vimeo e il widget di
-Calendly. Prima di accettare, al loro posto c'è un segnaposto.
+Il blocco automatico degli script di terzi **non è un attributo del tag**: in
+CookieYes si configura dal pannello, sito per sito. Su questo sito riguarda la
+mappa di Google nel footer — che sta in **ogni** pagina — il tour di my.mpskin,
+i player Vimeo e il widget di Calendly.
+
+**Lo script di CookieYes non è verificabile da qui**: il suo CDN è fuori dalla
+policy di rete dell'ambiente in cui questo codice si scrive e si prova. Da qui
+due scelte in `attribuzione.ts` che sarebbero strane altrimenti: la lettura del
+consenso poggia su **tre segnali** — `getCkyConsent()`, il cookie
+`cookieyes-consent`, e un controllo periodico limitato a venti secondi — e il
+default è **negato**, perché un fornitore che non risponde non è un consenso.
+`window.athlonStatoConsenso()` stampa cosa l'adattatore vede: chiamala su una
+pagina vera, e quando l'API è confermata il controllo periodico si può togliere.
 
 E `/privacy` esiste: era linkata dal footer di ogni pagina, da `/attiva` e da
 `/promo`, e **non c'era**. La parte tecnica — cosa si scrive nel browser, quali
