@@ -79,7 +79,14 @@ export function initChatAssistente(root, options) {
     return scelta ? scelta.label : '';
   }
 
-  var ATTESA_MAX = 15000;
+  /* Due attese diverse, perché sono due cose diverse. La verifica interroga
+     PerfectGym e torna in meno di un secondo: se tarda, tanto vale proseguire
+     come se non conoscessimo la persona, quindi il tetto resta corto. La
+     risposta del modello invece è lenta per costruzione — legge le voci del
+     sito e poi scrive una parola per volta — e un tetto di quindici secondi
+     buttava via risposte già pronte: misurate, arrivavano a 16,8 secondi. */
+  var ATTESA_VERIFICA = 15000;
+  var ATTESA_RISPOSTA = 45000;
 
   // ── Stato ─────────────────────────────────────────────────────────────────
   function statoIniziale() {
@@ -194,7 +201,7 @@ export function initChatAssistente(root, options) {
       var stop = new AbortController();
       var scaduta = window.setTimeout(function () {
         stop.abort();
-      }, ATTESA_MAX);
+      }, ATTESA_VERIFICA);
       var r = await fetch(VERIFICA, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -475,7 +482,7 @@ export function initChatAssistente(root, options) {
       var stop = new AbortController();
       var scaduta = window.setTimeout(function () {
         stop.abort();
-      }, ATTESA_MAX);
+      }, ATTESA_RISPOSTA);
       var r = await fetch(CHAT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -524,8 +531,18 @@ export function initChatAssistente(root, options) {
           '</p>'
         : '';
 
-      attesa.innerHTML = '<p>' + escape(risposta.risposta) + '</p>' + rimandi +
-        scappatoia(!!risposta.senzaRisposta);
+      /* Il modello ha l'ordine di scrivere in prosa e senza markdown, perché
+         qui il testo si stampa come testo. Ma se un capoverso arriva comunque,
+         va reso un capoverso e non una riga incollata alla precedente: è la
+         differenza fra una risposta che si legge e un muro. */
+      var paragrafi = risposta.risposta
+        .split(/\n{1,}/)
+        .map(function (r) { return r.trim(); })
+        .filter(Boolean)
+        .map(function (r) { return '<p>' + escape(r) + '</p>'; })
+        .join('');
+
+      attesa.innerHTML = paragrafi + rimandi + scappatoia(!!risposta.senzaRisposta);
       trascritto.push({ ruolo: 'assistente', testo: risposta.risposta });
     } catch (e) {
       /* Nel modal non c'è la ricerca locale a cui ricadere — quella è rimasta
