@@ -51,7 +51,10 @@ const { scuro = false } = Astro.props;
     align-items: baseline;
     flex-wrap: wrap;
     gap: 0.25rem 0.75rem;
-    margin: 0 0 1rem;
+    /* Nessun margine esterno: lo spazio attorno lo decide chi lo ospita, e i
+       due posti in cui vive hanno gutter diversi. Un margine dentro al
+       componente è un margine che va bene in un posto e stona nell'altro. */
+    margin: 0;
     padding: 0.875rem 1rem;
     border-radius: 0.875rem;
     background: rgba(255, 87, 1, 0.09);

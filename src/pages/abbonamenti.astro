@@ -171,6 +171,20 @@ const trust = [
               </ul>
             </div>
 
+            {/* Fra le attività comprese e le formule, e dentro **ogni** piano.
+                È qui che si decide: si è appena letto cosa c'è dentro e si sta
+                per guardare quanto costa, ed è nell'istante fra le due che
+                arriva «e se mi fermo?». Vale per lo Smart come per il Premium,
+                quindi ce l'hanno tutti e due: una promessa che sta su una card
+                sola sembra una condizione di quella card. */}
+            {/* `scuro` sullo Smart e non sul Premium: qui è **lo Smart** la card
+                nera (`.plan.smart`), l'opposto della promo dove il fondo scuro
+                ce l'ha il Premium. Senza, la cifra restava grigio scuro su nero
+                — cioè invisibile: rgba(39,36,35,.65) sopra rgb(39,36,35). */}
+            <div class="plan__sosp">
+              <BannerSospensione scuro={p.id === 'smart'} />
+            </div>
+
             {/* One vertical card per payment mode, as on the old site — far
                 easier to read at a distance than stacked rows. */}
             <div class="plan__options">
@@ -203,13 +217,6 @@ const trust = [
           </article>
         ))}
       </div>
-
-      {/* La sospensione esce dalla nota e diventa un banner, come sulla promo.
-          Dentro la nota era una voce fra tre, in mezzo alla quota di attivazione
-          e al certificato medico: quelle due sono condizioni da leggere prima di
-          firmare, questa è la risposta a «e se mi fermo?», che è una domanda
-          diversa e la sola che trattiene la mano. Le altre due restano dov'erano. */}
-      <BannerSospensione />
 
       <p class="ab-note">
         <strong>Quota di attivazione:</strong> €50 una tantum, per tutti i piani. Include il badge di accesso e
@@ -819,6 +826,19 @@ const trust = [
   }
 
   /* ---- Vertical price cards ---- */
+  /* Il gutter è quello del blocco delle attività qui sopra, non quello delle
+     formule qui sotto: il banner è testo che continua l'elenco, e allinearlo
+     alle schede del prezzo lo avrebbe fatto sporgere di sei pixel a sinistra
+     rispetto alla riga che lo precede.
+
+     Lo stacco è sopra e sotto, e non è la stessa misura per un motivo: sopra
+     c'è del testo — l'ultima attività dell'elenco — e sotto ci sono tre schede
+     con il loro bordo. Contro un bordo serve più aria che contro una riga di
+     testo, o il banner sembra appoggiato sulle schede. */
+  .plan__sosp {
+    padding: 0 28px 18px;
+  }
+
   .plan__options {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1313,7 +1333,8 @@ const trust = [
 
   @media (max-width: 640px) {
     .plan__head,
-    .plan__activities {
+    .plan__activities,
+    .plan__sosp {
       padding-left: 18px;
       padding-right: 18px;
     }
