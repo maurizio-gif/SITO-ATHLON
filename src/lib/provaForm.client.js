@@ -94,6 +94,26 @@ export function initProvaForm(root, options) {
     solo = solo.replace(/^\+39/, '').replace(/^0039/, '');
     return solo.replace(/\D/g, '');
   }
+  /**
+   * Riempie i campi del secondo passo con quello che la verifica ha restituito.
+   *
+   * Solo i campi vuoti: se la persona ha già scritto qualcosa, quello che ha
+   * scritto vince. E restano visibili e modificabili — non nascosti — perché
+   * un dato che arriva da un sistema va potuto guardare prima di confermarlo.
+   */
+  function precompila(body) {
+    if (body.nome) dati.nome = String(body.nome);
+    if (body.cognome) dati.cognome = String(body.cognome);
+    if (body.telefono) dati.cellulare = cellulareNudo(body.telefono);
+    [
+      [campoNome, dati.nome],
+      [campoCognome, dati.cognome],
+      [campoCellulare, dati.cellulare],
+    ].forEach(function (coppia) {
+      if (coppia[0] && !coppia[0].value && coppia[1]) coppia[0].value = coppia[1];
+    });
+  }
+
   function cellulareValido(v) {
     return /^3\d{8,9}$/.test(cellulareNudo(v));
   }
@@ -220,6 +240,14 @@ export function initProvaForm(root, options) {
       });
       var body = await r.json();
       if (body && body.stato) risultato = String(body.stato);
+      /* La verifica non risponde solo «chi sei»: se PerfectGym ha già
+         l'anagrafica — un socio, o chi ha lasciato i dati un'altra volta —
+         torna anche con nome, cognome e telefono. Prima li buttavamo e li
+         richiedevamo, cioè facevamo una domanda a cui la persona aveva già
+         risposto. L'assistente li usa per saltare il passo e «contattaci» per
+         precompilarlo; qui si fa come «contattaci», perché chi si iscrive a una
+         prova deve poterli rileggere e correggere prima di mandarli. */
+      if (body) precompila(body);
     } catch (e) {
       // PerfectGym irraggiungibile: si prosegue come se fosse un contatto
       // nuovo. La verifica vera la rifà comunque n8n quando crea il lead.
