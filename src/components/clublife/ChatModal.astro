@@ -79,33 +79,23 @@
           nessuno, che è il modo migliore per rendere inutile un'informativa. */}
     </section>
 
-    {/* ── 2. Adulti o junior ─────────────────────────────────────────────
-        Una scelta a due vie chiesta a parole è solo un'occasione per
-        fraintendere: sono due pulsanti. E cambia molto — la conoscenza che
-        l'assistente può usare, il tono, e cosa gli si chiede di ottenere. */}
-    <section class="ca__step" data-ca-step="ambito" hidden>
-      <h3 class="ca__title" tabindex="-1" data-ca-fuoco>Per chi cerchi informazioni?</h3>
-      <p class="ca__lead">Così ti parlo della cosa giusta.</p>
+    {/* ── 2. Quale attività ──────────────────────────────────────────────
+        Una scelta sola fra cinque, e la vede chiunque — socio o no: sapere che
+        è di casa dice come parlargli, non di che cosa sta parlando. Un padre con
+        l'abbonamento che chiede degli orari della scuola nuoto è un socio, e la
+        domanda è junior.
 
-      <div class="ca__scelte">
-        <button type="button" class="ca__scelta" data-ca-ambito="adulti">
-          <span class="ca__scelta-nome">Per me</span>
-          <span class="ca__scelta-nota">Sala pesi, corsi, piscina, abbonamenti</span>
-        </button>
-        <button type="button" class="ca__scelta" data-ca-ambito="junior">
-          <span class="ca__scelta-nome">Per un bambino</span>
-          <span class="ca__scelta-nota">Baby nuoto, scuola nuoto, pallanuoto, agonistica</span>
-        </button>
-      </div>
-    </section>
+        Le attività per adulti stanno in una voce unica perché per un adulto il
+        percorso è lo stesso — un abbonamento — mentre i quattro corsi dei
+        bambini hanno età, requisiti e iscrizioni diverse fra loro, e sapere
+        quale interessa è ciò che permette di non parlare degli altri tre.
 
-    {/* ── 3. Quale corso junior ──────────────────────────────────────────
-        I quattro corsi sono percorsi diversi con requisiti diversi, e sapere
-        quale interessa è ciò che permette di non parlare degli altri tre. */}
-    <section class="ca__step" data-ca-step="junior" hidden>
-      <h3 class="ca__title" tabindex="-1" data-ca-fuoco>Quale corso ti interessa?</h3>
-      <div class="ca__scelte" data-ca-junior></div>
-      <button type="button" class="ca__link" data-ca-indietro>← Torna indietro</button>
+        L'elenco lo dipinge lo script, da una lista sola: vedi
+        `chatAssistente.client.js`. */}
+    <section class="ca__step" data-ca-step="attivita" hidden>
+      <h3 class="ca__title" tabindex="-1" data-ca-fuoco>Di cosa parliamo?</h3>
+      <p class="ca__lead">Così ti do le risposte di quell’attività invece della media del sito.</p>
+      <div class="ca__scelte" data-ca-attivita></div>
     </section>
 
     {/* ── 4. La conversazione ────────────────────────────────────────────── */}
@@ -129,13 +119,19 @@
         interpretato dal parlato è un'anagrafica che prima o poi è sbagliata, e
         quella la corregge una persona a mano.
 
-        I campi del bambino compaiono solo nel ramo junior. */}
+        Sta **prima** della conversazione e lo vede solo chi non conosciamo: di
+        un socio l'anagrafica ce l'ha già PerfectGym. I campi del bambino
+        compaiono solo quando si cerca per un bambino. */}
     <section class="ca__step" data-ca-step="dati" hidden>
       <h3 class="ca__title" tabindex="-1" data-ca-fuoco data-ca-dati-titolo>I tuoi dati</h3>
       <p class="ca__lead" data-ca-dati-lead>
         Lasciaci come raggiungerti: ti richiamiamo noi.
       </p>
 
+      {/* I campi dell'adulto: spariscono tutti insieme quando la verifica ce li
+          ha già dati buoni, e resta il solo blocco del bambino. Restano
+          compilati dietro le quinte, così il payload è sempre completo. */}
+      <div data-ca-genitore>
       <div class="ca__griglia">
         <div class="ca__campo">
           <label class="ca__label" for="ca-nome">Nome</label>
@@ -148,6 +144,21 @@
       </div>
 
       <div class="ca__griglia">
+        {/* L'email è già stata scritta al primo passo e arriva precompilata, ma
+            resta modificabile: quella della verifica può non essere quella su cui
+            si vuole essere ricontattati. */}
+        <div class="ca__campo">
+          <label class="ca__label" for="ca-email-dati">Email</label>
+          <input
+            class="ca__input"
+            id="ca-email-dati"
+            type="email"
+            inputmode="email"
+            autocomplete="email"
+            placeholder="nome@esempio.it"
+            data-ca-f="email"
+          />
+        </div>
         <div class="ca__campo">
           <label class="ca__label" for="ca-cellulare">Cellulare</label>
           <input
@@ -160,10 +171,18 @@
             data-ca-f="cellulare"
           />
         </div>
+      </div>
+
+      {/* La data di nascita del genitore la chiede solo il percorso junior, ed è
+          la stessa ragione del blocco qui sopra: là si crea la sua anagrafica
+          guest e `AddGuestMember` la pretende, mentre un adulto che vuole essere
+          ricontattato diventa un lead, e `Crm2/AddLead` non ha quel campo. */}
+      <div data-ca-nascita hidden>
         <div class="ca__campo">
-          <label class="ca__label" for="ca-nascita">Data di nascita</label>
+          <label class="ca__label" for="ca-nascita">La tua data di nascita</label>
           <input class="ca__input" id="ca-nascita" type="date" data-ca-f="nascita" />
         </div>
+      </div>
       </div>
 
       {/* Il blocco del bambino: nel ramo junior servono due anagrafiche, e la
@@ -202,8 +221,15 @@
       <p class="ca__errore" data-ca-dati-errore hidden></p>
 
       <button type="button" class="ca__btn" data-ca-dati-invia>
-        Invia
+        Invia e continua
         <span class="ca__spinner" aria-hidden="true"></span>
+      </button>
+
+      {/* Compare solo dopo un invio fallito: se l'automazione è giù, la
+          conversazione non deve morire con lei. Lo script la tiene nascosta
+          finché non serve. */}
+      <button type="button" class="ca__link" data-ca-dati-salta hidden>
+        Continua comunque senza inviare →
       </button>
 
       <p class="ca__privacy" data-ca-dati-privacy>
@@ -212,15 +238,7 @@
         <a href="/privacy" target="_blank" rel="noopener">Informativa privacy</a>.
       </p>
 
-      <button type="button" class="ca__link" data-ca-dati-annulla>← Torna alla conversazione</button>
-    </section>
-
-    {/* ── 6. Fatto ──────────────────────────────────────────────────────── */}
-    <section class="ca__step" data-ca-step="fatto" hidden>
-      <h3 class="ca__title" tabindex="-1" data-ca-fuoco>Ci siamo.</h3>
-      <p class="ca__lead" data-ca-fatto-lead></p>
-      <a class="ca__btn ca__btn--link" data-ca-fatto-cta href="/" target="_blank" rel="noopener" hidden></a>
-      <button type="button" class="ca__link" data-ca-fatto-chiudi>Chiudi</button>
+      <button type="button" class="ca__link" data-ca-dati-annulla>← Torna indietro</button>
     </section>
   </div>
 </div>
@@ -413,6 +431,10 @@
     padding: 0;
     overflow: hidden;
   }
+
+  /* Il passo nascosto lo spegne `[hidden]` in `global.css`: `display: flex` qui
+     sopra scavalcherebbe la regola del browser, e la chat resterebbe in pagina
+     sotto tutti gli altri passi. */
 
   .ca__title {
     margin: 0 0 0.6rem;
@@ -798,10 +820,6 @@
   .ca__consenso a {
     color: var(--color-primary);
     text-decoration: underline;
-  }
-
-  .ca__btn--link {
-    text-decoration: none;
   }
 
   @media (max-width: 460px) {
