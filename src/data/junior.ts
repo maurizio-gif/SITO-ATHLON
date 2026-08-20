@@ -78,11 +78,25 @@ export interface CorsoJunior {
   /** L'etichetta dei pulsanti. Default: "Richiedi orari e costi". */
   cta?: string;
   /**
-   * Cosa chiede quel pulsante, per il modal della fase successiva: informazioni
-   * su un corso junior o la prova di inserimento, che per pallanuoto e nuoto
-   * agonistico è obbligatoria e fa parte del prodotto.
+   * Cosa chiede quel pulsante, per il modal: informazioni su un corso junior o
+   * la prova di inserimento, che per pallanuoto e nuoto agonistico è
+   * obbligatoria e fa parte del prodotto.
    */
   ctaIntent?: 'junior_info' | 'insertion_trial';
+  /**
+   * Una destinazione esterna al posto del form, per il caso in cui la richiesta
+   * **non è** una richiesta.
+   *
+   * Esiste per il Baby Nuoto e solo per lui: là il pulsante dice «Registrati
+   * per prenotare», e non è un modo di dire — le lezioni si prenotano a turno
+   * dal portale, quindi la cosa che serve davvero è l'account, non una risposta
+   * del desk. Passare dal form vorrebbe dire far scrivere una richiesta a chi
+   * ha già capito cosa fare, e fargliela aspettare.
+   *
+   * Sulle altre tre pagine il pulsante chiede orari, costi o una prova di
+   * inserimento: quelle sono domande, e restano al form.
+   */
+  ctaEsterna?: string;
   /**
    * Il Metodo Athlon: i passaggi che il club fa e può dimostrare. Esiste solo
    * per la Scuola Nuoto Bambini, che è l'attività con un metodo documentato —
@@ -156,6 +170,10 @@ export const JUNIOR: CorsoJunior[] = [
     claim: 'In acqua con te, dai tre mesi.',
     cta: 'Registrati per prenotare',
     ctaIntent: 'junior_info',
+    /* Il portale, non il form. `Registration` e non `Login`: chi arriva da
+       questa pagina l'account non ce l'ha — se ce l'ha entra dall'icona
+       dell'area riservata, che è due centimetri più in alto in ogni pagina. */
+    ctaEsterna: 'https://athlon.perfectgym.com/ClientPortal2/#/Registration',
     hero: `${U}/2024/08/P1160529.jpg`,
     fuoco: '50% 35%',
 
