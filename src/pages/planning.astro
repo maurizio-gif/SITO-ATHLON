@@ -135,9 +135,61 @@ const faqs = await faqPagina([
         Il planning viene aggiornato ogni mese. Prenoti dall'<a href="https://onelink.to/athlon">app
         Athlon Club</a> o dal <a href={`${PG}/#/Classes/1/Calendar`}>portale web</a>.
       </p>
+
+      {/* ── Per gli schermi della sede ─────────────────────────────────────
+          Non è un richiamo per chi visita: è lo strumento con cui il club
+          stampa il palinsesto sui due 9:16 all'ingresso. Sta in fondo, in
+          corpo minuto e senza pastiglia, perché a un visitatore non serve e
+          non deve sembrargli un'offerta.
+
+          Due misure e non una, e la ragione è aritmetica: 1080×1920 su un 40"
+          danno 2,17 px/mm, e a 2,5 m la regola dei cartelli chiede 17 mm —
+          cioè righe da 97 px, cioè diciassette righe per pagina. Con 180
+          lezioni due pagine sole obbligano a righe da 41 px, che si leggono
+          bene a un metro e poco più. Le due voci dicono il numero, così la
+          scelta la fa chi conosce la distanza dello schermo.
+
+          Il codice che disegna arriva al primo clic e non prima: è un canvas
+          da 1080×1920 e i dati del palinsesto, roba che a chi legge la pagina
+          non serve. */}
+      <p class="pl-scarica">
+        <span class="pl-scarica__eti">Schermi della sede</span>
+        <button type="button" class="pl-scarica__btn" data-pl-jpeg="3">
+          Scarica 2 JPEG 1080×1920
+        </button>
+        <button type="button" class="pl-scarica__btn" data-pl-jpeg="2">
+          in 3 pagine, caratteri più grandi
+        </button>
+        <span class="pl-scarica__esito" data-pl-esito aria-live="polite"></span>
+      </p>
     </div>
   </section>
 </Layout>
+
+<script>
+  /* L'import è dentro il gestore, quindi il modulo del canvas e il JSON del
+     palinsesto diventano un pezzo a parte che il browser scarica al primo clic.
+     Per chi legge la pagina — cioè quasi tutti — sono zero byte. */
+  document.querySelectorAll('[data-pl-jpeg]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const esito = document.querySelector('[data-pl-esito]');
+      const giorni = Number((btn as HTMLElement).dataset.plJpeg);
+      const prima = btn.textContent;
+      btn.setAttribute('disabled', 'true');
+      btn.textContent = 'Preparo…';
+      try {
+        const { scaricaPlanning } = await import('../lib/planningJpeg.client.js');
+        const fatto = await scaricaPlanning(giorni);
+        if (esito) esito.textContent = `${fatto.pagine} pagine, caratteri ~${fatto.mm} mm`;
+      } catch (e) {
+        if (esito) esito.textContent = 'Non è riuscito: riprova o guarda la console.';
+        console.error(e);
+      }
+      btn.textContent = prima;
+      btn.removeAttribute('disabled');
+    });
+  });
+</script>
 
 <style>
   /* ---- Hero ---- */
@@ -228,6 +280,51 @@ const faqs = await faqPagina([
 
   .pl-sec__sub a:hover {
     text-decoration: underline;
+  }
+
+  /* ---- Lo strumento della sede ----
+     Corpo minuto, grigio, e i comandi come link sottolineati: deve leggersi
+     come una nota di servizio, non come una CTA. Chi visita il sito lo scorre
+     senza vederlo, che è l'intenzione. */
+  .pl-scarica {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.9rem;
+    margin: 2.5rem 0 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: var(--text-2xs);
+  }
+
+  .pl-scarica__eti {
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .pl-scarica__btn {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--color-primary);
+    font-family: var(--font-body);
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .pl-scarica__btn[disabled] {
+    color: var(--text-muted);
+    cursor: default;
+    text-decoration: none;
+  }
+
+  .pl-scarica__esito {
+    color: var(--text-muted);
   }
 
   .pl-note {
