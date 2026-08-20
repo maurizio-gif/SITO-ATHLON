@@ -42,6 +42,20 @@ export const CLUB = {
   logo: '/wp-content/uploads/2025/08/Logo-oriz-full-2.png',
   /** L'immagine di anteprima quando si condivide un link senza foto propria. */
   socialImage: '/og/athlon-club.jpg',
+  /**
+   * I dati dell'ente, che vanno sui documenti e sui fogli affissi in sede.
+   *
+   * Stavano scritti a mano nel footer, e servivano anche al generatore dei JPEG
+   * del planning: due copie di un numero di affiliazione sono due copie che
+   * divergono al primo rinnovo, e quella sbagliata resta appesa a una parete.
+   */
+  legale: {
+    ragione: 'Società Sportiva Dilettantistica Point 2000 SSD',
+    piva: '05154811003',
+    asi: 'LAZ-RM4453',
+    fin: '996434',
+    csen: '71519',
+  },
 } as const;
 
 /** Giorni della settimana in schema.org, per gli orari del planning. */

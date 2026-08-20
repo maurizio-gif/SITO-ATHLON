@@ -154,11 +154,8 @@ const faqs = await faqPagina([
           non serve. */}
       <p class="pl-scarica">
         <span class="pl-scarica__eti">Schermi della sede</span>
-        <button type="button" class="pl-scarica__btn" data-pl-jpeg="3">
-          Scarica 2 JPEG 1080×1920
-        </button>
-        <button type="button" class="pl-scarica__btn" data-pl-jpeg="2">
-          in 3 pagine, caratteri più grandi
+        <button type="button" class="pl-scarica__btn" data-pl-jpeg>
+          Scarica i 2 fogli · JPEG 1080×1920
         </button>
         <span class="pl-scarica__esito" data-pl-esito aria-live="polite"></span>
       </p>
@@ -173,13 +170,12 @@ const faqs = await faqPagina([
   document.querySelectorAll('[data-pl-jpeg]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const esito = document.querySelector('[data-pl-esito]');
-      const giorni = Number((btn as HTMLElement).dataset.plJpeg);
       const prima = btn.textContent;
       btn.setAttribute('disabled', 'true');
       btn.textContent = 'Preparo…';
       try {
         const { scaricaPlanning } = await import('../lib/planningJpeg.client.js');
-        const fatto = await scaricaPlanning(giorni);
+        const fatto = await scaricaPlanning();
         if (esito) esito.textContent = `${fatto.pagine} pagine, caratteri ~${fatto.mm} mm`;
       } catch (e) {
         if (esito) esito.textContent = 'Non è riuscito: riprova o guarda la console.';

@@ -1,269 +1,385 @@
 // @ts-nocheck — script di browser, canvas diretto e nessuna annotazione di tipo
 //
-// Il palinsesto come JPEG per gli schermi verticali del club.
+// Il palinsesto come due JPEG per gli schermi verticali del club.
 //
-// Due schermi 9:16 da 40", letti da due-tre metri. Il file esce a 1080×1920,
-// che è la risoluzione nativa: un JPEG più grande verrebbe ridotto dallo
-// schermo e uno più piccolo interpolato, e in entrambi i casi il testo perde
-// il filo dei pixel proprio alla misura in cui conta.
+// ── Da dove viene questo disegno ─────────────────────────────────────────────
 //
-// ── L'aritmetica, perché decide tutto il resto ───────────────────────────────
+// Non è inventato: ricostruisce i due fogli che il club faceva a mano in Canva,
+// e che funzionavano. Tre scelte loro che qui sono regole, perché sono le tre
+// che risolvono i problemi in cui le mie prime due versioni erano finite.
 //
-// **L'altezza dello schermo è misurata, non dedotta dalla diagonale**: 960 mm,
-// col metro, su un pannello che di listino è un 42". La differenza non è
-// pedanteria — la diagonale nominale include la cornice e arrotonda, e da lì
-// si sbaglia di un millimetro per carattere. 1920 px su 960 mm fanno
-// **2,0 px/mm** esatti.
+// **Il taglio è per ambiente, non per giorno.** Acqua su un foglio — scuola
+// nuoto adulti, nuoto libero, aqua fitness — e sala sull'altro: gym floor,
+// corsi fitness, group reformer. Così ogni foglio ha tutti e sei i giorni della
+// sua area, che è il modo in cui uno cerca: chi viene a nuotare non legge la
+// colonna dei corsi in Sala A. Tagliare per giorno, come facevo prima, spezza a
+// metà ogni attività e obbliga a guardare due fogli per sapere quando c'è aqua
+// fitness.
 //
-// La regola dei cartelli — altezza del carattere ≈ distanza / 150 — a 2,5 m
-// chiede 17 mm, cioè 34 px di altezza maiuscola: con l'Inter, dove la
-// maiuscola è ~0,72 del corpo, sono 47 px di corpo e righe da ~102 px.
+// **Il nome sta su una riga sua e l'ora sotto**, in due barre sovrapposte. È la
+// soluzione al vincolo orizzontale su cui mi ero incagliato: con ora e nome
+// sulla stessa riga, in una colonna da 165 px al nome ne restavano 90, e
+// «Pilates Matwork» andava compresso o tagliato. Impilandoli il nome prende
+// tutta la larghezza della cella e ci sta senza deformarsi.
 //
-// In 1920 px meno l'intestazione restano ~1560 px utili, cioè **quindici righe
-// per pagina** a quella misura. Il palinsesto ha 180 lezioni: 180 diviso 15 fa
-// dodici pagine, non due.
+// **Il colore identifica la sezione**, quindi non serve una legenda: viola la
+// scuola nuoto, blu il nuoto libero, turchese l'acqua, arancio il fitness,
+// verde il reformer. La sala resta scritta nella barra dell'ora, perché il
+// colore dice l'attività e non la stanza.
 //
-// È la stessa aritmetica che AGENTS.md descrive due volte, per il totem e per
-// la televisione: su 1080 px non si può avere insieme il grado poster e tutto
-// il contenuto. Qui non la si risolve, la si dichiara — `maxRighe` è la
-// manopola, e da quella scende sia il corpo del carattere sia il numero di
-// pagine:
+// ── L'aritmetica, che resta quella ──────────────────────────────────────────
 //
-//   maxRighe 17  →  righe ~100 px  →  ~14 mm  →  giuste a 2,1 m  →  6 pagine
-//   maxRighe 40  →  righe ~41 px   →  ~7 mm   →  giuste a 1,0 m  →  2 pagine
+// L'altezza del pannello è **misurata**, 960 mm col metro su un 42" di listino:
+// 1920 px fanno 2,0 px/mm esatti. La diagonale nominale include la cornice e
+// arrotonda, e da lì si sbaglia di un millimetro per carattere.
 //
-// Nessuna delle due arriva ai 17 mm dei tre metri con questo contenuto: per
-// arrivarci servirebbero righe da 122 px, cioè dodici per pagina, cioè quindici
-// pagine. Il numero lo stampa la pagina dopo il download, così la scelta la fa
-// chi conosce la distanza dello schermo invece di fidarsi di un'etichetta.
+// Ogni foglio si adatta al suo contenuto e non all'altro, al contrario di
+// quando le due pagine erano le due metà della stessa tabella: là due misure
+// diverse fianco a fianco erano un difetto, qui sono due fogli di due materie e
+// il foglio dell'acqua — che ha meno lezioni — può respirare. È anche quello
+// che fanno i due originali.
 //
-// ── E il vincolo che non è verticale ────────────────────────────────────────
-//
-// **Due giorni per pagina**, e il numero viene da una prova sbagliata prima di
-// arrivarci. Con tre colonne la cella è larga 320 px; tolta l'ora e il filo
-// della sala al nome ne restano 216, che a corpo leggibile fanno nove caratteri
-// — e «Ginnastica Strutturale» ne ha ventidue. La prima versione tagliava i
-// nomi coi puntini, cioè cancellava l'unica informazione che serve davvero a
-// chi guarda lo schermo da tre metri: quale lezione è.
-//
-// Con due colonne da 497 px il nome ne ha 390, e **va a capo** invece di essere
-// tagliato: due righe bastano a qualunque nome del palinsesto. Il corpo del
-// carattere lo decide il minore fra due vincoli — l'altezza disponibile diviso
-// le righe, e la larghezza che regge la parola più lunga — perché fissarne uno
-// solo è il modo di scoprire l'altro a difetto fatto.
+// Quello che questi JPEG **non** riproducono sono i marchi dentro i nomi: sui
+// fogli in Canva «HBX boxing», «Les Mills BODYPUMP», «Antigravity» e «MOTR®»
+// sono lockup grafici. Qui sono testo, perché i file dei marchi non stanno nel
+// repository e inventarli male sarebbe peggio che scriverli.
 
 import dati from '../data/planning-corrente.json';
+import { CLUB } from '../data/club';
 
-/** 1080×1920: la risoluzione nativa dei due schermi. */
 const L = 1080;
 const A = 1920;
 
 /** Altezza del pannello, misurata col metro: 960 mm. Quindi 2,0 px/mm esatti. */
 const ALTEZZA_MM = 960;
 const PX_PER_MM = A / ALTEZZA_MM;
-
 /** Quanto della cassa alta occupa l'Inter rispetto al corpo dichiarato. */
 const MAIUSCOLA = 0.72;
 
-const COLORI = {
-  fondo: '#171514',
-  fondoRiga: 'rgba(255,255,255,0.04)',
-  testo: '#ffffff',
-  spento: 'rgba(255,255,255,0.55)',
-  arancio: '#ff5701',
-  filo: 'rgba(255,255,255,0.14)',
+const C = {
+  carta: '#f0ede8',
+  scuro: '#171514',
+  bianco: '#ffffff',
+  spento: '#6b6560',
 };
 
-/** Un colore per sala, così a colpo d'occhio si vede dove si va. */
-const SALA = {
-  'Sala A': '#ff5701',
-  'Sala B': '#ffb400',
-  'Sala C': '#7ad1c4',
-  'Vasca Grande': '#4aa3ff',
-  'Vasca Media': '#9b8cff',
-  'Gym Floor': '#c9c4bd',
+/** I due fogli, con le sezioni nell'ordine degli originali. */
+const FOGLI = [
+  {
+    nome: 'acqua',
+    sezioni: [
+      { id: 'scuola-nuoto-adulti', titolo: 'Scuola Nuoto Adulti', colore: '#5b6ef5' },
+      { id: 'nuoto-libero', titolo: 'Nuoto Libero Assistito', colore: '#1a56d6' },
+      { id: 'aqua-fitness', titolo: 'Aqua Fitness', colore: '#17b6c4' },
+    ],
+  },
+  {
+    nome: 'sala',
+    sezioni: [
+      { id: 'gym-floor', titolo: 'Gym Floor', colore: '#171514', orari: true },
+      { id: 'corsi-fitness', titolo: 'Corsi Fitness', colore: '#ff5701' },
+      { id: 'group-reformer', titolo: 'Group Reformer', colore: '#3f9c6d', soloOra: true },
+    ],
+  },
+];
+
+const GIORNI = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
+const NOMI = {
+  Lun: 'Lunedì', Mar: 'Martedì', Mer: 'Mercoledì',
+  Gio: 'Giovedì', Ven: 'Venerdì', Sab: 'Sabato',
 };
+
+/** L'ora d'inizio in minuti, per ordinare e per dividere le due fasce. */
+function minuti(t) {
+  const m = String(t).match(/(\d{1,2})[:.](\d{2})/);
+  return m ? Number(m[1]) * 60 + Number(m[2]) : 0;
+}
 
 /**
- * Le pagine, impacchettate.
+ * Le lezioni di una sezione, per giorno e divise in due fasce.
  *
- * Tre giorni per pagina, e le bande si aggiungono finché la colonna più alta
- * regge. Quando non regge più si apre una pagina nuova con gli stessi tre
- * giorni: è il motivo per cui il numero di pagine non si sceglie ma si scopre.
+ * Mattina fino alle 14, pomeriggio dopo: è la spaccatura che hanno i fogli
+ * originali, e non è arbitraria — nel palinsesto fra le 14 e le 16 non c'è
+ * quasi niente, quindi il bianco cade dove il club è vuoto. Serve a leggere in
+ * orizzontale: allineando l'inizio del pomeriggio su tutti i giorni, due
+ * colonne accanto si confrontano a colpo d'occhio.
  */
-function impagina(giorniPerPagina) {
-  const tutti = dati.bands[0].days.map((g) => g.short);
-  const gruppi = [];
-  for (let k = 0; k < tutti.length; k += giorniPerPagina) {
-    gruppi.push(tutti.slice(k, k + giorniPerPagina));
-  }
-
-  /* Nessun impacchettamento: su ogni pagina ci vanno **tutte** le bande dei
-     suoi giorni, e il carattere si adatta a quello che c'è. È l'opposto della
-     prima versione, che apriva pagine nuove per tenere il corpo grande — qui il
-     numero di pagine è il vincolo e il corpo è la conseguenza. */
-  return gruppi.map((giorni) => {
-    const sezioni = [];
-    let righe = 0;
-    dati.bands.forEach((banda) => {
-      const perGiorno = giorni.map((g) => {
-        const gg = banda.days.filter((x) => x.short === g)[0];
-        return (gg && gg.classes) || [];
-      });
-      const alta = Math.max.apply(null, perGiorno.map((c) => c.length));
-      if (alta === 0) return;
-      sezioni.push({ titolo: banda.title, perGiorno });
-      // Il titolo della banda costa 0,8 di riga, non una intera.
-      righe += alta + 0.8;
-    });
-    return { giorni, sezioni, righe };
+function perFascia(sezione) {
+  const banda = dati.bands.filter((b) => b.id === sezione.id)[0];
+  if (!banda) return null;
+  const giorni = GIORNI.map((g) => {
+    const gg = banda.days.filter((d) => d.short === g)[0];
+    const classi = ((gg && gg.classes) || []).slice().sort((a, b) => minuti(a.time) - minuti(b.time));
+    return {
+      mattina: classi.filter((k) => minuti(k.time) < 14 * 60),
+      pomeriggio: classi.filter((k) => minuti(k.time) >= 14 * 60),
+    };
   });
+  /* `soloOra` **si dichiara sulla sezione, non si deduce**, e ci sono arrivato
+     sbagliando: dedurlo da «tutte le lezioni hanno lo stesso nome» sembrava
+     elegante e degradava anche scuola nuoto e nuoto libero, che nei fogli
+     originali la barra del nome ce l'hanno. I fogli sono la specifica, e
+     contraddicono l'euristica: al reformer il nome non serve perché la sezione
+     lo dice già nel banner e la cella non aggiunge niente, mentre «SCUOLA
+     NUOTO» dentro la cella è quello che si legge da lontano. */
+  return {
+    giorni,
+    soloOra: !!sezione.soloOra,
+    mattina: Math.max.apply(null, giorni.map((g) => g.mattina.length)),
+    pomeriggio: Math.max.apply(null, giorni.map((g) => g.pomeriggio.length)),
+  };
 }
 
-/** Il testo, tagliato con i puntini se davvero non entra. */
-function accorcia(ctx, testo, largo) {
-  if (ctx.measureText(testo).width <= largo) return testo;
+/** Testo compresso in orizzontale se non entra, tagliato solo all'estremo. */
+function scrivi(x, testo, cx, cy, largoMax, centrato) {
+  const w = x.measureText(testo).width;
+  const k = Math.min(1, largoMax / w);
+  const gx = centrato ? cx - Math.min(w, largoMax) / 2 : cx;
+  if (k >= 0.999) {
+    x.fillText(testo, gx, cy);
+    return;
+  }
+  x.save();
+  x.translate(gx, cy);
+  x.scale(Math.max(k, 0.7), 1);
   let t = testo;
-  while (t.length > 4 && ctx.measureText(t + '…').width > largo) t = t.slice(0, -1);
-  return t + '…';
+  if (k < 0.7) {
+    while (t.length > 3 && x.measureText(t + '…').width * 0.7 > largoMax) t = t.slice(0, -1);
+    t += '…';
+  }
+  x.fillText(t, 0, 0);
+  x.restore();
 }
 
-function disegna(pagina, indice, totale, corpo) {
+/** Il nome su una o due righe, spezzato fra le parole. */
+function righeNome(x, testo, largoMax) {
+  if (x.measureText(testo).width <= largoMax) return [testo];
+  const parole = String(testo).split(' ');
+  let a = '';
+  const resto = [];
+  parole.forEach((w) => {
+    const prova = a ? a + ' ' + w : w;
+    if (!a || x.measureText(prova).width <= largoMax) a = prova;
+    else resto.push(w);
+  });
+  return resto.length ? [a, resto.join(' ')] : [a];
+}
+
+function disegnaFoglio(foglio, indice, totale) {
   const c = document.createElement('canvas');
   c.width = L;
   c.height = A;
   const x = c.getContext('2d');
-
-  x.fillStyle = COLORI.fondo;
+  x.fillStyle = C.carta;
   x.fillRect(0, 0, L, A);
   x.textBaseline = 'alphabetic';
 
-  const bordo = 34;
+  const bordo = 22;
+  const colW = (L - bordo * 2 - 5 * 6) / 6;
 
-  /* L'intestazione è alta 112 px e non 266 come nella prima versione: ogni
-     pixel speso qui è un pixel in meno per le lezioni, e con due pagine sole
-     quel conto si sente. Mese e numero di pagina su una riga. */
-  x.fillStyle = COLORI.arancio;
-  x.font = '700 26px Inter, sans-serif';
-  x.fillText('ATHLON CLUB · PLANNING', bordo, 46);
-  x.fillStyle = COLORI.testo;
-  x.font = '600 52px Inter, sans-serif';
-  x.fillText(String(dati.mese).toUpperCase(), bordo, 98);
-  x.fillStyle = COLORI.spento;
-  x.font = '500 30px Inter, sans-serif';
-  const coda = `${indice + 1} / ${totale}`;
-  x.fillText(coda, L - bordo - x.measureText(coda).width, 98);
+  // ── Testata: il marchio, come sui fogli originali ──
+  const testaH = 104;
+  x.fillStyle = C.scuro;
+  x.fillRect(bordo, 12, L - bordo * 2, testaH - 24);
+  x.font = "700 66px 'Tusker-Grotesk', sans-serif";
+  const wM = x.measureText('ATHLON CLUB').width;
+  x.font = "700 46px 'Tusker-Grotesk', sans-serif";
+  const wV = x.measureText(' 4.0').width;
+  const x0 = (L - (wM + wV)) / 2;
+  x.fillStyle = C.bianco;
+  x.font = "700 66px 'Tusker-Grotesk', sans-serif";
+  x.fillText('ATHLON CLUB', x0, 68);
+  x.fillStyle = '#ff5701';
+  x.font = "700 46px 'Tusker-Grotesk', sans-serif";
+  x.fillText(' 4.0', x0 + wM, 68);
 
-  const yTesta = 112;
-  const yPiede = A - 44;
+  // ── Piede: il blocco legale, che sta sui fogli e serve a norma ──
+  const yPiede = A - 128;
+  x.fillStyle = C.spento;
+  x.font = 'italic 500 23px Inter, sans-serif';
+  x.fillText('propaganda attività fisica sportiva dilettantistica', bordo + 6, yPiede + 32);
+  x.fillStyle = C.scuro;
+  x.font = '700 25px Inter, sans-serif';
+  x.fillText(CLUB.legale.ragione.toUpperCase(), bordo + 6, yPiede + 64);
+  x.fillStyle = C.spento;
+  x.font = '600 20px Inter, sans-serif';
+  x.fillText(`AFFILIAZIONE ASI: ${CLUB.legale.asi}`, bordo + 6, yPiede + 90);
+  x.font = '500 20px Inter, sans-serif';
+  x.fillText(
+    `${CLUB.street}, ${CLUB.postalCode} ${CLUB.city}  |  www.athlonroma.it  |  ${CLUB.email}`,
+    bordo + 6,
+    yPiede + 114
+  );
 
-  // ── Le colonne ──
-  const gutter = 18;
-  const colonne = pagina.giorni.length;
-  const largo = (L - bordo * 2 - gutter * (colonne - 1)) / colonne;
-  const yGiorno = yTesta + 40;
-  const yPrima = yGiorno + 26;
-  const utile = yPiede - yPrima - 24;
+  // ── L'altezza del blocco: una volta per foglio, non a tentativi ──
+  const sezioni = foglio.sezioni
+    .map((s) => Object.assign({}, s, { dati: s.orari ? null : perFascia(s) }))
+    .filter((s) => s.orari || s.dati);
 
-  /* Il corpo arriva da fuori, uguale per tutte le pagine, e non è un dettaglio
-     di implementazione: le due immagini finiscono su due schermi affiancati, e
-     due misure diverse fianco a fianco si vedono subito. Calcolarlo per pagina
-     — come faceva la prima versione — dava alla pagina meno affollata un corpo
-     più grande, che poi non lasciava spazio ai nomi lunghi e li faceva tagliare
-     **solo su quella pagina**: lo stesso corso intero a sinistra e coi puntini
-     a destra. */
-  const rigaH = utile / Math.max(pagina.righe, 1);
-  const corpoOra = Math.round(corpo * 0.82);
+  const disponibile = yPiede - testaH - 14;
+  const BANNER = 54;
+  const RIGA_GIORNI = 34;
+  const ARIA = 16;
+  const fisso = sezioni.reduce(
+    (n, sz) => n + BANNER + RIGA_GIORNI + ARIA + (sz.orari ? 34 + 26 : 0),
+    0
+  );
+  /* Le sezioni a nome unico costano 0,62 di blocco invece di 1: hanno la sola
+     barra dell'ora. Contarle piene voleva dire togliere quell'altezza a tutte
+     le altre — ed è il motivo per cui il foglio della sala era a 5,4 mm. */
+  const blocchi = sezioni.reduce((n, sz) => {
+    if (sz.orari) return n;
+    const righe = sz.dati.mattina + sz.dati.pomeriggio + 0.4;
+    return n + righe * (sz.dati.soloOra ? 0.62 : 1);
+  }, 0);
+  const bloccoH = Math.max(34, Math.min((disponibile - fisso) / blocchi, 92));
+  const nomeH = Math.round(bloccoH * 0.55);
+  const oraH = Math.round(bloccoH * 0.39);
+  const corpoNome = Math.max(12, Math.round(nomeH * 0.58));
+  const corpoOra = Math.max(12, Math.round(oraH * 0.62));
 
-  const nomiGiorno = { Lun: 'Lunedì', Mar: 'Martedì', Mer: 'Mercoledì', Gio: 'Giovedì', Ven: 'Venerdì', Sab: 'Sabato' };
+  let y = testaH;
 
-  /**
-   * Il nome su **una** riga sempre, compresso in orizzontale quando non entra.
-   *
-   * È la scelta che fa stare tutto su due pagine. Andare a capo raddoppierebbe
-   * l'altezza delle voci lunghe — e sono molte — costringendo a un corpo più
-   * piccolo per *tutte*; tagliare coi puntini cancella l'unica informazione che
-   * serve a chi guarda da lontano, cioè quale lezione è. Una compressione fino
-   * al 74% si legge senza accorgersene: sotto quella soglia si preferisce il
-   * taglio, perché un carattere schiacciato oltre non è più leggibile.
-   */
-  const MIN_COMPRESSIONE = 0.68;
+  sezioni.forEach((sez) => {
+    // Banner: titolo nel carattere display, e a destra il richiamo alla
+    // prenotazione nel colore della sezione, come sugli originali.
+    const bh = BANNER;
+    const wPren = 320;
+    x.fillStyle = C.scuro;
+    x.fillRect(bordo, y, L - bordo * 2 - wPren - 6, bh);
+    x.fillStyle = C.bianco;
+    x.font = "700 42px 'Tusker-Grotesk', sans-serif";
+    x.fillText(sez.titolo.toUpperCase(), bordo + 20, y + 43);
 
-  function scrivi(testo, gx, gy, largoMax) {
-    const w = x.measureText(testo).width;
-    if (w <= largoMax) {
-      x.fillText(testo, gx, gy);
+    x.fillStyle = sez.colore;
+    x.fillRect(L - bordo - wPren, y, wPren, bh);
+    x.fillStyle = C.bianco;
+    x.font = "700 28px 'Tusker-Grotesk', sans-serif";
+    scrivi(x, 'PRENOTA', L - bordo - wPren / 2, y + 30, wPren - 20, true);
+    x.font = 'italic 700 16px Inter, sans-serif';
+    scrivi(x, "CON L'APP ATHLONCLUB", L - bordo - wPren / 2, y + 49, wPren - 20, true);
+    y += bh + 8;
+
+    // Riga dei giorni
+    GIORNI.forEach((g, i) => {
+      const gx = bordo + i * (colW + 6);
+      x.fillStyle = C.bianco;
+      x.fillRect(gx, y, colW, RIGA_GIORNI);
+      x.fillStyle = C.scuro;
+      x.font = '700 19px Inter, sans-serif';
+      scrivi(x, NOMI[g].toUpperCase(), gx + colW / 2, y + 23, colW - 8, true);
+    });
+    y += RIGA_GIORNI + 6;
+
+    if (sez.orari) {
+      /* La Gym Floor non è un elenco di lezioni ma una fascia di apertura, e
+         `gymFloor.hours` la dà per gruppi di giorni: indice 0 lunedì-venerdì,
+         1 sabato, 2 domenica. La domenica sta a parte perché nella griglia dei
+         sei giorni non ha una colonna. */
+      GIORNI.forEach((g, i) => {
+        const gx = bordo + i * (colW + 6);
+        const h = dati.gymFloor.hours[g === 'Sab' ? 1 : 0];
+        x.fillStyle = C.scuro;
+        x.fillRect(gx, y, colW, 34);
+        x.fillStyle = C.bianco;
+        x.font = '700 19px Inter, sans-serif';
+        scrivi(x, h.hours, gx + colW / 2, y + 23, colW - 8, true);
+      });
+      const dom = dati.gymFloor.hours[2];
+      if (dom) {
+        x.fillStyle = C.spento;
+        x.font = '600 18px Inter, sans-serif';
+        x.fillText(`${dom.label.toUpperCase()}  ${dom.hours}`, bordo + 4, y + 56);
+      }
+      y += 34 + 40;
       return;
     }
-    const k = Math.max(largoMax / w, MIN_COMPRESSIONE);
-    x.save();
-    x.translate(gx, gy);
-    x.scale(k, 1);
-    x.fillText(k > MIN_COMPRESSIONE ? testo : accorcia(x, testo, largoMax / k), 0, 0);
-    x.restore();
-  }
 
-  pagina.giorni.forEach((g, col) => {
-    const gx = bordo + col * (largo + gutter);
-    let gy = yPrima;
+    // Le due fasce, allineate: il pomeriggio parte alla stessa altezza su tutti
+    // i giorni, ed è quello che permette di confrontarli in orizzontale.
+    const inizio = y;
+    const passoQui = sez.dati.soloOra ? bloccoH * 0.62 : bloccoH;
+    const yPom = inizio + sez.dati.mattina * passoQui + bloccoH * 0.4;
 
-    x.fillStyle = COLORI.testo;
-    x.font = '700 34px Inter, sans-serif';
-    x.fillText((nomiGiorno[g] || g).toUpperCase(), gx, yGiorno + 4);
-    x.strokeStyle = COLORI.arancio;
-    x.lineWidth = 4;
-    x.beginPath();
-    x.moveTo(gx, yGiorno + 18);
-    x.lineTo(gx + largo, yGiorno + 18);
-    x.stroke();
+    sez.dati.giorni.forEach((giorno, i) => {
+      const gx = bordo + i * (colW + 6);
+      [['mattina', inizio], ['pomeriggio', yPom]].forEach((coppia) => {
+        const solo = sez.dati.soloOra;
+        const passo = solo ? bloccoH * 0.62 : bloccoH;
+        giorno[coppia[0]].forEach((lez, n) => {
+          const by = coppia[1] + n * passo;
 
-    // 2,6 em bastano a «00:00»; il resto è spazio regalato al nome.
-    const oraW = Math.round(corpoOra * 2.6);
-    pagina.sezioni.forEach((sez) => {
-      x.fillStyle = COLORI.arancio;
-      x.font = `700 ${Math.round(corpo * 0.72)}px Inter, sans-serif`;
-      gy += rigaH * 0.62;
-      x.fillText(sez.titolo.toUpperCase(), gx, gy);
-      gy += rigaH * 0.18;
+          if (solo) {
+            x.fillStyle = sez.colore;
+            x.fillRect(gx, by, colW, oraH + 4);
+            /* La stringa vera e non «Sala » più il resto: le vasche si chiamano
+               «Vasca Grande», e comporre «SALA GRANDE» era sbagliato di fatto
+               oltre che troppo lungo per la barra. */
+            x.fillStyle = 'rgba(255,255,255,0.82)';
+            x.font = `600 ${Math.round(corpoOra * 0.86)}px Inter, sans-serif`;
+            if (lez.sala) x.fillText(String(lez.sala).toUpperCase(), gx + 8, by + oraH * 0.78);
+            x.fillStyle = C.bianco;
+            x.font = `700 ${Math.round(corpoOra * 1.06)}px Inter, sans-serif`;
+            const o = String(lez.time).split('–')[0].replace(':', '.');
+            x.fillText(o, gx + colW - 8 - x.measureText(o).width, by + oraH * 0.8);
+            return;
+          }
 
-      sez.perGiorno[col].forEach((lez) => {
-        const base = gy + rigaH * 0.78;
-        x.fillStyle = SALA[lez.sala] || COLORI.spento;
-        x.fillRect(gx, gy + rigaH * 0.16, 5, rigaH * 0.68);
+          x.fillStyle = C.scuro;
+          x.fillRect(gx, by, colW, nomeH);
+          x.fillStyle = C.bianco;
+          x.font = `700 ${corpoNome}px Inter, sans-serif`;
+          const rr = righeNome(x, lez.name.toUpperCase(), colW - 10);
+          if (rr.length === 1) {
+            scrivi(x, rr[0], gx + colW / 2, by + nomeH * 0.68, colW - 10, true);
+          } else {
+            x.font = `700 ${Math.round(corpoNome * 0.84)}px Inter, sans-serif`;
+            scrivi(x, rr[0], gx + colW / 2, by + nomeH * 0.45, colW - 8, true);
+            scrivi(x, rr[1], gx + colW / 2, by + nomeH * 0.87, colW - 8, true);
+          }
 
-        /* L'ora è quello che precede il trattino, **prefisso compreso**: nel
-           palinsesto il sabato del nuoto libero contiene una fascia di
-           domenica, scritta come `"Dom 09:30–12:30"`. È una convenzione dei
-           dati, non un errore, e senza comprimerla quel «Dom 09:30» sfonda la
-           casella e finisce sopra il nome della lezione. */
-        x.fillStyle = COLORI.spento;
-        x.font = `600 ${corpoOra}px Inter, sans-serif`;
-        const ora = String(lez.time).split('–')[0];
-        /* La casella dell'ora si allarga per questa riga se il testo lo chiede,
-           invece di comprimerlo fino a perderlo: «Dom 09:30» compresso a forza
-           diventava «Dom …», cioè una fascia senza orario. Il nome scala a
-           destra solo qui, e va bene — quella riga *è* diversa dalle altre. */
-        const oraQui = Math.max(oraW, Math.ceil(x.measureText(ora).width) + 10);
-        x.fillText(ora, gx + 13, base);
+          x.fillStyle = sez.colore;
+          x.fillRect(gx, by + nomeH + 1, colW, oraH);
+          // «Sala A» → «A», «Vasca Media» → «MEDIA»: nella barra colorata la
+          // parola «sala» non aggiunge niente e mangia lo spazio dell'ora.
+          const sala = String(lez.sala || '').replace(/^(Sala|Vasca)\s+/i, '');
+          const ora = String(lez.time).split('–')[0].replace(':', '.');
 
-        x.fillStyle = COLORI.testo;
-        x.font = `500 ${corpo}px Inter, sans-serif`;
-        scrivi(lez.name, gx + 13 + oraQui, base, largo - 13 - oraQui - 4);
-        gy += rigaH;
+          /* L'ora prima della sala, e la sala solo se ci sta davvero.
+             Il sabato del nuoto libero porta una fascia di domenica scritta
+             «Dom 09:30», che è larga il doppio di un orario normale: con la
+             sala disegnata comunque le due scritte si sovrapponevano —
+             «GRANDEom 09.30». Fra le due l'ora vince, perché è il dato, e la
+             vasca la dice già il colore della sezione. */
+          x.fillStyle = C.bianco;
+          x.font = `700 ${corpoOra}px Inter, sans-serif`;
+          const wOra = x.measureText(ora).width;
+          x.fillText(ora, gx + colW - 7 - wOra, by + nomeH + oraH * 0.74);
+
+          if (sala) {
+            x.font = `600 ${Math.round(corpoOra * 0.8)}px Inter, sans-serif`;
+            if (x.measureText(sala).width + wOra + 20 <= colW) {
+              x.fillStyle = 'rgba(255,255,255,0.82)';
+              x.fillText(sala.toUpperCase(), gx + 7, by + nomeH + oraH * 0.72);
+            }
+          }
+        });
       });
     });
+
+    const passoSez = sez.dati.soloOra ? bloccoH * 0.62 : bloccoH;
+    y = yPom + sez.dati.pomeriggio * passoSez + ARIA;
   });
 
-  // ── Piede: gli orari della Gym Floor, che non sono un elenco di lezioni ──
-  x.fillStyle = COLORI.spento;
-  x.font = '500 24px Inter, sans-serif';
-  const orari = dati.gymFloor.hours.map((h) => `${h.label} ${h.hours}`).join('   ·   ');
-  x.fillText(`GYM FLOOR   ${orari}`, bordo, yPiede + 26);
+  x.fillStyle = C.spento;
+  x.font = '600 19px Inter, sans-serif';
+  const coda = `${String(dati.mese).toUpperCase()}  ·  ${indice + 1}/${totale}`;
+  x.fillText(coda, L - bordo - 6 - x.measureText(coda).width, yPiede + 32);
 
+  c.dataset.corpo = String(corpoNome);
   return c;
 }
 
-/** Scarica un canvas come JPEG. */
 function scarica(canvas, nome) {
   return new Promise((risolvi) => {
     canvas.toBlob(
@@ -280,46 +396,28 @@ function scarica(canvas, nome) {
         risolvi();
       },
       'image/jpeg',
-      0.92
+      0.94
     );
   });
 }
 
-/**
- * Genera e scarica le pagine.
- *
- * `maxRighe` è la manopola descritta in testa: meno righe per pagina vuol dire
- * caratteri più grandi e più pagine. Restituisce quello che ha fatto, così chi
- * chiama può dirlo a schermo invece di far indovinare.
- */
-export async function scaricaPlanning(giorniPerPagina) {
-  // I font devono essere già caricati, altrimenti il canvas disegna col
-  // ripiego di sistema e il JPEG esce con un'altra faccia.
+/** Genera e scarica i due fogli. Restituisce cosa ha fatto, per dirlo a schermo. */
+export async function scaricaPlanning() {
+  // I font devono essere già caricati, altrimenti il canvas disegna col ripiego
+  // di sistema e il JPEG esce con un'altra faccia.
   if (document.fonts && document.fonts.ready) await document.fonts.ready;
 
-  const pagine = impagina(giorniPerPagina || 3);
   const mese = String(dati.mese).toLowerCase().replace(/\s+/g, '-');
-
-  /* Un corpo per tutte, deciso dalla pagina più affollata: è la misura che
-     entra dappertutto. Le costanti ripetono quelle di `disegna` — intestazione,
-     piede, righe dei giorni — ed è l'unico punto di questo file dove una misura
-     compare due volte: cambiando l'impaginazione va cambiata qui accanto. */
-  const utileStimato = A - 44 - 112 - 40 - 26 - 24;
-  const righePeggiori = Math.max.apply(null, pagine.map((p2) => p2.righe));
-  const corpo = Math.max(17, Math.round((utileStimato / righePeggiori) * 0.74));
-
-  /* Il corpo lo misura il disegno, non una formula ripetuta qui: `disegna` lo
-     appende al canvas, così il numero che la pagina stampa è quello che è
-     finito davvero nel JPEG. Una seconda copia del calcolo sarebbe la solita
-     copia che divergerà. */
-  for (let i = 0; i < pagine.length; i++) {
-    const canvas = disegna(pagine[i], i, pagine.length, corpo);
-    await scarica(canvas, `planning-${mese}-${i + 1}di${pagine.length}.jpg`);
+  const corpi = [];
+  for (let i = 0; i < FOGLI.length; i++) {
+    const canvas = disegnaFoglio(FOGLI[i], i, FOGLI.length);
+    corpi.push(Number(canvas.dataset.corpo));
+    await scarica(canvas, `planning-${mese}-${FOGLI[i].nome}.jpg`);
   }
 
   return {
-    pagine: pagine.length,
-    /** L'altezza della cassa alta, in millimetri sul pannello da 960 mm. */
-    mm: Math.round(((corpo * MAIUSCOLA) / PX_PER_MM) * 10) / 10,
+    pagine: FOGLI.length,
+    /** L'altezza della cassa alta del nome, in millimetri sul pannello. */
+    mm: Math.round(((Math.min.apply(null, corpi) * MAIUSCOLA) / PX_PER_MM) * 10) / 10,
   };
 }

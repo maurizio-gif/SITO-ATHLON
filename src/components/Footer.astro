@@ -1,5 +1,6 @@
 ---
 import { talkCta } from '../data/cta';
+import { CLUB } from '../data/club';
 
 const ADDRESS = 'Via Ugo Ojetti 134, 00137 Roma';
 const MAPS_QUERY = encodeURIComponent(ADDRESS);
@@ -236,8 +237,8 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
   <div class="footer-legal">
     <div class="container footer-legal__inner">
       <p>
-        Point 2000 Srl Società Sportiva Dilettantistica · Via Ugo Ojetti 134, 00137 Roma · P.IVA 05154811003 ·
-        Affiliazione ASI: LAZ-RM4453 · Affiliazione FIN: 996434 · Affiliazione CSEN: 71519
+        {CLUB.legale.ragione} · {CLUB.street}, {CLUB.postalCode} {CLUB.city} · P.IVA {CLUB.legale.piva} ·
+        Affiliazione ASI: {CLUB.legale.asi} · Affiliazione FIN: {CLUB.legale.fin} · Affiliazione CSEN: {CLUB.legale.csen}
       </p>
     </div>
     <a class="footer-credit" href="https://www.ready2digital.it" target="_blank" rel="noopener">
