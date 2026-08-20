@@ -78,8 +78,8 @@
       "statusCode": 301
     },
     {
-      "source": "/ginnastica-posturale",
-      "destination": "/ginnastica-strutturale",
+      "source": "/ginnastica-strutturale",
+      "destination": "/ginnastica-posturale",
       "statusCode": 301
     },
     {
@@ -580,6 +580,16 @@
     {
       "source": "/strenght-development-by-les-mills",
       "destination": "/strenght",
+      "statusCode": 301
+    },
+    {
+      "source": "/posturale",
+      "destination": "/ginnastica-posturale",
+      "statusCode": 301
+    },
+    {
+      "source": "/corsi-fitness/postural-fitness",
+      "destination": "/ginnastica-posturale",
       "statusCode": 301
     }
   ]

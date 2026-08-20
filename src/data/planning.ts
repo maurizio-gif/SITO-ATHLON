@@ -279,7 +279,7 @@ export function lessonCardsFor(bandIds: string[]): Record<string, LessonCard> {
  * | Sala A | `#c45010` | 4,66:1 | invariato | 4,66:1 |
  * | Sala B | `#9a8c18` | 3,42:1 | `#837714` (15% nero) | 4,55:1 |
  * | Sala C | `#5a9970` | 3,37:1 | `#4c815e` (16%) | 4,56:1 |
- * | Vasca Media | `#3a9fc4` | 3,03:1 | `#2e7f9d` (20%) | 4,53:1 |
+ * | Vasca Piccola | `#3a9fc4` | 3,03:1 | `#2e7f9d` (20%) | 4,53:1 |
  * | Vasca Grande | `#2d4f8a` | 8,09:1 | invariato | 8,09:1 |
  * | Gym Floor | `#ff5701` | 3,17:1 | `#bb4001` | 5,46:1 |
  *
@@ -290,14 +290,14 @@ export function lessonCardsFor(bandIds: string[]): Record<string, LessonCard> {
  * nessuna lezione ha «Gym Floor» come sala: il colore serve solo alla legenda.
  *
  * Le due tavolozze restano distinguibili dentro ogni banda: le legende che
- * compaiono davvero accostano Sala A e Sala B (ruggine e oliva) e Vasca Media e
+ * compaiono davvero accostano Sala A e Sala B (ruggine e oliva) e Vasca Piccola e
  * Vasca Grande (foglia di tè e blu).
  */
 export const ROOM_COLORS: Record<string, string> = {
   'Sala A': '#c45010',
   'Sala B': '#837714',
   'Sala C': '#4c815e',
-  'Vasca Media': '#2e7f9d',
+  'Vasca Piccola': '#2e7f9d',
   'Vasca Grande': '#2d4f8a',
   'Gym Floor': '#bb4001',
 };
@@ -313,7 +313,7 @@ export const ROOM_COLORS: Record<string, string> = {
  * bianco: schiarire un colore già scurito perderebbe la tinta due volte.
  *
  * Ogni valore è il colore originale schiarito col bianco della quantità minima
- * che porta a 4,5:1 su quel fondo: dal 19% della Vasca Media al 51% della Vasca
+ * che porta a 4,5:1 su quel fondo: dal 19% della Vasca Piccola al 51% della Vasca
  * Grande. Il minimo, non una quantità uguale per tutte, perché la tinta resta
  * più vicina possibile a quella della legenda:
  *
@@ -322,7 +322,7 @@ export const ROOM_COLORS: Record<string, string> = {
  * | Sala A | `#c45010` | 2,34:1 | `#dc9872` (41%) | 4,57:1 |
  * | Sala B | `#9a8c18` | 3,20:1 | `#b3a952` (25%) | 4,54:1 |
  * | Sala C | `#5a9970` | 3,24:1 | `#82b192` (24%) | 4,50:1 |
- * | Vasca Media | `#3a9fc4` | 3,61:1 | `#5fb1cf` (19%) | 4,52:1 |
+ * | Vasca Piccola | `#3a9fc4` | 3,61:1 | `#5fb1cf` (19%) | 4,52:1 |
  * | Vasca Grande | `#2d4f8a` | 1,35:1 | `#98a9c6` (51%) | 4,59:1 |
  * | Gym Floor | `#ff5701` | 3,44:1 | `#ff8648` (28%) | 4,56:1 |
  *
@@ -334,7 +334,7 @@ export const ROOM_COLORS_ON_DARK: Record<string, string> = {
   'Sala A': '#dc9872',
   'Sala B': '#b3a952',
   'Sala C': '#82b192',
-  'Vasca Media': '#5fb1cf',
+  'Vasca Piccola': '#5fb1cf',
   'Vasca Grande': '#98a9c6',
   'Gym Floor': '#ff8648',
 };

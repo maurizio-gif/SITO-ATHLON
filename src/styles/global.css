@@ -136,6 +136,32 @@
   --text-sm: 0.9rem;
   --text-base: 0.95rem;
   --text-md: 1.1rem;
+
+  /* Il corpo di un articolo, e sta fuori dalla scala di proposito: la scala
+     veste l'interfaccia — schede, listini, etichette — mentre questa è l'unica
+     misura del sito fatta per essere letta di seguito per due minuti.
+
+     20px e non 15,2 perché il corpo degli articoli ha smesso di stare nel
+     contenitore stretto: a 1272px di colonna, 15,2px facevano righe da 105
+     caratteri contro i 45-75 che si leggono comodi, e la riga si accorcia in due
+     modi soli — stringendo la colonna, che è quello che si è scelto di non fare,
+     o ingrandendo il carattere. Misurato: 105 → 85. Non arriva a 75, e non ci
+     arriverebbe senza un corpo da fumetto: è il prezzo della colonna piena,
+     pagato dove costa meno.
+
+     **Ma solo dove la colonna è larga**, ed è la parte che si sbaglia per prima:
+     20px valgono per una colonna da 1272px, non per un telefono. Su 375px di
+     schermo la colonna è 347, e 20px là dentro fanno righe da 28 caratteri —
+     esattamente il difetto opposto, e peggiore, perché su un telefono si legge
+     l'80% del sito. Quindi il valore di partenza è quello del sito e la misura
+     da lettura arriva a 900px, dove la colonna vale già 852.
+
+     Sul totem e sul televisore torna a `--text-base`, e non è una dimenticanza:
+     là la radice è in `vw`, quindi il corpo cresce già con lo schermo — 25,6px
+     sul pannello, che sono gli 8mm di vetro su cui quella taratura è costruita.
+     Ingrandirlo un'altra volta darebbe a queste pagine un corpo diverso da
+     quello di ogni altra pagina sullo stesso schermo. */
+  --prosa-size: var(--text-base);
   --text-lg: 1.375rem;
   --text-xl: 1.6rem;
   --text-2xl: clamp(2.1rem, 4.5vw, 3.1rem);
@@ -286,6 +312,15 @@ a, button {
 img {
   max-width: 100%;
   display: block;
+}
+
+/* Da qui in su la colonna di un articolo è larga abbastanza da meritare il
+   corpo da lettura: 852px a 900 di schermo. Sotto, il telefono tiene il corpo
+   del sito. */
+@media (min-width: 900px) {
+  :root {
+    --prosa-size: 1.25rem;
+  }
 }
 
 .container {
@@ -599,10 +634,17 @@ video:not([controls])::-webkit-media-controls-panel {
     padding: 0 1rem;
   }
 
-  /* Il testo lungo su 1080px pieni fa righe da 130 caratteri. Un limite in
-     caratteri, non in pixel, così vale anche se il pannello dichiara 1440. */
+  /* Il sommario e i testi d'apertura restano corti in caratteri, non in pixel,
+     così il limite vale anche se il pannello dichiara 1440. Il corpo degli
+     articoli non passa più da qui: sta nel contenitore pieno. */
   .container-narrow {
     max-width: 34ch;
+  }
+
+  /* Il corpo dell'articolo segue la taratura del pannello, come ogni altro
+     testo: la radice è in `vw` e ci pensa lei. */
+  :root {
+    --prosa-size: var(--text-base);
   }
 
   /* Un dito copre circa 9 mm di vetro: qui sono 30px, e un comando sotto i 60
@@ -642,7 +684,6 @@ video:not([controls])::-webkit-media-controls-panel {
   .nwcard__cta,
   .coach__cta,
   .ju-via__cta,
-  .guest__code,
   .tcc__num,
   .hero-secondary,
   .co-hero__link,
@@ -802,6 +843,9 @@ video:not([controls])::-webkit-media-controls-panel {
        ragione per cui la radice si ferma dove si ferma. Gli altri due
        contenitori erano già in rem e si sono adattati da soli. */
     --container-width: 58rem;
+
+    /* Come sul totem: la radice cresce già, e il corpo con lei. */
+    --prosa-size: var(--text-base);
 
     --radius: 1rem;
   }

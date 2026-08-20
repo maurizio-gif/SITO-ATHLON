@@ -17,7 +17,7 @@ export const SALE = [
   'Sala A',
   'Sala B',
   'Sala C',
-  'Vasca Media',
+  'Vasca Piccola',
   'Vasca Grande',
   'Gym Floor',
 ] as const;

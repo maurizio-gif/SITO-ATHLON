@@ -124,6 +124,21 @@ function perFascia(sezione) {
   };
 }
 
+/**
+ * La sala in una lettera: «Sala A» → A, «Vasca Grande» → G, «Vasca Piccola» → P.
+ *
+ * Nella barra dell'ora lo spazio è quello che è, e la parola intera lo mangia
+ * tutto — «PICCOLA» accanto a un orario non ci sta in 168 px. Una lettera sola
+ * basta perché il colore del filo dice già di che tipo di spazio si tratta, e
+ * chi frequenta il club le sale le chiama così.
+ */
+function sigla(sala) {
+  const t = String(sala || '').trim();
+  if (!t) return '';
+  const m = t.match(/^(?:Sala|Vasca)\s+(.)/i);
+  return (m ? m[1] : t[0]).toUpperCase();
+}
+
 /** Un rettangolo con gli angoli tondi, come le carte del sito. */
 function carta(x, gx, gy, w, h, r) {
   const rr = Math.min(r, h / 2, w / 2);
@@ -194,14 +209,17 @@ function disegnaFoglio(foglio, indice, totale) {
   x.font = '700 25px Inter, sans-serif';
   x.fillText('ATHLON CLUB · PLANNING', bordo, 34);
 
+  /* Il titolo è l'ambiente del foglio — «IN ACQUA», «IN SALA» — e **non il
+     mese**. Un mese stampato grande su un foglio appeso lo data: chi passa
+     davanti a «SETTEMBRE» a novembre non sa se sta leggendo il palinsesto
+     corrente o uno vecchio che nessuno ha sostituito, e nel dubbio non si fida.
+     L'ambiente invece è quello che serve a orientarsi fra i due schermi, ed è
+     vero sempre. Il mese resta nel nome del file, che è per chi archivia. */
   x.fillStyle = C.scuro;
   x.font = "700 68px 'Tusker-Grotesk', sans-serif";
-  x.fillText(String(dati.mese).toUpperCase(), bordo, 112);
+  x.fillText(foglio.etichetta.toUpperCase(), bordo, 112);
 
   x.fillStyle = C.spento;
-  x.font = '600 25px Inter, sans-serif';
-  const et = foglio.etichetta.toUpperCase();
-  x.fillText(et, L - bordo - x.measureText(et).width, 34);
   x.font = '500 24px Inter, sans-serif';
   const nota = "Prenoti dall'app Athlon Club o dal portale";
   x.fillText(nota, L - bordo - x.measureText(nota).width, 108);
@@ -214,7 +232,7 @@ function disegnaFoglio(foglio, indice, totale) {
   x.stroke();
 
   const testaH = 148;
-  /* Il piede è una riga sola: mese e numero di foglio. Il blocco legale che
+  /* Il piede è una riga sola: numero di foglio e indirizzo. Il blocco legale che
      stava qui — propaganda, ragione sociale, affiliazione, indirizzo — è via, e
      sono 128 px tornati al testo. Su uno schermo appeso in sede nessuno legge
      la partita IVA, e chi la deve leggere la trova nel footer del sito. */
@@ -328,7 +346,7 @@ function disegnaFoglio(foglio, indice, totale) {
           x.fill();
 
           const ora = String(lez.time).split('–')[0].replace(':', '.');
-          const sala = String(lez.sala || '').replace(/^(Sala|Vasca)\s+/i, '');
+          const sala = sigla(lez.sala);
 
           if (sez.dati.soloOra) {
             x.fillStyle = C.scuro;
@@ -380,12 +398,40 @@ function disegnaFoglio(foglio, indice, totale) {
   // ── Piede: una riga sola ──
   x.fillStyle = C.spento;
   x.font = '600 20px Inter, sans-serif';
-  const coda = `${String(dati.mese)} · foglio ${indice + 1} di ${totale} · ${foglio.etichetta}`;
+  const coda = `Foglio ${indice + 1} di ${totale}`;
   x.fillText(coda, bordo, yPiede + 22);
   const dir = 'athlonroma.it';
   x.fillText(dir, L - bordo - x.measureText(dir).width, yPiede + 22);
 
   c.dataset.corpo = String(corpoNome);
+  return c;
+}
+
+/**
+ * Il foglio ruotato di un quarto di giro in senso orario, per il lettore.
+ *
+ * Il pannello sta in verticale, ma il player che ci gira dentro vuole un file
+ * orizzontale e ruota lui l'immagine: dargliene una già verticale la fa arrivare
+ * coricata. Quindi si impagina in 1080×1920 — tutta la geometria sopra ragiona
+ * così — e si gira solo in uscita, che è l'unico punto in cui la rotazione è
+ * un fatto del file e non del disegno.
+ *
+ * Orario e non antiorario: `translate(A, 0)` più un quarto di giro manda l'angolo
+ * in basso a sinistra del foglio nell'origine, cioè **il fondo della pagina
+ * finisce a sinistra dell'immagine**. Al contrario finirebbe a destra e il
+ * planning si leggerebbe a testa in giù.
+ *
+ * Nessuna scala: 1080×1920 e 1920×1080 hanno gli stessi pixel, quindi non c'è
+ * ricampionamento e il testo resta esattamente quello disegnato.
+ */
+function ruota(foglio) {
+  const c = document.createElement('canvas');
+  c.width = A;
+  c.height = L;
+  const x = c.getContext('2d');
+  x.translate(A, 0);
+  x.rotate(Math.PI / 2);
+  x.drawImage(foglio, 0, 0);
   return c;
 }
 
@@ -421,7 +467,7 @@ export async function scaricaPlanning() {
   for (let i = 0; i < FOGLI.length; i++) {
     const canvas = disegnaFoglio(FOGLI[i], i, FOGLI.length);
     corpi.push(Number(canvas.dataset.corpo));
-    await scarica(canvas, `planning-${mese}-${FOGLI[i].nome}.jpg`);
+    await scarica(ruota(canvas), `planning-${mese}-${FOGLI[i].nome}.jpg`);
   }
 
   return {

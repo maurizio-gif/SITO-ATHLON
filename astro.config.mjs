@@ -22,13 +22,14 @@ export default defineConfig({
   /* Il vecchio indirizzo della scuola nuoto bambini finiva con "-3", un residuo
      di WordPress. L'indirizzo giusto è senza, ma quello vecchio è in giro nei
      link condivisi e nei risultati di ricerca: resta buono e porta al nuovo. */
-  /* La ginnastica posturale ha cambiato nome: in palinsesto e in pagina è
-     ginnastica strutturale, e l'indirizzo l'ha seguita. Quello vecchio è nei
-     link condivisi, nei risultati di ricerca e nel menu di chi ha la pagina
-     aperta da ieri: resta buono e porta al nuovo. */
+  /* Il corso si chiama **ginnastica posturale**, e per un po' questo file ha
+     creduto il contrario: c'era scritto che aveva cambiato nome in «strutturale»
+     e il redirect andava da posturale a strutturale, cioè dal nome giusto a
+     quello sbagliato. Corretto il verso, perché nel frattempo
+     `/ginnastica-strutturale` è stato generato e può essere stato raccolto. */
   redirects: {
     '/scuola-nuoto-bambini-3': '/scuola-nuoto-bambini',
-    '/ginnastica-posturale': '/ginnastica-strutturale',
+    '/ginnastica-strutturale': '/ginnastica-posturale',
     /* La chiusura della vasca era una scheda dell'Help Desk ed è diventata una
        news, che è quello che è sempre stata: l'indirizzo vecchio era indicizzato
        e la card del Club Life ci puntava. */
@@ -52,7 +53,7 @@ export default defineConfig({
          dirle di non indicizzarsi è la contraddizione che questa riga evita. */
       filter: (page) =>
         !page.includes('/scuola-nuoto-bambini-3') &&
-        !page.includes('/ginnastica-posturale') &&
+        !page.includes('/ginnastica-strutturale') &&
         !page.includes('/diagnostica-schermo') &&
         !page.includes('/attiva') &&
         !page.includes('/wikiathlon/'),

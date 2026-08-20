@@ -34,8 +34,19 @@ blocco dei tag sopra. */
   margin: 28px 0 10px;
 }
 
+/* Paragrafi ed elenchi prendono la misura da leggere; le tabelle no, e non è
+   una dimenticanza: là dentro il testo è un dato in una griglia, non una riga
+   da seguire, e ingrandirlo su cinque colonne fa uscire la tabella dalla
+   pagina. Un dato più piccolo della prosa che lo commenta è la convenzione di
+   qualunque pagina stampata. */
+.prosa p,
+.prosa li {
+  font-size: var(--prosa-size);
+}
+
 .prosa p {
   color: var(--text-muted);
+  line-height: 1.65;
 }
 
 .prosa a {
