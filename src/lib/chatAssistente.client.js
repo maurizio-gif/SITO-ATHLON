@@ -332,10 +332,12 @@ export function initChatAssistente(root, options) {
        fondo. Nel ramo junior porta con sé la pagina che dice come si completa
        l'iscrizione — è lì che finisce quel percorso, comunque vada. */
     if (dati.datiFatti) {
+      /* Nessuna promessa di essere richiamato: sta scrivendo adesso, e la
+         risposta la vuole adesso. Se poi quella dell'assistente non gli basta,
+         il pulsante sotto ogni risposta porta a una persona — ed è quello il
+         momento di parlare di ricontatti. */
       var conferma =
-        'Grazie' +
-        (dati.nome ? ' ' + dati.nome : '') +
-        ': i tuoi dati sono arrivati, ti ricontatta una persona del club.';
+        'Grazie' + (dati.nome ? ' ' + dati.nome : '') + ', ci siamo: i tuoi dati sono a posto.';
       bolla(
         'assistente',
         '<p>' +
@@ -468,9 +470,25 @@ export function initChatAssistente(root, options) {
 
   var inCorso = false;
 
+  /**
+   * L'ultima domanda che ha scritto lui, prima di questa. Serve al workflow per
+   * scegliere le voci del sito: un seguito come «e se volessi spendere di
+   * meno?» non nomina il suo argomento, e da solo pescava le voci sbagliate —
+   * fino a far inventare al modello un abbonamento che non esiste.
+   */
+  function domandaPrecedente() {
+    for (var i = trascritto.length - 1; i >= 0; i--) {
+      if (trascritto[i].ruolo === 'utente') return trascritto[i].testo;
+    }
+    return '';
+  }
+
   async function chiedi() {
     var domanda = (campoDomanda && campoDomanda.value || '').trim();
     if (domanda.length < 3 || inCorso) return;
+
+    // Da leggere prima di aggiungere la domanda nuova al trascritto.
+    var precedente = domandaPrecedente();
 
     inCorso = true;
     campoDomanda.value = '';
@@ -489,6 +507,7 @@ export function initChatAssistente(root, options) {
         signal: stop.signal,
         body: JSON.stringify({
           domanda: domanda,
+          precedente: precedente,
           sessione: sessione(),
           pagina: dati.pagina,
           origine: 'assistente',
@@ -515,6 +534,8 @@ export function initChatAssistente(root, options) {
       var fonti = (risposta.fonti || []).filter(function (f) {
         return f && f.url;
       });
+      /* Senza separatore fra i link: adesso sono pastiglie, e si separano da
+         sé. Il puntino in mezzo era la spaziatura di due link in fila. */
       var rimandi = fonti.length
         ? '<p class="ca__fonti">' +
           fonti
@@ -527,7 +548,7 @@ export function initChatAssistente(root, options) {
                 ' →</a>'
               );
             })
-            .join('<span aria-hidden="true"> · </span>') +
+            .join('') +
           '</p>'
         : '';
 
