@@ -1,12 +1,21 @@
 # Athlon Club — https://www.athlonroma.it
 #
-# Il sito è aperto: nessuna pagina è nascosta ai crawler, compresi quelli degli
+# Il sito è aperto: i contenuti si leggono tutti, compresi quelli degli
 # assistenti. Chi legge per rispondere a una domanda trova in /llms.txt lo stesso
 # contenuto in forma breve — indirizzo, orari, attività, prezzi — senza dover
 # interpretare il markup di ogni pagina.
+#
+# Le schede dell'Help Desk restano leggibili e **non** vanno bloccate qui: sono
+# `noindex` con un meta tag, e un `Disallow` impedirebbe di leggere proprio quel
+# meta — il risultato sarebbe una pagina esclusa dalla scansione ma ancora
+# elencabile, cioè l'opposto di quello che si vuole.
+#
+# /admin è il pannello di Tina: un'applicazione, non una pagina del club, e
+# quella sì che non ha niente da far leggere.
 
 User-agent: *
 Allow: /
+Disallow: /admin
 
 # Indice delle pagine
 Sitemap: https://www.athlonroma.it/sitemap-index.xml

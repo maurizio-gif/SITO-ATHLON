@@ -432,3 +432,53 @@ Consult these guides before working on related tasks:
 - [Adding or managing content](https://docs.astro.build/en/guides/content-collections/)
 - [Adding styles or using Tailwind](https://docs.astro.build/en/guides/styling/)
 - [Supporting multiple languages](https://docs.astro.build/en/guides/internationalization/)
+
+## I contenuti si scrivono da Tina, e il build lo sa
+
+News, eventi, schede dell'Help Desk, servizi e la landing della promo sono
+markdown in `src/content/`, e chi li scrive non apre GitHub: apre `/admin`, che
+è il pannello di [TinaCMS](https://tina.io). Tina è git-backed — salva
+scrivendo sul repository — quindi il contenuto resta versionato e il sito resta
+statico: nessun database da interrogare a ogni visita.
+
+Lo schema del pannello sta in `tina/config.ts` e **deve seguire** quello delle
+collezioni in `src/content.config.ts`. Sono due file perché fanno due cose
+diverse — uno valida al build, l'altro disegna i campi da riempire — ma una
+divergenza si paga due volte: un campo che Tina scrive e Zod rifiuta rompe il
+build, e un campo che Zod pretende e Tina non mostra è un campo che nessuno
+compilerà mai. Quando aggiungi un campo a una collezione, aggiungilo in tutti e
+due.
+
+- **Le attività** non si elencano a mano da nessuna delle due parti: escono da
+  `ACTIVITY_TAGS` in `src/data/activities.ts`, che popola la tendina di Tina, la
+  validazione e il primo passo del box dell'Help Desk. Aggiungerne una lì la fa
+  comparire nei tre posti.
+- **I prezzi non entrano nel CMS.** Vivono in `src/data/abbonamenti.ts` e le
+  pagine li leggono da lì: metterli anche in un documento di Tina vorrebbe dire
+  poterli cambiare in un posto solo dei due, e scoprirlo dal listino sbagliato
+  in vetrina. Vale per gli abbonamenti, per gli accessi singoli e per il
+  personal training.
+- **La cartella decide l'indirizzo.** `src/content/articles/<area>/<file>.md`
+  diventa `/wikiathlon/<area>/<file>`, `src/content/news/<file>.md` diventa
+  `/news/<file>`. Spostare un articolo di cartella o rinominarlo ne cambia il
+  link: se era pubblicato, serve un reindirizzo in `astro.config.mjs`.
+
+**Il build non dipende dalle credenziali.** `tinacms build` compila il pannello
+in `public/admin` e va prima di Astro, che copia `public/` nel `dist`. Ma serve
+un progetto su TinaCloud, e un build che si rompe per una variabile d'ambiente
+mancante è un sito che non si pubblica più: `scripts/build.mjs` compila il
+pannello **solo** se trova `TINA_CLIENT_ID` e `TINA_TOKEN`, altrimenti
+costruisce il sito e dice perché `/admin` non c'è. Il giorno in cui le variabili
+arrivano, il pannello compare al primo deploy.
+
+Per provare il pannello in locale non servono credenziali: `npm run dev:cms`
+alza il server GraphQL di Tina attorno ad `astro dev` e le modifiche finiscono
+nei file, non su un servizio. Per validare lo schema contro i contenuti senza
+pubblicare niente:
+
+```
+npx tinacms build --local --skip-cloud-checks --skip-search-index
+```
+
+`public/admin/`, `tina/__generated__/` e `tina/tina-lock.json` sono generati:
+stanno in `.gitignore` e non si committano.
