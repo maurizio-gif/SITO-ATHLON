@@ -19,3 +19,29 @@
 export const SITE = (
   import.meta.env.PUBLIC_SITE_URL || 'https://www.athlonroma.it'
 ).replace(/\/$/, '');
+
+/**
+ * Il gruppo di domini di Cookiebot, cioè il banner del consenso.
+ *
+ * Sta in chiaro come il client id di Tina, e per lo stesso motivo: finisce
+ * dentro l'attributo `data-cbid` della pagina, quindi lo legge chiunque apra il
+ * sorgente. Nasconderlo in una variabile darebbe l'illusione di un segreto e
+ * costerebbe un deploy rotto ogni volta che qualcuno dimentica di impostarla.
+ *
+ * **Vuoto è uno stato legittimo, e vale un interruttore solo.** Athlon ha già
+ * un account Cookiebot per athlonroma.it in WordPress, e il sito Astro è
+ * destinato a *essere* quel dominio: stesso dominio, stesso gruppo, stesso
+ * identificativo — non se ne crea un altro, si copia quello. Finché qui non c'è:
+ *
+ *  - il banner non viene scritto in pagina, perché uno script con un id finto
+ *    non chiede consenso, dà errore;
+ *  - `scripts/attribuzione.ts` continua a memorizzare `vid` e UTM come ha
+ *    sempre fatto.
+ *
+ * Nel momento in cui l'identificativo compare, le due cose scattano insieme:
+ * banner in pagina e archiviazione subordinata al consenso. Un interruttore
+ * solo e non due, perché lo stato intermedio — nessun banner e già niente
+ * attribuzione — non serve a nessuno: perderebbe i dati senza che nessuno
+ * possa acconsentire.
+ */
+export const COOKIEBOT_CBID = '';
