@@ -128,6 +128,10 @@
         Lasciaci come raggiungerti: ti richiamiamo noi.
       </p>
 
+      {/* I campi dell'adulto: spariscono tutti insieme quando la verifica ce li
+          ha già dati buoni, e resta il solo blocco del bambino. Restano
+          compilati dietro le quinte, così il payload è sempre completo. */}
+      <div data-ca-genitore>
       <div class="ca__griglia">
         <div class="ca__campo">
           <label class="ca__label" for="ca-nome">Nome</label>
@@ -169,14 +173,16 @@
         </div>
       </div>
 
-      {/* La data di nascita del genitore la chiede solo il percorso junior: là
-          fa parte di un'iscrizione, mentre per un adulto che vuole essere
-          ricontattato è un campo in più senza una ragione. */}
+      {/* La data di nascita del genitore la chiede solo il percorso junior, ed è
+          la stessa ragione del blocco qui sopra: là si crea la sua anagrafica
+          guest e `AddGuestMember` la pretende, mentre un adulto che vuole essere
+          ricontattato diventa un lead, e `Crm2/AddLead` non ha quel campo. */}
       <div data-ca-nascita hidden>
         <div class="ca__campo">
           <label class="ca__label" for="ca-nascita">La tua data di nascita</label>
           <input class="ca__input" id="ca-nascita" type="date" data-ca-f="nascita" />
         </div>
+      </div>
       </div>
 
       {/* Il blocco del bambino: nel ramo junior servono due anagrafiche, e la

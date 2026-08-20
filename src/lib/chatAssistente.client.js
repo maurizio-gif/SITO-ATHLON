@@ -269,8 +269,17 @@ export function initChatAssistente(root, options) {
        già deciso la verifica. */
     if (dati.ramo !== 'iscritto') dati.ramo = dati.ambito;
 
-    /* I dati prima della conversazione, ma solo a chi non conosciamo. */
-    if (dati.conosciuto || dati.datiFatti) apriConversazione();
+    /* Chi ha bisogno del form, e di quale parte:
+
+       - un'attività per adulti diventa un lead su PerfectGym, e un lead che c'è
+         già non si crea due volte: se lo conosciamo non c'è niente da chiedere;
+       - un corso per bambini diventa **due** anagrafiche guest, genitore e
+         figlio, e il figlio PerfectGym non ce l'ha mai detto: quei dati servono
+         sempre, anche al socio più vecchio del club. Di lui però il form chiede
+         solo ciò che manca. */
+    if (dati.datiFatti) apriConversazione();
+    else if (dati.ambito === 'junior') apriDati();
+    else if (dati.conosciuto) apriConversazione();
     else apriDati();
   }
 
@@ -541,6 +550,7 @@ export function initChatAssistente(root, options) {
     campi[el.dataset.caF] = el;
   });
   var bimbo = q('[data-ca-bimbo]');
+  var genitoreDati = q('[data-ca-genitore]');
   var nascitaGenitore = q('[data-ca-nascita]');
   var erroreDati = q('[data-ca-dati-errore]');
   var btnDati = q('[data-ca-dati-invia]');
@@ -557,6 +567,22 @@ export function initChatAssistente(root, options) {
 
   function valore(nome) {
     return campi[nome] ? String(campi[nome].value || '').trim() : '';
+  }
+
+  /**
+   * I campi dell'adulto si chiedono a meno che non li abbiamo già tutti e tre
+   * buoni dalla verifica. Il cellulare va controllato, non solo contato: su
+   * PerfectGym in quel campo può esserci un fisso, e allora è come non averlo.
+   * Finché la verifica pubblicata non restituisce l'anagrafica, questo è falso
+   * per tutti e il form li chiede — che è il comportamento giusto.
+   */
+  function serveGenitore() {
+    return !(
+      dati.conosciuto &&
+      dati.nome &&
+      dati.cognome &&
+      /^3\d{8,9}$/.test(cellulareNudo(dati.telefono))
+    );
   }
 
   function segnala(nome, messaggio) {
@@ -579,27 +605,33 @@ export function initChatAssistente(root, options) {
     });
 
     var oggi = new Date().toISOString().slice(0, 10);
+    var junior = dati.ambito === 'junior';
 
-    if (!valore('nome')) return segnala('nome', 'Serve il tuo nome.');
-    if (!valore('cognome')) return segnala('cognome', 'Serve il tuo cognome.');
-    if (!emailValida(valore('email'))) {
-      return segnala('email', 'Controlla l’indirizzo email: manca qualcosa.');
-    }
-    if (!/^3\d{8,9}$/.test(cellulareNudo(valore('cellulare')))) {
-      return segnala('cellulare', 'Serve un cellulare italiano, senza prefisso.');
+    /* Si valida quello che è a schermo: i campi dell'adulto che non gli abbiamo
+       chiesto sono precompilati da PerfectGym, e non è lui a doverli sistemare. */
+    if (serveGenitore()) {
+      if (!valore('nome')) return segnala('nome', 'Serve il tuo nome.');
+      if (!valore('cognome')) return segnala('cognome', 'Serve il tuo cognome.');
+      if (!emailValida(valore('email'))) {
+        return segnala('email', 'Controlla l’indirizzo email: manca qualcosa.');
+      }
+      if (!/^3\d{8,9}$/.test(cellulareNudo(valore('cellulare')))) {
+        return segnala('cellulare', 'Serve un cellulare italiano, senza prefisso.');
+      }
+      /* La data di nascita serve solo dove si crea un'anagrafica guest, cioè nel
+         ramo junior: `AddGuestMember` la pretende, `Crm2/AddLead` non ce l'ha. */
+      if (junior) {
+        if (!valore('nascita')) return segnala('nascita', 'Serve la tua data di nascita.');
+        /* Una data nel futuro non è una data di nascita: è un refuso, e su
+           PerfectGym diventerebbe un'anagrafica da correggere a mano. */
+        if (valore('nascita') > oggi) {
+          return segnala('nascita', 'La data di nascita non può essere nel futuro.');
+        }
+      }
     }
 
-    /* Per un adulto qui si è finito: nome, cognome, email e cellulare sono
-       tutto quello che serve per ricontattarlo. La data di nascita la chiede
-       solo il percorso junior, dove diventa parte di un'iscrizione. */
-    if (dati.ambito !== 'junior') return true;
+    if (!junior) return true;
 
-    if (!valore('nascita')) return segnala('nascita', 'Serve la tua data di nascita.');
-    /* Una data nel futuro non è una data di nascita: è un refuso, e su
-       PerfectGym diventerebbe un'anagrafica da correggere a mano. */
-    if (valore('nascita') > oggi) {
-      return segnala('nascita', 'La data di nascita non può essere nel futuro.');
-    }
     if (!valore('bnome')) return segnala('bnome', 'Serve il nome del bambino.');
     if (!valore('bcognome')) return segnala('bcognome', 'Serve il cognome del bambino.');
     if (!valore('bnascita')) return segnala('bnascita', 'Serve la data di nascita del bambino.');
@@ -619,19 +651,29 @@ export function initChatAssistente(root, options) {
 
   function apriDati() {
     var junior = dati.ambito === 'junior';
+    var suoi = serveGenitore();
     /* Un adulto lascia nome, cognome, email e cellulare, e nient'altro: la data
        di nascita e i dati del bambino sono di un'iscrizione, non di un
-       ricontatto. */
+       ricontatto. E se di lui sappiamo già tutto, resta solo il bambino. */
+    if (genitoreDati) genitoreDati.hidden = !suoi;
+    if (nascitaGenitore) nascitaGenitore.hidden = !(junior && suoi);
     if (bimbo) bimbo.hidden = !junior;
-    if (nascitaGenitore) nascitaGenitore.hidden = !junior;
     if (privacyDati) privacyDati.hidden = junior;
     if (saltaDati) saltaDati.hidden = true;
     if (erroreDati) erroreDati.hidden = true;
-    if (titoloDati) titoloDati.textContent = junior ? 'I dati per l’iscrizione' : 'I tuoi dati';
+    if (titoloDati) {
+      titoloDati.textContent = !junior
+        ? 'I tuoi dati'
+        : suoi
+          ? 'I dati per l’iscrizione'
+          : 'I dati di tuo figlio';
+    }
     if (leadDati) {
-      leadDati.textContent = junior
-        ? 'Servono i tuoi e quelli del bambino: li usiamo per preparare l’iscrizione. Poi passiamo alle tue domande.'
-        : 'Ci presentiamo: sono i dati con cui il club ti ricontatta. Poi passiamo alle tue domande.';
+      leadDati.textContent = !junior
+        ? 'Ci presentiamo: sono i dati con cui il club ti ricontatta. Poi passiamo alle tue domande.'
+        : suoi
+          ? 'Servono i tuoi e quelli del bambino: li usiamo per preparare l’iscrizione. Poi passiamo alle tue domande.'
+          : 'Di te sappiamo già tutto: serve solo chi iscriviamo. Poi passiamo alle tue domande.';
     }
     /* Quello che sappiamo già non si richiede a mano. L'email è quella del
        primo passo: resta modificabile, perché è possibile che l'abbia scritta
@@ -656,18 +698,22 @@ export function initChatAssistente(root, options) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ramo: dati.ramo,
+          /* Il ramo dice **come** parlargli, l'ambito dice **cosa** creare su
+             PerfectGym: un socio che iscrive suo figlio ha ramo `iscritto` e
+             ambito `junior`, e sono due anagrafiche guest, non un lead. */
+          ambito: dati.ambito,
           attivita: dati.attivita ? [dati.attivita] : [],
           attivitaJunior: dati.attivitaJunior,
-          email: valore('email'),
+          email: valore('email') || dati.email,
           memberId: dati.memberId,
           statoPgm: dati.stato,
           statoNucleo: dati.statoNucleo,
           sessione: sessione(),
           pagina: dati.pagina,
           genitore: {
-            nome: valore('nome'),
-            cognome: valore('cognome'),
-            cellulare: cellulareNudo(valore('cellulare')),
+            nome: valore('nome') || dati.nome,
+            cognome: valore('cognome') || dati.cognome,
+            cellulare: cellulareNudo(valore('cellulare')) || cellulareNudo(dati.telefono),
             /* Vuota nel ramo adulti, e non è una dimenticanza: là non si chiede.
                Il workflow deve accettarla vuota e non passarla a PerfectGym. */
             nascita: junior ? valore('nascita') : '',
