@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import AttivitaModal from '../components/AttivitaModal.astro';
 import Faq from '../components/Faq.astro';
+import BannerSospensione from '../components/BannerSospensione.astro';
 import { faqPagina } from '../data/faq';
 
 import { trialCta } from '../data/cta';
@@ -203,11 +204,17 @@ const trust = [
         ))}
       </div>
 
+      {/* La sospensione esce dalla nota e diventa un banner, come sulla promo.
+          Dentro la nota era una voce fra tre, in mezzo alla quota di attivazione
+          e al certificato medico: quelle due sono condizioni da leggere prima di
+          firmare, questa è la risposta a «e se mi fermo?», che è una domanda
+          diversa e la sola che trattiene la mano. Le altre due restano dov'erano. */}
+      <BannerSospensione />
+
       <p class="ab-note">
         <strong>Quota di attivazione:</strong> €50 una tantum, per tutti i piani. Include il badge di accesso e
         l'attivazione dell'account. Non è richiesta in caso di rinnovo.
-        · <strong>Sospensioni:</strong> illimitate, €{SOSPENSIONE.prezzo}/mese · <strong>Certificato medico:</strong> non
-        agonistico, entro 2 settimane dalla prima lezione.
+        · <strong>Certificato medico:</strong> non agonistico, entro 2 settimane dalla prima lezione.
       </p>
     </div>
   </section>

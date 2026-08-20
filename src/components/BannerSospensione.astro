@@ -1,0 +1,156 @@
+---
+/**
+ * «Sospensioni illimitate, €15 al mese, quante volte vuoi.»
+ *
+ * È la risposta alla domanda che ferma la mano prima di firmare un annuale —
+ * «e se mi fermo?» — e per questo non sta dentro la scheda di un prezzo ma
+ * accanto a tutti: vale per i due piani e per tutte le formule. *Illimitate* e
+ * non «fino a N» è il punto della frase.
+ *
+ * Vive in due posti, /promo e /abbonamenti, e per questo è un componente: la
+ * cifra la legge da `SOSPENSIONE` come tutto il resto del sito, e la frase sta
+ * scritta una volta sola. Due copie della stessa promessa sono due copie che
+ * prima o poi dicono cose diverse.
+ *
+ * `scuro` è per la card Premium della promo, che ha il fondo nero. I colori se
+ * li dà il componente e non il genitore: le classi di Astro sono con ambito, e
+ * una regola `.piano--premium .sosp__k` scritta nella pagina non raggiungerebbe
+ * un elemento che appartiene a questo file.
+ */
+import { SOSPENSIONE } from '../data/abbonamenti';
+
+interface Props {
+  /** Sopra un fondo scuro: il testo si schiarisce e l'arancione resta pieno. */
+  scuro?: boolean;
+}
+
+const { scuro = false } = Astro.props;
+---
+
+<a class:list={['sosp', scuro && 'sosp--scuro']} href={SOSPENSIONE.scheda}>
+  <span class="sosp__k">Sospensioni illimitate</span>
+  <span class="sosp__v">€{SOSPENSIONE.prezzo} al mese, quante volte vuoi</span>
+  {/* Sul telefono resta la freccia e le due parole spariscono: dentro la card
+      della promo il banner è larga 240 px, e «Come funziona» se ne prendeva
+      centodue — un terzo dello spazio, che mandava a capo prima la cifra e poi
+      l'etichetta. Il testo del link non serve a capire dove si va, perché a
+      essere cliccabile è tutto il banner e chi lo legge ha appena letto di che
+      cosa parla. */}
+  <span class="sosp__l">
+    <span class="sosp__l-testo">Come funziona</span>
+    <span aria-hidden="true">→</span>
+  </span>
+</a>
+
+<style>
+  /* Tutto il banner è il link, e non un pezzo dentro di lui: dà un bersaglio
+     grande come la card invece di due parole sottolineate, e sul telefono
+     libera i cento pixel che quelle parole occupavano. */
+  .sosp {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    margin: 0 0 1rem;
+    padding: 0.875rem 1rem;
+    border-radius: 0.875rem;
+    background: rgba(255, 87, 1, 0.09);
+    border: 1px solid rgba(255, 87, 1, 0.3);
+  }
+
+  .sosp__k {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .sosp__v {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .sosp__l {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: auto;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--accent-text);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    white-space: nowrap;
+  }
+
+  /* Il bersaglio è il banner, che di suo è già alto più di 44 px: qui serve
+     solo che non scenda sotto quella misura se un giorno il testo si accorcia. */
+  .sosp {
+    min-height: 2.75rem;
+  }
+
+  .sosp:hover {
+    background: rgba(255, 87, 1, 0.14);
+  }
+
+  .sosp--scuro:hover {
+    background: rgba(255, 87, 1, 0.18);
+  }
+
+  .sosp--scuro .sosp__k,
+  .sosp--scuro .sosp__l {
+    color: var(--color-primary);
+  }
+
+  .sosp--scuro .sosp__v {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  /* ---- Sul telefono: due righe, non tre ----
+     In fila con `flex-wrap` i tre pezzi andavano a capo uno per uno e «Come
+     funziona» finiva su una riga sua: la card cresceva di una quarantina di
+     pixel per un link di cento.
+
+     Con due colonne il link ne prende una tutta sua e si allunga sulle due
+     righe, quindi la sua larghezza non entra più nel conto di quando il testo
+     va a capo: l'etichetta sopra, la cifra sotto, e l'altezza è quella del
+     bersaglio da 44 px invece della somma di tre righe. E la cifra scende di un
+     gradino di scala, perché su 360 px lo spazio che le resta accanto al link è
+     poco più di duecento pixel. */
+  @media (max-width: 700px) {
+    .sosp {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 0.125rem 0.5rem;
+      padding: 0.75rem 0.875rem;
+    }
+
+    /* La spaziatura fra le lettere costa venti pixel su una riga di ventidue
+       caratteri, e sono venti pixel che qui decidono se va a capo. */
+    .sosp__k {
+      grid-column: 1;
+      grid-row: 1;
+      letter-spacing: 0.06em;
+    }
+
+    .sosp__v {
+      grid-column: 1;
+      grid-row: 2;
+      font-size: var(--text-xs);
+    }
+
+    .sosp__l {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      margin-left: 0;
+      font-size: var(--text-sm);
+    }
+
+    /* Restano le due parole solo dove c'è posto: sotto, la freccia. */
+    .sosp__l-testo {
+      display: none;
+    }
+  }
+</style>
