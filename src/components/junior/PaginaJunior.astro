@@ -41,6 +41,17 @@ const FORM = TALK.href;
 const CTA = corso.cta ?? 'Richiedi orari e costi';
 /* Il contesto che la CTA porta con sé: da qui il modal della fase successiva sa
    già di quale attività si parla, e non lo chiede di nuovo al genitore. */
+/* Il nome della scheda ridotto a un pezzo d'indirizzo, perché la provenienza
+   finisce nel payload e va letta in Airtable: «Scuola Nuoto 6-10 anni» →
+   `scuola-nuoto-6-10-anni`. */
+const slug = (t: string) =>
+  t
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+
 const CTA_ATTRS = ctaAttrs('resolve', corso.ctaIntent ?? 'junior_info', {
   activity: corso.slug,
   source: `/${corso.slug}`,
@@ -307,7 +318,14 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
             {/* La chiamata all'azione della scheda è un pulsante, non un link di
                 testo: su queste pagine è l'unico modo per sapere turni e costi,
                 e il battito lo tiene visibile senza gridare. */}
-            <a href={FORM} class="btn btn-primary ju-corso__btn" target="_blank" rel="noopener noreferrer">
+            <a
+              href={FORM}
+              class="btn btn-primary ju-corso__btn"
+              {...ctaAttrs('resolve', corso.ctaIntent ?? 'junior_info', {
+                activity: corso.slug,
+                source: `/${corso.slug}#${slug(c.nome)}`,
+              })}
+            >
               {CTA} →
             </a>
           </article>
@@ -368,7 +386,7 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
       </div>
 
       <div class="ju-cta">
-        <a href={FORM} class="btn btn-primary" target="_blank" rel="noopener noreferrer">{CTA} →</a>
+        <a href={FORM} class="btn btn-primary" {...CTA_ATTRS}>{CTA} →</a>
       </div>
     </div>
   </section>

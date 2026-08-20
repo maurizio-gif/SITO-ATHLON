@@ -242,8 +242,13 @@ const trust = [
             Athlon dal 2021.
           </p>
         </div>
+        {/* Il codice da copiare non sta più qui. Era la scorciatoia intorno al
+            form: si prendeva GOLD7 e si andava su PerfectGym a mano, senza che
+            il club sapesse chi stava attivando un Guest Pass e senza controllare
+            che fosse attivabile — la regola «mai avuto un abbonamento dal 2021»
+            la verifica il form al primo passo. Il codice c'è ancora, ma dove
+            serve: nell'ultimo passo del form, insieme alle istruzioni. */}
         <div class="guest__actions">
-          <button class="guest__code" type="button" data-copy-code="GOLD7">Codice: GOLD7 · copia</button>
           <a
             href={prova.href}
             class="btn btn-primary"
@@ -375,27 +380,6 @@ const trust = [
 </Layout>
 
 <script>
-  // Copy the guest-pass code, with the button itself confirming the result.
-  document.querySelectorAll<HTMLButtonElement>('[data-copy-code]').forEach((btn) => {
-    const code = btn.dataset.copyCode || '';
-    const original = btn.textContent;
-    btn.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(code);
-        btn.textContent = `${code} · copiato ✓`;
-        btn.classList.add('copied');
-      } catch {
-        // Clipboard can be blocked (permissions, insecure context) — say so
-        // rather than silently pretending it worked.
-        btn.textContent = `${code} · copia a mano`;
-      }
-      window.setTimeout(() => {
-        btn.textContent = original;
-        btn.classList.remove('copied');
-      }, 2000);
-    });
-  });
-
   /* L'accordion delle f.a.q. non è più qui: lo porta il componente Faq, con il
      suo script e il suo JSON-LD FAQPage — che questa pagina non emetteva, ed è
      la pagina su cui si decide di pagare. */
@@ -1103,30 +1087,6 @@ const trust = [
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
-  }
-
-  .guest__code {
-    font-family: var(--font-body);
-    font-size: var(--text-xs);
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    padding: 9px 16px;
-    border-radius: 999px;
-    border: none;
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.7);
-    cursor: pointer;
-    transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
-  }
-
-  .guest__code:hover {
-    background: rgba(255, 255, 255, 0.18);
-    color: var(--color-white);
-  }
-
-  .guest__code.copied {
-    background: rgba(111, 207, 151, 0.2);
-    color: #6fcf97;
   }
 
   /* ---- Price lists ---- */

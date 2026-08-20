@@ -71,7 +71,15 @@ const evento = {
     </header>
 
     <section class="evd__sec">
-      <div class="container-narrow">
+      {/* Il corpo sta nel contenitore pieno, come il resto della pagina.
+          Stava in `.container-narrow`, cioè 54rem — 864px su un desktop, e sul
+          totem perfino 34ch, che erano 579px su un pannello da 1080: metà
+          schermo di testo e metà vuoto, con le sezioni sotto a tutta larghezza.
+          La misura stretta è la regola tipografica, e la si sta rompendo di
+          proposito: a 1320px il corpo fa righe lunghe. Il sommario sopra la
+          foto resta corto in `ch`, perché là la riga lunga è illeggibile
+          davvero. */}
+      <div class="container">
         <div class="evd__body">
           <Content />
         </div>
