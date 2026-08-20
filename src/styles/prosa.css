@@ -1,0 +1,216 @@
+/**
+ * La prosa di un articolo, in un posto solo.
+ *
+ * Il markdown delle schede porta il suo HTML — titoli, elenchi, tabelle,
+ * `<details>` e le chiamate all'azione `.ci-*` con cui gli articoli sono stati
+ * scritti — e queste regole lo rivestono coi token del sito.
+ *
+ * Stava dentro il foglio con ambito della pagina dell'Help Desk, dove serviva
+ * un `:global()` per ogni selettore. Da quando gli articoli sono due tipi — le
+ * schede dell'Help Desk e le news, che ora hanno una pagina loro — lo stesso
+ * corpo va vestito in due pagine, e duplicare duecento righe di CSS vuol dire
+ * duecento righe che fra un mese sono diverse. Qui è un foglio normale: i
+ * selettori discendono tutti da `.prosa`, quindi non escono da lì.
+ */
+
+/* ---- Article body -------------------------------------------------
+The markdown carries its own HTML, so these are global: headings,
+lists, tables, <details> blocks and the .ci-* call-outs the articles
+were written against, restyled on this site's tokens. */
+/* Il primo elemento del corpo non aggiunge margine: lo spazio lo dà già il
+blocco dei tag sopra. */
+.prosa > *:first-child {
+  margin-top: 0;
+}
+
+.prosa h2 {
+  font-size: var(--text-xl);
+  letter-spacing: -0.01em;
+  margin: 38px 0 14px;
+}
+
+.prosa h3 {
+  font-size: var(--text-lg);
+  margin: 28px 0 10px;
+}
+
+.prosa p {
+  color: var(--text-muted);
+}
+
+.prosa a {
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.prosa a:hover {
+  text-decoration: underline;
+}
+
+.prosa strong {
+  color: var(--color-dark);
+  font-weight: 600;
+}
+
+.prosa ul,
+.prosa ol {
+  padding-left: 20px;
+  color: var(--text-muted);
+}
+
+.prosa li {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.prosa li::marker {
+  color: var(--color-primary);
+}
+
+.prosa hr {
+  height: 1px;
+  border: 0;
+  background: var(--border);
+  margin: 34px 0;
+}
+
+.prosa img {
+  border-radius: var(--radius);
+  margin: 20px 0;
+}
+
+.prosa blockquote {
+  margin: 20px 0;
+  padding: 14px 18px;
+  border-left: 3px solid var(--color-primary);
+  background: var(--color-cream);
+  border-radius: 0 12px 12px 0;
+}
+
+.prosa blockquote p {
+  margin: 0;
+}
+
+.prosa table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: var(--text-sm);
+}
+
+.prosa th,
+.prosa td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.prosa th {
+  font-size: var(--text-2xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* The article's own summary/detail blocks — same accordion feel as the
+FAQs elsewhere on the site, without needing any JavaScript. */
+.prosa details {
+  margin: 16px 0;
+  padding: 0 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+}
+
+.prosa summary {
+  padding: 15px 0;
+  cursor: pointer;
+  font-weight: 500;
+  list-style: none;
+}
+
+.prosa summary::-webkit-details-marker {
+  display: none;
+}
+
+.prosa summary::after {
+  content: '+';
+  float: right;
+  color: var(--color-primary);
+  font-size: 1.125rem;
+  line-height: 1;
+}
+
+.prosa details[open] summary::after {
+  content: '–';
+}
+
+.prosa details[open] summary {
+  border-bottom: 1px solid var(--border);
+}
+
+.prosa details > *:not(summary) {
+  margin-bottom: 14px;
+}
+
+/* Lead-in strip at the top of most articles. */
+.prosa .ci-hero {
+  padding: 16px 18px;
+  margin-bottom: 26px;
+  border-radius: var(--radius);
+  background: var(--color-dark);
+  color: var(--color-white);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.prosa .ci-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 30px 0 10px;
+}
+
+.prosa .ci-btn-primary,
+.prosa .ci-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 26px;
+  border-radius: 100px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.prosa .ci-btn-primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.prosa .ci-btn-secondary {
+  border: 1px solid var(--color-dark);
+  color: var(--color-dark);
+}
+
+/* Una tabella che non entra scorre dentro di sé, **a ogni larghezza**.
+Questa regola era dentro la media query del totem, e sul totem il problema
+era vero: testo a scala doppia, cinque colonne, 1080 px, la pagina scorreva
+di lato. Ma su un telefono da 390 px succede identico e lì la regola non
+arrivava: misurato, `/wikiathlon/adulti/sospensione` scorreva a 546 px per
+via della tabella delle due sospensioni. Il caso generale è lo stesso —
+tabella più larga del suo contenitore — e la cura pure, quella della
+settimana del planning: la pagina sta ferma e la tabella si sfoglia col
+dito. Senza media query non c'è una larghezza in cui ci si dimentica di
+applicarla. */
+.prosa table {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.prosa .ci-btn-primary:hover,
+.prosa .ci-btn-secondary:hover {
+  text-decoration: none;
+  transform: translateY(-1px);
+}
