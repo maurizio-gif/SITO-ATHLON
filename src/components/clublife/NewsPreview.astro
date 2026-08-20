@@ -53,11 +53,12 @@ const items = (await getCollection('news'))
               </div>
               <h3 class="nwcard__title">{n.data.title}</h3>
               <p class="nwcard__excerpt">{n.data.excerpt}</p>
-              {n.data.ctaHref && (
-                <a href={n.data.ctaHref} class="nwcard__cta">
-                  {n.data.ctaLabel ?? 'Leggi'} →
-                </a>
-              )}
+              {/* La card porta alla news, sempre: prima il link c'era solo se
+                  la notizia aveva un `ctaHref`, e portava altrove — al planning,
+                  a una scheda dell'Help Desk — quindi le news senza rimando non
+                  si potevano leggere affatto. Il rimando esiste ancora, ma sta
+                  dentro l'articolo: da qui si va a leggere la notizia. */}
+              <a href={`/news/${n.id}/`} class="nwcard__cta">Leggi →</a>
             </div>
           </article>
         ))}

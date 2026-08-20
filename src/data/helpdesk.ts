@@ -25,11 +25,12 @@ export const AREA_LABELS: Record<string, AreaMeta> = {
     label: 'Scuola Nuoto Bambini',
     blurb: 'Iscrizioni, livelli, recuperi, brevetti e organizzazione dei corsi.',
   },
-  news: {
-    label: 'Avvisi',
-    blurb: 'Comunicazioni e variazioni di orario in corso.',
-  },
+  /* L'area «Avvisi» non c'è più: il suo unico articolo era la chiusura della
+     vasca, che è una notizia e adesso vive fra le news, con una pagina sua. Un
+     avviso e una scheda di assistenza si leggono in due momenti diversi della
+     vita di un socio, e tenerli nello stesso elenco significava che chi cercava
+     «come disdico» trovava «a luglio la vasca è chiusa». */
 };
 
 /** Index order for the help-desk section. */
-export const AREA_ORDER = ['generali', 'adulti', 'snb', 'news'] as const;
+export const AREA_ORDER = ['generali', 'adulti', 'snb'] as const;

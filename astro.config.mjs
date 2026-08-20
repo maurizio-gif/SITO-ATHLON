@@ -29,6 +29,10 @@ export default defineConfig({
   redirects: {
     '/scuola-nuoto-bambini-3': '/scuola-nuoto-bambini',
     '/ginnastica-posturale': '/ginnastica-strutturale',
+    /* La chiusura della vasca era una scheda dell'Help Desk ed è diventata una
+       news, che è quello che è sempre stata: l'indirizzo vecchio era indicizzato
+       e la card del Club Life ci puntava. */
+    '/wikiathlon/news/orari-estate-2026': '/news/chiusura-vasca-grande-estate-2026',
   },
 
   integrations: [

@@ -403,9 +403,10 @@ export const GET: APIRoute = async () => {
       id: `news:${n.id}`,
       tipo: 'news',
       titolo: n.data.title,
-      url: n.data.ctaHref?.startsWith('http')
-        ? n.data.ctaHref
-        : `${SITE}${n.data.ctaHref ?? '/club-life#news'}`,
+      /* La news ha una pagina sua: prima l'url era quello del suo `ctaHref`,
+         che mandava a un'altra pagina, o l'ancora del Club Life — cioè non la
+         notizia ma il posto da cui si intravede. */
+      url: `${SITE}/news/${n.id}/`,
       area: `Avvisi · ${n.data.category}`,
       attivita: n.data.attivita,
       testo: blocchi(

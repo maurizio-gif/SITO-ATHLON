@@ -1,0 +1,277 @@
+---
+/**
+ * Una news, per intero, con un indirizzo suo.
+ *
+ * Prima le news erano solo card sul Club Life e sulla home: chi voleva leggerne
+ * una intera non poteva, e quella che aveva davvero qualcosa da dire mandava il
+ * lettore su un articolo dell'Help Desk — che è un posto diverso, con un altro
+ * tono e da oggi fuori dai motori. Una comunicazione del club è una notizia,
+ * non una scheda di assistenza: qui ha la sua pagina, indicizzabile e
+ * linkabile.
+ *
+ * Il corpo lo veste `prosa.css`, lo stesso foglio delle schede dell'Help Desk:
+ * gli articoli sono scritti con lo stesso markdown e le stesse chiamate
+ * all'azione `.ci-*`, e due copie di quel CSS sarebbero due copie che fra un
+ * mese divergono.
+ */
+import Layout from '../../layouts/Layout.astro';
+import { getCollection, render } from 'astro:content';
+import { formatEventDate } from '../../data/eventi';
+import { fotoHero } from '../../data/foto';
+import '../../styles/prosa.css';
+
+export async function getStaticPaths() {
+  const news = await getCollection('news', ({ data }) => !data.draft);
+  return news.map((entry) => ({ params: { slug: entry.id }, props: { entry, news } }));
+}
+
+const { entry, news } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+
+/* Le altre news, dalla più recente: chi ha appena letto una comunicazione del
+   club è la persona più probabile a volerne un'altra. Tre, non tutte. */
+const altre = news
+  .filter((n) => n.id !== entry.id)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 3);
+
+const SITE = 'https://www.athlonroma.it';
+const schema = {
+  '@type': 'NewsArticle',
+  headline: d.title,
+  description: d.excerpt,
+  datePublished: d.date.toISOString(),
+  url: `${SITE}/news/${entry.id}/`,
+  inLanguage: 'it',
+  articleSection: d.category,
+  ...(d.image ? { image: `${SITE}${d.image}` } : {}),
+  publisher: { '@id': `${SITE}/#club` },
+  isPartOf: { '@type': 'WebSite', '@id': `${SITE}/#website`, name: 'Athlon Club', url: `${SITE}/` },
+};
+---
+
+<Layout
+  title={`${d.title} | Athlon Club`}
+  description={d.excerpt}
+  chrome={false}
+  ogType="article"
+  image={d.image}
+  imageAlt={d.imageAlt}
+  breadcrumb={[{ name: 'Club Life', path: '/club-life#news' }, { name: d.title, path: `/news/${entry.id}/` }]}
+  schema={[schema]}
+>
+  <article class="nws">
+    <div class="container-narrow">
+      <nav class="nws__crumbs" aria-label="Percorso">
+        <a href="/club-life#news">Club Life</a>
+        <span aria-hidden="true">/</span>
+        <span>News</span>
+      </nav>
+
+      <div class="nws__meta">
+        <span class="nws__cat">{d.category}</span>
+        <span class="nws__date">{formatEventDate(d.date, true)}</span>
+      </div>
+
+      <h1 class="nws__title">{d.title}</h1>
+      <p class="nws__lede">{d.excerpt}</p>
+
+      {d.image && (
+        <img
+          class="nws__foto"
+          src={d.image}
+          alt={d.imageAlt ?? d.title}
+          {...fotoHero(d.image)}
+        />
+      )}
+
+      <div class="nws__body prosa">
+        <Content />
+      </div>
+
+      {/* Il link che la card portava prima resta, ma qui: sulla card era
+          l'unico modo di leggere la notizia, adesso la notizia si legge davvero
+          e quel link torna a essere quello che è — un rimando alla pagina che
+          c'entra. */}
+      {d.ctaHref && (
+        <a href={d.ctaHref} class="nws__cta">{d.ctaLabel ?? 'Vai'} →</a>
+      )}
+
+      {altre.length > 0 && (
+        <aside class="nws__altre" aria-labelledby="nws-altre">
+          <h2 class="nws__altre-titolo" id="nws-altre">Altre news dal club</h2>
+          <ul class="nws__altre-lista">
+            {altre.map((n) => (
+              <li>
+                <a href={`/news/${n.id}/`} class="nws__altra">
+                  <span class="nws__altra-data">{formatEventDate(n.data.date, true)}</span>
+                  <span class="nws__altra-titolo">{n.data.title}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
+
+      <a href="/club-life#news" class="nws__back">← Torna a Club Life</a>
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .nws {
+    padding: var(--space-section-md) 0 var(--space-section-lg);
+  }
+
+  .nws__crumbs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1.125rem;
+  }
+
+  .nws__crumbs a {
+    color: var(--color-primary);
+  }
+
+  .nws__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+    margin-bottom: 0.625rem;
+  }
+
+  .nws__cat {
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    background: rgba(255, 87, 1, 0.1);
+    color: var(--accent-text);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .nws__date {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .nws__title {
+    font-size: var(--text-2xl);
+    --lh: 1;
+    margin: 0 0 0.75rem;
+  }
+
+  .nws__lede {
+    margin: 0;
+    font-size: var(--text-md);
+    line-height: 1.55;
+    color: var(--text-muted);
+  }
+
+  /* La foto è l'elemento LCP della pagina, quindi passa da `fotoHero`: le foto
+     delle news arrivano dalla libreria del sito e pesano mezzo megabyte. */
+  .nws__foto {
+    width: 100%;
+    height: auto;
+    margin: 1.75rem 0 0;
+    border-radius: var(--radius);
+  }
+
+  .nws__body {
+    margin-top: 1.75rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .nws__cta {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    margin-top: 1.5rem;
+    padding: 0 1.35rem;
+    border-radius: 100px;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .nws__altre {
+    margin-top: var(--space-section-sm);
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .nws__altre-titolo {
+    margin: 0 0 1rem;
+    font-size: var(--text-lg);
+    --lh: 1.15;
+  }
+
+  .nws__altre-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .nws__altra {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 0.85rem;
+    background: var(--color-white);
+    transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease;
+  }
+
+  .nws__altra:hover {
+    border-color: var(--color-primary);
+    background: var(--color-cream);
+  }
+
+  .nws__altra-data {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .nws__altra-titolo {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-dark);
+  }
+
+  .nws__back {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    margin-top: var(--space-section-sm);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  @media (min-width: 820px) {
+    .nws__altre-lista {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>
