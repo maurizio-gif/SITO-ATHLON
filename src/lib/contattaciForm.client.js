@@ -45,7 +45,14 @@
 // un contatto in più da verificare a mano che una richiesta persa per un
 // timeout.
 
-import { WEBHOOK_VERIFICA, WEBHOOK_CONTATTO, PREISCRIZIONI, MACRO_BY_ID, ATTIVITA_ADULTI } from '../data/contatto';
+import {
+  WEBHOOK_VERIFICA,
+  WEBHOOK_CONTATTO,
+  PREISCRIZIONI,
+  MACRO_BY_ID,
+  ATTIVITA_ADULTI,
+  haGiaAccount,
+} from '../data/contatto';
 import { CALENDLY } from '../data/calendly';
 import { montaCalendario } from './calendario.client.js';
 
@@ -387,14 +394,12 @@ export function initContattaciForm(root, options) {
   /**
    * Se questa email ha già un profilo sul portale.
    *
-   * `Member` e `Guest` ce l'hanno — sono i due rami che l'automazione manda al
-   * reset password — mentre `Lead` è un contatto senza account e va raccolto.
-   * Il ripiego su `stato` copre il caso in cui la verifica non mandi
-   * `memberType`: allora si riconosce solo il Member.
+   * La regola sta in `data/contatto.ts`, perché la usa anche il controllo
+   * davanti ai pulsanti d'iscrizione: due copie della stessa condizione sono
+   * due condizioni che a un certo punto rispondono in modo diverso.
    */
   function vaAlPortale() {
-    if (dati.memberType) return /member|guest/i.test(dati.memberType);
-    return dati.statoPgm === 'iscritto';
+    return haGiaAccount({ memberType: dati.memberType, stato: dati.statoPgm });
   }
 
   // ── Ramo adulti ───────────────────────────────────────────────────────────

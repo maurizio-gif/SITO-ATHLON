@@ -43,6 +43,30 @@ export const PORTALE = {
   login: 'https://athlon.perfectgym.com/ClientPortal2/#/Login',
 } as const;
 
+/**
+ * Se questa email ha già un account sul portale.
+ *
+ * Sta qui e non dentro un form perché la usano in due — «contattaci» e il
+ * controllo davanti ai pulsanti d'iscrizione — e sarà la stessa ovunque si
+ * aggiunga un passo «verifica l'email». Una regola come questa scritta in due
+ * posti è una regola che a un certo punto risponde in due modi.
+ *
+ * **Lo decide `memberType`, non `stato`.** L'automazione distingue quattro
+ * valori: `Member` e `Guest` hanno un account, `Lead` e l'assenza no — un Lead
+ * è un contatto e non una persona che può fare login. `stato` invece unisce
+ * Lead e Guest sotto `esiste`, quindi non basta.
+ *
+ * Il ripiego su `stato === 'iscritto'` copre una versione del webhook che non
+ * mandi `memberType`: riconosce solo il Member, cioè tratta un Guest come uno
+ * senza account. È il verso giusto in cui sbagliare — chi ha un account e viene
+ * mandato a registrarsi lo scopre subito e fa il reset, mentre chi non ce l'ha
+ * e viene mandato al login resta fuori senza capire perché.
+ */
+export function haGiaAccount(esito: { memberType?: string; stato?: string }): boolean {
+  if (esito.memberType) return /member|guest/i.test(esito.memberType);
+  return esito.stato === 'iscritto';
+}
+
 /** La scheda con le modalità di preiscrizione: la chiusura del ramo junior. */
 export const PREISCRIZIONI = '/wikiathlon/snb/preiscrizioni-nuoto';
 

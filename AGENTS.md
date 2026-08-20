@@ -201,6 +201,53 @@ pari col codice; l'informativa la scrive il club. Vale la regola di `club.ts`:
 un dato inventato è peggio di un dato assente, e in un'informativa questo è
 doppiamente vero.
 
+## La verifica dell’email sta davanti a «Iscriviti», e chi non ha un account passa
+
+Su `/abbonamenti` e `/promo` i pulsanti d'iscrizione portavano diritti dentro
+PerfectGym. Il guaio era in fondo al percorso: chi ha già un account — di solito
+come **Guest**, perché ha fatto una prova o è in un nucleo — compilava tutta la
+registrazione e solo all'invio leggeva che quell'email esiste già e che deve fare
+il reset. Il lavoro buttato in un punto dove le persone si fermano. Quindi la
+domanda si fa prima, con la stessa forma degli altri form del sito: un campo
+email, la verifica, e da lì due strade.
+
+- **Ha un account** (`Member` o `Guest`) → non si registra: reset password e
+  login, e l'abbonamento lo fa da dentro.
+- **Lead, sconosciuto, verifica in errore o in timeout** → si va su PerfectGym,
+  all'indirizzo che il pulsante portava già, col suo `PaymentPlanId`.
+
+**La terza voce di quell'elenco vale come le altre due.** Un'iscrizione in più
+da riconciliare costa meno di una perduta per un timeout, quindi il timeout è
+nostro e non del browser — sei secondi, misurati — e qualunque errore lascia
+passare. È la stessa scelta del form di prova e di «contattaci».
+
+Tre cose da sapere prima di toccarlo:
+
+- **`memberType` decide, `stato` no**, e la regola sta una volta sola in
+  `haGiaAccount()` (`data/contatto.ts`), perché la usano in due — qui e
+  «contattaci» — e sarà la stessa ovunque si aggiunga un passo «verifica
+  l'email». `stato` unisce Lead e Guest sotto `esiste`: da lì non si distingue
+  chi può fare login. Il ripiego su `stato === 'iscritto'`, per un webhook che
+  non mandi `memberType`, riconosce solo il Member e tratta il Guest come uno
+  senza account — è il verso giusto in cui sbagliare.
+- **L'aggancio è `data-iscrizione` e non `data-cta="buy"`**, che sarebbe stato
+  comodo perché quei pulsanti già lo portano. Ma su `/personal-training`
+  `data-cta="buy"` sta anche su «Prenota una seduta» e «Aggiungi al tuo
+  abbonamento»: intercettarli avrebbe chiesto l'email per prenotare un
+  allenamento. Dieci pulsanti, zero agganci — controllato.
+- **I pulsanti conservano il loro `href`.** L'intercettazione è un miglioramento,
+  non un requisito: senza JavaScript, e con un click modificato (`ctrl`, `cmd`,
+  rotellina), si va su PerfectGym come prima. La destinazione la porta il
+  pulsante, quindi aggiungere un piano resta una riga in `data/abbonamenti.ts`.
+
+E **c'è la via di ritorno**, che non è una gentilezza in più: il campo arriva
+precompilato con l'email che il browser ricorda, che su un dispositivo condiviso
+in casa può essere di un altro. Chi si vede dire «hai già un account» per un
+indirizzo che non è suo deve avere qualcosa da cliccare. Quel comando **toglie
+`data-email-nota` dal campo** oltre a svuotarlo: `emailNota.ts` riempie sul fuoco
+ogni campo vuoto che lo porta, quindi svuotare e mettere il fuoco rimetterebbe
+dentro la stessa email. L'attributo è l'adesione, e lì si ritira.
+
 ## A hidden overlay must be hidden from the keyboard too
 
 `opacity: 0` and `pointer-events: none` hide an overlay from the eyes and the

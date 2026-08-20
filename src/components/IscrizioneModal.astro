@@ -1,0 +1,314 @@
+---
+/**
+ * Il controllo dell'email davanti ai pulsanti «Iscriviti».
+ *
+ * Il problema che risolve è una doccia fredda: chi ha già un account — spesso
+ * come **Guest**, perché ha fatto una prova o è stato aggiunto a un nucleo —
+ * cliccava «Iscriviti», arrivava su PerfectGym, compilava tutti i campi della
+ * registrazione, premeva avanti e solo lì leggeva che quell'email esiste già e
+ * che deve fare il reset della password. Tutto il lavoro buttato, e in un punto
+ * del percorso dove le persone si fermano.
+ *
+ * Quindi la domanda si fa **prima**, e si fa nel modo in cui il sito la fa
+ * ovunque: un campo email, la verifica su PerfectGym, e da lì due strade.
+ *
+ *  - **Ha già un account** (`Member` o `Guest`) → non si registra: rientra. Gli
+ *    si dà il reset e il login, e gli si dice di fare l'abbonamento da dentro.
+ *  - **Lead, sconosciuto, o la verifica non risponde** → si va su PerfectGym,
+ *    all'indirizzo che il pulsante portava già, con il suo `PaymentPlanId`.
+ *
+ * La terza voce di quell'elenco è deliberata e vale come le altre due: se
+ * PerfectGym è irraggiungibile la persona passa. Un'iscrizione in più da
+ * riconciliare costa meno di una perduta per un timeout — è la stessa scelta
+ * del form di prova e di «contattaci».
+ *
+ * ## Due dettagli che tengono in piedi il resto
+ *
+ * **I pulsanti conservano il loro `href`.** L'intercettazione è un
+ * miglioramento, non un requisito: senza JavaScript il click porta su
+ * PerfectGym esattamente come prima. Nessuno resta chiuso fuori.
+ *
+ * **L'aggancio è `data-iscrizione` e non `data-cta="buy"`**, che sarebbe stato
+ * comodo perché quei pulsanti già lo portano. Ma su `/personal-training`
+ * `data-cta="buy"` sta anche su «Prenota una seduta» e su «Aggiungi al tuo
+ * abbonamento», che non sono registrazioni: intercettarli avrebbe chiesto
+ * l'email per prenotare un allenamento.
+ */
+import { PORTALE } from '../data/contatto';
+---
+
+<div class="is" id="iscrizione-modal" aria-hidden="true">
+  <div class="is__backdrop" data-is-close></div>
+  <div class="is__panel" role="dialog" aria-modal="true" aria-labelledby="is-titolo">
+    <button type="button" class="is__close" data-is-close aria-label="Chiudi">×</button>
+
+    {/* ── 1. L'email ───────────────────────────────────────────────────────
+        Un campo e un pulsante, e nient'altro: qui davanti c'è una persona che
+        ha già deciso di iscriversi, e ogni domanda in più è un'occasione di
+        cambiare idea. Precompilato per chi ha già lasciato l'email al sito, e
+        allora è un tocco. */}
+    <section class="is__step" id="is-step-email">
+      <span class="is__eyebrow" data-is-piano>Iscrizione</span>
+      <h3 class="is__title" id="is-titolo" tabindex="-1" data-is-fuoco>La tua email.</h3>
+      <p class="is__lead">
+        Controlliamo se hai già un account sul portale Athlon: se ce l'hai, ti facciamo entrare
+        invece di farti ricompilare tutto.
+      </p>
+
+      <label class="is__label" for="is-email">Email</label>
+      <input
+        class="is__input"
+        id="is-email"
+        data-email-nota
+        type="email"
+        inputmode="email"
+        autocomplete="email"
+        placeholder="mario.rossi@email.it"
+      />
+      <p class="is__errore" data-is-errore hidden></p>
+
+      <button type="button" class="btn btn-primary is__btn" data-is-verifica>
+        Continua <span class="is__spinner" data-is-spinner hidden aria-hidden="true"></span>
+      </button>
+      <p class="is__nota">
+        Serve solo a non farti creare un secondo account. Non ti iscriviamo noi: l'iscrizione la
+        completi tu sul portale.
+      </p>
+    </section>
+
+    {/* ── 2. Ha già un account ─────────────────────────────────────────────
+        Non è un vicolo cieco ed è importante che non lo sembri: è la strada
+        corta. Il reset password è l'azione primaria perché è quella che serve a
+        chi non si ricorda di avere un account — cioè quasi tutti quelli che
+        arrivano qui. */}
+    <section class="is__step" id="is-step-portale" hidden>
+      <span class="is__eyebrow">Ci risulti già registrato</span>
+      <h3 class="is__title" tabindex="-1" data-is-fuoco>Hai già un account.</h3>
+      <p class="is__lead">
+        Questa email è già sul portale Athlon, quindi non serve registrarsi di nuovo: entra nel tuo
+        account e da lì <strong>scegli l'abbonamento</strong>. Se non ricordi la password, la
+        reimposti in un minuto.
+      </p>
+
+      <div class="is__azioni">
+        <a class="btn btn-primary is__btn" href={PORTALE.reset} target="_blank" rel="noopener noreferrer">
+          Reimposta la password →
+        </a>
+        <a class="is__link" href={PORTALE.login} target="_blank" rel="noopener noreferrer">
+          Entro nel portale
+        </a>
+      </div>
+
+      {/* La via di ritorno, e non è una gentilezza in più: il campo email arriva
+          precompilato con quella che il browser ricorda, che su un dispositivo
+          condiviso in casa può essere di un'altra persona. Senza questo, chi si
+          vede dire «hai già un account» per un indirizzo che non è suo non ha
+          niente da cliccare. Sta dentro la nota e non fra i comandi perché è
+          l'uscita rara, non l'azione. */}
+      <p class="is__nota">
+        Non è la tua email? <button type="button" class="is__ripeti" data-is-ripeti>Provane un'altra</button>.
+        Se pensi di non avere un account con questo indirizzo, scrivi a
+        <a href="mailto:desk@athlonroma.it">desk@athlonroma.it</a> e lo controlliamo noi.
+      </p>
+    </section>
+  </div>
+</div>
+
+<script>
+  import '../lib/iscrizione.client.js';
+</script>
+
+<style>
+  /* Il guscio è quello di ProvaModal: `visibility: hidden` da chiuso — così un
+     pannello chiuso non resta nell'ordine di tabulazione — e la visibilità non
+     sfuma, commuta, con il ritardo solo in chiusura. Metterle una durata
+     lascerebbe `hidden` per l'istante in cui lo script sposta il fuoco, e
+     `focus()` su un elemento invisibile non fa niente. */
+  .is {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.2s ease,
+      visibility 0s 0.2s;
+  }
+
+  .is.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+      opacity 0.2s ease,
+      visibility 0s;
+  }
+
+  .is__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(39, 36, 35, 0.62);
+  }
+
+  .is__panel {
+    position: relative;
+    width: min(30rem, 100%);
+    max-height: min(90vh, 44rem);
+    overflow-y: auto;
+    background: var(--color-white);
+    border-radius: 1.25rem;
+    padding: 2rem 1.75rem 1.6rem;
+    box-shadow: 0 1.5rem 3rem rgba(39, 36, 35, 0.28);
+  }
+
+  .is__close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 3rem;
+    height: 3rem;
+    border: 0;
+    background: transparent;
+    font-size: var(--text-2xl);
+    line-height: 1;
+    color: rgba(39, 36, 35, 0.55);
+    cursor: pointer;
+  }
+
+  .is__close:hover {
+    color: var(--color-dark);
+  }
+
+  .is__eyebrow {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+    margin-bottom: 0.35rem;
+  }
+
+  .is__title {
+    font-size: var(--text-2xl);
+    --lh: 1;
+    margin: 0 0 0.7rem;
+  }
+
+  .is__lead {
+    font-size: var(--text-base);
+    line-height: 1.55;
+    margin: 0 0 1.25rem;
+  }
+
+  .is__label {
+    display: block;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+  }
+
+  .is__input {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0 0.9rem;
+    font-family: inherit;
+    font-size: var(--text-base);
+    border: 1px solid rgba(39, 36, 35, 0.25);
+    border-radius: 0.6rem;
+    background: var(--color-white);
+    color: var(--color-dark);
+  }
+
+  .is__input:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+  }
+
+  .is__input.segnalato {
+    border-color: #c0392b;
+  }
+
+  .is__errore {
+    margin: 0.5rem 0 0;
+    font-size: var(--text-sm);
+    color: #c0392b;
+  }
+
+  .is__btn {
+    width: 100%;
+    margin-top: 1rem;
+    min-height: 3.25rem;
+  }
+
+  .is__azioni {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  /* Un comando a forma di link, quindi la sua altezza da tocco la prende da qui
+     e non dalla lista di `global.css`: quella è un elenco esplicito, e questo
+     non c'era. */
+  .is__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-dark);
+  }
+
+  .is__nota {
+    margin: 1rem 0 0;
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    color: rgba(39, 36, 35, 0.7);
+  }
+
+  /* Un comando a forma di parola dentro una frase: prende l'aspetto del link
+     che sembra, non quello del pulsante che è. */
+  .is__ripeti {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: var(--color-dark);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .is__spinner {
+    display: inline-block;
+    width: 0.85em;
+    height: 0.85em;
+    margin-left: 0.45em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: isGira 0.7s linear infinite;
+  }
+
+  @keyframes isGira {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (max-width: 700px) {
+    .is {
+      padding: 0.75rem;
+    }
+
+    .is__panel {
+      padding: 1.75rem 1.25rem 1.25rem;
+    }
+  }
+</style>
