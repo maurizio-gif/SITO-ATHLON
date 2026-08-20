@@ -696,7 +696,14 @@
     border-radius: 1rem 1rem 0.2rem 1rem;
   }
 
-  :global(@keyframes caEntra) {
+  /* I @keyframes non vanno dentro `:global()`: quello avvolge un selettore, e
+     un'at-rule non lo è — il compilatore ne fa
+     `[data-astro-cid-…]:global(@keyframes caEntra)`, che il browser butta via.
+     Non serve nemmeno: il nome di un'animazione è globale di suo, e `caGira`
+     qui sopra lo dimostra. Va avvolto solo il selettore delle regole che devono
+     raggiungere gli elementi iniettati dallo script con innerHTML — e la riga
+     `animation:` sta già in una di quelle. */
+  @keyframes caEntra {
     from { opacity: 0; transform: translateY(4px); }
     to { opacity: 1; transform: none; }
   }
@@ -719,7 +726,7 @@
   .ca__conversazione :global(.ca__pensa span:nth-child(2)) { animation-delay: 0.16s; }
   .ca__conversazione :global(.ca__pensa span:nth-child(3)) { animation-delay: 0.32s; }
 
-  :global(@keyframes caPunti) {
+  @keyframes caPunti {
     0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
     30% { opacity: 1; transform: translateY(-0.2rem); }
   }
