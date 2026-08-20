@@ -30,8 +30,27 @@
 import { spawnSync } from 'node:child_process';
 import { rmSync } from 'node:fs';
 
-const esegui = (comando, argomenti) =>
-  spawnSync(comando, argomenti, { stdio: 'inherit', shell: process.platform === 'win32' }).status ?? 1;
+const esegui = (comando, argomenti, opzioni = {}) =>
+  spawnSync(comando, argomenti, { stdio: 'inherit', shell: process.platform === 'win32', ...opzioni });
+
+/*
+ * Quanto aspettare il pannello prima di lasciarlo perdere.
+ *
+ * Perché un limite: `tinacms build` chiede a TinaCloud di indicizzare il
+ * repository e **aspetta che finisca**, e quell'attesa non ha una fine sua. Il
+ * giorno che TinaCloud restasse a metà, il comando non fallirebbe — resterebbe
+ * lì, portandosi dietro tutto il deploy fino al timeout di Vercel:
+ * quarantacinque minuti senza una riga di output, che è peggio di un errore,
+ * perché un errore almeno si legge. Il resto di questo file esiste perché il
+ * pannello non fermi il sito, e senza un limite quella promessa vale solo
+ * quando Tina ha la cortesia di fallire.
+ *
+ * Non è mai stato visto succedere: è un'assicurazione, e costa niente perché il
+ * limite è larghissimo. Misurato su questi deploy, il passo dura una
+ * quarantina di secondi, prima indicizzazione del repository compresa. Cinque
+ * minuti sono sette volte tanto.
+ */
+const LIMITE_PANNELLO_MS = 5 * 60_000;
 
 /* Su Vercel `VERCEL_ENV` vale 'production' per il ramo di produzione e
    'preview' per tutti gli altri. Fuori da Vercel non esiste, e allora decide
@@ -48,11 +67,20 @@ const perche = !process.env.TINA_TOKEN
 
 if (perche === null) {
   console.log('▲ Tina: compilo il pannello in public/admin');
-  if (esegui('tinacms', ['build']) !== 0) {
+  const esito = esegui('tinacms', ['build'], { timeout: LIMITE_PANNELLO_MS, killSignal: 'SIGKILL' });
+  /* Scaduto il tempo, `spawnSync` mette l'errore in `error` e uccide il
+     processo col segnale chiesto: `status` resta null, quindi il caso va
+     distinto o si legge come un fallimento qualunque. */
+  const scaduto = esito.error?.code === 'ETIMEDOUT' || esito.signal === 'SIGKILL';
+  if (scaduto || esito.status !== 0) {
     rmSync('public/admin', { recursive: true, force: true });
     console.warn(
-      '\n▲ Tina: il pannello non ha compilato, e il sito si pubblica senza.\n' +
-        "  /admin non ci sarà finché questo comando non torna a funzionare:\n" +
+      (scaduto
+        ? `\n▲ Tina: il pannello non ha finito in ${Math.round(LIMITE_PANNELLO_MS / 60_000)} minuti, l'ho fermato.\n` +
+          "  Quasi sempre è TinaCloud che non chiude l'indicizzazione: si riprova\n" +
+          '  al prossimo deploy, e intanto il sito si pubblica senza.\n'
+        : '\n▲ Tina: il pannello non ha compilato, e il sito si pubblica senza.\n') +
+        '  /admin non ci sarà finché questo comando non torna a funzionare:\n' +
         '  controlla TINA_TOKEN, che il ramo di produzione sia indicizzato su\n' +
         '  TinaCloud e che tina/tina-lock.json sia aggiornato allo schema.\n'
     );
@@ -64,4 +92,4 @@ if (perche === null) {
   );
 }
 
-process.exit(esegui('astro', ['build']));
+process.exit(esegui('astro', ['build']).status ?? 1);
