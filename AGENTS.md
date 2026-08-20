@@ -65,6 +65,34 @@ rendering, per PageSpeed.
   is a character sweep over `dist`, and today nothing outside `latin` is used
   except emoji and arrows, which come from the system font either way.
 
+## Il solo terzo dominio nel `<head>` è Google Tag Manager
+
+Container `GTM-T4J5G7D`, e sta in `Layout.astro` — che è il solo layout del
+sito, quindi tutte le route pubbliche ce l'hanno per costruzione. Due pezzi: lo
+snippet subito dopo `charset` e `viewport`, l'iframe `<noscript>` come prima
+riga del `<body>`.
+
+- **Non contraddice la regola qui sopra**, e la distinzione è quella che conta:
+  lo snippet è inline, e il `gtm.js` che inserisce è `async`. Niente blocca il
+  rendering. Quello che aggiunge è una connessione a un terzo dominio — DNS più
+  TLS prima del primo tag — ed è il prezzo di GTM, non un difetto
+  dell'installazione.
+- **`is:inline` non è decorativo.** Senza, Astro tratta il blocco come un modulo
+  suo e lo serve come `<script type="module">`, che è differito: il `dataLayer`
+  nascerebbe dopo che altro codice ha già provato a scriverci. Quello snippet
+  deve arrivare al browser esattamente com'è.
+- **I tag non si aggiungono qui, si aggiungono da GTM.** È il motivo per cui il
+  container esiste: un secondo script di tracciamento nel layout è un tag che
+  GTM non sa di avere e che nessuno può spegnere senza un deploy.
+- Le **pagine di reindirizzamento** generate dai `redirects` di
+  `astro.config.mjs` non ce l'hanno, e va bene: sono quattrocento byte di
+  `meta refresh` verso una pagina che invece ce l'ha.
+
+Per verificare: su ogni pagina del `dist`, lo snippet sta nel `<head>` preceduto
+solo dai due `meta`, e il `<noscript>` è il primo figlio del `<body>`. In un
+browser, `window.dataLayer` è un array con dentro l'evento `gtm.js` e lo script
+iniettato porta `async`.
+
 ## A hidden overlay must be hidden from the keyboard too
 
 `opacity: 0` and `pointer-events: none` hide an overlay from the eyes and the
