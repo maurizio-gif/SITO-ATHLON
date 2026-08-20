@@ -93,6 +93,26 @@ const graph = [
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    {/* Google Tag Manager, e sta qui in cima per la ragione per cui GTM esiste:
+        è lui che decide quali altri tag partono, quindi ogni riga prima di lui
+        è ritardo su tutto quello che gestisce. Dopo charset e viewport, che
+        vanno prima di qualunque cosa, e prima di tutto il resto.
+
+        `is:inline` non è un dettaglio: senza, Astro tratta il blocco come un
+        modulo suo — lo raccoglie, lo trasforma e lo serve come `<script
+        type="module">`, che è differito. Lo snippet deve invece arrivare al
+        browser esattamente com'è ed eseguire subito, perché il `dataLayer` va
+        creato prima che qualsiasi altro codice ci scriva dentro.
+
+        Non contraddice la regola sulle richieste cross-origin che bloccano il
+        rendering: lo snippet è inline e il gtm.js che inserisce è `async`. */}
+    <script is:inline>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-T4J5G7D');</script>
+
     <link rel="icon" type="image/png" href="/wp-content/uploads/2025/08/Pittogramma.png" />
     <link rel="canonical" href={canonical} />
 
@@ -144,6 +164,12 @@ const graph = [
     <script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })} />
   </head>
   <body>
+    {/* La controparte senza JavaScript dello snippet qui sopra. Prima riga del
+        body perché è lì che Google la vuole, e resta invisibile: un iframe 0×0
+        con `display: none`. */}
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T4J5G7D"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
     {chrome && <Header />}
     <main>
       <slot />
