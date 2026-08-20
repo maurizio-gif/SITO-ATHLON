@@ -48,6 +48,41 @@ export function initChatAssistente(root, options) {
   /** Dove finisce il percorso junior, comunque vada. */
   var LANDING_JUNIOR = '/wikiathlon/snb/preiscrizioni-nuoto/';
 
+  /* ── Il richiamo telefonico ──────────────────────────────────────────────
+     Si propone **solo a chi non è ancora dei nostri** — adulto o genitore non
+     fa differenza, conta che sia nuovo — e **non subito**: dopo qualche
+     risposta. Offrirlo al primo messaggio è un venditore che interrompe una
+     domanda; offrirlo dopo tre è una porta aperta a chi si è già fatto un'idea
+     e adesso vuole parlarne.
+
+     I dati li abbiamo già tutti, perché per un nuovo il form viene prima della
+     conversazione: si passano precompilati a Calendly così la persona trova il
+     modulo pieno e sceglie solo giorno e ora.
+
+     **La mappatura dei parametri è qui e solo qui.** Calendly precompila per
+     nome fisso: `name` (o `first_name`/`last_name` se il modulo ha i due campi
+     separati — li mandiamo tutti e tre, quelli di troppo vengono ignorati),
+     `email`, `location` per il numero quando l'evento è una chiamata in uscita
+     — è Calendly a chiedere il numero come «luogo» — e `a1`, `a2`… per le
+     domande personalizzate, nell'ordine in cui stanno nel modulo.
+
+     Quell'ordine dalla nostra parte non si vede: la pagina dell'evento non è
+     leggibile da qui e quell'account Calendly non è quello collegato. Quindi:
+     se aprendo il link il numero non arriva nel suo campo, il campo non è il
+     «luogo» ma una domanda personalizzata — si mette `telefono: 'a1'` e
+     `contesto: 'a2'`, e non c'è altro da cambiare. Per sicurezza il numero è
+     anche la prima riga del contesto, così non si perde comunque. */
+  var RICHIAMO = {
+    url: 'https://calendly.com/athlonclub/recall/',
+    /** Quante risposte dell'assistente prima di proporlo. */
+    dopoRisposte: 3,
+    campi: { telefono: 'location', contesto: 'a1' },
+    /* Il trascritto intero non ci sta in una query string, e un url troppo
+       lungo lo troncano il browser o Calendly: si tengono gli ultimi scambi,
+       che sono quelli che dicono di cosa si stava parlando. */
+    maxContesto: 1200,
+  };
+
   /* Le cinque voci fra cui scegliere, una sola.
 
      Le quattro junior portano lo slug di `activities.ts`, e non per ordine: è
@@ -407,6 +442,77 @@ export function initChatAssistente(root, options) {
     );
   }
 
+  // ── Il richiamo telefonico ────────────────────────────────────────────────
+  /**
+   * Compare una volta sola, dopo `RICHIAMO.dopoRisposte` risposte, e solo a chi
+   * non è ancora iscritto. Non è la via d'uscita della `scappatoia()`, che è
+   * scritta e va al desk: questa è una telefonata, e la chiede chi ha letto un
+   * po' e adesso vuole una voce.
+   */
+  var risposteDate = 0;
+  var richiamoOfferto = false;
+
+  /** Quello che finisce nel campo libero del modulo: il contesto della chiamata. */
+  function contestoRichiamo() {
+    var testa = ['Richiesta arrivata dalla chat del sito Athlon.'];
+    /* Il numero anche qui, in chiaro, e non per ridondanza inutile: se il campo
+       del telefono su Calendly non è il «luogo» il parametro va perso, e questa
+       riga è quello che resta da leggere a chi richiama. */
+    if (dati.telefono) testa.push('Telefono: +39 ' + cellulareNudo(dati.telefono));
+    var att = etichettaAttivita();
+    if (att) testa.push('Interesse: ' + att);
+    if (dati.pagina) testa.push('Pagina da cui scrive: ' + dati.pagina);
+
+    var scambi = trascritto.map(function (m) {
+      return (m.ruolo === 'utente' ? 'Persona: ' : 'Assistente: ') + m.testo;
+    });
+    /* Dalla fine verso l'inizio: se non ci sta tutto si taglia il vecchio, che
+       è la parte che serve meno a chi deve richiamare. */
+    var corpo = '';
+    for (var i = scambi.length - 1; i >= 0; i--) {
+      var candidato = scambi[i] + (corpo ? '\n' + corpo : '');
+      if (candidato.length > RICHIAMO.maxContesto) break;
+      corpo = candidato;
+    }
+    return testa.join('\n') + '\n\nConversazione:\n' + (corpo || '(nessuno scambio)');
+  }
+
+  /** Il link con tutto già dentro: chi ci arriva scegle solo giorno e ora. */
+  function linkRichiamo() {
+    var p = new URLSearchParams();
+    var nome = [dati.nome, dati.cognome].filter(Boolean).join(' ');
+    /* Tutte e tre le forme del nome: Calendly usa `name` con il campo unico e
+       `first_name`/`last_name` con i due separati, e quelle di troppo le
+       ignora. Mandarle tutte è l'unico modo di non dipendere da come è
+       configurato un modulo che da qui non si vede. */
+    if (nome) p.set('name', nome);
+    if (dati.nome) p.set('first_name', dati.nome);
+    if (dati.cognome) p.set('last_name', dati.cognome);
+    if (dati.email) p.set('email', dati.email);
+    if (dati.telefono) p.set(RICHIAMO.campi.telefono, '+39' + cellulareNudo(dati.telefono));
+    p.set(RICHIAMO.campi.contesto, contestoRichiamo());
+    return RICHIAMO.url + '?' + p.toString();
+  }
+
+  function proponiRichiamo() {
+    risposteDate++;
+    if (richiamoOfferto || dati.conosciuto) return;
+    if (risposteDate < RICHIAMO.dopoRisposte) return;
+    /* Senza email non c'è niente da precompilare, e un modulo vuoto è una
+       richiesta in più invece di una scorciatoia. */
+    if (!dati.email || !conversazione) return;
+    richiamoOfferto = true;
+    var box = document.createElement('div');
+    box.className = 'ca__richiamo';
+    box.innerHTML =
+      '<p class="ca__richiamo-lead">Preferisci sentirci a voce? Ti richiamiamo noi: scegli giorno e ora, i tuoi dati sono già compilati.</p>' +
+      '<a class="ca__richiamo-btn" href="' +
+      escape(linkRichiamo()) +
+      '" target="_blank" rel="noopener">Prenota una chiamata →</a>';
+    conversazione.appendChild(box);
+    conversazione.scrollTop = conversazione.scrollHeight;
+  }
+
   var ticketInviato = false;
 
   /** Il modulo che compare quando si chiede di essere contattati. */
@@ -577,6 +683,7 @@ export function initChatAssistente(root, options) {
 
       attesa.innerHTML = paragrafi + rimandi + scappatoia(!!risposta.senzaRisposta);
       trascritto.push({ ruolo: 'assistente', testo: risposta.risposta });
+      proponiRichiamo();
     } catch (e) {
       /* Nel modal non c'è la ricerca locale a cui ricadere — quella è rimasta
          nel box della pagina. Qui si dice come stanno le cose e si offre la
