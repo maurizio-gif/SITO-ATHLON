@@ -492,7 +492,12 @@ export const GET: APIRoute = async () => {
     id: 'abbonamento:guest-pass',
     tipo: 'abbonamento',
     titolo: 'Guest Pass — la prova del club',
-    url: `${SITE}/abbonamenti`,
+    /* `/attiva` e non `/abbonamenti`: chi arriva qui dalla chat o dalla ricerca
+       vuole la settimana di prova, e quella pagina è dove si attiva — codice,
+       passaggi, requisiti. Il listino non gli serve, e l'assistente cita
+       l'url della voce così com'è: se qui c'è la pagina sbagliata, la manda
+       lui alla pagina sbagliata. */
+    url: `${SITE}/attiva`,
     area: 'Abbonamenti',
     attivita: [],
     testo: `${GUEST_PASS.giorni} giorni di accesso completo al club a ${GUEST_PASS.prezzo} €, con il codice ${GUEST_PASS.codice}. È riservato a chi non ha e non ha mai avuto un abbonamento Athlon dal ${GUEST_PASS.dal} in poi.`,
