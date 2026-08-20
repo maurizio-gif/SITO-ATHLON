@@ -104,8 +104,15 @@ const pulito = toPlain;
 const capoversi = (parti?: (string | false | null | undefined)[]) =>
   (parti ?? []).filter(Boolean).map((s) => pulito(s as string)).filter(Boolean).join('\n\n');
 
-/** Unisce blocchi già composti saltando quelli vuoti. Non tocca gli a capo. */
-const blocchi = (...parti: (string | false | null | undefined)[]) =>
+/**
+ * Unisce blocchi già composti saltando quelli vuoti. Non tocca gli a capo.
+ *
+ * Accetta anche un numero perché è quello che i chiamanti passano davvero:
+ * `c.punti?.length && blocchi(…)` vale `0` quando l'elenco è vuoto, non
+ * `false`. Il `filter(Boolean)` lo scartava già — era solo la firma a non
+ * dirlo, e sono due dei cinque errori che `tsc` segnalava su questo repo.
+ */
+const blocchi = (...parti: (string | number | false | null | undefined)[]) =>
   parti.filter(Boolean).join('\n\n').trim();
 
 /** Un elenco puntato, o niente se non ci sono voci. */
