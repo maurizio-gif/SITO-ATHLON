@@ -38,7 +38,15 @@ import {
   PLANNING_MONTH,
 } from '../data/planning';
 import { CLUB } from '../data/club';
-import { plans, GUEST_PASS, SOSPENSIONE, activityInfo, SINGOLI, PERSONAL } from '../data/abbonamenti';
+import {
+  plans,
+  GUEST_PASS,
+  SOSPENSIONE,
+  activityInfo,
+  SINGOLI,
+  PERSONAL,
+  ETA_MINIMA_ADULTI,
+} from '../data/abbonamenti';
 import { ACTIVITY_TAGS, ACTIVITY_IDS } from '../data/activities';
 import { AREA_LABELS } from '../data/helpdesk';
 import { vociFaq } from '../data/faq';
@@ -557,9 +565,32 @@ export const GET: APIRoute = async () => {
       url: info.href ? `${SITE}${info.href}` : `${SITE}/abbonamenti`,
       area: 'Attività comprese negli abbonamenti',
       attivita: [],
-      testo: pulito(info.body),
+      /* La soglia d'età in coda a ogni attività per adulti, e non solo in una
+         voce sua: la domanda arriva sempre attaccata a un'attività («posso
+         portare mio figlio al nuoto libero?»), e una regola che sta altrove è
+         una regola che il recupero non pesca. */
+      testo: blocchi(
+        pulito(info.body),
+        `Riservata a chi ha almeno ${ETA_MINIMA_ADULTI.anni} anni: sotto quell'eta' non e' accessibile. Per i piu' piccoli c'e' ${ETA_MINIMA_ADULTI.alternativa}.`
+      ),
     });
   }
+
+  /* La stessa regola anche come voce a se', per le domande che non nominano
+     nessuna attivita' in particolare. */
+  voci.push({
+    id: 'club:eta-minima-adulti',
+    tipo: 'club',
+    titolo: `Eta' minima per le attivita' degli adulti: ${ETA_MINIMA_ADULTI.anni} anni`,
+    url: `${SITE}/abbonamenti`,
+    area: 'Attività comprese negli abbonamenti',
+    attivita: [],
+    testo: blocchi(
+      `**Tutte** le attivita' per adulti sono riservate a chi ha almeno ${ETA_MINIMA_ADULTI.anni} anni: Gym Floor, corsi fitness, Group Reformer, aqua fitness, scuola nuoto adulti, corso gestanti, personal training.`,
+      `**Il nuoto libero non fa eccezione**: sotto i ${ETA_MINIMA_ADULTI.anni} anni non si accede alla vasca in autonomia, nemmeno accompagnati da un genitore iscritto. Non e' una questione di abbonamento, e' una regola d'accesso: non proporre abbonamenti, prove o accessi singoli per aggirarla.`,
+      `Chi ha meno di ${ETA_MINIMA_ADULTI.anni} anni nuota con ${ETA_MINIMA_ADULTI.alternativa}, che e' un corso con l'istruttore in vasca, e prima dei 30 mesi con il Baby Nuoto.`
+    ),
+  });
 
   /* ---- Il club, e come ci si muove -------------------------------------- */
   voci.push({
