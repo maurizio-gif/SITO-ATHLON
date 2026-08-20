@@ -3,7 +3,6 @@ title: Iscrizione Corsi 2026/27
 description: Prezzi, modalità e procedura di iscrizione per la stagione 2026/2027.
 # È la destinazione del percorso junior della chat: ci si arriva dopo aver
 # lasciato i dati, non da una ricerca su Google.
-noindex: true
 area:
   - Scuola Nuoto Bambini
   - News

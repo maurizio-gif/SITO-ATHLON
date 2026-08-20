@@ -10,13 +10,60 @@ export async function getStaticPaths() {
     // The id already carries the folder, so the URL keeps the shape the
     // standalone wiki served: /wikiathlon/<area>/<slug>
     params: { slug: entry.id },
-    props: { entry },
+    /* Tutte le schede vengono passate a ogni pagina: i correlati si calcolano
+       qui, a build time, e non c'è modo di conoscerli guardando una scheda
+       sola. */
+    props: { entry, tutte: articles },
   }));
 }
 
-const { entry } = Astro.props;
+/**
+ * Le schede vicine a questa, e come si decide che lo sono.
+ *
+ * Tre segnali, in ordine di forza. **L'attività** pesa più di tutto: chi legge
+ * della disdetta della scuola nuoto ha in mano un problema di scuola nuoto, e
+ * la disdetta degli abbonamenti adulti non gli serve — è la confusione che
+ * l'Help Desk esiste per evitare. Poi i **tag**, che dicono l'argomento dentro
+ * l'attività: «certificato medico», «prenotazioni», «disdetta». Ultima la
+ * **cartella**, che da sola vuol dire solo «parla dello stesso mondo» e basta a
+ * riempire quando gli altri due non bastano.
+ *
+ * Quattro, non tutte quelle che scattano: una lista lunga sotto un articolo non
+ * è un aiuto, è un altro indice da leggere.
+ */
+function correlate(questa, tutte, quante = 4) {
+  const suoi = (x) => ({
+    attivita: new Set(x.data.attivita ?? []),
+    tag: new Set(x.data.tags ?? []),
+    cartella: x.id.split('/')[0],
+  });
+  const a = suoi(questa);
+  const comuni = (x, y) => [...x].filter((v) => y.has(v)).length;
+
+  return tutte
+    .filter((x) => x.id !== questa.id)
+    .map((x) => {
+      const b = suoi(x);
+      return {
+        entry: x,
+        punti:
+          comuni(a.attivita, b.attivita) * 3 +
+          comuni(a.tag, b.tag) * 2 +
+          (a.cartella === b.cartella ? 1 : 0),
+      };
+    })
+    .filter((x) => x.punti > 0)
+    /* A pari punteggio decide l'`order` del frontmatter, che è l'ordine in cui
+       l'Help Desk le mostra: è già una gerarchia scritta da chi le conosce. */
+    .sort((x, y) => y.punti - x.punti || (x.entry.data.order ?? 99) - (y.entry.data.order ?? 99))
+    .slice(0, quante)
+    .map((x) => x.entry);
+}
+
+const { entry, tutte } = Astro.props;
 const { Content } = await render(entry);
 const d = entry.data;
+const vicine = correlate(entry, tutte);
 
 const areas = Array.isArray(d.area) ? d.area : [d.area];
 const folder = entry.id.split('/')[0];
@@ -57,7 +104,17 @@ const scheda = {
   description={d.description}
   chrome={false}
   ogType="article"
-  noindex={d.noindex}
+  {/* **Tutto l'Help Desk sta fuori dai motori**, non più solo le schede che lo
+      chiedevano nel frontmatter. Sono risposte operative scritte per chi è già
+      del club o ci sta entrando — condizioni, procedure, cosa portare — e la
+      porta da cui si arriva è il box dell'Help Desk o l'assistente, che le
+      leggono comunque perché la conoscenza gliela passa `/kb.json` e non
+      Google. Restano pubbliche e linkabili: `noindex` dice «non mostrarmi nei
+      risultati», non «non farmi leggere».
+
+      La sitemap esclude l'intera cartella, in `astro.config.mjs`: dichiarare una
+      pagina e poi dirle di non indicizzarsi è una contraddizione. */}
+  noindex={true}
   breadcrumb={[{ name: 'Help Desk', path: '/club-life#help-desk' }, { name: d.title, path: `/wikiathlon/${entry.id}/` }]}
   schema={[scheda]}
 >
@@ -89,6 +146,22 @@ const scheda = {
       <div class="wa__body">
         <Content />
       </div>
+
+      {vicine.length > 0 && (
+        <aside class="wa__vicine" aria-labelledby="wa-vicine">
+          <h2 class="wa__vicine-titolo" id="wa-vicine">Se ti serve anche questo</h2>
+          <ul class="wa__vicine-lista">
+            {vicine.map((v) => (
+              <li>
+                <a href={`/wikiathlon/${v.id}/`} class="wa__vicina">
+                  <span class="wa__vicina-titolo">{v.data.title}</span>
+                  <span class="wa__vicina-desc">{v.data.description}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
 
       <a href="/club-life#help-desk" class="wa__back">← Torna all'Help Desk</a>
     </div>
@@ -196,6 +269,72 @@ const scheda = {
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--text-muted);
+  }
+
+  /* ---- Le schede vicine ----
+     Chiudono l'articolo, sopra il ritorno all'Help Desk: chi è arrivato in
+     fondo ha finito di leggere, ed è il punto in cui una domanda nuova gli
+     viene in mente. Sono card in colonna e non una fila di link: il titolo
+     dice l'argomento, la descrizione dice se è il suo caso — senza, sono
+     quattro titoli da indovinare. */
+  .wa__vicine {
+    margin: var(--space-section-sm) 0 0;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--border);
+  }
+
+  /* `--text-lg` come gli h3 del corpo e non `--text-xl` come gli h2: è un
+     titolo di servizio dopo la fine dell'articolo, non un'altra sezione da
+     leggere. Un gradino sotto, e la gerarchia resta leggibile. */
+  .wa__vicine-titolo {
+    margin: 0 0 1rem;
+    font-size: var(--text-lg);
+    --lh: 1.15;
+  }
+
+  .wa__vicine-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .wa__vicina {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 0.85rem;
+    background: var(--color-white);
+    transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease;
+  }
+
+  .wa__vicina:hover {
+    border-color: var(--color-primary);
+    background: var(--color-cream);
+  }
+
+  .wa__vicina-titolo {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-dark);
+  }
+
+  .wa__vicina-desc {
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    color: var(--text-muted);
+  }
+
+  /* Due colonne quando c'è spazio: quattro card in fila verticale su un
+     desktop sono una colonna di vuoto a destra. */
+  @media (min-width: 820px) {
+    .wa__vicine-lista {
+      grid-template-columns: 1fr 1fr;
+      gap: 0.7rem;
+    }
   }
 
   .wa__back {
@@ -392,18 +531,20 @@ const scheda = {
     color: var(--color-dark);
   }
 
-  /* Sul totem verticale (le tre misure sono spiegate in global.css, sotto «Il
-     totem verticale del club») il testo è a scala doppia e una tabella da
-     cinque colonne non entra in 1080px: la pagina scorreva di lato, ed è la cosa
-     peggiore che possa fare su uno schermo fisso. Diventa un blocco che scorre
-     dentro di sé, come la settimana del planning: la pagina sta ferma e la
-     tabella si sfoglia col dito. */
-  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
-    .wa__body :global(table) {
-      display: block;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
+  /* Una tabella che non entra scorre dentro di sé, **a ogni larghezza**.
+     Questa regola era dentro la media query del totem, e sul totem il problema
+     era vero: testo a scala doppia, cinque colonne, 1080 px, la pagina scorreva
+     di lato. Ma su un telefono da 390 px succede identico e lì la regola non
+     arrivava: misurato, `/wikiathlon/adulti/sospensione` scorreva a 546 px per
+     via della tabella delle due sospensioni. Il caso generale è lo stesso —
+     tabella più larga del suo contenitore — e la cura pure, quella della
+     settimana del planning: la pagina sta ferma e la tabella si sfoglia col
+     dito. Senza media query non c'è una larghezza in cui ci si dimentica di
+     applicarla. */
+  .wa__body :global(table) {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .wa__body :global(.ci-btn-primary:hover),
