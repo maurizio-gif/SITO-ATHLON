@@ -80,7 +80,7 @@ export interface Destinatario {
   dominio: string;
   perche: string;
   /**
-   * Esiste solo quando il banner c'è. Elencare Cookiebot fra i destinatari
+   * Esiste solo quando il banner c'è. Elencare CookieYes fra i destinatari
    * mentre il banner non è attivo sarebbe scrivere una cosa falsa in
    * un'informativa, che è il posto peggiore dove scriverne una.
    */
@@ -128,8 +128,8 @@ export const DESTINATARI: Destinatario[] = [
     perche: 'Il tour virtuale della struttura.',
   },
   {
-    nome: 'Cookiebot',
-    dominio: 'consent.cookiebot.com',
+    nome: 'CookieYes',
+    dominio: 'cdn-cookieyes.com',
     perche: 'Raccoglie e conserva la scelta sui cookie, e la ripresenta a ogni visita.',
     soloConBanner: true,
   },
