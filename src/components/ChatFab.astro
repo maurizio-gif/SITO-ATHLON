@@ -3,9 +3,14 @@
  * Il comando fisso della chat: in basso a destra, su ogni pagina.
  *
  * Non è una scorciatoia a una sezione come il vecchio `FloatingHelp`: apre
- * l'assistente, che è la cosa che risponde. Per questo sta **sempre** lì e non
- * dopo la hero — chi ha una domanda l'ha già in testa quando arriva, e non
- * bisogna fargli scorrere una pagina per trovare dove chiederla.
+ * l'assistente, che è la cosa che risponde. Sta su ogni pagina, dalla home al
+ * regolamento, perché una domanda può nascere in qualunque punto.
+ *
+ * **Ma non sul primo schermo**, e questa è una correzione a come era nato: sul
+ * telefono la sua zona è occupata dalla riga dell'area riservata della hero, e
+ * due comandi sovrapposti sono due comandi che non si possono premere. Compare
+ * appena si scorre — un quarto di schermata, un colpo di pollice — e torna via
+ * se si risale in cima, dove la sovrapposizione tornerebbe.
  *
  * La forma sono **due pezzi separati**, ed è deliberato: il pulsante è la bolla
  * tonda e piena, e basta lei a dire dove si clicca; l'invito è testo leggero
@@ -37,6 +42,7 @@
   type="button"
   class="cfab"
   data-cta="assistente"
+  data-cfab
   aria-haspopup="dialog"
   aria-label="Chatta con noi: apri l’assistente del club"
 >
@@ -85,18 +91,31 @@
     color: inherit;
     font-family: var(--font-body);
     cursor: pointer;
-    /* Entra dopo che la pagina si è posata: un pulsante che compare insieme a
-       tutto il resto è un pulsante in mezzo al resto. */
+    /* Non c'è al primo schermo, e non è una preferenza estetica: sul telefono
+       la sua zona è occupata dalla riga dell'area riservata della hero — il
+       pulsante tondo con l'icona utente sta a 48 px dal bordo, esattamente
+       sotto la pastiglia. Due comandi sovrapposti sono due comandi che non si
+       possono premere.
+
+       Quindi compare appena si scorre, e la classe la mette lo script qui
+       sotto. `visibility` insieme all'opacità perché finché non c'è non deve
+       nemmeno essere tabulabile: un pulsante invisibile che intercetta il tab è
+       la stessa cosa che l'assistente ha già imparato a non fare con gli
+       overlay chiusi (vedi AGENTS.md). */
     opacity: 0;
+    visibility: hidden;
     transform: translateY(0.75rem);
-    animation: cfab-entra var(--dur-base, 0.32s) var(--ease-out-crit, ease-out) 0.9s forwards;
+    transition: opacity var(--dur-base, 0.32s) var(--ease-out-crit, ease-out),
+      transform var(--dur-base, 0.32s) var(--ease-out-crit, ease-out),
+      visibility 0s var(--dur-base, 0.32s);
   }
 
-  @keyframes cfab-entra {
-    to {
-      opacity: 1;
-      transform: none;
-    }
+  .cfab.cfab--visibile {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: opacity var(--dur-base, 0.32s) var(--ease-out-crit, ease-out),
+      transform var(--dur-base, 0.32s) var(--ease-out-crit, ease-out), visibility 0s;
   }
 
   /* Con un modal aperto il pulsante non serve e non deve restare sotto la
@@ -253,10 +272,17 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    /* Chi chiede meno movimento chiede meno movimento, non un pulsante che
+       ricompare sopra un altro: la comparsa resta legata allo scorrimento, è la
+       traslazione a sparire. */
     .cfab {
-      opacity: 1;
       transform: none;
-      animation: none;
+      transition: opacity var(--dur-fast, 0.2s) ease, visibility 0s var(--dur-fast, 0.2s);
+    }
+
+    .cfab.cfab--visibile {
+      transform: none;
+      transition: opacity var(--dur-fast, 0.2s) ease, visibility 0s;
     }
 
     .cfab:hover .cfab__bolla {
@@ -273,3 +299,51 @@
     }
   }
 </style>
+
+<script>
+  /**
+   * Il pulsante compare quando si è scorso un po', e torna via in cima.
+   *
+   * La soglia è un quarto dello schermo e non un numero di pixel: quello che
+   * deve uscire dal campo è un elemento nel flusso della hero, quindi si misura
+   * bene in schermate. Un quarto è «appena un po» — un colpo di pollice — e
+   * basta ad allontanare la riga dell'area riservata, che sul telefono finisce
+   * proprio sotto la pastiglia.
+   *
+   * Tornando in cima il pulsante se ne va di nuovo, perché lì la
+   * sovrapposizione ritorna: la regola è simmetrica o non è una regola.
+   *
+   * Un caso da non sbagliare: **una pagina che non scorre**. Se il documento
+   * sta in una schermata non ci sarà mai uno scroll, e un pulsante che aspetta
+   * un evento che non arriverà è un pulsante che non esiste. Lì si mostra
+   * subito, e non c'è nessuna hero sotto cui finire.
+   */
+  (() => {
+    const fab = document.querySelector('[data-cfab]');
+    if (!fab) return;
+
+    const soglia = () => Math.max(100, window.innerHeight * 0.25);
+    const scorribile = () =>
+      document.documentElement.scrollHeight > window.innerHeight + soglia();
+
+    let atteso = false;
+    const decidi = () => {
+      atteso = false;
+      const mostra = !scorribile() || window.scrollY > soglia();
+      fab.classList.toggle('cfab--visibile', mostra);
+    };
+
+    const alloScroll = () => {
+      if (atteso) return;
+      atteso = true;
+      requestAnimationFrame(decidi);
+    };
+
+    /* Al ritorno da un'altra pagina il browser ripristina la posizione prima
+       che questo script parta: si decide subito, non al primo scroll. */
+    decidi();
+    addEventListener('scroll', alloScroll, { passive: true });
+    /* Girare il telefono cambia sia la soglia sia quanto si può scorrere. */
+    addEventListener('resize', alloScroll, { passive: true });
+  })();
+</script>
