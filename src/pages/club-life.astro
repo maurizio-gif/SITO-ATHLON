@@ -4,7 +4,6 @@ import EventiPreview from '../components/eventi/EventiPreview.astro';
 import NewsPreview from '../components/clublife/NewsPreview.astro';
 import HelpDesk from '../components/clublife/HelpDesk.astro';
 import Servizi from '../components/clublife/Servizi.astro';
-import FloatingHelp from '../components/FloatingHelp.astro';
 import { upcomingEvents } from '../data/eventi';
 import { getCollection } from 'astro:content';
 import { fotoHero } from '../data/foto';
@@ -104,7 +103,6 @@ const sections = [
   <HelpDesk id="help-desk" />
 
   {/* Shortcut to the Help Desk, now that it sits at the bottom. */}
-  <FloatingHelp revealAfter=".cl-hero" hideWhenVisible="#help-desk" />
 </Layout>
 
 <style>

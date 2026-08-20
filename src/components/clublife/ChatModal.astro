@@ -244,14 +244,22 @@
 </div>
 
 <script>
-  import { initChatAssistente } from '../../lib/chatAssistente.client.js';
+  /* La logica dell'assistente è un file da parte e si carica al **primo clic**,
+     non al caricamento della pagina: da quando il modal sta in `Layout`, il
+     markup c'è su tutte e settantotto le pagine, e far scaricare a chiunque il
+     codice di una conversazione che la maggior parte non aprirà è esattamente
+     il tipo di peso che questo sito non si prende (vedi AGENTS.md sui font).
+     `import()` dinamico, quindi Vite lo mette in un file suo.
 
+     Il markup invece c'è da subito, ed è la ragione per cui il ritardo non si
+     vede: il passo dell'email è visibile per default, quindi il pannello si
+     apre già scritto mentre il modulo arriva. */
   const modal = document.querySelector<HTMLElement>('#chat-assistente');
 
   if (modal) {
     let ultimoComando: HTMLElement | null = null;
-
-    const chat = initChatAssistente(modal, { onChiudi: () => chiudi() });
+    let chat: { apri: (pagina: string) => void; reset: () => void } | null = null;
+    let inArrivo: Promise<void> | null = null;
 
     function chiudi() {
       modal!.classList.remove('open');
@@ -260,12 +268,22 @@
       ultimoComando?.focus();
     }
 
-    function apri(comando: HTMLElement) {
+    function carica() {
+      if (!inArrivo) {
+        inArrivo = import('../../lib/chatAssistente.client.js').then((m) => {
+          chat = m.initChatAssistente(modal!, { onChiudi: () => chiudi() });
+        });
+      }
+      return inArrivo;
+    }
+
+    async function apri(comando: HTMLElement) {
       ultimoComando = comando;
       modal!.classList.add('open');
       modal!.setAttribute('aria-hidden', 'false');
       document.body.classList.add('amodal-locked');
-      chat.apri(location.pathname);
+      await carica();
+      chat?.apri(location.pathname);
     }
 
     /* Delegato al documento, come per la prova: un comando che apre
@@ -276,6 +294,19 @@
       if (!cta) return;
       e.preventDefault();
       apri(cta);
+    });
+
+    /* Il dito o il puntatore che si avvicina al pulsante è il preavviso che
+       serve: il modulo parte lì, e al clic è già in memoria. Costa una
+       richiesta solo a chi ha davvero avuto l'intenzione. */
+    ['pointerenter', 'focusin', 'touchstart'].forEach((evento) => {
+      document.addEventListener(
+        evento,
+        (e) => {
+          if ((e.target as HTMLElement | null)?.closest?.('[data-cta="assistente"]')) carica();
+        },
+        { passive: true, capture: true }
+      );
     });
 
     modal.querySelectorAll('[data-ca-close]').forEach((el) => el.addEventListener('click', chiudi));

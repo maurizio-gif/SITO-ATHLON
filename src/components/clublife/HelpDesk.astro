@@ -13,7 +13,6 @@ import { clausole, urlClausola } from '../../data/termini';
 import { formatEventDate } from '../../data/eventi';
 import { toPlain, clamp } from '../../data/testo';
 import SupportForm from './SupportForm.astro';
-import ChatModal from './ChatModal.astro';
 
 interface Props {
   id?: string;
@@ -327,7 +326,6 @@ const SUGGESTIONS: Record<string, string[]> = {
     </div>
 
     <SupportForm />
-    <ChatModal />
   </div>
 </section>
 

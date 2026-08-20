@@ -12,7 +12,6 @@ tags:
   - iscrizione
   - "2026"
   - "2027"
-  - stagionale
   - mensile
   - prezzi
   - quota attivazione
@@ -22,11 +21,9 @@ attivita:
   - baby-nuoto
 ---
 <div class="ci-hero">
-  🟢 Preiscrizioni attive dal <strong>1 Maggio</strong> al <strong>31 Luglio 2026</strong><br>
-  📅 Stagione <strong>14 Settembre 2026 – 20 Giugno 2027</strong>
+  📅 Stagione <strong>14 Settembre 2026 – 20 Giugno 2027</strong><br>
+  🟢 Iscrizioni aperte, con <strong>abbonamento mensile</strong>
 </div>
-
-> ⚠️ Dal 1° Agosto 2026 solo abbonamento mensile, senza benefit preiscrizione.
 
 ## Turni disponibili
 
@@ -48,13 +45,13 @@ attivita:
 <details>
 <summary><strong>Visualizza prezzi, pro-rata e dettagli abbonamento</strong></summary>
 
-| Frequenza | **Mensile** | Stagionale | *Equiv. mensile* |
-|:---|:---:|:---:|:---:|
-| Monosettimanale | **€89/mese** * | **€699** in un'unica soluzione | *€77,67/mese* |
-| Bisettimanale | **€109/mese** * | **€850** in un'unica soluzione | *€94,44/mese* |
-| Agonistico / Pallanuoto | **€119/mese** * | **€935** in un'unica soluzione | *€103,89/mese* |
+| Frequenza | Mensile |
+|:---|:---:|
+| Monosettimanale | **€89/mese** |
+| Bisettimanale | **€109/mese** |
+| Agonistico / Pallanuoto | **€119/mese** |
 
-> 💡 Lo stagionale si paga **tutto in anticipo in un'unica soluzione**. L'equivalente mensile è solo indicativo per confronto — non è possibile rateizzarlo.
+> 💡 L'abbonamento è mensile, con rinnovo automatico il giorno 1 di ogni mese (punto 4.11).
 
 **Pro-rata mesi di apertura e chiusura:** per i mesi di Settembre (inizio 14/09) e Giugno (fine 20/06) viene addebitato l'importo proporzionale ai giorni effettivi di frequenza.
 

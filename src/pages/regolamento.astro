@@ -11,7 +11,6 @@
  * punto arrivato si evidenzia da solo.
  */
 import Layout from '../layouts/Layout.astro';
-import FloatingHelp from '../components/FloatingHelp.astro';
 import { TERMINI, TERMINI_VERSIONE, anchorClausola, totaleClausole } from '../data/termini';
 import { ACTIVITY_LABEL } from '../data/activities';
 ---
@@ -127,7 +126,6 @@ import { ACTIVITY_LABEL } from '../data/activities';
   </div>
 
   {/* Il regolamento dice la regola; l'Help Desk spiega come si fa. */}
-  <FloatingHelp href="/club-life#help-desk" revealAfter=".tc-hero" />
 </Layout>
 
 <script>

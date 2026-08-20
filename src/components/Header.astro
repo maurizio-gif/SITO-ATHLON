@@ -206,6 +206,28 @@ const accountBlocks = [
       {...contatta.attrs}
     >{contatta.label}</a>
 
+    {/* Accanto a Contattaci, e non al suo posto: sono le due strade per farsi
+        rispondere, e in questa barra convivono. Solo l'icona, perche' lo spazio
+        e' contato — misurato a 360 px ne restano 88, e la pastiglia di
+        Contattaci ne prende 119: due testi non ci stanno. Piena invece che
+        contornata, cosi' fra le due si vede quale risponde subito. */}
+    <button
+      type="button"
+      class="header-chat-mobile"
+      data-cta="assistente"
+      aria-haspopup="dialog"
+      aria-label="Chatta con noi: apri l’assistente del club"
+      title="Chatta con noi"
+    >
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M20.5 11.6a8 8 0 0 1-8 8H8.3L4 22.4v-4.3a8 8 0 0 1 8.5-14 8 8 0 0 1 8 7.5Z" />
+        <circle cx="9" cy="11.5" r="1.1" fill="currentColor" stroke="none" />
+        <circle cx="12.5" cy="11.5" r="1.1" fill="currentColor" stroke="none" />
+        <circle cx="16" cy="11.5" r="1.1" fill="currentColor" stroke="none" />
+      </svg>
+    </button>
+
     <div class="header-actions">
       <button
         class="acct-btn"
@@ -615,7 +637,8 @@ const accountBlocks = [
   }
 
   /* Mobile-only pill in the bar — desktop keeps the CTA inside the nav. */
-  .header-contact-mobile {
+  .header-contact-mobile,
+  .header-chat-mobile {
     display: none;
   }
 
@@ -1292,7 +1315,9 @@ const accountBlocks = [
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto;
+      /* Auto solo a sinistra: la coppia con la chat resta centrata nella barra
+         come prima ci stava la sola pastiglia. */
+      margin: 0 0 0 auto;
       min-height: 2.75rem;
       padding: 0.625rem 0.875rem;
       /* Arancione del marchio, per scelta: dodici pixel di testo sul bianco
@@ -1310,6 +1335,43 @@ const accountBlocks = [
       line-height: 1;
       text-transform: uppercase;
       white-space: nowrap;
+    }
+
+    /* Il gemello della pastiglia: tonda, piena, senza testo. `auto` a destra
+       per chiudere il centraggio della coppia. Sopra l'overlay del menu come
+       tutto quello che sta nella barra, perche' col menu aperto una domanda si
+       fa comunque. */
+    .header-chat-mobile {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 0 0;
+      width: 2.75rem;
+      height: 2.75rem;
+      flex-shrink: 0;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: var(--color-white);
+      cursor: pointer;
+      transition: transform var(--dur-press) ease;
+    }
+
+    .header-chat-mobile:active {
+      transform: scale(0.94);
+    }
+
+    /* Sotto i 360 px non ci sta: la barra ne lascia liberi 48 e questo ne
+       chiede 44 piu' il divario. Chi ha uno schermo cosi' la chat la trova
+       comunque nel pulsante fisso in basso a destra, che non dipende dalla
+       barra. */
+    @media (max-width: 359px) {
+      .header-chat-mobile {
+        display: none;
+      }
     }
 
     .header-actions {
