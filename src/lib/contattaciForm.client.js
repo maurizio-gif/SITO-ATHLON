@@ -45,7 +45,7 @@
 // un contatto in più da verificare a mano che una richiesta persa per un
 // timeout.
 
-import { WEBHOOK_VERIFICA, WEBHOOK_CONTATTO, PREISCRIZIONI, MACRO_BY_ID } from '../data/contatto';
+import { WEBHOOK_VERIFICA, WEBHOOK_CONTATTO, PREISCRIZIONI, MACRO_BY_ID, ATTIVITA_ADULTI } from '../data/contatto';
 import { CALENDLY } from '../data/calendly';
 import { montaCalendario } from './calendario.client.js';
 
@@ -101,6 +101,8 @@ export function initContattaciForm(root, options) {
       origine: '',
       cta: '',
       attivitaOrigine: '',
+      /* L'area dedotta dal pulsante di partenza, se c'era. */
+      macroDaCta: '',
     };
   }
   var dati = stato();
@@ -181,6 +183,46 @@ export function initContattaciForm(root, options) {
   /** Da dove si è arrivati, per il pulsante «indietro» di ogni passo. */
   var storia = [];
 
+  /**
+   * Gli occhielli dei passi, e perché non sono scritti nel markup.
+   *
+   * Il totale cambia: con l'area già scelta dal pulsante di partenza i passi
+   * sono due, altrimenti tre. Un «Passo 1 di 3» stampato nell'HTML sarebbe
+   * diventato una bugia esattamente nel caso che abbiamo appena aggiunto — e
+   * un contatore che mente è peggio di un contatore assente, perché chi legge
+   * si prepara a una schermata che non arriva.
+   */
+  function numeraPassi() {
+    var salta = !!dati.macroDaCta;
+    qa('[data-cf-passo]').forEach(function (el) {
+      var n = parseInt(el.dataset.cfPasso, 10);
+      if (salta) n -= 1;
+      el.textContent = 'Passo ' + n + ' di ' + (salta ? 2 : 3);
+      // Con l'area già scelta il passo «1» non esiste: il suo occhiello
+      // sparisce invece di dire «Passo 0».
+      el.hidden = n < 1;
+    });
+  }
+
+  /** La riga «stai scrivendo per …», e l'occhiello del primo passo. */
+  function mostraContesto() {
+    var riga = q('[data-cf-contesto]');
+    var area = q('[data-cf-contesto-area]');
+    var occhiello = q('[data-cf-occhiello]');
+    var macro = dati.macroDaCta ? MACRO_BY_ID[dati.macroDaCta] : null;
+    if (riga) riga.hidden = !macro;
+    if (macro) {
+      /* L'etichetta dell'attività precisa quando c'è, l'area quando non c'è:
+         chi arriva dalla pagina del reformer legge «Group Reformer», non
+         «Adulti», perché è quello che ha in mente. */
+      var precisa = ATTIVITA_ADULTI.filter(function (a) { return a.id === dati.attivitaOrigine; })[0];
+      if (area) area.textContent = precisa ? precisa.label : macro.label;
+      if (occhiello) occhiello.textContent = 'Richiesta · ' + macro.label;
+    } else if (occhiello) {
+      occhiello.textContent = 'Richiesta al team';
+    }
+  }
+
   function mostraStep(nome, senzaStoria) {
     if (!senzaStoria && attuale !== nome) storia.push(attuale);
     attuale = nome;
@@ -259,6 +301,15 @@ export function initContattaciForm(root, options) {
       segnala(campoEmail);
       return;
     }
+
+    if (dati.macroDaCta) {
+      /* `storia` finta di proposito: «Indietro» dal ramo porta alla scelta
+         dell'area, non all'email. Chi è arrivato dalla pagina della pallanuoto
+         e voleva chiedere d'altro ha comunque una strada, senza ricominciare. */
+      storia = ['macro'];
+      scegliMacro(dati.macroDaCta);
+      return;
+    }
     mostraStep('macro');
   }
 
@@ -279,6 +330,27 @@ export function initContattaciForm(root, options) {
     });
   }
 
+  /**
+   * L'area, dedotta dal pulsante da cui si è partiti.
+   *
+   * I comandi delle pagine junior portano `data-cta-activity` con lo slug del
+   * corso — `pallanuoto`, `scuola-nuoto-bambini` — che è lo stesso vocabolario
+   * di `activities.ts` e quindi lo stesso degli `id` delle macro. Chi arriva da
+   * lì ha **già detto** di cosa vuole parlare, e richiederlo è la domanda che
+   * fa chiudere il pannello: il passo si salta.
+   *
+   * Per un'attività per adulti — `gym-floor`, `reformer` — la macro è `adulti` e
+   * lo slug diventa la pastiglia già spuntata al passo dopo. Oggi non ci sono
+   * comandi `resolve` sulle pagine adulti, ma il giorno che ci saranno funziona
+   * senza toccare niente.
+   */
+  function macroDa(attivita) {
+    if (!attivita) return '';
+    if (MACRO_BY_ID[attivita]) return attivita;
+    var adulta = ATTIVITA_ADULTI.some(function (a) { return a.id === attivita; });
+    return adulta ? 'adulti' : '';
+  }
+
   // ── Passo 2: la macro attività, e il bivio ────────────────────────────────
   function scegliMacro(id) {
     var macro = MACRO_BY_ID[id];
@@ -293,6 +365,13 @@ export function initContattaciForm(root, options) {
     if (livello) livello.hidden = macro.ramo !== 'junior';
 
     if (macro.ramo === 'adulti') {
+      /* L'attività da cui si è partiti è già spuntata: una pastiglia sola,
+         non tutte — chi arriva dalla pagina del reformer vuole parlare del
+         reformer, e può aggiungerne altre se gli servono. */
+      if (dati.attivitaOrigine) {
+        var chip = q('[data-cf-attivita][value="' + dati.attivitaOrigine + '"]');
+        if (chip) chip.checked = true;
+      }
       mostraStep('adulti');
       return;
     }
@@ -534,6 +613,7 @@ export function initContattaciForm(root, options) {
       origine: dati.origine,
       cta: dati.cta,
       attivitaOrigine: dati.attivitaOrigine,
+      macroDaCta: dati.macroDaCta,
       utm: utm(),
       vid: vid(),
     };
@@ -653,6 +733,18 @@ export function initContattaciForm(root, options) {
   var btnInviaGenitore = q('[data-cf-invia-genitore]');
   if (btnInviaGenitore) btnInviaGenitore.addEventListener('click', inviaGenitore);
 
+  /* «cambia» rinuncia alla preselezione: da qui in poi i passi tornano tre, e
+     il contatore lo dice. */
+  var btnCambia = q('[data-cf-contesto-cambia]');
+  if (btnCambia) {
+    btnCambia.addEventListener('click', function () {
+      dati.macroDaCta = '';
+      numeraPassi();
+      mostraContesto();
+      mostraStep('macro');
+    });
+  }
+
   qa('[data-cf-indietro]').forEach(function (btn) {
     btn.addEventListener('click', indietro);
   });
@@ -692,6 +784,8 @@ export function initContattaciForm(root, options) {
       if (steps[k]) pulisciErrore(steps[k]);
     });
     storia = [];
+    numeraPassi();
+    mostraContesto();
     root.classList.remove('cf--largo');
     if (calendario) {
       calendario.distruggi();
@@ -709,6 +803,9 @@ export function initContattaciForm(root, options) {
       dati.origine = origine || '';
       dati.cta = cta || '';
       dati.attivitaOrigine = attivita || '';
+      dati.macroDaCta = macroDa(dati.attivitaOrigine);
+      numeraPassi();
+      mostraContesto();
       mostraStep('email', true);
     },
     reset: function () {

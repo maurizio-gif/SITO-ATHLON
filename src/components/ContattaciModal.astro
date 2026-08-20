@@ -57,8 +57,22 @@ import {
         Chi vuole una risposta ora ha la chat un clic più in là, e chi vuole
         parlare con qualcuno non deve passare da un assistente per arrivarci. */}
     <section class="cf__step" id="cf-step-email">
-      <span class="cf__eyebrow">Richiesta al team</span>
+      <span class="cf__eyebrow" data-cf-occhiello>Richiesta al team</span>
       <h3 class="cf__title" id="cf-titolo-corrente" tabindex="-1" data-cf-fuoco>Contatta il nostro team.</h3>
+
+      {/* Il contesto, quando si arriva da un pulsante che lo dichiara — «trova
+          il corso giusto per tuo figlio» sulla scuola nuoto, «richiedi la prova
+          di inserimento» sulla pallanuoto. Compare solo in quel caso.
+
+          Serve a tre cose insieme, ed è il motivo per cui la scelta si mostra
+          invece di sparire: conferma che è il posto giusto, spiega perché le
+          domande sono due e non tre, e lascia la via d'uscita a chi voleva
+          chiedere d'altro. Saltare una domanda in silenzio è peggio che
+          farla. */}
+      <p class="cf__contesto" data-cf-contesto hidden>
+        <span>Stai scrivendo per <strong data-cf-contesto-area></strong></span>
+        <button type="button" class="cf__contesto-cambia" data-cf-contesto-cambia>cambia</button>
+      </p>
       {/* Niente promesse di telefonate qui, e non è prudenza: il calendario
           del richiamo **non** compare a tutti. Chi ha già un'anagrafica sul
           portale e chiede dei corsi junior finisce sulla schermata del reset
@@ -98,7 +112,7 @@ import {
         richiesta di un adulto e l'iscrizione di un bambino di tre mesi non
         hanno una domanda in comune. */}
     <section class="cf__step" id="cf-step-macro" hidden>
-      <span class="cf__eyebrow">Passo 1 di 3</span>
+      <span class="cf__eyebrow" data-cf-passo="1">Passo 1 di 3</span>
       <h3 class="cf__title" tabindex="-1" data-cf-fuoco>Di cosa vuoi parlare?</h3>
       <p class="cf__lead">Scegli l'area: le domande dopo cambiano, e così non te ne facciamo di inutili.</p>
 
@@ -116,7 +130,7 @@ import {
 
     {/* ── 3a. Adulti: attività e richiesta ───────────────────────────────── */}
     <section class="cf__step" id="cf-step-adulti" hidden>
-      <span class="cf__eyebrow">Passo 2 di 3</span>
+      <span class="cf__eyebrow" data-cf-passo="2">Passo 2 di 3</span>
       <h3 class="cf__title" tabindex="-1" data-cf-fuoco>Cosa ti interessa?</h3>
       <p class="cf__lead">Anche più di una. Poi scrivici cosa vuoi sapere.</p>
 
@@ -147,7 +161,7 @@ import {
 
     {/* ── 4a. Adulti: i dati ─────────────────────────────────────────────── */}
     <section class="cf__step" id="cf-step-dati" hidden>
-      <span class="cf__eyebrow">Passo 3 di 3</span>
+      <span class="cf__eyebrow" data-cf-passo="3">Passo 3 di 3</span>
       <h3 class="cf__title" tabindex="-1" data-cf-fuoco>I tuoi dati.</h3>
       <p class="cf__lead">Servono per risponderti, e per riconoscerti se ci scrivi di nuovo.</p>
 
@@ -189,7 +203,7 @@ import {
         nome del genitore. Le tre domande sul nuoto valgono per la scuola
         nuoto, l'agonistico e la pallanuoto — non per il baby. */}
     <section class="cf__step" id="cf-step-bambino" hidden>
-      <span class="cf__eyebrow">Passo 2 di 3</span>
+      <span class="cf__eyebrow" data-cf-passo="2">Passo 2 di 3</span>
       <h3 class="cf__title" tabindex="-1" data-cf-fuoco>Parlaci di lui o lei.</h3>
       <p class="cf__lead">Sono i dati con cui la direzione tecnica trova il gruppo giusto.</p>
 
@@ -239,7 +253,7 @@ import {
 
     {/* ── 4b. Junior e baby: il genitore ─────────────────────────────────── */}
     <section class="cf__step" id="cf-step-genitore" hidden>
-      <span class="cf__eyebrow">Passo 3 di 3</span>
+      <span class="cf__eyebrow" data-cf-passo="3">Passo 3 di 3</span>
       <h3 class="cf__title" tabindex="-1" data-cf-fuoco>E di te.</h3>
       <p class="cf__lead">
         L'iscrizione di un minore si intesta a un adulto: sei tu il titolare del nucleo sul portale.
@@ -437,15 +451,25 @@ import {
     daIndirizzo();
     window.addEventListener('hashchange', daIndirizzo);
 
-    // Ogni comando di contatto del sito porta già data-cta="talk" da `cta.ts`:
-    // si intercetta lì, e i quattro punti — header, barra mobile, footer,
-    // /attiva, /promo — non hanno niente da cambiare. L'ascolto è delegato al
-    // documento e non attaccato a ogni pulsante, perché alcune CTA vivono
-    // dentro stringhe HTML (le risposte delle FAQ) e potrebbero comparire dopo
-    // il caricamento. L'href resta come ripiego senza JavaScript.
+    /* Due categorie di comandi, non una.
+       - `talk` è «parlare con una persona»: header, barra mobile, footer,
+         /attiva, /promo.
+       - `resolve` è «ho una domanda precisa e voglio la risposta», ed è quello
+         che portano i pulsanti delle quattro pagine junior — «trova il corso
+         giusto per tuo figlio», «richiedi la prova di inserimento». Andavano al
+         modulo n8n in una scheda nuova; ora aprono questo form, che è
+         esattamente quello che `cta.ts` prevedeva per loro.
+
+       `explore` e `member` restano fuori di proposito: il primo porta a
+       un'ancora della stessa pagina, il secondo al portale di chi è già
+       iscritto — nessuno dei due è una richiesta al desk.
+
+       L'ascolto è delegato al documento e non attaccato a ogni pulsante, perché
+       alcune CTA vivono dentro stringhe HTML (le risposte delle FAQ) e
+       potrebbero comparire dopo il caricamento. */
     document.addEventListener('click', (e) => {
       const target = e.target as HTMLElement | null;
-      const cta = target?.closest<HTMLElement>('[data-cta="talk"]');
+      const cta = target?.closest<HTMLElement>('[data-cta="talk"], [data-cta="resolve"]');
       if (!cta) return;
       e.preventDefault();
       apri(cta);
@@ -885,6 +909,41 @@ import {
     color: var(--text-muted);
     font-size: var(--text-2xs);
     text-align: center;
+  }
+
+  /* ---- Il contesto di partenza ----
+     Una pastiglia bassa e chiara, non un avviso: è un'informazione che
+     conferma, non un problema da risolvere. Il «cambia» è un pulsante di
+     testo perché è quello che fa — riporta al passo della scelta. */
+  .cf__contesto {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0 0 1.25rem;
+    padding: 0.6rem 0.85rem;
+    border-radius: 0.7rem;
+    background: var(--color-cream);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .cf__contesto strong {
+    color: var(--color-dark);
+  }
+
+  .cf__contesto-cambia {
+    min-height: 1.75rem;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--color-primary);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
   }
 
   /* ---- L'alternativa: la chat ----
