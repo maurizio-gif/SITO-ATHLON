@@ -211,12 +211,21 @@ il reset. Il lavoro buttato in un punto dove le persone si fermano. Quindi la
 domanda si fa prima, con la stessa forma degli altri form del sito: un campo
 email, la verifica, e da lì due strade.
 
-- **Ha un account** (`Member` o `Guest`) → non si registra: reset password e
-  login, e **la procedura scritta** — entra, apri *Abbonamenti*, tocca *Aggiungi
+- **Ha un account** (`Member` o `Guest`) → non si registra: rientra, e con **la
+  procedura scritta** — accedi, apri *Abbonamenti*, tocca *Aggiungi
   abbonamento*. Le tre righe non sono ridondanza: fin qui la persona comprava
   con due click, e la si manda in un'altra applicazione a cercarsi la voce nel
   menu. Senza, «fai il login e scegli l'abbonamento» è un compito, non
   un'istruzione.
+
+  **L'accesso è l'azione, il reset è la deviazione**, e l'ordine conta: il
+  comando pieno porta al login, il reset sta sotto in corpo piccolo. Dare il
+  pulsante pieno al reset diceva «la tua password non funziona» a chi ce l'ha
+  nel gestore. Il link del reset è `inline-block` e non in linea, perché il
+  `padding` verticale su un elemento in linea non riserva spazio: sborderebbe
+  sul pulsante sopra e, venendo dopo nel documento, ne rubberebbe i click sul
+  bordo inferiore. Misurato: 45 px di bersaglio sul telefono, 12 px di distanza
+  dal pulsante.
 - **Lead, sconosciuto, verifica in errore o in timeout** → si va su PerfectGym,
   all'indirizzo che il pulsante portava già, col suo `PaymentPlanId`.
 

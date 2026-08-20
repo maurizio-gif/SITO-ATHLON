@@ -78,9 +78,14 @@ import { PORTALE } from '../data/contatto';
 
     {/* ── 2. Ha già un account ─────────────────────────────────────────────
         Non è un vicolo cieco ed è importante che non lo sembri: è la strada
-        corta. Il reset password è l'azione primaria perché è quella che serve a
-        chi non si ricorda di avere un account — cioè quasi tutti quelli che
-        arrivano qui.
+        corta.
+
+        **L'accesso è l'azione, il reset è la deviazione.** Entrare nel portale è
+        dove la persona deve arrivare; reimpostare la password è un passaggio in
+        più che serve solo a chi non se la ricorda. Dare al reset il pulsante
+        pieno diceva l'opposto — «la tua password non funziona» — a chi magari
+        ce l'ha in gestore. Quindi il comando pieno porta al login e il reset sta
+        sotto, più piccolo, dov'è la domanda che se lo fa venire in mente.
 
         E la procedura è **scritta**, i tre passi che servono dentro il portale.
         Non è ridondanza: fin qui la persona stava per comprare un abbonamento
@@ -96,10 +101,11 @@ import { PORTALE } from '../data/contatto';
       </p>
 
       <ol class="is__passi">
-        <li>
-          <strong>Entra nel portale</strong> con questa email. Se non ricordi la password,
-          reimpostala qui sotto: arriva una mail e ci vuole un minuto.
-        </li>
+        {/* Il primo passo dice le stesse parole del pulsante — «accedi al
+            portale» — perché è quel pulsante. Nominare l'azione in due modi
+            diversi fa cercare un terzo comando. E la password non si nomina qui:
+            la sua riga sta sotto il pulsante, che è dove serve. */}
+        <li><strong>Accedi al portale</strong> con questa email.</li>
         <li>Nel menu del tuo account apri <strong>Abbonamenti</strong>.</li>
         <li>
           Tocca <strong>Aggiungi abbonamento</strong> e scegli il tuo: trovi gli stessi piani e gli
@@ -108,12 +114,16 @@ import { PORTALE } from '../data/contatto';
       </ol>
 
       <div class="is__azioni">
-        <a class="btn btn-primary is__btn" href={PORTALE.reset} target="_blank" rel="noopener noreferrer">
-          Reimposta la password →
+        <a class="btn btn-primary is__btn" href={PORTALE.login} target="_blank" rel="noopener noreferrer">
+          Accedi al portale →
         </a>
-        <a class="is__link" href={PORTALE.login} target="_blank" rel="noopener noreferrer">
-          Entro nel portale
-        </a>
+        {/* Il link resta sulla riga della domanda: a capo, Astro toglierebbe lo
+            spazio e il testo direbbe «password?Richiedi il reset». Qui la
+            spaziatura del `padding` lo nasconderebbe all'occhio ma non a chi
+            legge con la voce. */}
+        <p class="is__reset">
+          Non ricordi la password? <a href={PORTALE.reset} target="_blank" rel="noopener noreferrer">Richiedi il reset</a>
+        </p>
       </div>
 
       {/* La via di ritorno, e non è una gentilezza in più: il campo email arriva
@@ -314,20 +324,34 @@ import { PORTALE } from '../data/contatto';
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 0.6rem;
+    gap: 0.75rem;
   }
 
-  /* Un comando a forma di link, quindi la sua altezza da tocco la prende da qui
-     e non dalla lista di `global.css`: quella è un elenco esplicito, e questo
-     non c'era. */
-  .is__link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 3rem;
-    font-size: var(--text-sm);
+  /* Il reset, subordinato al pulsante d'accesso: una domanda in corpo piccolo
+     col comando dentro. Piccolo all'occhio, non piccolo al dito — e le due cose
+     stanno insieme solo grazie a `inline-block`.
+     Il link è `inline-block` e non in linea perché il `padding` verticale su un
+     elemento in linea **non riserva spazio**: sborda sui vicini, e siccome il
+     link viene dopo nel documento vincerebbe il colpo sopra il bordo inferiore
+     di «Accedi al portale» — cioè chi mira al pulsante pieno finirebbe sul
+     reset. Così invece il paragrafo cresce e i due bersagli non si toccano.
+     Misurato: 45 px sul telefono, 76 sul totem, senza cambiare il corpo del
+     testo. */
+  .is__reset {
+    /* Lo spazio lo dà il `gap` del contenitore: un margine qui si sommerebbe. */
+    margin: 0;
+    text-align: center;
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    color: rgba(39, 36, 35, 0.7);
+  }
+
+  .is__reset a {
+    display: inline-block;
+    padding: 0.8rem 0.4rem;
     font-weight: 600;
-    color: var(--color-dark);
+    color: var(--accent-text);
+    text-decoration: underline;
   }
 
   .is__nota {
