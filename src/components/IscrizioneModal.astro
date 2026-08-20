@@ -80,15 +80,32 @@ import { PORTALE } from '../data/contatto';
         Non è un vicolo cieco ed è importante che non lo sembri: è la strada
         corta. Il reset password è l'azione primaria perché è quella che serve a
         chi non si ricorda di avere un account — cioè quasi tutti quelli che
-        arrivano qui. */}
+        arrivano qui.
+
+        E la procedura è **scritta**, i tre passi che servono dentro il portale.
+        Non è ridondanza: fin qui la persona stava per comprare un abbonamento
+        con due click, e la si sta mandando in un'altra applicazione a cercarlo
+        da sola. Senza le tre righe, «fai il login e scegli l'abbonamento» è un
+        compito, non un'istruzione — e chi non trova la voce nel menu chiude. */}
     <section class="is__step" id="is-step-portale" hidden>
       <span class="is__eyebrow">Ci risulti già registrato</span>
       <h3 class="is__title" tabindex="-1" data-is-fuoco>Hai già un account.</h3>
       <p class="is__lead">
-        Questa email è già sul portale Athlon, quindi non serve registrarsi di nuovo: entra nel tuo
-        account e da lì <strong>scegli l'abbonamento</strong>. Se non ricordi la password, la
-        reimposti in un minuto.
+        Questa email è già sul portale Athlon, quindi non serve registrarsi di nuovo:
+        l'abbonamento lo <strong>scegli da dentro il tuo account</strong>, in tre passi.
       </p>
+
+      <ol class="is__passi">
+        <li>
+          <strong>Entra nel portale</strong> con questa email. Se non ricordi la password,
+          reimpostala qui sotto: arriva una mail e ci vuole un minuto.
+        </li>
+        <li>Nel menu del tuo account apri <strong>Abbonamenti</strong>.</li>
+        <li>
+          Tocca <strong>Aggiungi abbonamento</strong> e scegli il tuo: trovi gli stessi piani e gli
+          stessi prezzi di questa pagina.
+        </li>
+      </ol>
 
       <div class="is__azioni">
         <a class="btn btn-primary is__btn" href={PORTALE.reset} target="_blank" rel="noopener noreferrer">
@@ -107,8 +124,8 @@ import { PORTALE } from '../data/contatto';
           l'uscita rara, non l'azione. */}
       <p class="is__nota">
         Non è la tua email? <button type="button" class="is__ripeti" data-is-ripeti>Provane un'altra</button>.
-        Se pensi di non avere un account con questo indirizzo, scrivi a
-        <a href="mailto:desk@athlonroma.it">desk@athlonroma.it</a> e lo controlliamo noi.
+        Se pensi di non avere un account con questo indirizzo,
+        scrivi a <a href="mailto:desk@athlonroma.it">desk@athlonroma.it</a> e lo controlliamo noi.
       </p>
     </section>
   </div>
@@ -244,6 +261,53 @@ import { PORTALE } from '../data/contatto';
     width: 100%;
     margin-top: 1rem;
     min-height: 3.25rem;
+  }
+
+  /* I tre passi dentro il portale. Il numero è un contatore e non una cifra
+     scritta a mano, così aggiungere o togliere un passo non lascia indietro una
+     numerazione sbagliata.
+     La pastiglia è **posizionata**, non una colonna di griglia: `display: grid`
+     sul `li` promuove a elemento di griglia ogni figlio in linea, quindi lo
+     `<strong>` finiva in una cella e il testo dopo di lui in un'altra — larga
+     1,75 rem, cioè un carattere per riga. Il testo del passo deve restare flusso
+     in linea, e l'unico modo è che il `li` resti un blocco. */
+  .is__passi {
+    counter-reset: ispasso;
+    list-style: none;
+    display: grid;
+    gap: 0.7rem;
+    margin: 0 0 1.35rem;
+    padding: 0;
+  }
+
+  .is__passi li {
+    counter-increment: ispasso;
+    position: relative;
+    padding-left: 2.4rem;
+    min-height: 1.6rem;
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  /* Centrata sulla prima riga, e ricavata dall'interlinea invece di essere
+     spostata a occhio: se `--text-sm` cambia, la pastiglia resta al suo posto. */
+  .is__passi li::before {
+    content: counter(ispasso);
+    position: absolute;
+    left: 0;
+    top: calc((1.5em - 1.6rem) / 2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: var(--accent-fill);
+    color: var(--color-white);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    line-height: 1;
   }
 
   .is__azioni {

@@ -212,7 +212,11 @@ domanda si fa prima, con la stessa forma degli altri form del sito: un campo
 email, la verifica, e da lì due strade.
 
 - **Ha un account** (`Member` o `Guest`) → non si registra: reset password e
-  login, e l'abbonamento lo fa da dentro.
+  login, e **la procedura scritta** — entra, apri *Abbonamenti*, tocca *Aggiungi
+  abbonamento*. Le tre righe non sono ridondanza: fin qui la persona comprava
+  con due click, e la si manda in un'altra applicazione a cercarsi la voce nel
+  menu. Senza, «fai il login e scegli l'abbonamento» è un compito, non
+  un'istruzione.
 - **Lead, sconosciuto, verifica in errore o in timeout** → si va su PerfectGym,
   all'indirizzo che il pulsante portava già, col suo `PaymentPlanId`.
 
