@@ -84,20 +84,6 @@ export interface CorsoJunior {
    */
   ctaIntent?: 'junior_info' | 'insertion_trial';
   /**
-   * Una destinazione esterna al posto del form, per il caso in cui la richiesta
-   * **non è** una richiesta.
-   *
-   * Esiste per il Baby Nuoto e solo per lui: là il pulsante dice «Registrati
-   * per prenotare», e non è un modo di dire — le lezioni si prenotano a turno
-   * dal portale, quindi la cosa che serve davvero è l'account, non una risposta
-   * del desk. Passare dal form vorrebbe dire far scrivere una richiesta a chi
-   * ha già capito cosa fare, e fargliela aspettare.
-   *
-   * Sulle altre tre pagine il pulsante chiede orari, costi o una prova di
-   * inserimento: quelle sono domande, e restano al form.
-   */
-  ctaEsterna?: string;
-  /**
    * Il Metodo Athlon: i passaggi che il club fa e può dimostrare. Esiste solo
    * per la Scuola Nuoto Bambini, che è l'attività con un metodo documentato —
    * gruppi definiti in vasca, istruttore assegnato, progressione consultabile,
@@ -170,10 +156,27 @@ export const JUNIOR: CorsoJunior[] = [
     claim: 'In acqua con te, dai tre mesi.',
     cta: 'Registrati per prenotare',
     ctaIntent: 'junior_info',
-    /* Il portale, non il form. `Registration` e non `Login`: chi arriva da
-       questa pagina l'account non ce l'ha — se ce l'ha entra dall'icona
-       dell'area riservata, che è due centimetri più in alto in ogni pagina. */
-    ctaEsterna: 'https://athlon.perfectgym.com/ClientPortal2/#/Registration',
+    /* **Questo pulsante non va al portale, e non è una svista.** L'etichetta
+       dice «registrati», quindi la scorciatoia sembra ovvia: mandare al
+       `#/Registration` di PerfectGym e far creare l'account da sé. È sbagliato,
+       ed è il tipo di errore che si scopre a valle.
+
+       Per prenotare una lezione di baby nuoto servono **due** anagrafiche
+       legate: il genitore e il bambino, con il bambino dentro il nucleo
+       famigliare del genitore. La registrazione del portale ne crea una sola,
+       quella di chi la compila — e un genitore senza il figlio nel nucleo non
+       ha niente da prenotare, quindi torna indietro o chiama.
+
+       Le due anagrafiche le crea il form, o meglio l'automazione dietro di
+       lui: è il ramo `nucleo` di `athlon-contatto-compilato`, che chiama
+       `AddGuestMember` per il genitore e poi di nuovo per il figlio passando il
+       `parentMemberId`. Sono le stesse due chiamate che facevano
+       `INSERIMENTO GENITORE` e `INSERIMENTO FIGLIO` nel form n8n di prima, ed è
+       la ragione per cui quel percorso esiste.
+
+       Chi l'account ce l'ha già arriva comunque dove deve: il form lo riconosce
+       dall'email e gli mostra la schermata del reset password, con la nota su
+       dove trovare il figlio nel nucleo. */
     hero: `${U}/2024/08/P1160529.jpg`,
     fuoco: '50% 35%',
 

@@ -34,17 +34,7 @@ const { corso } = Astro.props;
 
    L'`href` resta per chi non ha JavaScript e per il clic col tasto centrale, e
    porta all'Help Desk come tutte le altre CTA di contatto del sito. */
-const FORM = corso.ctaEsterna ?? TALK.href;
-
-/* Con una destinazione esterna il comando esce dal sito, quindi scheda nuova —
-   e soprattutto **non** porta `data-cta="resolve"`, altrimenti il modal lo
-   intercetterebbe e la scheda non si aprirebbe mai. `member` è il tipo giusto:
-   la destinazione è il portale, che è lo strumento con cui si usa il club. */
-const ESTERNA = Boolean(corso.ctaEsterna);
-const CTA_ATTRS_FUORI = ctaAttrs('member', 'portal_registration', {
-  activity: corso.slug,
-  source: `/${corso.slug}`,
-});
+const FORM = TALK.href;
 /* L'etichetta dei pulsanti è quella della pagina originale: sul Baby Nuoto si
    registra un account per poter prenotare, sulle altre si chiedono turni e
    costi, e le due cose non si dicono allo stesso modo. */
@@ -84,13 +74,7 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
     <span class="eyebrow">{corso.eta}</span>
     <h1 class="ju-hero__title">{corso.nome}</h1>
     {corso.claim && <p class="ju-hero__lede">{corso.claim}</p>}
-    <a
-      href={FORM}
-      class="btn btn-primary ju-hero__cta"
-      target={ESTERNA ? '_blank' : undefined}
-      rel={ESTERNA ? 'noopener noreferrer' : undefined}
-      {...(ESTERNA ? CTA_ATTRS_FUORI : CTA_ATTRS)}
-    >
+    <a href={FORM} class="btn btn-primary ju-hero__cta" {...CTA_ATTRS}>
       {CTA} →
     </a>
   </div>
@@ -115,13 +99,7 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
         <div>
           <h2 class="ju-sec__title ju-intro__title" data-anim="reveal">{corso.titoloIntro}</h2>
           {corso.intro.map((p) => <p class="ju-sec__sub">{p}</p>)}
-          <a
-            href={FORM}
-            class="btn btn-primary ju-cta__btn"
-            target={ESTERNA ? '_blank' : undefined}
-            rel={ESTERNA ? 'noopener noreferrer' : undefined}
-            {...(ESTERNA ? CTA_ATTRS_FUORI : CTA_ATTRS)}
-          >
+          <a href={FORM} class="btn btn-primary ju-cta__btn" {...CTA_ATTRS}>
             {CTA} →
           </a>
         </div>
@@ -142,13 +120,7 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
         <h2 class="ju-sec__title" data-anim="reveal">{corso.titoloIntro}</h2>
         {corso.intro.map((p) => <p class="ju-sec__sub">{p}</p>)}
         <div class="ju-cta">
-          <a
-            href={FORM}
-            class="btn btn-primary"
-            target={ESTERNA ? '_blank' : undefined}
-            rel={ESTERNA ? 'noopener noreferrer' : undefined}
-            {...(ESTERNA ? CTA_ATTRS_FUORI : CTA_ATTRS)}
-          >
+          <a href={FORM} class="btn btn-primary" {...CTA_ATTRS}>
             {CTA} →
           </a>
           {corso.adesione && <a href="#iscrizione" class="ju-link">Quanto costa →</a>}
@@ -384,10 +356,7 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
             <a
               href={FORM}
               class="ju-via__cta"
-              target={ESTERNA ? '_blank' : undefined}
-              rel={ESTERNA ? 'noopener noreferrer' : undefined}
-              {...ctaAttrs(ESTERNA ? 'member' : 'resolve',
-                ESTERNA ? 'portal_registration' : (corso.ctaIntent ?? 'junior_info'), {
+              {...ctaAttrs('resolve', corso.ctaIntent ?? 'junior_info', {
                 activity: corso.slug,
                 source: `/${corso.slug}#${a.medium}`,
               })}
