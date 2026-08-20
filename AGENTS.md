@@ -563,6 +563,20 @@ della dashboard — cioè `scripts/build.mjs`. Aggiungere un `buildCommand` qui
 significherebbe avere la configurazione di build in due posti, e scoprire quale
 vince il giorno che divergono.
 
+**Un progetto Vercel solo, e i due sottodomini come suoi domini.** Non due
+progetti nuovi: le regole `has: host` stanno nel `vercel.json` di *questo*
+progetto, e perché siano valutate la richiesta deve arrivare qui. Due progetti
+separati avrebbero configurazione vuota e servirebbero il nulla.
+
+**E vanno aggiunti senza «Redirect to primary»**, che è quello che Vercel
+propone per primo quando aggiungi un dominio. Quel redirect avviene al bordo
+*prima* del routing del progetto, quindi scavalcherebbe tutto questo file — e il
+risultato sarebbe sbagliato in due modi diversi: sul wiki funzionerebbe quasi,
+perdendo le due eccezioni, mentre sul planning conserverebbe il percorso e
+`planning.athlonroma.it/settembre.html` diventerebbe `/settembre.html`, che non
+esiste. Sul planning il percorso va **buttato**, ed è il motivo per cui quella
+regola non usa lo splat.
+
 **Le regole scattano solo per gli host attaccati al progetto.** `has` con
 `type: host` confronta l'intestazione della richiesta: finché
 `wiki.athlonroma.it` non è un dominio di questo progetto Vercel, quelle quattro
