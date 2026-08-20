@@ -79,7 +79,14 @@ export default defineConfig({
           // nessuna pagina legge, e cancellare questo lascerebbe il sito senza
           // orari da mostrare.
           allowedActions: { create: false, delete: false },
-          router: () => '/planning',
+          // **Niente `router` qui.** Sembra il modo di dare al documento un link
+          // alla sua pagina, e invece dice a Tina un'altra cosa: che quel
+          // documento si modifica *visualmente*, sulla pagina. Al click il
+          // pannello va su `#/~/planning` invece che sul modulo, la pagina è
+          // Astro statico e non ha gli hook di Tina, e chi ci arriva legge
+          // «Looks like there's nothing to edit on this page» — cioè la
+          // collezione risulta vuota pur essendo piena. È l'unica che l'aveva
+          // ed era l'unica che non si apriva.
         },
         fields: [
           {
