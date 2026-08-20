@@ -161,6 +161,27 @@ export const SOSPENSIONE = {
   /** Il preavviso, in giorni, rispetto al primo del mese. */
   preavviso: 10,
   scheda: '/wikiathlon/adulti/sospensione/',
+  /**
+   * A che cosa si applica, che è la parte che mancava e che la scheda invece
+   * dice in cima: «valido per abbonamenti Adulti acquistati dal 1 Settembre
+   * 2021 e abbonamenti Baby Nuoto». I quindici euro non valgono per gli altri
+   * corsi dei bambini, e un assistente che non lo sa promette a un genitore una
+   * cosa che alla cassa non esiste.
+   */
+  valePer: 'gli abbonamenti Adulti acquistati dal 1 settembre 2021 e gli abbonamenti Baby Nuoto',
+  /** I corsi che non la hanno, per nome: sono la domanda che arriva. */
+  nonValePer: ['Scuola Nuoto Bambini', 'Nuoto Agonistico', 'Pallanuoto'],
+  /**
+   * L'altra sospensione, che non è la stessa cosa e viene confusa sempre:
+   * gratuita, per inidoneità documentata di almeno sessanta giorni. Quella
+   * **c'è anche** per i corsi che non hanno quella a pagamento, ed è alternativa
+   * al recupero delle lezioni. Senza questa riga la risposta giusta diventa un
+   * «no» che è falso per metà.
+   */
+  inabilita: {
+    giorni: 60,
+    scheda: '/wikiathlon/snb/preiscrizioni-nuoto/',
+  },
 } as const;
 
 /**

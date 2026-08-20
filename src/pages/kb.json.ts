@@ -488,7 +488,11 @@ export const GET: APIRoute = async () => {
     url: `${SITE}${SOSPENSIONE.scheda}`,
     area: 'Abbonamenti',
     attivita: [],
-    testo: `La sospensione costa ${SOSPENSIONE.prezzo} € e vale un mese solare per volta, senza limite al numero di sospensioni. Va chiesta con ${SOSPENSIONE.preavviso} giorni di preavviso rispetto al primo del mese da sospendere.`,
+    testo: blocchi(
+      `La sospensione a pagamento costa ${SOSPENSIONE.prezzo} € e vale un mese solare per volta, senza limite al numero di sospensioni. Va chiesta con ${SOSPENSIONE.preavviso} giorni di preavviso rispetto al primo del mese da sospendere, e non e' retroattiva: non si sospende il mese in corso.`,
+      `**Vale solo per ${SOSPENSIONE.valePer}.** Per ${SOSPENSIONE.nonValePer.join(', ')} la sospensione a pagamento **non esiste**: non proporla e non dire una cifra.`,
+      `Per quei corsi c'e' un'altra strada, che non e' la stessa cosa: la sospensione **gratuita per inidoneita' fisica documentata** di almeno ${SOSPENSIONE.inabilita.giorni} giorni continuativi, alternativa al recupero delle lezioni e non cumulabile con esso. Serve un certificato medico.`
+    ),
   });
 
   /* ---- Senza abbonamento: si paga una lezione alla volta ----------------
