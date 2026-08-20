@@ -8,8 +8,9 @@
  * the data comes from (a local file today, a fetch from the Decap-edited
  * planning repo, a CMS in this project) by changing this file alone.
  */
-import data from './planning-settembre.json';
+import data from './planning-corrente.json';
 import lessonData from './planning-lessons.json';
+import { SALE } from './sale';
 
 export type PlanTag = 'smart' | 'premium';
 
@@ -51,16 +52,21 @@ export interface GymFloor {
   hours: OpeningRow[];
 }
 
-const planning = data as unknown as { gymFloor: GymFloor; bands: Band[] };
+const planning = data as unknown as { mese: string; gymFloor: GymFloor; bands: Band[] };
 
 /**
- * Il mese che questo planning copre. Va aggiornato insieme al JSON, ma **non va
- * stampato in pagina**: un'etichetta con il mese invecchia da sola e fa sembrare
- * vecchio un orario che è quello giusto. Gli orari si presentano come la
- * settimana tipo, che è ciò che sono. Serve qui a dire quale palinsesto è
- * caricato, per chi lo sostituisce.
+ * Il mese che questo planning copre, e lo dice il palinsesto stesso: è il campo
+ * `mese` del JSON, quindi si riscrive da Tina insieme agli orari. Era una
+ * costante qui dentro, e cambiare il palinsesto senza toccare il codice
+ * lasciava indietro il mese.
+ *
+ * **Non va stampato in pagina**: un'etichetta con il mese invecchia da sola e fa
+ * sembrare vecchio un orario che è quello giusto. Gli orari si presentano come
+ * la settimana tipo, che è ciò che sono. Serve a dire quale palinsesto è
+ * caricato — a chi lo sostituisce, e all'assistente, che lo cita nella sua
+ * knowledge base (`kb.json.ts`).
  */
-export const PLANNING_MONTH = 'Settembre 2026';
+export const PLANNING_MONTH: string = planning.mese;
 
 export const gymFloor: GymFloor = planning.gymFloor;
 export const bands: Band[] = planning.bands;
@@ -176,11 +182,15 @@ export function openHours(): number {
   );
 }
 
-/** Rooms actually used by a band, in a stable order, for its legend. */
+/**
+ * Le sale che una fascia usa davvero, nell'ordine della legenda.
+ *
+ * L'ordine è quello di `SALE`, che è la lista condivisa: qui c'era una copia
+ * delle stesse sale, e una copia è una cosa in più da ricordare di aggiornare.
+ */
 export function roomsOf(band: Band): string[] {
-  const order = ['Sala A', 'Sala B', 'Sala C', 'Vasca Media', 'Vasca Grande'];
   const used = new Set(band.days.flatMap((d) => d.classes.map((c) => c.sala)).filter(Boolean));
-  return order.filter((r) => used.has(r));
+  return SALE.filter((r) => used.has(r));
 }
 
 /* ---- Lesson cards (description, video, characteristics) ---------------- */
@@ -332,4 +342,27 @@ export const ROOM_COLORS_ON_DARK: Record<string, string> = {
 /** Il colore della sala per il fondo su cui va: chiaro o scuro. */
 export function roomColor(sala: string, variant: 'light' | 'dark' = 'light'): string | undefined {
   return (variant === 'dark' ? ROOM_COLORS_ON_DARK : ROOM_COLORS)[sala];
+}
+
+/*
+ * Ogni sala dell'elenco condiviso ha i suoi due colori.
+ *
+ * Un controllo al build e non un tipo: `Record<Sala, string>` non ferma una
+ * chiave che manca, e stringere il tipo delle due tavolozze romperebbe chi le
+ * indicizza con una stringa qualunque. Questo invece si fa sentire subito, ed è
+ * il momento giusto per accorgersene: una sala senza colore non dà errore in
+ * pagina, sparisce dalla legenda in silenzio.
+ */
+for (const sala of SALE) {
+  for (const [dove, tavolozza] of [
+    ['chiaro', ROOM_COLORS],
+    ['scuro', ROOM_COLORS_ON_DARK],
+  ] as const) {
+    if (!tavolozza[sala]) {
+      throw new Error(
+        `La sala "${sala}" non ha un colore per il fondo ${dove}. ` +
+          `Aggiungilo in planning.ts, o togli la sala da SALE in data/sale.ts.`
+      );
+    }
+  }
 }
