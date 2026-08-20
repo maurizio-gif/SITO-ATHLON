@@ -463,13 +463,25 @@ due.
   `/news/<file>`. Spostare un articolo di cartella o rinominarlo ne cambia il
   link: se era pubblicato, serve un reindirizzo in `astro.config.mjs`.
 
-**Il build non dipende dalle credenziali.** `tinacms build` compila il pannello
-in `public/admin` e va prima di Astro, che copia `public/` nel `dist`. Ma quel
-comando pretende il token di TinaCloud, e un build che si rompe per una
-variabile d'ambiente mancante è un sito che non si pubblica più:
-`scripts/build.mjs` compila il pannello **solo** se trova `TINA_TOKEN`,
-altrimenti costruisce il sito e dice perché `/admin` non c'è. Il giorno in cui
-la variabile arriva, il pannello compare al primo deploy.
+**Il pannello non può mai fermare il sito.** `tinacms build` compila
+`public/admin` e va prima di Astro, che copia `public/` nel `dist`. Ma quel
+comando parla con TinaCloud, e TinaCloud conosce un ramo solo: quello che
+indicizza. Su un deploy di anteprima si ferma in partenza — *Branch
+'claude/...' is not on TinaCloud* — e prima che `scripts/build.mjs` prendesse
+questa forma si fermava con lui tutto il deploy, sito compreso. Quindi:
+
+- **il pannello si costruisce solo per la produzione** (`VERCEL_ENV`), e non è
+  una rinuncia: quello di un'anteprima punterebbe a un ramo che TinaCloud non
+  ha, e si aprirebbe su un errore;
+- **se non compila, il sito si pubblica senza.** Token scaduto, lock fuori
+  sincrono, TinaCloud giù: si scrive perché a schermo, si butta l'eventuale
+  build a metà — mai spedire un `public/admin` incompleto — e si va avanti con
+  Astro. Un CMS che non compila è un pannello da sistemare; un deploy bloccato
+  è un sito che non si aggiorna più.
+
+Il che vuol dire che `/admin` mancante non rompe niente e non si nota: **quando
+si toccano lo schema o le credenziali, il log del deploy di produzione è la
+verifica**, non il fatto che il sito sia salito.
 
 Il **client id** invece sta in chiaro in `tina/config.ts`: è pubblico per
 costruzione — finisce dentro il bundle di `/admin`, che gira nel browser di chi

@@ -1,35 +1,67 @@
 #!/usr/bin/env node
 /**
- * Il build del sito, con il pannello di Tina se ci sono le credenziali.
+ * Il build del sito, con il pannello di Tina quando ha senso costruirlo.
  *
  * `tinacms build` compila il pannello in `public/admin` e va eseguito **prima**
- * di Astro, perché Astro copia `public/` nel `dist`. Ma quel comando pretende
- * il token di TinaCloud, e un build che si rompe per una variabile d'ambiente
- * mancante è un sito che non si pubblica più.
+ * di Astro, perché Astro copia `public/` nel `dist`. Ma quel comando parla con
+ * TinaCloud, e TinaCloud conosce un ramo solo: quello che indicizza. Su un
+ * deploy di anteprima — un ramo di lavoro, una PR — la prima cosa che fa è
+ * fermarsi:
  *
- * Quindi la regola è: se il token c'è si costruisce anche il pannello, se non
- * c'è si costruisce il sito e si dice perché il pannello non c'è. Il giorno in
- * cui la variabile viene aggiunta su Vercel, /admin compare al primo deploy
- * senza toccare una riga.
+ *   ERROR: Branch 'claude/...' is not on TinaCloud.
+ *
+ * e con lui si ferma tutto il deploy, sito compreso. Da qui le due regole.
+ *
+ * **Il pannello si costruisce solo per la produzione.** Non è una rinuncia: il
+ * pannello di un'anteprima punterebbe comunque a un ramo che TinaCloud non ha,
+ * quindi si aprirebbe su un errore. /admin vive sul sito pubblicato, dove il
+ * contenuto è quello vero.
+ *
+ * **E se si rompe, non porta giù il sito con sé.** Il pannello è un accessorio;
+ * le pagine sono il prodotto. Se `tinacms build` fallisce — token scaduto,
+ * schema fuori sincrono, TinaCloud non raggiungibile — si scrive perché a
+ * schermo, si butta l'eventuale build a metà e si pubblica il sito. Un CMS che
+ * non compila è un pannello da sistemare; un deploy bloccato è un sito che non
+ * si aggiorna più.
  *
  * Il client id non serve controllarlo: sta in `tina/config.ts`, perché è
  * pubblico per costruzione — finisce nel bundle del pannello.
  */
 import { spawnSync } from 'node:child_process';
+import { rmSync } from 'node:fs';
 
-const esegui = (comando, argomenti) => {
-  const esito = spawnSync(comando, argomenti, { stdio: 'inherit', shell: process.platform === 'win32' });
-  if (esito.status !== 0) process.exit(esito.status ?? 1);
-};
+const esegui = (comando, argomenti) =>
+  spawnSync(comando, argomenti, { stdio: 'inherit', shell: process.platform === 'win32' }).status ?? 1;
 
-if (process.env.TINA_TOKEN) {
-  console.log('▲ Tina: token trovato, compilo il pannello in public/admin');
-  esegui('tinacms', ['build']);
+/* Su Vercel `VERCEL_ENV` vale 'production' per il ramo di produzione e
+   'preview' per tutti gli altri. Fuori da Vercel non esiste, e allora decide
+   solo il token: un build in locale gira sul ramo che si ha sotto mano. */
+const suVercel = Boolean(process.env.VERCEL);
+const anteprima = suVercel && process.env.VERCEL_ENV !== 'production';
+const ramo = process.env.VERCEL_GIT_COMMIT_REF || 'il ramo locale';
+
+const perche = !process.env.TINA_TOKEN
+  ? 'nessun TINA_TOKEN'
+  : anteprima
+    ? `deploy di anteprima su ${ramo}, che TinaCloud non indicizza`
+    : null;
+
+if (perche === null) {
+  console.log('▲ Tina: compilo il pannello in public/admin');
+  if (esegui('tinacms', ['build']) !== 0) {
+    rmSync('public/admin', { recursive: true, force: true });
+    console.warn(
+      '\n▲ Tina: il pannello non ha compilato, e il sito si pubblica senza.\n' +
+        "  /admin non ci sarà finché questo comando non torna a funzionare:\n" +
+        '  controlla TINA_TOKEN, che il ramo di produzione sia indicizzato su\n' +
+        '  TinaCloud e che tina/tina-lock.json sia aggiornato allo schema.\n'
+    );
+  }
 } else {
   console.log(
-    '▲ Tina: nessun TINA_TOKEN, salto il pannello.\n' +
-      "  Il sito si pubblica comunque; /admin non esiste finché la variabile non c'è."
+    `▲ Tina: ${perche}, salto il pannello.\n` +
+      "  Il sito si pubblica comunque; /admin sta sul sito di produzione."
   );
 }
 
-esegui('astro', ['build']);
+process.exit(esegui('astro', ['build']));
