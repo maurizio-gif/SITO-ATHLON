@@ -637,6 +637,28 @@ export const GET: APIRoute = async () => {
     ),
   });
 
+  /* ---- Una cosa riservata va detta riservata dove viene detta -----------
+     L'appuntamento col Direttore Tecnico e' gratuito e **riservato agli
+     iscritti** alla Scuola Nuoto: lo dichiara la sua scheda, in fondo. Ma il
+     Direttore Tecnico e' nominato in sette voci — i brevetti, la didattica, gli
+     intensivi, le iscrizioni, due clausole, la scheda del corso — e in nessuna
+     di quelle sette c'era la riserva. Togliere dal contesto la scheda dedicata
+     non e' bastato: il bot l'ha promesso a un genitore non iscritto leggendolo
+     dalla scheda del corso, che nel ramo junior c'e' sempre.
+
+     Quindi la riserva si attacca qui, a valle, a ogni voce che lo nomina: una
+     riga sola, e vale anche per le voci che qualcuno scrivera' domani. Il
+     posto giusto per una regola e' accanto al fatto, non in un altro
+     documento che il recupero potrebbe non pescare. */
+  const RISERVA_DT =
+    'L\u2019appuntamento telefonico con il Direttore Tecnico e\u2019 un servizio gratuito **riservato a chi e\u2019 gia\u2019 iscritto** alla Scuola Nuoto Athlon: a chi sta ancora valutando non va proposto. Chi non e\u2019 iscritto e vuole parlare con una persona scrive al team dal pulsante dell\u2019assistente.';
+
+  for (const v of voci) {
+    if (/[Dd]irettore [Tt]ecnico|[Dd]irezione [Tt]ecnica/.test(v.testo) && !v.testo.includes(RISERVA_DT)) {
+      v.testo = blocchi(v.testo, RISERVA_DT);
+    }
+  }
+
   const body = {
     /* A cosa serve questo file, scritto dentro il file: chi lo consuma è un
        modello, e il modo più affidabile per dargli una regola è metterla nel
