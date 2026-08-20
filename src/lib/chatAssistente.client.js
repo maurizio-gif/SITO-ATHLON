@@ -6,22 +6,23 @@
 // si scopre dall'email prima di qualsiasi altra cosa, perché cambia tutto quello
 // che viene dopo:
 //
-//   email → verifica ─┬─ il nucleo ha un abbonamento vivo
-//                     │    → attività → assistenza (schede + regolamento)
-//                     └─ no, o non lo conosciamo
-//                          → per me o per un bambino → attività → dati
-//                            ├─ adulti  → informazioni dal sito, obiettivo la prova
-//                            └─ junior  → il corso scelto, e come ci si iscrive
+//   email → verifica → quale attività ─┬─ l'anagrafica c'è già
+//                                       │    → conversazione
+//                                       └─ non la conosciamo
+//                                            → i dati → conversazione
 //
 // Due domande prima della conversazione, e in quest'ordine:
 //
-//   - **di cosa parliamo**, a chiunque, socio o no: «disdetta», «recuperi» e
-//     «cambio orario» sono procedure diverse per un abbonamento e per la scuola
-//     nuoto, e l'attività è ciò che le distingue. Senza, l'assistente risponde
-//     con la media di tutto il sito;
-//   - **chi sei**, solo a chi non conosciamo: di un socio l'anagrafica ce l'ha
-//     già PerfectGym, e richiederla è una domanda a cui ha già risposto
-//     iscrivendosi.
+//   - **di cosa parliamo**, a chiunque: «disdetta», «recuperi» e «cambio
+//     orario» sono procedure diverse per un abbonamento e per la scuola nuoto,
+//     e l'attività è ciò che le distingue. Senza, l'assistente risponde con la
+//     media di tutto il sito. Cinque voci, una sola scelta: le attività per
+//     adulti stanno tutte insieme perché per un adulto il percorso e' lo stesso,
+//     mentre i quattro corsi dei bambini hanno eta', requisiti e iscrizioni
+//     diverse fra loro;
+//   - **chi sei**, solo se l'email non e' gia' in PerfectGym: di chi c'e' già
+//     l'anagrafica ce l'ha il gestionale, e richiederla e' una domanda a cui ha
+//     già risposto.
 //
 // Tre cose che questo file fa **e che il modello non deve fare**:
 //
@@ -34,7 +35,7 @@
 // Al modello resta il suo lavoro: rispondere alle domande con i contenuti del
 // sito, dentro la fetta di conoscenza del ramo in cui siamo.
 
-import { ACTIVITY_TAGS, ACTIVITY_AUDIENCE } from '../data/activities';
+import { ACTIVITY_AUDIENCE } from '../data/activities';
 
 export function initChatAssistente(root, options) {
   var onChiudi = (options && options.onChiudi) || function () {};
@@ -47,28 +48,32 @@ export function initChatAssistente(root, options) {
   /** Dove finisce il percorso junior, comunque vada. */
   var LANDING_JUNIOR = '/wikiathlon/snb/preiscrizioni-nuoto/';
 
-  /* Le attività sono quelle di `activities.ts`: lo stesso vocabolario dei tag
-     degli articoli, del box dell'Help Desk e dello Switch di CONTATTACI. Qui se
-     ne sceglie una per volta, perché è quella che decide quale fetta di
-     conoscenza l'assistente può usare.
+  /* Le cinque voci fra cui scegliere, una sola.
 
-     Le note stanno solo dove aggiungono qualcosa che il nome non dice: l'età
-     ammessa è la prima cosa che un genitore cerca. */
-  var NOTE_ATTIVITA = {
-    'baby-nuoto': 'dai 3 ai 36 mesi',
-    'scuola-nuoto-bambini': 'dai 30 mesi ai 13 anni',
-  };
+     Le quattro junior portano lo slug di `activities.ts`, e non per ordine: è
+     quello il valore che il workflow accetta in `attivitaJunior` per restringere
+     la conoscenza a un corso solo, ed è con quello che sono taggati gli articoli
+     del wiki.
 
-  function attivitaDi(ambito) {
-    return ACTIVITY_TAGS.filter(function (a) {
-      return a.audience === ambito;
-    }).map(function (a) {
-      return { id: a.id, label: a.label, nota: NOTE_ATTIVITA[a.id] || '' };
-    });
-  }
+     `adulti` invece non è uno slug e non deve diventarlo: sta per le otto
+     attività che elenca la sua nota, perché per un adulto il percorso è lo
+     stesso — un abbonamento — e chiedergli quale delle otto prima di poter fare
+     una domanda è una domanda in più senza una risposta in più. Le otto restano
+     nominate nella nota: chi cerca il Reformer si riconosce lì. */
+  var ATTIVITA = [
+    {
+      id: 'adulti',
+      label: 'Attività adulti',
+      nota: 'Gym Floor, Corsi Fitness, Group Reformer, Nuoto Libero, Aqua Fitness, Scuola Nuoto Adulti, Corso Gestanti, Personal Training',
+    },
+    { id: 'scuola-nuoto-bambini', label: 'Scuola Nuoto Bambini', nota: 'dai 3 anni' },
+    { id: 'baby-nuoto', label: 'Baby Nuoto', nota: 'dai 3 ai 36 mesi' },
+    { id: 'nuoto-agonistico', label: 'Nuoto Agonistico', nota: '' },
+    { id: 'pallanuoto', label: 'Pallanuoto', nota: '' },
+  ];
 
   function etichettaAttivita() {
-    var scelta = ACTIVITY_TAGS.filter(function (a) {
+    var scelta = ATTIVITA.filter(function (a) {
       return a.id === dati.attivita;
     })[0];
     return scelta ? scelta.label : '';
@@ -90,8 +95,10 @@ export function initChatAssistente(root, options) {
       telefono: '',
       /** iscritto | adulti | junior — è ciò che decide tono e conoscenza. */
       ramo: '',
-      /** adulti | junior: per chi si cercano informazioni, che non è il ramo. */
+      /** adulti | junior: lo dice l'attività scelta, e non è il ramo. */
       ambito: '',
+      /** Vero se PerfectGym conosce già l'email: allora il form non si chiede. */
+      conosciuto: false,
       /** Lo slug dell'attività scelta, o '' se non ne ha scelta nessuna. */
       attivita: '',
       attivitaJunior: '',
@@ -124,7 +131,6 @@ export function initChatAssistente(root, options) {
   };
   var passi = {
     email: q('[data-ca-step="email"]'),
-    ambito: q('[data-ca-step="ambito"]'),
     attivita: q('[data-ca-step="attivita"]'),
     chat: q('[data-ca-step="chat"]'),
     dati: q('[data-ca-step="dati"]'),
@@ -137,8 +143,6 @@ export function initChatAssistente(root, options) {
   var btnDomanda = q('[data-ca-invia]');
   var intestazione = q('[data-ca-intestazione]');
   var elencoAttivita = q('[data-ca-attivita]');
-  var titoloAttivita = q('[data-ca-attivita-titolo]');
-  var leadAttivita = q('[data-ca-attivita-lead]');
 
   function mostra(nome) {
     dati.passo = nome;
@@ -218,38 +222,31 @@ export function initChatAssistente(root, options) {
     dati.cognome = (esito && esito.cognome) || '';
     dati.telefono = (esito && esito.telefono) || '';
 
-    /* Il ramo lo decide PerfectGym, e lo decide qui una volta sola: la scelta
-       dell'attività che segue non lo cambia. Un socio resta un socio anche
-       quando chiede del corso di suo figlio, e va servito con le schede e il
-       regolamento invece che con il depliant. */
+    /* Il ramo lo decide PerfectGym, e lo decide qui: un socio resta un socio
+       anche quando chiede del corso di suo figlio, e va servito con le schede e
+       il regolamento invece che con il depliant. La scelta dell'attività, che
+       viene dopo, non lo cambia. */
     if (dati.statoNucleo === 'iscritto') dati.ramo = 'iscritto';
-    mostra('ambito');
-  }
 
-  // ── Passo 2: per me o per un bambino ──────────────────────────────────────
-  function scegliAmbito(ambito) {
-    dati.ambito = ambito === 'junior' ? 'junior' : 'adulti';
-    /* Per chi non è di casa l'ambito è anche il ramo. Per un socio no: quello
-       l'ha già deciso la verifica, e questa scelta dice solo di che cosa parla. */
-    if (dati.ramo !== 'iscritto') dati.ramo = dati.ambito;
+    /* `conosciuto` è la domanda del form: l'anagrafica esiste già? Vale per un
+       socio e per chi è a sistema come lead — di entrambi PerfectGym ha nome,
+       cognome e telefono, e ce li ha appena detti. Chiederli di nuovo è una
+       domanda a cui hanno già risposto. Se la verifica non ha risposto affatto
+       (`errore`) non sappiamo niente, quindi il form si chiede. */
+    dati.conosciuto =
+      dati.statoNucleo === 'iscritto' ||
+      dati.statoNucleo === 'esiste' ||
+      dati.stato === 'iscritto' ||
+      dati.stato === 'esiste';
+
     dipingiAttivita();
     mostra('attivita');
   }
 
-  // ── Passo 3: quale attività ───────────────────────────────────────────────
+  // ── Passo 2: quale attività ───────────────────────────────────────────────
   function dipingiAttivita() {
-    var junior = dati.ambito === 'junior';
-    if (titoloAttivita) {
-      titoloAttivita.textContent = junior ? 'Quale corso ti interessa?' : 'Di cosa parliamo?';
-    }
-    if (leadAttivita) {
-      leadAttivita.textContent = junior
-        ? 'Ti parlo di quello, e non degli altri tre.'
-        : 'Così ti do le risposte di quell’attività invece della media del sito.';
-    }
     if (!elencoAttivita) return;
-
-    var scelte = attivitaDi(dati.ambito).map(function (a) {
+    elencoAttivita.innerHTML = ATTIVITA.map(function (a) {
       return (
         '<button type="button" class="ca__scelta" data-ca-attivita-scelta="' +
         escape(a.id) +
@@ -259,20 +256,7 @@ export function initChatAssistente(root, options) {
         (a.nota ? '<span class="ca__scelta-nota">' + escape(a.nota) + '</span>' : '') +
         '</button>'
       );
-    });
-
-    /* L'ultima voce non è un ripiego: chi non ha ancora scelto è esattamente la
-       persona a cui l'assistente serve di più, e obbligarla a indovinare una
-       casella prima di poter fare una domanda è il modo di mandarla via. */
-    scelte.push(
-      '<button type="button" class="ca__scelta" data-ca-attivita-scelta="">' +
-        '<span class="ca__scelta-nome">' +
-        (junior ? 'Non ho ancora scelto' : 'In generale, del club') +
-        '</span><span class="ca__scelta-nota">Rispondo con tutto quello che c’è nel sito</span>' +
-        '</button>'
-    );
-
-    elencoAttivita.innerHTML = scelte.join('');
+    }).join('');
   }
 
   function scegliAttivita(id) {
@@ -280,21 +264,24 @@ export function initChatAssistente(root, options) {
     /* `attivitaJunior` è quella con cui il workflow restringe la conoscenza a un
        corso solo: vale per i quattro junior e per nessun'altra attività. */
     dati.attivitaJunior = id && ACTIVITY_AUDIENCE[id] === 'junior' ? id : '';
+    dati.ambito = dati.attivitaJunior ? 'junior' : 'adulti';
+    /* Chi non è di casa prende il ramo dall'attività; per un socio il ramo l'ha
+       già deciso la verifica. */
+    if (dati.ramo !== 'iscritto') dati.ramo = dati.ambito;
 
-    /* I dati prima della conversazione — ma solo a chi non conosciamo, e una
-       volta sola. */
-    if (dati.ramo === 'iscritto' || dati.datiFatti) apriConversazione();
+    /* I dati prima della conversazione, ma solo a chi non conosciamo. */
+    if (dati.conosciuto || dati.datiFatti) apriConversazione();
     else apriDati();
   }
 
   // ── Passo 3: la conversazione ─────────────────────────────────────────────
   var APERTURE = {
+    /* Nessun nome qui, ed è voluto: il nome lo dice solo chi ce l'ha appena
+       scritto nel form. Salutare per nome chi non ha compilato niente è dirgli
+       che lo stiamo riconoscendo da un'email, e non è il tono di un help desk. */
     iscritto: function () {
-      var chi = dati.nome ? ' ' + dati.nome : '';
       return (
-        'Ciao' +
-        escape(chi) +
-        '. Sono l’assistente dell’Help Desk: rispondo su prenotazioni, ' +
+        'Ciao. Sono l’assistente dell’Help Desk: rispondo su prenotazioni, ' +
         'certificato medico, sospensioni, disdette e tutto quello che c’è nelle schede e nel regolamento. ' +
         'Dimmi pure.'
       );
@@ -377,26 +364,14 @@ export function initChatAssistente(root, options) {
    * sicurezza una cosa che non c'entra.
    */
   function scappatoia(senzaRisposta) {
-    /* Nei rami commerciali il primo comando non è la lamentela ma il passo
-       avanti: chi sta valutando vuole lasciare i dati, non aprire un reclamo.
-       Il ticket resta, un gradino sotto.
-
-       Da quando i dati arrivano prima della conversazione, questo pulsante
-       compare in un caso solo: l'invio non è riuscito e si è proseguito senza.
-       È la seconda occasione, non una richiesta ripetuta. */
-    var lasciaDati =
-      dati.ramo !== 'iscritto' && !dati.datiFatti
-        ? '<button type="button" class="ca__uscita-btn ca__uscita-btn--pieno" data-ca-dati>' +
-          (dati.ramo === 'junior' ? 'Richiedi informazioni →' : 'Fatti richiamare →') +
-          '</button>'
-        : '';
-
+    /* Un comando solo, e sempre lo stesso: parlare con una persona. I dati,
+       quando servono, li ha già chiesti il form prima della conversazione —
+       riproporli qui sarebbe chiedere due volte la stessa cosa. */
     return (
       '<div class="ca__uscita">' +
       '<span class="ca__uscita-lead">' +
       (senzaRisposta ? 'Su questo serve una persona.' : 'Vuoi parlarne con noi?') +
       '</span>' +
-      lasciaDati +
       '<button type="button" class="ca__uscita-btn" data-ca-ticket>Contatta il team →</button>' +
       '</div>'
     );
@@ -566,6 +541,7 @@ export function initChatAssistente(root, options) {
     campi[el.dataset.caF] = el;
   });
   var bimbo = q('[data-ca-bimbo]');
+  var nascitaGenitore = q('[data-ca-nascita]');
   var erroreDati = q('[data-ca-dati-errore]');
   var btnDati = q('[data-ca-dati-invia]');
   var titoloDati = q('[data-ca-dati-titolo]');
@@ -602,27 +578,32 @@ export function initChatAssistente(root, options) {
       if (campi[k].classList) campi[k].classList.remove('ca__input--errore');
     });
 
+    var oggi = new Date().toISOString().slice(0, 10);
+
     if (!valore('nome')) return segnala('nome', 'Serve il tuo nome.');
     if (!valore('cognome')) return segnala('cognome', 'Serve il tuo cognome.');
+    if (!emailValida(valore('email'))) {
+      return segnala('email', 'Controlla l’indirizzo email: manca qualcosa.');
+    }
     if (!/^3\d{8,9}$/.test(cellulareNudo(valore('cellulare')))) {
       return segnala('cellulare', 'Serve un cellulare italiano, senza prefisso.');
     }
+
+    /* Per un adulto qui si è finito: nome, cognome, email e cellulare sono
+       tutto quello che serve per ricontattarlo. La data di nascita la chiede
+       solo il percorso junior, dove diventa parte di un'iscrizione. */
+    if (dati.ambito !== 'junior') return true;
+
     if (!valore('nascita')) return segnala('nascita', 'Serve la tua data di nascita.');
     /* Una data nel futuro non è una data di nascita: è un refuso, e su
        PerfectGym diventerebbe un'anagrafica da correggere a mano. */
-    if (valore('nascita') > new Date().toISOString().slice(0, 10)) {
+    if (valore('nascita') > oggi) {
       return segnala('nascita', 'La data di nascita non può essere nel futuro.');
     }
-
-    /* I campi del bambino li chiede l'ambito, non il ramo: un socio che chiede
-       del corso di suo figlio ha ramo `iscritto` e non vede questo form, ma un
-       genitore nuovo ha ramo `junior` e ambito `junior` insieme. */
-    if (dati.ambito !== 'junior') return true;
-
     if (!valore('bnome')) return segnala('bnome', 'Serve il nome del bambino.');
     if (!valore('bcognome')) return segnala('bcognome', 'Serve il cognome del bambino.');
     if (!valore('bnascita')) return segnala('bnascita', 'Serve la data di nascita del bambino.');
-    if (valore('bnascita') > new Date().toISOString().slice(0, 10)) {
+    if (valore('bnascita') > oggi) {
       return segnala('bnascita', 'La data di nascita non può essere nel futuro.');
     }
     if (campi.consenso && !campi.consenso.checked) {
@@ -638,7 +619,11 @@ export function initChatAssistente(root, options) {
 
   function apriDati() {
     var junior = dati.ambito === 'junior';
+    /* Un adulto lascia nome, cognome, email e cellulare, e nient'altro: la data
+       di nascita e i dati del bambino sono di un'iscrizione, non di un
+       ricontatto. */
     if (bimbo) bimbo.hidden = !junior;
+    if (nascitaGenitore) nascitaGenitore.hidden = !junior;
     if (privacyDati) privacyDati.hidden = junior;
     if (saltaDati) saltaDati.hidden = true;
     if (erroreDati) erroreDati.hidden = true;
@@ -648,9 +633,12 @@ export function initChatAssistente(root, options) {
         ? 'Servono i tuoi e quelli del bambino: li usiamo per preparare l’iscrizione. Poi passiamo alle tue domande.'
         : 'Ci presentiamo: sono i dati con cui il club ti ricontatta. Poi passiamo alle tue domande.';
     }
-    // Quello che sappiamo già non si richiede.
+    /* Quello che sappiamo già non si richiede a mano. L'email è quella del
+       primo passo: resta modificabile, perché è possibile che l'abbia scritta
+       per fare la verifica e ne voglia usare un'altra per essere ricontattato. */
     if (campi.nome && !campi.nome.value) campi.nome.value = dati.nome || '';
     if (campi.cognome && !campi.cognome.value) campi.cognome.value = dati.cognome || '';
+    if (campi.email && !campi.email.value) campi.email.value = dati.email || '';
     if (campi.cellulare && !campi.cellulare.value) {
       campi.cellulare.value = cellulareNudo(dati.telefono) || '';
     }
@@ -670,7 +658,7 @@ export function initChatAssistente(root, options) {
           ramo: dati.ramo,
           attivita: dati.attivita ? [dati.attivita] : [],
           attivitaJunior: dati.attivitaJunior,
-          email: dati.email,
+          email: valore('email'),
           memberId: dati.memberId,
           statoPgm: dati.stato,
           statoNucleo: dati.statoNucleo,
@@ -680,7 +668,9 @@ export function initChatAssistente(root, options) {
             nome: valore('nome'),
             cognome: valore('cognome'),
             cellulare: cellulareNudo(valore('cellulare')),
-            nascita: valore('nascita'),
+            /* Vuota nel ramo adulti, e non è una dimenticanza: là non si chiede.
+               Il workflow deve accettarla vuota e non passarla a PerfectGym. */
+            nascita: junior ? valore('nascita') : '',
           },
           bambino: junior
             ? {
@@ -716,11 +706,13 @@ export function initChatAssistente(root, options) {
     }
   }
 
-  /** Nome, cognome e cellulare come li ha scritti: servono al ticket. */
+  /** Come li ha scritti lui: è quello che finisce nel ticket, e il nome con cui
+      lo si saluta. */
   function ricordaDati() {
     dati.nome = valore('nome');
     dati.cognome = valore('cognome');
     dati.telefono = cellulareNudo(valore('cellulare'));
+    if (emailValida(valore('email'))) dati.email = valore('email');
   }
 
   // ── Eventi ────────────────────────────────────────────────────────────────
@@ -734,22 +726,11 @@ export function initChatAssistente(root, options) {
   }
 
   root.addEventListener('click', function (e) {
-    var ambito = e.target.closest && e.target.closest('[data-ca-ambito]');
-    if (ambito) {
-      scegliAmbito(ambito.dataset.caAmbito);
-      return;
-    }
     var scelta = e.target.closest && e.target.closest('[data-ca-attivita-scelta]');
     if (scelta) {
       scegliAttivita(scelta.dataset.caAttivitaScelta);
       return;
     }
-    var indietro = e.target.closest && e.target.closest('[data-ca-indietro]');
-    if (indietro) {
-      mostra('ambito');
-      return;
-    }
-
     var chiedeTeam = e.target.closest && e.target.closest('[data-ca-ticket]');
     if (chiedeTeam) {
       apriTicket(chiedeTeam.closest('.ca__msg'));
@@ -766,10 +747,6 @@ export function initChatAssistente(root, options) {
       return;
     }
 
-    if (e.target.closest && e.target.closest('[data-ca-dati]')) {
-      apriDati();
-      return;
-    }
     if (e.target.closest && e.target.closest('[data-ca-dati-invia]')) {
       inviaDati();
       return;
