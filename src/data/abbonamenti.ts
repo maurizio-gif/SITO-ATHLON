@@ -13,6 +13,25 @@ import { PG } from './cta';
  * «attività incluse». La leggono la pagina abbonamenti e la landing /promo:
  * stessa attività, stessa spiegazione, un posto solo.
  */
+/**
+ * L'età minima per le attività degli adulti, tutte quante.
+ *
+ * Non è un dettaglio di una sola disciplina: è la soglia sotto la quale il
+ * palinsesto adulti non è accessibile, **nuoto libero compreso**. È il caso che
+ * arriva più spesso in chat — «posso portare mio figlio in piscina a nuotare?»
+ * — e la risposta è no: sotto i tredici anni si passa dalla Scuola Nuoto
+ * Bambini, che è un corso con un istruttore in vasca, non un accesso libero.
+ *
+ * Sta nei dati e non in una pagina perché deve finire nella KB
+ * dell'assistente insieme a ogni attività per adulti: una regola che vive in
+ * un solo punto è una regola che il bot non trova quando gli serve.
+ */
+export const ETA_MINIMA_ADULTI = {
+  anni: 13,
+  /** Dove va chi è sotto la soglia: non un rifiuto, un'alternativa. */
+  alternativa: 'la Scuola Nuoto Bambini, fino ai 13 anni',
+} as const;
+
 export const activityInfo: Record<string, { title: string; body: string; href?: string }> = {
   'Gym Floor': {
     title: 'Gym Floor',
