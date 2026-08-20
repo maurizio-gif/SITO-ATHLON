@@ -726,6 +726,12 @@ const PG = 'https://athlon.perfectgym.com/ClientPortal2';
     color: var(--color-primary);
   }
 
+  /* Il banner della sospensione non porta margini suoi (vive anche negli
+     abbonamenti, con un altro gutter): lo stacca da qui la card che lo ospita. */
+  .piano :global(.sosp) {
+    margin: 0 0 16px;
+  }
+
   /* ---- Le due formule annuali di ogni piano ---- */
   .formule {
     display: grid;
