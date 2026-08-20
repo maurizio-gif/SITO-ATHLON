@@ -458,7 +458,10 @@ export const GET: APIRoute = async () => {
       id: `abbonamento:${piano.id}`,
       tipo: 'abbonamento',
       titolo: `Abbonamento ${piano.name}`,
-      url: `${SITE}/abbonamenti`,
+      /* Con l'ancora del piano: l'assistente cita questo url tale e quale, e chi
+         clicca deve trovarsi davanti allo Smart o al Premium — non in cima a una
+         pagina da cui ricominciare a cercare. */
+      url: `${SITE}/abbonamenti#${piano.id}`,
       area: 'Abbonamenti',
       attivita: [],
       testo: blocchi(
