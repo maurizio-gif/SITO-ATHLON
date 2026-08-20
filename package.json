@@ -7,7 +7,9 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "dev:cms": "tinacms dev -c \"astro dev\"",
+    "build": "node scripts/build.mjs",
+    "build:sito": "astro build",
     "preview": "astro preview",
     "astro": "astro"
   },

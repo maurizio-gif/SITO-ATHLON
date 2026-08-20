@@ -3,6 +3,13 @@ dist/
 # generated types
 .astro/
 
+# Tina: il pannello e il client sono generati dal build, non si versionano.
+# `public/admin` lo scrive `tinacms build` prima di Astro; `tina/__generated__`
+# è lo schema compilato e cambia a ogni modifica di tina/config.ts.
+public/admin/
+tina/__generated__/
+tina/tina-lock.json
+
 # dependencies
 node_modules/
 

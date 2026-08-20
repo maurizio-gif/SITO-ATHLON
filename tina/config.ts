@@ -229,7 +229,11 @@ export default defineConfig({
             name: 'area',
             label: 'Area',
             list: true,
-            options: ['Generali', 'Adulti – Club', 'Scuola Nuoto Bambini', 'News'],
+            /* «News» non c'è più: quella era la chiusura della vasca, che è una
+               notizia e ora vive fra le news con una pagina sua. Lasciare
+               l'opzione qui vorrebbe dire poter rimettere un avviso in un
+               elenco di procedure. */
+            options: ['Generali', 'Adulti – Club', 'Scuola Nuoto Bambini'],
           },
           { type: 'string', name: 'tags', label: 'Tag', list: true },
           attivitaField,
@@ -241,6 +245,123 @@ export default defineConfig({
           { type: 'string', name: 'updatedDate', label: 'Data aggiornamento' },
           { type: 'boolean', name: 'draft', label: 'Bozza (non pubblicare)' },
           { type: 'rich-text', name: 'body', label: 'Contenuto', isBody: true },
+        ],
+      },
+
+      // ─── NEWS ──────────────────────────────────────────────────────────────
+      // Ogni news è un articolo con un indirizzo suo: /news/<nome-file>. Il
+      // nome del file lo fa lo slug del titolo, quindi il titolo si scrive
+      // pensando anche al link.
+      //
+      // La differenza con l'Help Desk è il tempo, non il tono: una news è
+      // datata e invecchia, una scheda dell'Help Desk risponde a una domanda
+      // che si ripete. Se una comunicazione vale ancora fra un anno, è una
+      // scheda.
+      // ───────────────────────────────────────────────────────────────────────
+      {
+        name: 'news',
+        label: 'News',
+        path: 'src/content/news',
+        format: 'md',
+        ui: {
+          filename: {
+            slugify: (values) =>
+              (values?.title || 'nuova-news')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-|-$/g, ''),
+          },
+          defaultItem: () => ({
+            date: new Date().toISOString(),
+            category: 'Club',
+          }),
+        },
+        fields: [
+          { type: 'string', name: 'title', label: 'Titolo', isTitle: true, required: true },
+          {
+            type: 'datetime',
+            name: 'date',
+            label: 'Data',
+            required: true,
+            ui: { dateFormat: 'DD/MM/YYYY' },
+            description: 'Ordina le news: la più recente compare prima.',
+          },
+          {
+            type: 'string',
+            name: 'category',
+            label: 'Categoria (l’etichetta sulla card)',
+            options: ['Club', 'Struttura', 'Corsi', 'Orari', 'Scuola Nuoto', 'Eventi'],
+          },
+          {
+            type: 'string',
+            name: 'excerpt',
+            label: 'Riassunto (la card mostra questo, e i motori lo usano come descrizione)',
+            required: true,
+            ui: { component: 'textarea' },
+          },
+          { type: 'image', name: 'image', label: 'Immagine' },
+          {
+            type: 'string',
+            name: 'imageAlt',
+            label: 'Descrizione immagine (per accessibilità e SEO)',
+          },
+          {
+            type: 'string',
+            name: 'ctaLabel',
+            label: 'Pulsante · testo',
+            description:
+              'Facoltativo. Il pulsante appare in fondo all’articolo, non sulla card: dalla card si va a leggere la notizia.',
+          },
+          { type: 'string', name: 'ctaHref', label: 'Pulsante · link' },
+          attivitaField,
+          { type: 'boolean', name: 'draft', label: 'Bozza (non pubblicare)' },
+          {
+            type: 'rich-text',
+            name: 'body',
+            label: 'La notizia',
+            isBody: true,
+            description:
+              'Il testo dell’articolo. Il riassunto sopra non va ripetuto qui: sulla pagina compare già in cima.',
+          },
+        ],
+      },
+
+      // ─── SERVIZI ───────────────────────────────────────────────────────────
+      // Le voci della sezione Servizi del Club Life. Non hanno una pagina
+      // loro: sono una riga sempre visibile e un testo che si apre.
+      // ───────────────────────────────────────────────────────────────────────
+      {
+        name: 'servizi',
+        label: 'Servizi',
+        path: 'src/content/servizi',
+        format: 'md',
+        fields: [
+          { type: 'string', name: 'title', label: 'Nome del servizio', isTitle: true, required: true },
+          {
+            type: 'number',
+            name: 'order',
+            label: 'Ordine nell’elenco (numero più basso = più in alto)',
+          },
+          {
+            type: 'string',
+            name: 'desc',
+            label: 'Una riga, sempre visibile',
+            required: true,
+            ui: { component: 'textarea' },
+          },
+          {
+            type: 'string',
+            name: 'detail',
+            label: 'Il resto, che si apre al tocco',
+            required: true,
+            ui: { component: 'textarea' },
+          },
+          { type: 'string', name: 'href', label: 'Link (una pagina del sito o un indirizzo esterno)' },
+          { type: 'string', name: 'hrefLabel', label: 'Testo del link' },
+          attivitaField,
+          { type: 'boolean', name: 'draft', label: 'Bozza (non pubblicare)' },
         ],
       },
 
