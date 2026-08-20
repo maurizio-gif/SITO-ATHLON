@@ -20,7 +20,7 @@ attivita: []
 
 ## Attività a prenotazione
 
-Gym Floor · Corsi Fitness · Aqua Fitness · Scuola Nuoto Adulti · Nuoto Libero Assistito · Corsi Fitness Virtual · Baby Nuoto (3-30 mesi) · Recuperi Scuola Nuoto Bambini · Group Reformer
+Gym Floor · Corsi Fitness · Aqua Fitness · Scuola Nuoto Adulti · Nuoto Libero Assistito · Corsi Fitness Virtual · Baby Nuoto (3-36 mesi) · Recuperi Scuola Nuoto Bambini · Group Reformer
 
 ## Regole principali
 
