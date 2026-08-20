@@ -38,7 +38,7 @@ import {
   PLANNING_MONTH,
 } from '../data/planning';
 import { CLUB } from '../data/club';
-import { plans, GUEST_PASS, SOSPENSIONE, activityInfo } from '../data/abbonamenti';
+import { plans, GUEST_PASS, SOSPENSIONE, activityInfo, SINGOLI, PERSONAL } from '../data/abbonamenti';
 import { ACTIVITY_TAGS, ACTIVITY_IDS } from '../data/activities';
 import { AREA_LABELS } from '../data/helpdesk';
 import { vociFaq } from '../data/faq';
@@ -489,6 +489,45 @@ export const GET: APIRoute = async () => {
     area: 'Abbonamenti',
     attivita: [],
     testo: `La sospensione costa ${SOSPENSIONE.prezzo} € e vale un mese solare per volta, senza limite al numero di sospensioni. Va chiesta con ${SOSPENSIONE.preavviso} giorni di preavviso rispetto al primo del mese da sospendere.`,
+  });
+
+  /* ---- Senza abbonamento: si paga una lezione alla volta ----------------
+     Questa voce nasce da una risposta sbagliata. A «avete carnet di accessi?»
+     l'assistente rispondeva che i corsi stanno «solo negli abbonamenti», e non
+     era prudenza: gli accessi singoli erano scritti a mano nel markup di
+     `abbonamenti.astro`, quindi nella KB non c'erano e per il bot non
+     esistevano. Un listino che vive in una pagina esiste per chi apre quella
+     pagina e per nessun altro.
+
+     Le due cose vanno dette insieme, perché la domanda è sempre quella: il
+     carnet no, la lezione singola sì. Un «no» secco manda via una persona che
+     voleva pagare. */
+  voci.push({
+    id: 'abbonamento:accessi-singoli',
+    tipo: 'abbonamento',
+    titolo: 'Accessi singoli — senza abbonamento',
+    url: `${SITE}/abbonamenti#accessi-singoli`,
+    area: 'Abbonamenti',
+    attivita: [],
+    testo: blocchi(
+      'Si puo\u2019 entrare senza abbonamento: si prenota e si paga una lezione o un accesso alla volta, dall\u2019app o dal portale.',
+      `**Non esistono carnet**, ne\u2019 pacchetti di ingressi da comprare in anticipo: si paga volta per volta. Una tantum, la prima volta, il badge di accesso costa ${SINGOLI.badge} \u20ac.`,
+      SINGOLI.voci.map((v) => `${v.nome} \u2014 ${v.nota}: ${v.prezzo} \u20ac per accesso.`).join('\n')
+    ),
+  });
+
+  voci.push({
+    id: 'abbonamento:personal-training',
+    tipo: 'abbonamento',
+    titolo: 'Personal Training — pacchetti e seduta singola',
+    url: `${SITE}/abbonamenti#personal-training`,
+    area: 'Abbonamenti',
+    attivita: [],
+    testo: blocchi(
+      'I pacchetti di personal training si aggiungono a un abbonamento attivo. La seduta singola invece e\u2019 aperta anche a chi non e\u2019 iscritto.',
+      PERSONAL.pacchetti.map((x) => `${x.etichetta}: ${x.prezzo} \u20ac.`).join('\n'),
+      `Seduta singola: ${PERSONAL.singolaIscritti} \u20ac per gli iscritti, ${PERSONAL.singolaEsterni} \u20ac per gli esterni.`
+    ),
   });
 
   voci.push({

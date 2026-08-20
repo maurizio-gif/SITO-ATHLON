@@ -6,7 +6,7 @@ import { faqPagina } from '../data/faq';
 
 import { trialCta } from '../data/cta';
 import { offerSchema } from '../data/club';
-import { plans, GUEST_PASS, SOSPENSIONE, activityInfo } from '../data/abbonamenti';
+import { plans, GUEST_PASS, SOSPENSIONE, activityInfo, SINGOLI, PERSONAL } from '../data/abbonamenti';
 /* Il dominio di produzione, per gli @id assoluti degli schemi. */
 const SITE = 'https://www.athlonroma.it';
 
@@ -35,20 +35,6 @@ const activityIcon: Record<string, string> = {
 
 
 
-const singoli = [
-  { name: 'Gym Floor', note: 'Accesso 90 minuti', price: '€20' },
-  { name: 'Corso Fitness', note: '85+ corsi tra cui scegliere', price: '€22' },
-  { name: 'Aqua Fitness', note: 'Aqua Gym, Hydrobike, Gestanti', price: '€22' },
-  { name: 'Nuoto Libero Assistito', note: 'Sessione 60 minuti', price: '€20' },
-  { name: 'Scuola Nuoto Adulti', note: 'Base, Intermedio, Avanzato', price: '€22' },
-  { name: 'Group Reformer', note: 'Gruppi da 10 con istruttore', price: '€25' },
-];
-
-const ptPackages = [
-  { label: '2 sedute al mese', price: '€80' },
-  { label: '4 sedute al mese', price: '€140' },
-  { label: '8 sedute al mese', price: '€280' },
-];
 
 /**
  * I due piani in forma leggibile da una macchina. I prezzi non sono scritti qui:
@@ -255,22 +241,23 @@ const trust = [
   </section>
 
   <!-- ACCESSI SINGOLI -->
-  <section class="ab-sec">
+  <section class="ab-sec" id="accessi-singoli">
     <div class="container">
       <span class="eyebrow" data-anim="from-left">Senza abbonamento</span>
       <h2 class="ab-sec__title" data-anim="reveal">Accessi singoli</h2>
       <p class="ab-sec__sub">
-        Prenota e paga una lezione o un accesso alla volta. Badge di accesso €5 (una tantum).
+        Prenota e paga una lezione o un accesso alla volta. Badge di accesso €{SINGOLI.badge} (una
+        tantum). Non ci sono carnet: nessun pacchetto di ingressi da comprare in anticipo.
       </p>
 
       <ul class="singoli">
-        {singoli.map((s) => (
+        {SINGOLI.voci.map((v) => (
           <li class="singolo">
             <div>
-              <span class="singolo__name">{s.name}</span>
-              <span class="singolo__note">{s.note}</span>
+              <span class="singolo__name">{v.nome}</span>
+              <span class="singolo__note">{v.nota}</span>
             </div>
-            <span class="singolo__price">{s.price}</span>
+            <span class="singolo__price">€{v.prezzo}</span>
           </li>
         ))}
       </ul>
@@ -280,7 +267,7 @@ const trust = [
   </section>
 
   <!-- PERSONAL TRAINING -->
-  <section class="ab-sec ab-sec--alt">
+  <section class="ab-sec ab-sec--alt" id="personal-training">
     <div class="container">
       <span class="eyebrow" data-anim="from-left">Allenamento individuale</span>
       <h2 class="ab-sec__title" data-anim="reveal">Personal Training</h2>
@@ -289,16 +276,17 @@ const trust = [
       </p>
 
       <ul class="singoli">
-        {ptPackages.map((p) => (
+        {PERSONAL.pacchetti.map((p) => (
           <li class="singolo">
-            <span class="singolo__name">{p.label}</span>
-            <span class="singolo__price">{p.price}</span>
+            <span class="singolo__name">{p.etichetta}</span>
+            <span class="singolo__price">€{p.prezzo}</span>
           </li>
         ))}
       </ul>
 
       <p class="ab-pt-note">
-        Seduta singola: <strong>€45</strong> per iscritti · <strong>€55</strong> per esterni
+        Seduta singola: <strong>€{PERSONAL.singolaIscritti}</strong> per iscritti ·
+        <strong>€{PERSONAL.singolaEsterni}</strong> per esterni
       </p>
       <a href={`${PG}/#/PersonalTraining?clubId=1&trainerId=null`} class="btn btn-outline-dark">
         Prenota una seduta →
