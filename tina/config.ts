@@ -1,5 +1,6 @@
 import { defineConfig } from 'tinacms';
 import { ACTIVITY_TAGS } from '../src/data/activities';
+import { SALE } from '../src/data/sale';
 
 // Le attività sono definite una volta sola in src/data/activities.ts: lo stesso
 // elenco valida il frontmatter, popola questa tendina e disegna il primo passo
@@ -52,6 +53,188 @@ export default defineConfig({
 
   schema: {
     collections: [
+      // ─── PLANNING ──────────────────────────────────────────────────────────
+      // Il palinsesto della settimana, e da qui si muove mezzo sito.
+      //
+      // È un documento solo — il palinsesto corrente — quindi non si crea e non
+      // si cancella: si riscrive. Ogni pagina che mostra orari legge da questo
+      // file attraverso `data/planning.ts`, così una lezione spostata cambia
+      // insieme /planning, /corsi-fitness, le quindici pagine dei corsi, la
+      // pagina di ogni attività in acqua e i conteggi che il sito stampa
+      // («N lezioni a settimana», «più di N ore»): sono calcolati, non scritti.
+      //
+      // Il nome della lezione è la chiave con cui la pagina del corso trova i
+      // suoi orari, e la sala è la chiave del colore in legenda: la prima è
+      // testo libero perché un corso nuovo deve poter entrare in palinsesto, la
+      // seconda è una tendina perché le sale sono sei e sono quelle.
+      // ───────────────────────────────────────────────────────────────────────
+      {
+        name: 'planning',
+        label: 'Planning (orari settimanali)',
+        path: 'src/data',
+        format: 'json',
+        match: { include: 'planning-corrente' },
+        ui: {
+          // Uno e uno solo: un secondo palinsesto sarebbe un palinsesto che
+          // nessuna pagina legge, e cancellare questo lascerebbe il sito senza
+          // orari da mostrare.
+          allowedActions: { create: false, delete: false },
+          router: () => '/planning',
+        },
+        fields: [
+          {
+            type: 'string',
+            name: 'mese',
+            label: 'Mese coperto da questo palinsesto',
+            description:
+              'Non compare nelle pagine — un orario giusto con un mese vecchio accanto sembra vecchio. Serve a te per sapere cosa è caricato, e all’assistente della chat, che lo cita.',
+            required: true,
+          },
+
+          {
+            type: 'object',
+            name: 'gymFloor',
+            label: 'Gym Floor · sala aperta',
+            description:
+              'La Gym Floor non ha lezioni: ha orari di apertura. Da qui esce anche il totale di ore di sala aperta che il sito mostra.',
+            fields: [
+              { type: 'string', name: 'title', label: 'Titolo', required: true },
+              {
+                type: 'string',
+                name: 'planTags',
+                label: 'Compresa negli abbonamenti',
+                list: true,
+                options: [
+                  { value: 'smart', label: 'Smart' },
+                  { value: 'premium', label: 'Premium' },
+                ],
+                required: true,
+              },
+              {
+                type: 'string',
+                name: 'lede',
+                label: 'Testo di presentazione',
+                ui: { component: 'textarea' },
+                required: true,
+              },
+              {
+                type: 'object',
+                name: 'hours',
+                label: 'Orari di apertura',
+                list: true,
+                ui: { itemProps: (i) => ({ label: [i?.label, i?.hours].filter(Boolean).join(' · ') }) },
+                fields: [
+                  {
+                    type: 'string',
+                    name: 'label',
+                    label: 'Giorni (es. Lunedì – Venerdì)',
+                    required: true,
+                  },
+                  {
+                    type: 'string',
+                    name: 'hours',
+                    label: 'Dalle – alle (es. 06:00 – 22:00)',
+                    description:
+                      'Le ore si sommano da sole: una fascia scritta male non fa errore, fa un totale sbagliato.',
+                    required: true,
+                  },
+                ],
+              },
+            ],
+          },
+
+          {
+            type: 'object',
+            name: 'bands',
+            label: 'Fasce di palinsesto',
+            list: true,
+            ui: { itemProps: (i) => ({ label: i?.title }) },
+            fields: [
+              {
+                type: 'string',
+                name: 'id',
+                label: 'Codice della fascia',
+                description:
+                  'NON cambiarlo: è il nome con cui le pagine chiedono questa fascia (corsi-fitness, group-reformer, scuola-nuoto-adulti, nuoto-libero, aqua-fitness). Cambiandolo il sito non compila più.',
+                required: true,
+              },
+              { type: 'string', name: 'title', label: 'Titolo della fascia', required: true },
+              {
+                type: 'string',
+                name: 'planTags',
+                label: 'Compresa negli abbonamenti',
+                list: true,
+                options: [
+                  { value: 'smart', label: 'Smart' },
+                  { value: 'premium', label: 'Premium' },
+                ],
+                required: true,
+              },
+              {
+                type: 'string',
+                name: 'lede',
+                label: 'Testo di presentazione',
+                description:
+                  'Scrivi {n} dove va il numero di lezioni della fascia e {ore} dove vanno le sue ore: li sostituisce il sito contando il palinsesto, così non restano indietro.',
+                ui: { component: 'textarea' },
+                required: true,
+              },
+              {
+                type: 'object',
+                name: 'days',
+                label: 'Giorni',
+                list: true,
+                ui: {
+                  itemProps: (i) => ({
+                    label: `${i?.full ?? 'Giorno'} · ${i?.classes?.length ?? 0} lezioni`,
+                  }),
+                },
+                fields: [
+                  { type: 'string', name: 'short', label: 'Sigla (Lun)', required: true },
+                  { type: 'string', name: 'full', label: 'Giorno (Lunedì)', required: true },
+                  {
+                    type: 'object',
+                    name: 'classes',
+                    label: 'Lezioni del giorno',
+                    list: true,
+                    ui: {
+                      itemProps: (i) => ({
+                        label: [i?.time, i?.name, i?.sala].filter(Boolean).join(' · '),
+                      }),
+                    },
+                    fields: [
+                      {
+                        type: 'string',
+                        name: 'time',
+                        label: 'Orario (es. 07:40–08:30)',
+                        description:
+                          'Con il trattino lungo e senza spazi. Da qui il sito calcola la durata, quindi le ore totali dipendono da come è scritto.',
+                        required: true,
+                      },
+                      {
+                        type: 'string',
+                        name: 'name',
+                        label: 'Lezione',
+                        description:
+                          'Scrivilo **come si chiama nella sua pagina**: è con questo nome che la pagina del corso trova i suoi orari e che si apre la scheda della lezione. Cambiandolo, quella pagina scrive «questo mese non è in palinsesto».',
+                        required: true,
+                      },
+                      {
+                        type: 'string',
+                        name: 'sala',
+                        label: 'Sala',
+                        description: 'Vuoto per le attività che non stanno in una sala.',
+                        options: SALE.map((s) => ({ value: s, label: s })),
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+
       // ─── EVENTI ────────────────────────────────────────────────────────────
       // Template standard: ogni evento ha la stessa struttura, e "Crea nuovo"
       // parte già compilato (defaultItem) con una sala e due lezioni da

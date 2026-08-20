@@ -436,10 +436,11 @@ Consult these guides before working on related tasks:
 ## I contenuti si scrivono da Tina, e il build lo sa
 
 News, eventi, schede dell'Help Desk, servizi e la landing della promo sono
-markdown in `src/content/`, e chi li scrive non apre GitHub: apre `/admin`, che
-è il pannello di [TinaCMS](https://tina.io). Tina è git-backed — salva
-scrivendo sul repository — quindi il contenuto resta versionato e il sito resta
-statico: nessun database da interrogare a ogni visita.
+markdown in `src/content/`; il planning è il JSON in `src/data/`. Chi li scrive
+non apre GitHub: apre `/admin`, che è il pannello di
+[TinaCMS](https://tina.io). Tina è git-backed — salva scrivendo sul repository
+— quindi il contenuto resta versionato e il sito resta statico: nessun database
+da interrogare a ogni visita.
 
 Lo schema del pannello sta in `tina/config.ts` e **deve seguire** quello delle
 collezioni in `src/content.config.ts`. Sono due file perché fanno due cose
@@ -462,6 +463,27 @@ due.
   diventa `/wikiathlon/<area>/<file>`, `src/content/news/<file>.md` diventa
   `/news/<file>`. Spostare un articolo di cartella o rinominarlo ne cambia il
   link: se era pubblicato, serve un reindirizzo in `astro.config.mjs`.
+- **Il planning è l'unica collezione che non è un contenuto**, ed è quella da
+  cui si muove più sito: è `src/data/planning-corrente.json`, un documento solo
+  — non si crea e non si cancella — che tutte le pagine con orari leggono
+  attraverso `data/planning.ts`. Spostare una lezione cambia insieme
+  `/planning`, `/corsi-fitness`, le quindici pagine dei corsi e quelle delle
+  attività in acqua; e i numeri che il sito stampa («N lezioni a settimana»,
+  «più di N ore», i `{n}` e `{ore}` dentro i testi delle fasce) sono contati dal
+  palinsesto, non scritti. Misurato: sposta l'Antigravity e cambiano `/planning`,
+  `/antigravity` e `/corsi-fitness`, mentre `/nuoto-libero` resta identico.
+
+  Tre chiavi tengono in piedi quelle connessioni, e vanno trattate come tali.
+  L'**`id` della fascia** è il nome con cui una pagina la chiede (`getBand`):
+  cambiarlo fa fallire il build, ed è voluto. Il **nome della lezione** è come
+  la pagina del corso trova i suoi orari — `corso.lezioni` in `data/corsi.ts` e
+  l'elenco in `corsi-fitness.astro` — e rinominarlo non rompe niente ma svuota
+  quella tabella: `LessonSchedule` scrive «questo mese non è in palinsesto»,
+  che è il modo giusto di sbagliare ma resta uno sbaglio. La **sala** è la
+  chiave del colore in legenda, e per quella non c'è da fidarsi di chi scrive:
+  in Tina è una tendina, e le sue voci escono da `SALE` in `src/data/sale.ts`,
+  la stessa lista che ordina le legende e che `planning.ts` controlla al build
+  abbia un colore per ogni voce, in chiaro e in scuro.
 
 **Il pannello non può mai fermare il sito.** `tinacms build` compila
 `public/admin` e va prima di Astro, che copia `public/` nel `dist`. Ma quel
