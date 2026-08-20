@@ -139,8 +139,12 @@ const trust = [
       </p>
 
       <div class="plans">
+        {/* L'`id` non è decorativo: è l'ancora a cui l'assistente manda chi
+            chiede un prezzo. Nella risposta le cifre non ci sono — un listino
+            letto in chat non si capisce — quindi il link deve atterrare sul
+            piano di cui si stava parlando, non in cima alla pagina. */}
         {plans.map((p, i) => (
-          <article class:list={['plan', p.id]} data-anim="scale" data-anim-delay={String(i * 100)}>
+          <article id={p.id} class:list={['plan', p.id]} data-anim="scale" data-anim-delay={String(i * 100)}>
             <div class="plan__head">
               <span class="plan__badge">{p.badge}</span>
               {/* Two-tone lockup, as on the old site: the word "Abbonamento"
@@ -575,6 +579,10 @@ const trust = [
   }
 
   .plan {
+    /* L'header è `sticky`, quindi un salto all'ancora finirebbe sotto la barra:
+       in rem, così il margine cresce con la barra sul totem e sul televisore
+       invece di restare la misura di un telefono. */
+    scroll-margin-top: 6rem;
     border-radius: var(--radius);
     overflow: hidden;
   }
