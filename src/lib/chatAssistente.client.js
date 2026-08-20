@@ -59,19 +59,22 @@ export function initChatAssistente(root, options) {
      conversazione: si passano precompilati a Calendly così la persona trova il
      modulo pieno e sceglie solo giorno e ora.
 
-     **La mappatura dei parametri è qui e solo qui.** Calendly precompila per
-     nome fisso: `name` (o `first_name`/`last_name` se il modulo ha i due campi
-     separati — li mandiamo tutti e tre, quelli di troppo vengono ignorati),
-     `email`, `location` per il numero quando l'evento è una chiamata in uscita
-     — è Calendly a chiedere il numero come «luogo» — e `a1`, `a2`… per le
-     domande personalizzate, nell'ordine in cui stanno nel modulo.
+     **La mappatura dei parametri è qui e solo qui**, e non è più un'ipotesi:
+     letta dall'evento sull'account del club. `recall` è un `outbound_call` —
+     il club chiama, e Calendly chiede il numero come «luogo», quindi il numero
+     va in `location` — e ha **una sola** domanda personalizzata, in posizione
+     0 e **obbligatoria**: «Per favore, condividi tutto ciò che può essere
+     utile per preparare il nostro incontro.» Le domande personalizzate si
+     precompilano con `a1`, `a2`… nell'ordine del modulo, quindi il contesto è
+     `a1`. Che quella domanda sia obbligatoria è il motivo per cui va
+     riempita sempre: vuota, blocca la prenotazione.
 
-     Quell'ordine dalla nostra parte non si vede: la pagina dell'evento non è
-     leggibile da qui e quell'account Calendly non è quello collegato. Quindi:
-     se aprendo il link il numero non arriva nel suo campo, il campo non è il
-     «luogo» ma una domanda personalizzata — si mette `telefono: 'a1'` e
-     `contesto: 'a2'`, e non c'è altro da cambiare. Per sicurezza il numero è
-     anche la prima riga del contesto, così non si perde comunque. */
+     Il nome è il campo unico di Calendly, quindi `name` e basta.
+
+     Se un domani il modulo cambia — una domanda in più prima di quella, o il
+     numero spostato in una domanda invece che nel «luogo» — si aggiorna
+     `campi` qui sotto e non serve toccare altro. Il numero resta comunque
+     anche nella prima riga del contesto, che è la rete di sicurezza. */
   var RICHIAMO = {
     url: 'https://calendly.com/athlonclub/recall/',
     /** Quante risposte dell'assistente prima di proporlo. */
@@ -480,14 +483,9 @@ export function initChatAssistente(root, options) {
   /** Il link con tutto già dentro: chi ci arriva scegle solo giorno e ora. */
   function linkRichiamo() {
     var p = new URLSearchParams();
+    /* Un campo nome solo, come il modulo dell'evento. */
     var nome = [dati.nome, dati.cognome].filter(Boolean).join(' ');
-    /* Tutte e tre le forme del nome: Calendly usa `name` con il campo unico e
-       `first_name`/`last_name` con i due separati, e quelle di troppo le
-       ignora. Mandarle tutte è l'unico modo di non dipendere da come è
-       configurato un modulo che da qui non si vede. */
     if (nome) p.set('name', nome);
-    if (dati.nome) p.set('first_name', dati.nome);
-    if (dati.cognome) p.set('last_name', dati.cognome);
     if (dati.email) p.set('email', dati.email);
     if (dati.telefono) p.set(RICHIAMO.campi.telefono, '+39' + cellulareNudo(dati.telefono));
     p.set(RICHIAMO.campi.contesto, contestoRichiamo());
