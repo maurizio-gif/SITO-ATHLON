@@ -175,3 +175,43 @@ export const GUEST_PASS = {
   /** Riservato a chi non ha avuto un abbonamento Athlon da quest'anno in poi. */
   dal: 2021,
 } as const;
+
+/**
+ * Gli accessi singoli, e il perché stanno qui e non nella pagina.
+ *
+ * Erano scritti a mano dentro `abbonamenti.astro`, e per questo la KB
+ * dell'assistente non li aveva mai visti: a «avete carnet di accessi?» il bot
+ * rispondeva che i corsi stanno «solo negli abbonamenti», che è falso e manda
+ * via una persona che voleva pagare. Un listino che vive nel markup di una
+ * pagina è un listino che esiste per chi apre quella pagina e per nessun altro.
+ *
+ * Il carnet, quello, davvero non c'è: non si comprano pacchetti di ingressi
+ * prepagati. Si prenota e si paga una lezione alla volta — che è la cosa che
+ * serve sapere, e che va detta al posto di un «no».
+ */
+export const SINGOLI = {
+  /** Il badge, una tantum: si paga la prima volta e poi mai più. */
+  badge: '5',
+  voci: [
+    { nome: 'Gym Floor', nota: 'Accesso 90 minuti', prezzo: '20' },
+    { nome: 'Corso Fitness', nota: '85+ corsi tra cui scegliere', prezzo: '22' },
+    { nome: 'Aqua Fitness', nota: 'Aqua Gym, Hydrobike, Gestanti', prezzo: '22' },
+    { nome: 'Nuoto Libero Assistito', nota: 'Sessione 60 minuti', prezzo: '20' },
+    { nome: 'Scuola Nuoto Adulti', nota: 'Base, Intermedio, Avanzato', prezzo: '22' },
+    { nome: 'Group Reformer', nota: 'Gruppi da 10 con istruttore', prezzo: '25' },
+  ],
+} as const;
+
+/**
+ * Il personal training: pacchetti mensili sopra un abbonamento attivo, e la
+ * seduta singola, che è l'unica cosa del club aperta anche a chi non è iscritto.
+ */
+export const PERSONAL = {
+  pacchetti: [
+    { etichetta: '2 sedute al mese', prezzo: '80' },
+    { etichetta: '4 sedute al mese', prezzo: '140' },
+    { etichetta: '8 sedute al mese', prezzo: '280' },
+  ],
+  singolaIscritti: '45',
+  singolaEsterni: '55',
+} as const;
