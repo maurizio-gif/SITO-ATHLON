@@ -338,7 +338,7 @@ export const JUNIOR: CorsoJunior[] = [
       { slug: 'gym-floor', perche: 'La sala attrezzi affaccia direttamente sulle piscine: ti alleni con la vasca davanti agli occhi.' },
       { slug: 'reformer', perche: 'Cinquanta minuti in Sala C: centro, postura e controllo, in gruppi da dieci.' },
       { slug: 'aqua-fitness', perche: 'Resti in acqua ma tocca a te: lavoro completo e nessun carico sulle articolazioni.' },
-      { slug: 'ginnastica-strutturale', perche: 'Per la schiena che ha portato in braccio tutto il giorno.' },
+      { slug: 'ginnastica-posturale', perche: 'Per la schiena che ha portato in braccio tutto il giorno.' },
     ],
     titolo: 'Baby Nuoto Roma Talenti – Dai 3 mesi | Athlon Club',
     descrizione:

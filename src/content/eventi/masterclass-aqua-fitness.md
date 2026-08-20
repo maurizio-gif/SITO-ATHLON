@@ -5,7 +5,7 @@ date: 2026-09-27
 time: "09:30 – 13:00"
 image: "/wp-content/uploads/2025/11/ATHLON88-scaled.jpg"
 imageAlt: "Lezione di aqua fitness in vasca ad Athlon Club"
-excerpt: "Una mattina in acqua, gratuita e aperta anche a chi non è iscritto: quattro lezioni di fila fra Vasca Grande e Vasca Media."
+excerpt: "Una mattina in acqua, gratuita e aperta anche a chi non è iscritto: quattro lezioni di fila fra Vasca Grande e Vasca Piccola."
 free: true
 notes:
   - "Porta cuffia, costume e ciabatte"
@@ -16,7 +16,7 @@ program:
     slots:
       - { time: "09:30", lesson: "Aqua Training", trainer: "Filippo" }
       - { time: "10:20", lesson: "Aqua Aerobic", trainer: "Alessia" }
-  - room: "Vasca Media"
+  - room: "Vasca Piccola"
     slots:
       - { time: "11:10", lesson: "Hydrobike", trainer: "Arianna" }
       - { time: "12:00", lesson: "Aqua Soft", trainer: "Alice" }

@@ -42,7 +42,7 @@
             },
             {
               "time": "09:30–10:20",
-              "name": "Ginnastica Strutturale",
+              "name": "Ginnastica Posturale",
               "sala": "Sala A"
             },
             {
@@ -158,7 +158,7 @@
             },
             {
               "time": "16:50–17:40",
-              "name": "Ginnastica Strutturale",
+              "name": "Ginnastica Posturale",
               "sala": "Sala A"
             },
             {
@@ -219,7 +219,7 @@
             },
             {
               "time": "10:30–11:20",
-              "name": "Ginnastica Strutturale",
+              "name": "Ginnastica Posturale",
               "sala": "Sala A"
             },
             {
@@ -315,7 +315,7 @@
             },
             {
               "time": "16:40–17:30",
-              "name": "Ginnastica Strutturale",
+              "name": "Ginnastica Posturale",
               "sala": "Sala A"
             },
             {
@@ -952,12 +952,12 @@
             {
               "time": "08:15–09:00",
               "name": "Hydrobike",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "09:00–09:50",
               "name": "Aqua Soft",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "11:00–11:50",
@@ -967,17 +967,17 @@
             {
               "time": "13:30–14:20",
               "name": "Aqua Tonic",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "18:50–19:35",
               "name": "Hydrobike",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "19:40–20:30",
               "name": "Aqua Tonic",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             }
           ]
         },
@@ -988,7 +988,7 @@
             {
               "time": "09:00–09:50",
               "name": "Aqua Soft",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "11:00–11:50",
@@ -998,22 +998,22 @@
             {
               "time": "13:00–13:45",
               "name": "Hydrobike",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "13:50–14:40",
               "name": "Aqua Aerobic",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "18:50–19:40",
               "name": "Aqua Aerobic",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "19:40–20:25",
               "name": "Hydrobike",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             }
           ]
         },
@@ -1024,12 +1024,12 @@
             {
               "time": "08:15–09:05",
               "name": "Aqua Soft",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "09:05–09:55",
               "name": "Aqua Soft",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "11:00–11:50",
@@ -1039,12 +1039,12 @@
             {
               "time": "13:00–13:50",
               "name": "Aqua Tonic",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "13:50–14:35",
               "name": "Hydrobike",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "19:20–20:10",
@@ -1054,7 +1054,7 @@
             {
               "time": "20:10–20:55",
               "name": "Hydrobike",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             }
           ]
         },
@@ -1065,7 +1065,7 @@
             {
               "time": "09:00–09:50",
               "name": "Aqua Soft",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "11:00–11:50",
@@ -1075,17 +1075,17 @@
             {
               "time": "13:30–14:20",
               "name": "Aqua Aerobic",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "18:50–19:40",
               "name": "Aqua Aerobic",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "19:40–20:25",
               "name": "Hydrobike",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             }
           ]
         },
@@ -1096,12 +1096,12 @@
             {
               "time": "08:15–09:00",
               "name": "Hydrobike",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "09:00–09:50",
               "name": "Aqua Soft",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "11:00–11:50",
@@ -1111,22 +1111,22 @@
             {
               "time": "13:00–13:45",
               "name": "Hydrobike",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "13:50–14:40",
               "name": "Aqua Aerobic",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "18:50–19:35",
               "name": "Hydrobike",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             },
             {
               "time": "19:40–20:30",
               "name": "Aqua Tonic",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             }
           ]
         },
@@ -1147,7 +1147,7 @@
             {
               "time": "12:20–13:05",
               "name": "Hydrobike",
-              "sala": "Vasca Media"
+              "sala": "Vasca Piccola"
             }
           ]
         }

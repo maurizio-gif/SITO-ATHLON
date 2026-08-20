@@ -132,7 +132,7 @@ Durante l'anno potranno essere effettuate riprese fotografiche o video. La comun
 <details>
 <summary><strong>4.4 – Il Corso</strong></summary>
 
-Dal **14 Settembre 2026** al **20 Giugno 2027**. Durata lezioni: **40'** in Vasca Media, **50'** in Vasca Grande. La strutturazione dei corsi è riferita alle diverse età e livelli didattici. La suddivisione degli allievi si basa su criteri di omogeneità per età e livello tecnico. La Direzione Tecnica si riserva il diritto di cambiare l'insegnante assegnato a seconda delle diverse esigenze didattiche.
+Dal **14 Settembre 2026** al **20 Giugno 2027**. Durata lezioni: **40'** in Vasca Piccola, **50'** in Vasca Grande. La strutturazione dei corsi è riferita alle diverse età e livelli didattici. La suddivisione degli allievi si basa su criteri di omogeneità per età e livello tecnico. La Direzione Tecnica si riserva il diritto di cambiare l'insegnante assegnato a seconda delle diverse esigenze didattiche.
 
 </details>
 
