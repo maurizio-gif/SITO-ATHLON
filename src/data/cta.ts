@@ -88,24 +88,25 @@ export function trialCta(ctx: CtaContext) {
 /**
  * «Contattaci»: mettersi in contatto con una persona del club.
  *
- * Va al modulo contatti n8n, lo stesso che raccoglie le richieste dei corsi
- * junior. I parametri riproducono la convenzione già in uso: `source=SitoWeb`
- * minuscolo e `Medium` con la maiuscola, con un valore che dice **quale**
- * pulsante è stato premuto — `PulsanteContattaci`, come `PulsanteBabyNuoto` per
- * il baby nuoto. Da qui la richiesta si distingue dalle altre senza guardare
- * altro.
+ * Dietro c'era il modulo contatti ospitato da n8n — `CONTATTACI - ATHLON`,
+ * con le pagine del form dentro l'automazione — aperto in una scheda nuova.
+ * Ora c'è `ContattaciModal.astro`, che sta nel Layout e intercetta ogni comando
+ * con `data-cta="talk"`: la persona non lascia più la pagina da cui è partita,
+ * e la pagina e l'attività di provenienza il modal le legge dal markup invece
+ * di passarle in query string. La convenzione `source=SitoWeb&Medium=Pulsante…`
+ * non serve più: quello che diceva — quale pulsante è stato premuto — adesso
+ * viaggia nel payload come `origine` e `cta`, insieme a UTM e `vid`.
  *
- * Quando il modal contatto esisterà — lascia un messaggio · prenota una
- * telefonata · prenota un appuntamento in sede — si cambia `href` qui e
- * cambiano tutti i punti del sito. L'intento è già `contact`, e la pagina di
- * partenza viaggia nel markup, quindi il modal sa da dove arriva la persona
- * senza chiederlo.
+ * L'`href` qui sotto è il ripiego per chi non ha JavaScript, e per il click con
+ * il tasto centrale che apre una scheda: porta all'Help Desk, che è l'altro
+ * modo di farsi rispondere senza compilare niente. Non è più un indirizzo
+ * esterno — il percorso del contatto vive dentro al sito.
  */
-const CONTACT_FORM = 'https://automazione.n8ndevelop.it/form/a4283d20-5832-46a3-9d88-df3561060e12';
+const TALK_FALLBACK = '/club-life#help-desk';
 
 export const TALK = {
   label: 'Contattaci',
-  href: `${CONTACT_FORM}?source=SitoWeb&Medium=PulsanteContattaci`,
+  href: TALK_FALLBACK,
   intent: 'contact',
 } as const;
 
@@ -114,8 +115,8 @@ export function talkCta(ctx: CtaContext) {
   return {
     label: TALK.label,
     href: TALK.href,
-    /** Il modulo è esterno: si apre in una scheda nuova finché è un form. */
-    external: true,
+    /** Il modal è nel sito: niente scheda nuova, niente `target`. */
+    external: false,
     attrs: ctaAttrs('talk', TALK.intent, ctx),
   };
 }

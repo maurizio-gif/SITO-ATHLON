@@ -36,7 +36,7 @@
       </span>
       <span class="ca__chi">
         <span class="ca__nome">Athlon Club</span>
-        <span class="ca__stato" data-ca-intestazione>Help Desk</span>
+        <span class="ca__stato" data-ca-intestazione>Assistente Virtuale</span>
       </span>
       <button type="button" class="ca__close" data-ca-close aria-label="Chiudi">×</button>
     </header>
@@ -1011,6 +1011,43 @@
     border-radius: 1rem;
     background: var(--color-cream);
     border: 1px solid rgba(39, 36, 35, 0.1);
+  }
+
+  .ca__conversazione :global(.ca__richiamo-titolo) {
+    margin: 0 0 0.3rem;
+    font-family: var(--font-heading);
+    font-size: var(--text-md);
+    line-height: 1.15;
+    color: var(--color-dark);
+  }
+
+  /* `height` e non `min-height`: il widget prende l'altezza del contenitore
+     solo se il contenitore ce l'ha, altrimenti resta ai suoi 150px iniziali.
+     Più basso che negli altri due pannelli, perché qui il riquadro sta dentro
+     una conversazione che scorre: 34rem lasciano vedere che sopra e sotto c'è
+     altro, e non sequestrano la chat. */
+  .ca__conversazione :global(.ca__richiamo-cal) {
+    height: 34rem;
+    margin-bottom: 0.2rem;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background: var(--color-white);
+  }
+
+  .ca__conversazione :global(.ca__richiamo-cal iframe) {
+    width: 100% !important;
+    height: 100% !important;
+    border: 0;
+  }
+
+  .ca__conversazione :global(.ca__richiamo-fatto) {
+    margin: 0.6rem 0 0;
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.7rem;
+    background: rgba(255, 87, 1, 0.1);
+    color: var(--accent-text);
+    font-size: var(--text-xs);
+    font-weight: 600;
   }
 
   .ca__conversazione :global(.ca__richiamo-lead) {

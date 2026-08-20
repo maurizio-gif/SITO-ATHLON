@@ -19,6 +19,9 @@
 // Se PerfectGym non risponde si prosegue: meglio un lead in più da verificare
 // a mano che una richiesta persa per un timeout.
 
+import { CALENDLY } from '../data/calendly';
+import { montaCalendario } from './calendario.client.js';
+
 export function initProvaForm(root, options) {
   var P = options.prefix;
   var onReset = options.onReset || function () {};
@@ -120,11 +123,54 @@ export function initProvaForm(root, options) {
   // ── Navigazione ───────────────────────────────────────────────────────────
   var attuale = 'email';
 
+  /* ── Il calendario del richiamo ────────────────────────────────────────────
+     Sull'ultima schermata, sotto il codice. La logica dell'embed — script
+     pigro, ripiego se non carica, conferma della prenotazione — sta in
+     `calendario.client.js`, condivisa con il form dei contatti e con la chat.
+
+     L'evento è `richiamami`, quello degli adulti: chi attiva un Guest Pass è
+     un adulto, e la chiamata serve a farlo partire, non a inserire un bambino
+     in un corso. */
+  var calendario = null;
+
+  async function apriCalendario() {
+    if (calendario) calendario.distruggi();
+    root.classList.add('pf--largo');
+    calendario = await montaCalendario({
+      riquadro: q('[data-pf-calendario]'),
+      ripiego: q('[data-pf-cal-ripiego]'),
+      link: q('[data-pf-cal-link]'),
+      url: CALENDLY.richiamami,
+      prefill: {
+        name: (dati.nome + ' ' + dati.cognome).trim(),
+        email: dati.email,
+        // `location` è il campo del telefono negli eventi «chiamata».
+        location: dati.cellulare ? '+39' + dati.cellulare : '',
+      },
+      onPrenotato: function () {
+        var fatto = q('[data-pf-cal-fatto]');
+        if (fatto) fatto.hidden = false;
+      },
+    });
+  }
+
+  function chiudiCalendario() {
+    root.classList.remove('pf--largo');
+    if (calendario) {
+      calendario.distruggi();
+      calendario = null;
+    }
+  }
+
   function mostraStep(nome) {
     attuale = nome;
     Object.keys(steps).forEach(function (k) {
       if (steps[k]) steps[k].hidden = k !== nome;
     });
+    // Il widget si monta solo qui, e non all'apertura del modal: è un terzo
+    // dominio, e chi non arriva in fondo non deve pagarne DNS, TLS e script.
+    if (nome === 'esito') apriCalendario();
+    else chiudiCalendario();
     // Il titolo del passo raccoglie il focus: chi naviga da tastiera o con lo
     // screen reader si ritrova all'inizio della schermata nuova e non sul
     // pulsante di prima, che ora è nascosto.
@@ -278,6 +324,7 @@ export function initProvaForm(root, options) {
   });
 
   function reset() {
+    chiudiCalendario();
     dati = stato();
     [campoEmail, campoNome, campoCognome, campoCellulare].forEach(function (c) {
       if (!c) return;

@@ -522,6 +522,109 @@ says on the screen itself which one is failing and how many millimetres the body
 copy measures. Keep the three numbers identical between `global.css`, that page,
 and every `/* + tv */` query.
 
+## I due sottodomini vecchi reindirizzano da `vercel.json`
+
+Prima di questo sito l'ecosistema era su tre host: `athlonroma.it` su WordPress,
+`wiki.athlonroma.it` con l'Help Desk (Astro su Netlify) e
+`planning.athlonroma.it` col palinsesto (HTML statico su Netlify). Le prime due
+sono diventate sezioni di questo sito — `/wikiathlon/<area>/<slug>` e
+`/planning` — e i vecchi indirizzi sono indicizzati e linkati.
+
+I redirect stanno **qui e non su Netlify**, in `vercel.json`, e la ragione è di
+manutenzione: le regole vivono nel repository che contiene le destinazioni,
+quindi chi rinomina un articolo vede il redirect nello stesso diff. Il prezzo è
+che i due sottodomini vanno aggiunti come domini del progetto Vercel e i loro
+record DNS spostati da Netlify — una volta sola, e in cambio due siti Netlify
+si archiviano invece di restare vivi per sempre come gusci di redirect.
+
+- **Per il wiki è quasi un cambio di host e basta**, e non per fortuna: dei 24
+  articoli del wiki vecchio **22 hanno il percorso identico** qui, perché la
+  forma `/wikiathlon/<area>/<slug>` è stata tenuta di proposito (vedi la sezione
+  su Tina). Quindi una regola con lo splat li copre tutti.
+- **Per il planning lo splat non si usa.** Là era un file HTML per mese —
+  `settembre.html`, `agosto.html` — qui è una pagina sola che legge il
+  palinsesto corrente: `planning.athlonroma.it/settembre.html` deve diventare
+  `/planning`, non `/settembre.html`, che non esiste.
+- **L'ordine dell'array è la regola**, perché Vercel applica la prima che
+  corrisponde: le specifiche prima del catch-all. `orari-estate-2026` sta prima
+  perché era una scheda dell'Help Desk e qui è una news, e senza quella regola
+  lo splat la manderebbe su `/wikiathlon/news/orari-estate-2026`, che il
+  `redirects` di `astro.config.mjs` reindirizza di nuovo: due salti invece di
+  uno.
+- **`statusCode: 301` e non `permanent: true`.** Sono la stessa intenzione ma
+  `permanent` emette un 308, e per una migrazione di dominio il 301 è la
+  convenzione che ogni crawler e ogni strumento vecchio tratta senza sorprese.
+
+Due trappole da conoscere.
+
+**Un `vercel.json` sovrascrive solo le chiavi che contiene.** Qui c'è solo
+`redirects`, quindi il comando di build e la cartella di output restano quelli
+della dashboard — cioè `scripts/build.mjs`. Aggiungere un `buildCommand` qui
+significherebbe avere la configurazione di build in due posti, e scoprire quale
+vince il giorno che divergono.
+
+**Le regole scattano solo per gli host attaccati al progetto.** `has` con
+`type: host` confronta l'intestazione della richiesta: finché
+`wiki.athlonroma.it` non è un dominio di questo progetto Vercel, quelle quattro
+regole non vengono mai valutate — non danno errore, semplicemente non esistono.
+È il motivo per cui il file da solo non basta, e per cui va messo in produzione
+**dopo** che `www` punta a Vercel: prima, i redirect manderebbero su un
+WordPress che quelle pagine non ha.
+
+### E le 102 regole di WordPress, che stanno nello stesso file
+
+Sotto le sei per host ci sono i redirect che il plugin Redirection teneva sul
+WordPress: 257 regole esportate, ridotte a 102 dopo aver buttato i duplicati, le
+disattivate e quelle che qui farebbero danno. Sono ordinate per traffico, il che
+non serve al funzionamento — Vercel confronta tutte le `source` — ma rende
+leggibile quali contano.
+
+**Tre categorie di regole vanno buttate, non portate**, e ognuna ha morso:
+
+- **Quelle la cui sorgente qui è una pagina vera.** `/scuola-nuoto-bambini` →
+  `/scuola-nuoto-bambini-3` aveva 26 813 hit su WordPress, dove la pagina si
+  chiamava `-3`; qui la pagina *è* `/scuola-nuoto-bambini`, e il verso è
+  invertito. Portarla avrebbe fatto un **ciclo infinito** con il redirect
+  `-3 → senza suffisso`. Stessa cosa per `/planning` → `planning.athlonroma.it`
+  (11 787 hit) e `/regolamento` → il PDF (10 275): qui sono due pagine, e il
+  redirect le avrebbe oscurate.
+- **Le catene.** Il plugin ne aveva tredici, tipo `/corsi-fitness/aeroshock` →
+  `/gpasse` → `/gpcoreo`. Vanno appiattite sulla destinazione finale, con una
+  regola: **l'appiattimento si ferma appena la destinazione è una pagina che
+  esiste qui.** Senza quel freno, `/termini-e-condizioni-…pdf` → `/regolamento`
+  proseguiva fino al PDF vecchio, cioè scavalcava la pagina che l'ha sostituito.
+- **Le sorgenti malformate dell'export**, tipo
+  `/abbonamenti/www.athlonroma.it/planning`: sono errori di battitura del
+  pannello, non indirizzi che qualcuno visita.
+
+**Le tre regole di `astro.config.mjs` stanno anche qui**, e non è una
+duplicazione da togliere: quelle generano pagine di `meta refresh` nel `dist`,
+questa dà un **301 vero**, e Vercel valuta i redirect prima di servire i file —
+quindi vince il 301 e la pagina di refresh non viene mai raggiunta. Le tre in
+`astro.config.mjs` restano perché il filtro della sitemap le legge da lì.
+
+Attenzione al falso positivo che ne consegue: se controlli «la sorgente esiste
+nel `dist`?» per scovare i redirect che oscurano una pagina, quelle tre
+risultano positive **perché sono pagine di refresh**, non contenuti. Vanno
+escluse dal controllo.
+
+Restano **126 indirizzi senza destinazione decisa**, quasi tutti scarti di
+WordPress — allegati, tag, categorie-prodotto — che su WordPress finivano in
+home. Mandare in home un indirizzo che non esiste più è un *soft 404*, e Google
+lo tratta peggio di un 404 onesto: non sono stati portati di proposito. Le
+eccezioni con traffico vero — `/lead` con 267 041 hit, `/corsi-adulti` con
+2 677, `/tv` e i suoi sottopercorsi — meritano una destinazione scelta, non la
+home.
+
+Per verificare, dopo il deploy e lo spostamento dei domini:
+
+```
+curl -sI https://wiki.athlonroma.it/wikiathlon/generali/certificato-medico/ | head -3
+```
+
+Deve dire `301` e `location: https://www.athlonroma.it/wikiathlon/generali/certificato-medico`.
+Un `200` vuol dire che il dominio non è ancora sul progetto.
+
 ## Documentation
 
 Full documentation: https://docs.astro.build

@@ -104,13 +104,7 @@ const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 
       <div class="pr-hero__actions" data-anim data-anim-delay="260">
         <a href="#piani" class="btn btn-primary">Vedi gli abbonamenti in promo →</a>
-        <a
-          href={contatta.href}
-          class="btn btn-outline"
-          target="_blank"
-          rel="noopener noreferrer"
-          {...contatta.attrs}
-        >{contatta.label}</a>
+        <a href={contatta.href} class="btn btn-outline" {...contatta.attrs}>{contatta.label}</a>
       </div>
     </div>
   </section>
@@ -322,10 +316,8 @@ const PG = 'https://athlon.perfectgym.com/ClientPortal2';
       <a
         href={contatta.href}
         class="btn btn-primary"
-        target="_blank"
-        rel="noopener noreferrer"
         {...contatta.attrs}
-      >Contattaci →</a>
+        >Contattaci →</a>
     </div>
 
     {/* La landing gira senza il footer del sito, quindi le condizioni non

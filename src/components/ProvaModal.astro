@@ -115,6 +115,37 @@ import { REGISTRAZIONE, PASSI_ATTIVAZIONE as PASSI } from '../data/guestPass';
       <p class="pf__nota">
         Ti abbiamo mandato le stesse istruzioni via email e WhatsApp. Il Pass si attiva entro 30 giorni.
       </p>
+
+      {/* ── Il richiamo ───────────────────────────────────────────────────
+          Il calendario in fondo alla schermata del codice, e non è un in più
+          decorativo: fra «ecco il codice» e «il Pass è attivo» ci sono sei
+          passi sul portale, ed è lì che una prova si perde. Un Guest Pass che
+          nessuno riesce ad attivare è un contatto buono buttato.
+
+          Sta **dopo** il codice e i passi, non prima: chi sa cavarsela ha già
+          quello che gli serve nella parte alta, e questo non gli sta in mezzo. */}
+      <div class="pf__cal">
+        <h4 class="pf__cal-titolo">Vuoi essere ricontattato?</h4>
+        <p class="pf__cal-nota">
+          Se preferisci farlo insieme: scegli quando, e ti chiamiamo noi mentre lo attivi.
+        </p>
+
+        <div class="pf__cal-riquadro" data-pf-calendario></div>
+
+        <div class="pf__cal-ripiego" data-pf-cal-ripiego hidden>
+          <p class="pf__cal-nota">
+            Il calendario non si carica: di solito è il blocco dei cookie, o un'estensione del browser.
+            Si apre comunque in una scheda nuova.
+          </p>
+          <a class="btn btn-primary pf__btn" data-pf-cal-link target="_blank" rel="noopener noreferrer">
+            Apri il calendario →
+          </a>
+        </div>
+
+        <p class="pf__cal-fatto" data-pf-cal-fatto hidden>
+          ✓ Appuntamento fissato. Ti arriva la conferma via email.
+        </p>
+      </div>
     </section>
   </div>
 </div>
@@ -204,6 +235,12 @@ import { REGISTRAZIONE, PASSI_ATTIVAZIONE as PASSI } from '../data/guestPass';
     background: rgba(10, 10, 8, 0.6);
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
+  }
+
+  /* Come nel form dei contatti: il widget di Calendly sotto le 30rem impila la
+     lista degli orari invece di affiancarla al mese, e diventano due scroll. */
+  .pf--largo .pf__panel {
+    width: min(46rem, 100%);
   }
 
   .pf__panel {
@@ -464,7 +501,69 @@ import { REGISTRAZIONE, PASSI_ATTIVAZIONE as PASSI } from '../data/guestPass';
     text-align: center;
   }
 
+  /* ---- Il calendario ---- */
+  .pf__cal {
+    margin: 1.75rem 0 0;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .pf__cal-titolo {
+    margin: 0 0 0.35rem;
+    font-size: var(--text-lg);
+    --lh: 1.15;
+  }
+
+  .pf__cal-nota {
+    margin: 0 0 1rem;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+
+  /* `height` e non `min-height`: il widget prende l'altezza del contenitore
+     solo se il contenitore ce l'ha, altrimenti resta ai suoi 150px iniziali
+     con il resto del riquadro vuoto sotto. In rem perché la passa all'iframe. */
+  .pf__cal-riquadro {
+    height: 41rem;
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+
+  /* L'iframe lo inietta uno script, quindi non porta l'attributo di scope di
+     Astro: senza `:global` la regola non lo raggiunge. */
+  .pf__cal-riquadro :global(iframe) {
+    width: 100% !important;
+    height: 100% !important;
+    border: 0;
+  }
+
+  .pf__cal-ripiego {
+    padding: 1.1rem 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 0.85rem;
+    background: var(--color-cream);
+  }
+
+  .pf__cal-ripiego .pf__cal-nota {
+    margin-bottom: 0.9rem;
+  }
+
+  .pf__cal-fatto {
+    margin: 1rem 0 0;
+    padding: 0.8rem 1rem;
+    border-radius: 0.75rem;
+    background: rgba(255, 87, 1, 0.08);
+    color: var(--accent-text);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
   @media (max-width: 640px) {
+    .pf__cal-riquadro {
+      height: 46rem;
+    }
+
     .pf {
       padding: 1rem;
     }

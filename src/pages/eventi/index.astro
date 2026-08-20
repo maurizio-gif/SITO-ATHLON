@@ -8,16 +8,22 @@ const past = await pastEvents();
 
 <Layout
   title="Eventi e Masterclass | Athlon Club Roma Talenti"
-  description="Masterclass gratuite, open day e appuntamenti della Athlon Community a Roma Talenti: il calendario dei prossimi eventi del club."
+  description="Masterclass e seminari, gare, corsi speciali, formazione e brevetti alla Athlon Community di Roma Talenti: il calendario dei prossimi eventi del club."
   breadcrumb={[{ name: 'Eventi', path: '/eventi' }]}
 >
   <section class="evh">
     <div class="container">
       <span class="eyebrow">Athlon Community</span>
       <h1 class="evh__title">Eventi <em class="accent">e masterclass</em></h1>
+      {/* La gratuità non si promette più, qui né sulla home né sul Club Life:
+          la maggior parte degli appuntamenti è a pagamento, e il prezzo lo
+          dichiara ogni evento nel suo file — è il badge «Gratuito» sulla card,
+          che compare solo dove `free` è vero. Una pagina che annuncia
+          «masterclass gratuite» e poi apre su un listino è la promessa che
+          brucia la fiducia più in fretta di tutte. */}
       <p class="evh__lede">
-        Masterclass gratuite, open day e giornate aperte anche a chi non è iscritto. Partecipa alla
-        community del club.
+        Masterclass e seminari, gare, corsi speciali, formazione e brevetti. Gli appuntamenti della
+        community del club, aperti anche a chi non è iscritto.
       </p>
     </div>
   </section>

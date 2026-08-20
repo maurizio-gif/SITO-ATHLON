@@ -30,7 +30,7 @@ const ilClub = [
   { label: 'Abbonamenti', href: '/abbonamenti' },
   { label: 'Orari Corsi', href: '/planning' },
   { label: 'Eventi', href: '/eventi' },
-  { label: contatta.label, href: contatta.href, external: true },
+  { label: contatta.label, href: contatta.href, attrs: contatta.attrs },
 ];
 
 const risorse = [
@@ -113,13 +113,7 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
           href={`https://www.google.com/maps/dir/?api=1&destination=${MAPS_QUERY}`}
           target="_blank"
           rel="noopener">Indicazioni</a>
-        <a
-          class="btn btn-primary"
-          href={contatta.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          {...contatta.attrs}
-        >{contatta.label}</a>
+        <a class="btn btn-primary" href={contatta.href} {...contatta.attrs}>{contatta.label}</a>
       </div>
     </div>
   </section>
@@ -186,7 +180,15 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
       <ul>
         {ilClub.map((l) => (
           <li>
-            <a href={l.href} target={l.external ? '_blank' : undefined} rel={l.external ? 'noopener' : undefined}>
+            {/* `attrs` porta i `data-cta` della voce Contattaci, che è quello
+                che il modal intercetta: senza lo spread questa voce del menu
+                sarebbe l'unica CTA di contatto del sito a non aprirlo. */}
+            <a
+              href={l.href}
+              target={l.external ? '_blank' : undefined}
+              rel={l.external ? 'noopener' : undefined}
+              {...(l.attrs ?? {})}
+            >
               {l.label}
             </a>
           </li>

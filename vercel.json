@@ -1,0 +1,586 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/wikiathlon/news/orari-estate-2026/:resto*",
+      "has": [
+        {
+          "type": "host",
+          "value": "wiki.athlonroma.it"
+        }
+      ],
+      "destination": "https://www.athlonroma.it/news/chiusura-vasca-grande-estate-2026",
+      "statusCode": 301
+    },
+    {
+      "source": "/admin/:resto*",
+      "has": [
+        {
+          "type": "host",
+          "value": "wiki.athlonroma.it"
+        }
+      ],
+      "destination": "https://www.athlonroma.it/admin",
+      "statusCode": 301
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "wiki.athlonroma.it"
+        }
+      ],
+      "destination": "https://www.athlonroma.it/club-life#help-desk",
+      "statusCode": 301
+    },
+    {
+      "source": "/:percorso*",
+      "has": [
+        {
+          "type": "host",
+          "value": "wiki.athlonroma.it"
+        }
+      ],
+      "destination": "https://www.athlonroma.it/:percorso*",
+      "statusCode": 301
+    },
+    {
+      "source": "/admin/:resto*",
+      "has": [
+        {
+          "type": "host",
+          "value": "planning.athlonroma.it"
+        }
+      ],
+      "destination": "https://www.athlonroma.it/admin",
+      "statusCode": 301
+    },
+    {
+      "source": "/:percorso*",
+      "has": [
+        {
+          "type": "host",
+          "value": "planning.athlonroma.it"
+        }
+      ],
+      "destination": "https://www.athlonroma.it/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/lead",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
+      "source": "/scuola-nuoto-bambini-3",
+      "destination": "/scuola-nuoto-bambini",
+      "statusCode": 301
+    },
+    {
+      "source": "/ginnastica-posturale",
+      "destination": "/ginnastica-strutturale",
+      "statusCode": 301
+    },
+    {
+      "source": "/wikiathlon/news/orari-estate-2026",
+      "destination": "/news/chiusura-vasca-grande-estate-2026",
+      "statusCode": 301
+    },
+    {
+      "source": "/scuola-nuoto-bambini-2",
+      "destination": "/scuola-nuoto-bambini",
+      "statusCode": 301
+    },
+    {
+      "source": "/referral",
+      "destination": "https://automazione.n8ndevelop.it/form/b433d08f-ec91-4fda-9648-2fc6a8d9b680?source=APP&medium=Pulsante",
+      "statusCode": 301
+    },
+    {
+      "source": "/portale",
+      "destination": "https://athlon.perfectgym.com/ClientPortal2/#/Login",
+      "statusCode": 301
+    },
+    {
+      "source": "/contatti",
+      "destination": "/#contattaci",
+      "statusCode": 301
+    },
+    {
+      "source": "/app",
+      "destination": "https://onelink.to/athlon",
+      "statusCode": 301
+    },
+    {
+      "source": "/iscriviti",
+      "destination": "/abbonamenti",
+      "statusCode": 301
+    },
+    {
+      "source": "/login",
+      "destination": "https://athlon.perfectgym.com/ClientPortal2/#/Login",
+      "statusCode": 301
+    },
+    {
+      "source": "/free-week-meta",
+      "destination": "/promo",
+      "statusCode": 301
+    },
+    {
+      "source": "/boxing",
+      "destination": "/hbx",
+      "statusCode": 301
+    },
+    {
+      "source": "/corso-gestanti",
+      "destination": "/gestanti",
+      "statusCode": 301
+    },
+    {
+      "source": "/aqua-fitness-2",
+      "destination": "/aqua-fitness",
+      "statusCode": 301
+    },
+    {
+      "source": "/abbonamenti-corsi",
+      "destination": "/abbonamenti",
+      "statusCode": 301
+    },
+    {
+      "source": "/corsi-bambini/scuola-nuoto",
+      "destination": "/scuola-nuoto-bambini",
+      "statusCode": 301
+    },
+    {
+      "source": "/calistenichs",
+      "destination": "/calisthenics",
+      "statusCode": 301
+    },
+    {
+      "source": "/san-valentino-free",
+      "destination": "/promo",
+      "statusCode": 301
+    },
+    {
+      "source": "/athlon-club/corsi-fitness",
+      "destination": "/corsi-fitness",
+      "statusCode": 301
+    },
+    {
+      "source": "/slimming",
+      "destination": "/body-sculpt",
+      "statusCode": 301
+    },
+    {
+      "source": "/athlon-club/corsi-aqua-fitness",
+      "destination": "/aqua-fitness",
+      "statusCode": 301
+    },
+    {
+      "source": "/gpasse",
+      "destination": "/gpcoreo",
+      "statusCode": 301
+    },
+    {
+      "source": "/athlon-club/gym-floor-functional-area",
+      "destination": "/gym-floor",
+      "statusCode": 301
+    },
+    {
+      "source": "/free-week-landing-ads",
+      "destination": "/promo",
+      "statusCode": 301
+    },
+    {
+      "source": "/account",
+      "destination": "https://athlon.perfectgym.com/ClientPortal2/#/Login",
+      "statusCode": 301
+    },
+    {
+      "source": "/settore-agonistico/pallanuoto",
+      "destination": "/pallanuoto",
+      "statusCode": 301
+    },
+    {
+      "source": "/corsi-fitness/tone",
+      "destination": "/corsi-fitness",
+      "statusCode": 301
+    },
+    {
+      "source": "/news/planning",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/snb-landing",
+      "destination": "/wikiathlon/snb/preiscrizioni-nuoto",
+      "statusCode": 301
+    },
+    {
+      "source": "/news/planning-orario-athlon-club",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/news/news-club/planning-orario-athlon-club",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/eventi-athlon",
+      "destination": "/eventi",
+      "statusCode": 301
+    },
+    {
+      "source": "/free-week-landing-meta",
+      "destination": "/promo",
+      "statusCode": 301
+    },
+    {
+      "source": "/guest-pass-gold-7",
+      "destination": "/promo",
+      "statusCode": 301
+    },
+    {
+      "source": "/corsi-fitness/boxing",
+      "destination": "/hbx",
+      "statusCode": 301
+    },
+    {
+      "source": "/corsi-fitness/aeroshock",
+      "destination": "/gpcoreo",
+      "statusCode": 301
+    },
+    {
+      "source": "/corsi-adulti/scuola-nuoto",
+      "destination": "/scuola-nuoto-adulti",
+      "statusCode": 301
+    },
+    {
+      "source": "/wp-content/uploads/2018/05/orario-athlon-club-gennaio-2020.pdf",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/corsi-fitness/revoring",
+      "destination": "/corsi-fitness",
+      "statusCode": 301
+    },
+    {
+      "source": "/tv/fitness-masters/power-yoga",
+      "destination": "/yoga",
+      "statusCode": 301
+    },
+    {
+      "source": "/free7-meta-c",
+      "destination": "/promo",
+      "statusCode": 301
+    },
+    {
+      "source": "/tv/fitness-masters/gpasse",
+      "destination": "/gpcoreo",
+      "statusCode": 301
+    },
+    {
+      "source": "/news/corsi-intensivi-nuoto",
+      "destination": "/scuola-nuoto-bambini",
+      "statusCode": 301
+    },
+    {
+      "source": "/corsi-fitness/functional-circuit",
+      "destination": "/hbx",
+      "statusCode": 301
+    },
+    {
+      "source": "/corsi-fitness/zumba",
+      "destination": "/corsi-fitness",
+      "statusCode": 301
+    },
+    {
+      "source": "/wp-content/uploads/termini-e-condizioni-athlon-04-09.docx.pdf",
+      "destination": "/regolamento",
+      "statusCode": 301
+    },
+    {
+      "source": "/login-ok",
+      "destination": "https://athlon.perfectgym.com/ClientPortal2/#/Login",
+      "statusCode": 301
+    },
+    {
+      "source": "/nuoto-gestanti-2",
+      "destination": "/gestanti",
+      "statusCode": 301
+    },
+    {
+      "source": "/corsi-fitness/slimming",
+      "destination": "/corsi-fitness",
+      "statusCode": 301
+    },
+    {
+      "source": "/referral-natale",
+      "destination": "https://automazione.n8ndevelop.it/form/b433d08f-ec91-4fda-9648-2fc6a8d9b680?source=APP&medium=Pulsante",
+      "statusCode": 301
+    },
+    {
+      "source": "/accedi",
+      "destination": "https://athlon.perfectgym.com/ClientPortal2/#/Login",
+      "statusCode": 301
+    },
+    {
+      "source": "/home-test/attachment/corsi-fitness-3",
+      "destination": "/corsi-fitness",
+      "statusCode": 301
+    },
+    {
+      "source": "/black-week-24",
+      "destination": "/promo",
+      "statusCode": 301
+    },
+    {
+      "source": "/wp-content/uploads/termini-e-condizioni-point-pg.pdf",
+      "destination": "/regolamento",
+      "statusCode": 301
+    },
+    {
+      "source": "/categoria-prodotto/adulti-ricorrenti",
+      "destination": "/abbonamenti",
+      "statusCode": 301
+    },
+    {
+      "source": "/scuola-nuoto-adulti/attachment/orari-scuola-nuoto-adulti",
+      "destination": "/scuola-nuoto-adulti",
+      "statusCode": 301
+    },
+    {
+      "source": "/corsi-fitness/power-yoga",
+      "destination": "/yoga",
+      "statusCode": 301
+    },
+    {
+      "source": "/wp-content/uploads/mod_isc_form_snf_mod_sav_06e-1.pdf",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/orari-luglio-e-agosto",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/scuola-nuoto-bambini-2/attachment/staff-scuola-nuoto-2019-20-3",
+      "destination": "/scuola-nuoto-bambini",
+      "statusCode": 301
+    },
+    {
+      "source": "/orari",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/demo-pass",
+      "destination": "https://youtu.be/Uw7WQf84lzo",
+      "statusCode": 301
+    },
+    {
+      "source": "/planning-orario-web-202324-5-2",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/news/planning-orario-athlon-club/attachment/planning-settembre-2020-athlon-club-ok-2",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/wp-content/uploads/planning-orario-web-2.pdf",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/wp-content/uploads/planning-orario-web-4-1.pdf",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/baby-nuoto/attachment/baby-nuoto-slider-sito",
+      "destination": "/baby-nuoto",
+      "statusCode": 301
+    },
+    {
+      "source": "/wp-content/uploads/planning-orario-web-3.pdf",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/planning-orario-web-2",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/planning-web-estate-2023-1",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/planning-orario-web-202324-1",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/landing-san-valentino",
+      "destination": "/promo",
+      "statusCode": 301
+    },
+    {
+      "source": "/corsi-fitness/attachment/ath-009",
+      "destination": "/corsi-fitness",
+      "statusCode": 301
+    },
+    {
+      "source": "/wp-content/uploads/planning-settembre-2020-athlon-club-ok-1.pdf",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/landing-free-week-org",
+      "destination": "/promo",
+      "statusCode": 301
+    },
+    {
+      "source": "/wp-content/uploads/condizioni-di-utilizzo-athlon-tv.pdf",
+      "destination": "/regolamento",
+      "statusCode": 301
+    },
+    {
+      "source": "/agonismo-squadra-pallanuoto",
+      "destination": "/pallanuoto",
+      "statusCode": 301
+    },
+    {
+      "source": "/motr/attachment/in-asse-motr",
+      "destination": "/motr",
+      "statusCode": 301
+    },
+    {
+      "source": "/wp-content/uploads/2019/03/orario-marzo-2019-1.pdf",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/wp-content/uploads/planning-fitness-marzo22.pdf",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/gym-floor/attachment/b35bdcc6-6161-4a28-8b4a-719a7f6ae684",
+      "destination": "/gym-floor",
+      "statusCode": 301
+    },
+    {
+      "source": "/scuola-nuoto",
+      "destination": "/scuola-nuoto-bambini",
+      "statusCode": 301
+    },
+    {
+      "source": "/planning-orario-web-202324-5",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/master/attachment/hbx-2",
+      "destination": "/hbx",
+      "statusCode": 301
+    },
+    {
+      "source": "/wp-content/uploads/2019/08/planning-athlon-club-2019_20-orario-club-ottobre-1.pdf",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/knowledge-base/reformer/1/esercizi",
+      "destination": "/reformer",
+      "statusCode": 301
+    },
+    {
+      "source": "/antigravity-1-1-scaled-1-jpg",
+      "destination": "/antigravity",
+      "statusCode": 301
+    },
+    {
+      "source": "/planning-orario-web-202324-1-2",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/promo/attachment/img_2052-2",
+      "destination": "/promo",
+      "statusCode": 301
+    },
+    {
+      "source": "/planning-orario-web-202324-3",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/planning-orario-web-202324-4",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/termini-e-condizioni-athlon-05-24-docx",
+      "destination": "/regolamento",
+      "statusCode": 301
+    },
+    {
+      "source": "/aqua-gym-gestanti",
+      "destination": "/gestanti",
+      "statusCode": 301
+    },
+    {
+      "source": "/nuoto-baby",
+      "destination": "/baby-nuoto",
+      "statusCode": 301
+    },
+    {
+      "source": "/free-",
+      "destination": "/promo",
+      "statusCode": 301
+    },
+    {
+      "source": "/wp-content/uploads/planning-ottobre-2021.pdf",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/gym-floor-test",
+      "destination": "/gym-floor",
+      "statusCode": 301
+    },
+    {
+      "source": "/antigravity-test",
+      "destination": "/antigravity",
+      "statusCode": 301
+    },
+    {
+      "source": "/scuola-nuoto-2",
+      "destination": "/scuola-nuoto-adulti",
+      "statusCode": 301
+    },
+    {
+      "source": "/elementor-pagina-6792",
+      "destination": "/privacy",
+      "statusCode": 301
+    },
+    {
+      "source": "/wp-content/uploads/2018/05/orario-athlon-club-aprile-2019.pdf",
+      "destination": "/planning",
+      "statusCode": 301
+    },
+    {
+      "source": "/strenght-development-by-les-mills",
+      "destination": "/strenght",
+      "statusCode": 301
+    }
+  ]
+}

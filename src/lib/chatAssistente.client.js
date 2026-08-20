@@ -36,6 +36,8 @@
 // sito, dentro la fetta di conoscenza del ramo in cui siamo.
 
 import { ACTIVITY_AUDIENCE } from '../data/activities';
+import { CALENDLY } from '../data/calendly';
+import { montaCalendario } from './calendario.client.js';
 
 export function initChatAssistente(root, options) {
   var onChiudi = (options && options.onChiudi) || function () {};
@@ -76,7 +78,11 @@ export function initChatAssistente(root, options) {
      `campi` qui sotto e non serve toccare altro. Il numero resta comunque
      anche nella prima riga del contesto, che è la rete di sicurezza. */
   var RICHIAMO = {
-    url: 'https://calendly.com/athlonclub/recall/',
+    /* L'indirizzo sta in `data/calendly.ts` col resto degli eventi del club:
+       tre file che ne tenevano una copia ciascuno erano tre posti da aggiornare
+       il giorno in cui un evento viene rinominato — e un link Calendly rotto non
+       dà errore, dà «questo evento non esiste» a chi stava per prenotare. */
+    url: CALENDLY.recall,
     /** Quante risposte dell'assistente prima di proporlo. */
     dopoRisposte: 3,
     campi: { telefono: 'location', contesto: 'a1' },
@@ -347,7 +353,7 @@ export function initChatAssistente(root, options) {
        che lo stiamo riconoscendo da un'email, e non è il tono di un help desk. */
     iscritto: function () {
       return (
-        'Ciao. Sono l’assistente dell’Help Desk: rispondo su prenotazioni, ' +
+        'Ciao. Sono l’assistente virtuale di Athlon: rispondo su prenotazioni, ' +
         'certificato medico, sospensioni, disdette e tutto quello che c’è nelle schede e nel regolamento. ' +
         'Dimmi pure.'
       );
@@ -480,17 +486,11 @@ export function initChatAssistente(root, options) {
     return testa.join('\n') + '\n\nConversazione:\n' + (corpo || '(nessuno scambio)');
   }
 
-  /** Il link con tutto già dentro: chi ci arriva scegle solo giorno e ora. */
-  function linkRichiamo() {
-    var p = new URLSearchParams();
-    /* Un campo nome solo, come il modulo dell'evento. */
-    var nome = [dati.nome, dati.cognome].filter(Boolean).join(' ');
-    if (nome) p.set('name', nome);
-    if (dati.email) p.set('email', dati.email);
-    if (dati.telefono) p.set(RICHIAMO.campi.telefono, '+39' + cellulareNudo(dati.telefono));
-    p.set(RICHIAMO.campi.contesto, contestoRichiamo());
-    return RICHIAMO.url + '?' + p.toString();
-  }
+  /* Il link diretto — il ripiego se l'embed non carica — lo compone
+     `linkDiretto` in `calendario.client.js` a partire dallo stesso
+     `prefill` del widget: due modi di costruire lo stesso indirizzo erano due
+     modi di sbagliarlo diversamente. La mappatura dei campi resta descritta in
+     `RICHIAMO.campi` qui sopra, che è dove si guarda se il modulo cambia. */
 
   function proponiRichiamo() {
     risposteDate++;
@@ -500,15 +500,47 @@ export function initChatAssistente(root, options) {
        richiesta in più invece di una scorciatoia. */
     if (!dati.email || !conversazione) return;
     richiamoOfferto = true;
+
+    /* Il calendario dentro la conversazione, al posto del pulsante che portava
+       fuori. Qui vale più che altrove: la chat è una conversazione in corso, e
+       mandare fuori sito a metà discorso la interrompe — chi torna, se torna,
+       trova il filo perso.
+
+       Il precompilato è lo stesso di prima, contesto della conversazione
+       compreso: su Calendly la domanda personalizzata `a1` è obbligatoria, e
+       vuota blocca la prenotazione. Nell'embed si passa da `customAnswers`. */
     var box = document.createElement('div');
     box.className = 'ca__richiamo';
     box.innerHTML =
-      '<p class="ca__richiamo-lead">Preferisci sentirci a voce? Ti richiamiamo noi: scegli giorno e ora, i tuoi dati sono già compilati.</p>' +
-      '<a class="ca__richiamo-btn" href="' +
-      escape(linkRichiamo()) +
-      '" target="_blank" rel="noopener">Prenota una chiamata →</a>';
+      '<p class="ca__richiamo-titolo">Vuoi essere ricontattato?</p>' +
+      '<p class="ca__richiamo-lead">Ti richiamiamo noi: scegli giorno e ora, i tuoi dati e quello di cui abbiamo parlato sono già compilati.</p>' +
+      '<div class="ca__richiamo-cal" data-ca-calendario></div>' +
+      '<div class="ca__richiamo-ripiego" data-ca-cal-ripiego hidden>' +
+      '<p class="ca__richiamo-lead">Il calendario non si carica: di solito è il blocco dei cookie. Si apre comunque in una scheda nuova.</p>' +
+      '<a class="ca__richiamo-btn" data-ca-cal-link target="_blank" rel="noopener">Apri il calendario →</a>' +
+      '</div>' +
+      '<p class="ca__richiamo-fatto" data-ca-cal-fatto hidden>✓ Appuntamento fissato. Ti arriva la conferma via email.</p>';
     conversazione.appendChild(box);
     conversazione.scrollTop = conversazione.scrollHeight;
+
+    var nome = [dati.nome, dati.cognome].filter(Boolean).join(' ');
+    montaCalendario({
+      riquadro: box.querySelector('[data-ca-calendario]'),
+      ripiego: box.querySelector('[data-ca-cal-ripiego]'),
+      link: box.querySelector('[data-ca-cal-link]'),
+      url: RICHIAMO.url,
+      prefill: {
+        name: nome,
+        email: dati.email,
+        location: dati.telefono ? '+39' + cellulareNudo(dati.telefono) : '',
+        customAnswers: { a1: contestoRichiamo() },
+      },
+      onPrenotato: function () {
+        var fatto = box.querySelector('[data-ca-cal-fatto]');
+        if (fatto) fatto.hidden = false;
+        conversazione.scrollTop = conversazione.scrollHeight;
+      },
+    });
   }
 
   var ticketInviato = false;

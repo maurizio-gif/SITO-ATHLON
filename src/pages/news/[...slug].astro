@@ -9,6 +9,16 @@
  * non una scheda di assistenza: qui ha la sua pagina, indicizzabile e
  * linkabile.
  *
+ * **L'impaginazione è quella della pagina di un evento**, e non una a parte:
+ * hero a tutta larghezza con la foto e il titolo dentro `.container`, il corpo
+ * in `.container-narrow`, le sezioni di chiusura di nuovo a tutta larghezza su
+ * fondo crema. Prima la pagina era una colonna da 864px sospesa nel bianco —
+ * niente intestazione, niente fasce, niente che arrivasse al bordo — e su un
+ * desktop leggeva come un foglio schiacciato in mezzo allo schermo. La misura
+ * del testo **non** è cambiata, ed è il punto: a 1440px erano già 94 caratteri
+ * per riga, oltre il limite del leggibile. Quello che mancava era la pagina
+ * intorno, non lo spazio dentro.
+ *
  * Il corpo lo veste `prosa.css`, lo stesso foglio delle schede dell'Help Desk:
  * gli articoli sono scritti con lo stesso markdown e le stesse chiamate
  * all'azione `.ci-*`, e due copie di quel CSS sarebbero due copie che fra un
@@ -51,10 +61,14 @@ const schema = {
 };
 ---
 
+{/* Con intestazione e footer, al contrario delle schede dell'Help Desk. La
+    differenza non è di gusto: una news è una pagina pubblica e indicizzata, e
+    chi ci arriva da una ricerca o da un link condiviso non ha nessun'altra
+    strada verso il resto del sito. Le schede si aprono dal box dell'Help Desk
+    e lì il ritorno c'è già. */}
 <Layout
   title={`${d.title} | Athlon Club`}
   description={d.excerpt}
-  chrome={false}
   ogType="article"
   image={d.image}
   imageAlt={d.imageAlt}
@@ -62,46 +76,62 @@ const schema = {
   schema={[schema]}
 >
   <article class="nws">
-    <div class="container-narrow">
-      <nav class="nws__crumbs" aria-label="Percorso">
-        <a href="/club-life#news">Club Life</a>
-        <span aria-hidden="true">/</span>
-        <span>News</span>
-      </nav>
-
-      <div class="nws__meta">
-        <span class="nws__cat">{d.category}</span>
-        <span class="nws__date">{formatEventDate(d.date, true)}</span>
-      </div>
-
-      <h1 class="nws__title">{d.title}</h1>
-      <p class="nws__lede">{d.excerpt}</p>
-
+    {/* La foto sta nell'hero e non più nel corpo: è l'elemento LCP della
+        pagina, quindi passa da `fotoHero` come prima, ma adesso riempie la
+        fascia invece di stare dentro la colonna di lettura. Una news senza
+        foto — il campo è facoltativo — prende la variante piatta: la stessa
+        fascia scura, senza immagine e più bassa, perché una banda alta di
+        colore pieno è vuoto e non respiro. */}
+    <header class:list={['nws__hero', !d.image && 'nws__hero--flat']}>
       {d.image && (
         <img
-          class="nws__foto"
+          class="nws__img"
           src={d.image}
           alt={d.imageAlt ?? d.title}
           {...fotoHero(d.image)}
         />
       )}
+      <div class="nws__scrim" aria-hidden="true"></div>
 
-      <div class="nws__body prosa">
-        <Content />
+      <div class="container nws__head">
+        <nav class="nws__crumbs" aria-label="Percorso">
+          <a href="/club-life#news">Club Life</a>
+          <span aria-hidden="true">/</span>
+          <span>News</span>
+        </nav>
+
+        <h1 class="nws__title">{d.title}</h1>
+        <p class="nws__lede">{d.excerpt}</p>
+
+        <div class="nws__meta">
+          <span class="nws__cat">{d.category}</span>
+          <span class="nws__date">{formatEventDate(d.date, true)}</span>
+        </div>
       </div>
+    </header>
 
-      {/* Il link che la card portava prima resta, ma qui: sulla card era
-          l'unico modo di leggere la notizia, adesso la notizia si legge davvero
-          e quel link torna a essere quello che è — un rimando alla pagina che
-          c'entra. */}
-      {d.ctaHref && (
-        <a href={d.ctaHref} class="nws__cta">{d.ctaLabel ?? 'Vai'} →</a>
-      )}
+    <section class="nws__sec">
+      <div class="container-narrow">
+        <div class="nws__body prosa">
+          <Content />
+        </div>
 
-      {altre.length > 0 && (
-        <aside class="nws__altre" aria-labelledby="nws-altre">
+        {/* Il link che la card portava prima resta, ma qui: sulla card era
+            l'unico modo di leggere la notizia, adesso la notizia si legge
+            davvero e quel link torna a essere quello che è — un rimando alla
+            pagina che c'entra. */}
+        {d.ctaHref && (
+          <a href={d.ctaHref} class="btn btn-primary nws__cta">{d.ctaLabel ?? 'Vai'} →</a>
+        )}
+      </div>
+    </section>
+
+    {altre.length > 0 && (
+      <section class="nws__sec nws__sec--alt" aria-labelledby="nws-altre">
+        <div class="container">
+          <span class="eyebrow">Dal club</span>
           <h2 class="nws__altre-titolo" id="nws-altre">Altre news dal club</h2>
-          <ul class="nws__altre-lista">
+          <ul class="nws__altre-lista" style={`--cols:${altre.length}`}>
             {altre.map((n) => (
               <li>
                 <a href={`/news/${n.id}/`} class="nws__altra">
@@ -111,17 +141,65 @@ const schema = {
               </li>
             ))}
           </ul>
-        </aside>
-      )}
+        </div>
+      </section>
+    )}
 
-      <a href="/club-life#news" class="nws__back">← Torna a Club Life</a>
-    </div>
+    <section class="nws__sec nws__sec--coda">
+      <div class="container">
+        <a href="/club-life#news" class="nws__back">← Torna a Club Life</a>
+      </div>
+    </section>
   </article>
 </Layout>
 
 <style>
-  .nws {
-    padding: var(--space-section-md) 0 var(--space-section-lg);
+  /* ---- Hero ----
+     Le misure sono quelle della pagina evento: stessa altezza, stesso scrim,
+     stesso allineamento in basso. Due pagine che sono la stessa cosa — un
+     contenuto datato con una foto e un titolo — non hanno ragione di avere due
+     teste diverse. */
+  .nws__hero {
+    position: relative;
+    min-height: 62vh;
+    display: flex;
+    align-items: flex-end;
+    background: var(--color-dark);
+    color: var(--color-white);
+    overflow: hidden;
+  }
+
+  /* Senza foto la fascia serve solo a portare titolo e data: l'altezza la
+     decide il contenuto. */
+  .nws__hero--flat {
+    min-height: 0;
+  }
+
+  .nws__img,
+  .nws__scrim {
+    position: absolute;
+    inset: 0;
+  }
+
+  .nws__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .nws__scrim {
+    background: linear-gradient(
+      rgba(39, 36, 35, 0.35) 0%,
+      rgba(39, 36, 35, 0.75) 60%,
+      var(--color-dark) 100%
+    );
+  }
+
+  .nws__head {
+    position: relative;
+    z-index: 1;
+    padding-top: var(--space-section-lg);
+    padding-bottom: var(--space-section-sm);
   }
 
   .nws__crumbs {
@@ -132,7 +210,7 @@ const schema = {
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--text-muted);
+    color: rgba(255, 255, 255, 0.65);
     margin-bottom: 1.125rem;
   }
 
@@ -140,19 +218,38 @@ const schema = {
     color: var(--color-primary);
   }
 
+  .nws__title {
+    font-size: var(--text-3xl);
+    letter-spacing: var(--tracking-2xl);
+    margin: 0 0 0.75rem;
+  }
+
+  /* Il sommario sta nell'hero, e va tenuto corto in caratteri e non in pixel:
+     sulla larghezza piena del contenitore sarebbero righe da 150 caratteri
+     sopra una foto, che è la cosa meno leggibile che si possa comporre. */
+  .nws__lede {
+    max-width: 52ch;
+    margin: 0;
+    font-size: var(--text-md);
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  /* Categoria e data sotto il sommario e non sopra il titolo: sopra facevano
+     una riga di etichette che il titolo doveva scavalcare. */
   .nws__meta {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 0.5rem 0.75rem;
-    margin-bottom: 0.625rem;
+    margin-top: 1.125rem;
   }
 
   .nws__cat {
-    padding: 0.25rem 0.6rem;
+    padding: 0.3rem 0.75rem;
     border-radius: 999px;
-    background: rgba(255, 87, 1, 0.1);
-    color: var(--accent-text);
+    background: var(--color-primary);
+    color: var(--color-white);
     font-size: var(--text-2xs);
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -160,65 +257,39 @@ const schema = {
   }
 
   .nws__date {
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--border-dark);
     font-size: var(--text-2xs);
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--text-muted);
+    color: rgba(255, 255, 255, 0.75);
   }
 
-  .nws__title {
-    font-size: var(--text-2xl);
-    --lh: 1;
-    margin: 0 0 0.75rem;
+  /* ---- Sezioni ---- */
+  .nws__sec {
+    padding: var(--space-section-md) 0;
   }
 
-  .nws__lede {
-    margin: 0;
-    font-size: var(--text-md);
-    line-height: 1.55;
-    color: var(--text-muted);
+  .nws__sec--alt {
+    background: var(--color-cream);
   }
 
-  /* La foto è l'elemento LCP della pagina, quindi passa da `fotoHero`: le foto
-     delle news arrivano dalla libreria del sito e pesano mezzo megabyte. */
-  .nws__foto {
-    width: 100%;
-    height: auto;
-    margin: 1.75rem 0 0;
-    border-radius: var(--radius);
-  }
-
-  .nws__body {
-    margin-top: 1.75rem;
-    padding-top: 1.75rem;
-    border-top: 1px solid var(--border);
+  /* La coda è solo il link di ritorno: un'intera fascia di sezione sotto una
+     riga di testo è spazio bianco che sembra un errore di caricamento. */
+  .nws__sec--coda {
+    padding: 0 0 var(--space-section-md);
   }
 
   .nws__cta {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
     margin-top: 1.5rem;
-    padding: 0 1.35rem;
-    border-radius: 100px;
-    background: var(--color-primary);
-    color: var(--color-white);
-    font-size: var(--text-xs);
-    font-weight: 700;
-    letter-spacing: 0.04em;
-  }
-
-  .nws__altre {
-    margin-top: var(--space-section-sm);
-    padding-top: 1.75rem;
-    border-top: 1px solid var(--border);
   }
 
   .nws__altre-titolo {
-    margin: 0 0 1rem;
-    font-size: var(--text-lg);
-    --lh: 1.15;
+    margin: 0.625rem 0 1.75rem;
+    font-size: var(--text-2xl);
+    letter-spacing: var(--tracking-2xl);
   }
 
   .nws__altre-lista {
@@ -226,23 +297,36 @@ const schema = {
     margin: 0;
     padding: 0;
     display: grid;
-    gap: 0.6rem;
+    /* Soglia in rem: la griglia scende da tre colonne a due da sé quando la
+       radice cresce, sul totem e sulla televisione, senza una media query.
+
+       Il `max-width` legato al numero di card è la parte non ovvia, e serve al
+       caso più comune di tutti: quando il club ha pubblicato due news, «altre
+       news» ne ha una sola, e una `auto-fit` le dà tutti i 1320px del
+       contenitore — una card con dentro una data e un titolo, larga quanto lo
+       schermo. Il tetto è per card e in rem, quindi con tre card non fa niente
+       e con una la tiene della sua misura. */
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    max-width: calc(var(--cols, 3) * 26rem);
+    gap: 0.9rem;
+    align-items: start;
   }
 
   .nws__altra {
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
-    padding: 0.9rem 1rem;
+    gap: 0.35rem;
+    height: 100%;
+    padding: 1.15rem 1.25rem;
     border: 1px solid var(--border);
-    border-radius: 0.85rem;
+    border-radius: var(--radius);
     background: var(--color-white);
     transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease;
   }
 
   .nws__altra:hover {
     border-color: var(--color-primary);
-    background: var(--color-cream);
+    background: var(--color-white);
   }
 
   .nws__altra-data {
@@ -254,8 +338,9 @@ const schema = {
   }
 
   .nws__altra-titolo {
-    font-size: var(--text-sm);
+    font-size: var(--text-md);
     font-weight: 600;
+    line-height: 1.35;
     color: var(--color-dark);
   }
 
@@ -263,15 +348,20 @@ const schema = {
     display: inline-flex;
     align-items: center;
     min-height: 2.75rem;
-    margin-top: var(--space-section-sm);
     font-size: var(--text-xs);
     font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--color-primary);
   }
 
-  @media (min-width: 820px) {
-    .nws__altre-lista {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+  .nws__back:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 640px) {
+    .nws__hero {
+      min-height: 54vh;
     }
   }
 </style>
