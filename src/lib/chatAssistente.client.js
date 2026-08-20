@@ -250,6 +250,7 @@ export function initChatAssistente(root, options) {
     }
 
     dati.email = campoEmail.value.trim().toLowerCase();
+    if (window.athlonRicordaEmail) window.athlonRicordaEmail(dati.email);
     attendi(btnEmail, true);
 
     var esito = null;

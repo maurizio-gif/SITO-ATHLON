@@ -30,7 +30,7 @@ export interface Voce {
   dove: string;
   cosa: string;
   durata: string;
-  categoria: 'necessario' | 'marketing';
+  categoria: 'necessario' | 'funzionale' | 'marketing';
 }
 
 /**
@@ -58,6 +58,13 @@ export const STORAGE: Voce[] = [
     cosa: 'La campagna da cui la visita è arrivata (parametri utm_*, gclid, fbclid), letta una volta al primo tocco.',
     durata: 'La sessione del browser',
     categoria: 'marketing',
+  },
+  {
+    chiave: 'athlon_email',
+    dove: 'localStorage',
+    cosa: "L'indirizzo email che hai già lasciato in un modulo, per non chiedertelo di nuovo la volta successiva. Resta sul tuo dispositivo: non viene riletto dai nostri sistemi, e sul totem in ingresso al club non viene mai memorizzato né mostrato.",
+    durata: 'Finché non si svuota il browser',
+    categoria: 'funzionale',
   },
   {
     chiave: 'athlon:assistente:sessione',

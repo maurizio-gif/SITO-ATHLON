@@ -197,6 +197,10 @@ export function initProvaForm(root, options) {
       return;
     }
     dati.email = campoEmail.value.trim();
+    // Ricordata qui e non all'invio del lead: a questo punto l'indirizzo è
+    // valido e la persona l'ha confermato premendo. Se poi abbandona il
+    // secondo passo, la prossima volta trova comunque il campo pieno.
+    if (window.athlonRicordaEmail) window.athlonRicordaEmail(dati.email);
     attendi(btnVerifica, true);
 
     var risultato = 'nuovo';

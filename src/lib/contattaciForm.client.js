@@ -268,6 +268,7 @@ export function initContattaciForm(root, options) {
       return;
     }
     dati.email = campoEmail.value.trim().toLowerCase();
+    if (window.athlonRicordaEmail) window.athlonRicordaEmail(dati.email);
     attendi(btnVerifica, true);
 
     try {
