@@ -141,10 +141,44 @@ non ovvie:
   browser, non se una persona può chiedere una prova: senza consenso il payload
   parte senza `vid` e senza UTM, e `provaForm.client.js` lo prevedeva già.
 
-La categoria conta: `athlon_vid` e `athlon_utm` sono **marketing**, la sessione
-della chat e il passo dell'Help Desk sono **necessari** — sono lo stato del
-servizio che la persona ha chiesto, durano la sessione e non profilano.
-Bloccarli romperebbe la chat.
+La categoria conta, e sono tre. `athlon_vid` e `athlon_utm` stanno sotto
+**advertisement**; la sessione della chat e il passo dell'Help Desk sono
+**necessari** — lo stato del servizio che la persona ha chiesto, durano la
+sessione e non profilano, e bloccarli romperebbe la chat; `athlon_email` è
+**funzionale**. Come si legge il consenso sta in `scripts/consenso.ts`, una
+volta per tutte: `quandoConsentito(categoria, azione)` esegue subito o quando il
+consenso arriva, con **una coda per categoria** — chi accetta i funzionali e
+rifiuta la pubblicità deve avere la sua email ricordata e nessuna attribuzione,
+e una coda sola le farebbe partire insieme.
+
+### L'email si ricorda nel browser, non si rilegge dal server
+
+Il form della prova si compila una volta, gli altri no: l'assistente,
+«contattaci» e il ticket dell'Help Desk ripartono tutti chiedendo l'email,
+perché è la porta del controllo su PerfectGym — da lì il sito sa se esiste già
+un'anagrafica e **salta** nome, cognome e telefono. Il passo resta; quello che
+`scripts/emailNota.ts` toglie è la digitazione.
+
+Tre scelte, e nessuna è arbitraria:
+
+- **nel browser e non sul server.** Chiedere a n8n «di chi è il `vid` X?»
+  sarebbe una consultazione di dati personali senza autenticazione, con chiave
+  scelta dal client: chi legge o indovina un `vid` tira fuori la scheda. Così
+  il dato non esce e non rientra, resta sul dispositivo che l'aveva digitato.
+- **`functional` e non `advertisement`.** Ricordare un campo per non
+  richiederlo è comodità, non profilazione — e i funzionali li accetta molta
+  più gente.
+- **niente sul totem.** Il club ha un dispositivo condiviso vero, e lì
+  ricordare l'email vorrebbe dire mostrare quella dell'ultimo visitatore al
+  prossimo. Si riconosce dalle stesse tre condizioni di `global.css`, che vanno
+  tenute in pari anche qui.
+
+Il campo che vuole la precompilazione porta `data-email-nota`; chi conferma
+un'email chiama `window.athlonRicordaEmail(...)`. Due meccanismi la riempiono:
+uno al caricamento e uno al fuoco sul campo — il secondo serve perché i
+pannelli si svuotano quando si chiudono, e senza di lui la riapertura sarebbe
+vuota. Un'email **nell'URL vince sul ricordo** (`SupportForm.astro`): chi arriva
+da un link col proprio indirizzo è un'informazione più specifica.
 
 Il blocco automatico degli script di terzi **non è un attributo del tag**: in
 CookieYes si configura dal pannello, sito per sito. Su questo sito riguarda la

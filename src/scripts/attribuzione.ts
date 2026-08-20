@@ -46,118 +46,21 @@
  * dati senza rendere il sito più corretto di un millimetro.
  */
 
-import { COOKIEYES_KEY } from '../data/sito';
+import { quandoConsentito } from './consenso';
 
 const KEY_UTM = 'athlon_utm';
 const KEY_VID = 'athlon_vid';
 
-/* ── Consenso ───────────────────────────────────────────────────────────────
-   CookieYes, e la categoria che ci riguarda si chiama **advertisement**: non
-   `marketing`, che è il nome di un altro fornitore. Le categorie sono
-   necessary, functional, analytics, performance, advertisement.
+/* La categoria che governa questi due è **advertisement**, non `analytics`,
+   benché servano anche a misurare: l'identificativo viene allegato ai dati di
+   contatto per riattaccare una richiesta a una persona, e quello è marketing.
+   Chi accetta solo le statistiche non lo riceve, ed è corretto così anche se
+   costa attribuzione.
 
-   L'identificatore del browser sta sotto advertisement e non sotto analytics,
-   benché serva anche a misurare: viene allegato ai dati di contatto per
-   riattaccare una richiesta a una persona, e quello è marketing. Chi accetta
-   solo le statistiche non lo riceve, ed è corretto così anche se costa
-   attribuzione.
-
-   **Tre segnali e non uno**, e la ragione è dichiarata: il comportamento dello
-   script di CookieYes non è verificabile da questo repository — il suo CDN non
-   è raggiungibile dall'ambiente in cui il codice viene scritto e provato — così
-   la lettura non dipende dall'aver indovinato un nome:
-
-     1. `getCkyConsent()`, se lo espone;
-     2. il cookie `cookieyes-consent`, che porta le categorie in chiaro;
-     3. un controllo periodico dei due, limitato nel tempo, per il caso in cui
-        l'evento si chiami diversamente da come lo aspettiamo.
-
-   Il default è **negato**: se nessuno dei tre dice sì, non si scrive. Un
-   fornitore che non risponde non è un consenso.
-
-   Quando l'API sarà confermata su una pagina vera — `window.athlonStatoConsenso()`
-   la stampa — il controllo periodico si può togliere. È l'unico pezzo qui che
-   esiste per prudenza e non per necessità. */
-type Categorie = Record<string, boolean>;
-
-/** Le cinque categorie di CookieYes. Il cookie ne porta anche altre chiavi. */
-const CATEGORIE = ['necessary', 'functional', 'analytics', 'performance', 'advertisement'];
-
-/** Lo stato secondo la funzione globale di CookieYes, se c'è. */
-function daFunzione(): Categorie | null {
-  const g = (window as unknown as { getCkyConsent?: () => { categories?: Categorie } }).getCkyConsent;
-  if (typeof g !== 'function') return null;
-  try {
-    return g()?.categories ?? null;
-  } catch {
-    return null;
-  }
-}
-
-/** Lo stato secondo il cookie: `...,analytics:yes,advertisement:no`. */
-function daCookie(): Categorie | null {
-  try {
-    const trovato = /(?:^|;\s*)cookieyes-consent=([^;]+)/.exec(document.cookie);
-    if (!trovato) return null;
-    const out: Categorie = {};
-    decodeURIComponent(trovato[1])
-      .split(',')
-      .forEach((pezzo) => {
-        const [k, v] = pezzo.split(':');
-        /* Solo le categorie: nel cookie ci sono anche `consentid` e `action`,
-           che non sono sì/no e letti come tali direbbero «no» a sproposito. */
-        if (k && v && CATEGORIE.includes(k.trim())) out[k.trim()] = v.trim() === 'yes';
-      });
-    return Object.keys(out).length ? out : null;
-  } catch {
-    return null;
-  }
-}
-
-function consensoPubblicita(): boolean {
-  if (!COOKIEYES_KEY) return true; // nessun banner: vale il comportamento di prima
-  const stato = daFunzione() ?? daCookie();
-  return Boolean(stato?.advertisement);
-}
-
-/** Le `set` che il consenso ha rimandato, da rifare quando arriva. */
-const rimandate: (() => void)[] = [];
-
-function scrivi(azione: () => void): void {
-  if (consensoPubblicita()) azione();
-  else rimandate.push(azione);
-}
-
-/** Cosa vede l'adattatore, per confermare l'API su una pagina vera. */
-(window as unknown as { athlonStatoConsenso: () => unknown }).athlonStatoConsenso = () => ({
-  chiaveConfigurata: Boolean(COOKIEYES_KEY),
-  daFunzione: daFunzione(),
-  daCookie: daCookie(),
-  pubblicitaConsentita: consensoPubblicita(),
-  scrittureInAttesa: rimandate.length,
-});
-
-if (COOKIEYES_KEY) {
-  const rivaluta = () => {
-    if (!consensoPubblicita()) return; // può ancora arrivare: la coda resta
-    while (rimandate.length) rimandate.shift()!();
-  };
-
-  /* Sul documento e sulla finestra: quale dei due porti l'evento dipende dal
-     fornitore, ascoltarli entrambi non costa niente. */
-  ['cookieyes_consent_update', 'cookieyes_banner_load'].forEach((e) => {
-    document.addEventListener(e, rivaluta);
-    window.addEventListener(e, rivaluta);
-  });
-
-  /* La rete di sicurezza descritta sopra: venti secondi, poi smette. Chi
-     acconsente più tardi lo dice comunque con l'evento o col ricarico. */
-  let tentativi = 0;
-  const orologio = setInterval(() => {
-    rivaluta();
-    if (++tentativi >= 40 || !rimandate.length) clearInterval(orologio);
-  }, 500);
-}
+   Come si legge il consenso — tre segnali, default negato — sta in
+   `scripts/consenso.ts`, perché lo chiede anche l'email ricordata, e per una
+   categoria diversa. */
+const scrivi = (azione: () => void) => quandoConsentito('advertisement', azione);
 
 /** Quello che vale la pena raccogliere: campagna, click-id delle due piattaforme. */
 const CHIAVI = [

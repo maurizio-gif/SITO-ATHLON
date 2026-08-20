@@ -97,6 +97,7 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
           autocomplete="email"
           inputmode="email"
           aria-describedby="sup-email-hint"
+        data-email-nota
         />
         <p class="fld__hint" id="sup-email-hint">Ci serve per risponderti</p>
       </div>
@@ -160,11 +161,14 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
       el.value = fromUrl(el.dataset.prefill || '');
     });
 
-    // Email is a visible field, so it is only filled if the URL carries one and
-    // the person has not started typing their own.
+    /* L'email dall'URL vince su quella ricordata dal browser
+       (`scripts/emailNota.ts`), e senza il guardiano sul valore vuoto: chi
+       arriva da un link che porta il suo indirizzo è un'informazione più
+       specifica di un ricordo, e i due script girano entrambi al caricamento
+       senza un ordine garantito. Qui nessuno ha ancora digitato niente. */
     const email = form.querySelector<HTMLInputElement>('#sup-email');
     const urlEmail = fromUrl('email,Email,user_email');
-    if (email && urlEmail && !email.value) email.value = urlEmail;
+    if (email && urlEmail) email.value = urlEmail;
 
     // A URL usually carries one name string; split it across the two fields.
     const first = form.querySelector<HTMLInputElement>('#sup-first');
@@ -232,6 +236,8 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
       if (!first?.value.trim()) return say('Manca il nome.', 'err');
       if (!last?.value.trim()) return say('Manca il cognome.', 'err');
       const emailValue = email?.value.trim() || '';
+      const w = window as unknown as { athlonRicordaEmail?: (e: string) => void };
+      if (emailValue) w.athlonRicordaEmail?.(emailValue);
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailValue))
         return say('Controlla l’indirizzo email: senza quello non possiamo risponderti.', 'err');
 
