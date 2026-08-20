@@ -463,13 +463,32 @@ due.
   `/news/<file>`. Spostare un articolo di cartella o rinominarlo ne cambia il
   link: se era pubblicato, serve un reindirizzo in `astro.config.mjs`.
 
-**Il build non dipende dalle credenziali.** `tinacms build` compila il pannello
-in `public/admin` e va prima di Astro, che copia `public/` nel `dist`. Ma serve
-un progetto su TinaCloud, e un build che si rompe per una variabile d'ambiente
-mancante è un sito che non si pubblica più: `scripts/build.mjs` compila il
-pannello **solo** se trova `TINA_CLIENT_ID` e `TINA_TOKEN`, altrimenti
-costruisce il sito e dice perché `/admin` non c'è. Il giorno in cui le variabili
-arrivano, il pannello compare al primo deploy.
+**Il pannello non può mai fermare il sito.** `tinacms build` compila
+`public/admin` e va prima di Astro, che copia `public/` nel `dist`. Ma quel
+comando parla con TinaCloud, e TinaCloud conosce un ramo solo: quello che
+indicizza. Su un deploy di anteprima si ferma in partenza — *Branch
+'claude/...' is not on TinaCloud* — e prima che `scripts/build.mjs` prendesse
+questa forma si fermava con lui tutto il deploy, sito compreso. Quindi:
+
+- **il pannello si costruisce solo per la produzione** (`VERCEL_ENV`), e non è
+  una rinuncia: quello di un'anteprima punterebbe a un ramo che TinaCloud non
+  ha, e si aprirebbe su un errore;
+- **se non compila, il sito si pubblica senza.** Token scaduto, lock fuori
+  sincrono, TinaCloud giù: si scrive perché a schermo, si butta l'eventuale
+  build a metà — mai spedire un `public/admin` incompleto — e si va avanti con
+  Astro. Un CMS che non compila è un pannello da sistemare; un deploy bloccato
+  è un sito che non si aggiorna più.
+
+Il che vuol dire che `/admin` mancante non rompe niente e non si nota: **quando
+si toccano lo schema o le credenziali, il log del deploy di produzione è la
+verifica**, non il fatto che il sito sia salito.
+
+Il **client id** invece sta in chiaro in `tina/config.ts`: è pubblico per
+costruzione — finisce dentro il bundle di `/admin`, che gira nel browser di chi
+scrive — quindi metterlo in una variabile darebbe l'illusione di un segreto
+senza nasconderlo a nessuno, e costerebbe un deploy rotto ogni volta che
+qualcuno dimentica di impostarla. Il **token** è un segreto vero, legge il
+repository, e sta solo fra le variabili d'ambiente.
 
 Per provare il pannello in locale non servono credenziali: `npm run dev:cms`
 alza il server GraphQL di Tina attorno ad `astro dev` e le modifiche finiscono
@@ -480,5 +499,11 @@ pubblicare niente:
 npx tinacms build --local --skip-cloud-checks --skip-search-index
 ```
 
-`public/admin/`, `tina/__generated__/` e `tina/tina-lock.json` sono generati:
-stanno in `.gitignore` e non si committano.
+`public/admin/` e `tina/__generated__/` sono generati e stanno in `.gitignore`.
+
+**`tina/tina-lock.json` invece si committa**, ed è l'unica eccezione: è il file
+con cui TinaCloud indicizza il contenuto del repository, e senza di lui il
+pannello si apre su un archivio vuoto. Lo genera `tinacms dev` (o un
+`tinacms build` con il token), quindi **dopo ogni modifica a `tina/config.ts`**
+va rigenerato e committato insieme al resto: un lock che descrive uno schema
+diverso da quello vero è un pannello che mostra campi che non esistono.
