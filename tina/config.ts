@@ -14,16 +14,27 @@ const attivitaField = {
   options: ACTIVITY_TAGS.map((a) => ({ value: a.id, label: a.label })),
 };
 
-// Credenziali TinaCloud — da aggiungere come variabili d'ambiente:
-//   TINA_CLIENT_ID  →  Vercel: Project Settings > Environment Variables
-//   TINA_TOKEN      →  stessa posizione
-// Si ottengono creando un progetto per QUESTO repo su https://app.tina.io
+// Credenziali TinaCloud.
+//
+// Il **client id** sta qui in chiaro e va bene così: è l'identificativo con cui
+// il pannello, che gira nel browser di chi scrive, dice a TinaCloud di quale
+// progetto si tratta. Finisce comunque dentro il bundle di /admin, quindi
+// tenerlo in una variabile d'ambiente darebbe l'illusione di un segreto senza
+// nasconderlo a nessuno — e costerebbe un deploy rotto ogni volta che qualcuno
+// dimentica di impostarla. La variabile resta come scavalco, per puntare un
+// altro progetto senza toccare il codice.
+//
+// Il **token** invece è un segreto vero — legge il contenuto del repository —
+// e sta solo fra le variabili d'ambiente:
+//   TINA_TOKEN  →  Vercel: Project Settings > Environment Variables
+//
+// Il progetto è https://app.tina.io/projects/f1554e47-10b5-4176-b73b-89a13f5529b4
 // (uno per repository: quello del TCA non vale qui).
 
 export default defineConfig({
   branch:
     process.env.VERCEL_GIT_COMMIT_REF || process.env.GITHUB_BRANCH || process.env.HEAD || 'main',
-  clientId: process.env.TINA_CLIENT_ID || '',
+  clientId: process.env.TINA_CLIENT_ID || 'f1554e47-10b5-4176-b73b-89a13f5529b4',
   token: process.env.TINA_TOKEN || '',
 
   build: {

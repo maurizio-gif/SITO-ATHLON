@@ -6,9 +6,12 @@ dist/
 # Tina: il pannello e il client sono generati dal build, non si versionano.
 # `public/admin` lo scrive `tinacms build` prima di Astro; `tina/__generated__`
 # è lo schema compilato e cambia a ogni modifica di tina/config.ts.
+#
+# `tina/tina-lock.json` **non** sta qui, ed è deliberato: è l'unico generato che
+# va committato, perché è il file con cui TinaCloud indicizza il contenuto del
+# repository. Ignorarlo vuol dire un pannello che si apre e non trova niente.
 public/admin/
 tina/__generated__/
-tina/tina-lock.json
 
 # dependencies
 node_modules/
