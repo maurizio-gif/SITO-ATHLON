@@ -24,7 +24,8 @@ import Layout from '../layouts/Layout.astro';
 import AttivitaModal from '../components/AttivitaModal.astro';
 import SpacesGallery from '../components/home/SpacesGallery.astro';
 import Faq from '../components/Faq.astro';
-import { plans, SOSPENSIONE } from '../data/abbonamenti';
+import { plans } from '../data/abbonamenti';
+import BannerSospensione from '../components/BannerSospensione.astro';
 import { bands, countLessons, bandHours, totalLessons, totalHours, openHours, siContaAOre, gymFloor } from '../data/planning';
 import { talkCta } from '../data/cta';
 import { urlPiccola } from '../data/foto';
@@ -170,14 +171,9 @@ const PG = 'https://athlon.perfectgym.com/ClientPortal2';
             </ul>
 
             {/* Vale per tutti e due i piani e per tutte e due le formule, quindi
-                sta qui e non dentro le schede del prezzo: è la risposta alla
-                domanda che ferma la mano prima di firmare un annuale — «e se mi
-                fermo?». Illimitate, non "fino a N": è il punto. */}
-            <p class="sospensione">
-              <span class="sospensione__k">Sospensioni illimitate</span>
-              <span class="sospensione__v">€{SOSPENSIONE.prezzo} al mese, quante volte vuoi</span>
-              <a class="sospensione__l" href={SOSPENSIONE.scheda}>Come funziona →</a>
-            </p>
+                sta qui e non dentro le schede del prezzo. Il banner è un
+                componente perché lo usa anche /abbonamenti. */}
+            <BannerSospensione scuro={p.id === 'premium'} />
 
             <div class="formule">
               {p.annuali.map((o) => (
@@ -727,56 +723,6 @@ const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 
   .piano--premium .att__mark {
     background: rgba(255, 87, 1, 0.24);
-    color: var(--color-primary);
-  }
-
-  /* ---- La sospensione ---- */
-  .sospensione {
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 4px 12px;
-    margin: 0 0 16px;
-    padding: 14px 16px;
-    border-radius: 14px;
-    background: rgba(255, 87, 1, 0.09);
-    border: 1px solid rgba(255, 87, 1, 0.3);
-  }
-
-  .sospensione__k {
-    font-size: var(--text-2xs);
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--accent-text);
-  }
-
-  .piano--premium .sospensione__k {
-    color: var(--color-primary);
-  }
-
-  .sospensione__v {
-    font-size: var(--text-sm);
-    color: var(--text-muted);
-  }
-
-  .piano--premium .sospensione__v {
-    color: rgba(255, 255, 255, 0.75);
-  }
-
-  .sospensione__l {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
-    margin-left: auto;
-    font-size: var(--text-xs);
-    font-weight: 700;
-    color: var(--accent-text);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  .piano--premium .sospensione__l {
     color: var(--color-primary);
   }
 
