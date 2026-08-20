@@ -59,11 +59,13 @@ const categoria = {
           </p>
         </div>
       ) : (
-        INFORMATIVA.map((s) => (
+        INFORMATIVA.map((s, i) => (
           <>
-            <h2>{s.titolo}</h2>
-            {s.corpo.map((p) => (
-              <p set:html={p} />
+            <h2 id={`s${i + 1}`}>{s.titolo}</h2>
+            {/* `Fragment` e non `<p>`: i blocchi portano il proprio tag, e una
+                tabella dentro un `<p>` non è HTML valido. */}
+            {s.corpo.map((b) => (
+              <Fragment set:html={b} />
             ))}
           </>
         ))

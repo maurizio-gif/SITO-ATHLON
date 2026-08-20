@@ -47,4 +47,4 @@ export const SITE = (
  * due, perché lo stato intermedio — nessun banner e già niente attribuzione —
  * perderebbe i dati senza che nessuno possa acconsentire.
  */
-export const COOKIEYES_KEY = '';
+export const COOKIEYES_KEY = '3e76f0f799c6d1d94882361d';
