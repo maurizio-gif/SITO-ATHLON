@@ -25,6 +25,7 @@ import ProvaModal from '../components/ProvaModal.astro';
 import ChatModal from '../components/clublife/ChatModal.astro';
 import ChatFab from '../components/ChatFab.astro';
 import { CLUB, clubSchema, breadcrumbSchema } from '../data/club';
+import { COOKIEBOT_CBID } from '../data/sito';
 
 interface Props {
   title: string;
@@ -94,10 +95,40 @@ const graph = [
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    {/* Google Tag Manager, e sta qui in cima per la ragione per cui GTM esiste:
+    {/* Il banner del consenso, e sta **sopra** GTM perché è lui a dire a GTM
+        cosa può fare: Consent Mode vuole lo stato di default — tutto negato —
+        prima che gtm.js parta. Invertirli vuol dire un istante in cui i tag
+        girano senza sapere di non poter girare.
+
+        Nel layout e non dentro GTM come tag, benché GTM lo permetta: un blocco
+        pubblicitario che ferma googletagmanager.com fermerebbe anche il banner,
+        e chi non vede il banner non può acconsentire. Il sito ha storage suo da
+        governare (`scripts/attribuzione.ts`), quindi il segnale di consenso
+        deve arrivare anche quando GTM non arriva.
+
+        `data-blockingmode="auto"` è la parte che fa il lavoro sporco: Cookiebot
+        trattiene da sé gli script e gli iframe di terzi finché non c'è
+        consenso. Su questo sito riguarda la mappa di Google nel footer — che
+        sta in *ogni* pagina — il tour di my.mpskin, i player Vimeo e il widget
+        di Calendly. Prima di accettare, al loro posto compare il segnaposto di
+        Cookiebot.
+
+        Senza identificativo non si scrive niente: uno `data-cbid` finto non
+        chiede il consenso, dà errore. Vedi `data/sito.ts`. */}
+    {COOKIEBOT_CBID && (
+      <script
+        id="Cookiebot"
+        src="https://consent.cookiebot.com/uc.js"
+        data-cbid={COOKIEBOT_CBID}
+        data-blockingmode="auto"
+        is:inline
+      />
+    )}
+
+    {/* Google Tag Manager, e sta qui subito dopo il banner per la ragione per cui GTM esiste:
         è lui che decide quali altri tag partono, quindi ogni riga prima di lui
-        è ritardo su tutto quello che gestisce. Dopo charset e viewport, che
-        vanno prima di qualunque cosa, e prima di tutto il resto.
+        è ritardo su tutto quello che gestisce. Prima di GTM sta solo ciò che
+        deve: charset, viewport e il consenso.
 
         `is:inline` non è un dettaglio: senza, Astro tratta il blocco come un
         modulo suo — lo raccoglie, lo trasforma e lo serve come `<script

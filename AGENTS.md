@@ -89,9 +89,69 @@ riga del `<body>`.
   `meta refresh` verso una pagina che invece ce l'ha.
 
 Per verificare: su ogni pagina del `dist`, lo snippet sta nel `<head>` preceduto
-solo dai due `meta`, e il `<noscript>` è il primo figlio del `<body>`. In un
-browser, `window.dataLayer` è un array con dentro l'evento `gtm.js` e lo script
-iniettato porta `async`.
+solo dai due `meta` **e dal banner del consenso**, e il `<noscript>` è il primo
+figlio del `<body>`. In un browser, `window.dataLayer` è un array con dentro
+l'evento `gtm.js` e lo script iniettato porta `async`.
+
+### Il consenso è un interruttore solo, e si chiama `COOKIEBOT_CBID`
+
+Sopra GTM sta Cookiebot, perché Consent Mode vuole lo stato di default — tutto
+negato — prima che `gtm.js` parta. **Nel layout e non come tag dentro GTM**,
+benché GTM lo permetta: un blocco pubblicitario che ferma
+`googletagmanager.com` fermerebbe anche il banner, e chi non vede il banner non
+può acconsentire. Questo sito ha storage suo da governare, quindi il segnale
+deve arrivare anche quando GTM non arriva.
+
+L'identificativo del gruppo di domini sta in `data/sito.ts`, in chiaro come il
+client id di Tina e per la stessa ragione. **Athlon ha un solo account
+Cookiebot**: il sito Astro è destinato a *essere* `www.athlonroma.it`, che è già
+nel gruppo del sito WordPress — stesso dominio, stesso identificativo, e la
+scelta già data non si ripresenta al cambio di piattaforma.
+
+Vuoto è uno stato legittimo, e comanda tre cose insieme:
+
+| | `COOKIEBOT_CBID` vuoto | impostato |
+| --- | --- | --- |
+| banner | non scritto in pagina | in cima al `<head>` |
+| `vid` e UTM | memorizzati, come sempre | memorizzati **solo col consenso** |
+| `/privacy` | dice che il banner è in arrivo | descrive il consenso e mostra la dichiarazione dei cookie |
+
+Un interruttore e non tre, perché lo stato intermedio — nessun banner e già
+niente attribuzione — perderebbe i dati senza rendere il sito più corretto di un
+millimetro, e la pagina descriverebbe un consenso che nessuno ha potuto dare.
+
+Come è fatta la subordinazione, in `scripts/attribuzione.ts`, e sono tre scelte
+non ovvie:
+
+- **tutto vive in memoria comunque**, e solo la scrittura nello storage aspetta.
+  Così chi accetta alla terza pagina non perde l'attribuzione del primo tocco:
+  senza questo, la conversione risulterebbe «nessuna campagna», che è il dato
+  sbagliato e non il dato mancante.
+- **senza consenso il `vid` vale una pagina sola.** Il form che parte da questa
+  pagina ha comunque un identificativo, così l'automazione può unire due invii
+  della stessa persona; alla pagina dopo è un altro, e va bene — un
+  identificativo che non sopravvive alla navigazione non ricostruisce un
+  percorso.
+- **i form non si bloccano mai.** Il consenso cookie governa cosa si scrive nel
+  browser, non se una persona può chiedere una prova: senza consenso il payload
+  parte senza `vid` e senza UTM, e `provaForm.client.js` lo prevedeva già.
+
+La categoria conta: `athlon_vid` e `athlon_utm` sono **marketing**, la sessione
+della chat e il passo dell'Help Desk sono **necessari** — sono lo stato del
+servizio che la persona ha chiesto, durano la sessione e non profilano.
+Bloccarli romperebbe la chat.
+
+`data-blockingmode="auto"` fa il resto: Cookiebot trattiene gli iframe di terzi
+finché non c'è consenso. Su questo sito sono la mappa di Google nel footer — che
+sta in **ogni** pagina — il tour di my.mpskin, i player Vimeo e il widget di
+Calendly. Prima di accettare, al loro posto c'è un segnaposto.
+
+E `/privacy` esiste: era linkata dal footer di ogni pagina, da `/attiva` e da
+`/promo`, e **non c'era**. La parte tecnica — cosa si scrive nel browser, quali
+form ci sono, dove finiscono i dati — sta in `data/privacy.ts` e va tenuta in
+pari col codice; l'informativa la scrive il club. Vale la regola di `club.ts`:
+un dato inventato è peggio di un dato assente, e in un'informativa questo è
+doppiamente vero.
 
 ## A hidden overlay must be hidden from the keyboard too
 

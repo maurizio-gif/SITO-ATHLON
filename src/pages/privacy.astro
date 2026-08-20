@@ -1,0 +1,249 @@
+---
+/**
+ * Privacy e cookie, su `/privacy` — l'indirizzo che il footer di ogni pagina
+ * linka già, e che fino a oggi era un 404. Lo linkano anche `/attiva` e
+ * `/promo`: tre punti del sito che portavano a una pagina inesistente, ed è la
+ * prima cosa che si guarda quando si controlla un banner di consenso.
+ *
+ * Tre parti, e solo una è un documento legale. L'informativa arriva da
+ * `data/privacy.ts` e la scrive il club; **cosa il sito scrive nel browser** e
+ * **dove finiscono i dati** sono fatti verificabili dal codice, tenuti in pari
+ * col codice; la **dichiarazione dei cookie** la genera Cookiebot e si aggiorna
+ * da sé alla scansione successiva.
+ *
+ * `chrome={false}` come gli altri documenti del club: la pagina si legge da
+ * sola. `noindex` no — un'informativa deve poter essere trovata.
+ */
+import Layout from '../layouts/Layout.astro';
+import '../styles/prosa.css';
+import { COOKIEBOT_CBID } from '../data/sito';
+import { TITOLARE, STORAGE, DESTINATARI, INFORMATIVA } from '../data/privacy';
+
+const categoria = {
+  necessario: 'Necessario',
+  marketing: 'Marketing',
+} as const;
+---
+
+<Layout
+  title="Privacy e cookie | Athlon Club Roma Talenti"
+  description="Come Athlon Club tratta i dati di chi visita il sito: cosa viene scritto nel browser, quali dati raccolgono i moduli di contatto e a quali servizi vengono trasmessi."
+  chrome={false}
+  breadcrumb={[{ name: 'Privacy e cookie', path: '/privacy' }]}
+>
+  <section class="pv-hero">
+    <div class="container-narrow">
+      <span class="eyebrow" data-anim="from-left">Documenti del club</span>
+      <h1 class="pv-hero__title">Privacy e <em class="accent">cookie</em></h1>
+      <p class="pv-hero__lede">
+        Cosa questo sito scrive nel tuo browser, quali dati raccolgono i moduli di contatto
+        e a chi vengono trasmessi. Titolare del trattamento è {TITOLARE.ragioneSociale},
+        che gestisce {TITOLARE.nomeCommerciale}.
+      </p>
+      <p class="pv-hero__meta">
+        Per qualsiasi richiesta sui tuoi dati: <a href={`mailto:${TITOLARE.email}`}>{TITOLARE.email}</a>
+      </p>
+    </div>
+  </section>
+
+  <div class="container-narrow pv-corpo prosa">
+    {
+      INFORMATIVA.length === 0 ? (
+        <div class="pv-avviso">
+          <p>
+            <strong>L'informativa completa è in corso di pubblicazione su questo indirizzo.</strong>
+            Nel frattempo qui sotto trovi la parte che riguarda questo sito — cosa viene scritto
+            nel tuo browser e a quali servizi arrivano i dati dei moduli — che è completa e
+            aggiornata. Per il documento integrale, o per esercitare i tuoi diritti,
+            scrivi a <a href={`mailto:${TITOLARE.email}`}>{TITOLARE.email}</a>.
+          </p>
+        </div>
+      ) : (
+        INFORMATIVA.map((s) => (
+          <>
+            <h2>{s.titolo}</h2>
+            {s.corpo.map((p) => (
+              <p set:html={p} />
+            ))}
+          </>
+        ))
+      )
+    }
+
+    <h2 id="cosa-scriviamo">Cosa questo sito scrive nel tuo browser</h2>
+    <p>
+      Non sono cookie in senso tecnico — sono <em>localStorage</em> e <em>sessionStorage</em> —
+      ma la regola è la stessa: quello che non serve a farti funzionare il sito viene scritto
+      solo se acconsenti.
+    </p>
+    <table>
+      <thead>
+        <tr><th>Nome</th><th>Cosa contiene</th><th>Durata</th><th>Categoria</th></tr>
+      </thead>
+      <tbody>
+        {
+          STORAGE.map((v) => (
+            <tr>
+              <td><code>{v.chiave}</code><br /><small>{v.dove}</small></td>
+              <td>{v.cosa}</td>
+              <td>{v.durata}</td>
+              <td>{categoria[v.categoria]}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+    {
+      COOKIEBOT_CBID ? (
+        <p>
+          I due marcati «Marketing» sono scritti <strong>solo dopo il tuo consenso</strong>. Se lo
+          neghi, il sito funziona identico e i moduli si inviano allo stesso modo: manca soltanto
+          l'informazione su quale campagna ti ha portato qui.
+        </p>
+      ) : (
+        <p>
+          Il banner con cui scegliere è in corso di attivazione su questo sito. Fino ad allora
+          puoi impedire la scrittura dei due marcati «Marketing» dalle impostazioni del tuo
+          browser, oppure chiederci la cancellazione dei dati collegati scrivendo a
+          <a href={`mailto:${TITOLARE.email}`}>{TITOLARE.email}</a>.
+        </p>
+      )
+    }
+
+    <h2 id="moduli">I moduli di contatto</h2>
+    <p>
+      Il sito ha due punti in cui si lasciano dei dati: il modulo <strong>«prova gratuita»</strong>
+      e l'<strong>assistente</strong> del Club Life. Entrambi raccolgono nome, cognome, indirizzo
+      email e numero di cellulare, più l'attività a cui sei interessato.
+    </p>
+    <p>
+      Questi invii <strong>non dipendono dal consenso ai cookie</strong>, ed è una distinzione che
+      vale la pena spiegare: il consenso ai cookie riguarda ciò che viene archiviato nel tuo
+      browser, mentre i dati di un modulo li stai mandando tu, per la richiesta che ci stai
+      facendo. Se hai acconsentito al marketing, al modulo viene allegato anche l'identificativo
+      <code>athlon_vid</code> e la campagna di provenienza; se non hai acconsentito, il modulo
+      parte senza.
+    </p>
+
+    <h2 id="destinatari">Dove finiscono i dati</h2>
+    <table>
+      <thead>
+        <tr><th>Servizio</th><th>Perché</th></tr>
+      </thead>
+      <tbody>
+        {
+          DESTINATARI.filter((d) => !d.soloConBanner || COOKIEBOT_CBID).map((d) => (
+            <tr>
+              <td>{d.nome}<br /><small><code>{d.dominio}</code></small></td>
+              <td>{d.perche}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+
+    {
+      COOKIEBOT_CBID && (
+        <>
+          <h2 id="cookie">Dichiarazione dei cookie</h2>
+          <p>
+            L'elenco qui sotto è generato e aggiornato automaticamente dalla scansione del sito.
+          </p>
+          {/* Lo script di Cookiebot scrive l'elenco al posto di se stesso: va
+              messo dove l'elenco deve comparire, non nel <head>. */}
+          <script
+            id="CookieDeclaration"
+            src={`https://consent.cookiebot.com/${COOKIEBOT_CBID}/cd.js`}
+            type="text/javascript"
+            async
+            is:inline
+          />
+
+          <h2 id="cambia-scelta">Cambiare idea</h2>
+          <p>
+            Puoi rivedere o revocare il consenso quando vuoi, e non serve svuotare niente:
+          </p>
+          <p>
+            {/* `Cookiebot.renew()` riapre il banner. È un requisito, non una
+                cortesia: revocare deve costare quanto acconsentire. */}
+            <button type="button" class="pv-rinnova" data-cookiebot-rinnova>
+              Rivedi le tue scelte sui cookie
+            </button>
+          </p>
+          <script is:inline>
+            document.querySelector('[data-cookiebot-rinnova]')?.addEventListener('click', function () {
+              if (window.Cookiebot && window.Cookiebot.renew) window.Cookiebot.renew();
+            });
+          </script>
+        </>
+      )
+    }
+  </div>
+</Layout>
+
+<style>
+  .pv-hero {
+    padding: var(--space-section-sm) 0 2rem;
+    background: var(--color-cream);
+  }
+
+  .pv-hero__title {
+    font-size: var(--text-4xl);
+    --lh: 0.95;
+    margin: 0.4rem 0 1rem;
+  }
+
+  .pv-hero__lede {
+    font-size: var(--text-lg);
+    line-height: 1.55;
+    max-width: 34em;
+    margin: 0 0 0.9rem;
+  }
+
+  .pv-hero__meta {
+    font-size: var(--text-sm);
+    color: rgba(39, 36, 35, 0.7);
+    margin: 0;
+  }
+
+  .pv-corpo {
+    padding: 2.5rem 0 var(--space-section-sm);
+  }
+
+  /* L'avviso sul documento in arrivo: si deve leggere come una nota del club,
+     non come un errore della pagina. */
+  .pv-avviso {
+    border-left: 3px solid var(--color-accent);
+    background: var(--color-cream);
+    padding: 1rem 1.15rem;
+    margin: 0 0 2rem;
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+
+  .pv-avviso p {
+    margin: 0;
+  }
+
+  /* Un comando, quindi ha l'altezza di un comando: la regola del totem vale
+     anche qui, e la misura è in rem perché su quel pannello il root cresce. */
+  .pv-rinnova {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    padding: 0 1.15rem;
+    border: 1px solid var(--color-dark);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-dark);
+    font-family: inherit;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease;
+  }
+
+  .pv-rinnova:hover {
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+</style>
