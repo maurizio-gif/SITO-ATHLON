@@ -359,7 +359,7 @@ export const JUNIOR: CorsoJunior[] = [
           nome: 'Progressione',
           titolo: 'Vedi a che punto è, e cosa gli manca',
           testo:
-            'Nel tuo account, alla voce Brevetti, trovi i brevetti raggiunti e le prove necessarie per il livello successivo, aggiornati circa ogni due mesi. Se vuoi parlarne con una persona, il Direttore Tecnico si prenota: ti richiamiamo noi.',
+            'Nel tuo account, alla voce Brevetti, trovi i brevetti raggiunti e le prove necessarie per il livello successivo, aggiornati circa ogni due mesi. Se sei gia’ iscritto e vuoi parlarne con una persona, il Direttore Tecnico si prenota: ti richiamiamo noi.',
         },
         {
           nome: 'Brevetto',
