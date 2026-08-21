@@ -116,6 +116,50 @@ function rivaluta(): void {
   scrittureInAttesa: [...rimandate].reduce((n, [, coda]) => n + coda.length, 0),
 });
 
+/* Il dominio a cui la chiave di CookieYes è registrata. Serve solo all'avviso
+   qui sotto: è l'unico posto del sito che ha bisogno di sapere «dove dovremmo
+   essere», e tenerlo qui evita di spargere il nome del dominio nel codice. */
+const DOMINIO_UFFICIALE = /(^|\.)athlonroma\.it$/i;
+
+/**
+ * L'avviso che trasforma un guasto silenzioso in un guasto visibile.
+ *
+ * Le due configurazioni sbagliate sono simmetriche e nessuna delle due si vede
+ * guardando il sito — si vedono solo come «una cosa che non funziona più»:
+ *
+ *  - **chiave impostata e CookieYes che non risponde.** È quello che è capitato:
+ *    la produzione su un host che l'account CookieYes non conosce, quindi
+ *    nessun banner, nessun consenso possibile, e `vid`, UTM ed email non
+ *    memorizzati. Da fuori sembrava «l'email non si precompila».
+ *  - **chiave vuota sul dominio ufficiale.** Il verso opposto, ed è quello che
+ *    si dimentica: finito lo spostamento, se nessuno rimette la chiave il sito
+ *    gira senza banner e memorizza come prima.
+ *
+ * Non blocca niente e non parla all'utente: è una riga in console per chi apre
+ * gli strumenti. `athlonStatoConsenso()` resta il dettaglio.
+ */
+function avvisaSeNonCombacia(silenzioso: boolean): void {
+  const host = location.hostname;
+  const ufficiale = DOMINIO_UFFICIALE.test(host);
+
+  if (COOKIEYES_KEY && silenzioso) {
+    console.warn(
+      `[athlon] CookieYes non risponde su ${host}: nessun banner, quindi ` +
+        'niente consenso e niente memorizzato — vid, UTM ed email ricordata ' +
+        'sono spenti. Se questo host non è fra i domini registrati ' +
+        'nell\'account, svuota COOKIEYES_KEY in data/sito.ts finché non lo è.'
+    );
+  }
+
+  if (!COOKIEYES_KEY && ufficiale) {
+    console.warn(
+      `[athlon] Siamo su ${host} senza banner del consenso: COOKIEYES_KEY è ` +
+        'vuota in data/sito.ts. Era il ripiego per stare su un host che ' +
+        'CookieYes non conosce — qui va rimessa.'
+    );
+  }
+}
+
 if (COOKIEYES_KEY) {
   /* Sul documento e sulla finestra: quale dei due porti l'evento dipende dal
      fornitore, ascoltarli entrambi non costa niente. */
@@ -129,6 +173,13 @@ if (COOKIEYES_KEY) {
   let tentativi = 0;
   const orologio = setInterval(() => {
     rivaluta();
-    if (++tentativi >= 40) clearInterval(orologio);
+    if (++tentativi >= 40) {
+      clearInterval(orologio);
+      /* Venti secondi e nessuno dei tre segnali ha parlato: non è un visitatore
+         che sta ancora leggendo il banner, è un banner che non c'è. */
+      avvisaSeNonCombacia(daFunzione() === null && daCookie() === null);
+    }
   }, 500);
+} else {
+  avvisaSeNonCombacia(false);
 }
