@@ -115,26 +115,39 @@ const inTesta = PREFISSI.filter((p) => p.iso === 'IT');
      al numero resterebbe uno spiraglio. */
   .tel__prefisso {
     flex: 0 0 auto;
-    /* Da 7.5rem a 5rem, e la misura la decide il testo che si vede a tendina
-       chiusa: «+39» sono 26 px, il padding 0,5rem per lato e `appearance: auto`
-       vuole il suo spazio per la freccia, che il browser disegna **dentro** il
-       padding destro. Una misura sola per telefono e desktop, perché il testo è
-       lo stesso — prima erano due e la seconda esisteva solo perché la prima
+    /* Da 7.5rem a 4.5rem, e la misura la decide il testo che si vede a tendina
+       chiusa: «+39». Una misura sola per telefono e desktop, perché il testo è
+       lo stesso — prima erano due, e la seconda esisteva solo perché la prima
        era troppo larga.
+
+       **La freccia è nostra, e questo è il punto che è costato.** Con
+       `appearance: auto` quella del browser non sta nel padding: se la prende
+       dal contenuto, in aggiunta a quello che il padding già riserva. Quindi
+       nessun conto sul padding la tiene fuori — «+39» si leggeva prima «+» e
+       poi «+…» — e la larghezza che servirebbe non è deducibile, perché quanto
+       spazio si prenda lo decide il browser. Con `appearance: none` la freccia
+       la disegna questo `background-image` e lo spazio glielo riserva
+       `padding-right`: 54 px liberi per un testo di 30, e il conto è verificabile.
+
+       Il grigio è un valore fisso e non `currentColor`, che dentro un `url()`
+       non si può usare. Verificato che basti: i cinque campi telefono del sito
+       — la prova, i due di «contattaci», la chat e i tre del referral — hanno
+       tutti fondo bianco e testo scuro. Il giorno che uno finisce su un fondo
+       scuro, questa freccia va rifatta con una `mask` e `background-color`.
 
        Misurato nel pannello della chat, che è il posto più stretto in cui questo
        campo vive — là la riga è divisa in due colonne: sul telefono il numero
-       passa da 335 px su una riga sua a 273 px accanto al prefisso, e su desktop
-       da 128 a 160 quando accanto c'è anche l'email. 4rem è la misura in cui
-       «+39» (26 px), il padding e la freccia stanno senza toccarsi. */
-    width: 4rem;
+       passa da 335 px su una riga sua a 257 px accanto al prefisso, e su desktop
+       da 128 a 152 quando accanto c'è anche l'email. */
+    width: 4.5rem;
     padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    /* `text-overflow` non funziona su un `select` chiuso in tutti i browser, ma
-       il testo visibile è corto per costruzione: la voce selezionata è quella in
-       testa, «🇮🇹 +39», e le altre mostrano il paese solo mentre il menu è
-       aperto — dove lo spazio è quello della lista, non del campo. */
-    text-overflow: ellipsis;
+    padding-right: 1.25rem;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.4rem center;
+    background-size: 0.65rem;
   }
 
   .tel__numero {
