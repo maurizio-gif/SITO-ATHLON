@@ -777,9 +777,24 @@ divergere.
 ```
 
 `classe` è la classe del campo di testo del pannello ospite, e **va passata**:
-gli stili con ambito di Astro non attraversano i confini dei componenti, quindi
-il componente porta la disposizione e la classe porta il colore — bianco nella
+il componente porta la disposizione, la classe porta il colore — bianco nella
 prova, scuro nell'Help Desk.
+
+**Ma passare la classe non basta: la regola del pannello dev'essere
+`:global`.** Gli stili con ambito di Astro non attraversano i confini dei
+componenti, e a non attraversarli è la *regola*, non la classe. Il `select` e
+l'`input` li rende `CampoTelefono`, quindi portano l'ambito di quel file,
+mentre `.pf__input { … }` scritto nel modal diventa
+`.pf__input[data-astro-cid-oynkqsed]` e non li tocca mai. Il campo telefono era
+nudo — con l'aspetto grezzo del browser — in **tutti e quattro** i pannelli, e
+non se n'era accorto nessuno finché non è stato guardato sul referral.
+
+Si scrive `:global(.pf__input) { … }`, e la classe è già propria del pannello,
+quindi globale non collide con niente. Per verificarlo non basta guardare uno
+screenshot: si misurano gli stili calcolati del `select` e si confrontano con
+quelli di un `input` del pannello — sfondo, bordo, raggio, famiglia e corpo
+devono coincidere. Vale per qualunque componente condiviso che si aspetti di
+essere vestito da chi lo ospita.
 
 **Non si legge mai `input.value` da solo.** Quello è il numero come l'ha scritto
 la persona, non il numero: la tendina sta in `#<id>-prefisso`, e la composizione
@@ -881,6 +896,201 @@ inviato e non contiene niente — e i tre pezzi si aggiungono a mano.
 o uno script Python prendono `403 Authorization data is wrong!`, che sembra un
 problema di credenziali e non lo è. Per provarlo si passa dal browser, dal form
 vero, che è comunque la prova che conta.
+
+## Ogni dato raccolto finisce su Supabase, e Airtable è il passeggero
+
+Il database del sito è il progetto Supabase **`app-athlon`**
+(`kdbcwwpdazvtmjolybdm`), e ci scrivono le automazioni n8n, mai il browser: la
+chiave che scrive è la service key, che sta solo in n8n. Tutte le tabelle hanno
+RLS attiva e **zero policy**, che è il modo di dire «solo la service key passa».
+Una policy `anon` su una di queste tabelle è un elenco di lead pubblicato.
+
+Lo schema sta in `supabase/migrations/`, e va tenuto in pari: una colonna
+aggiunta dalla dashboard e non qui è una colonna che il prossimo ambiente non
+avrà. Non c'è un `db push` in CI — le migrazioni si eseguono a mano nella SQL
+Editor — quindi il file è documentazione eseguibile, non un meccanismo.
+
+**Airtable resta, e resta secondario.** `athlon-contatto-compilato` e
+`athlon-referral` scrivono ancora la loro riga su `ATHLON CLUB / RICHIESTE`, e
+va bene finché il desk lavora di lì. Ma la fonte di verità è Supabase, e si
+vede dall'ordine dei nodi: la riga sul database si scrive **prima** di Airtable,
+prima di SendGrid, prima di Spoki e prima di PerfectGym. Non è estetica — quei
+nodi hanno `onError: continueRegularOutput`, quindi falliscono in silenzio, e
+nell'ordine inverso un timeout del CRM sarebbe un contatto perduto senza che
+nessuno se ne accorga.
+
+Dove finisce cosa:
+
+| webhook | tabella |
+| --- | --- |
+| `athlon-prova-compilata` | `richieste_prova` |
+| `athlon-contatto-compilato` | `richieste_contatto` |
+| `help-desk-athlon` | `richieste_help_desk` |
+| `chat-athlon` | `chat_conversazioni`, `chat_messaggi` |
+| `chat-athlon-dati` | `chat_lead` |
+| `chat-athlon-ticket` | `chat_ticket` |
+| `athlon-referral` | `richieste_referral` |
+| `athlon-verifica-iscritto`, `athlon-reset-password` | `eventi_email` |
+
+E sopra tutte c'è `utenti`, l'anagrafica: ogni riga di queste tabelle porta una
+`utente_id` che un trigger riempie da sola, deduplicando per id PerfectGym e
+per email. Sta più sotto, e non va toccata da n8n.
+
+**Gli scarti si registrano come i successi**, ed è la riga che manca più spesso.
+Il referral rifiutava due casi — chi invita non è socio, l'amico lo è già —
+mandandoli su un nodo `No-Op`: gli inviti persi non esistevano, quindi nessuno
+poteva sapere quanti fossero né perché. Ora hanno una riga con `esito` e
+`motivo_scarto`. Stessa idea per l'email malformata in `eventi_email`: se sono
+tante, il problema è il campo, non chi scrive.
+
+### `eventi_email` è il funnel, le `richieste_*` sono le conversioni
+
+Le tabelle `richieste_*` contengono chi è arrivato in fondo. `eventi_email`
+contiene chi ha cominciato: **una riga ogni volta che qualcuno digita un
+indirizzo**, quale che sia il form e quale che sia l'esito. La distanza fra le
+due è quanti si fermano a metà.
+
+Il buco era grosso e invisibile: `athlon-verifica-iscritto` è l'endpoint più
+trafficato del sito — ci passano la prova, «contattaci», la chat, l'Help Desk e
+i pulsanti *Iscriviti* di `/abbonamenti` e `/promo` — e non scriveva niente da
+nessuna parte. Chi digitava l'email, leggeva «hai già un account» e chiudeva la
+pagina non era mai esistito.
+
+Due viste rispondono alla domanda che nessuna tabella può:
+`email_tutte` (ogni tocco, da tutte le sorgenti) e `email_contatti` (una riga
+per indirizzo). Sono `security_invoker`, senza il quale scavalcherebbero la RLS
+di tutto quello che c'è sotto. **Aggiungendo un form, aggiungi il suo ramo a
+`email_tutte`**: una vista che non copre tutte le sorgenti risponde con
+sicurezza a una domanda sbagliata, ed è peggio di una vista che non c'è.
+
+### `utenti` è l'anagrafica, e la deduplica sta nel database
+
+Una riga per persona, non per richiesta. Ogni tabella dei form porta una
+`utente_id` che un trigger riempie da sola: `richieste_referral` ne porta due,
+`utente_invitante_id` e `utente_amico_id`, perché quella riga contiene due
+persone.
+
+**La deduplica sta in Postgres e non in n8n**, ed è la scelta che regge tutto il
+resto: i workflow continuano a scrivere quello che scrivevano, e aggiungere un
+form vuol dire aggiungere una colonna e un trigger invece di rimettere le mani
+in nove automazioni. Le righe già scritte si agganciano rieseguendo la `update`
+di ripopolamento in fondo alla migrazione.
+
+Due chiavi, in quest'ordine, e l'ordine è la regola:
+
+1. **`pgm_member_id`**, e vince sempre. Lo dice il gestionale, non chi compila:
+   due indirizzi diversi con lo stesso id sono la stessa persona, ed è il caso
+   normale di chi scrive dal lavoro e poi da casa. Vince *anche* quando l'email
+   punterebbe a un'altra scheda.
+2. **`email_norm`**, minuscola e senza spazi, calcolata dalla colonna. È l'unica
+   chiave che abbiamo per chi non è ancora su PerfectGym — cioè per ogni
+   contatto nuovo, che è la ragione per cui esiste il sito.
+
+**Il telefono non è una chiave**, ed è deliberato: al club i figli si iscrivono
+col cellulare del genitore, quindi accorparli automaticamente fonderebbe tre
+persone in una. Sta nella vista `utenti_da_unire`, che propone le coppie e
+lascia decidere.
+
+`trova_o_crea_utente()` **riempie i buchi e non sovrascrive**. Il primo dato che
+abbiamo di una persona è quello che ha scritto lei; una riga di referral porta
+il nome dell'amico come lo ha digitato un terzo, e non deve poter correggere
+l'originale. L'email non si sostituisce mai: lì è l'identità, e cambiarla
+staccherebbe tutto quello che è già agganciato.
+
+`primo_contatto` e `ultimo_contatto` si scrivono con `least` e `greatest` e non
+con «l'ultimo che passa», così ripopolare le righe vecchie dà lo stesso
+risultato in qualunque ordine giri — che è quello che rende la migrazione
+rieseguibile senza pensarci.
+
+**Il trigger non può far fallire un form, e questa è la riga da non togliere.**
+Sta in `BEFORE INSERT`, quindi se solleva, la richiesta della persona non viene
+salvata: sarebbe il modo più stupido di perdere un lead. Quindi tre reti, e
+ognuna copre un caso vero:
+
+- l'`INSERT` su `utenti` è dentro un `exception when unique_violation`, perché
+  due richieste della stessa persona nello stesso istante passano entrambe la
+  `select` e poi una delle due sbatte sull'indice unico. Si rilegge la riga che
+  ha creato l'altra;
+- l'`UPDATE` lo stesso, per l'id PerfectGym che nel frattempo è finito altrove:
+  si aggiorna tutto il resto e lo si lascia dov'è;
+- e sopra tutto, `assegna_utente()` cattura *qualunque* errore, scrive un
+  `warning` e mette `utente_id` a null. Un aggancio mancato si ricalcola, una
+  richiesta perduta no.
+
+Le viste: `utente_attivita` è la scheda di una persona in ordine di tempo,
+`utenti_completi` l'elenco per la segreteria. In tutte e due, le righe con
+fonte `eventi_email` sono **tocchi e non richieste** — una verifica di email non
+è una conversione: `utenti_completi.richieste` le esclude, `attivita_totali` le
+conta.
+
+### Le candidature sono l'eccezione: niente tracciamento, niente anagrafica
+
+`/lavora` raccoglie i curriculum e sostituisce il Typeform `AthlonCV`, che
+faceva le stesse domande in sei schermate. Il workflow è `athlon-candidatura`:
+scrive su `candidature` e manda a `valentina@athlonroma.it` l'email con i dati
+e il curriculum in allegato.
+
+**È l'unica tabella del sito che sta fuori da tutto il resto**, e non è una
+dimenticanza: nessun `vid`, nessuna UTM, nessuna `utente_id`, nessun trigger
+`assegna_utente`. Chi manda un curriculum non è un lead. Le altre tabelle
+servono a capire da quale campagna arriva un contatto commerciale; su una
+candidatura quella domanda non ha senso e la risposta sarebbe un dato personale
+raccolto per niente. Sono anche dati di categoria diversa — una storia
+lavorativa e un giudizio su di sé — e non devono finire nella scheda che la
+segreteria apre per vendere un abbonamento. Se qualcuno aggiunge il
+tracciamento al form, va tolto: la tabella non ha le colonne apposta, e il Code
+node li ferma comunque.
+
+**Il curriculum viaggia in allegato e non in una colonna.** Nella riga restano
+nome, tipo e peso, come per l'allegato dell'Help Desk: il base64 in `payload`
+sarebbero megabyte per riga. `cv_url` esiste già vuota, ed è il posto dove
+finirà il link il giorno che il file andrà su Supabase Storage — così quel
+passaggio non chiederà una migrazione.
+
+**Le posizioni aperte stanno in `src/data/lavora.ts`**, una volta sola: le legge
+l'elenco della pagina e le legge la tendina del form, e da due posti diversi
+divergerebbero. L'elenco vuoto è uno stato legittimo e la pagina lo dice per
+intero — la candidatura spontanea resta, ed è quella che al club serve tutto
+l'anno. **Un annuncio inventato è peggio di un annuncio assente**: manda una
+persona a scrivere una lettera per un posto che non esiste.
+
+### Un nodo Supabase in bozza non scrive niente
+
+Questa istanza n8n ha bozze e versioni pubblicate, e **`update_workflow` non
+pubblica**: crea una versione e la lascia lì. Le esecuzioni manuali girano la
+bozza, il webhook di produzione gira la versione attiva — quindi si può provare
+un nodo, vederlo scrivere la riga, ed essere convinti che sia vivo mentre non lo
+è. Dopo ogni modifica va chiamato `publish_workflow`, e il controllo è
+`versionId == activeVersionId` in `get_workflow_details`.
+
+Non è teoria: `richieste_prova` era vuota da giorni perché il nodo
+«Supabase RICHIESTE PROVA» esisteva **solo in bozza**. Il workflow sembrava a
+posto guardandolo, e la tabella restava a zero.
+
+Attenzione a cosa ci si porta dietro quando si pubblica: le versioni sono
+istantanee, non diff, quindi pubblicare la propria modifica pubblica anche le
+bozze di chi è passato prima. Prima di farlo, confronta `activeVersion.nodes`
+con `nodes`. Un diff che tocca *tutti* i nodi di solito non è una modifica vera
+ma l'editor che ha tolto i valori uguali al default (`action: hash`,
+`encoding: hex`, `type: SHA256` sul nodo Crypto sono tutti default): verificalo
+con `get_node_types` invece di indovinare, perché il caso in cui non lo fossero
+— un hash che cambia — romperebbe l'abbinamento delle conversioni Meta senza
+dare errore.
+
+### Il nodo che scrive non deve poter fermare il form
+
+Ogni nodo Supabase aggiunto porta `onError: continueRegularOutput`, e sta fuori
+dal percorso della risposta al browser. Vale la regola dei form: perdere una
+riga è brutto, impedire a una persona di chiedere una prova è peggio.
+
+Una trappola sola, e morde in silenzio: **il nodo Supabase restituisce la riga
+inserita, non l'item che ha ricevuto.** Da lì in poi `$json` ha i nomi delle
+colonne (`member_id`, `stato_pgm`) e non quelli del form (`memberId`,
+`statoPgm`), quindi ogni espressione a valle legge `undefined` — e con
+`typeValidation: loose` un `IF` non dà errore, prende semplicemente il ramo
+sbagliato. Se l'inserimento sta *in mezzo* alla catena serve un Code node che
+rimetta i dati buoni (`Ripristina Dati` in `CHAT ATHLON — DATI` è l'esempio);
+altrimenti si mette il nodo su un ramo parallelo e si legge `$('Nodo').item`.
 
 ## Le pagine senza intestazione azzerano `--header-h`
 

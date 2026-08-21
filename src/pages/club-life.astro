@@ -184,11 +184,10 @@ const altre = sections.filter((s) => s.id !== 'help-desk');
       vantaggio che si ha perché si è soci. Prima dell'Help Desk, che è dove si
       va quando qualcosa non torna.
 
-      È un link e non un pulsante, e la differenza conta: `ReferralModal` sta
-      solo su `/referral`, quindi qui `data-cta="referral"` non trova nessun
-      ascoltatore e l'`href` fa il suo lavoro — porta là, e là il pannello si
-      apre da sé. Un pannello in più su questa pagina sarebbero dieci chilobyte
-      per un comando che si usa una volta nella vita del socio. */}
+      Il comando non sta qui: sta nel pulsante che galleggia in alto, che è
+      sempre a portata mentre si scorre e apre lo stesso `ReferralModal` che
+      questa pagina già carica. Un secondo pulsante a metà pagina diceva la
+      stessa cosa due volte, e quello in alto la dice meglio. */}
   <section class="cl-invita">
     <div class="container cl-invita__inner">
       <div class="cl-invita__testo">
@@ -200,12 +199,6 @@ const altre = sections.filter((s) => s.id !== 'help-desk');
           €{VOUCHER.valore} {VOUCHER.uso}.
         </p>
       </div>
-      <a class="btn btn-primary cl-invita__cta" href="/referral" data-cta="referral">
-        Manda l'invito →
-      </a>
-      {/* Resta un `<a>` con l'`href`, anche adesso che il modal lo intercetta:
-          è il ripiego per chi ha JavaScript disattivato e per il clic col tasto
-          centrale, come ogni altra CTA del sito. */}
     </div>
   </section>
 
@@ -712,13 +705,6 @@ const altre = sections.filter((s) => s.id !== 'help-desk');
     font-size: var(--text-sm);
     line-height: 1.6;
     color: rgba(255, 255, 255, 0.72);
-  }
-
-  /* Il corpo dentro la scala: un valore scritto a mano resterebbe indietro sul
-     totem e sul televisore, dove la radice cresce. */
-  .cl-invita__cta {
-    flex: none;
-    font-size: var(--text-sm);
   }
 
   /* Le quattro sezioni non hanno più bisogno di uno scarto: la barra
