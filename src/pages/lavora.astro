@@ -25,6 +25,7 @@ import Layout from '../layouts/Layout.astro';
 import CampoTelefono from '../components/CampoTelefono.astro';
 import { POSIZIONI, SPONTANEA, VANTAGGI, conGrassetto, CV_TIPI } from '../data/lavora';
 import { CLUB } from '../data/club';
+import { fotoHero } from '../data/foto';
 
 const CI_SONO_POSIZIONI = POSIZIONI.length > 0;
 ---
@@ -35,7 +36,14 @@ const CI_SONO_POSIZIONI = POSIZIONI.length > 0;
   breadcrumb={[{ name: 'Lavora con noi', path: '/lavora' }]}
 >
   <section class="lv-hero">
-    <div class="container lv-hero__inner">
+    <img
+      class="lv-hero__bg"
+      src="/wp-content/uploads/2025/11/ATHLON79-scaled.jpg"
+      alt="La sala pesi di Athlon Club"
+      {...fotoHero('/wp-content/uploads/2025/11/ATHLON79-scaled.jpg')}
+    />
+    <div class="lv-hero__scrim"></div>
+    <div class="container lv-hero__content">
       <span class="eyebrow" data-anim="from-left">Lavora con noi</span>
       <h1 class="lv-hero__titolo">Unisciti al<br /><em class="accent">team Athlon.</em></h1>
       <p class="lv-hero__lede">
@@ -383,13 +391,35 @@ const CI_SONO_POSIZIONI = POSIZIONI.length > 0;
 
 <style>
   .lv-hero {
+    position: relative;
     padding: var(--space-section-md) 0 var(--space-section-sm);
     background: var(--color-dark);
     color: var(--color-white);
+    overflow: hidden;
   }
 
-  .lv-hero__inner {
-    max-width: 46rem;
+  .lv-hero__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .lv-hero__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      rgba(23, 21, 20, 0.72) 0%,
+      rgba(23, 21, 20, 0.86) 60%,
+      rgba(23, 21, 20, 0.94) 100%
+    );
+  }
+
+  .lv-hero__content {
+    position: relative;
+    z-index: 1;
   }
 
   .lv-hero__titolo {
@@ -400,6 +430,7 @@ const CI_SONO_POSIZIONI = POSIZIONI.length > 0;
 
   .lv-hero__lede {
     margin: 0 0 1.75rem;
+    max-width: 46rem;
     font-size: var(--text-base);
     line-height: 1.6;
     color: rgba(255, 255, 255, 0.72);
