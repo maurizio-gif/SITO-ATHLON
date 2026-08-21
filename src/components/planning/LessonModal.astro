@@ -20,8 +20,13 @@ const cards = lessonCardsFor(bands);
   <div class="lmodal__panel" role="dialog" aria-modal="true" aria-labelledby="lmodal-title">
     <button type="button" class="lmodal__close" data-lmodal-close aria-label="Chiudi">×</button>
 
-    <div class="lmodal__video" hidden>
-      <video autoplay playsinline muted loop preload="metadata"></video>
+    {/* Il riquadro dei media: la clip della lezione quando c'è, altrimenti una
+        foto. Quello che non si mostra porta l'attributo `hidden`, che
+        `global.css` traduce in `display: none` per tutto il sito — e va tolto
+        dall'altro, o resterebbero in pagina tutti e due. */}
+    <div class="lmodal__media" hidden>
+      <video autoplay playsinline muted loop preload="metadata" hidden></video>
+      <img class="lmodal__pic" alt="" hidden />
     </div>
 
     <div class="lmodal__body">
@@ -41,7 +46,14 @@ const cards = lessonCardsFor(bands);
 
 <script>
   type Stat = { l: string; v: number };
-  type Card = { desc: string; videoUrl?: string; videoStart?: number; stats?: Stat[] };
+  type Card = {
+    desc: string;
+    videoUrl?: string;
+    videoStart?: number;
+    imageUrl?: string;
+    imageFocus?: string;
+    stats?: Stat[];
+  };
 
   const cards = ((window as any).__ATHLON_LESSONS__ || {}) as Record<string, Card>;
 
@@ -50,8 +62,9 @@ const cards = lessonCardsFor(bands);
   const titleEl = modal?.querySelector<HTMLElement>('.lmodal__title');
   const metaEl = modal?.querySelector<HTMLElement>('[data-lmodal-meta]');
   const descEl = modal?.querySelector<HTMLElement>('.lmodal__desc');
-  const videoWrap = modal?.querySelector<HTMLElement>('.lmodal__video');
-  const video = modal?.querySelector<HTMLVideoElement>('.lmodal__video video');
+  const mediaWrap = modal?.querySelector<HTMLElement>('.lmodal__media');
+  const video = modal?.querySelector<HTMLVideoElement>('.lmodal__media video');
+  const pic = modal?.querySelector<HTMLImageElement>('.lmodal__pic');
   const statsWrap = modal?.querySelector<HTMLElement>('.lmodal__stats');
   const statsList = modal?.querySelector<HTMLElement>('.lmodal__stats-list');
 
@@ -79,15 +92,28 @@ const cards = lessonCardsFor(bands);
     if (metaEl) metaEl.textContent = meta;
     if (descEl) descEl.innerHTML = card.desc;
 
-    if (video && videoWrap) {
+    if (video && mediaWrap) {
       if (card.videoUrl) {
+        if (pic) pic.hidden = true;
         video.src = card.videoUrl;
         if (card.videoStart) video.currentTime = card.videoStart;
-        videoWrap.hidden = false;
+        video.hidden = false;
+        mediaWrap.hidden = false;
         // Autoplay can be refused; the poster frame is still worth showing.
         video.play().catch(() => {});
+      } else if (card.imageUrl && pic) {
+        // Nessuna clip: la foto. Il video resta senza sorgente, così un
+        // pannello aperto non tiene in memoria quella di prima.
+        video.hidden = true;
+        video.removeAttribute('src');
+        video.load();
+        pic.src = card.imageUrl;
+        pic.alt = `${name} ad Athlon Club`;
+        pic.style.objectPosition = card.imageFocus || '';
+        pic.hidden = false;
+        mediaWrap.hidden = false;
       } else {
-        videoWrap.hidden = true;
+        mediaWrap.hidden = true;
       }
     }
 
@@ -206,11 +232,12 @@ const cards = lessonCardsFor(bands);
     background: var(--color-dark);
   }
 
-  .lmodal__video {
+  .lmodal__media {
     background: var(--color-dark);
   }
 
-  .lmodal__video video {
+  .lmodal__media video,
+  .lmodal__pic {
     display: block;
     width: 100%;
     aspect-ratio: 16 / 9;
