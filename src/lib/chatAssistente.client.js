@@ -933,6 +933,12 @@ export function initChatAssistente(root, options) {
       });
       if (!r.ok) throw new Error(String(r.status));
 
+      /* Dopo il controllo su `r.ok`, quindi solo quando i dati sono davvero
+         arrivati: qui un 500 diventa un `throw` e finisce nel `catch`, dove la
+         persona può proseguire senza che il lead sia stato scritto. */
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: 'lead_submit', lead_source: 'chat' });
+
       /* Quello che la persona ha scritto lo teniamo: è ciò che compare nel
          ticket se poi la conversazione non basta, e il nome con cui la si
          saluta un momento dopo. */

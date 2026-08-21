@@ -654,6 +654,21 @@ export function initContattaciForm(root, options) {
       // due richieste della stessa persona diventerebbero indistinguibili.
       var risposta = await r.json();
       if (risposta && risposta.richiestaId) dati.richiestaId = String(risposta.richiestaId);
+
+      /* Un evento per lead, e questa funzione viene chiamata due volte per la
+         stessa persona: la seconda da `onPrenotato` del calendario, con
+         `aggiornamento: 'richiamo'`, che non è un contatto nuovo ma un update
+         della riga già scritta (n8n la colpisce per `richiestaId`). Senza il
+         guardo, chi prenota il richiamo nel ramo junior contava due volte.
+
+         Il push sta qui e non nei rami chiamanti — «adulti» e
+         «genitore/bambino» passano entrambi da qui — e sta dentro il `try`,
+         perché il `catch` sotto prosegue in silenzio anche quando la richiesta
+         non è mai arrivata. */
+      if (!extra || !extra.aggiornamento) {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: 'lead_submit', lead_source: 'contatti' });
+      }
     } catch (e) {
       // Dal punto di vista della persona la richiesta è partita, e dirle il
       // contrario a schermo non le dà niente da fare. Il contatto perso resta

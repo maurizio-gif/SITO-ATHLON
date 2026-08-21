@@ -321,6 +321,14 @@ export function initProvaForm(root, options) {
           vid: vid(),
         }),
       });
+
+      /* Dentro il `try` e non accanto a `mostraStep('esito')`: quello step si
+         mostra anche quando la fetch fallisce — il `catch` qui sotto è vuoto di
+         proposito, perché il codice è della persona comunque — e un evento di
+         conversione spedito su una richiesta mai arrivata conterebbe un lead
+         che n8n non ha. */
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: 'lead_submit', lead_source: 'prova' });
     } catch (e) {
       // La richiesta è partita dal punto di vista della persona: il codice è
       // suo e glielo diamo lo stesso. Il lead perso resta un problema nostro,
