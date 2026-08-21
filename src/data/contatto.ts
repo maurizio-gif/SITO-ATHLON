@@ -99,6 +99,25 @@ export function haGiaAccount(esito: { memberType?: string; stato?: string }): bo
   return esito.stato === 'iscritto';
 }
 
+/**
+ * Se questa email è di un **socio**, non solo di chi ha un account.
+ *
+ * È una domanda diversa da `haGiaAccount`, e la differenza è tutto il referral:
+ * là dentro `Guest` conta come «ha un account», qui no. Chi invita deve essere
+ * socio — un guest non ha un abbonamento da cui far partire un invito — e chi
+ * viene invitato non deve esserlo, perché il pass è per chi non frequenta.
+ * La stessa riga risponde alle due domande da due lati.
+ *
+ * `Guest` passa di proposito, sul lato invitato: chi ha fatto una prova in
+ * passato può riceverne un'altra. È la regola che il flusso su n8n applica
+ * oggi, confermata dal club, e va detta perché il messaggio di rifiuto di
+ * quel flusso promette il contrario — «o ha già attivato una prova».
+ */
+export function eSocio(esito: { memberType?: string; stato?: string }): boolean {
+  if (esito.memberType) return /member/i.test(esito.memberType);
+  return esito.stato === 'iscritto';
+}
+
 /** La scheda con le modalità di preiscrizione: la chiusura del ramo junior. */
 export const PREISCRIZIONI = '/wikiathlon/snb/preiscrizioni-nuoto';
 

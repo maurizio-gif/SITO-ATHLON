@@ -7,6 +7,11 @@ import Servizi from '../components/clublife/Servizi.astro';
 import { upcomingEvents } from '../data/eventi';
 import { getCollection } from 'astro:content';
 import { fotoHero } from '../data/foto';
+import { PASS, VOUCHER } from '../data/referral';
+/* Qui il modal serve davvero: i due comandi di questa pagina — la fascia e il
+   pulsante fluttuante — devono aprire il form sul posto, non portare via. Sulle
+   altre pagine non c'è, e là `data-cta="referral"` resta un link a /referral. */
+import ReferralModal from '../components/ReferralModal.astro';
 
 // Counts drive the anchor menu labels, so the nav says how much is behind each
 // section instead of promising something empty.
@@ -174,9 +179,58 @@ const altre = sections.filter((s) => s.id !== 'help-desk');
 
   <Servizi id="servizi" />
 
+  {/* L'invito, dopo i servizi e non altrove: quella sezione dice cosa comprende
+      l'abbonamento, e invitare un amico è l'ultima voce di quell'elenco — un
+      vantaggio che si ha perché si è soci. Prima dell'Help Desk, che è dove si
+      va quando qualcosa non torna.
+
+      È un link e non un pulsante, e la differenza conta: `ReferralModal` sta
+      solo su `/referral`, quindi qui `data-cta="referral"` non trova nessun
+      ascoltatore e l'`href` fa il suo lavoro — porta là, e là il pannello si
+      apre da sé. Un pannello in più su questa pagina sarebbero dieci chilobyte
+      per un comando che si usa una volta nella vita del socio. */}
+  <section class="cl-invita">
+    <div class="container cl-invita__inner">
+      <div class="cl-invita__testo">
+        <span class="eyebrow" data-anim="from-left">Un vantaggio da socio</span>
+        <h2 class="cl-invita__titolo" data-anim="reveal">Porta un amico.</h2>
+        <p class="cl-invita__sub">
+          Lui prova tutto il club per {PASS.giorni} giorni pagando solo il badge, €{PASS.prezzo}
+          invece di €{PASS.prezzoPieno}. Se poi si iscrive, a te arriva un voucher da
+          €{VOUCHER.valore} {VOUCHER.uso}.
+        </p>
+      </div>
+      <a class="btn btn-primary cl-invita__cta" href="/referral" data-cta="referral">
+        Manda l'invito →
+      </a>
+      {/* Resta un `<a>` con l'`href`, anche adesso che il modal lo intercetta:
+          è il ripiego per chi ha JavaScript disattivato e per il clic col tasto
+          centrale, come ogni altra CTA del sito. */}
+    </div>
+  </section>
+
   {/* Last on the page: it is the deepest of the four, and it closes with its own
       way out — the chat's "scrivi al team" button. */}
   <HelpDesk id="help-desk" />
+
+  {/* Il comando fluttuante in cima, sempre presente.
+
+      Questa pagina non ha intestazione, quindi la fascia in alto è libera: è
+      l'unico posto dove si può mettere qualcosa che resta visibile mentre si
+      scorre, e serve perché l'invito è un vantaggio che il socio non va a
+      cercare — se sta leggendo le news non gli viene in mente, e la fascia che
+      lo racconta sta a metà pagina.
+
+      Centrato e non a destra: là c'è già il pittogramma in cima e il comando
+      della chat in basso, e tre cose sullo stesso lato diventano una colonna di
+      pulsanti. `position: fixed` e non `sticky` perché non ha un contenitore da
+      cui uscire — deve stare sopra la pagina, non dentro una sezione. */}
+  <a class="cl-invita-fab" href="/referral" data-cta="referral">
+    <span class="cl-invita-fab__icona" aria-hidden="true">🎟</span>
+    <span>Invita un amico</span>
+  </a>
+
+  <ReferralModal />
 
   {/* Shortcut to the Help Desk, now that it sits at the bottom. */}
 </Layout>
@@ -507,6 +561,106 @@ const altre = sections.filter((s) => s.id !== 'help-desk');
       transition: none;
       transform: none;
     }
+  }
+
+  /* Il comando fluttuante: sotto i pannelli (320) e sotto il comando della chat
+     (300), perché quando un pannello è aperto questo non deve galleggiarci
+     sopra. */
+  .cl-invita-fab {
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 200;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    /* 3rem e non 2,75: 44px stava sotto i 48 che il sito si è dato come minimo
+       per un bersaglio, e questo è un comando che si preme col pollice. */
+    min-height: 3rem;
+    padding: 0.6rem 1.25rem;
+    border-radius: 100px;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    /* L'ombra lo stacca sia dalla foto scura dell'hero che dalle sezioni chiare
+       più in basso: senza, a metà pagina sembra incollato al testo. */
+    box-shadow: 0 8px 24px -6px rgba(23, 21, 20, 0.5);
+    transition: background-color var(--dur-fast) ease, transform var(--dur-fast) ease;
+  }
+
+  .cl-invita-fab:hover {
+    background: var(--accent-hover);
+    transform: translateX(-50%) translateY(-1px);
+  }
+
+  .cl-invita-fab__icona {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  /* Su un telefono la pastiglia intera non ci sta accanto a niente, ma in cima
+     è sola: resta com'è e perde solo un po' di pieno. */
+  @media (max-width: 420px) {
+    .cl-invita-fab {
+      padding: 0.6rem 1rem;
+      font-size: var(--text-2xs);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cl-invita-fab,
+    .cl-invita-fab:hover {
+      transition: none;
+      transform: translateX(-50%);
+    }
+  }
+
+  /* ---- L'invito a un amico ---- */
+  /* Una fascia scura fra due sezioni chiare: è un'offerta e non un contenuto
+     della pagina, e deve leggersi come tale senza gridare come l'arancione. */
+  .cl-invita {
+    padding: var(--space-section-sm) 0;
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .cl-invita__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .cl-invita__testo {
+    max-width: 40rem;
+  }
+
+  .cl-invita__titolo {
+    font-size: var(--text-xl);
+    --lh: 1;
+    letter-spacing: 0.01em;
+    margin: 0.5rem 0 0.5rem;
+  }
+
+  .cl-invita__sub {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  /* Il corpo dentro la scala: un valore scritto a mano resterebbe indietro sul
+     totem e sul televisore, dove la radice cresce. */
+  .cl-invita__cta {
+    flex: none;
+    font-size: var(--text-sm);
   }
 
   /* Le quattro sezioni non hanno più bisogno di uno scarto: la barra

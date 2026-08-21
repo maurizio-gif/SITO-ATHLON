@@ -1,0 +1,535 @@
+---
+/**
+ * «Invita un amico», dentro al sito.
+ *
+ * Rifà il form `REFERRAL ATHLON` che stava su n8n — sei pagine di form trigger
+ * con la logica dentro gli switch — con lo stesso percorso e le stesse regole,
+ * che ora stanno scritte in `data/referral.ts` e in `eSocio()`.
+ *
+ * ## Il percorso, e perché ha questa forma
+ *
+ * 1. **L'email di chi invita**, e la verifica su PerfectGym. Prima di tutto,
+ *    perché il resto dipende da quella risposta: chiedere i dati dell'amico e
+ *    poi dire «non puoi invitare nessuno» è far compilare quattro campi per
+ *    niente.
+ * 2. **I dati dell'amico** più la liberatoria, che è la parte legale del
+ *    programma e sta prima dell'invio perché è lì che si accetta.
+ * 3. **La verifica dell'amico**, e qui la stessa regola letta dall'altro lato:
+ *    se è già socio il pass non si attiva. Non è un vicolo — gli si dice cosa
+ *    può fare invece.
+ *
+ * ## Tre scelte che non si leggono dal codice
+ *
+ * **Le due verifiche usano l'endpoint che il sito ha già**
+ * (`athlon-verifica-iscritto`), non due chiamate nuove: è la stessa domanda che
+ * fanno il form di prova, quello dei contatti e il controllo davanti a
+ * «Iscriviti». Il flusso su n8n le faceva con due nodi HTTP suoi, ed era la
+ * terza e la quarta copia della stessa query OData.
+ *
+ * **La verifica dell'amico avviene nel browser, prima dell'invio.** Nel flusso
+ * vecchio il rifiuto arrivava dopo: si compilava, si mandava, e la pagina dopo
+ * diceva no. Qui lo si sa premendo il pulsante, e nessuna riga viene scritta su
+ * Airtable per un invito che non parte.
+ *
+ * **Se la verifica non risponde, si passa.** Vale per entrambe, ed è la scelta
+ * che il sito fa in ogni form: un invito in più da riconciliare costa meno di
+ * un invito perso per un timeout. Il workflow rifà il controllo, che è dove
+ * conta.
+ */
+import { PASS, VOUCHER, COMPRESO, LIBERATORIA } from '../data/referral';
+---
+
+<div class="rfr" id="referral-modal" aria-hidden="true">
+  <div class="rfr__backdrop" data-rfr-close></div>
+  <div class="rfr__panel" role="dialog" aria-modal="true" aria-labelledby="rfr-titolo">
+    <button type="button" class="rfr__close" data-rfr-close aria-label="Chiudi">×</button>
+
+    {/* ── 1. Chi invita ──────────────────────────────────────────────────── */}
+    <section class="rfr__step" id="rfr-step-email">
+      <span class="rfr__eyebrow">Invita un amico</span>
+      <h3 class="rfr__title" id="rfr-titolo" tabindex="-1" data-rfr-fuoco>
+        Regala {PASS.giorni} giorni di Athlon.
+      </h3>
+      <p class="rfr__claim">
+        A lui {PASS.giorni} giorni di club a €{PASS.prezzo}. A te €{VOUCHER.valore} {VOUCHER.uso},
+        se poi si iscrive.
+      </p>
+
+      {/* Le sette attività per nome, e non «tutto il club»: il pass apre il
+          palinsesto Premium, e chi legge sta decidendo se l'invito vale la pena
+          di essere fatto. Un elenco è più convincente di un aggettivo. */}
+      <ul class="rfr__lista">
+        {COMPRESO.map((c) => <li>{c}</li>)}
+      </ul>
+
+      <p class="rfr__nota rfr__nota--su">
+        Il tuo amico paga solo il badge di accesso, €{PASS.prezzo} una volta sola — invece dei
+        €{PASS.prezzoPieno} del Guest Pass. Vale per chi non ha un abbonamento o un pass dal 2021.
+      </p>
+
+      <label class="rfr__label" for="rfr-email">La tua email</label>
+      <input
+        class="rfr__input"
+        id="rfr-email"
+        data-email-nota
+        type="email"
+        inputmode="email"
+        autocomplete="email"
+        placeholder="mario.rossi@email.it"
+      />
+      <p class="rfr__aiuto">Quella con cui sei registrato al portale Athlon.</p>
+      <p class="rfr__errore" data-rfr-errore hidden></p>
+
+      <button type="button" class="btn btn-primary rfr__btn" data-rfr-verifica>
+        <span class="rfr__btn-testo">Continua</span>
+        <span class="rfr__spinner" data-rfr-spinner hidden aria-hidden="true"></span>
+      </button>
+    </section>
+
+    {/* ── 1b. Chi invita non è socio ─────────────────────────────────────── */}
+    <section class="rfr__step" id="rfr-step-non-socio" hidden>
+      <span class="rfr__eyebrow">Serve un abbonamento attivo</span>
+      <h3 class="rfr__title" tabindex="-1" data-rfr-fuoco>L'invito parte dai soci.</h3>
+      <p class="rfr__lead">
+        Con questa email non ci risulta un abbonamento attivo, e il programma è riservato a chi ce
+        l'ha: il voucher da €{VOUCHER.valore} si usa {VOUCHER.uso}, quindi serve un abbonamento su
+        cui usarlo.
+      </p>
+      <div class="rfr__azioni">
+        <a class="btn btn-primary rfr__btn" href="/abbonamenti#piani">Vedi gli abbonamenti →</a>
+        {/* Apre il modulo contatti: `data-cta="talk"` è tutto il meccanismo, e
+            il gestore qui sotto chiude questo pannello perché i due non si
+            impilino. */}
+        <a class="rfr__link" href="/club-life#help-desk" data-cta="talk" data-cta-source="referral-non-socio">
+          È un errore? Scrivici
+        </a>
+      </div>
+      <p class="rfr__nota">
+        Non è la tua email? <button type="button" class="rfr__ripeti" data-rfr-ripeti>Provane un'altra</button>.
+      </p>
+    </section>
+
+    {/* ── 2. L'amico ─────────────────────────────────────────────────────── */}
+    <section class="rfr__step" id="rfr-step-amico" hidden>
+      <span class="rfr__eyebrow" data-rfr-saluto>Chi vuoi invitare</span>
+      <h3 class="rfr__title" tabindex="-1" data-rfr-fuoco>I suoi dati.</h3>
+      <p class="rfr__lead">
+        Gli mandiamo il pass per email e su WhatsApp. Il cellulare serve per il secondo: senza,
+        l'invito arriva solo via mail.
+      </p>
+
+      <div class="rfr__coppia">
+        <div>
+          <label class="rfr__label" for="rfr-nome">Nome</label>
+          <input class="rfr__input" id="rfr-nome" type="text" autocomplete="off" placeholder="Mario" />
+        </div>
+        <div>
+          <label class="rfr__label" for="rfr-cognome">Cognome</label>
+          <input class="rfr__input" id="rfr-cognome" type="text" autocomplete="off" placeholder="Rossi" />
+        </div>
+      </div>
+
+      <label class="rfr__label" for="rfr-cellulare">Il suo cellulare</label>
+      <input
+        class="rfr__input"
+        id="rfr-cellulare"
+        type="tel"
+        inputmode="tel"
+        autocomplete="off"
+        placeholder="320 112 2333"
+      />
+
+      <label class="rfr__label" for="rfr-amico-email">La sua email</label>
+      <input
+        class="rfr__input"
+        id="rfr-amico-email"
+        type="email"
+        inputmode="email"
+        autocomplete="off"
+        placeholder="amico@email.it"
+      />
+
+      <p class="rfr__errore" data-rfr-errore hidden></p>
+
+      {/* La liberatoria è una casella da spuntare e non un testo da leggere di
+          sfuggita: qui si dichiara di avere l'autorizzazione a comunicare i dati
+          di un'altra persona, e quella dichiarazione è la base del trattamento.
+          Nel form vecchio era un blocco di HTML sopra il pulsante — cioè
+          l'accettazione era implicita nell'invio. Uno spunto esplicito è la
+          stessa cosa detta in modo verificabile. */}
+      <label class="rfr__consenso">
+        <input type="checkbox" data-rfr-consenso />
+        <span>
+          {LIBERATORIA} Vedi l'<a href="/privacy" target="_blank" rel="noopener noreferrer">informativa privacy</a>.
+        </span>
+      </label>
+
+      <button type="button" class="btn btn-primary rfr__btn" data-rfr-invia>
+        <span class="rfr__btn-testo">Manda l'invito</span>
+        <span class="rfr__spinner" data-rfr-spinner-invio hidden aria-hidden="true"></span>
+      </button>
+    </section>
+
+    {/* ── 2b. L'amico è già socio ────────────────────────────────────────── */}
+    <section class="rfr__step" id="rfr-step-amico-socio" hidden>
+      <span class="rfr__eyebrow">Il pass no, ma provare sì</span>
+      <h3 class="rfr__title" tabindex="-1" data-rfr-fuoco>Ci risulta già dei nostri.</h3>
+      <p class="rfr__lead">
+        <strong data-rfr-nome-amico></strong> ha già un abbonamento con noi, quindi il pass di prova
+        non si attiva — è riservato a chi non frequenta. Ma per tornare in palestra non serve:
+        può <strong>prenotare una lezione singola</strong> e pagare solo quella,
+        oppure scegliere <strong>uno dei nostri abbonamenti</strong>.
+      </p>
+      <div class="rfr__scelta">
+        <a class="btn btn-primary rfr__btn" href="/abbonamenti#accessi-singoli">Lezione singola →</a>
+        <a class="btn btn-primary rfr__btn" href="/abbonamenti#piani">Abbonamenti →</a>
+      </div>
+      <p class="rfr__nota">
+        Volevi invitare un'altra persona? <button type="button" class="rfr__ripeti" data-rfr-altro-amico>Cambia i dati</button>.
+      </p>
+    </section>
+
+    {/* ── 3. Fatto ───────────────────────────────────────────────────────── */}
+    <section class="rfr__step" id="rfr-step-fatto" hidden>
+      <span class="rfr__eyebrow">Invito partito</span>
+      <h3 class="rfr__title" tabindex="-1" data-rfr-fuoco>Fatto.</h3>
+      <p class="rfr__lead" data-rfr-esito></p>
+      <p class="rfr__nota">
+        Quando attiva il pass e poi si iscrive, il voucher da €{VOUCHER.valore} arriva a te: te lo
+        diciamo per email.
+      </p>
+      <div class="rfr__azioni">
+        <button type="button" class="btn btn-primary rfr__btn" data-rfr-altro>Invita un altro amico</button>
+        <a class="rfr__link" href="/club-life">Torna al club →</a>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  import '../lib/referralForm.client.js';
+</script>
+
+<style>
+  /* Il guscio è quello di ProvaModal, che a sua volta è quello di AttivitaModal:
+     stesse regole di visibilità, stesso blocco dello scroll, stessa transizione.
+     Chiuso è `visibility: hidden`, così non resta nell'ordine di tabulazione; la
+     durata è zero e il ritardo c'è solo in chiusura, perché in apertura lo
+     script sposta subito il focus. */
+  .rfr {
+    position: fixed;
+    inset: 0;
+    z-index: 320;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transition: opacity var(--dur-fast) ease, visibility 0s var(--dur-fast);
+  }
+
+  .rfr.open {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+    transition: opacity var(--dur-fast) ease, visibility 0s;
+  }
+
+  .rfr__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 8, 0.6);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
+  .rfr__panel {
+    position: relative;
+    z-index: 1;
+    width: min(32rem, 100%);
+    max-height: calc(100svh - 3rem);
+    overflow-y: auto;
+    padding: 2rem 1.875rem 1.875rem;
+    border-radius: var(--radius);
+    background: var(--color-white);
+    box-shadow: 0 30px 70px -18px rgba(0, 0, 0, 0.5);
+    transform: translateY(10px) scale(0.98);
+    transition: transform var(--dur-base) var(--ease-out-crit);
+  }
+
+  .rfr.open .rfr__panel {
+    transform: none;
+  }
+
+  .rfr__close {
+    position: absolute;
+    top: 0.875rem;
+    right: 0.875rem;
+    width: 2.375rem;
+    height: 2.375rem;
+    border: none;
+    border-radius: 50%;
+    background: rgba(39, 36, 35, 0.07);
+    color: var(--color-dark);
+    font-size: 1.375rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .rfr__close:hover {
+    background: rgba(39, 36, 35, 0.14);
+  }
+
+  .rfr__eyebrow {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .rfr__title {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: var(--text-xl);
+    --lh: 1;
+    margin: 0.5rem 0 0.4rem;
+  }
+
+  .rfr__claim {
+    margin: 0 0 1rem;
+    font-weight: 600;
+    color: var(--accent-text);
+  }
+
+  .rfr__lead {
+    margin: 0 0 1.25rem;
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  .rfr__lead strong {
+    color: var(--color-dark);
+    font-weight: 600;
+  }
+
+  /* Due colonne di spunte: sette voci in fila sarebbero una lista della spesa,
+     e in due colonne si leggono in un colpo d'occhio. `auto-fit` con il minimo
+     in rem le fa tornare una colonna su un telefono, e sul totem restano due. */
+  .rfr__lista {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 0.3rem 1rem;
+    margin: 0 0 1rem;
+    padding: 0;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  .rfr__lista li {
+    padding-left: 1.1rem;
+    position: relative;
+  }
+
+  .rfr__lista li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  .rfr__label {
+    display: block;
+    margin: 0 0 0.375rem;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .rfr__input {
+    width: 100%;
+    padding: 0.8rem 0.9rem;
+    margin-bottom: 0.875rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 0.75rem;
+    background: var(--color-white);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--color-dark);
+  }
+
+  .rfr__input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  .rfr__input.segnalato {
+    border-color: #d14701;
+  }
+
+  /* Nome e cognome affiancati: `1 1 0` e non `auto`, o il campo con il
+     segnaposto più lungo si prende più spazio dell'altro. */
+  .rfr__coppia {
+    display: flex;
+    gap: 0.625rem;
+  }
+
+  .rfr__coppia > * {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .rfr__aiuto {
+    margin: -0.5rem 0 0.875rem;
+    font-size: var(--text-2xs);
+    color: rgba(39, 36, 35, 0.5);
+  }
+
+  .rfr__errore {
+    margin: 0 0 0.75rem;
+    font-size: var(--text-xs);
+    color: #d14701;
+  }
+
+  /* La liberatoria: corpo piccolo perché è lunga, ma la casella è un bersaglio
+     pieno. `align-items: start` o lo spunto si centra sul blocco di testo
+     invece di stare sulla sua prima riga. */
+  .rfr__consenso {
+    display: flex;
+    align-items: start;
+    gap: 0.625rem;
+    margin: 0.25rem 0 1.25rem;
+    font-size: var(--text-2xs);
+    line-height: 1.5;
+    color: rgba(39, 36, 35, 0.6);
+    cursor: pointer;
+  }
+
+  .rfr__consenso input {
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin-top: 0.1rem;
+    accent-color: var(--color-primary);
+  }
+
+  .rfr__consenso a {
+    color: var(--accent-text);
+    text-decoration: underline;
+  }
+
+  .rfr__btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 3.25rem;
+  }
+
+  .rfr__azioni {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Le due alternative dello stesso peso, come nel modal della prova: chi legge
+     qui non ha una scelta da farsi consigliare. */
+  .rfr__scelta {
+    display: flex;
+    gap: 0.625rem;
+    width: 100%;
+  }
+
+  .rfr__scelta .rfr__btn {
+    flex: 1 1 0;
+  }
+
+  @media (max-width: 420px) {
+    .rfr__scelta {
+      flex-direction: column;
+    }
+  }
+
+  .rfr__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .rfr__link:hover {
+    color: var(--accent-text);
+  }
+
+  .rfr__nota {
+    margin: 1rem 0 0;
+    font-size: var(--text-2xs);
+    line-height: 1.6;
+    color: rgba(39, 36, 35, 0.6);
+  }
+
+  .rfr__nota--su {
+    margin: 0 0 1.25rem;
+  }
+
+  /* Un comando a forma di parola dentro una frase. */
+  .rfr__ripeti {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: var(--accent-text);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .rfr__spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    margin-left: 0.5rem;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: var(--color-white);
+    border-radius: 50%;
+    animation: rfr-gira 0.7s linear infinite;
+  }
+
+  @keyframes rfr-gira {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rfr,
+    .rfr__panel,
+    .rfr__spinner {
+      transition: none;
+      animation: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .rfr {
+      padding: 0;
+      align-items: flex-end;
+    }
+
+    .rfr__panel {
+      width: 100%;
+      max-height: 94svh;
+      border-radius: var(--radius) var(--radius) 0 0;
+      padding: 1.75rem 1.25rem 1.5rem;
+    }
+  }
+</style>
