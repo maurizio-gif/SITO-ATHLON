@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection, render } from 'astro:content';
 import { formatEventDate } from '../../data/eventi';
+import { fotoHero } from '../../data/foto';
 
 export async function getStaticPaths() {
   const events = await getCollection('eventi', ({ data }) => !data.draft);
@@ -35,7 +36,7 @@ const evento = {
   url: `${SITE}/eventi/${entry.id}/`,
   offers: {
     '@type': 'Offer',
-    url: d.ctaHref,
+    ...(d.ctaHref ? { url: d.ctaHref } : {}),
     ...(gratuito ? { price: '0', priceCurrency: 'EUR' } : { description: d.price }),
     availability: isPast ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
   },
@@ -53,7 +54,11 @@ const evento = {
 >
   <article class="evd">
     <header class="evd__hero">
-      <img class="evd__img" src={d.image} alt={d.imageAlt ?? d.title} />
+      {/* Foto a tutta larghezza, ed è l'LCP della pagina: passa da `fotoHero`
+          come le hero del resto del sito. Senza, il `src` da 2048px veniva
+          servito a chiunque e — quando il file era più stretto della scatola —
+          ingrandito, cioè pesante e sfocato insieme. */}
+      <img class="evd__img" src={d.image} alt={d.imageAlt ?? d.title} {...fotoHero(d.image)} />
       <div class="evd__scrim"></div>
       <div class="container evd__head">
         <span class="eyebrow">{d.kicker}</span>
@@ -93,7 +98,12 @@ const evento = {
           </div>
         )}
 
-        {!isPast && (
+        {/* `ctaHref` ha un default nello schema, quindi di norma c'è. Ma un
+            evento annunciato prima delle sue modalità lo svuota di proposito:
+            un pulsante che porta alla registrazione del portale, quando ancora
+            non c'è niente da prenotare, è una promessa che quella pagina non
+            mantiene. */}
+        {!isPast && d.ctaHref && (
           <a href={d.ctaHref} class="btn btn-primary evd__cta">{d.ctaLabel} →</a>
         )}
       </div>
