@@ -16,9 +16,23 @@
  *
  * `classe` è la classe del campo di testo del pannello che lo ospita, e va
  * passata: i pannelli hanno vestiti diversi — bianco nella prova, scuro
- * nell'Help Desk — e gli stili con ambito di Astro non attraversano i confini
- * dei componenti. Il componente porta solo la **disposizione** (le due parti
+ * nell'Help Desk. Il componente porta solo la **disposizione** (le due parti
  * accanto, con la tendina che non si stringe), il colore lo porta la classe.
+ *
+ * ## E la regola del pannello dev'essere `:global`
+ *
+ * Passare la classe non basta, e questo è costato: gli stili con ambito di
+ * Astro non attraversano i confini dei componenti, ma a non attraversarli è
+ * la **regola**, non la classe. Il `select` e l'`input` qui sotto portano
+ * l'ambito di *questo* file, mentre `.pf__input { … }` scritto nel modal
+ * diventa `.pf__input[data-astro-cid-oynkqsed]` e non li tocca mai. Il campo
+ * restava nudo — con l'aspetto grezzo del browser — in tutti e quattro i
+ * pannelli, e nessuno se n'era accorto.
+ *
+ * Quindi nel pannello la regola si scrive `:global(.pf__input) { … }`. La
+ * classe è già propria del pannello, quindi globale non collide con niente.
+ * Per verificarlo non si guarda: si misurano gli stili calcolati del `select`
+ * e si confrontano con quelli di un `input` del pannello.
  *
  * Lato script, i due elementi si leggono come `#<id>-prefisso` e `#<id>`, e il
  * numero si compone con `validaTelefono()` da `data/prefissi.ts`. Chi legge

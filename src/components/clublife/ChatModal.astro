@@ -492,7 +492,14 @@ import CampoTelefono from '../CampoTelefono.astro';
     color: var(--text-muted);
   }
 
-  .ca__input {
+  /* Questi selettori sono `:global` per una ragione sola, e non e' pigrizia: il
+     campo telefono lo rende `CampoTelefono.astro`, quindi il suo `select` e il
+     suo `input` portano l'ambito di *quel* componente. Una regola con ambito
+     scritta qui diventa `.ca__input[data-astro-cid-…]` e non li raggiunge mai —
+     passare la classe al componente non basta, perche' a non attraversare il
+     confine e' la regola, non la classe. Erano nudi da sempre.
+     La classe e' gia' propria di questo pannello, quindi globale non collide. */
+  :global(.ca__input) {
     width: 100%;
     min-height: 3.25rem;
     padding: 0.75rem 1rem;
@@ -506,11 +513,11 @@ import CampoTelefono from '../CampoTelefono.astro';
     transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
   }
 
-  .ca__input::placeholder {
+  :global(.ca__input)::placeholder {
     color: rgba(39, 36, 35, 0.38);
   }
 
-  .ca__input:focus {
+  :global(.ca__input):focus {
     outline: none;
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(255, 87, 1, 0.15);
@@ -822,7 +829,7 @@ import CampoTelefono from '../CampoTelefono.astro';
     min-width: 0;
   }
 
-  .ca__input--errore {
+  :global(.ca__input--errore) {
     border-color: #c0341a;
   }
 

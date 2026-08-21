@@ -777,9 +777,24 @@ divergere.
 ```
 
 `classe` è la classe del campo di testo del pannello ospite, e **va passata**:
-gli stili con ambito di Astro non attraversano i confini dei componenti, quindi
-il componente porta la disposizione e la classe porta il colore — bianco nella
+il componente porta la disposizione, la classe porta il colore — bianco nella
 prova, scuro nell'Help Desk.
+
+**Ma passare la classe non basta: la regola del pannello dev'essere
+`:global`.** Gli stili con ambito di Astro non attraversano i confini dei
+componenti, e a non attraversarli è la *regola*, non la classe. Il `select` e
+l'`input` li rende `CampoTelefono`, quindi portano l'ambito di quel file,
+mentre `.pf__input { … }` scritto nel modal diventa
+`.pf__input[data-astro-cid-oynkqsed]` e non li tocca mai. Il campo telefono era
+nudo — con l'aspetto grezzo del browser — in **tutti e quattro** i pannelli, e
+non se n'era accorto nessuno finché non è stato guardato sul referral.
+
+Si scrive `:global(.pf__input) { … }`, e la classe è già propria del pannello,
+quindi globale non collide con niente. Per verificarlo non basta guardare uno
+screenshot: si misurano gli stili calcolati del `select` e si confrontano con
+quelli di un `input` del pannello — sfondo, bordo, raggio, famiglia e corpo
+devono coincidere. Vale per qualunque componente condiviso che si aspetti di
+essere vestito da chi lo ospita.
 
 **Non si legge mai `input.value` da solo.** Quello è il numero come l'ha scritto
 la persona, non il numero: la tendina sta in `#<id>-prefisso`, e la composizione
