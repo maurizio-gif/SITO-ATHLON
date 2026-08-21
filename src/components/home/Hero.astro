@@ -273,6 +273,10 @@ const prova = trialCta({ source: '/' });
     color: var(--color-primary);
     text-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
     margin-bottom: 20px;
+    /* Il resto del sito eredita 700 da `.eyebrow` in global.css: qui, sopra un
+       titolo già grande e un video, un pelo meno pesante basta a farla leggere
+       come introduzione e non come un secondo titolo. */
+    font-weight: 600;
   }
 
   .hero-eyebrow__spezzata {
@@ -595,6 +599,28 @@ const prova = trialCta({ source: '/' });
       bottom: 0.875rem;
       width: 2.625rem;
       height: 2.625rem;
+    }
+  }
+
+  /* Solo il telefono, non il totem: lì il video ha già tutto lo spazio che la
+     fascia condivisa sopra gli lascia, e i due comandi ci stanno comodi fianco
+     a fianco su una superficie enorme. Qui il video perdeva contro il blocco
+     testo — un secondo pulsante pieno e uno alto come l'altro home lo
+     riducevano a una striscia. Tolto un comando e abbassato l'altro, il video
+     torna a essere la prima cosa che si vede. */
+  @media (max-width: 900px) {
+    /* `min-height` e non `flex-basis`: il video resta `flex: 1 1 auto` e cresce
+       oltre la metà quando il testo lascia spazio, ma non scende sotto. */
+    .hero-media {
+      min-height: 50%;
+    }
+
+    .hero-secondary {
+      display: none;
+    }
+
+    .hero-actions .btn-primary {
+      padding: 12px 26px;
     }
   }
 
