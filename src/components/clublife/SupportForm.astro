@@ -289,6 +289,32 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
       el.value = fromUrl(el.dataset.prefill || '');
     });
 
+    /* Le UTM non stanno solo nell'URL, e leggerle da lì era il bug: questo
+       pannello si apre da qualunque pagina, e chi arriva da una campagna e
+       gira una pagina prima di scrivere ha l'URL pulito — quindi la richiesta
+       arrivava senza campagna. La sorgente è `athlonGetUtm()`, cioè il primo
+       tocco tenuto in sessione da `scripts/attribuzione.ts`, che è la stessa
+       da cui leggono il form della prova e «contattaci».
+       L'URL vince quando c'è: una UTM nell'indirizzo di adesso è più specifica
+       di quella memorizzata all'arrivo. */
+    /* Le UTM memorizzate si versano **all'apertura del pannello**, non qui.
+       Qui `athlonGetUtm` può non esistere ancora: `scripts/attribuzione.ts` è un
+       altro modulo e l'ordine di caricamento non è garantito — misurato, i campi
+       restavano vuoti con la campagna regolarmente in sessione. All'apertura è
+       tutto pronto, ed è comunque il solo momento in cui servono.
+
+       I campi si cercano nel DOM e non da `UTM_FIELDS`: quella costante sta nel
+       frontmatter, che gira sul server, e da qui dentro non esiste. Riferirla
+       lanciava un `ReferenceError` che fermava **tutto** questo script — form
+       muto e pannello che non si apriva più. */
+    const versaUtm = () => {
+      const memorizzate =
+        (window as unknown as { athlonGetUtm?: () => Record<string, string> }).athlonGetUtm?.() ?? {};
+      root.querySelectorAll<HTMLInputElement>('input[name^="utm_"]').forEach((campo) => {
+        if (!campo.value && memorizzate[campo.name]) campo.value = memorizzate[campo.name];
+      });
+    };
+
     /* L'email dall'URL vince su quella ricordata dal browser
        (`scripts/emailNota.ts`), e senza il guardiano sul valore vuoto: chi
        arriva da un link che porta il suo indirizzo è un'informazione più
@@ -322,6 +348,7 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
       if (activityField && !activityField.value.trim()) {
         activityField.value = 'Non specificata';
       }
+      versaUtm();
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
       document.body.classList.add('supm-locked');

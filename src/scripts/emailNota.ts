@@ -34,21 +34,9 @@
  * `window.athlonRicordaEmail(email)`.
  */
 import { quandoConsentito } from './consenso';
+import { suTotem } from './totem';
 
 const CHIAVE = 'athlon_email';
-
-/* Le tre condizioni del totem, identiche a quelle di `global.css` e di
-   `/diagnostica-schermo`. Se cambiano là vanno cambiate qui: è il prezzo di
-   avere una regola che vive in CSS e serve anche al JavaScript. */
-const TOTEM = '(min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10)';
-
-function suTotem(): boolean {
-  try {
-    return window.matchMedia(TOTEM).matches;
-  } catch {
-    return false;
-  }
-}
 
 function leggi(): string {
   if (suTotem()) return '';

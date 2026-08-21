@@ -47,12 +47,13 @@
  */
 
 import { quandoConsentito } from './consenso';
+import { suTotem } from './totem';
 
 const KEY_UTM = 'athlon_utm';
 const KEY_VID = 'athlon_vid';
 
-/* La categoria che governa questi due è **advertisement**, non `analytics`,
-   benché servano anche a misurare: l'identificativo viene allegato ai dati di
+/* La categoria che governa il **`vid`** è `advertisement`, non `analytics`,
+   benché serva anche a misurare: l'identificativo viene allegato ai dati di
    contatto per riattaccare una richiesta a una persona, e quello è marketing.
    Chi accetta solo le statistiche non lo riceve, ed è corretto così anche se
    costa attribuzione.
@@ -103,22 +104,67 @@ function utmSalvati(): Utm {
    e quella da cui si travasa se il consenso arriva a metà navigazione. */
 let utmInMemoria: Utm = {};
 
+/** La sorgente forzata del totem. */
+const SORGENTE_TOTEM = 'TOUR';
+
+/**
+ * Sul totem la sorgente è sempre `TOUR`, e **vince sull'URL**.
+ *
+ * Il totem è un dispositivo fisico all'ingresso del club: chi lo tocca è una
+ * persona che è già dentro, e senza questo ogni richiesta partita da lì
+ * risultava «diretta» — indistinguibile da chi arriva sul sito da casa
+ * digitando l'indirizzo. Con la sorgente forzata, tutti i form compilati sul
+ * totem portano `utm_source=TOUR`, e il traffico del club in sede si separa da
+ * quello di rete senza chiedere niente a nessuno.
+ *
+ * Vince sull'URL e non il contrario, ed è il senso di «forzare»: quel pannello
+ * mostra sempre lo stesso sito, quindi una UTM nell'indirizzo lì è un residuo
+ * di un incollaggio, non una campagna. Le altre chiavi — medium, campaign, i
+ * click-id — restano se per qualche ragione ci sono.
+ *
+ * Il riconoscimento è quello di `scripts/totem.ts`, condiviso con l'email che
+ * sul totem non si precompila: la stessa domanda, fatta in un posto solo.
+ */
+function sorgenteTotem(daUrl: Utm): Utm {
+  if (!suTotem()) return daUrl;
+  return { ...daUrl, utm_source: SORGENTE_TOTEM };
+}
+
+/**
+ * Le UTM del primo tocco, e **si scrivono subito**: non passano da `scrivi()`.
+ *
+ * È una deroga voluta al consenso `advertisement`, e la ragione è che senza di
+ * lei il dato non si perdeva a metà — si perdeva del tutto. Misurato: chi
+ * arrivava da una campagna, girava una pagina e poi compilava un form
+ * risultava **senza campagna**, perché la copia in memoria muore col
+ * caricamento e questo è un sito a pagine separate, non una single-page. Non
+ * c'era nessun altro posto dove quel dato potesse vivere.
+ *
+ * Quindi la scelta, del club: la campagna del primo tocco è un dato di
+ * sessione — `sessionStorage`, non un cookie, non `localStorage` — che muore
+ * con la scheda e non identifica nessuno da solo. Il `vid` invece **resta
+ * subordinato al consenso**, ed è la distinzione che regge la deroga: le UTM
+ * dicono «da dove viene questa visita», il `vid` dice «questa visita è la
+ * stessa di prima», e solo il secondo è un identificativo.
+ *
+ * Il primo tocco vince: se in sessione c'è già qualcosa non si sovrascrive,
+ * altrimenti l'ultima pagina con una UTM in coda cancellerebbe la campagna che
+ * ha portato la persona qui.
+ */
 function catturaUtm(): void {
   try {
     if (sessionStorage.getItem(KEY_UTM)) return; // già memorizzato in questa sessione
   } catch {
     /* storage negato (navigazione privata, impostazioni): si prosegue senza */
   }
-  const trovati = utmDaUrl();
+  const trovati = sorgenteTotem(utmDaUrl());
   if (!Object.keys(trovati).length) return;
   utmInMemoria = trovati;
-  scrivi(() => {
-    try {
-      if (!sessionStorage.getItem(KEY_UTM)) sessionStorage.setItem(KEY_UTM, JSON.stringify(trovati));
-    } catch {
-      /* niente storage: resta la copia in memoria */
-    }
-  });
+  try {
+    sessionStorage.setItem(KEY_UTM, JSON.stringify(trovati));
+  } catch {
+    /* niente storage: resta la copia in memoria, che vale per questa pagina */
+  }
 }
 
 /* Il `vid` di questa pagina. Senza consenso è tutto quello che c'è, e muore
