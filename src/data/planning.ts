@@ -208,6 +208,19 @@ export interface LessonCard {
   videoUrl?: string;
   /** Seconds to seek to before showing the frame, when the opening is dull. */
   videoStart?: number;
+  /**
+   * Una foto, per le lezioni di cui non esiste una clip: il pannello del
+   * planning si apriva sul solo testo, e delle trenta schede nove non hanno
+   * video. Serve solo dove il video manca — una clip dice della lezione più di
+   * qualunque fotografia, quindi vince lei.
+   */
+  imageUrl?: string;
+  /**
+   * Il punto focale della foto, come `object-position`. Il riquadro del
+   * pannello è 16:9 e una foto verticale ci entra ritagliata al centro, che su
+   * una foto di studio è il fondo bianco sopra le teste.
+   */
+  imageFocus?: string;
   stats?: LessonStat[];
 }
 
@@ -234,6 +247,11 @@ function normalise(name: string): string {
 const LESSON_ALIASES: Record<string, string> = {
   PILATES: 'PILATES MATWORK',
   'BODY PUMP': 'LES MILLS BODY PUMP',
+  /* Il contrario: qui il palinsesto è più lungo della scheda. La lezione si
+     chiama Matwork 4.1 e in griglia il club la abbrevia in «Mat 4.1», che è il
+     nome della scheda; scritta per intero deve trovarla comunque. Il valore è
+     già normalizzato — il punto di «4.1» il normalizzatore lo toglie. */
+  'MATWORK 41': 'MAT 41',
 };
 
 const cardsByKey = new Map(Object.entries(cards).map(([k, v]) => [normalise(k), v]));

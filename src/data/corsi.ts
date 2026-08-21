@@ -48,6 +48,14 @@ export interface VarianteCorso {
   video?: string;
   stats?: LessonStat[];
   poster?: string;
+  /**
+   * Il punto focale del poster, come `object-position`, per la stessa ragione
+   * per cui ce l'ha la hero: il riquadro delle caratteristiche è quadrato e una
+   * foto verticale ci entra ritagliata al centro, che su una foto di studio è
+   * il fondo bianco sopra le teste. Vale solo dove il poster è una foto e non
+   * il primo fotogramma di un video.
+   */
+  fuoco?: string;
 }
 
 export interface SimileCorso {
@@ -454,17 +462,37 @@ export const CORSI: Corso[] = [
   {
     slug: 'pilates',
     nome: 'Pilates',
-    claim: 'Il centro del corpo, un movimento alla volta.',
+    claim: 'Matwork e Matwork 4.1: due lezioni sul tappetino.',
     hero: `${U}/2024/08/IMG_2499-scaled.jpg`,
     fuoco: '32% 40%',
     intro: [
       'Il nostro programma di Pilates è strutturato per sviluppare forza funzionale, flessibilità articolare, equilibrio dinamico e coordinazione neuromuscolare. Attraverso una serie di esercizi che integrano movimenti precisi e controllati, questo metodo lavora sui muscoli profondi del core, migliorando la stabilità del tronco e la postura globale. Ogni sessione combina esercizi di mobilizzazione della colonna vertebrale, allungamento attivo e rafforzamento muscolare per un corpo tonico e allineato.',
-      'Si lavora a bassa intensità, con la respirazione guidata dall’istruttore e un numero contenuto di ripetizioni per esercizio: conta come si esegue il movimento, non quante volte. È il lavoro che le barre qui sotto misurano su controllo e flessibilità.',
+      'Sul tappetino ci sono due lezioni, comprese nello stesso abbonamento: il Pilates Matwork, che lavora sul controllo a bassa intensità, e Matwork 4.1, che prende gli stessi esercizi e li organizza in sequenze più dinamiche. Le barre qui sotto misurano la differenza.',
     ],
     varianti: [
-      { nome: null, testo: '', lezione: 'Pilates Matwork', poster: `${U}/2024/08/IMG_2547-1-scaled.jpg` },
+      {
+        nome: 'Pilates Matwork',
+        id: 'matwork',
+        lezione: 'Pilates Matwork',
+        poster: `${U}/2024/08/IMG_2547-1-scaled.jpg`,
+        testo:
+          'Si lavora a bassa intensità, con la respirazione guidata dall’istruttore e un numero contenuto di ripetizioni per esercizio: conta come si esegue il movimento, non quante volte. La lezione tiene insieme mobilizzazione della colonna, allungamento attivo e rafforzamento dei muscoli profondi del core.',
+      },
+      {
+        nome: 'Matwork 4.1',
+        id: 'matwork-41',
+        lezione: 'Mat 4.1',
+        poster: `${U}/2026/08/Matwork-41-Athlon.jpg`,
+        fuoco: '50% 74%',
+        testo:
+          'Matwork 4.1 prende alcuni esercizi del metodo Pilates e li porta su un piano più dinamico e funzionale: sequenze precise e progressive che, lezione dopo lezione, si legano in un flow. Si lavora insieme su forza, stabilità, mobilità, flessibilità e controllo motorio, e quello che migliora è la qualità del movimento. È accessibile a tutti e stimolante per chiunque: una lezione intensa e coinvolgente, con una sfida nuova ogni volta.',
+      },
     ],
-    lezioni: ['Pilates Matwork'],
+    /* In palinsesto Matwork 4.1 è scritto «Mat 4.1», che è come il club lo
+       abbrevia nella griglia. Ci sono entrambe le forme perché il nome è la
+       chiave con cui questa pagina trova i suoi orari: se un mese venisse
+       scritto per intero, la tabella si svuoterebbe in silenzio. */
+    lezioni: ['Pilates Matwork', 'Mat 4.1', 'Matwork 4.1'],
     attrezzatura:
       'Abbigliamento sportivo aderente, un asciugamano personale e acqua. Si lavora sul tappetino, a piedi nudi o con calzini antiscivolo.',
     simili: [
@@ -473,7 +501,7 @@ export const CORSI: Corso[] = [
       { slug: 'yoga', perche: 'Respirazione e mobilità, con la parte mentale in primo piano.' },
     ],
     descrizione:
-      'Pilates matwork ad Athlon Club Roma Talenti: core, postura e controllo del movimento. Orari della settimana e caratteristiche della lezione.',
+      'Pilates ad Athlon Club Roma Talenti: Matwork e Matwork 4.1, fra controllo del movimento e sequenze dinamiche. Orari e caratteristiche delle lezioni.',
   },
   {
     slug: 'strenght',

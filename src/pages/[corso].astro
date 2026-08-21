@@ -21,7 +21,7 @@ import { scheda } from '../data/pagine';
 import { getBand, bands, bandHours, siContaAOre } from '../data/planning';
 import { trialCta } from '../data/cta';
 import { serviceSchema } from '../data/club';
-import { fotoHero } from '../data/foto';
+import { fotoHero, fotoPiccola } from '../data/foto';
 
 /* Il dominio di produzione, per gli @id assoluti degli schemi. */
 const SITE = 'https://www.athlonroma.it';
@@ -307,7 +307,15 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
                   <source src={v.media.video} type="video/mp4" />
                 </video>
               ) : (
-                v.poster && <img class="co-car__video" src={v.poster} alt={`${v.nome ?? corso.nome} ad Athlon Club`} />
+                v.poster && (
+                  <img
+                    class="co-car__video"
+                    src={v.poster}
+                    alt={`${v.nome ?? corso.nome} ad Athlon Club`}
+                    style={v.fuoco ? `object-position:${v.fuoco}` : undefined}
+                    {...fotoPiccola(v.poster, '(max-width: 900px) 92vw, 620px')}
+                  />
+                )
               )}
 
               {v.media.stats.length > 0 && (
