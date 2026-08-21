@@ -33,3 +33,9 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Le clip ricodificate, mentre si guardano prima di scambiarle.
+# `scripts/comprimi-video.mjs` scrive qui e non tocca gli originali: sono
+# candidate, non contenuti — decine di MB che il sito non serve mai, e che dopo
+# lo scambio sono una copia identica di quello che sta in `public/`.
+.video-out/
