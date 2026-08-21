@@ -8,22 +8,7 @@
  * richieste_help_desk). The field names below are the contract with it — rename
  * one here and it stops arriving in the email and in the database.
  */
-import { ACTIVITY_TAGS } from '../../data/activities';
-
 const SUPPORT_ENDPOINT = 'https://automazione.n8ndevelop.it/webhook/help-desk-athlon';
-
-/* Le stesse voci del primo passo del box, dalla stessa lista: `ACTIVITY_TAGS` è
-   la sorgente unica — popola la tendina di Tina, la validazione delle
-   collezioni, il box dell'Help Desk e adesso anche questa. Aggiungere
-   un'attività là la fa comparire qui senza toccare niente.
-
-   Divise per pubblico come nel box, perché «Scuola Nuoto» esiste in due
-   versioni e le due procedure non sono la stessa: senza i due gruppi la tendina
-   avrebbe due voci quasi identiche in un elenco piatto di dodici. */
-const GRUPPI = [
-  { label: 'Adulti', voci: ACTIVITY_TAGS.filter((a) => a.audience === 'adulti') },
-  { label: 'Junior', voci: ACTIVITY_TAGS.filter((a) => a.audience === 'junior') },
-];
 
 /** The five standard campaign parameters, captured as-is when present. */
 const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
@@ -42,58 +27,37 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
         E il tempo di risposta sta nel testo grande e non in fondo in corpo
         minuscolo, perché è la cosa che decide se una persona scrive o rinuncia:
         «ti risponde una persona, in breve tempo» non è una promessa, è una
-        formula. «In pochi minuti» lo è. */}
+        formula. «In pochi minuti» lo è.
+
+        Via il «non un risponditore automatico»: nominare la cosa che non siamo
+        la mette in testa a chi legge, e una frase che si difende parte perdendo.
+        Al suo posto il fatto detto in positivo — lo staff c'è adesso — che è la
+        stessa informazione senza il paragone. */}
     <div class="sup__head">
       <span class="sup__eyebrow">Richiedi assistenza</span>
       <h3 class="sup__title u-display" id="sup-title">Scrivi al nostro team</h3>
       <p class="sup__lede">
-        La tua richiesta la legge una persona del club, non un risponditore
-        automatico: <strong>ti rispondiamo per email in pochi minuti</strong>.
+        <strong>Il nostro staff è online adesso</strong> e legge la tua richiesta appena
+        arriva: <strong>ti rispondiamo per email entro pochi minuti</strong>.
       </p>
     </div>
 
   <form class="sup__form" data-support-form novalidate>
-    {/* Una tendina, e a scelta **multipla**.
+    {/* Il campo «attività di interesse» non c'è, e non è una dimenticanza.
 
-        Era un paragrafo di sola lettura: l'attività la scegliava il primo passo
-        del box dell'Help Desk, e qui si mostrava soltanto. Funzionava finché al
-        form si arrivava dal box — da quando il pulsante «richiedi assistenza»
-        lo apre da solo, chi entra da lì non aveva modo di dire di cosa parla.
+        C'era, ed era un `<select multiple>` col suggerimento «su desktop con
+        Ctrl o Cmd»: quando le istruzioni d'uso di un campo devono nominare un
+        tasto modificatore, il campo è sbagliato. Ma la risposta non era
+        rifarlo meglio — era togliere la domanda. Le attività servono alla
+        **ricerca dell'Help Desk**, dove restringono le schede da cercare e
+        quindi si guadagnano il posto che occupano. Qui servivano a smistare una
+        richiesta che una persona legge comunque, e chiedevano di scorrere
+        dodici voci prima di arrivare al campo per cui il form esiste.
 
-        `multiple` perché il box ne fa scegliere più di una, e una tendina a
-        scelta singola non sa rappresentare «Gym Floor e Aqua Fitness»: la
-        selezione della persona sarebbe stata troncata a una voce senza dirlo.
-
-        Il dato inviato resta il campo nascosto qui sotto, che è quello che il
-        workflow legge e che il box riempie: la tendina lo comanda, non lo
-        sostituisce. Le voci hanno per valore l'**etichetta** e non l'id, perché
-        il workflow riceve «Gym Floor, Aqua Fitness» e la mail al desk le stampa
-        così — è il formato che il flusso vecchio scriveva.
-
-        Niente voce «Non specificata»: in una scelta multipla il non specificato
-        è non selezionare niente, e una voce che vuol dire «nessuna» accanto a
-        dodici che si possono spuntare insieme è una contraddizione da cliccare.
-        Il ripiego lo mette lo script all'apertura. */}
-    <div class="fld">
-      <label class="fld__label" for="sup-attivita">Attività di interesse</label>
-      <select
-        class="fld__input fld__multi"
-        id="sup-attivita"
-        multiple
-        size="6"
-        data-support-activity-select
-      >
-        {GRUPPI.map((g) => (
-          <optgroup label={g.label}>
-            {g.voci.map((a) => <option value={a.label}>{a.label}</option>)}
-          </optgroup>
-        ))}
-      </select>
-      <p class="fld__hint">
-        Puoi scegliere più di una — su desktop con <kbd>Ctrl</kbd> o <kbd>Cmd</kbd> — oppure
-        nessuna. Ci aiuta a mandare la richiesta alla persona giusta.
-      </p>
-    </div>
+        Il campo nascosto qui sotto resta, ed è il punto: chi arriva dal box
+        dell'Head Desk porta con sé le attività che aveva scelto là, e il
+        workflow le riceve come sempre. Chi apre il form da solo manda «Non
+        specificata», che è la verità. */}
 
     {/* I due campi Nome e Cognome non ci sono più, e il loro contenuto è finito
         qui dentro. La ragione è che erano la domanda sbagliata fatta nel posto
@@ -202,7 +166,6 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
   const message = document.querySelector<HTMLTextAreaElement>('[data-support-message]');
   const status = document.querySelector<HTMLElement>('[data-support-status]');
   const activityField = document.querySelector<HTMLInputElement>('[data-support-activity]');
-  const activitySelect = document.querySelector<HTMLSelectElement>('[data-support-activity-select]');
   const fileField = document.querySelector<HTMLInputElement>('[data-support-file]');
 
   /** Il file in base64, senza il prefisso `data:` che il webhook non usa. */
@@ -268,22 +231,6 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
       if (activityField && !activityField.value.trim()) {
         activityField.value = 'Non specificata';
       }
-      if (activitySelect && activityField) {
-        /* Il campo nascosto porta una stringa separata da virgole, perché è così
-           che il box la scrive e così che il workflow la legge. Qui si spacchetta
-           per accendere le righe corrispondenti.
-
-           `Non specificata` non è una voce della tendina: è il valore che vale
-           quando non se n'è scelta nessuna, quindi non corrisponde a niente e
-           lascia la lista vuota — che è esattamente quello che deve mostrare. */
-        const scelte = activityField.value
-          .split(',')
-          .map((v) => v.trim())
-          .filter(Boolean);
-        Array.from(activitySelect.options).forEach((o) => {
-          o.selected = scelte.includes(o.value);
-        });
-      }
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
       document.body.classList.add('supm-locked');
@@ -302,18 +249,6 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
     // two components through the DOM.
     (window as any).__athlonOpenSupport = openModal;
 
-    /* Il campo nascosto resta la verità, quindi la tendina ci scrive dentro. Il
-       contrario — mettere `name="attivita"` sulla tendina e togliere il campo —
-       avrebbe fatto perdere le scelte multiple del box, che una tendina non sa
-       tenere. */
-    activitySelect?.addEventListener('change', () => {
-      if (!activityField) return;
-      /* `select.value` su una tendina multipla restituisce **una sola** voce, la
-         prima scelta: usarlo qui avrebbe buttato via tutte le altre senza dare
-         segno. Le selezionate si leggono da `selectedOptions`. */
-      const scelte = Array.from(activitySelect.selectedOptions).map((o) => o.value);
-      activityField.value = scelte.length ? scelte.join(', ') : 'Non specificata';
-    });
 
     root.querySelectorAll('[data-support-close]').forEach((el) =>
       el.addEventListener('click', closeModal)
@@ -573,38 +508,7 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
      disegna come un riquadro con le righe dentro, quindi le regole della
      freccia native non servono e va tolto il `padding` orizzontale che le
      lasciava spazio. L'altezza la dà `size`, non il CSS. */
-  .fld__multi {
-    padding: 0.375rem;
-    background-image: none;
-    padding-right: 0.375rem;
-    line-height: 1.9;
-  }
 
-  .fld__multi optgroup {
-    color: rgba(255, 255, 255, 0.45);
-    font-size: var(--text-2xs);
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  .fld__multi option {
-    padding: 0.2rem 0.5rem;
-    border-radius: 0.375rem;
-    color: var(--color-white);
-    font-size: var(--text-sm);
-    letter-spacing: 0;
-    text-transform: none;
-  }
-
-  /* La riga scelta col colore del marchio: il grigio di sistema su questo fondo
-     scuro non si distingue da una riga qualunque, ed è l'unico segnale che dice
-     cosa si è selezionato. `checked` e non `:hover`, così vale anche dopo che il
-     puntatore è andato via. */
-  .fld__multi option:checked {
-    background: var(--color-primary);
-    color: var(--color-white);
-  }
 
   .fld__hint kbd {
     padding: 0.05rem 0.3rem;
