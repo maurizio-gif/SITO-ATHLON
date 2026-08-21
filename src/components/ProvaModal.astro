@@ -19,6 +19,7 @@
 import { REGISTRAZIONE, PASSI_ATTIVAZIONE as PASSI } from '../data/guestPass';
 import { SINGOLI } from '../data/abbonamenti';
 import { TALK } from '../data/cta';
+import CampoTelefono from './CampoTelefono.astro';
 ---
 
 <div class="pf" id="prova-modal" aria-hidden="true">
@@ -116,7 +117,7 @@ import { TALK } from '../data/cta';
       </div>
 
       <label class="pf__label" for="pf-cellulare">Cellulare</label>
-      <input class="pf__input" id="pf-cellulare" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="320 112 2333" />
+      <CampoTelefono id="pf-cellulare" classe="pf__input" />
 
       <p class="pf__errore" data-pf-errore hidden></p>
 

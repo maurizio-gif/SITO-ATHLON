@@ -20,6 +20,7 @@
 // cosa che la persona è venuta a fare e la aspetta.
 import { WEBHOOK_VERIFICA, eSocio } from '../data/contatto';
 import { WEBHOOK_REFERRAL, CANALI, AMICI } from '../data/referral';
+import { validaTelefono } from '../data/prefissi';
 
 (function () {
   var modal = document.getElementById('referral-modal');
@@ -54,6 +55,7 @@ import { WEBHOOK_REFERRAL, CANALI, AMICI } from '../data/referral';
       cognome: modal.querySelector('#rfr-cognome-' + i),
       email: modal.querySelector('#rfr-email-' + i),
       cellulare: modal.querySelector('#rfr-cell-' + i),
+      prefisso: modal.querySelector('#rfr-cell-' + i + '-prefisso'),
     });
   }
 
@@ -119,27 +121,6 @@ import { WEBHOOK_REFERRAL, CANALI, AMICI } from '../data/referral';
 
   function emailValida(v) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v || '').trim());
-  }
-
-  /**
-   * Il cellulare in forma internazionale.
-   *
-   * Il flusso su n8n incollava `+39` davanti a quello che la persona aveva
-   * scritto, e su un numero già scritto `+39 320…` usciva `+39+39320…` — un
-   * numero a cui WhatsApp non arriva. Qui si toglie tutto quello che non è una
-   * cifra, si tolgono il prefisso e lo zero internazionale se ci sono, e si
-   * rimette `+39` una volta sola.
-   *
-   * Vuoto è ammesso: il cellulare non è obbligatorio, e senza di lui l'invito
-   * parte solo per email.
-   */
-  function cellulareNormale(v) {
-    var cifre = String(v || '').replace(/[^\d+]/g, '');
-    if (!cifre) return '';
-    cifre = cifre.replace(/^\+/, '').replace(/^00/, '');
-    if (cifre.indexOf('39') === 0 && cifre.length > 10) cifre = cifre.slice(2);
-    if (cifre.length < 8) return null;
-    return '+39' + cifre;
   }
 
   /** La verifica su PerfectGym, con il suo tempo massimo. Null = non lo sappiamo. */
@@ -271,6 +252,10 @@ import { WEBHOOK_REFERRAL, CANALI, AMICI } from '../data/referral';
          chi ha premuto «aggiungi» e poi ha cambiato idea senza chiudere il
          blocco non sta sbagliando niente. Uno riempito a metà invece è un
          errore, e va detto dove. */
+      /* Un blocco aperto e completamente vuoto si salta invece di dare errore:
+         chi ha premuto «aggiungi» e poi ha cambiato idea senza chiudere il
+         blocco non sta sbagliando niente. La tendina del prefisso non conta come
+         «riempito» — ha un valore da sempre, è preselezionata. */
       if (!nome && !cognome && !email && !cell) continue;
 
       if (!nome) return { errore: 'Manca il nome dell’amico ' + b.n + '.', campo: b.nome };
@@ -278,10 +263,15 @@ import { WEBHOOK_REFERRAL, CANALI, AMICI } from '../data/referral';
       if (!emailValida(email)) {
         return { errore: 'Serve l’email dell’amico ' + b.n + ': è lì che arriva il pass.', campo: b.email };
       }
-      var cellulare = cellulareNormale(cell);
-      if (cellulare === null) {
-        return { errore: 'Il cellulare dell’amico ' + b.n + ' sembra incompleto. Puoi anche lasciarlo vuoto.', campo: b.cellulare };
+      /* Il cellulare è obbligatorio come gli altri tre, e non per simmetria: il
+         pass parte anche su WhatsApp, e un amico senza numero riceve metà
+         dell'invito. Il controllo non guarda solo la forma — `3333333333` è un
+         cellulare italiano formalmente perfetto che non è di nessuno. */
+      var tel = validaTelefono(b.prefisso ? b.prefisso.value : '+39', cell);
+      if (!tel.ok) {
+        return { errore: 'Amico ' + b.n + ': ' + tel.motivo, campo: b.cellulare };
       }
+      var cellulare = tel.e164;
       if (email === invitante.email) {
         return { errore: 'L’amico ' + b.n + ' ha la tua email: serve quella della persona che vuoi invitare.', campo: b.email };
       }
@@ -402,22 +392,18 @@ import { WEBHOOK_REFERRAL, CANALI, AMICI } from '../data/referral';
          nominano le persone e si dice come. Con uno solo l'indirizzo si scrive:
          è la conferma che serve a chi ha appena digitato una mail che potrebbe
          aver sbagliato. */
+      /* Con un amico solo si scrive l'indirizzo: è la conferma che serve a chi ha
+         appena digitato una mail che potrebbe aver sbagliato. Con più di uno gli
+         indirizzi in fila diventano illeggibili, e si nominano le persone. */
       var nomi = elenca(daInvitare.map(function (a) { return a.nome; }));
-      var conCell = daInvitare.filter(function (a) { return a.cellulare; }).length;
       if (daInvitare.length === 1) {
         var uno = daInvitare[0];
-        esitoTesto.textContent = uno.cellulare
-          ? 'Il pass è in viaggio verso ' + uno.nome + ': per ' + CANALI[0] + ' su ' + uno.email +
-            ' e via ' + CANALI[1] + ' al ' + uno.cellulare + '.'
-          : 'Il pass è in viaggio verso ' + uno.nome + ', per ' + CANALI[0] + ' su ' + uno.email + '.';
+        esitoTesto.textContent =
+          'Il pass è in viaggio verso ' + uno.nome + ': per ' + CANALI[0] + ' su ' + uno.email +
+          ' e via ' + CANALI[1] + ' al ' + uno.cellulare + '.';
       } else {
         esitoTesto.textContent =
-          'Il pass è in viaggio verso ' + nomi + ': per ' + CANALI[0] +
-          (conCell === daInvitare.length
-            ? ' e via ' + CANALI[1] + '.'
-            : conCell
-              ? ' e via ' + CANALI[1] + ' a chi ci ha lasciato il numero.'
-              : '.');
+          'Il pass è in viaggio verso ' + nomi + ', per ' + CANALI[0] + ' e via ' + CANALI[1] + '.';
       }
     }
 
@@ -445,6 +431,9 @@ import { WEBHOOK_REFERRAL, CANALI, AMICI } from '../data/referral';
       [b.nome, b.cognome, b.email, b.cellulare].forEach(function (c) {
         if (c) c.value = '';
       });
+      /* Anche la tendina torna al preselezionato: chi ha invitato un amico
+         inglese e riapre il pannello per un amico italiano troverebbe `+44`. */
+      if (b.prefisso) b.prefisso.value = '+39';
       /* Il primo blocco resta aperto, gli altri due tornano chiusi: la
          schermata si riapre come la prima volta. */
       if (b.root) b.root.hidden = b.n > 1;
@@ -509,7 +498,7 @@ import { WEBHOOK_REFERRAL, CANALI, AMICI } from '../data/referral';
     });
   }
   blocchi.forEach(function (b) {
-    [b.nome, b.cognome, b.email, b.cellulare].forEach(function (c) {
+    [b.nome, b.cognome, b.email, b.cellulare, b.prefisso].forEach(function (c) {
       if (!c) return;
       c.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {

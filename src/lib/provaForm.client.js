@@ -21,6 +21,7 @@
 
 import { CALENDLY } from '../data/calendly';
 import { montaCalendario } from './calendario.client.js';
+import { validaTelefono } from '../data/prefissi';
 
 export function initProvaForm(root, options) {
   var P = options.prefix;
@@ -36,7 +37,6 @@ export function initProvaForm(root, options) {
     email: 'Controlla l’indirizzo email: manca qualcosa.',
     nome: 'Serve il tuo nome.',
     cognome: 'Serve il tuo cognome.',
-    cellulare: 'Serve un numero di cellulare italiano, senza prefisso.',
     invio: 'Non siamo riusciti a inviare la richiesta. Riprova tra poco.',
   };
 
@@ -88,11 +88,18 @@ export function initProvaForm(root, options) {
     return /^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$/.test(String(v).trim());
   }
 
-  /** Accetta 3201122333, +39 320 112 2333, 0039320…: resta il numero nudo. */
-  function cellulareNudo(v) {
-    var solo = String(v).replace(/[^\d+]/g, '');
-    solo = solo.replace(/^\+39/, '').replace(/^0039/, '');
-    return solo.replace(/\D/g, '');
+  /**
+   * Il numero, in forma internazionale, dal prefisso scelto e da quello scritto.
+   *
+   * Sostituisce un `cellulareNudo()` che toglieva `+39` e `0039` e restituiva le
+   * cifre nude, e un `cellulareValido()` che controllava `^3\d{8,9}$`. Due cose
+   * non funzionavano: il numero nudo veniva poi ricomposto con un `'+39' +`
+   * scritto altrove — quindi chi ha un numero straniero non poteva lasciarlo —
+   * e la forma giusta non basta, perché `3333333333` la rispetta.
+   */
+  function telefonoDa(campo) {
+    var pref = q('#' + P + '-cellulare-prefisso');
+    return validaTelefono(pref ? pref.value : '+39', campo ? campo.value : '');
   }
   /**
    * Riempie i campi del secondo passo con quello che la verifica ha restituito.
@@ -104,7 +111,10 @@ export function initProvaForm(root, options) {
   function precompila(body) {
     if (body.nome) dati.nome = String(body.nome);
     if (body.cognome) dati.cognome = String(body.cognome);
-    if (body.telefono) dati.cellulare = cellulareNudo(body.telefono);
+    /* Il numero che PerfectGym restituisce è già in forma internazionale
+       (`+39340…`): si mette nel campo così com'è, e la tendina lo riconosce
+       perché `componiTelefono` scarta il prefisso ripetuto. */
+    if (body.telefono) dati.cellulare = String(body.telefono);
     [
       [campoNome, dati.nome],
       [campoCognome, dati.cognome],
@@ -112,10 +122,6 @@ export function initProvaForm(root, options) {
     ].forEach(function (coppia) {
       if (coppia[0] && !coppia[0].value && coppia[1]) coppia[0].value = coppia[1];
     });
-  }
-
-  function cellulareValido(v) {
-    return /^3\d{8,9}$/.test(cellulareNudo(v));
   }
 
   function mostraErrore(step, testo) {
@@ -165,7 +171,7 @@ export function initProvaForm(root, options) {
         name: (dati.nome + ' ' + dati.cognome).trim(),
         email: dati.email,
         // `location` è il campo del telefono negli eventi «chiamata».
-        location: dati.cellulare ? '+39' + dati.cellulare : '',
+        location: dati.cellulare || '',
       },
       onPrenotato: function () {
         var fatto = q('[data-pf-cal-fatto]');
@@ -279,15 +285,19 @@ export function initProvaForm(root, options) {
       segnala(campoCognome);
       return;
     }
-    if (!cellulareValido(campoCellulare.value)) {
-      mostraErrore(steps.dati, ERR.cellulare);
+    var tel = telefonoDa(campoCellulare);
+    if (!tel.ok) {
+      mostraErrore(steps.dati, tel.motivo);
       segnala(campoCellulare);
       return;
     }
 
     dati.nome = campoNome.value.trim();
     dati.cognome = campoCognome.value.trim();
-    dati.cellulare = cellulareNudo(campoCellulare.value);
+    /* Il numero completo, col `+`: chi lo riceve non deve più incollarci niente
+       davanti. Era il numero nudo, e il prefisso lo aggiungeva chi lo usava —
+       una riga per ogni consumatore, e ognuna assumeva l'Italia. */
+    dati.cellulare = tel.e164;
     attendi(btnInvia, true);
 
     try {

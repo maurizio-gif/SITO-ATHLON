@@ -54,6 +54,7 @@ import {
   haGiaAccount,
 } from '../data/contatto';
 import { CALENDLY } from '../data/calendly';
+import { validaTelefono } from '../data/prefissi';
 import { montaCalendario } from './calendario.client.js';
 
 export function initContattaciForm(root, options) {
@@ -67,7 +68,6 @@ export function initContattaciForm(root, options) {
     richiesta: 'Scrivi la tua richiesta: anche due righe bastano.',
     nome: 'Serve il tuo nome.',
     cognome: 'Serve il tuo cognome.',
-    cellulare: 'Serve un numero di cellulare italiano, senza prefisso.',
     privacy: 'Serve il consenso al trattamento per poterti rispondere.',
     bnome: 'Serve il nome del bambino.',
     bcognome: 'Serve il cognome del bambino.',
@@ -151,14 +151,21 @@ export function initContattaciForm(root, options) {
     return /^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$/.test(String(v).trim());
   }
 
-  /** Accetta 3201122333, +39 320 112 2333, 0039320…: resta il numero nudo. */
-  function cellulareNudo(v) {
-    var solo = String(v).replace(/[^\d+]/g, '');
-    solo = solo.replace(/^\+39/, '').replace(/^0039/, '');
-    return solo.replace(/\D/g, '');
-  }
-  function cellulareValido(v) {
-    return /^3\d{8,9}$/.test(cellulareNudo(v));
+  /**
+   * Il numero, in forma internazionale, dal prefisso scelto e da quello scritto.
+   *
+   * Sostituisce `cellulareNudo()` più `cellulareValido()`, che tenevano il numero
+   * nudo e lo ricomponevano con un `'+39' +` scritto in due posti più sotto:
+   * quindi chi ha un numero straniero non poteva lasciarlo, e la forma giusta
+   * non bastava — `3333333333` la rispetta ed è il numero di nessuno.
+   *
+   * Il campo è uno dei due, l'adulto o il genitore: la tendina del prefisso è
+   * quella accanto, e si trova dall'id del campo più `-prefisso`.
+   */
+  function telefonoDa(campo) {
+    if (!campo) return { ok: false, motivo: 'Manca il numero di cellulare.' };
+    var pref = q('#' + campo.id + '-prefisso');
+    return validaTelefono(pref ? pref.value : '+39', campo.value);
   }
 
   function mostraErrore(step, testo) {
@@ -324,7 +331,10 @@ export function initContattaciForm(root, options) {
   function precompila(body) {
     if (body.nome) dati.nome = String(body.nome);
     if (body.cognome) dati.cognome = String(body.cognome);
-    if (body.telefono) dati.cellulare = cellulareNudo(body.telefono);
+    /* Il numero che PerfectGym restituisce è già internazionale (`+39340…`): si
+       mette nel campo così com'è, e `componiTelefono` scarta il prefisso
+       ripetuto quando lo ricompone. */
+    if (body.telefono) dati.cellulare = String(body.telefono);
     [
       ['#' + P + '-nome', dati.nome],
       ['#' + P + '-cognome', dati.cognome],
@@ -449,8 +459,9 @@ export function initContattaciForm(root, options) {
       segnala(campoCognome);
       return;
     }
-    if (!cellulareValido(campoCellulare.value)) {
-      mostraErrore(steps.dati, ERR.cellulare);
+    var telcampoCellulare = telefonoDa(campoCellulare);
+    if (!telcampoCellulare.ok) {
+      mostraErrore(steps.dati, telcampoCellulare.motivo);
       segnala(campoCellulare);
       return;
     }
@@ -462,7 +473,7 @@ export function initContattaciForm(root, options) {
 
     dati.nome = campoNome.value.trim();
     dati.cognome = campoCognome.value.trim();
-    dati.cellulare = cellulareNudo(campoCellulare.value);
+    dati.cellulare = telcampoCellulare.e164;
     dati.privacy = true;
     dati.marketing = !!(campoMarketing && campoMarketing.checked);
 
@@ -556,8 +567,9 @@ export function initContattaciForm(root, options) {
       segnala(gNascita);
       return;
     }
-    if (!cellulareValido(gCellulare.value)) {
-      mostraErrore(steps.genitore, ERR.cellulare);
+    var telgCellulare = telefonoDa(gCellulare);
+    if (!telgCellulare.ok) {
+      mostraErrore(steps.genitore, telgCellulare.motivo);
       segnala(gCellulare);
       return;
     }
@@ -570,7 +582,7 @@ export function initContattaciForm(root, options) {
     dati.nome = gNome.value.trim();
     dati.cognome = gCognome.value.trim();
     dati.nascita = gNascita.value;
-    dati.cellulare = cellulareNudo(gCellulare.value);
+    dati.cellulare = telgCellulare.e164;
     dati.privacy = true;
     dati.marketing = !!(gMarketing && gMarketing.checked);
 
@@ -603,7 +615,7 @@ export function initContattaciForm(root, options) {
       nome: dati.nome,
       cognome: dati.cognome,
       cellulare: dati.cellulare,
-      telefono: dati.cellulare ? '+39' + dati.cellulare : '',
+      telefono: dati.cellulare || '',
       dataNascita: dati.nascita,
       bambino: dati.bambino,
       richiamoTelefonico: dati.richiamo,
@@ -673,7 +685,7 @@ export function initContattaciForm(root, options) {
     return {
       name: (dati.nome + ' ' + dati.cognome).trim(),
       email: dati.email,
-      location: dati.cellulare ? '+39' + dati.cellulare : '',
+      location: dati.cellulare || '',
     };
   }
 

@@ -37,6 +37,7 @@
  * conta.
  */
 import { PASS, VOUCHER, COMPRESO, LIBERATORIA, AMICI } from '../data/referral';
+import CampoTelefono from './CampoTelefono.astro';
 
 /* I blocchi li genera il numero, non tre righe copiate: `AMICI` è la stessa
    costante che legge il client e che la landing stampa, quindi cambiarlo cambia
@@ -133,8 +134,9 @@ const BLOCCHI = Array.from({ length: AMICI }, (_, i) => i + 1);
       <span class="rfr__eyebrow" data-rfr-saluto>Chi vuoi invitare</span>
       <h3 class="rfr__title" tabindex="-1" data-rfr-fuoco>I loro dati.</h3>
       <p class="rfr__lead">
-        Il pass arriva per email e su WhatsApp, a nome tuo. Puoi invitarne fino a {AMICI}: compila
-        solo quelli che ti servono.
+        Il pass arriva per email <strong>e</strong> su WhatsApp, a nome tuo: per questo servono
+        tutti e quattro i dati. Puoi invitarne fino a {AMICI} — compila solo i riquadri che ti
+        servono.
       </p>
 
       {BLOCCHI.map((n) => (
@@ -164,7 +166,7 @@ const BLOCCHI = Array.from({ length: AMICI }, (_, i) => i + 1);
             </div>
             <div>
               <label class="rfr__label" for={`rfr-cell-${n}`}>Cellulare</label>
-              <input class="rfr__input" id={`rfr-cell-${n}`} type="tel" inputmode="tel" autocomplete="off" placeholder="320 112 2333" />
+              <CampoTelefono id={`rfr-cell-${n}`} classe="rfr__input" />
             </div>
           </div>
         </fieldset>

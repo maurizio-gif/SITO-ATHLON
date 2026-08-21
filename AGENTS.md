@@ -764,6 +764,69 @@ curl -sI https://wiki.athlonroma.it/wikiathlon/generali/certificato-medico/ | he
 Deve dire `301` e `location: https://www.athlonroma.it/wikiathlon/generali/certificato-medico`.
 Un `200` vuol dire che il dominio non è ancora sul progetto.
 
+## Un campo telefono, e uno solo: `CampoTelefono.astro`
+
+I campi «cellulare» del sito sono cinque, in quattro pannelli — la prova, i
+contatti (l'adulto e il genitore), il referral (tre, uno per amico) e la chat —
+e sono tutti lo stesso componente. Chi ne aggiunge uno usa quello: la lista dei
+prefissi è duecento righe, e cinque copie sarebbero cinque occasioni di
+divergere.
+
+```astro
+<CampoTelefono id="rfr-cell-1" classe="rfr__input" />
+```
+
+`classe` è la classe del campo di testo del pannello ospite, e **va passata**:
+gli stili con ambito di Astro non attraversano i confini dei componenti, quindi
+il componente porta la disposizione e la classe porta il colore — bianco nella
+prova, scuro nell'Help Desk.
+
+**Non si legge mai `input.value` da solo.** Quello è il numero come l'ha scritto
+la persona, non il numero: la tendina sta in `#<id>-prefisso`, e la composizione
+la fa `validaTelefono()` in `data/prefissi.ts`. Chi legge il campo a mano
+reintroduce esattamente il bug che questo componente ha chiuso.
+
+### Il numero esce in E.164, e nessuno gli incolla più niente davanti
+
+Prima ogni form chiedeva il numero senza prefisso e chi lo consumava incollava
+`'+39' +`. Erano quattro righe in quattro file, e ognuna assumeva l'Italia:
+
+- chi scriveva `+39 320…` finiva con `+39+39320…`;
+- chi ha un numero straniero non era raggiungibile — il suo `+44 7…` diventava
+  `+39447…`, che è un numero italiano che non esiste, e il WhatsApp partiva
+  verso il nulla **senza dare errore**.
+
+Adesso il numero arriva già completo a n8n, ad Airtable, a Spoki e a PerfectGym.
+Il nodo `Form` di `athlon-referral` ha una rete di sicurezza per chi chiamasse
+l'endpoint da fuori senza il `+`, e assume l'Italia — l'unica assunzione sensata
+per questo club — ma il percorso normale non la usa.
+
+### `validaTelefono` chiede «è plausibile», non «è ben formato»
+
+`+393333333333` passa qualunque controllo di formato — dieci cifre, comincia per
+3, è un cellulare italiano perfetto — e non è il numero di nessuno. Chi non vuole
+lasciare il suo numero digita quello. Quindi tre controlli in fila:
+
+1. **La forma.** Lunghezza E.164, e per l'Italia il cellulare deve cominciare per
+   3 ed essere di nove o dieci cifre. Un fisso in un campo «cellulare» non è un
+   errore di battitura: è un numero su cui WhatsApp non esiste.
+2. **La varietà.** Meno di quattro cifre diverse vuol dire inventato.
+3. **Le sequenze.** Sette cifre consecutive in salita o in discesa.
+
+**Sette e non sei, ed è misurato**: a sei, `+44 7911 123456` — un numero dalla
+forma perfettamente britannica — veniva rifiutato, perché una sequenza di sei
+capita per caso circa una volta su diecimila. Il verso giusto in cui sbagliare è
+questo: un numero finto che passa lo si scopre al primo messaggio non
+consegnato, una persona vera che non riesce a lasciare il suo numero non torna.
+
+Fuori dall'Italia si controllano solo lunghezza, varietà e sequenze: le regole
+nazionali sono duecento e cambiano, e un falso negativo costa più di un numero
+sbagliato.
+
+Per **verificare un prefisso**: la lista ufficiale è ITU-T E.164. Un prefisso
+sbagliato non dà errore, manda un messaggio a un numero che non esiste, e non lo
+si scopre mai.
+
 ## Il form dell'assistenza chiede poco, e il resto lo va a prendere
 
 Il form dell'Help Desk — `components/clublife/SupportForm.astro`, dentro

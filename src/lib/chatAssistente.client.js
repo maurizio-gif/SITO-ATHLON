@@ -36,6 +36,7 @@
 // sito, dentro la fetta di conoscenza del ramo in cui siamo.
 
 import { ACTIVITY_AUDIENCE } from '../data/activities';
+import { validaTelefono } from '../data/prefissi';
 import { CALENDLY } from '../data/calendly';
 import { montaCalendario } from './calendario.client.js';
 
@@ -468,7 +469,7 @@ export function initChatAssistente(root, options) {
     /* Il numero anche qui, in chiaro, e non per ridondanza inutile: se il campo
        del telefono su Calendly non è il «luogo» il parametro va perso, e questa
        riga è quello che resta da leggere a chi richiama. */
-    if (dati.telefono) testa.push('Telefono: +39 ' + cellulareNudo(dati.telefono));
+    if (dati.telefono) testa.push('Telefono: ' + dati.telefono);
     var att = etichettaAttivita();
     if (att) testa.push('Interesse: ' + att);
     if (dati.pagina) testa.push('Pagina da cui scrive: ' + dati.pagina);
@@ -533,7 +534,7 @@ export function initChatAssistente(root, options) {
       prefill: {
         name: nome,
         email: dati.email,
-        location: dati.telefono ? '+39' + cellulareNudo(dati.telefono) : '',
+        location: dati.telefono || '',
         customAnswers: { a1: contestoRichiamo() },
       },
       onPrenotato: function () {
@@ -747,10 +748,22 @@ export function initChatAssistente(root, options) {
   var privacyDati = q('[data-ca-dati-privacy]');
   var saltaDati = q('[data-ca-dati-salta]');
 
-  /** Accetta 3201122333, +39 320 112 2333, 0039320…: resta il numero nudo. */
-  function cellulareNudo(v) {
-    var solo = String(v || '').replace(/[^\d+]/g, '');
-    return solo.replace(/^\+39/, '').replace(/^0039/, '').replace(/\D/g, '');
+  /**
+   * Il numero in forma internazionale, dal prefisso scelto accanto al campo.
+   *
+   * Sostituisce un `cellulareNudo()` che teneva le cifre nude e un `'+39' +`
+   * incollato in tre posti diversi: quindi chi ha un numero straniero non poteva
+   * lasciarlo, e la forma giusta non bastava — `3333333333` la rispetta.
+   */
+  function telefonoScelto(valoreScritto) {
+    var pref = q('#ca-cellulare-prefisso');
+    return validaTelefono(pref ? pref.value : '+39', valoreScritto);
+  }
+
+  /** Il numero già pronto, o `''`. Per i punti che non devono validare niente. */
+  function telefonoPronto(v) {
+    var e = validaTelefono('+39', v);
+    return e.ok ? e.e164 : '';
   }
 
   function valore(nome) {
@@ -769,7 +782,7 @@ export function initChatAssistente(root, options) {
       dati.conosciuto &&
       dati.nome &&
       dati.cognome &&
-      /^3\d{8,9}$/.test(cellulareNudo(dati.telefono))
+      validaTelefono('+39', dati.telefono).ok
     );
   }
 
@@ -803,8 +816,9 @@ export function initChatAssistente(root, options) {
       if (!emailValida(valore('email'))) {
         return segnala('email', 'Controlla l’indirizzo email: manca qualcosa.');
       }
-      if (!/^3\d{8,9}$/.test(cellulareNudo(valore('cellulare')))) {
-        return segnala('cellulare', 'Serve un cellulare italiano, senza prefisso.');
+      var tel = telefonoScelto(valore('cellulare'));
+      if (!tel.ok) {
+        return segnala('cellulare', tel.motivo);
       }
       /* La data di nascita serve solo dove si crea un'anagrafica guest, cioè nel
          ramo junior: `AddGuestMember` la pretende, `Crm2/AddLead` non ce l'ha. */
@@ -870,7 +884,7 @@ export function initChatAssistente(root, options) {
     if (campi.cognome && !campi.cognome.value) campi.cognome.value = dati.cognome || '';
     if (campi.email && !campi.email.value) campi.email.value = dati.email || '';
     if (campi.cellulare && !campi.cellulare.value) {
-      campi.cellulare.value = cellulareNudo(dati.telefono) || '';
+      campi.cellulare.value = dati.telefono || '';
     }
     mostra('dati');
   }
@@ -901,7 +915,7 @@ export function initChatAssistente(root, options) {
           genitore: {
             nome: valore('nome') || dati.nome,
             cognome: valore('cognome') || dati.cognome,
-            cellulare: cellulareNudo(valore('cellulare')) || cellulareNudo(dati.telefono),
+            cellulare: telefonoPronto(valore('cellulare')) || dati.telefono || '',
             /* Vuota nel ramo adulti, e non è una dimenticanza: là non si chiede.
                Il workflow deve accettarla vuota e non passarla a PerfectGym. */
             nascita: junior ? valore('nascita') : '',
@@ -945,7 +959,7 @@ export function initChatAssistente(root, options) {
   function ricordaDati() {
     dati.nome = valore('nome');
     dati.cognome = valore('cognome');
-    dati.telefono = cellulareNudo(valore('cellulare'));
+    dati.telefono = telefonoPronto(valore('cellulare'));
     if (emailValida(valore('email'))) dati.email = valore('email');
   }
 
