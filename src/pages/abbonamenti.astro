@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import AttivitaModal from '../components/AttivitaModal.astro';
+import IscrizioneModal from '../components/IscrizioneModal.astro';
 import Faq from '../components/Faq.astro';
 import BannerSospensione from '../components/BannerSospensione.astro';
 import { faqPagina } from '../data/faq';
@@ -210,7 +211,14 @@ const trust = [
                     <li>{o.note}</li>
                   </ul>
 
-                  <a href={o.href} class="plan__cta" data-cta="buy">Iscriviti a {p.name} →</a>
+                  {/* `data-iscrizione` apre il controllo dell'email prima di
+                      PerfectGym (vedi `IscrizioneModal.astro`): chi ha già un
+                      account viene mandato al login invece di scoprire a fine
+                      registrazione che la sua email esiste già. L'`href` resta
+                      quello di prima, e senza JavaScript vale lui. */}
+                  <a href={o.href} class="plan__cta" data-cta="buy" data-iscrizione={p.name}>
+                    Iscriviti a {p.name} →
+                  </a>
                 </div>
               ))}
             </div>
@@ -305,8 +313,8 @@ const trust = [
       </ul>
 
       <p class="ab-pt-note">
-        Seduta singola: <strong>€{PERSONAL.singolaIscritti}</strong> per iscritti ·
-        <strong>€{PERSONAL.singolaEsterni}</strong> per esterni
+        Seduta singola: <strong>€{PERSONAL.singolaIscritti}</strong> per iscritti
+        · <strong>€{PERSONAL.singolaEsterni}</strong> per esterni
       </p>
       <a href={`${PG}/#/PersonalTraining?clubId=1&trainerId=null`} class="btn btn-outline-dark">
         Prenota una seduta →
@@ -377,6 +385,11 @@ const trust = [
 
   {/* Il modale dietro ogni chip «attività incluse». */}
   <AttivitaModal />
+
+  {/* Il controllo dell'email davanti ai pulsanti d'iscrizione. Sta qui e non
+      nel Layout perché i pulsanti esistono su questa pagina e su /promo: le
+      altre settantasette non hanno niente da intercettare. */}
+  <IscrizioneModal />
 </Layout>
 
 <script>

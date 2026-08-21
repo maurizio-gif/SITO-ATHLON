@@ -22,6 +22,7 @@
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import AttivitaModal from '../components/AttivitaModal.astro';
+import IscrizioneModal from '../components/IscrizioneModal.astro';
 import SpacesGallery from '../components/home/SpacesGallery.astro';
 import Faq from '../components/Faq.astro';
 import { plans } from '../data/abbonamenti';
@@ -191,7 +192,10 @@ const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 
                   <p class="formula__nota">{o.note}</p>
 
-                  <a href={o.href} class="btn btn-primary formula__cta" data-cta="buy">
+                  {/* Come su /abbonamenti: `data-iscrizione` mette il controllo
+                      dell'email davanti a PerfectGym, l'`href` resta la strada
+                      per chi non ha JavaScript. */}
+                  <a href={o.href} class="btn btn-primary formula__cta" data-cta="buy" data-iscrizione={p.name}>
                     Iscriviti a {p.name} →
                   </a>
                 </div>
@@ -331,6 +335,11 @@ const PG = 'https://athlon.perfectgym.com/ClientPortal2';
   </section>
   {/* Il modale dietro ogni attività compresa. */}
   <AttivitaModal />
+
+  {/* Il controllo dell'email davanti ai pulsanti d'iscrizione. Sta qui e non
+      nel Layout perché i pulsanti esistono su questa pagina e su /promo: le
+      altre settantasette non hanno niente da intercettare. */}
+  <IscrizioneModal />
 </Layout>
 
 <script>
