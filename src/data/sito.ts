@@ -46,5 +46,25 @@ export const SITE = (
  * pagina e archiviazione subordinata al consenso. Un interruttore solo e non
  * due, perché lo stato intermedio — nessun banner e già niente attribuzione —
  * perderebbe i dati senza che nessuno possa acconsentire.
+ *
+ * ## Perché adesso è vuota, e quando va rimessa
+ *
+ * La chiave è `3e76f0f799c6d1d94882361d`, e va rimessa **il giorno che
+ * `www.athlonroma.it` punta su Vercel**. Non un momento prima, e la ragione è
+ * quella scritta sopra, capitata per davvero: CookieYes serve il banner solo sui
+ * domini registrati nell'account, e l'account ha quel dominio solo — piano Free,
+ * uno. Finché la produzione sta su `sito-athlon.vercel.app`, CookieYes non
+ * decide niente su questo host: `getCkyConsent()` non esiste, il cookie
+ * `cookieyes-consent` non compare, e `consenso()` risponde «negato» per
+ * costruzione, perché un fornitore che non risponde non è un consenso.
+ *
+ * Cioè: con la chiave impostata qui il sito stava **esattamente nello stato
+ * intermedio** che questo commento dichiara sbagliato — nessun banner e già
+ * niente memorizzato. Si vedeva da fuori come «l'email non si ricorda», che è il
+ * sintomo piccolo; quello grosso era che `vid` e UTM non venivano scritti, e
+ * ogni richiesta risultava senza campagna.
+ *
+ * Il promemoria non è questo commento: `scripts/consenso.ts` avvisa in console
+ * quando la configurazione e l'host non combaciano, nei due versi.
  */
-export const COOKIEYES_KEY = '3e76f0f799c6d1d94882361d';
+export const COOKIEYES_KEY = '';

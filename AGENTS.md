@@ -125,6 +125,33 @@ Un interruttore e non tre, perché lo stato intermedio — nessun banner e già
 niente attribuzione — perderebbe i dati senza rendere il sito più corretto di un
 millimetro, e la pagina descriverebbe un consenso che nessuno ha potuto dare.
 
+**La chiave va impostata solo su un host che l'account CookieYes conosce**, e
+questa riga è costata due giorni di guasto silenzioso. CookieYes serve il banner
+per i **domini registrati**, e l'account Athlon ne ha uno — `www.athlonroma.it`,
+piano Free. Finché la produzione sta su `sito-athlon.vercel.app`, con la chiave
+impostata succede questo: nessun banner, `getCkyConsent()` mai definito, cookie
+`cookieyes-consent` mai scritto, e `consenso()` che risponde «negato» per
+costruzione. Cioè *esattamente* lo stato intermedio dichiarato sbagliato qui
+sopra — raggiunto senza volerlo, perché la chiave era giusta e l'host no.
+
+Si è visto come «l'email non si precompila», che è il sintomo piccolo. Quello
+grosso era l'attribuzione: le UTM del primo tocco non sopravvivevano alla
+navigazione e il `vid` non sopravviveva alla pagina, quindi una conversione dopo
+un clic risultava senza campagna. Chi converte sulla pagina d'arrivo la portava
+ancora, perché tutto vive in memoria comunque — motivo per cui il guasto non era
+totale e proprio per questo non si notava.
+
+Quindi **la chiave è vuota fino allo spostamento del dominio**, e va rimessa
+quel giorno: `3e76f0f799c6d1d94882361d`, scritta in `data/sito.ts` accanto alla
+dichiarazione. Aggiungere il dominio Vercel a CookieYes sarebbe l'alternativa,
+ma il piano Free ammette un dominio solo e quell'indirizzo è da buttare.
+
+E il promemoria non è questo paragrafo: `scripts/consenso.ts` **avvisa in
+console quando la configurazione e l'host non combaciano**, nei due versi —
+chiave impostata e fornitore che tace dopo venti secondi, oppure chiave vuota su
+un host `athlonroma.it`. Sono le due sole configurazioni sbagliate possibili, e
+nessuna delle due si vede guardando il sito.
+
 Come è fatta la subordinazione, in `scripts/attribuzione.ts`, e sono tre scelte
 non ovvie:
 
