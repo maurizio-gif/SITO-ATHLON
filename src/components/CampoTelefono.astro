@@ -47,9 +47,17 @@ interface Props {
   /** La classe del campo di testo del pannello ospite, per il colore. */
   classe: string;
   placeholder?: string;
+  /* Tutto il resto finisce sul campo del numero. Serve ai pannelli che non
+     leggono i campi per id ma per attributo: la chat costruisce la sua mappa da
+     `[data-ca-f]`, e senza un modo di passarlo il suo campo cellulare non era
+     nella mappa — cioè non esisteva per la validazione. */
+  [attributo: string]: unknown;
 }
 
-const { id, classe, placeholder = '340 1234567' } = Astro.props;
+/* Il segnaposto senza spazi: è la forma in cui il numero va scritto, e uno
+   spazio là dentro invita a scriverlo — `validaTelefono` lo tollera, ma il
+   segnaposto è un esempio e un esempio si copia. */
+const { id, classe, placeholder = '3401234567', ...resto } = Astro.props;
 
 /* L'Italia in testa, e poi tutti in ordine. Non è un doppione da togliere: la
    prima voce è il preselezionato e nessuno la cerca, la seconda sta alla lettera
@@ -64,9 +72,16 @@ const inTesta = PREFISSI.filter((p) => p.iso === 'IT');
       sarebbe rumore. */}
   <label class="tel__nascosta" for={`${id}-prefisso`}>Prefisso internazionale</label>
   <select class={`${classe} tel__prefisso`} id={`${id}-prefisso`}>
+    {/* La voce in testa porta il solo prefisso, senza bandiera e senza paese.
+        È quella che si vede a tendina chiusa, e la sua lunghezza decide la
+        larghezza del campo: con «🇮🇹 Italia +39» servivano 135 px e su un
+        telefono il numero — che è il campo che si scrive — restava senza
+        spazio. Il paese non si perde: l'Italia c'è di nuovo qui sotto alla
+        lettera I, con bandiera e nome, dove lo spazio è quello della lista
+        aperta e non del campo. */}
     {inTesta.map((p) => (
       <option value={p.codice} selected={p.codice === PREFISSO_PREDEFINITO}>
-        {bandiera(p.iso)} {p.codice}
+        {p.codice}
       </option>
     ))}
     <option disabled>──────────</option>
@@ -82,6 +97,7 @@ const inTesta = PREFISSI.filter((p) => p.iso === 'IT');
     inputmode="tel"
     autocomplete="tel-national"
     placeholder={placeholder}
+    {...resto}
   />
 </div>
 
@@ -96,11 +112,24 @@ const inTesta = PREFISSI.filter((p) => p.iso === 'IT');
 
   /* La tendina non si stringe e non si allarga: a `flex: 1` un nome di paese
      lungo — «Saint Vincent e Grenadine» — le farebbe prendere metà della riga e
-     al numero resterebbe uno spiraglio. La larghezza basta per «🇮🇹 +39» e per i
-     prefissi a tre cifre, che è tutto quello che si vede quando è chiusa. */
+     al numero resterebbe uno spiraglio. */
   .tel__prefisso {
     flex: 0 0 auto;
-    width: 7.5rem;
+    /* Da 7.5rem a 5rem, e la misura la decide il testo che si vede a tendina
+       chiusa: «+39» sono 26 px, il padding 0,5rem per lato e `appearance: auto`
+       vuole il suo spazio per la freccia, che il browser disegna **dentro** il
+       padding destro. Una misura sola per telefono e desktop, perché il testo è
+       lo stesso — prima erano due e la seconda esisteva solo perché la prima
+       era troppo larga.
+
+       Misurato nel pannello della chat, che è il posto più stretto in cui questo
+       campo vive — là la riga è divisa in due colonne: sul telefono il numero
+       passa da 335 px su una riga sua a 273 px accanto al prefisso, e su desktop
+       da 128 a 160 quando accanto c'è anche l'email. 4rem è la misura in cui
+       «+39» (26 px), il padding e la freccia stanno senza toccarsi. */
+    width: 4rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
     /* `text-overflow` non funziona su un `select` chiuso in tutti i browser, ma
        il testo visibile è corto per costruzione: la voce selezionata è quella in
        testa, «🇮🇹 +39», e le altre mostrano il paese solo mentre il menu è
@@ -127,16 +156,4 @@ const inTesta = PREFISSI.filter((p) => p.iso === 'IT');
     border: 0;
   }
 
-  /* Su un telefono stretto i due campi in fila lasciano al numero meno di
-     duecento pixel, e il numero è il campo che si scrive: la tendina va sopra,
-     larga come tutto. */
-  @media (max-width: 420px) {
-    .tel {
-      flex-direction: column;
-    }
-
-    .tel__prefisso {
-      width: 100%;
-    }
-  }
 </style>

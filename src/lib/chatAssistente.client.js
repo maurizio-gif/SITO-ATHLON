@@ -747,6 +747,28 @@ export function initChatAssistente(root, options) {
   var leadDati = q('[data-ca-dati-lead]');
   var privacyDati = q('[data-ca-dati-privacy]');
   var saltaDati = q('[data-ca-dati-salta]');
+  var emailEco = q('[data-ca-email-eco]');
+  var emailEcoValore = q('[data-ca-email-eco-valore]');
+  var emailCampo = q('[data-ca-email-campo]');
+  var emailGriglia = q('[data-ca-email-griglia]');
+
+  /**
+   * L'email confermata si mostra come riga, non come campo.
+   *
+   * Il campo resta nel documento e resta compilato: `valore('email')` legge da
+   * lì e il payload pure, quindi nascondere il contenitore non cambia niente di
+   * quello che parte. Cambia solo cosa vede una persona che l'ha già scritta un
+   * passo prima.
+   */
+  function mostraEmailConfermata(confermata) {
+    if (!emailEco || !emailCampo) return;
+    emailEco.hidden = !confermata;
+    emailCampo.hidden = confermata;
+    if (emailGriglia) emailGriglia.classList.toggle('ca__griglia--una', confermata);
+    if (confermata && emailEcoValore) {
+      emailEcoValore.textContent = campi.email ? campi.email.value : '';
+    }
+  }
 
   /**
    * Il numero in forma internazionale, dal prefisso scelto accanto al campo.
@@ -793,6 +815,14 @@ export function initChatAssistente(root, options) {
     }
     var el = campi[nome];
     if (el) {
+      /* L'email confermata non ha un campo a schermo, quindi non c'è niente da
+         mettere a fuoco: `focus()` su un elemento invisibile non fa niente e il
+         messaggio resterebbe senza un posto dove intervenire. Non è un caso
+         raggiungibile — la riga si mostra solo con un indirizzo già valido — ma
+         se lo diventasse, meglio riaprirlo che segnalare nel vuoto. */
+      if (nome === 'email' && emailCampo && emailCampo.hidden) {
+        mostraEmailConfermata(false);
+      }
       el.classList.add('ca__input--errore');
       el.focus();
     }
@@ -855,8 +885,15 @@ export function initChatAssistente(root, options) {
     var junior = dati.ambito === 'junior';
     var suoi = serveGenitore();
     /* Un adulto lascia nome, cognome, email e cellulare, e nient'altro: la data
-       di nascita e i dati del bambino sono di un'iscrizione, non di un
-       ricontatto. E se di lui sappiamo già tutto, resta solo il bambino. */
+       di nascita e i dati del bambino servono a creare l'anagrafica del bambino
+       sul portale, non a farsi ricontattare. E se di lui sappiamo già tutto,
+       resta solo il bambino.
+
+       Il testo non parla di **iscrizione**, e non è una sfumatura: qui non si
+       iscrive nessuno a niente. Si crea l'account del bambino, che è quello che
+       gli fa vedere corsi, orari e posti liberi sul portale — promettere
+       un'iscrizione a chi ha lasciato quattro campi in una chat vorrebbe dire
+       far credere che il posto è preso. */
     if (genitoreDati) genitoreDati.hidden = !suoi;
     if (nascitaGenitore) nascitaGenitore.hidden = !(junior && suoi);
     if (bimbo) bimbo.hidden = !junior;
@@ -867,15 +904,15 @@ export function initChatAssistente(root, options) {
       titoloDati.textContent = !junior
         ? 'I tuoi dati'
         : suoi
-          ? 'I dati per l’iscrizione'
+          ? 'I dati per il suo account'
           : 'I dati di tuo figlio';
     }
     if (leadDati) {
       leadDati.textContent = !junior
         ? 'Ci presentiamo: sono i dati con cui il club ti ricontatta. Poi passiamo alle tue domande.'
         : suoi
-          ? 'Servono i tuoi e quelli del bambino: li usiamo per preparare l’iscrizione. Poi passiamo alle tue domande.'
-          : 'Di te sappiamo già tutto: serve solo chi iscriviamo. Poi passiamo alle tue domande.';
+          ? 'Con i tuoi e quelli del bambino gli creiamo un account sul portale: da lì vedi tutti i nostri corsi, gli orari e i posti liberi. Poi passiamo alle tue domande.'
+          : 'Di te sappiamo già tutto: servono solo i suoi, per creargli l’account sul portale e farti vedere tutti i corsi. Poi passiamo alle tue domande.';
     }
     /* Quello che sappiamo già non si richiede a mano. L'email è quella del
        primo passo: resta modificabile, perché è possibile che l'abbia scritta
@@ -886,6 +923,9 @@ export function initChatAssistente(root, options) {
     if (campi.cellulare && !campi.cellulare.value) {
       campi.cellulare.value = dati.telefono || '';
     }
+    /* Confermata solo se è davvero un indirizzo: se la verifica non ne ha
+       lasciato uno buono il campo va chiesto, non confermato. */
+    mostraEmailConfermata(!!(campi.email && emailValida(campi.email.value)));
     mostra('dati');
   }
 

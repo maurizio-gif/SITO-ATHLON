@@ -145,11 +145,21 @@ import CampoTelefono from '../CampoTelefono.astro';
         </div>
       </div>
 
-      <div class="ca__griglia">
-        {/* L'email è già stata scritta al primo passo e arriva precompilata, ma
-            resta modificabile: quella della verifica può non essere quella su cui
-            si vuole essere ricontattati. */}
-        <div class="ca__campo">
+      {/* L'email l'ha già scritta al primo passo, e richiederla qui era chiedere
+          due volte la stessa cosa: il campo compariva precompilato e sembrava un
+          modulo che non si ricorda quello che gli hai appena detto.
+
+          Al suo posto una riga che la conferma. Il campo resta nel documento e
+          resta compilato — la validazione e il payload leggono da lì — ma non si
+          vede più: l'email da usare è quella con cui la verifica è stata fatta,
+          cioè quella su cui il club conosce questa persona. Chi ne vuole
+          un'altra la dice nella conversazione, che è la riga dopo. */}
+      <p class="ca__eco" data-ca-email-eco hidden>
+        Ti scriviamo a <strong data-ca-email-eco-valore></strong>
+      </p>
+
+      <div class="ca__griglia" data-ca-email-griglia>
+        <div class="ca__campo" data-ca-email-campo>
           <label class="ca__label" for="ca-email-dati">Email</label>
           <input
             class="ca__input"
@@ -163,7 +173,10 @@ import CampoTelefono from '../CampoTelefono.astro';
         </div>
         <div class="ca__campo">
           <label class="ca__label" for="ca-cellulare">Cellulare</label>
-          <CampoTelefono id="ca-cellulare" classe="ca__input" />
+          {/* `data-ca-f` è come la chat trova i suoi campi: senza, questo non
+              era nella mappa e `valore('cellulare')` tornava sempre vuoto —
+              cioè «Manca il numero di cellulare» con il numero scritto. */}
+          <CampoTelefono id="ca-cellulare" classe="ca__input" data-ca-f="cellulare" />
         </div>
       </div>
 
@@ -822,6 +835,23 @@ import CampoTelefono from '../CampoTelefono.astro';
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
+  }
+
+  /* Con l'email confermata la griglia resta con un campo solo: senza questa
+     classe il cellulare terrebbe metà riga e l'altra metà sarebbe un buco. */
+  .ca__griglia--una {
+    grid-template-columns: 1fr;
+  }
+
+  /* La riga di conferma: un fatto, non un campo. */
+  .ca__eco {
+    margin: 0 0 0.9rem;
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .ca__eco strong {
+    color: var(--color-white);
   }
 
   .ca__campo {
