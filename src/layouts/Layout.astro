@@ -27,6 +27,7 @@ import ChatModal from '../components/clublife/ChatModal.astro';
 import ChatFab from '../components/ChatFab.astro';
 import { CLUB, clubSchema, breadcrumbSchema } from '../data/club';
 import { COOKIEYES_KEY } from '../data/sito';
+import { ogDa } from '../data/foto';
 
 interface Props {
   title: string;
@@ -76,7 +77,11 @@ const {
    una pagina può essere servita. */
 const site = Astro.site ?? new URL('https://www.athlonroma.it');
 const canonical = new URL(Astro.url.pathname.replace(/\/+$/, '/') || '/', site).href;
-const ogImage = new URL(image, site).href;
+/* La variante 1200×630, non la foto originale: `og:image:width/height` qui
+   sotto dichiarano quelle misure per ogni pagina, e passare un 2560×1707 da
+   864 kB le rendeva false — con l'anteprima di WhatsApp che parte e resta
+   vuota. `ogDa` torna la foto com'era quando la variante non c'è. */
+const ogImage = new URL(ogDa(image), site).href;
 
 /* Un solo grafo per pagina invece di tanti blocchi slegati: il club, il
    percorso di navigazione e quello che la pagina è. Gli schemi puntano al club

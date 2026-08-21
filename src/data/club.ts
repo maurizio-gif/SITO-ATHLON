@@ -40,8 +40,21 @@ export const CLUB = {
     'https://www.youtube.com/channel/UC9XX5E0u-qqlqavtawlmOnQ',
   ],
   logo: '/wp-content/uploads/2025/08/Logo-oriz-full-2.png',
-  /** L'immagine di anteprima quando si condivide un link senza foto propria. */
-  socialImage: '/og/athlon-club.jpg',
+  /**
+   * L'immagine di anteprima quando si condivide un link senza foto propria.
+   *
+   * È il **percorso della foto originale**, non del ritaglio: ci pensa `ogDa()`
+   * (`data/foto.ts`) a tradurlo nella variante 1200×630 di `public/og/`. Così
+   * la sorgente è una sola per tutte le pagine, e cambiare la foto qui basta.
+   *
+   * Prima era `/og/athlon-club.jpg`, un ritaglio con logo e scritte incollate
+   * sopra — che condiviso su WhatsApp sembrava una locandina, non un'anteprima.
+   * Cambiare percorso serve anche a un'altra cosa: WhatsApp e Facebook tengono
+   * in cache l'immagine **per URL**, per settimane, quindi sostituire il file
+   * lasciando lo stesso indirizzo non aggiorna niente. Il nome nuovo la
+   * rinfresca.
+   */
+  socialImage: '/wp-content/uploads/2025/11/ATHLON85-scaled.jpg',
   /**
    * I dati dell'ente, che vanno sui documenti e sui fogli affissi in sede.
    *

@@ -396,6 +396,49 @@ optimiser never sees them. `scripts/varianti-foto.mjs` writes the variants and
   build pipeline on purpose: on Vercel it would pull sharp on every deploy to
   regenerate files that never change.
 
+### L'anteprima di un link condiviso è un'immagine a parte
+
+`Layout.astro` dichiara per **ogni** pagina `og:image:width=1200` e
+`og:image:height=630`, e per un pezzo passava al `<meta og:image>` la foto
+originale della pagina: un file da 2560×1707 e fino a 1,2 MB. Le misure
+dichiarate erano quindi false su quasi tutto il sito, e WhatsApp — che scarta
+l'immagine oltre i ~300 kB — mostrava l'anteprima che parte, scrive titolo e
+descrizione, e resta vuota. Il sintomo sembrava un problema di rete o di cache;
+era questo.
+
+`scripts/og-immagini.mjs` genera un ritaglio `1200×630` in `public/og/` per ogni
+foto usata come anteprima, e scrive `src/data/og-immagini.json`, la mappa che
+`ogDa()` (in `data/foto.ts`) usa per tradurre una sorgente nella sua variante.
+Il Layout chiama `ogDa()` e non tocca altro.
+
+- **Le sorgenti non si elencano a mano.** Lo script le legge dagli stessi posti
+  da cui le legge il sito: `corsi.ts` **e** `junior.ts` per le hero dei corsi, il
+  frontmatter di news, eventi e promo, più l'elenco `PAGINE` per le pagine che
+  passano una foto letterale. Leggere un solo file dei corsi aveva lasciato
+  fuori le quattro pagine junior, che tornavano a servire l'originale da 1,2 MB.
+- **La mappa esiste perché al build non si può guardare il filesystem** per
+  sapere se la variante c'è: quel JSON è il contratto fra lo script e `ogDa()`.
+  Chi non è nella mappa passa invariato, che è il verso giusto in cui sbagliare
+  — un'immagine grossa è un'anteprima che qualche client non disegna, un'immagine
+  assente è un'anteprima che nessuno disegna.
+- **Il nome della variante porta dentro anno e mese dell'originale.** Senza,
+  `2025/03/Athlon88-scaled.jpg` e `2025/11/ATHLON88-scaled.jpg` — due foto
+  diverse — finiscono sullo stesso file: su questo Mac il filesystem non
+  distingue le maiuscole.
+- **Cambiare il file lasciando lo stesso URL non aggiorna niente.** WhatsApp e
+  Facebook tengono in cache l'immagine **per indirizzo**, per settimane. Per
+  rinfrescare un'anteprima serve un nome nuovo — è la ragione per cui
+  `CLUB.socialImage` è passato da `/og/athlon-club.jpg` al percorso della foto
+  sorgente, che `ogDa()` traduce in un `/og/` diverso.
+- **Non ci si mettono scritte sopra.** L'immagine di default era un montaggio
+  con logo, titolo e indirizzo incollati sulla foto: condiviso su WhatsApp
+  sembrava una locandina invece dell'anteprima di un sito.
+
+Per verificare, sul `dist`: ogni pagina che non sia una di `meta refresh` deve
+avere un `og:image` che esiste, sta sotto `/og/`, misura esattamente 1200×630 e
+pesa meno di 300 kB. L'ultima passata: 84 pagine, 33 immagini distinte, la più
+grande 149 kB.
+
 ## Whitespace around inline tags
 
 Astro trims the line break on **both** sides of an inline tag, so a wrapped

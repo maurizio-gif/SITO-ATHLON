@@ -98,3 +98,29 @@ export function fotoHero(src: string) {
   if (fonti.length === 1) return { fetchpriority: 'high' };
   return { srcset: fonti.join(', '), sizes: '100vw', fetchpriority: 'high' };
 }
+
+/* ---- L'immagine dell'anteprima condivisa ------------------------------- */
+
+import ogMappa from './og-immagini.json';
+
+/**
+ * La variante 1200×630 di una foto, per il `<meta og:image>`.
+ *
+ * `Layout.astro` dichiara per ogni pagina `og:image:width=1200` e
+ * `og:image:height=630`, e prima passava la foto originale: un file da
+ * 2560×1707 e fino a 864 kB. Le dimensioni dichiarate erano dunque false — e
+ * WhatsApp, che scarta l'immagine oltre i ~300 kB, mostrava l'anteprima che
+ * parte e resta vuota.
+ *
+ * Le varianti le genera `scripts/og-immagini.mjs`, che scrive anche la mappa
+ * qui importata. La mappa esiste perché al build non si può interrogare il
+ * filesystem per sapere se la variante c'è: la lista è il contratto fra lo
+ * script e questa funzione.
+ *
+ * Chi non è nella mappa torna com'era. È il caso giusto in cui non fare
+ * niente: un'immagine grande è un'anteprima che qualche client non disegna,
+ * un'immagine assente è un'anteprima che nessun client disegna.
+ */
+export function ogDa(src: string): string {
+  return (ogMappa as Record<string, string>)[src] ?? src;
+}
