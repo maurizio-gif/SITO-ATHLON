@@ -54,7 +54,12 @@ const prova = trialCta({ source: '/' });
   <div class="hero-spot"></div>
 
   <div class="hero-content">
-    <span class="eyebrow hero-eyebrow">Club Sportivo dal 1973 · Roma Talenti</span>
+    <span class="eyebrow hero-eyebrow">
+      <span class="hero-eyebrow__intera">Club Sportivo dal 1973 · Roma Talenti</span>
+      {/* Sotto i 900px la riga unica si spezzava in un punto scomodo: qui a
+          capo dopo l'anno, non dopo il pallino. */}
+      <span class="hero-eyebrow__spezzata">Club sportivo a Talenti dal 1973<br />Roma Talenti</span>
+    </span>
     <h1 class="hero-title">Athlon Club <em class="accent">4.0</em></h1>
     <p class="hero-lede">Innovare è la nostra<br />miglior tradizione.</p>
 
@@ -67,25 +72,34 @@ const prova = trialCta({ source: '/' });
         {prova.label} <span aria-hidden="true">→</span>
       </a>
 
-      <a href="/abbonamenti" class="hero-secondary">Scopri gli abbonamenti</a>
+      <a href="/abbonamenti" class="btn btn-outline hero-secondary">Scopri gli abbonamenti</a>
 
-      {/* Members already signed up go the other way: straight into the account
-          panel the header icon opens. Same trigger hook, so one panel serves
-          both. */}
-      <span class="hero-login">
-        <span class="hero-login__hint">Accedi <span aria-hidden="true">→</span></span>
+      {/* Terza via, dopo provare e leggere i piani: parlare subito. Stesso
+          comando `data-cta="assistente"` del pulsante della barra e della
+          pastiglia fissa, così apre lo stesso assistente ovunque lo si tocchi. */}
+      <span class="hero-chat">
+        <span class="hero-chat__hint">
+          Chatta con noi
+          <svg class="hero-chat__freccia" viewBox="0 0 24 24" width="14" height="14" fill="none"
+            stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+            aria-hidden="true">
+            <path d="M4 12h15" />
+            <path d="M13 6l6 6-6 6" />
+          </svg>
+        </span>
         <button
           type="button"
-          class="hero-login__btn"
-          data-acct-open
-          aria-label="Accedi — il tuo club"
+          class="hero-chat__btn"
+          data-cta="assistente"
+          aria-label="Chatta con noi: apri l’assistente del club"
           aria-haspopup="dialog"
-          aria-expanded="false"
         >
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
+            <path d="M20.5 11.6a8 8 0 0 1-8 8H8.3L4 22.4v-4.3a8 8 0 0 1 8.5-14 8 8 0 0 1 8 7.5Z" />
+            <circle class="hero-chat__punto" cx="9" cy="11.5" r="1.1" fill="currentColor" stroke="none" />
+            <circle class="hero-chat__punto" cx="12.5" cy="11.5" r="1.1" fill="currentColor" stroke="none" />
+            <circle class="hero-chat__punto" cx="16" cy="11.5" r="1.1" fill="currentColor" stroke="none" />
           </svg>
         </button>
       </span>
@@ -261,6 +275,10 @@ const prova = trialCta({ source: '/' });
     margin-bottom: 20px;
   }
 
+  .hero-eyebrow__spezzata {
+    display: none;
+  }
+
   .hero-title {
     /* La scala tipografica del sito arriva a --text-4xl; qui la si supera di
        poco perche' e' il titolo della home. Era 1.5 e su un desktop largo
@@ -305,30 +323,21 @@ const prova = trialCta({ source: '/' });
     gap: 14px 18px;
   }
 
-  /* Secondaria dell'hero: un link, non un secondo pulsante — la gerarchia fra
-     provare e leggere i piani deve restare leggibile a colpo d'occhio. */
+  /* Secondaria dell'hero: un pulsante vero, ma più piccolo di «Prova Athlon»
+     — un contorno bianco lo rende visibile sul video senza competere col
+     pieno arancione, che resta l'unico comando pieno della hero. */
   .hero-secondary {
-    font-size: var(--text-sm);
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: var(--color-white);
-    text-decoration: underline;
-    text-underline-offset: 4px;
-    text-decoration-thickness: 1px;
-    text-decoration-color: rgba(255, 255, 255, 0.5);
+    padding: 12px 22px;
+    font-size: var(--text-xs);
   }
 
-  .hero-secondary:hover {
-    text-decoration-color: var(--color-white);
-  }
-
-  .hero-login {
+  .hero-chat {
     display: inline-flex;
     align-items: center;
     gap: 10px;
   }
 
-  .hero-login__hint {
+  .hero-chat__hint {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -340,7 +349,7 @@ const prova = trialCta({ source: '/' });
     white-space: nowrap;
   }
 
-  .hero-login__btn {
+  .hero-chat__btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -357,13 +366,64 @@ const prova = trialCta({ source: '/' });
       transform var(--dur-fast) var(--ease-out-crit);
   }
 
-  .hero-login__btn:hover {
+  .hero-chat__btn:hover {
     background: var(--accent-hover);
   }
 
-  .hero-login__btn:active {
+  .hero-chat__btn:active {
     transform: scale(0.92);
     transition-duration: var(--dur-press);
+  }
+
+  /* La freccia spinge verso la bolla, come quella della pastiglia fissa —
+     stesso motivo, stesso movimento breve e continuo. */
+  .hero-chat__freccia {
+    flex-shrink: 0;
+    animation: hero-chat-punta 1.4s ease-in-out infinite;
+  }
+
+  @keyframes hero-chat-punta {
+    0%,
+    100% {
+      transform: translateX(-0.06rem);
+    }
+    50% {
+      transform: translateX(0.16rem);
+    }
+  }
+
+  /* I tre punti dentro il fumetto: dicono che dall'altra parte c'è qualcuno,
+     la stessa animazione della pastiglia fissa e del comando della barra. */
+  .hero-chat__punto {
+    animation: hero-chat-punto 1.5s ease-in-out infinite;
+  }
+
+  .hero-chat__punto:nth-of-type(2) {
+    animation-delay: 0.22s;
+  }
+
+  .hero-chat__punto:nth-of-type(3) {
+    animation-delay: 0.44s;
+  }
+
+  @keyframes hero-chat-punto {
+    0%,
+    60%,
+    100% {
+      opacity: 0.4;
+      transform: none;
+    }
+    30% {
+      opacity: 1;
+      transform: translateY(-0.08rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-chat__freccia,
+    .hero-chat__punto {
+      animation: none;
+    }
   }
 
   .scroll-down {
@@ -504,13 +564,15 @@ const prova = trialCta({ source: '/' });
       font-size: var(--text-xl);
     }
 
-    .hero-login__hint,
-    .hero-secondary {
+    .hero-chat__hint {
       color: var(--color-dark);
     }
 
+    /* Il fondo qui sotto è chiaro, non il video: il contorno bianco del
+       pulsante sparirebbe. */
     .hero-secondary {
-      text-decoration-color: rgba(39, 36, 35, 0.4);
+      border-color: var(--color-dark);
+      color: var(--color-dark);
     }
 
     /* Shrinks to the leftover space instead of holding a fixed ratio, which is
@@ -533,6 +595,17 @@ const prova = trialCta({ source: '/' });
       bottom: 0.875rem;
       width: 2.625rem;
       height: 2.625rem;
+    }
+  }
+
+  /* Solo il telefono, non il totem che condivide la stessa media query sopra:
+     a 1080px di larghezza la riga unica ci sta comoda, qui no. */
+  @media (max-width: 700px) {
+    .hero-eyebrow__intera {
+      display: none;
+    }
+    .hero-eyebrow__spezzata {
+      display: inline;
     }
   }
 

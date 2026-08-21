@@ -9,7 +9,7 @@
  *  - `totalLessons()` — 180 lezioni a settimana, su cinque fasce;
  *  - `totalHours()`   — le ore che quelle lezioni occupano;
  *  - `openHours()`    — le ore in cui la Gym Floor è aperta;
- *  - la prima e l'ultima lezione di ogni giornata, per dire da che ora a che ora.
+ *  - `gymFloor.hours` — apertura e chiusura vere, per dire da che ora a che ora.
  *
  * Le due voci sono tenute distinte di proposito: le ore di palinsesto sono
  * lezioni a orario fisso, le ore di sala aperta sono accesso libero. Sommarle in
@@ -22,24 +22,22 @@
  * otto attività comprese in Premium (`abbonamenti.astro`, `plans[].activities`),
  * le cinque famiglie dei corsi (`corsi-fitness.astro`).
  */
-import { bands, totalLessons, totalHours, openHours } from '../../data/planning';
+import { gymFloor, totalLessons, totalHours, openHours } from '../../data/planning';
 
 const lezioni = totalLessons();
 const ore = totalHours();
 const oreSala = openHours();
 
-/* Da che ora a che ora si può fare qualcosa: la prima lezione del palinsesto e
-   l'ultima, lette dal planning invece che ricordate a memoria. */
-const orari = bands.flatMap((b) =>
-  b.days.flatMap((d) => d.classes.map((c) => c.time.replace(/^[A-Za-z]{3}\s*/, '').split(/[–-]/)))
-);
-const prima = orari.map((o) => o[0]).sort()[0];
-const ultima = orari.map((o) => o[1]).sort().at(-1);
+/* Da che ora a che ora si entra: gli orari veri della Gym Floor (la fascia
+   infrasettimanale, che è la più ampia), non la prima e l'ultima lezione del
+   palinsesto — quelle iniziano più tardi e finiscono prima dell'apertura
+   vera, e dirlo così suggeriva un ingresso alle 7 invece che alle 6. */
+const [apertura, chiusura] = gymFloor.hours[0].hours.split(/[–-]/).map((o) => o.trim());
 
 const blocchi = [
   {
     titolo: 'Scegli l’ora',
-    testo: `Il palinsesto va da ${prima} a ${ultima}, e la Gym Floor è aperta ${oreSala} ore a settimana. Prenoti dall’app Athlon Club o dal portale fino a tre giorni prima: ogni fascia ha una capienza definita e mentre prenoti vedi quanti posti restano.`,
+    testo: `Siamo aperti dalle ${apertura} alle ${chiusura}, ${oreSala} ore a settimana di Gym Floor. Prenoti dall’app Athlon Club o dal portale fino a tre giorni prima: ogni fascia ha una capienza definita e mentre prenoti vedi quanti posti restano.`,
   },
   {
     titolo: 'Scegli l’attività',
