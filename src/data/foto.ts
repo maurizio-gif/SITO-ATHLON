@@ -44,11 +44,28 @@ export function urlPiccola(src: string): string {
  * Gli attributi da mettere su un `<img>` che vive in una casella piccola.
  * `sizes` dichiara quanto spazio occupa davvero, altrimenti il browser assume
  * tutta la larghezza della finestra e sceglie sempre l'originale.
+ *
+ * **La `-1280` entra nello `srcset` quando esiste**, e non è un dettaglio: fra
+ * 640 e l'originale c'è un salto, e su uno schermo a doppia densità ci si cade
+ * dentro. Misurato sulle card degli eventi — casella da 406 px, `sizes` da 420,
+ * densità 2× — servono 840 px: la 640 non basta e il browser prendeva
+ * l'originale, 864 kB per una casella da quattro dita. Con la variante media in
+ * mezzo ne scarica un quarto.
+ *
+ * Le foto che non hanno una `-1280` — la maggioranza, perché la genera solo la
+ * lista delle hero — si comportano esattamente come prima: `variante` torna
+ * `null` e il candidato non viene aggiunto.
  */
 export function fotoPiccola(src: string, sizes = '(max-width: 760px) 76vw, 340px') {
   const piccola = variante(src);
   if (!piccola) return {};
-  return { srcset: `${piccola} ${LARGHEZZA}w, ${src} 2560w`, sizes };
+  const media = variante(src, LARGHEZZA_HERO);
+  const fonti = [
+    `${piccola} ${LARGHEZZA}w`,
+    media && `${media} ${LARGHEZZA_HERO}w`,
+    `${src} 2560w`,
+  ].filter(Boolean);
+  return { srcset: fonti.join(', '), sizes };
 }
 
 /**

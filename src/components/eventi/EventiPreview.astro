@@ -4,6 +4,7 @@
  * the club-life hub, so both always show the same next events.
  */
 import { upcomingEvents, formatEventDate, formatEventBadge } from '../../data/eventi';
+import { fotoPiccola } from '../../data/foto';
 
 interface Props {
   limit?: number;
@@ -48,7 +49,15 @@ const events = await upcomingEvents(limit);
               <article class="evcard" data-anim="scale" data-anim-delay={String(i * 100)}>
                 <a class="evcard__link" href={`/eventi/${e.id}`}>
                   <div class="evcard__media">
-                    <img src={e.data.image} alt={e.data.imageAlt ?? e.data.title} loading="lazy" />
+                    {/* La card è larga ~420px: `sizes` lo dichiara, o il
+                        browser assume la finestra intera e prende l'originale
+                        da 2048px per una casella da 406. */}
+                    <img
+                      src={e.data.image}
+                      alt={e.data.imageAlt ?? e.data.title}
+                      loading="lazy"
+                      {...fotoPiccola(e.data.image, '(max-width: 760px) 88vw, 420px')}
+                    />
                     <span class="evcard__date">
                       <span class="evcard__day u-display">{badge.day}</span>
                       <span class="evcard__month">{badge.month}</span>

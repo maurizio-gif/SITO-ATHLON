@@ -24,7 +24,7 @@
  * Non è nella pipeline di build di proposito — su Vercel farebbe scaricare sharp
  * a ogni deploy per rigenerare file che non cambiano.
  */
-import { readFile, rm, stat } from 'node:fs/promises';
+import { readdir, readFile, rm, stat } from 'node:fs/promises';
 import { join, dirname, extname, basename } from 'node:path';
 import sharp from 'sharp';
 
@@ -64,7 +64,13 @@ const FONTI = {
     { file: 'src/pages/reformer.astro', chiave: 'rf-hero' },
     { file: 'src/pages/club-life.astro', chiave: 'cl-hero' },
     { file: 'src/pages/corsi-fitness.astro', chiave: 'cf-hero' },
+    { file: 'src/pages/lavora.astro', chiave: 'lv-hero' },
   ],
+  /* Le foto di news ed eventi sono hero anche loro — le pagine di dettaglio le
+     passano da `fotoHero` — ma non stanno in un file: sono il campo `image:` di
+     ogni markdown della collezione, e chi scrive da Tina ne aggiunge una senza
+     toccare il codice. Quindi la cartella, non l'elenco. */
+  heroCartelle: ['src/content/news', 'src/content/eventi'],
 };
 
 const RE_FOTO = /\/wp-content\/uploads\/[\w./-]+\.(?:jpe?g|png|webp)/gi;
@@ -103,6 +109,16 @@ async function fotoHero() {
       if (i === -1) continue;
       const [primo] = daTesto(s.slice(i, i + 400));
       if (primo) trovate.add(primo);
+    }
+  }
+  for (const cartella of FONTI.heroCartelle) {
+    for (const nome of await readdir(cartella)) {
+      /* I `._*` sono i sidecar che exFAT semina accanto a ogni file: non sono
+         markdown e leggerli non darebbe niente di utile. */
+      if (!nome.endsWith('.md') || nome.startsWith('._')) continue;
+      const s = await readFile(join(cartella, nome), 'utf8');
+      const m = s.match(/^image:\s*["']?(\/wp-content\/[^"'\s]+)["']?/m);
+      if (m) trovate.add(m[1]);
     }
   }
   return trovate;

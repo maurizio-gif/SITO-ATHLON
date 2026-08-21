@@ -85,9 +85,17 @@ blocco dei tag sopra. */
   margin: 34px 0;
 }
 
+/* `height: auto` non è ridondante: `global.css` dà a ogni `img` un
+   `max-width: 100%`, e quando quello stringe la larghezza l'altezza resta
+   quella dell'attributo `height` — che una foto nella prosa porta per
+   riservare lo spazio ed evitare il salto di layout. Il render della vasca
+   grande, 1672×941, sul telefono usciva 347×941: schiacciato in orizzontale
+   e allungato in verticale. Con `auto` la proporzione la ricalcola il
+   browser, e l'attributo continua a fare il suo lavoro. */
 .prosa img {
   border-radius: var(--radius);
   margin: 20px 0;
+  height: auto;
 }
 
 .prosa blockquote {
