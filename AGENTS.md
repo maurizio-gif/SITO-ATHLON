@@ -838,7 +838,39 @@ npx tinacms build --local --skip-cloud-checks --skip-search-index
 
 **`tina/tina-lock.json` invece si committa**, ed è l'unica eccezione: è il file
 con cui TinaCloud indicizza il contenuto del repository, e senza di lui il
-pannello si apre su un archivio vuoto. Lo genera `tinacms dev` (o un
-`tinacms build` con il token), quindi **dopo ogni modifica a `tina/config.ts`**
-va rigenerato e committato insieme al resto: un lock che descrive uno schema
-diverso da quello vero è un pannello che mostra campi che non esistono.
+pannello si apre su un archivio vuoto. Un lock che descrive uno schema diverso
+da quello vero è un pannello che mostra campi che non esistono — e, dal
+momento in cui il build di produzione compila il pannello, è **`/admin` che non
+c'è**: `tinacms build` confronta lo schema locale col remoto e si ferma con
+*«The local Tina schema doesn't match the remote Tina schema»*.
+
+**Non basta guardare `tina/`, e questo è il punto che è costato.** Lo schema del
+pannello non sta tutto in `tina/config.ts`: le tendine le popolano i dati —
+`SALE` per la sala di una lezione, `ACTIVITY_TAGS` per l'attività. Quindi
+rinominare una sala in `src/data/sale.ts` **cambia lo schema di Tina** da un
+commit che non tocca `tina/` nemmeno di striscio. È esattamente come si è rotto:
+`Vasca Media` → `Vasca Piccola` nel commit della vasca piccola, lock non
+rigenerato, pannello giù per due giorni senza che nessuna pagina pubblica se ne
+accorgesse. Il `git log -- tina/` non lo trova: **cerca chi tocca i dati che
+alimentano lo schema**.
+
+E un reindex da TinaCloud non lo sistema: quello reindicizza i *contenuti*, e lo
+schema remoto lo aggiorna un `tinacms build` autenticato — cioè proprio quello
+che si è fermato. Va rotto dal lato del repository.
+
+Rigenerarlo **non richiede credenziali né rete**, benché la strada ovvia sia
+`tinacms dev`. Il lock è la composizione di tre file che il build locale scrive
+già in `tina/__generated__/`:
+
+```
+npx tinacms build --local --skip-cloud-checks --skip-search-index
+python3 -c "import json;print(json.dumps({k:json.load(open(f'tina/__generated__/_{k}.json',encoding='utf-8')) for k in ('schema','lookup','graphql')},separators=(',',':'),ensure_ascii=False),end='')" > tina/tina-lock.json
+```
+
+Le tre chiavi in quell'ordine, minificato, senza newline finale e senza
+`\uXXXX`: è la forma esatta del file, e il diff che ne esce va letto — se
+contiene più della modifica che stavi facendo, la ricostruzione non è fedele e
+il lock non si committa.
+
+La verifica è **il log del deploy di produzione**, non il fatto che il sito sia
+salito: il sito sale comunque, per costruzione.
