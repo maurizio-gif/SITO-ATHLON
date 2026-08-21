@@ -1,0 +1,591 @@
+---
+/**
+ * «Lavora con noi»: le posizioni aperte e il form che raccoglie i curriculum.
+ *
+ * Sostituisce il Typeform `AthlonCV`, che faceva le stesse domande in sei
+ * schermate una alla volta. Le stesse domande stanno qui in una pagina sola,
+ * e la ragione non è estetica: da un Typeform i dati escono su Typeform, e
+ * questo sito ha un database suo — la candidatura finisce su Supabase
+ * (`app-athlon`, tabella `candidature`) e il curriculum arriva in allegato al
+ * club.
+ *
+ * **Qui non si traccia niente, ed è deliberato.** Nessun `vid`, nessuna UTM,
+ * nessun aggancio all'anagrafica `utenti`: chi manda un curriculum non è un
+ * lead. Le altre tabelle del sito servono a capire da quale campagna arriva un
+ * contatto commerciale; su una candidatura quella domanda non ha senso, e la
+ * risposta sarebbe un dato personale raccolto per niente. `candidature` è una
+ * tabella a sé, senza trigger e senza `utente_id`, ed è così che deve restare.
+ *
+ * Le posizioni le tiene `data/lavora.ts`, una volta sola: le legge l'elenco qui
+ * sotto e le legge la tendina del form. Se l'elenco è vuoto la pagina non si
+ * rompe — mostra la candidatura spontanea, che è comunque il caso che il club
+ * vuole raccogliere tutto l'anno.
+ */
+import Layout from '../layouts/Layout.astro';
+import CampoTelefono from '../components/CampoTelefono.astro';
+import { POSIZIONI, SPONTANEA, CV_MAX_BYTE, CV_TIPI, ENDPOINT_CANDIDATURA } from '../data/lavora';
+import { CLUB } from '../data/club';
+
+const CI_SONO_POSIZIONI = POSIZIONI.length > 0;
+---
+
+<Layout
+  title="Lavora con noi | Posizioni aperte | Athlon Club Roma"
+  description="Le posizioni aperte di Athlon Club a Roma e il modulo per candidarti: lasci i tuoi dati, alleghi il curriculum e ti ricontattiamo noi."
+  breadcrumb={[{ name: 'Lavora con noi', path: '/lavora' }]}
+>
+  <section class="lv-hero">
+    <div class="container lv-hero__inner">
+      <span class="eyebrow" data-anim="from-left">Lavora con noi</span>
+      <h1 class="lv-hero__titolo">Vieni a lavorare<br /><em class="accent">in Athlon.</em></h1>
+      <p class="lv-hero__lede">
+        Un club è le persone che ci stanno dentro: chi accoglie in reception, chi corregge una
+        posizione in sala, chi tiene l'acqua pulita. Se ti va di essere una di quelle persone,
+        raccontaci chi sei.
+      </p>
+      <a class="btn btn-primary lv-hero__cta" href="#candidati">Mandaci il tuo CV →</a>
+    </div>
+  </section>
+
+  <section class="lv-sec" id="posizioni">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Posizioni aperte</span>
+
+      {CI_SONO_POSIZIONI ? (
+        <>
+          <h2 class="lv-sec__titolo" data-anim="reveal">Chi stiamo cercando.</h2>
+          <ul class="lv-posizioni">
+            {POSIZIONI.map((p) => (
+              <li class="lv-posizione">
+                <div class="lv-posizione__testa">
+                  <h3 class="lv-posizione__titolo">{p.titolo}</h3>
+                  {(p.impegno || p.area) && (
+                    <p class="lv-posizione__meta">
+                      {[p.area, p.impegno].filter(Boolean).join(' · ')}
+                    </p>
+                  )}
+                </div>
+                <p class="lv-posizione__testo">{p.descrizione}</p>
+                {p.requisiti && p.requisiti.length > 0 && (
+                  <ul class="lv-posizione__requisiti">
+                    {p.requisiti.map((r) => <li>{r}</li>)}
+                  </ul>
+                )}
+                {/* Il comando porta al form e gli preseleziona la posizione:
+                    chi ha appena letto un annuncio non deve ritrovarlo in una
+                    tendina. */}
+                <a class="lv-posizione__cta" href="#candidati" data-lv-scegli={p.id}>
+                  Candidati per questo ruolo →
+                </a>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <>
+          <h2 class="lv-sec__titolo" data-anim="reveal">Nessun annuncio aperto adesso.</h2>
+          {/* Un elenco vuoto detto per intero, e non nascosto: «al momento non
+              cerchiamo» è un'informazione, «questa pagina non dice niente» no.
+              E la candidatura spontanea non è un premio di consolazione — al
+              club serve un archivio da cui pescare il giorno che qualcuno se ne
+              va, che è sempre il giorno in cui non c'è tempo di cercare. */}
+          <p class="lv-sec__sub">
+            Non abbiamo posizioni pubblicate in questo momento, ma il curriculum mandalo lo stesso:
+            lo teniamo, e quando si apre qualcosa la prima cosa che facciamo è guardare chi si è
+            già presentato.
+          </p>
+        </>
+      )}
+    </div>
+  </section>
+
+  <section class="lv-sec lv-sec--form" id="candidati">
+    <div class="container lv-form__wrap">
+      <span class="eyebrow" data-anim="from-left">Candidati</span>
+      <h2 class="lv-sec__titolo" data-anim="reveal">Raccontaci chi sei.</h2>
+      <p class="lv-sec__sub">
+        Cinque minuti, e li leggiamo tutti. Le due domande aperte contano più del curriculum:
+        è lì che si capisce con chi stiamo parlando.
+      </p>
+
+      <form class="lv-form" novalidate data-lv-form>
+        <div class="lv-campo">
+          <label class="lv-label" for="lv-posizione">Per quale posizione ti candidi?</label>
+          {CI_SONO_POSIZIONI ? (
+            <select class="lv__input" id="lv-posizione" name="posizione" data-lv-posizione>
+              <option value="">Scegli…</option>
+              {POSIZIONI.map((p) => <option value={p.titolo} data-id={p.id}>{p.titolo}</option>)}
+              <option value={SPONTANEA.titolo}>{SPONTANEA.titolo}</option>
+            </select>
+          ) : (
+            /* Senza annunci la tendina avrebbe una voce sola, che è un comando
+               travestito da scelta. Meglio il campo libero: è quello che
+               chiedeva anche il Typeform. */
+            <input
+              class="lv__input"
+              id="lv-posizione"
+              name="posizione"
+              type="text"
+              autocomplete="off"
+              placeholder="Il ruolo che ti interessa — o «candidatura spontanea»"
+              data-lv-posizione
+            />
+          )}
+        </div>
+
+        <div class="lv-coppia">
+          <div class="lv-campo">
+            <label class="lv-label" for="lv-nome">Nome</label>
+            <input class="lv__input" id="lv-nome" name="nome" type="text"
+              autocomplete="given-name" placeholder="Mario" />
+          </div>
+          <div class="lv-campo">
+            <label class="lv-label" for="lv-cognome">Cognome</label>
+            <input class="lv__input" id="lv-cognome" name="cognome" type="text"
+              autocomplete="family-name" placeholder="Rossi" />
+          </div>
+        </div>
+
+        <div class="lv-campo">
+          <label class="lv-label" for="lv-email">Email</label>
+          {/* Niente `data-email-nota`: quel meccanismo ricorda l'indirizzo di
+              chi chiede una prova, e una candidatura non è la stessa persona
+              né lo stesso consenso. */}
+          <input class="lv__input" id="lv-email" name="email" type="email"
+            inputmode="email" autocomplete="email" placeholder="mario.rossi@email.it" />
+        </div>
+
+        <div class="lv-campo">
+          <label class="lv-label" for="lv-cellulare">Cellulare</label>
+          <CampoTelefono id="lv-cellulare" classe="lv__input" />
+        </div>
+
+        <div class="lv-campo lv-campo--stretto">
+          <label class="lv-label" for="lv-nascita">Data di nascita</label>
+          <input class="lv__input" id="lv-nascita" name="dataNascita" type="date"
+            autocomplete="bday" />
+        </div>
+
+        <div class="lv-campo">
+          <label class="lv-label" for="lv-esperienza">
+            Hai già avuto esperienze simili? Raccontaci cosa facevi.
+          </label>
+          <p class="lv-aiuto" id="lv-esperienza-aiuto">
+            Se non hai esperienza, raccontaci perché ti piacerebbe iniziare proprio da qui.
+          </p>
+          <textarea class="lv__input lv__area" id="lv-esperienza" name="esperienza" rows="4"
+            aria-describedby="lv-esperienza-aiuto"
+            placeholder="Due anni in una piscina comunale, turni del mattino…"></textarea>
+        </div>
+
+        <div class="lv-campo">
+          <label class="lv-label" for="lv-motivazione">
+            Perché pensi di essere la persona giusta?
+          </label>
+          <p class="lv-aiuto" id="lv-motivazione-aiuto">
+            Scrivi le due o tre caratteristiche che secondo te contano di più in questo ruolo.
+          </p>
+          <textarea class="lv__input lv__area" id="lv-motivazione" name="motivazione" rows="4"
+            aria-describedby="lv-motivazione-aiuto"
+            placeholder="Sto bene con le persone, e non mi pesa il turno delle sei…"></textarea>
+        </div>
+
+        <div class="lv-campo">
+          <label class="lv-label" for="lv-cv">Il tuo curriculum</label>
+          <input class="lv__input lv__file" id="lv-cv" type="file" accept={CV_TIPI}
+            aria-describedby="lv-cv-aiuto" data-lv-cv />
+          <p class="lv-aiuto" id="lv-cv-aiuto">PDF o Word, fino a 5 MB.</p>
+        </div>
+
+        <label class="lv-consenso">
+          <input type="checkbox" data-lv-consenso />
+          <span>
+            Ho letto <a href="/privacy">l'informativa privacy</a> e autorizzo {CLUB.legale.ragione}
+            a trattare i miei dati per valutare questa candidatura.
+          </span>
+        </label>
+
+        <button class="btn btn-primary lv-invia" type="submit">Manda la candidatura →</button>
+        <p class="lv-esito" role="status" aria-live="polite" data-lv-esito></p>
+      </form>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  import { validaTelefono } from '../data/prefissi';
+  import { CV_MAX_BYTE, ENDPOINT_CANDIDATURA } from '../data/lavora';
+
+  const form = document.querySelector<HTMLFormElement>('[data-lv-form]');
+  const esito = document.querySelector<HTMLParagraphElement>('[data-lv-esito]');
+  const campoCv = document.querySelector<HTMLInputElement>('[data-lv-cv]');
+  const consenso = document.querySelector<HTMLInputElement>('[data-lv-consenso]');
+  const posizione = document.querySelector<HTMLSelectElement | HTMLInputElement>('[data-lv-posizione]');
+
+  /** Il file in base64, senza il prefisso `data:` che il webhook non usa. */
+  const leggiBase64 = (f: File) =>
+    new Promise<string>((risolvi, rifiuta) => {
+      const r = new FileReader();
+      r.onload = () => {
+        const s = String(r.result || '');
+        const virgola = s.indexOf(',');
+        risolvi(virgola >= 0 ? s.slice(virgola + 1) : s);
+      };
+      r.onerror = () => rifiuta(r.error);
+      r.readAsDataURL(f);
+    });
+
+  const di = (sel: string) => document.querySelector<HTMLInputElement | HTMLTextAreaElement>(sel);
+  const val = (sel: string) => (di(sel)?.value || '').trim();
+
+  const dire = (testo: string, tipo: '' | 'ok' | 'err') => {
+    if (!esito) return;
+    esito.textContent = testo;
+    esito.dataset.tipo = tipo;
+  };
+
+  /* I comandi degli annunci portano al form e gli preselezionano la posizione:
+     chi ha appena letto «Istruttore di sala» non deve ritrovarlo in una
+     tendina. Funziona solo quando la tendina c'è; col campo libero lo si
+     scrive, e va bene lo stesso. */
+  document.querySelectorAll<HTMLAnchorElement>('[data-lv-scegli]').forEach((a) => {
+    a.addEventListener('click', () => {
+      const titolo = a.closest('.lv-posizione')?.querySelector('.lv-posizione__titolo')?.textContent;
+      if (posizione && titolo) posizione.value = titolo.trim();
+    });
+  });
+
+  if (form) {
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+
+      const nome = val('#lv-nome');
+      const cognome = val('#lv-cognome');
+      const email = val('#lv-email');
+      const ruolo = (posizione?.value || '').trim();
+
+      if (!ruolo) return dire('Dicci per quale posizione ti candidi.', 'err');
+      if (!nome || !cognome) return dire('Servono nome e cognome.', 'err');
+      if (!/^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$/.test(email)) {
+        return dire('Controlla l’indirizzo email.', 'err');
+      }
+
+      /* Il numero non si legge dal campo: quello è come l'ha scritto la
+         persona. La tendina sta in `#lv-cellulare-prefisso` e la composizione
+         la fa `validaTelefono`, come in ogni altro form del sito. */
+      const pref = document.querySelector<HTMLSelectElement>('#lv-cellulare-prefisso');
+      const tel = validaTelefono(pref?.value || '+39', val('#lv-cellulare'));
+      if (!tel.ok) return dire(tel.motivo || 'Controlla il numero di cellulare.', 'err');
+
+      if (!consenso?.checked) {
+        return dire('Serve il consenso al trattamento dei dati per proseguire.', 'err');
+      }
+
+      /* Il tetto si controlla qui, prima di leggere il file: un rifiuto
+         immediato è più gentile di trenta secondi di caricamento che finiscono
+         in un errore. */
+      const cv = campoCv?.files?.[0] || null;
+      if (cv && cv.size > CV_MAX_BYTE) {
+        return dire(
+          `Il curriculum è troppo grande (${(cv.size / 1024 / 1024).toFixed(1)} MB): il limite è 5 MB.`,
+          'err'
+        );
+      }
+
+      const btn = form.querySelector<HTMLButtonElement>('.lv-invia');
+      if (btn) btn.disabled = true;
+      dire('Invio in corso…', '');
+
+      try {
+        /* Nessun `vid`, nessuna UTM, nessun `origine`: una candidatura non è un
+           lead e non si traccia. Se un giorno qualcuno li aggiunge qui, li
+           aggiunge anche alla tabella — e quella è fatta apposta per non
+           averli. */
+        const dati: Record<string, unknown> = {
+          posizione: ruolo,
+          nome,
+          cognome,
+          email: email.toLowerCase(),
+          cellulare: tel.e164,
+          dataNascita: val('#lv-nascita') || null,
+          esperienza: val('#lv-esperienza'),
+          motivazione: val('#lv-motivazione'),
+          consenso: true,
+          pagina: location.pathname,
+        };
+
+        /* Il campo file non ha `name` e non passa da `FormData`: un `File`
+           dentro `JSON.stringify` diventa `{}`, cioè un campo che sembra
+           inviato e non contiene niente. I quattro pezzi si aggiungono a mano. */
+        if (cv) {
+          dati.cvNome = cv.name;
+          dati.cvTipo = cv.type || 'application/octet-stream';
+          dati.cvPeso = cv.size;
+          dati.cvBase64 = await leggiBase64(cv);
+        }
+
+        const res = await fetch(ENDPOINT_CANDIDATURA, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dati),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        form.reset();
+        dire('Ricevuta. Se il profilo ci interessa ti scriviamo noi.', 'ok');
+      } catch {
+        dire('Non è stato possibile inviare. Riprova fra poco.', 'err');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    });
+  }
+</script>
+
+<style>
+  .lv-hero {
+    padding: var(--space-section-md) 0 var(--space-section-sm);
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .lv-hero__inner {
+    max-width: 46rem;
+  }
+
+  .lv-hero__titolo {
+    font-size: var(--text-3xl);
+    --lh: 0.95;
+    margin: 0.5rem 0 1rem;
+  }
+
+  .lv-hero__lede {
+    margin: 0 0 1.75rem;
+    font-size: var(--text-base);
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .lv-hero__cta {
+    font-size: var(--text-sm);
+  }
+
+  .lv-sec {
+    padding: var(--space-section-sm) 0;
+  }
+
+  .lv-sec--form {
+    background: var(--color-sand, #eeeae3);
+  }
+
+  .lv-sec__titolo {
+    font-size: var(--text-2xl);
+    --lh: 1;
+    margin: 0.5rem 0 0.75rem;
+  }
+
+  .lv-sec__sub {
+    margin: 0 0 1.5rem;
+    max-width: 46rem;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  /* Le schede si dimensionano da sole: con il minimo in rem la griglia perde
+     una colonna quando la radice cresce, sul totem e sul televisore, senza
+     bisogno di una media query. */
+  .lv-posizioni {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    gap: 1rem;
+  }
+
+  .lv-posizione {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-strong, rgba(39, 36, 35, 0.12));
+    border-radius: 1rem;
+    background: var(--color-white);
+  }
+
+  .lv-posizione__titolo {
+    font-size: var(--text-lg);
+    --lh: 1.05;
+    margin: 0;
+  }
+
+  .lv-posizione__meta {
+    margin: 0.25rem 0 0;
+    font-size: var(--text-2xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .lv-posizione__testo {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: 1.65;
+    color: var(--text-muted);
+  }
+
+  .lv-posizione__requisiti {
+    margin: 0;
+    padding-left: 1.1rem;
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  /* Nella lista dei comandi a forma di link di `global.css` non c'è, quindi
+     l'altezza da dito se la prende qui: `inline-flex` e non `inline`, o il
+     padding verticale non riserva spazio e il bersaglio resta alto quanto il
+     testo. */
+  .lv-posizione__cta {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    min-height: 2.75rem;
+    padding: 0.5rem 0;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  .lv-form__wrap {
+    max-width: 46rem;
+  }
+
+  .lv-campo {
+    margin-bottom: 1.25rem;
+  }
+
+  .lv-campo--stretto {
+    max-width: 16rem;
+  }
+
+  .lv-coppia {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  /* `1 1 0` e non `auto`: con `auto` il campo col segnaposto più lungo si
+     prende più spazio dell'altro. */
+  .lv-coppia > .lv-campo {
+    flex: 1 1 0;
+    min-width: 12rem;
+  }
+
+  .lv-label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-dark);
+  }
+
+  .lv-aiuto {
+    margin: -0.125rem 0 0.5rem;
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    color: var(--text-muted);
+  }
+
+  /* Questi selettori sono `:global` per una ragione sola: il campo telefono lo
+     rende `CampoTelefono.astro`, quindi il suo `select` e il suo `input`
+     portano l'ambito di *quel* componente. Una regola con ambito scritta qui
+     diventerebbe `.lv__input[data-astro-cid-…]` e non li raggiungerebbe mai —
+     passare la classe al componente non basta, perché a non attraversare il
+     confine è la regola, non la classe. */
+  :global(.lv__input) {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(39, 36, 35, 0.18);
+    border-radius: 0.75rem;
+    background: var(--color-white);
+    color: var(--color-dark);
+    font-family: var(--font-body);
+    /* 1rem tondo: sotto i 16px iOS ingrandisce la pagina al focus. */
+    font-size: 1rem;
+  }
+
+  :global(.lv__input)::placeholder {
+    color: rgba(39, 36, 35, 0.38);
+  }
+
+  :global(.lv__input):focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(255, 87, 1, 0.15);
+  }
+
+  .lv__area {
+    min-height: 7rem;
+    line-height: 1.6;
+    resize: vertical;
+  }
+
+  .lv__file {
+    padding: 0.75rem;
+  }
+
+  .lv__file::file-selector-button {
+    margin-right: 0.75rem;
+    padding: 0.5rem 0.9rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: var(--color-dark);
+    color: var(--color-white);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    cursor: pointer;
+  }
+
+  .lv-consenso {
+    display: flex;
+    gap: 0.625rem;
+    align-items: start;
+    margin: 0.5rem 0 1.25rem;
+    font-size: var(--text-xs);
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  .lv-consenso input {
+    flex: none;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-top: 0.1rem;
+    accent-color: var(--color-primary);
+  }
+
+  .lv-invia {
+    font-size: var(--text-sm);
+  }
+
+  .lv-esito {
+    margin: 0.875rem 0 0;
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    min-height: 1.25rem;
+  }
+
+  .lv-esito[data-tipo='ok'] {
+    color: #1b7f3b;
+  }
+
+  .lv-esito[data-tipo='err'] {
+    color: #d92d20;
+  }
+</style>

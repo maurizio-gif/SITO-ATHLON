@@ -1023,6 +1023,37 @@ fonte `eventi_email` sono **tocchi e non richieste** — una verifica di email n
 è una conversione: `utenti_completi.richieste` le esclude, `attivita_totali` le
 conta.
 
+### Le candidature sono l'eccezione: niente tracciamento, niente anagrafica
+
+`/lavora` raccoglie i curriculum e sostituisce il Typeform `AthlonCV`, che
+faceva le stesse domande in sei schermate. Il workflow è `athlon-candidatura`:
+scrive su `candidature` e manda a `valentina@athlonroma.it` l'email con i dati
+e il curriculum in allegato.
+
+**È l'unica tabella del sito che sta fuori da tutto il resto**, e non è una
+dimenticanza: nessun `vid`, nessuna UTM, nessuna `utente_id`, nessun trigger
+`assegna_utente`. Chi manda un curriculum non è un lead. Le altre tabelle
+servono a capire da quale campagna arriva un contatto commerciale; su una
+candidatura quella domanda non ha senso e la risposta sarebbe un dato personale
+raccolto per niente. Sono anche dati di categoria diversa — una storia
+lavorativa e un giudizio su di sé — e non devono finire nella scheda che la
+segreteria apre per vendere un abbonamento. Se qualcuno aggiunge il
+tracciamento al form, va tolto: la tabella non ha le colonne apposta, e il Code
+node li ferma comunque.
+
+**Il curriculum viaggia in allegato e non in una colonna.** Nella riga restano
+nome, tipo e peso, come per l'allegato dell'Help Desk: il base64 in `payload`
+sarebbero megabyte per riga. `cv_url` esiste già vuota, ed è il posto dove
+finirà il link il giorno che il file andrà su Supabase Storage — così quel
+passaggio non chiederà una migrazione.
+
+**Le posizioni aperte stanno in `src/data/lavora.ts`**, una volta sola: le legge
+l'elenco della pagina e le legge la tendina del form, e da due posti diversi
+divergerebbero. L'elenco vuoto è uno stato legittimo e la pagina lo dice per
+intero — la candidatura spontanea resta, ed è quella che al club serve tutto
+l'anno. **Un annuncio inventato è peggio di un annuncio assente**: manda una
+persona a scrivere una lettera per un posto che non esiste.
+
 ### Un nodo Supabase in bozza non scrive niente
 
 Questa istanza n8n ha bozze e versioni pubblicate, e **`update_workflow` non
