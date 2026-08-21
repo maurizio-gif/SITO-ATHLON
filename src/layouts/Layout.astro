@@ -104,6 +104,46 @@ const graph = [
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    {/* ── Google Consent Mode v2: lo stato di default ────────────────────────
+
+        **Il primissimo script della pagina, e l'ordine è la sostanza.** Se GTM
+        partisse prima di questo, Google considererebbe il consenso concesso e
+        traccerebbe senza autorizzazione: il default non è un valore iniziale
+        qualsiasi, è la sola cosa che vale finché il banner non parla.
+
+        Tutto negato tranne il necessario. GTM si carica comunque — non è più
+        bloccato, e non deve esserlo: legge «negato» e resta in modalità senza
+        cookie, mandando ping anonimi con cui Google stima le conversioni di chi
+        rifiuta, invece di perderle come col blocco totale dello script.
+
+        `wait_for_update: 500` dà mezzo secondo a CookieYes per ripristinare la
+        scelta di chi ha già acconsentito in una visita precedente: senza, i
+        primi eventi partirebbero da «negato» anche per chi aveva detto sì.
+
+        `functionality_storage` è concesso di default perché copre ciò che serve
+        a far funzionare il sito. Lo storage nostro governato dal consenso
+        `functional` — l'email ricordata — non passa da qui: lo decide
+        `quandoConsentito()` in `scripts/consenso.ts`, che legge CookieYes
+        direttamente. Questi segnali parlano solo ai tag di Google.
+
+        Il ponte che traduce le categorie del banner in questi segnali sta in
+        `scripts/consenso.ts`, dove i listener di CookieYes già vivono: vedi lì
+        il perché non lo si delega all'integrazione nativa di CookieYes. */}
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { window.dataLayer.push(arguments); }
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'denied',
+        personalization_storage: 'denied',
+        functionality_storage: 'granted',
+        security_storage: 'granted',
+        wait_for_update: 500,
+      });
+    </script>
+
     {/* Il banner del consenso, e sta **sopra** GTM perché è lui a dire a GTM
         cosa può fare: Consent Mode vuole lo stato di default — tutto negato —
         prima che gtm.js parta. Invertirli vuol dire un istante in cui i tag
@@ -201,11 +241,18 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })} />
   </head>
   <body>
-    {/* La controparte senza JavaScript dello snippet qui sopra. Prima riga del
-        body perché è lì che Google la vuole, e resta invisibile: un iframe 0×0
-        con `display: none`. */}
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T4J5G7D"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    {/* L'iframe `<noscript>` di GTM **non c'è, ed è deliberato.**
+
+        Era la controparte senza JavaScript dello snippet nel `<head>`, e con il
+        Consent Mode diventa una porta aperta: il gating non lo fa più il blocco
+        dello script, lo fa lo stato di consenso — che è JavaScript. Senza
+        JavaScript quello stato non esiste, quindi quell'iframe caricherebbe GTM
+        **scavalcando il consenso**, che è esattamente ciò che il Consent Mode
+        serve a impedire.
+
+        Il prezzo è nullo: senza JavaScript la misurazione sarebbe comunque
+        quasi inesistente. La stessa scelta del sito del Tennis Club
+        Ambrosiano, da cui questo impianto è stato portato. */}
 
     {chrome && <Header />}
     <main>

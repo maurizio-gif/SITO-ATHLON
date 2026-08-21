@@ -68,9 +68,10 @@ rendering, per PageSpeed.
 ## Il solo terzo dominio nel `<head>` è Google Tag Manager
 
 Container `GTM-T4J5G7D`, e sta in `Layout.astro` — che è il solo layout del
-sito, quindi tutte le route pubbliche ce l'hanno per costruzione. Due pezzi: lo
-snippet subito dopo `charset` e `viewport`, l'iframe `<noscript>` come prima
-riga del `<body>`.
+sito, quindi tutte le route pubbliche ce l'hanno per costruzione. Lo snippet
+viene dopo `charset`, `viewport`, **lo stato di default del Consent Mode** e il
+banner del consenso: quell'ordine è la sostanza, e il perché sta nella sezione
+sul Consent Mode qui sotto.
 
 - **Non contraddice la regola qui sopra**, e la distinzione è quella che conta:
   lo snippet è inline, e il `gtm.js` che inserisce è `async`. Niente blocca il
@@ -84,14 +85,67 @@ riga del `<body>`.
 - **I tag non si aggiungono qui, si aggiungono da GTM.** È il motivo per cui il
   container esiste: un secondo script di tracciamento nel layout è un tag che
   GTM non sa di avere e che nessuno può spegnere senza un deploy.
+- **L'iframe `<noscript>` non c'è più, ed è deliberato.** Era la controparte
+  senza JavaScript dello snippet, prima riga del `<body>`. Con il Consent Mode
+  diventa una porta aperta: il gating non lo fa più il blocco dello script, lo
+  fa lo stato di consenso — che è JavaScript. Senza JavaScript quello stato non
+  esiste, quindi quell'iframe caricherebbe GTM **scavalcando il consenso**. Il
+  prezzo è nullo: senza JavaScript la misurazione è comunque quasi inesistente.
 - Le **pagine di reindirizzamento** generate dai `redirects` di
   `astro.config.mjs` non ce l'hanno, e va bene: sono quattrocento byte di
   `meta refresh` verso una pagina che invece ce l'ha.
 
 Per verificare: su ogni pagina del `dist`, lo snippet sta nel `<head>` preceduto
-solo dai due `meta` **e dal banner del consenso**, e il `<noscript>` è il primo
-figlio del `<body>`. In un browser, `window.dataLayer` è un array con dentro
-l'evento `gtm.js` e lo script iniettato porta `async`.
+solo dai due `meta`, **dallo stato di default del Consent Mode e dal banner del
+consenso**, e da nessun altro. In un browser, `window.dataLayer` è un array con
+dentro l'evento `gtm.js`, lo script iniettato porta `async`, e non esiste alcun
+`googletagmanager.com/ns.html` in pagina.
+
+### Il Consent Mode v2, e il ponte che lo comanda
+
+Portato dal sito del Tennis Club Ambrosiano, dove era già in produzione. Tre
+pezzi, e l'ordine fra i primi due non è negoziabile:
+
+1. **Lo stato di default**, primissimo script del `<head>`, prima di CookieYes e
+   di GTM. Tutto negato tranne `functionality_storage` e `security_storage`.
+   Se GTM partisse prima, Google considererebbe il consenso concesso: il
+   default non è un valore iniziale qualsiasi, è la sola cosa che vale finché
+   il banner non parla. `wait_for_update: 500` dà mezzo secondo a CookieYes per
+   ripristinare la scelta di una visita precedente, o i primi eventi
+   partirebbero da «negato» anche per chi aveva detto sì.
+2. **GTM non è più bloccato, e non deve esserlo.** Legge «negato» e resta in
+   modalità senza cookie, mandando ping anonimi con cui Google stima le
+   conversioni di chi rifiuta — invece di perderle come col blocco totale
+   dello script. È l'approccio che Google raccomanda e il solo che permette la
+   modellazione delle conversioni.
+3. **Il ponte** sta in `scripts/consenso.ts`, dentro `rivaluta()`, e traduce le
+   categorie del banner nei cinque segnali che GA4 e Ads leggono:
+   `advertisement` governa i quattro pubblicitari più `personalization_storage`,
+   `analytics` il solo `analytics_storage`.
+
+Tre cose da sapere prima di toccarlo:
+
+- **Nel pannello CookieYes il Consent Mode nativo va lasciato disattivato.** Il
+  fornitore lo offre, ma dipende dal piano e due sorgenti che mandano gli stessi
+  segnali sono due sorgenti che prima o poi divergono.
+- **Si passa dalla `gtag()` globale, non da un `dataLayer.push()` scritto a
+  mano.** `gtag()` mette nella coda l'oggetto `arguments`, ed è quella forma che
+  GTM riconosce come comando di consenso: un array o un oggetto semplice con le
+  stesse chiavi finisce in coda come un evento qualsiasi e viene ignorato in
+  silenzio, che è il modo peggiore di sbagliare.
+- **Il comando si manda solo quando lo stato cambia.** `rivaluta()` è chiamata
+  anche dalla rete di sicurezza — ogni mezzo secondo per venti secondi — e senza
+  il confronto con l'ultimo stato spedito il `dataLayer` riceveva quaranta
+  comandi identici.
+
+`functionality_storage` non si aggiorna e resta concesso dal default: lo storage
+funzionale di questo sito — l'email ricordata — non lo decide un tag di Google
+ma `quandoConsentito('functional', …)`, che legge CookieYes direttamente.
+
+Per verificare, in un browser: `window.dataLayer` contiene esattamente **due**
+comandi `consent` al caricamento, `default` e `update`; dando il consenso dal
+banner ne arriva **un terzo** con i segnali a `granted`. Con
+`window.athlonStatoConsenso()` si legge cosa vede l'adattatore.
 
 ### Il consenso è un interruttore solo, e si chiama `COOKIEYES_KEY`
 

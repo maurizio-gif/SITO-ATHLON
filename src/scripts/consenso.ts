@@ -96,7 +96,61 @@ export function quandoConsentito(categoria: Categoria, azione: () => void): void
   rimandate.set(categoria, coda);
 }
 
+/**
+ * Il ponte verso il Google Consent Mode.
+ *
+ * Traduce le categorie del banner nei segnali che GTM, GA4 e Ads leggono. Lo
+ * stato di default — tutto negato — lo dichiara `Layout.astro` come primissimo
+ * script; questo lo aggiorna quando il visitatore sceglie.
+ *
+ * **Sta qui e non nell'integrazione nativa di CookieYes**, che il pannello del
+ * fornitore offre: quella dipende dal piano sottoscritto, e due sorgenti che
+ * mandano gli stessi segnali sono due sorgenti che prima o poi divergono. Nel
+ * pannello CookieYes il Consent Mode va quindi lasciato **disattivato**.
+ *
+ * E sta in questo file e non nel layout perché i listener di CookieYes sono già
+ * qui: un secondo blocco che ascolta gli stessi due eventi avrebbe due copie
+ * della stessa mappa fra categorie e segnali, da tenere in pari a mano.
+ *
+ * La mappa ricalca quella del sito del Tennis Club Ambrosiano, che questo
+ * impianto ha portato: `advertisement` governa i quattro segnali pubblicitari
+ * più la personalizzazione, `analytics` il solo `analytics_storage`.
+ * `functionality_storage` non si aggiorna — resta concesso dal default —
+ * perché lo storage funzionale di questo sito non lo decide un tag di Google
+ * ma `quandoConsentito('functional', …)` qui sotto.
+ */
+/* L'ultimo stato spedito a Google, per non ripetersi. `rivaluta()` viene
+   chiamata anche dalla rete di sicurezza — ogni mezzo secondo per venti
+   secondi — e senza questo confronto il `dataLayer` riceveva quaranta comandi
+   di consenso identici: rumore per chi legge la coda in debug, e lavoro inutile
+   per GTM, che rivaluta i suoi trigger a ogni comando. */
+let ultimoConsentMode = '';
+
+function aggiornaConsentMode(): void {
+  /* Si passa dalla `gtag()` globale che `Layout.astro` definisce, e non da un
+     `dataLayer.push()` scritto qui: `gtag()` mette nella coda l'oggetto
+     `arguments`, ed è **quella forma** che GTM riconosce come comando di
+     consenso. Un array o un oggetto semplice con le stesse chiavi finirebbe
+     nella coda come un evento qualsiasi e verrebbe ignorato in silenzio — che
+     è il modo peggiore di sbagliare, perché a schermo non si vede nulla. */
+  const g = (window as unknown as { gtag?: (...a: unknown[]) => void }).gtag;
+  if (typeof g !== 'function') return;
+  const pub = consenso('advertisement');
+  const segnali = {
+    analytics_storage: consenso('analytics') ? 'granted' : 'denied',
+    ad_storage: pub ? 'granted' : 'denied',
+    ad_user_data: pub ? 'granted' : 'denied',
+    ad_personalization: pub ? 'granted' : 'denied',
+    personalization_storage: pub ? 'granted' : 'denied',
+  };
+  const firma = JSON.stringify(segnali);
+  if (firma === ultimoConsentMode) return;
+  ultimoConsentMode = firma;
+  g('consent', 'update', segnali);
+}
+
 function rivaluta(): void {
+  aggiornaConsentMode();
   rimandate.forEach((coda, categoria) => {
     if (!consenso(categoria) || !coda.length) return;
     rimandate.set(categoria, []);
