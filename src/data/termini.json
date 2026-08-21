@@ -164,7 +164,7 @@
       {
         "id": "4.1",
         "titolo": "Certificato Medico",
-        "testo": "Prima dell’inizio dell’attività è obbligatorio inviare in allegato via e-mail copia del Certificato Medico di idoneità all’attività sportiva non agonistica. Sono esentati i soli bambini fino ai 5 anni di età. Nel caso in cui questo non avvenga, verrà tenuto sospeso il Badge personale fino a quando l’Iscritto non invierà il Certificato Medico dovuto"
+        "testo": "Entro 14 giorni dall’inizio dell’attività è obbligatorio inviare in allegato via e-mail copia del Certificato Medico di idoneità all’attività sportiva non agonistica. Sono esentati i soli bambini fino ai 5 anni di età. Nel caso in cui questo non avvenga, verrà tenuto sospeso il Badge personale fino a quando l’Iscritto non invierà il Certificato Medico dovuto"
       },
       {
         "id": "4.2",
@@ -174,7 +174,7 @@
       {
         "id": "4.3",
         "titolo": "Riprese Fotografiche",
-        "testo": "Durante l’anno, in occasione di eventi didattici, sportivi o promozionali, potranno essere effettuate riprese fotografiche o video all’interno del Club. Per ogni evento in cui sia prevista la presenza di un fotografo, la comunicazione ufficiale verrà pubblicata con almeno 10 (dieci) giorni di preavviso sul sito wiki.athlonroma.it, considerata a tutti gli effetti valida e vincolante come notifica. L’avviso specificherà la data dell’evento e le modalità di accesso alle immagini (consultazione, selezione, acquisto). Le immagini saranno scattate in ambienti comuni e in contesti di gruppo, nei limiti di quanto consentito dalla normativa vigente in materia di privacy. Point 2000 non è titolare del trattamento dei dati raccolti in occasione delle riprese fotografiche, le quali sono gestite in piena autonomia dallo studio fotografico incaricato, che agisce in qualità di autonomo titolare del trattamento ai sensi del Regolamento UE 679/2016 (GDPR). I file digitali e i provini verranno conservati dallo studio fotografico per un periodo massimo di 90 (novanta) giorni e successivamente eliminati, salvo diverso accordo diretto tra l’utente e lo studio stesso. In ogni momento, l’utente ripreso potrà esercitare i propri diritti di accesso, opposizione o cancellazione delle immagini esclusivamente nei confronti dello studio fotografico incaricato. Point 2000 declina ogni responsabilità per l’uso delle immagini effettuato dal fotografo in violazione della normativa o degli accordi contrattuali. La partecipazione agli eventi durante i quali sono effettuate riprese comporta consenso tacito salvo opposizione espressa delle condizioni sopra indicate, fermo restando il diritto dell’utente di non partecipare o di opporsi preventivamente con comunicazione scritta"
+        "testo": "Durante l’anno, in occasione di eventi didattici, sportivi o promozionali, potranno essere effettuate riprese fotografiche o video all’interno del Club. Per ogni evento in cui sia prevista la presenza di un fotografo, la comunicazione ufficiale verrà pubblicata con almeno 10 (dieci) giorni di preavviso sul sito www.athlonroma.it, considerata a tutti gli effetti valida e vincolante come notifica. L’avviso specificherà la data dell’evento e le modalità di accesso alle immagini (consultazione, selezione, acquisto). Le immagini saranno scattate in ambienti comuni e in contesti di gruppo, nei limiti di quanto consentito dalla normativa vigente in materia di privacy. Point 2000 non è titolare del trattamento dei dati raccolti in occasione delle riprese fotografiche, le quali sono gestite in piena autonomia dallo studio fotografico incaricato, che agisce in qualità di autonomo titolare del trattamento ai sensi del Regolamento UE 679/2016 (GDPR). I file digitali e i provini verranno conservati dallo studio fotografico per un periodo massimo di 90 (novanta) giorni e successivamente eliminati, salvo diverso accordo diretto tra l’utente e lo studio stesso. In ogni momento, l’utente ripreso potrà esercitare i propri diritti di accesso, opposizione o cancellazione delle immagini esclusivamente nei confronti dello studio fotografico incaricato. Point 2000 declina ogni responsabilità per l’uso delle immagini effettuato dal fotografo in violazione della normativa o degli accordi contrattuali. La partecipazione agli eventi durante i quali sono effettuate riprese comporta consenso tacito salvo opposizione espressa delle condizioni sopra indicate, fermo restando il diritto dell’utente di non partecipare o di opporsi preventivamente con comunicazione scritta"
       },
       {
         "id": "4.4",
@@ -276,7 +276,7 @@
       {
         "id": "7.1",
         "titolo": "Certificato Medico",
-        "testo": "Prima dell’inizio dell’attività è obbligatorio inviare in allegato via e-mail copia del Certificato Medico di idoneità all’attività sportiva non agonistica. In assenza di tale documentazione, il Badge personale verrà sospeso e l’accesso al centro non sarà consentito fino all’invio del Certificato Medico richiesto. Si precisa che l’eventuale sospensione dell’accesso per mancata presentazione del Certificato Medico non dà diritto ad alcun rimborso, proroga, recupero o compensazione economica, in quanto trattasi di obbligo previsto dalla normativa vigente e noto all’Utente al momento dell’iscrizione"
+        "testo": "Entro 14 giorni dall’inizio dell’attività è obbligatorio inviare in allegato via e-mail copia del Certificato Medico di idoneità all’attività sportiva non agonistica. In assenza di tale documentazione, il Badge personale verrà sospeso e l’accesso al centro non sarà consentito fino all’invio del Certificato Medico richiesto. Si precisa che l’eventuale sospensione dell’accesso per mancata presentazione del Certificato Medico non dà diritto ad alcun rimborso, proroga, recupero o compensazione economica, in quanto trattasi di obbligo previsto dalla normativa vigente e noto all’Utente al momento dell’iscrizione"
       },
       {
         "id": "7.2",
@@ -301,7 +301,7 @@
       {
         "id": "7.6",
         "titolo": "Prenotazioni",
-        "testo": "La prenotazione di corsi, lezioni, servizi o attività similari deve essere effettuata direttamente dall’Utente, esclusivamente tramite il proprio account personale (via browser o APP). In caso di ripetute mancate disdette (pari o superiori a 3 nell’arco di 1 mese), potrà essere temporaneamente sospesa la possibilità di effettuare nuove prenotazioni per un periodo di 4 giorni. Le modalità operative, i termini temporali e le eventuali limitazioni (es. numero massimo di prenotazioni attive, finestra temporale di prenotazione o disdetta, ecc.) sono pubblicate e costantemente aggiornate all’interno della sezione dedicata sul sito web, al seguente link: https://wiki.athlonroma.it/wikiathlon/generali/prenotazioni/ L’Utente è tenuto a prenderne visione e a rispettarne il contenuto in ogni sua parte"
+        "testo": "La prenotazione di corsi, lezioni, servizi o attività similari deve essere effettuata direttamente dall’Utente, esclusivamente tramite il proprio account personale (via browser o APP). In caso di ripetute mancate disdette (pari o superiori a 3 nell’arco di 1 mese), potrà essere temporaneamente sospesa la possibilità di effettuare nuove prenotazioni per un periodo di 3 giorni. Le modalità operative, i termini temporali e le eventuali limitazioni (es. numero massimo di prenotazioni attive, finestra temporale di prenotazione o disdetta, ecc.) sono pubblicate e costantemente aggiornate all’interno della sezione dedicata sul sito web, al seguente link: https://www.athlonroma.it/wikiathlon/generali/prenotazioni/ L’Utente è tenuto a prenderne visione e a rispettarne il contenuto in ogni sua parte"
       },
       {
         "id": "7.7",
@@ -367,7 +367,7 @@
       {
         "id": "8.4",
         "titolo": "Prenotazioni",
-        "testo": "La prenotazione di corsi, lezioni, servizi o attività similari deve essere effettuata direttamente dall’Utente, esclusivamente tramite il proprio account personale (via browser o APP). In caso di ripetute mancate disdette (pari o superiori a 3 nell’arco di 1 mese), potrà essere temporaneamente sospesa la possibilità di effettuare nuove prenotazioni per un periodo di 4 giorni. Le modalità operative, i termini temporali e le eventuali limitazioni (es. numero massimo di prenotazioni attive, finestra temporale di prenotazione o disdetta, ecc.) sono pubblicate e costantemente aggiornate all’interno della sezione dedicata sul sito web, al seguente link: https://wiki.athlonroma.it/wikiathlon/generali/prenotazioni/ L’Utente è tenuto a prenderne visione e a rispettarne il contenuto in ogni sua parte"
+        "testo": "La prenotazione di corsi, lezioni, servizi o attività similari deve essere effettuata direttamente dall’Utente, esclusivamente tramite il proprio account personale (via browser o APP). In caso di ripetute mancate disdette (pari o superiori a 3 nell’arco di 1 mese), potrà essere temporaneamente sospesa la possibilità di effettuare nuove prenotazioni per un periodo di 3 giorni. Le modalità operative, i termini temporali e le eventuali limitazioni (es. numero massimo di prenotazioni attive, finestra temporale di prenotazione o disdetta, ecc.) sono pubblicate e costantemente aggiornate all’interno della sezione dedicata sul sito web, al seguente link: https://www.athlonroma.it/wikiathlon/generali/prenotazioni/ L’Utente è tenuto a prenderne visione e a rispettarne il contenuto in ogni sua parte"
       },
       {
         "id": "8.5",
@@ -429,7 +429,7 @@
       {
         "id": "10.1",
         "titolo": "Certificato Medico",
-        "testo": "Per partecipare alle attività sportive, di gruppo o individuali, è obbligatorio per tutti gli utenti di età superiore ai 6 anni inviare via e-mail copia del Certificato Medico di idoneità all’attività sportiva non agonistica. In assenza di tale documentazione, il Badge personale verrà sospeso e l’accesso al Club sarà inibito. La mancata presentazione del certificato non dà diritto ad alcun rimborso o proroga dei prodotti acquistati"
+        "testo": "Per partecipare alle attività sportive, di gruppo o individuali, è obbligatorio per tutti gli utenti di età superiore ai 6 anni inviare via e-mail, entro 14 giorni dall’inizio dell’attività, copia del Certificato Medico di idoneità all’attività sportiva non agonistica. In assenza di tale documentazione, il Badge personale verrà sospeso e l’accesso al Club sarà inibito. La mancata presentazione del certificato non dà diritto ad alcun rimborso o proroga dei prodotti acquistati"
       },
       {
         "id": "10.2",
@@ -465,7 +465,7 @@
       {
         "id": "11.1",
         "titolo": "Certificato Medico",
-        "testo": "Prima dell’inizio dell’attività è obbligatorio inviare in allegato via e-mail copia del Certificato Medico di idoneità all’attività sportiva non agonistica. Sono esentati i soli bambini fino ai 5 anni di età. Nel caso in cui questo non avvenga, verrà tenuto sospeso il Badge personale fino a quando l’Iscritto non invierà il Certificato Medico dovuto. Sono esclusi da tale obbligo i bambini di età fino ai 6 anni compresi"
+        "testo": "Entro 14 giorni dall’inizio dell’attività è obbligatorio inviare in allegato via e-mail copia del Certificato Medico di idoneità all’attività sportiva non agonistica. Sono esentati i soli bambini fino ai 5 anni di età. Nel caso in cui questo non avvenga, verrà tenuto sospeso il Badge personale fino a quando l’Iscritto non invierà il Certificato Medico dovuto. Sono esclusi da tale obbligo i bambini di età fino ai 6 anni compresi"
       },
       {
         "id": "11.2",

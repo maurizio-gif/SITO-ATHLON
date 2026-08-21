@@ -7,15 +7,15 @@
  * cose aggiunte qui sono i titoli di navigazione delle clausole che nel
  * documento non ne avevano uno, e i tag attività per sezione.
  *
- * **Il testo pubblicato è di nuovo identico a quello sottoscritto.** La versione
- * di Agosto 2025 portava cinque emendamenti — elencati allora in
- * `MODIFICHE_DOPO_PDF` — fatti per allineare il contratto a ciò che il club
- * applicava davvero. Il documento di Aprile 2026 **non li ha recepiti**, e
- * pubblicare il contratto verbatim ha quindi voluto dire rimetterli come stanno
- * nel documento firmato. Quello che ne resta aperto sta in
- * `DISALLINEAMENTI_COL_SITO` qui sotto: sono contraddizioni fra il contratto e
- * altre pagine di questo sito, e si chiudono da una parte o dall'altra — non
- * riscrivendo di nuovo il contratto da qui.
+ * **Il testo pubblicato non è identico a quello sottoscritto**, e le differenze
+ * stanno in `MODIFICHE_DOPO_DOCUMENTO` qui sotto. Sono le stesse tre che la
+ * versione di Agosto 2025 portava già e che il documento di Aprile 2026 non ha
+ * recepito: il club ha confermato che la regola applicata è quella del sito, non
+ * quella scritta nel documento, quindi il sito pubblica la regola vera.
+ *
+ * **Finché il documento non viene riemesso, quella lista è il debito.** Va letta
+ * prima di toccare qualsiasi cosa qui dentro, e va svuotata il giorno che un
+ * documento nuovo la recepisce e `termini.json` viene rigenerato da quello.
  *
  * Due consumatori, una fonte: la pagina /regolamento e il box dell'Help Desk, che
  * indicizza ogni clausola e ci linka direttamente con l'ancora.
@@ -76,46 +76,59 @@ export const TERMINI: SezioneTermini[] = (raw as Omit<SezioneTermini, 'attivita'
 export const TERMINI_VERSIONE = 'Aprile 2026';
 
 /**
- * Gli unici due punti in cui il testo pubblicato non è identico al documento, e
- * sono due refusi del documento stesso: la 8.4 apre con «lLa prenotazione» e il
- * titolo della 1.4 dice «Bagde Accesso». Non sono differenze di contenuto e non
- * si riproducono; se il documento verrà corretto, questa lista si svuota.
- */
-export const SCOSTAMENTI_DAL_DOCUMENTO = [
-  { clausole: ['8.4'], cosa: 'Corretto il refuso iniziale «lLa prenotazione».' },
-  { clausole: ['1.4'], cosa: 'Corretto il refuso «Bagde» nel titolo di navigazione.' },
-] as const;
-
-/**
- * Dove il contratto di Aprile 2026 e il resto del sito dicono cose diverse.
+ * Le differenze fra il testo pubblicato e il documento di Aprile 2026.
  *
- * Non è una lista di cose da sistemare qui dentro: il contratto è il contratto,
- * e va pubblicato com'è. È la lista di ciò che qualcuno deve decidere — o si
- * riemette il documento, o si correggono le pagine che lo contraddicono.
- * Finché resta aperta, una persona che legge due pagine di questo sito trova
- * due risposte diverse alla stessa domanda.
+ * Tre di contenuto e due refusi. Le tre di contenuto sono decisioni del club,
+ * prese perché il documento e la pratica si erano allontanati: in ognuna il
+ * sito pubblica **la regola che il club applica davvero**, e il documento è
+ * quello rimasto indietro. Sanare il sito lasciando il documento com'era
+ * avrebbe solo spostato la contraddizione.
  *
- * Tutti e tre i punti erano già stati sanati sul testo di Agosto 2025 e sono
- * tornati indietro con il documento nuovo, che non li ha recepiti.
+ * Questa lista è ciò che serve a chi riemette il documento per sapere cosa
+ * cambiare. Non si allunga senza una decisione del club: una clausola non si
+ * riscrive da qui perché suona meglio.
  */
-export const DISALLINEAMENTI_COL_SITO = [
+export const MODIFICHE_DOPO_DOCUMENTO = [
   {
     clausole: ['7.6', '8.4'],
-    contratto: 'Il blocco dopo le mancate disdette dura 4 giorni.',
-    sito: 'Le schede dell’Help Desk dicono 3 giorni, in quattro punti fra `generali/prenotazioni` e `generali/prenotazioni-problemi`.',
-    nota: 'Tre è quanto risultava applicare il sistema. Il contratto è l’unico a dirne quattro.',
+    cosa: 'Blocco delle prenotazioni dopo le mancate disdette: da 4 a 3 giorni.',
+    perche:
+      'Tre è quanto applica il sistema, ed è quanto le schede dell’Help Desk dicono in quattro punti. Il documento è l’unico a dirne quattro.',
   },
   {
     clausole: ['4.1', '7.1', '10.1', '11.1'],
-    contratto: 'Il certificato medico non agonistico va inviato prima dell’inizio dell’attività; la 10.1 non dà un termine.',
-    sito: '`generali/certificato-medico` concede 14 giorni dall’inizio dell’attività.',
-    nota: 'La 6.2 non c’entra e resta com’è: riguarda il certificato AGONISTICO, dove la visita deve precedere l’attività per legge.',
+    cosa: 'Certificato medico NON agonistico: entro 14 giorni dall’inizio dell’attività.',
+    perche:
+      'Il documento lo chiede prima dell’inizio, e la 10.1 non dà nessun termine; la tolleranza dei quattordici giorni è quella vera ed è quella che `generali/certificato-medico` dichiara. Ora è scritta uguale in tutti e quattro i punti.',
+  },
+  {
+    clausole: ['6.2'],
+    cosa: 'Lasciata invariata: resta «prima dell’inizio dell’attività».',
+    perche:
+      'È l’unica che riguarda il certificato AGONISTICO, per il settore agonistico e la pallanuoto. Lì la visita deve precedere l’attività e non è una scelta del club: concedere una finestra sarebbe stato un errore, non un allineamento. Confermato dal club.',
   },
   {
     clausole: ['4.3', '7.6', '8.4'],
-    contratto: 'Le clausole rimandano a wiki.athlonroma.it, e la 7.6 e la 8.4 dichiarano vincolante ciò che è pubblicato lì.',
-    sito: 'Il wiki è dentro questo sito da quando è stato rifatto, e vive su www.athlonroma.it/wikiathlon.',
-    nota: 'I redirect per quel sottodominio stanno in `vercel.json` ma non sono attivi finché il dominio non è agganciato al progetto: fino a quel giorno le clausole rimandano a un indirizzo che non risponde.',
+    cosa: 'Gli indirizzi citati passano da wiki.athlonroma.it a www.athlonroma.it.',
+    perche:
+      'Il wiki è dentro questo sito da quando è stato rifatto, e la 7.6 e la 8.4 dichiarano vincolante ciò che è pubblicato a quell’indirizzo. Deciso dal club di citare la destinazione e non il vecchio host.',
+    /* **Oggi quel link dà 404, e va saputo.** Misurato: `www.athlonroma.it` è
+       ancora il WordPress, che il percorso `/wikiathlon/…` non ha, mentre
+       `wiki.athlonroma.it` risponde 200 perché il vecchio sito è ancora in
+       piedi. Il verso si invertirà con lo spostamento del dominio — quel giorno
+       `www` serve queste pagine e i redirect di `vercel.json` mandano lì anche
+       il sottodominio — ma da qui a quel giorno una clausola che dichiara
+       vincolante una pagina rimanda a un indirizzo che non risponde.
+
+       Non è un errore da correggere qui: è una ragione in più per fare lo
+       spostamento, e la si tiene scritta perché nessuno la scopra da un
+       reclamo. */
+    nota: 'Il link citato risponde solo dopo lo spostamento del dominio su Vercel.',
+  },
+  {
+    clausole: ['8.4', '1.4'],
+    cosa: 'Corretti due refusi del documento: «lLa prenotazione» e «Bagde» nel titolo.',
+    perche: 'Errori di trascrizione, non differenze di contenuto.',
   },
 ] as const;
 
