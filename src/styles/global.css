@@ -724,19 +724,6 @@ video:not([controls])::-webkit-media-controls-panel {
     min-height: 1.8rem;
   }
 
-  /* La hero: senza tetto la fascia video si prendeva tutto lo spazio avanzato e
-     le due azioni finivano a cinquanta pixel dal bordo, cioè si vedevano ma
-     nessuno le avrebbe cercate lì. Il tetto lascia il posto a titolo,
-     sottotitolo e pulsanti nella stessa schermata.
-
-     58svh e non 42: a 42 avanzavano 450px che la hero, centrata, spartiva in due
-     bande bianche vuote da 225 — sopra il video e sotto i pulsanti. Ora ne
-     avanzano 140, il video arriva quasi a toccare la barra e le azioni restano
-     settanta pixel sopra il bordo. La misura è in svh, non in px, perché deve
-     valere identica se Windows dichiara 1080 o 1440. */
-  .hero-media {
-    max-height: 58svh;
-  }
 }
 
 /* ---- Il televisore 16:9 — PROJECT RULE -----------------------------------
