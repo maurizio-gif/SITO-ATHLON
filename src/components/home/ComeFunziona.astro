@@ -6,14 +6,19 @@
  * tutti derivati dal planning del mese, nessuno scritto a mano. Se il palinsesto
  * cambia, cambia la sezione.
  *
- *  - `totalLessons()` — 180 lezioni a settimana, su cinque fasce;
- *  - `totalHours()`   — le ore che quelle lezioni occupano;
- *  - `openHours()`    — le ore in cui la Gym Floor è aperta;
- *  - `gymFloor.hours` — apertura e chiusura vere, per dire da che ora a che ora.
+ *  - `totalLessons()` — le lezioni a orario fisso, con istruttore: corsi
+ *    fitness, Group Reformer, Aqua Fitness, Scuola Nuoto Adulti;
+ *  - `openHours()`     — le ore in cui la Gym Floor è aperta, accesso libero;
+ *  - `bandHours(nuotoLibero)` — le ore della vasca a nuoto libero, anch'essa
+ *    ad accesso libero e non una lezione;
+ *  - `gymFloor.hours`  — apertura e chiusura vere, per dire da che ora a che ora.
  *
- * Le due voci sono tenute distinte di proposito: le ore di palinsesto sono
- * lezioni a orario fisso, le ore di sala aperta sono accesso libero. Sommarle in
- * un solo numero senza dire di cosa è fatto sarebbe gonfiarlo.
+ * Prima qui c'era anche `totalHours()`, «ore di palinsesto», ma sommava le ore
+ * delle lezioni **e** quelle del nuoto libero in un solo numero: sembrava
+ * dire quante ore durano le lezioni sopra, mentre includeva un'attività che
+ * lì non è contata. Tolto: le lezioni si contano in lezioni, il resto — Gym
+ * Floor e nuoto libero, che sono la stessa cosa (accesso libero, non a
+ * orario fisso) — si conta in ore.
  *
  * Athlon Club 4.0 resta l'eyebrow, ma qui è un mezzo e non un vanto: l'app e il
  * planning servono a rendere gestibile la scelta — prenoti, vedi i posti che
@@ -22,11 +27,11 @@
  * otto attività comprese in Premium (`abbonamenti.astro`, `plans[].activities`),
  * le cinque famiglie dei corsi (`corsi-fitness.astro`).
  */
-import { gymFloor, totalLessons, totalHours, openHours } from '../../data/planning';
+import { gymFloor, totalLessons, openHours, getBand, bandHours } from '../../data/planning';
 
 const lezioni = totalLessons();
-const ore = totalHours();
 const oreSala = openHours();
+const oreNuoto = bandHours(getBand('nuoto-libero'));
 
 /* Da che ora a che ora si entra: gli orari veri della Gym Floor (la fascia
    infrasettimanale, che è la più ampia), non la prima e l'ultima lezione del
@@ -41,7 +46,7 @@ const blocchi = [
   },
   {
     titolo: 'Scegli l’attività',
-    testo: `${lezioni} lezioni a settimana su cinque fasce: corsi fitness, Group Reformer, Aqua Fitness, Scuola Nuoto Adulti e nuoto libero assistito. I soli corsi fitness sono diciotto, divisi in cinque famiglie — forza, fiato, musica, postura, mobilità.`,
+    testo: `${lezioni} lezioni a settimana su quattro fasce: corsi fitness, Group Reformer, Aqua Fitness e Scuola Nuoto Adulti. I soli corsi fitness sono diciotto, divisi in cinque famiglie — forza, fiato, musica, postura, mobilità.`,
   },
   {
     titolo: 'Cambia quando vuoi',
@@ -58,8 +63,8 @@ const blocchi = [
       {lezioni} lezioni a settimana.<br />Scegli le tue.
     </h2>
     <p class="come__sub">
-      {ore} ore di palinsesto e {oreSala} ore di sala aperta: quando allenarti, e cosa fare, lo
-      decidi ogni settimana.
+      {oreSala} ore di Gym Floor e {oreNuoto} ore di Nuoto Libero: quando allenarti, e cosa fare,
+      lo decidi ogni settimana.
     </p>
 
     <ol class="come__grid">
