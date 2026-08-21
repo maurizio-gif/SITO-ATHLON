@@ -120,6 +120,22 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
     </div>
   </section>
 
+  {/* La fascia «cerchiamo personale», fra la mappa e i link.
+      Sta nel footer e non in una pagina perche' chi cerca lavoro non arriva
+      dalla home: arriva da un annuncio o da un giro sul sito, e in fondo a
+      qualunque pagina trova comunque questa riga. */}
+  <section class="footer-lavora" aria-label="Lavora con noi">
+    <div class="container footer-lavora__inner">
+      <div>
+        <span class="eyebrow">Lavora con noi</span>
+        <p class="footer-lavora__testo">
+          Athlon è in cerca di personale: scopri le posizioni aperte.
+        </p>
+      </div>
+      <a class="btn btn-primary footer-lavora__cta" href="/lavora">Posizioni aperte →</a>
+    </div>
+  </section>
+
   <!-- Link -->
   <div class="footer-main">
   <div class="container footer-grid">
@@ -781,4 +797,49 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
       font-size: var(--text-2xs);
     }
   }
+
+  /* La fascia «lavora con noi», fra la mappa e i link del footer. */
+  .footer-lavora {
+    padding: 2rem 0;
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .footer-lavora__inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.5rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* L'occhiello qui sta su arancione, non sul fondo chiaro di sempre: il
+     colore d'accento su se stesso sparirebbe. */
+  .footer-lavora .eyebrow {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .footer-lavora__testo {
+    margin: 0.25rem 0 0;
+    max-width: 34rem;
+    font-size: var(--text-base);
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  /* Il comando e' bianco su arancione: `btn-primary` qui sarebbe invisibile. */
+  .footer-lavora__cta {
+    flex: none;
+    font-size: var(--text-sm);
+    background: var(--color-white);
+    color: var(--color-dark);
+    border-color: var(--color-white);
+  }
+
+  .footer-lavora__cta:hover {
+    background: var(--color-dark);
+    color: var(--color-white);
+    border-color: var(--color-dark);
+  }
+
 </style>

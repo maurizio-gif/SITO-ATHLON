@@ -23,7 +23,7 @@
  */
 import Layout from '../layouts/Layout.astro';
 import CampoTelefono from '../components/CampoTelefono.astro';
-import { POSIZIONI, SPONTANEA, CV_MAX_BYTE, CV_TIPI, ENDPOINT_CANDIDATURA } from '../data/lavora';
+import { POSIZIONI, SPONTANEA, VANTAGGI, conGrassetto, CV_TIPI } from '../data/lavora';
 import { CLUB } from '../data/club';
 
 const CI_SONO_POSIZIONI = POSIZIONI.length > 0;
@@ -37,13 +37,25 @@ const CI_SONO_POSIZIONI = POSIZIONI.length > 0;
   <section class="lv-hero">
     <div class="container lv-hero__inner">
       <span class="eyebrow" data-anim="from-left">Lavora con noi</span>
-      <h1 class="lv-hero__titolo">Vieni a lavorare<br /><em class="accent">in Athlon.</em></h1>
+      <h1 class="lv-hero__titolo">Unisciti al<br /><em class="accent">team Athlon.</em></h1>
       <p class="lv-hero__lede">
         Un club è le persone che ci stanno dentro: chi accoglie in reception, chi corregge una
-        posizione in sala, chi tiene l'acqua pulita. Se ti va di essere una di quelle persone,
-        raccontaci chi sei.
+        posizione in sala, chi insegna a un bambino a stare a galla. Se ti va di essere una di
+        quelle persone, raccontaci chi sei.
       </p>
-      <a class="btn btn-primary lv-hero__cta" href="#candidati">Mandaci il tuo CV →</a>
+
+      <ul class="lv-vantaggi">
+        {VANTAGGI.map((v) => (
+          <li class="lv-vantaggi__voce">
+            <svg class="lv-vantaggi__segno" viewBox="0 0 24 24" width="20" height="20" fill="none"
+              stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+              aria-hidden="true"><path d="M4 12.5 9.5 18 20 6" /></svg>
+            <span>{v}</span>
+          </li>
+        ))}
+      </ul>
+
+      <a class="btn btn-primary lv-hero__cta" href="#candidati">Candidati qui →</a>
     </div>
   </section>
 
@@ -54,29 +66,57 @@ const CI_SONO_POSIZIONI = POSIZIONI.length > 0;
       {CI_SONO_POSIZIONI ? (
         <>
           <h2 class="lv-sec__titolo" data-anim="reveal">Chi stiamo cercando.</h2>
+
+          {/* `<details>` e non un accordion scritto a mano: si apre con la
+              tastiera, si trova con la ricerca della pagina, funziona senza
+              JavaScript, e il browser gestisce da sé lo stato nascosto — che
+              su questo sito è la regola (un pannello chiuso non deve restare
+              raggiungibile col tab). `name` li rende esclusivi dove il browser
+              lo supporta, e dove non lo supporta restano semplicemente
+              apribili insieme. */}
           <ul class="lv-posizioni">
             {POSIZIONI.map((p) => (
-              <li class="lv-posizione">
-                <div class="lv-posizione__testa">
-                  <h3 class="lv-posizione__titolo">{p.titolo}</h3>
-                  {(p.impegno || p.area) && (
-                    <p class="lv-posizione__meta">
-                      {[p.area, p.impegno].filter(Boolean).join(' · ')}
-                    </p>
-                  )}
-                </div>
-                <p class="lv-posizione__testo">{p.descrizione}</p>
-                {p.requisiti && p.requisiti.length > 0 && (
-                  <ul class="lv-posizione__requisiti">
-                    {p.requisiti.map((r) => <li>{r}</li>)}
-                  </ul>
-                )}
-                {/* Il comando porta al form e gli preseleziona la posizione:
-                    chi ha appena letto un annuncio non deve ritrovarlo in una
-                    tendina. */}
-                <a class="lv-posizione__cta" href="#candidati" data-lv-scegli={p.id}>
-                  Candidati per questo ruolo →
-                </a>
+              <li>
+                <details class="lv-pos" name="posizioni-aperte">
+                  <summary class="lv-pos__testa">
+                    <span class="lv-pos__segno" aria-hidden="true"></span>
+                    <h3 class="lv-pos__titolo">{p.titolo}</h3>
+                  </summary>
+
+                  <div class="lv-pos__corpo">
+                    {p.apertura?.map((t) => (
+                      <p class="lv-pos__apertura" set:html={conGrassetto(t)}></p>
+                    ))}
+
+                    {p.blocchi.map((b) => (
+                      <div class="lv-pos__blocco">
+                        {b.titolo && <p class="lv-pos__blocco-titolo">{b.titolo}</p>}
+                        {b.testo && <p class="lv-pos__testo" set:html={conGrassetto(b.testo)}></p>}
+                        {b.voci && (
+                          <ul class="lv-pos__voci">
+                            {b.voci.map((v) => <li set:html={conGrassetto(v)}></li>)}
+                          </ul>
+                        )}
+                      </div>
+                    ))}
+
+                    {p.contratto && (
+                      <p class="lv-pos__contratto">
+                        <strong>Contratto proposto:</strong> {p.contratto}
+                        {p.contrattoNota && <em class="lv-pos__nota">({p.contrattoNota})</em>}
+                      </p>
+                    )}
+
+                    {p.chiusura && <p class="lv-pos__chiusura" set:html={conGrassetto(p.chiusura)}></p>}
+
+                    {/* Porta al form e gli preseleziona la posizione: chi ha
+                        appena letto l'annuncio non deve ritrovarlo in una
+                        tendina. */}
+                    <a class="lv-pos__cta" href="#candidati" data-lv-scegli={p.titolo}>
+                      Candidati per questo ruolo →
+                    </a>
+                  </div>
+                </details>
               </li>
             ))}
           </ul>
@@ -250,8 +290,8 @@ const CI_SONO_POSIZIONI = POSIZIONI.length > 0;
      scrive, e va bene lo stesso. */
   document.querySelectorAll<HTMLAnchorElement>('[data-lv-scegli]').forEach((a) => {
     a.addEventListener('click', () => {
-      const titolo = a.closest('.lv-posizione')?.querySelector('.lv-posizione__titolo')?.textContent;
-      if (posizione && titolo) posizione.value = titolo.trim();
+      const titolo = a.dataset.lvScegli;
+      if (posizione && titolo) posizione.value = titolo;
     });
   });
 
@@ -391,68 +431,170 @@ const CI_SONO_POSIZIONI = POSIZIONI.length > 0;
     color: var(--text-muted);
   }
 
-  /* Le schede si dimensionano da sole: con il minimo in rem la griglia perde
-     una colonna quando la radice cresce, sul totem e sul televisore, senza
-     bisogno di una media query. */
+  .lv-vantaggi {
+    list-style: none;
+    margin: 0 0 1.75rem;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .lv-vantaggi__voce {
+    display: flex;
+    gap: 0.625rem;
+    align-items: start;
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.86);
+  }
+
+  .lv-vantaggi__segno {
+    flex: none;
+    margin-top: 0.1rem;
+    color: var(--color-primary);
+  }
+
   .lv-posizioni {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-    gap: 1rem;
+    border-top: 1px solid var(--border-strong, rgba(39, 36, 35, 0.12));
   }
 
-  .lv-posizione {
+  .lv-pos {
+    border-bottom: 1px solid var(--border-strong, rgba(39, 36, 35, 0.12));
+  }
+
+  /* Il triangolino di sistema via, in tutti e due i modi che servono: i
+     browser moderni leggono `list-style`, Safari vuole ancora lo pseudo. */
+  .lv-pos__testa {
+    list-style: none;
     display: flex;
-    flex-direction: column;
-    gap: 0.625rem;
-    padding: 1.5rem;
-    border: 1px solid var(--border-strong, rgba(39, 36, 35, 0.12));
-    border-radius: 1rem;
-    background: var(--color-white);
+    gap: 0.875rem;
+    align-items: center;
+    /* Il bersaglio e' tutta la riga, e l'altezza minima e' quella del dito. */
+    min-height: 3.5rem;
+    padding: 1rem 0;
+    cursor: pointer;
   }
 
-  .lv-posizione__titolo {
+  .lv-pos__testa::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Il piu' che diventa meno, disegnato con due pseudo-elementi invece che con
+     un carattere: un `+` tipografico cambia forma e peso da un font all'altro,
+     e qui accanto a un titolo in Tusker sarebbe minuscolo. */
+  .lv-pos__segno {
+    position: relative;
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--color-primary);
+  }
+
+  .lv-pos__segno::before,
+  .lv-pos__segno::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    margin-top: -1px;
+    background: currentColor;
+    transition: transform var(--dur-fast, 0.15s) ease;
+  }
+
+  .lv-pos__segno::after {
+    transform: rotate(90deg);
+  }
+
+  .lv-pos[open] .lv-pos__segno::after {
+    transform: rotate(0deg);
+  }
+
+  .lv-pos__titolo {
+    margin: 0;
     font-size: var(--text-lg);
     --lh: 1.05;
-    margin: 0;
   }
 
-  .lv-posizione__meta {
-    margin: 0.25rem 0 0;
-    font-size: var(--text-2xs);
-    letter-spacing: 0.08em;
+  .lv-pos[open] .lv-pos__titolo {
+    color: var(--color-primary);
+  }
+
+  .lv-pos__corpo {
+    padding: 0 0 1.5rem 2.125rem;
+    max-width: 46rem;
+  }
+
+  .lv-pos__apertura {
+    margin: 0 0 0.875rem;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    color: var(--color-dark);
+  }
+
+  .lv-pos__blocco {
+    margin-bottom: 1rem;
+  }
+
+  .lv-pos__blocco-titolo {
+    margin: 0 0 0.375rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--color-primary);
   }
 
-  .lv-posizione__testo {
+  .lv-pos__testo,
+  .lv-pos__voci {
     margin: 0;
     font-size: var(--text-sm);
     line-height: 1.65;
     color: var(--text-muted);
   }
 
-  .lv-posizione__requisiti {
-    margin: 0;
+  .lv-pos__voci {
     padding-left: 1.1rem;
+  }
+
+  .lv-pos__voci li {
+    margin-bottom: 0.25rem;
+  }
+
+  .lv-pos__contratto {
+    margin: 1rem 0 0;
     font-size: var(--text-sm);
     line-height: 1.6;
+    color: var(--color-dark);
+  }
+
+  .lv-pos__nota {
+    display: block;
     color: var(--text-muted);
   }
 
-  /* Nella lista dei comandi a forma di link di `global.css` non c'è, quindi
+  .lv-pos__chiusura {
+    margin: 1rem 0 0;
+    font-size: var(--text-sm);
+    line-height: 1.65;
+    color: var(--color-dark);
+  }
+
+  /* Non e' nella lista dei comandi a forma di link di `global.css`, quindi
      l'altezza da dito se la prende qui: `inline-flex` e non `inline`, o il
      padding verticale non riserva spazio e il bersaglio resta alto quanto il
      testo. */
-  .lv-posizione__cta {
-    margin-top: auto;
+  .lv-pos__cta {
     display: inline-flex;
     align-items: center;
-    align-self: flex-start;
-    min-height: 2.75rem;
-    padding: 0.5rem 0;
+    /* 3rem e non 2.75: il minimo del sito e' 48px, e a 44 il controllo passa
+       la vista ma non lo sweep. */
+    min-height: 3rem;
+    margin-top: 1rem;
     font-size: var(--text-sm);
     font-weight: 700;
     color: var(--color-primary);
