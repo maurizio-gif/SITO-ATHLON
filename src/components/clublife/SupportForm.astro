@@ -8,7 +8,40 @@
  * richieste_help_desk). The field names below are the contract with it — rename
  * one here and it stops arriving in the email and in the database.
  */
+import { gymFloor } from '../../data/planning';
+
 const SUPPORT_ENDPOINT = 'https://automazione.n8ndevelop.it/webhook/help-desk-athlon';
+
+/**
+ * Gli orari del club, per giorno della settimana, in minuti dalla mezzanotte.
+ *
+ * Serve a dire «il nostro staff è online adesso» solo quando è vero. Il dato è
+ * quello del palinsesto (`gymFloor.hours`), quindi il giorno che il club cambia
+ * gli orari cambia anche questa frase — senza che nessuno se lo ricordi.
+ *
+ * L'indice è quello di `Date.getDay()`: 0 è domenica. La lettura delle etichette
+ * ricalca quella di `openHours()` in `data/planning.ts` — «Lunedì – Venerdì» si
+ * riconosce dal «venerd», il resto è un giorno solo — ed è lo stesso patto: se
+ * un giorno le etichette del palinsesto cambiano forma, vanno aggiornati
+ * entrambi i posti.
+ */
+const minuti = (t: string) => {
+  const [h, m] = t.trim().split(':').map(Number);
+  return h * 60 + m;
+};
+
+const ORARI: ({ da: number; a: number } | null)[] = Array(7).fill(null);
+for (const riga of gymFloor.hours) {
+  const [da, a] = riga.hours.split(/[–-]/).map((v) => minuti(v));
+  const giorni = /venerd/i.test(riga.label)
+    ? [1, 2, 3, 4, 5]
+    : /sabato/i.test(riga.label)
+      ? [6]
+      : /domenica/i.test(riga.label)
+        ? [0]
+        : [];
+  for (const g of giorni) ORARI[g] = { da, a };
+}
 
 /** The five standard campaign parameters, captured as-is when present. */
 const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
@@ -36,10 +69,68 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
     <div class="sup__head">
       <span class="sup__eyebrow">Richiedi assistenza</span>
       <h3 class="sup__title u-display" id="sup-title">Scrivi al nostro team</h3>
-      <p class="sup__lede">
-        <strong>Il nostro staff è online adesso</strong> e legge la tua richiesta appena
-        arriva: <strong>ti rispondiamo per email entro pochi minuti</strong>.
+      {/* Due versioni della stessa riga, e a schermo ne resta una.
+
+          «Online adesso» è una promessa con un orario dentro, e questo sito è
+          statico: al build non si sa che ore saranno quando qualcuno aprirà il
+          pannello. Quindi la scelta la fa il browser, e il **valore di partenza
+          nel markup è quello prudente** — se lo script non gira, o gira tardi,
+          si legge la versione che è vera a qualunque ora. Il verso opposto
+          avrebbe promesso una risposta immediata alle tre di notte.
+
+          L'ora è quella di Roma e non quella del dispositivo: chi scrive
+          dall'estero non deve leggere «siamo chiusi» perché il suo orologio dice
+          un'altra cosa. */}
+      <p class="sup__lede" data-support-orari={JSON.stringify(ORARI)}>
+        <span data-support-chiuso>
+          La tua richiesta la legge <strong>una persona del club</strong>: <strong>ti
+          rispondiamo per email appena riapriamo</strong>.
+        </span>
+        <span data-support-aperto hidden>
+          <strong>Il nostro staff è online adesso</strong> e legge la tua richiesta appena
+          arriva: <strong>ti rispondiamo per email entro pochi minuti</strong>.
+        </span>
       </p>
+
+      {/* `is:inline` perché deve girare **durante il parsing**, prima che la riga
+          sia dipinta: uno script di modulo è differito e si vedrebbe la versione
+          prudente per un istante anche in pieno orario di apertura. E dentro un
+          `is:inline` non si scrivono espressioni Astro — vedi AGENTS.md — quindi
+          gli orari arrivano dall'attributo qui sopra e non da un'interpolazione. */}
+      <script is:inline>
+        (function () {
+          var p = document.querySelector('[data-support-orari]');
+          if (!p) return;
+          var orari;
+          try {
+            orari = JSON.parse(p.dataset.supportOrari);
+          } catch (e) {
+            return;
+          }
+          /* L'ora di Roma, chiunque legga e da dove: `en-GB` dà «lun» e «14:05»
+             in forma fissa, quindi si possono leggere per posizione. */
+          var f = new Intl.DateTimeFormat('en-GB', {
+            timeZone: 'Europe/Rome',
+            weekday: 'short',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+          });
+          var parti = {};
+          f.formatToParts(new Date()).forEach(function (x) {
+            parti[x.type] = x.value;
+          });
+          var giorni = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+          var g = giorni[parti.weekday];
+          var ora = Number(parti.hour) * 60 + Number(parti.minute);
+          var oggi = g === undefined ? null : orari[g];
+          if (!oggi || ora < oggi.da || ora >= oggi.a) return;
+          var aperto = p.querySelector('[data-support-aperto]');
+          var chiuso = p.querySelector('[data-support-chiuso]');
+          if (aperto) aperto.hidden = false;
+          if (chiuso) chiuso.hidden = true;
+        })();
+      </script>
     </div>
 
   <form class="sup__form" data-support-form novalidate>
