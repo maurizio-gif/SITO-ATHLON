@@ -242,6 +242,15 @@ html {
   scroll-padding-top: calc(var(--header-h, 73px) + 1rem);
 }
 
+/* Le pagine senza intestazione — `/club-life`, le schede dell'Help Desk,
+   `/attiva`, `/promo` — non hanno nessuno che pubblichi `--header-h`, e senza
+   questa riga lo scarto qui sopra cadrebbe sul suo ripiego: 89px di vuoto sopra
+   ogni ancora di una pagina che in cima non ha niente. L'attributo lo mette
+   `Layout.astro` quando `chrome` è falso. */
+html[data-senza-intestazione] {
+  --header-h: 0px;
+}
+
 body {
   margin: 0;
   font-family: var(--font-body);

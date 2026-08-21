@@ -91,7 +91,15 @@ const graph = [
 ---
 
 <!doctype html>
-<html lang="it">
+{/* `data-senza-intestazione` quando la pagina non ha l'header: `global.css`
+    ci azzera `--header-h`. Serve perché quella variabile la pubblica il
+    `ResizeObserver` dentro `Header.astro`, che su queste pagine non esiste, e
+    lo `scroll-padding-top` cadrebbe sul ripiego di 73px — settantatré pixel di
+    scarto sopra ogni ancora di una pagina che non ha niente in cima. Un
+    attributo e non uno `<style is:inline>`: quello passa il contenuto alla
+    lettera, espressioni comprese, quindi le graffe del CSS finirebbero in
+    pagina come testo (provato). */}
+<html lang="it" data-senza-intestazione={chrome ? undefined : ''}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -199,6 +207,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T4J5G7D"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
+    {/* Senza intestazione, `--header-h` non lo pubblica nessuno: la scrive il
+        `ResizeObserver` dentro `Header.astro`, che qui non c'è. E il
+        `scroll-padding-top` di `global.css` — quello che tiene le ancore sotto
+        l'header appiccicoso — cadrebbe sul suo ripiego di 73px, cioè
+        settantatré pixel di scarto su una pagina che non ha niente in cima.
+        Zero dichiarato è il modo di dirlo, e vale per `/club-life`, per le
+        schede dell'Help Desk, per `/attiva` e `/promo`. */}
     {chrome && <Header />}
     <main>
       <slot />
