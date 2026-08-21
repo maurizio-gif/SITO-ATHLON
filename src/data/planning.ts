@@ -233,6 +233,7 @@ function normalise(name: string): string {
  */
 const LESSON_ALIASES: Record<string, string> = {
   PILATES: 'PILATES MATWORK',
+  'BODY PUMP': 'LES MILLS BODY PUMP',
 };
 
 const cardsByKey = new Map(Object.entries(cards).map(([k, v]) => [normalise(k), v]));

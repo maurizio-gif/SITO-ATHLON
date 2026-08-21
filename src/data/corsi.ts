@@ -214,7 +214,13 @@ export const CORSI: Corso[] = [
     varianti: [
       { nome: null, testo: '', lezione: 'Les Mills Body Pump', poster: `${U}/2024/08/DSC08297-2-1-scaled.jpg` },
     ],
-    lezioni: [],
+    /* Il nome in palinsesto è "Body Pump" (senza "Les Mills davanti"): è quello
+       che decide gli orari di questa pagina — vedi `slots` in `[corso].astro`.
+       Il video e la descrizione della sezione "Caratteristiche" restano
+       agganciati a "Les Mills Body Pump" sopra, che è la chiave scritta in
+       `planning-lessons.json`; l'alias in `planning.ts` (`LESSON_ALIASES`)
+       fa combaciare le due forme per il modal del planning. */
+    lezioni: ['Body Pump'],
     attrezzatura: 'Abbigliamento sportivo e scarpe adeguate, un asciugamano personale e acqua.',
     simili: [
       { slug: 'strenght', perche: 'Sempre bilanciere, programmato sulla forza invece che sulla resistenza.' },
