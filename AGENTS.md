@@ -531,6 +531,40 @@ that headless Chromium here has **no H.264 decoder**
 (`canPlayType('video/mp4; codecs="avc1.42E01E"')` is `''`), so the site's own
 MP4s never advance in it; measure frames with a VP8/WebM clip instead.
 
+### Una clip entra in `public/` solo dopo essere passata dai due script
+
+`scripts/comprimi-video.mjs` ricodifica e `scripts/confronta-video.mjs` verifica,
+e il metodo sta scritto per intero in testa al primo. Le quattro regole che non
+si contrattano:
+
+- **H.264 per tutte, anche quando costa.** Firefox non decodifica l'HEVC e Chrome
+  solo con supporto hardware: lì una clip HEVC è un rettangolo nero. Sei clip lo
+  erano, e convertite pesano il doppio o il triplo — Body Sculpt 3,7 → 9,1 MB. Si
+  fa comunque: il criterio non è il peso, è che il video si veda.
+- **`+faststart`, `yuv420p`, nessuna traccia audio.** L'indice in fondo al file
+  fa scaricare tutta la clip prima del primo fotogramma, ed era così su quindici
+  file su ventisei. L'audio su una clip muta senza controlli è peso che nessuno
+  può sentire: 7,2 MB in sedici file. L'unica eccezione possibile è la hero della
+  home, dove `Hero.astro` toglie il muto a schermo intero.
+- **La risoluzione non si tocca, e la ragione è una misura.** Il riquadro di una
+  scheda corso misura 362 px CSS su un telefono — a densità 3× sono 1086 pixel
+  fisici, quindi 1080 di larghezza è esattamente la misura giusta — e arriva a
+  1026 px sul totem e 1448 nel pannello del planning sulla televisione. Scendere
+  a 720p, come fu fatto per Baby Nuoto e Reformer misurando solo a densità 1×,
+  vuol dire ingrandire su quei due schermi.
+- **Il CRF si scegle col VMAF, non a occhio**, e dove la ricodifica trasparente
+  pesa più del sorgente **si rimuxa** (`-c copy -an -movflags +faststart`):
+  stessi pixel, senza audio, indice davanti. Succede più spesso di quanto sembri
+  — quindici clip su venti — perché queste sorgenti erano già dentro la frontiera
+  di efficienza di H.264. L'acqua è il caso peggiore: Aqua Soft ricodificato a
+  qualità indistinguibile pesa il 24% in più.
+
+Due trappole della misura, ognuna costata mezz'ora. La finestra di riferimento va
+estratta **senza perdita** e le prove devono partire da lei; e il confronto
+seleziona i fotogrammi **per numero**, non per secondo — su acqua che schizza un
+fotogramma di scarto vale cinquanta punti di VMAF (41 invece di 91) e sembra un
+disastro di qualità invece che un errore di allineamento.
+
 ## The club's kiosk is a form factor of its own, and it is not a phone
 
 A 27" portrait panel (9:16, Windows, Edge or Chrome) stands in the club's
