@@ -1,0 +1,128 @@
+---
+/**
+ * Il campo «cellulare» del sito: una tendina col prefisso e il numero accanto.
+ *
+ * Esiste come componente e non come cinque blocchi copiati perché i campi
+ * telefono sono cinque, in quattro pannelli diversi — la prova, i contatti (due:
+ * l'adulto e il genitore), il referral (tre, uno per amico) e la chat — e la
+ * lista dei prefissi è duecento righe. Cinque copie sarebbero mille righe di
+ * markup e cinque occasioni di divergere.
+ *
+ * ## Come si usa
+ *
+ * ```astro
+ * <CampoTelefono id="rfr-cell-1" classe="rfr__input" />
+ * ```
+ *
+ * `classe` è la classe del campo di testo del pannello che lo ospita, e va
+ * passata: i pannelli hanno vestiti diversi — bianco nella prova, scuro
+ * nell'Help Desk — e gli stili con ambito di Astro non attraversano i confini
+ * dei componenti. Il componente porta solo la **disposizione** (le due parti
+ * accanto, con la tendina che non si stringe), il colore lo porta la classe.
+ *
+ * Lato script, i due elementi si leggono come `#<id>-prefisso` e `#<id>`, e il
+ * numero si compone con `validaTelefono()` da `data/prefissi.ts`. Chi legge
+ * questo campo non deve mai leggere `input.value` da solo: quello è il numero
+ * come l'ha scritto la persona, non il numero.
+ */
+import { PREFISSI, PREFISSO_PREDEFINITO, bandiera } from '../data/prefissi';
+
+interface Props {
+  /** L'id del campo del numero. La tendina prende lo stesso più `-prefisso`. */
+  id: string;
+  /** La classe del campo di testo del pannello ospite, per il colore. */
+  classe: string;
+  placeholder?: string;
+}
+
+const { id, classe, placeholder = '340 1234567' } = Astro.props;
+
+/* L'Italia in testa, e poi tutti in ordine. Non è un doppione da togliere: la
+   prima voce è il preselezionato e nessuno la cerca, la seconda sta alla lettera
+   I dove chi scorre l'elenco se l'aspetta. */
+const inTesta = PREFISSI.filter((p) => p.iso === 'IT');
+---
+
+<div class="tel">
+  {/* La tendina ha un'etichetta sua, invisibile: senza, chi usa uno screen
+      reader sente «menu, +39» e non sa di che menu si tratti. Non è visibile
+      perché accanto c'è già l'etichetta del campo, e ripeterla a schermo
+      sarebbe rumore. */}
+  <label class="tel__nascosta" for={`${id}-prefisso`}>Prefisso internazionale</label>
+  <select class={`${classe} tel__prefisso`} id={`${id}-prefisso`}>
+    {inTesta.map((p) => (
+      <option value={p.codice} selected={p.codice === PREFISSO_PREDEFINITO}>
+        {bandiera(p.iso)} {p.codice}
+      </option>
+    ))}
+    <option disabled>──────────</option>
+    {PREFISSI.map((p) => (
+      <option value={p.codice}>{bandiera(p.iso)} {p.paese} {p.codice}</option>
+    ))}
+  </select>
+
+  <input
+    class={`${classe} tel__numero`}
+    id={id}
+    type="tel"
+    inputmode="tel"
+    autocomplete="tel-national"
+    placeholder={placeholder}
+  />
+</div>
+
+<style>
+  .tel {
+    display: flex;
+    gap: 0.375rem;
+    /* I due campi hanno il margine sotto dalla classe del pannello, e sommati
+       farebbero il doppio: qui si annulla e lo rimette il contenitore. */
+    align-items: start;
+  }
+
+  /* La tendina non si stringe e non si allarga: a `flex: 1` un nome di paese
+     lungo — «Saint Vincent e Grenadine» — le farebbe prendere metà della riga e
+     al numero resterebbe uno spiraglio. La larghezza basta per «🇮🇹 +39» e per i
+     prefissi a tre cifre, che è tutto quello che si vede quando è chiusa. */
+  .tel__prefisso {
+    flex: 0 0 auto;
+    width: 7.5rem;
+    /* `text-overflow` non funziona su un `select` chiuso in tutti i browser, ma
+       il testo visibile è corto per costruzione: la voce selezionata è quella in
+       testa, «🇮🇹 +39», e le altre mostrano il paese solo mentre il menu è
+       aperto — dove lo spazio è quello della lista, non del campo. */
+    text-overflow: ellipsis;
+  }
+
+  .tel__numero {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  /* Visibile agli screen reader, non all'occhio. `clip` e non `display: none`,
+     che la toglierebbe anche a loro. */
+  .tel__nascosta {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Su un telefono stretto i due campi in fila lasciano al numero meno di
+     duecento pixel, e il numero è il campo che si scrive: la tendina va sopra,
+     larga come tutto. */
+  @media (max-width: 420px) {
+    .tel {
+      flex-direction: column;
+    }
+
+    .tel__prefisso {
+      width: 100%;
+    }
+  }
+</style>

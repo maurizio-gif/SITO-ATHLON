@@ -117,13 +117,48 @@ import { PORTALE } from '../data/contatto';
         <a class="btn btn-primary is__btn" href={PORTALE.login} target="_blank" rel="noopener noreferrer">
           Accedi al portale →
         </a>
-        {/* Il link resta sulla riga della domanda: a capo, Astro toglierebbe lo
-            spazio e il testo direbbe «password?Richiedi il reset». Qui la
-            spaziatura del `padding` lo nasconderebbe all'occhio ma non a chi
-            legge con la voce. */}
-        <p class="is__reset">
-          Non ricordi la password? <a href={PORTALE.reset} target="_blank" rel="noopener noreferrer">Richiedi il reset</a>
+        {/* Il reset non è più un link che porta via: è un pulsante che fa
+            partire la mail e lascia la persona qui.
+
+            Prima portava alla pagina `ForgotPassword` del portale, dove la
+            prima cosa da fare era **ridigitare** l'indirizzo appena scritto nel
+            campo sopra — in un'altra applicazione, con un'altra grafica, in
+            un'altra scheda. Tre occasioni di perdersi per un dato che avevamo
+            già.
+
+            Il verbo dice cosa succede: «Inviami l'email...» e non «Richiedi il
+            reset», perché il primo descrive un invio e il secondo una pratica.
+            Resta subordinato all'accesso — è la deviazione, non l'azione —
+            quindi vive dentro il paragrafo della domanda. */}
+        <p class="is__reset" data-is-reset-riga>
+          Non ricordi la password?
+          <button type="button" class="is__reset-btn" data-is-reset>
+            Inviami l'email per reimpostarla
+            <span class="is__spinner" data-is-reset-spinner hidden aria-hidden="true"></span>
+          </button>
         </p>
+
+        {/* La conferma prende il posto della riga qui sopra: l'indirizzo si
+            ripete per intero perché è la cosa che la persona deve andare a
+            controllare, e sapere *in quale* casella guardare è metà
+            dell'informazione — su un dispositivo di casa la mail che il browser
+            ricordava può essere di un'altra persona.
+
+            `aria-live` perché il cambio avviene senza ricaricare né spostare il
+            fuoco: chi usa uno screen reader altrimenti non saprebbe che il
+            pulsante ha fatto qualcosa. `polite` e non `assertive` — è una
+            conferma, non un allarme. */}
+        <p class="is__reset-esito" data-is-reset-fatto hidden aria-live="polite">
+          Controlla la tua email <strong data-is-reset-email></strong> e clicca sul link che ti
+          abbiamo inviato per impostare una nuova password.
+        </p>
+
+        {/* Se la chiamata non riesce non c'è nessun messaggio: si apre la pagina
+            del portale, che è la cosa che la persona voleva. Un avviso qui
+            l'avrebbe rimandata a leggere e poi a cliccare per arrivare allo
+            stesso posto — due passi in più per una cosa che è già andata
+            storta. L'indirizzo sta in `PORTALE.reset` e lo usa
+            `iscrizione.client.js`; qui non serve markup. */}
       </div>
 
       {/* La via di ritorno, e non è una gentilezza in più: il campo email arriva
@@ -346,13 +381,66 @@ import { PORTALE } from '../data/contatto';
     color: rgba(39, 36, 35, 0.7);
   }
 
-  .is__reset a {
+  /* Il pulsante del reset condivide la regola col link, e deve: è la stessa
+     cosa vista due volte — la parola dentro la frase che si può toccare. Le
+     tre righe che seguono servono solo a togliere al `<button>` l'aspetto che
+     il browser gli dà da sé; l'altezza del bersaglio la porta il `padding` di
+     sopra, ed è la ragione per cui le due regole non si separano. */
+  .is__reset a,
+  .is__reset-btn {
     display: inline-block;
     padding: 0.8rem 0.4rem;
     font-weight: 600;
     color: var(--accent-text);
     text-decoration: underline;
   }
+
+  .is__reset-btn {
+    border: 0;
+    background: none;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    cursor: pointer;
+  }
+
+  .is__reset-btn:disabled {
+    cursor: progress;
+    opacity: 0.6;
+  }
+
+  /* Lo spinner dentro una parola, non dentro un pulsante pieno: `currentColor`
+     lo tiene arancione come il testo che accompagna, e il margine lo stacca
+     dall'ultima lettera. */
+  .is__reset-btn .is__spinner {
+    margin-left: 0.4rem;
+    vertical-align: -0.1em;
+    border-color: currentColor;
+    border-top-color: transparent;
+  }
+
+  /* L'esito prende il posto della riga della domanda, quindi ne eredita la
+     misura: cambiare corpo qui farebbe saltare il pannello di qualche pixel nel
+     momento del passaggio. Il verde è quello delle conferme del sito, non un
+     verde nuovo. */
+  .is__reset-esito {
+    margin: 0;
+    padding: 0.7rem 0.9rem;
+    border-radius: var(--radius-sm, 0.5rem);
+    background: rgba(111, 207, 151, 0.14);
+    text-align: center;
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    color: rgba(39, 36, 35, 0.85);
+  }
+
+  .is__reset-esito strong {
+    /* L'indirizzo può essere lungo e senza spazi: senza questo allarga il
+       pannello invece di andare a capo. */
+    overflow-wrap: anywhere;
+    color: var(--color-dark);
+  }
+
 
   .is__nota {
     margin: 1rem 0 0;

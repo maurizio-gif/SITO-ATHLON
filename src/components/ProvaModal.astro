@@ -17,6 +17,9 @@
  * chiave nel browser, nessuna route server, il sito resta statico.
  */
 import { REGISTRAZIONE, PASSI_ATTIVAZIONE as PASSI } from '../data/guestPass';
+import { SINGOLI } from '../data/abbonamenti';
+import { TALK } from '../data/cta';
+import CampoTelefono from './CampoTelefono.astro';
 ---
 
 <div class="pf" id="prova-modal" aria-hidden="true">
@@ -45,18 +48,54 @@ import { REGISTRAZIONE, PASSI_ATTIVAZIONE as PASSI } from '../data/guestPass';
       </button>
     </section>
 
-    {/* ── 2a. È già socio: il Pass non si attiva ─────────────────────── */}
+    {/* ── 2a. Il Pass non si attiva, ma provare si può ────────────────
+
+        Questa schermata era scritta come un diniego — «Solo per chi non è mai
+        stato socio», e sotto un rimando agli abbonamenti — e leggeva come se la
+        risposta fosse no. Non lo è: l'unica cosa che non si attiva è **questo**
+        pass, perché è riservato a chi non ci ha mai provato. Provare resta
+        possibile in due modi, e sono entrambi immediati: una lezione singola,
+        che non chiede nessun impegno, o un abbonamento.
+
+        Quindi si nomina la lezione singola per prima e col suo prezzo. È la
+        cosa più vicina a quello che la persona stava cercando quando ha
+        premuto «Prova Athlon», e senza il prezzo un rimando a «accessi
+        singoli» sembra la solita pagina da studiare. */}
     <section class="pf__step" id="pf-step-blocco" hidden>
-      <span class="pf__eyebrow">Guest Pass non attivabile</span>
-      <h3 class="pf__title" tabindex="-1" data-pf-fuoco>Solo per chi non è mai stato socio.</h3>
+      <span class="pf__eyebrow">Il Guest Pass no, ma provare sì</span>
+      <h3 class="pf__title" tabindex="-1" data-pf-fuoco>Ci sono altri due modi.</h3>
       <p class="pf__lead">
-        Il Guest Pass Premium è attivabile soltanto da chi non ha e non ha avuto un abbonamento Athlon
-        dal 2021. Per allenarti con noi puoi partire da un abbonamento, oppure scriverci: troviamo
-        insieme la formula giusta.
+        Il Guest Pass è riservato a chi non ha mai avuto un abbonamento Athlon dal 2021, e a te
+        risulta già un tesseramento: quello non possiamo attivarlo. Ma per rimettere piede in
+        palestra non serve — puoi <strong>prenotare una lezione singola</strong>, da €{SINGOLI.voci
+          .map((v) => Number(v.prezzo))
+          .sort((a, b) => a - b)[0]}, e pagare solo quella,
+        oppure scegliere <strong>uno dei nostri abbonamenti</strong>. Nel dubbio, scrivici: ti
+        diciamo qual è la formula giusta per come ti alleni.
       </p>
       <div class="pf__azioni">
-        <a class="btn btn-primary pf__btn" href="/abbonamenti">Vedi gli abbonamenti →</a>
-        <a class="pf__link" href="/club-life#contatti">Preferisco parlarne con voi</a>
+        {/* Due strade alternative, quindi due comandi dello stesso peso: stesso
+            stile, stessa larghezza, affiancati. Prima la lezione singola era il
+            pulsante pieno e l'abbonamento un link sottolineato, cioè la pagina
+            suggeriva una risposta — e non c'è una risposta da suggerire: chi
+            vuole rientrare una volta prende la lezione, chi ha deciso prende
+            l'abbonamento, e il club non ha motivo di spingere l'una o l'altro.
+
+            L'abbonamento punta a `#piani`, non alla cima della pagina: chi ha
+            già scelto «abbonamento» ha superato l'introduzione, e deve trovarsi
+            davanti «Come vuoi vivere il club?». */}
+        <div class="pf__scelta">
+          <a class="btn btn-primary pf__btn" href="/abbonamenti#accessi-singoli">Lezione singola →</a>
+          <a class="btn btn-primary pf__btn" href="/abbonamenti#piani">Abbonamenti →</a>
+        </div>
+        {/* Questo apre il modulo contatti, e il `data-cta="talk"` è tutto il
+            meccanismo: `ContattaciModal` ascolta sul documento. L'`href` resta
+            per chi non ha JavaScript. Il gestore qui sotto chiude questo
+            pannello, altrimenti i due resterebbero impilati — è la stessa cosa
+            che `ContattaciModal` fa col rimando all'assistente. */}
+        <a class="pf__link" href={TALK.href} data-cta="talk" data-cta-source="prova-non-attivabile">
+          Preferisco contattarvi
+        </a>
       </div>
     </section>
 
@@ -78,7 +117,7 @@ import { REGISTRAZIONE, PASSI_ATTIVAZIONE as PASSI } from '../data/guestPass';
       </div>
 
       <label class="pf__label" for="pf-cellulare">Cellulare</label>
-      <input class="pf__input" id="pf-cellulare" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="320 112 2333" />
+      <CampoTelefono id="pf-cellulare" classe="pf__input" />
 
       <p class="pf__errore" data-pf-errore hidden></p>
 
@@ -196,6 +235,13 @@ import { REGISTRAZIONE, PASSI_ATTIVAZIONE as PASSI } from '../data/guestPass';
     });
 
     modal.querySelectorAll('[data-pf-close]').forEach((el) => el.addEventListener('click', chiudi));
+
+    // Il passaggio al modulo contatti: quello lo apre `ContattaciModal`, che
+    // ascolta `data-cta="talk"` sul documento. Qui si chiude solo questo
+    // pannello, altrimenti i due resterebbero impilati.
+    modal.querySelectorAll('[data-cta="talk"]').forEach((el) =>
+      el.addEventListener('click', () => chiudi())
+    );
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && modal.classList.contains('open')) chiudi();
@@ -420,6 +466,22 @@ import { REGISTRAZIONE, PASSI_ATTIVAZIONE as PASSI } from '../data/guestPass';
     gap: 0.75rem;
   }
 
+  /* Le due alternative sulla stessa riga e della stessa misura: `flex: 1 1 0`
+     le rende identiche qualunque sia la lunghezza dell'etichetta, che è la
+     condizione perché leggano come pari — con `flex-basis: auto` la più lunga
+     si prenderebbe più spazio e tornerebbe a sembrare la principale. */
+  .pf__scelta {
+    display: flex;
+    gap: 0.625rem;
+    width: 100%;
+  }
+
+  .pf__scelta .pf__btn {
+    flex: 1 1 0;
+    justify-content: center;
+    text-align: center;
+  }
+
   .pf__link {
     display: inline-flex;
     align-items: center;
@@ -569,6 +631,16 @@ import { REGISTRAZIONE, PASSI_ATTIVAZIONE as PASSI } from '../data/guestPass';
     }
     .pf__panel {
       padding: 1.75rem 1.25rem 1.5rem;
+    }
+  }
+
+  /* Su un telefono stretto le due alternative non ci stanno affiancate: a 375px
+     il pannello lascia 303px di contenuto, cioè 146px a pulsante, e
+     «Lezione singola →» ne chiede 165 — la parola si spezzerebbe. In colonna
+     restano comunque identiche, che è la cosa che conta. */
+  @media (max-width: 420px) {
+    .pf__scelta {
+      flex-direction: column;
     }
   }
 

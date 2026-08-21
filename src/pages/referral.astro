@@ -1,0 +1,322 @@
+---
+/**
+ * «Invita un amico»: una pagina che è il form.
+ *
+ * Il pannello si apre da sé al caricamento — lo fa `referralForm.client.js`,
+ * che riconosce questo indirizzo — quindi quello che c'è sotto non è la pagina
+ * principale: è quello che resta quando il pannello si chiude, e quello che vede
+ * chi ha JavaScript disattivato.
+ *
+ * **Perciò sotto c'è l'offerta scritta per intero**, e non un rimando: chi chiude
+ * il pannello per pensarci si troverebbe davanti il nulla. Le cifre sono quelle
+ * di `data/referral.ts`, le stesse che il pannello mostra — un prezzo scritto
+ * due volte è un prezzo che prima o poi diverge.
+ *
+ * **`noindex` e senza intestazione**, per scelta del club: è una pagina che si
+ * raggiunge da un link — il pulsante in Club Life, una newsletter, un QR in
+ * sede — non dai motori di ricerca. Il programma è per i soci, e una pagina
+ * indicizzata porterebbe soprattutto persone che al primo passo si sentono
+ * dire no. Senza header non è nemmeno navigabile per caso, ed è coerente:
+ * questa pagina fa una cosa sola.
+ *
+ * Il modal è importato qui e non nel Layout, e nemmeno per errore: sono dieci
+ * chilobyte di markup che su settantasette pagine non servono a nessuno. Dove
+ * non c'è, un comando `data-cta="referral"` resta il link che è — porta qui, e
+ * qui il pannello si apre. Il ripiego è la pagina stessa.
+ */
+import Layout from '../layouts/Layout.astro';
+import ReferralModal from '../components/ReferralModal.astro';
+import { PASS, VOUCHER, COMPRESO, AMICI } from '../data/referral';
+import { fotoHero } from '../data/foto';
+
+const FOTO = '/wp-content/uploads/2025/03/Athlon95-scaled.jpg';
+---
+
+<Layout
+  title={`Invita un amico | ${PASS.giorni} giorni di Athlon a €${PASS.prezzo} | Athlon Club Roma`}
+  description={`Sei socio Athlon? Invita un amico: lui prova il club per ${PASS.giorni} giorni pagando solo il badge da €${PASS.prezzo}, e se poi si iscrive tu ricevi un voucher da €${VOUCHER.valore} ${VOUCHER.uso}.`}
+  breadcrumb={[{ name: 'Invita un amico', path: '/referral' }]}
+  chrome={false}
+  noindex
+>
+  <section class="rp-hero">
+    <img
+      class="rp-hero__bg"
+      src={FOTO}
+      alt="Un gruppo durante una lezione ad Athlon Club"
+      {...fotoHero(FOTO)}
+    />
+    <div class="rp-hero__scrim" aria-hidden="true"></div>
+
+    <div class="container rp-hero__inner">
+      <span class="eyebrow">Solo per i soci</span>
+      <h1 class="rp-hero__title">Invita i tuoi<br /><em class="accent">amici</em></h1>
+      <p class="rp-hero__lede">
+        Da soli si comincia. In gruppo si continua.
+      </p>
+      {/* Il perché prima del cosa: chi arriva qui non sta cercando un'offerta,
+          sta decidendo se disturbare tre amici. La ragione per cui il club lo
+          incoraggia — chi si allena in compagnia molla meno — è quello che
+          rende l'invito una cosa da fare e non un favore da chiedere.
+
+          «Praticamente in regalo» e non «gratis»: il badge costa €5, e una
+          promessa di gratuità smentita alla cassa vale meno di zero. Allo stesso
+          modo «fino a tre alla volta» e non «quanti vuoi»: tre è il limite del
+          modulo, e si può tornare. */}
+      <p class="rp-hero__sub">
+        Chi si allena in compagnia si ferma meno: ci si aspetta, ci si tira, si torna. Per questo
+        puoi invitare <strong>fino a {AMICI} amici alla volta</strong> — e puoi tornare a invitarne
+        altri. Ognuno prova <strong>tutto il club per {PASS.giorni} giorni</strong> praticamente in
+        regalo: paga solo il badge di accesso, <strong>€{PASS.prezzo}</strong> invece dei
+        €{PASS.prezzoPieno} del Guest Pass. E per ognuno che poi si iscrive, a te arriva
+        un <strong>voucher da €{VOUCHER.valore}</strong> {VOUCHER.uso}.
+      </p>
+
+      <button type="button" class="btn btn-primary rp-hero__cta" data-cta="referral">
+        Manda gli inviti →
+      </button>
+    </div>
+  </section>
+
+  <section class="rp-sec">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Cosa prova</span>
+      <h2 class="rp-sec__title" data-anim="reveal">Tutto il club, per {PASS.giorni} giorni.</h2>
+      <p class="rp-sec__sub">
+        Il pass apre il palinsesto completo — le stesse attività dell'abbonamento Premium, senza
+        limitazioni sui giorni — e vale così per ognuno degli amici che inviti.
+      </p>
+
+      <ul class="rp-lista">
+        {COMPRESO.map((c) => <li class="rp-lista__voce">{c}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="rp-sec rp-sec--alt">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Come funziona</span>
+      <h2 class="rp-sec__title" data-anim="reveal">Tre passi, due minuti.</h2>
+
+      <ol class="rp-passi">
+        <li>
+          <span class="rp-passi__num u-display">01</span>
+          <span class="rp-passi__testo">
+            <strong>Lasci la tua email</strong>, quella con cui sei registrato al portale:
+            controlliamo che il tuo abbonamento sia attivo.
+          </span>
+        </li>
+        <li>
+          <span class="rp-passi__num u-display">02</span>
+          <span class="rp-passi__testo">
+            <strong>Aggiungi i tuoi amici</strong>, fino a {AMICI}: nome, cognome, email e
+            cellulare di ognuno. Il pass gli arriva per email e su WhatsApp, a nome tuo.
+          </span>
+        </li>
+        <li>
+          <span class="rp-passi__num u-display">03</span>
+          <span class="rp-passi__testo">
+            <strong>Vengono ad allenarsi</strong> con te. Per ognuno che si iscrive, un voucher da
+            €{VOUCHER.valore} arriva a te.
+          </span>
+        </li>
+      </ol>
+
+      <div class="rp-chiusura">
+        <button type="button" class="btn btn-primary rp-hero__cta" data-cta="referral">
+          Manda l'invito →
+        </button>
+        {/* Le due condizioni che decidono se l'invito parte, dette qui e non in
+            fondo in corpo minuscolo: sono le sole due ragioni per cui il form
+            può dire no, e chi le legge prima non ci sbatte contro dopo. */}
+        <p class="rp-chiusura__nota">
+          Serve un abbonamento attivo per invitare, e chi inviti non deve essere già iscritto: il
+          pass è per chi non frequenta. Lo controlliamo noi mentre compili, così non mandi un
+          invito che non può partire.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <ReferralModal />
+</Layout>
+
+<style>
+  /* ---- Hero ---- */
+  .rp-hero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 34rem;
+    padding-bottom: var(--space-section-sm);
+    background: var(--color-dark);
+    color: var(--color-white);
+    overflow: hidden;
+  }
+
+  .rp-hero__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 22%;
+  }
+
+  .rp-hero__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      rgba(23, 21, 20, 0.72) 0%,
+      rgba(23, 21, 20, 0.82) 45%,
+      rgba(23, 21, 20, 0.94) 100%
+    );
+  }
+
+  .rp-hero__inner {
+    position: relative;
+    z-index: 1;
+    padding-top: var(--space-section-lg);
+  }
+
+  .rp-hero__title {
+    font-size: var(--text-4xl);
+    --lh: var(--leading-4xl);
+    letter-spacing: var(--tracking-4xl);
+    margin: 0.875rem 0 0;
+  }
+
+  .rp-hero__title .accent {
+    font-style: normal;
+    color: var(--color-primary);
+  }
+
+  .rp-hero__lede {
+    max-width: 34rem;
+    margin: 0.625rem 0 0;
+    font-size: var(--text-2xl);
+    line-height: 1.05;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .rp-hero__sub {
+    max-width: 40rem;
+    margin: 0.875rem 0 0;
+    font-size: var(--text-base);
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .rp-hero__sub strong {
+    color: var(--color-white);
+    font-weight: 600;
+  }
+
+  /* Il corpo dentro la scala: un `0.875rem` scritto a mano resterebbe indietro
+     sul totem e sul televisore, dove la radice cresce. */
+  .rp-hero__cta {
+    margin-top: 1.5rem;
+    font-size: var(--text-sm);
+  }
+
+  /* ---- Sezioni ---- */
+  .rp-sec {
+    padding: var(--space-section-md) 0;
+  }
+
+  .rp-sec--alt {
+    background: var(--color-cream);
+  }
+
+  .rp-sec__title {
+    font-size: var(--text-2xl);
+    --lh: var(--leading-2xl);
+    letter-spacing: var(--tracking-2xl);
+    margin: 0.75rem 0 0.5rem;
+  }
+
+  .rp-sec__sub {
+    max-width: 40rem;
+    margin: 0 0 1.75rem;
+    color: var(--text-muted);
+  }
+
+  /* Le sette attività: la griglia si sistema da sé e il minimo è in rem, quindi
+     sul totem e sul televisore perde una colonna senza una media query. */
+  .rp-lista {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 0.625rem;
+    margin: 0;
+    padding: 0;
+  }
+
+  .rp-lista__voce {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 3.25rem;
+    padding: 0.875rem 1.125rem;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    font-weight: 500;
+  }
+
+  .rp-lista__voce::before {
+    content: '✓';
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  .rp-passi {
+    list-style: none;
+    display: grid;
+    gap: 1rem;
+    max-width: 46rem;
+    margin: 1.75rem 0 0;
+    padding: 0;
+    counter-reset: rp;
+  }
+
+  .rp-passi li {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+  }
+
+  .rp-passi__num {
+    flex: none;
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    --lh: 1;
+    color: var(--color-primary);
+  }
+
+  .rp-passi__testo {
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  .rp-passi__testo strong {
+    color: var(--color-dark);
+    font-weight: 600;
+  }
+
+  .rp-chiusura {
+    margin-top: 2rem;
+  }
+
+  .rp-chiusura__nota {
+    max-width: 40rem;
+    margin: 1rem 0 0;
+    font-size: var(--text-xs);
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+</style>

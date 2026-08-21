@@ -32,6 +32,7 @@ import {
   CONSENSO_MARKETING,
   PORTALE,
 } from '../data/contatto';
+import CampoTelefono from './CampoTelefono.astro';
 ---
 
 <div class="cf" id="contattaci-modal" aria-hidden="true">
@@ -177,7 +178,7 @@ import {
       </div>
 
       <label class="cf__label" for="cf-cellulare">Cellulare</label>
-      <input class="cf__input" id="cf-cellulare" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="320 112 2333" />
+      <CampoTelefono id="cf-cellulare" classe="cf__input" />
 
       <label class="cf__consenso">
         <input type="checkbox" id="cf-privacy" />
@@ -274,7 +275,7 @@ import {
       <input class="cf__input" id="cf-g-nascita" type="date" autocomplete="bday" />
 
       <label class="cf__label" for="cf-g-cellulare">Il tuo cellulare</label>
-      <input class="cf__input" id="cf-g-cellulare" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="320 112 2333" />
+      <CampoTelefono id="cf-g-cellulare" classe="cf__input" />
 
       <label class="cf__consenso">
         <input type="checkbox" id="cf-g-privacy" />

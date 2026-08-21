@@ -91,7 +91,15 @@ const graph = [
 ---
 
 <!doctype html>
-<html lang="it">
+{/* `data-senza-intestazione` quando la pagina non ha l'header: `global.css`
+    ci azzera `--header-h`. Serve perché quella variabile la pubblica il
+    `ResizeObserver` dentro `Header.astro`, che su queste pagine non esiste, e
+    lo `scroll-padding-top` cadrebbe sul ripiego di 73px — settantatré pixel di
+    scarto sopra ogni ancora di una pagina che non ha niente in cima. Un
+    attributo e non uno `<style is:inline>`: quello passa il contenuto alla
+    lettera, espressioni comprese, quindi le graffe del CSS finirebbero in
+    pagina come testo (provato). */}
+<html lang="it" data-senza-intestazione={chrome ? undefined : ''}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

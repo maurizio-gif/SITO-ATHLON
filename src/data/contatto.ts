@@ -32,12 +32,44 @@ export const WEBHOOK_VERIFICA = 'https://automazione.n8ndevelop.it/webhook/athlo
  */
 export const WEBHOOK_CONTATTO = 'https://automazione.n8ndevelop.it/webhook/athlon-contatto-compilato';
 
+/**
+ * L'endpoint che chiede a PerfectGym di mandare la mail per reimpostare la
+ * password. Riceve `{ email }` e risponde `inviata`, `errore` o
+ * `email_non_valida`.
+ *
+ * Esiste per togliere un attrito preciso: chi ha già un account arrivava sulla
+ * pagina `ForgotPassword` del portale e là doveva **ridigitare** l'indirizzo che
+ * aveva appena scritto nel nostro campo, in un'applicazione con un'altra grafica
+ * e in un'altra scheda. Ora il pulsante fa partire la mail e la persona resta
+ * qui.
+ *
+ * Dietro c'è `POST /Api/v2.2/MemberAuth/SendResetPasswordLink`, e come sempre la
+ * chiamata la fa n8n: le chiavi di PerfectGym non stanno nel browser.
+ *
+ * **`inviata` non è una prova di consegna**, e sono due cose distinte. La prima:
+ * quell'endpoint risponde `200` anche per un indirizzo che non esiste — provato,
+ * `content-length: 0` — perché non deve rivelare a un estraneo se un account c'è.
+ * Qui non è un problema, perché il pulsante lo vede solo chi la verifica ha già
+ * riconosciuto. La seconda: la mail parte solo se in PerfectGym c'è la regola di
+ * automazione «User password reset has been requested». Senza quella la risposta
+ * è `200` e non parte niente — è la sola parte di questo percorso che non si può
+ * verificare dal codice.
+ */
+export const WEBHOOK_RESET = 'https://automazione.n8ndevelop.it/webhook/athlon-reset-password';
+
 /* Il calendario e i suoi indirizzi non stanno più qui: sono in
    `data/calendly.ts`, perché i posti che lo usano sono tre — questo form,
    quello della prova e l'assistente in chat — e la logica dell'embed è in
    `lib/calendario.client.js`. */
 
-/** Il portale, per chi risulta già registrato: reset password e accesso. */
+/**
+ * Il portale, per chi risulta già registrato: reset password e accesso.
+ *
+ * `reset` non è più la strada principale — la mail la fa partire
+ * `WEBHOOK_RESET` — ma resta, ed è il ripiego che serve: se la chiamata non
+ * riesce, la persona deve avere ancora un modo di reimpostare la password, e
+ * quel modo è la pagina del portale.
+ */
 export const PORTALE = {
   reset: 'https://athlon.perfectgym.com/ClientPortal2/#/ForgotPassword',
   login: 'https://athlon.perfectgym.com/ClientPortal2/#/Login',
@@ -64,6 +96,25 @@ export const PORTALE = {
  */
 export function haGiaAccount(esito: { memberType?: string; stato?: string }): boolean {
   if (esito.memberType) return /member|guest/i.test(esito.memberType);
+  return esito.stato === 'iscritto';
+}
+
+/**
+ * Se questa email è di un **socio**, non solo di chi ha un account.
+ *
+ * È una domanda diversa da `haGiaAccount`, e la differenza è tutto il referral:
+ * là dentro `Guest` conta come «ha un account», qui no. Chi invita deve essere
+ * socio — un guest non ha un abbonamento da cui far partire un invito — e chi
+ * viene invitato non deve esserlo, perché il pass è per chi non frequenta.
+ * La stessa riga risponde alle due domande da due lati.
+ *
+ * `Guest` passa di proposito, sul lato invitato: chi ha fatto una prova in
+ * passato può riceverne un'altra. È la regola che il flusso su n8n applica
+ * oggi, confermata dal club, e va detta perché il messaggio di rifiuto di
+ * quel flusso promette il contrario — «o ha già attivato una prova».
+ */
+export function eSocio(esito: { memberType?: string; stato?: string }): boolean {
+  if (esito.memberType) return /member/i.test(esito.memberType);
   return esito.stato === 'iscritto';
 }
 

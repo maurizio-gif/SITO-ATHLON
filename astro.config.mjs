@@ -56,6 +56,11 @@ export default defineConfig({
         !page.includes('/ginnastica-strutturale') &&
         !page.includes('/diagnostica-schermo') &&
         !page.includes('/attiva') &&
+        /* `/referral` è `noindex` per scelta del club: si raggiunge da un link,
+           non da una ricerca. Una pagina che dice a un motore di non indicizzarla
+           e poi si dichiara nella sitemap è la contraddizione che questa riga
+           evita, la stessa di `/attiva`. */
+        !page.includes('/referral') &&
         !page.includes('/wikiathlon/'),
 
       /* Priorità e frequenza sono suggerimenti, e Google li ignora — restano

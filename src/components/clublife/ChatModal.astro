@@ -17,6 +17,7 @@
  * l'header, una pagina corso — le due copie divergerebbero al primo bug corretto
  * in una sola delle due.
  */
+import CampoTelefono from '../CampoTelefono.astro';
 ---
 
 <div class="ca" id="chat-assistente" aria-hidden="true">
@@ -162,15 +163,7 @@
         </div>
         <div class="ca__campo">
           <label class="ca__label" for="ca-cellulare">Cellulare</label>
-          <input
-            class="ca__input"
-            id="ca-cellulare"
-            type="tel"
-            inputmode="tel"
-            autocomplete="tel"
-            placeholder="3XX XXXXXXX"
-            data-ca-f="cellulare"
-          />
+          <CampoTelefono id="ca-cellulare" classe="ca__input" />
         </div>
       </div>
 

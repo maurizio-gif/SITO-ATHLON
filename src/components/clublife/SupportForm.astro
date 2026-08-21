@@ -8,7 +8,22 @@
  * richieste_help_desk). The field names below are the contract with it — rename
  * one here and it stops arriving in the email and in the database.
  */
+import { ACTIVITY_TAGS } from '../../data/activities';
+
 const SUPPORT_ENDPOINT = 'https://automazione.n8ndevelop.it/webhook/help-desk-athlon';
+
+/* Le stesse voci del primo passo del box, dalla stessa lista: `ACTIVITY_TAGS` è
+   la sorgente unica — popola la tendina di Tina, la validazione delle
+   collezioni, il box dell'Help Desk e adesso anche questa. Aggiungere
+   un'attività là la fa comparire qui senza toccare niente.
+
+   Divise per pubblico come nel box, perché «Scuola Nuoto» esiste in due
+   versioni e le due procedure non sono la stessa: senza i due gruppi la tendina
+   avrebbe due voci quasi identiche in un elenco piatto di dodici. */
+const GRUPPI = [
+  { label: 'Adulti', voci: ACTIVITY_TAGS.filter((a) => a.audience === 'adulti') },
+  { label: 'Junior', voci: ACTIVITY_TAGS.filter((a) => a.audience === 'junior') },
+];
 
 /** The five standard campaign parameters, captured as-is when present. */
 const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
@@ -20,69 +35,114 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
   <div class="sup" role="dialog" aria-modal="true" aria-labelledby="sup-title">
     <button type="button" class="sup__close" data-support-close aria-label="Chiudi">×</button>
 
+    {/* «Parla» era la parola sbagliata: da qui non parte una telefonata ma un
+        messaggio, e chi legge «parla con il nostro team» si aspetta qualcuno in
+        linea. Il verbo dice cosa succede davvero.
+
+        E il tempo di risposta sta nel testo grande e non in fondo in corpo
+        minuscolo, perché è la cosa che decide se una persona scrive o rinuncia:
+        «ti risponde una persona, in breve tempo» non è una promessa, è una
+        formula. «In pochi minuti» lo è. */}
     <div class="sup__head">
-      <span class="sup__eyebrow">Scrivi all'assistenza</span>
-      <h3 class="sup__title u-display" id="sup-title">Parla con il nostro team</h3>
+      <span class="sup__eyebrow">Richiedi assistenza</span>
+      <h3 class="sup__title u-display" id="sup-title">Scrivi al nostro team</h3>
       <p class="sup__lede">
-        Mandaci la domanda: ti risponde una persona del club, via email, in breve tempo.
+        La tua richiesta la legge una persona del club, non un risponditore
+        automatico: <strong>ti rispondiamo per email in pochi minuti</strong>.
       </p>
     </div>
 
   <form class="sup__form" data-support-form novalidate>
-    {/* Not a field: the activity comes from the first step of the Help Desk box,
-        which is where the choice belongs. Shown so nobody wonders whether we
-        know what they are asking about. */}
+    {/* Una tendina, e a scelta **multipla**.
+
+        Era un paragrafo di sola lettura: l'attività la scegliava il primo passo
+        del box dell'Help Desk, e qui si mostrava soltanto. Funzionava finché al
+        form si arrivava dal box — da quando il pulsante «richiedi assistenza»
+        lo apre da solo, chi entra da lì non aveva modo di dire di cosa parla.
+
+        `multiple` perché il box ne fa scegliere più di una, e una tendina a
+        scelta singola non sa rappresentare «Gym Floor e Aqua Fitness»: la
+        selezione della persona sarebbe stata troncata a una voce senza dirlo.
+
+        Il dato inviato resta il campo nascosto qui sotto, che è quello che il
+        workflow legge e che il box riempie: la tendina lo comanda, non lo
+        sostituisce. Le voci hanno per valore l'**etichetta** e non l'id, perché
+        il workflow riceve «Gym Floor, Aqua Fitness» e la mail al desk le stampa
+        così — è il formato che il flusso vecchio scriveva.
+
+        Niente voce «Non specificata»: in una scelta multipla il non specificato
+        è non selezionare niente, e una voce che vuol dire «nessuna» accanto a
+        dodici che si possono spuntare insieme è una contraddizione da cliccare.
+        Il ripiego lo mette lo script all'apertura. */}
     <div class="fld">
-      <span class="fld__label">Attività di interesse <span class="fld__req">*</span></span>
-      <p class="sup__activity" data-support-activity-label></p>
+      <label class="fld__label" for="sup-attivita">Attività di interesse</label>
+      <select
+        class="fld__input fld__multi"
+        id="sup-attivita"
+        multiple
+        size="6"
+        data-support-activity-select
+      >
+        {GRUPPI.map((g) => (
+          <optgroup label={g.label}>
+            {g.voci.map((a) => <option value={a.label}>{a.label}</option>)}
+          </optgroup>
+        ))}
+      </select>
+      <p class="fld__hint">
+        Puoi scegliere più di una — su desktop con <kbd>Ctrl</kbd> o <kbd>Cmd</kbd> — oppure
+        nessuna. Ci aiuta a mandare la richiesta alla persona giusta.
+      </p>
     </div>
 
+    {/* I due campi Nome e Cognome non ci sono più, e il loro contenuto è finito
+        qui dentro. La ragione è che erano la domanda sbagliata fatta nel posto
+        sbagliato: chiedevano «il nome dell'utente per il quale si richiede
+        assistenza» in due caselle da riempire prima di poter inviare, e chi
+        scrive per sé le compilava con i propri, chi scrive per un figlio si
+        fermava a decidere di chi fosse il nome richiesto. Due campi
+        obbligatori per un dato che l'automazione ora ricava dall'email
+        interrogando PerfectGym.
+
+        Quello che resta da chiedere è il contesto, e il contesto non entra in
+        una casella: sta nel testo, e va chiesto lì con degli esempi. Il
+        segnaposto elenca le tre cose che al desk servono davvero per non
+        dover riscrivere chiedendo. */}
     <div class="fld">
       <label class="fld__label" for="sup-message">La tua domanda <span class="fld__req">*</span></label>
       <textarea
         class="fld__input fld__input--area"
         id="sup-message"
         name="message"
-        rows="5"
+        rows="6"
         required
-        placeholder="Scrivi qui la tua domanda, con più dettagli possibile."
+        placeholder="Raccontaci tutto: nome e cognome dell'iscritto per cui scrivi, il corso o l'orario di cui si tratta, le date, e qualsiasi altro dettaglio utile."
+        aria-describedby="sup-message-hint"
         data-support-message></textarea>
+      <p class="fld__hint" id="sup-message-hint">
+        Più cose ci scrivi, meno passaggi servono: indica sempre <strong>nome e cognome
+        dell'iscritto</strong> per il quale chiedi assistenza — che può essere tuo figlio, non
+        necessariamente tu — e tutto quello che può aiutarci a sistemare la cosa al primo colpo.
+      </p>
     </div>
 
-    {/* The name is the member's, not necessarily the sender's: a parent writes
-        for a child, and the desk looks the account up by that name. */}
-    <div class="sup__row">
-      <div class="fld">
-        <label class="fld__label" for="sup-first">Nome <span class="fld__req">*</span></label>
-        <input
-          class="fld__input"
-          id="sup-first"
-          name="firstName"
-          type="text"
-          required
-          autocomplete="given-name"
-          aria-describedby="sup-first-hint"
-        />
-        <p class="fld__hint" id="sup-first-hint">
-          Nome dell'utente per il quale si richiede assistenza
-        </p>
-      </div>
-
-      <div class="fld">
-        <label class="fld__label" for="sup-last">Cognome <span class="fld__req">*</span></label>
-        <input
-          class="fld__input"
-          id="sup-last"
-          name="lastName"
-          type="text"
-          required
-          autocomplete="family-name"
-          aria-describedby="sup-last-hint"
-        />
-        <p class="fld__hint" id="sup-last-hint">
-          Cognome dell'utente per il quale si richiede assistenza
-        </p>
-      </div>
+    {/* Un allegato, e uno solo: la richiesta tipica ne ha uno — il certificato
+        medico, la schermata dell'app che dà errore, la ricevuta di un
+        pagamento. Un campo multiplo inviterebbe a caricare una cartella. */}
+    <div class="fld">
+      <label class="fld__label" for="sup-file">Allegato</label>
+      <input
+        class="fld__input fld__file"
+        id="sup-file"
+        type="file"
+        accept="image/*,application/pdf"
+        aria-describedby="sup-file-hint"
+        data-support-file
+      />
+      <p class="fld__hint" id="sup-file-hint">
+        Facoltativo: puoi caricare qui il tuo <strong>certificato medico</strong> o
+        uno <strong>screenshot</strong>. Immagine o PDF, fino a 5 MB.
+      </p>
     </div>
 
     <div class="sup__row">
@@ -125,8 +185,8 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
     <input type="hidden" name="rispostaLink" data-support-answer-url />
 
     <p class="sup__note">
-      <span class="fld__req">*</span> Tutti i campi sono obbligatori. Usiamo questi dati solo per
-      risponderti: nessun altro uso, nessuna lista.
+      <span class="fld__req">*</span> I campi con l'asterisco sono obbligatori. Usiamo questi dati
+      solo per risponderti: nessun altro uso, nessuna lista.
     </p>
 
     <button type="submit" class="sup__submit">Invia la domanda →</button>
@@ -142,7 +202,21 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
   const message = document.querySelector<HTMLTextAreaElement>('[data-support-message]');
   const status = document.querySelector<HTMLElement>('[data-support-status]');
   const activityField = document.querySelector<HTMLInputElement>('[data-support-activity]');
-  const activityLabel = document.querySelector<HTMLElement>('[data-support-activity-label]');
+  const activitySelect = document.querySelector<HTMLSelectElement>('[data-support-activity-select]');
+  const fileField = document.querySelector<HTMLInputElement>('[data-support-file]');
+
+  /** Il file in base64, senza il prefisso `data:` che il webhook non usa. */
+  const leggiBase64 = (f: File) =>
+    new Promise<string>((risolvi, rifiuta) => {
+      const r = new FileReader();
+      r.onload = () => {
+        const s = String(r.result || '');
+        const virgola = s.indexOf(',');
+        risolvi(virgola >= 0 ? s.slice(virgola + 1) : s);
+      };
+      r.onerror = () => rifiuta(r.error);
+      r.readAsDataURL(f);
+    });
 
   if (root && form) {
     const params = new URLSearchParams(location.search);
@@ -170,16 +244,6 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
     const urlEmail = fromUrl('email,Email,user_email');
     if (email && urlEmail) email.value = urlEmail;
 
-    // A URL usually carries one name string; split it across the two fields.
-    const first = form.querySelector<HTMLInputElement>('#sup-first');
-    const last = form.querySelector<HTMLInputElement>('#sup-last');
-    const urlFirst = fromUrl('firstname,firstName,nome,name');
-    const urlLast = fromUrl('lastname,lastName,cognome,surname');
-    if (first && urlFirst && !first.value) first.value = urlFirst.split(' ')[0];
-    if (last && !last.value) {
-      last.value = urlLast || urlFirst.split(' ').slice(1).join(' ');
-    }
-
     const pageField = form.querySelector<HTMLInputElement>('[data-support-page]');
     if (pageField) pageField.value = location.pathname + location.search;
 
@@ -187,8 +251,39 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
 
     const openModal = () => {
       lastFocus = document.activeElement as HTMLElement;
-      // The Help Desk box fills the hidden field just before opening this.
-      if (activityLabel) activityLabel.textContent = activityField?.value || '—';
+      /* La tendina si allinea al campo nascosto, che è quello che il box
+         dell'Help Desk riempie appena prima di aprire questo pannello. Tre
+         casi, e il terzo è la ragione per cui questo non è un `select.value =`
+         e basta:
+
+          - **niente** — si arriva dal pulsante in fondo alla sezione, e vale
+            «Non specificata», che è la prima voce;
+          - **una attività** — la tendina la trova fra le sue voci e la mostra;
+          - **più attività** insieme, «Gym Floor, Aqua Fitness», perché il box
+            ne fa scegliere quante se ne vuole. Nessuna voce corrisponde, e un
+            `value` che non corrisponde viene ignorato in silenzio: la tendina
+            tornerebbe su «Non specificata» e la scelta della persona sarebbe
+            **cancellata senza dirlo**. Quindi si aggiunge una voce con quel
+            testo esatto, e si toglie alla riapertura. */
+      if (activityField && !activityField.value.trim()) {
+        activityField.value = 'Non specificata';
+      }
+      if (activitySelect && activityField) {
+        /* Il campo nascosto porta una stringa separata da virgole, perché è così
+           che il box la scrive e così che il workflow la legge. Qui si spacchetta
+           per accendere le righe corrispondenti.
+
+           `Non specificata` non è una voce della tendina: è il valore che vale
+           quando non se n'è scelta nessuna, quindi non corrisponde a niente e
+           lascia la lista vuota — che è esattamente quello che deve mostrare. */
+        const scelte = activityField.value
+          .split(',')
+          .map((v) => v.trim())
+          .filter(Boolean);
+        Array.from(activitySelect.options).forEach((o) => {
+          o.selected = scelte.includes(o.value);
+        });
+      }
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
       document.body.classList.add('supm-locked');
@@ -206,6 +301,19 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
     // The chat flow opens it; keeping the handle on window avoids coupling the
     // two components through the DOM.
     (window as any).__athlonOpenSupport = openModal;
+
+    /* Il campo nascosto resta la verità, quindi la tendina ci scrive dentro. Il
+       contrario — mettere `name="attivita"` sulla tendina e togliere il campo —
+       avrebbe fatto perdere le scelte multiple del box, che una tendina non sa
+       tenere. */
+    activitySelect?.addEventListener('change', () => {
+      if (!activityField) return;
+      /* `select.value` su una tendina multipla restituisce **una sola** voce, la
+         prima scelta: usarlo qui avrebbe buttato via tutte le altre senza dare
+         segno. Le selezionate si leggono da `selectedOptions`. */
+      const scelte = Array.from(activitySelect.selectedOptions).map((o) => o.value);
+      activityField.value = scelte.length ? scelte.join(', ') : 'Non specificata';
+    });
 
     root.querySelectorAll('[data-support-close]').forEach((el) =>
       el.addEventListener('click', closeModal)
@@ -226,15 +334,7 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
 
       // Validated here rather than by the browser so the messages are in the
       // page's own voice and appear in one place.
-      // Mandatory, and it cannot be fixed from in here: it is step 1 of the box.
-      if (!activityField?.value.trim())
-        return say(
-          'Manca l’attività di interesse: scegliela nel box qui sopra, poi riprova.',
-          'err'
-        );
       if (!message?.value.trim()) return say('Scrivi la tua domanda prima di inviare.', 'err');
-      if (!first?.value.trim()) return say('Manca il nome.', 'err');
-      if (!last?.value.trim()) return say('Manca il cognome.', 'err');
       const emailValue = email?.value.trim() || '';
       const w = window as unknown as { athlonRicordaEmail?: (e: string) => void };
       if (emailValue) w.athlonRicordaEmail?.(emailValue);
@@ -250,15 +350,46 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
         );
       }
 
+      /* L'allegato viaggia in base64 dentro lo stesso JSON, e non come
+         `multipart/form-data`. Due ragioni. Il webhook che riceve legge un
+         oggetto JSON e da quello escono le due email e la riga sul database:
+         passare a multipart vorrebbe dire riscrivere il contratto per un campo
+         facoltativo. E il base64 costa un terzo in più di byte, che su un tetto
+         di 5 MB sono 6,7 MB di richiesta — dentro il limite del webhook.
+
+         Il tetto si controlla **qui**, prima di leggere il file: un rifiuto
+         immediato è più gentile di trenta secondi di caricamento che finiscono
+         in un errore, e il limite del server non spiega mai cosa fare. */
+      const MAX = 5 * 1024 * 1024;
+      const scelto = fileField?.files?.[0] || null;
+      if (scelto && scelto.size > MAX) {
+        return say(
+          `L'allegato è troppo grande (${(scelto.size / 1024 / 1024).toFixed(1)} MB): il limite è 5 MB.`,
+          'err'
+        );
+      }
+
       const btn = form.querySelector<HTMLButtonElement>('.sup__submit');
       if (btn) btn.disabled = true;
       say('Invio in corso…', '');
 
       try {
+        /* Il campo file non ha `name`, quindi `FormData` non lo raccoglie — ed è
+           voluto: un `File` dentro `JSON.stringify` diventa `{}`, cioè un campo
+           che sembra inviato e non contiene niente. I tre pezzi che al webhook
+           servono si aggiungono a mano qui sotto. */
+        const dati: Record<string, unknown> = Object.fromEntries(new FormData(form) as any);
+        if (scelto) {
+          dati.allegatoNome = scelto.name;
+          dati.allegatoTipo = scelto.type || 'application/octet-stream';
+          dati.allegatoPeso = scelto.size;
+          dati.allegatoBase64 = await leggiBase64(scelto);
+        }
+
         const res = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(Object.fromEntries(new FormData(form) as any)),
+          body: JSON.stringify(dati),
         });
         if (!res.ok) throw new Error(String(res.status));
         form.reset();
@@ -359,6 +490,11 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
     margin: 8px 0 6px;
   }
 
+  .sup__lede strong {
+    color: var(--color-white);
+    font-weight: 600;
+  }
+
   .sup__lede {
     margin: 0 0 22px;
     max-width: 40rem;
@@ -427,6 +563,89 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
     color: var(--color-white);
   }
 
+  /* Il campo file di sistema su un fondo scuro è un rettangolo bianco con un
+     pulsante grigio: si vede che non è del sito. Il contenitore prende la
+     stessa veste degli altri campi e solo il pulsante interno resta nativo,
+     ridisegnato — sostituirlo del tutto vorrebbe dire nascondere l'input e
+     mettergli davanti un'etichetta, e allora il nome del file scelto va
+     stampato a mano, che è codice in più per un campo facoltativo. */
+  /* La tendina multipla è una lista, non un menu che si apre: il browser la
+     disegna come un riquadro con le righe dentro, quindi le regole della
+     freccia native non servono e va tolto il `padding` orizzontale che le
+     lasciava spazio. L'altezza la dà `size`, non il CSS. */
+  .fld__multi {
+    padding: 0.375rem;
+    background-image: none;
+    padding-right: 0.375rem;
+    line-height: 1.9;
+  }
+
+  .fld__multi optgroup {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .fld__multi option {
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.375rem;
+    color: var(--color-white);
+    font-size: var(--text-sm);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  /* La riga scelta col colore del marchio: il grigio di sistema su questo fondo
+     scuro non si distingue da una riga qualunque, ed è l'unico segnale che dice
+     cosa si è selezionato. `checked` e non `:hover`, così vale anche dopo che il
+     puntatore è andato via. */
+  .fld__multi option:checked {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .fld__hint kbd {
+    padding: 0.05rem 0.3rem;
+    border: 1px solid var(--border-dark);
+    border-radius: 0.25rem;
+    background: rgba(255, 255, 255, 0.06);
+    font-family: var(--font-body);
+    font-size: 0.95em;
+  }
+
+  .fld__file {
+    padding: 0.6rem 0.75rem;
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.62);
+    cursor: pointer;
+  }
+
+  .fld__file::file-selector-button {
+    margin-right: 0.9rem;
+    padding: 0.55rem 1rem;
+    border: 1px solid var(--color-primary);
+    border-radius: 100px;
+    background: transparent;
+    color: var(--color-primary);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
+  }
+
+  .fld__file::file-selector-button:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .fld__hint strong {
+    color: rgba(255, 255, 255, 0.62);
+    font-weight: 600;
+  }
+
   .fld__req {
     color: var(--color-primary);
   }
@@ -436,17 +655,6 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
     font-size: var(--text-xs);
     line-height: 1.45;
     color: rgba(255, 255, 255, 0.38);
-  }
-
-  /* Reads as a stated fact, not as an empty input. */
-  .sup__activity {
-    margin: 0;
-    padding: 13px 15px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 87, 1, 0.35);
-    background: rgba(255, 87, 1, 0.1);
-    font-weight: 600;
-    color: var(--color-white);
   }
 
   .sup__note {

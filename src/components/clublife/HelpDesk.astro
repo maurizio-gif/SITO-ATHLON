@@ -206,11 +206,52 @@ const SUGGESTIONS: Record<string, string[]> = {
 
     {/* La via lunga, accanto a quella corta: il box qui sotto cerca fra le
         schede, l'assistente parla. Sono due mestieri diversi e stanno bene
-        vicini — chi sa già cosa cerca usa la ricerca, chi non lo sa chiede. */}
-    <button type="button" class="hd__assistente" data-cta="assistente">
-      Parla con l'assistente
-      <span class="hd__assistente-nota">Ti aiuta a trovare la risposta giusta</span>
+        vicini — chi sa già cosa cerca usa la ricerca, chi non lo sa chiede.
+
+        Era un pulsante arancione della misura di un pulsante, con scritto
+        «Parla con l'assistente». Due cose non funzionavano. La prima è la
+        scala: stava accanto a un box di ricerca alto tre volte tanto, e la
+        via principale sembrava l'accessorio. La seconda sono le parole —
+        «parla con l'assistente» descrive uno strumento, «chatta con noi e
+        trova subito la risposta» descrive cosa ottieni, ed è anche la stessa
+        frase del pulsante nell'header: la stessa azione detta con le stesse
+        parole si riconosce, detta in due modi sembra due cose.
+
+        L'icona è quella dell'header, identica: tre punti in una nuvoletta. */}
+    {/* Le due strade insieme, e in cima: chiedere all'assistente o scrivere al
+        team. Il comando dello staff stava in fondo, dopo l'elenco delle schede,
+        e questo diceva una cosa sbagliata sull'ordine — che scrivere sia
+        l'ultima spiaggia dopo aver cercato. Per chi ha una domanda che nessuna
+        scheda può risolvere — «il mio abbonamento è sbagliato» — cercare fra le
+        schede è tempo perso, e la deve trovare subito.
+
+        L'alternativa resta asimmetrica di proposito: la chat è piena e larga,
+        l'assistenza è contornata. La prima risponde in un secondo e la seconda
+        in qualche ora, quindi non sono pari — ma sono entrambe qui, ed è quello
+        che conta. */}
+    <div class="hd__vie">
+    <button type="button" class="hd__chat" data-cta="assistente" aria-haspopup="dialog">
+      <span class="hd__chat__icona" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.5 11.6a8 8 0 0 1-8 8H8.3L4 22.4v-4.3a8 8 0 0 1 8.5-14 8 8 0 0 1 8 7.5Z" />
+          <circle cx="9" cy="11.5" r="1.1" fill="currentColor" stroke="none" />
+          <circle cx="12.5" cy="11.5" r="1.1" fill="currentColor" stroke="none" />
+          <circle cx="16" cy="11.5" r="1.1" fill="currentColor" stroke="none" />
+        </svg>
+      </span>
+      <span class="hd__chat__testo">
+        <span class="hd__chat__nome u-display">Chatta con noi</span>
+        <span class="hd__chat__nota">e trova subito la risposta</span>
+      </span>
+      <span class="hd__chat__freccia" aria-hidden="true">→</span>
     </button>
+
+      <button type="button" class="hd__vie__staff" data-open-support>
+        <span class="hd__vie__staff__nome">Scrivi al team</span>
+        <span class="hd__vie__staff__nota">Ti rispondiamo in pochi minuti</span>
+      </button>
+    </div>
 
     {/* Ask-a-question box, in two steps: the activity, then the question.
         Matching runs in the browser against an index built at compile time — no
@@ -323,6 +364,31 @@ const SUGGESTIONS: Record<string, string[]> = {
           </ul>
         </details>
       ))}
+    </div>
+
+    {/* La via d'uscita in fondo, dopo le schede.
+
+        Fin qui la pagina ha proposto tre modi di trovare da soli: la chat, la
+        ricerca, l'elenco per argomento. Chi arriva a leggere quest'ultima riga
+        li ha esauriti tutti e tre, e senza un comando qui la sua unica mossa
+        è tornare su. Il «oppure» è la parola giusta: non annulla quello che
+        c'è sopra, aggiunge la strada che resta.
+
+        `data-open-support` è lo stesso attributo che usa la chat quando offre
+        di scrivere al team: un aggancio solo, e l'ascoltatore sta sulla sezione
+        e non sull'area delle risposte, così vale anche per questo pulsante. */}
+    {/* Il comando resta anche qui, e non è una ripetizione da togliere: chi ha
+        scorso tutte le schede fino in fondo è a mille pixel da quello in cima,
+        e mandarlo a cercarlo su è la cosa che fa chiudere la pagina. È lo stesso
+        `data-open-support`, quindi un ascoltatore per due posti. */}
+    <div class="hd__staff">
+      <p class="hd__staff__testo">
+        Non hai trovato la risposta? <strong>Scrivi al nostro team</strong>: la legge una persona
+        del club e ti risponde per email in pochi minuti.
+      </p>
+      <button type="button" class="hd__staff__btn" data-open-support>
+        Richiedi assistenza →
+      </button>
     </div>
 
     <SupportForm />
@@ -734,7 +800,10 @@ window.__ATHLON_ACTIVITIES__ = ${JSON.stringify(ACTIVITY_TAGS)};`}
 
   // Opening the form from an answer carries the question across, so nobody
   // types it twice, then hands over to the modal.
-  results?.addEventListener('click', (e) => {
+  /* Sulla sezione e non su `results`: lo stesso attributo lo porta anche il
+     pulsante in fondo alla pagina, che non sta dentro l'area delle risposte.
+     Un ascoltatore per due posti, invece di due ascoltatori che poi divergono. */
+  document.querySelector<HTMLElement>('.hd')?.addEventListener('click', (e) => {
     const trigger = (e.target as HTMLElement).closest('[data-open-support]');
     if (!trigger) return;
 
@@ -1217,37 +1286,170 @@ window.__ATHLON_ACTIVITIES__ = ${JSON.stringify(ACTIVITY_TAGS)};`}
     background: var(--color-primary);
   }
 
-  /* Il comando che apre l'assistente: pieno, perché è la via principale per
-     chi non sa cosa cercare. In rem, così cresce sul totem come il resto. */
-  .hd__assistente {
+  /* Il comando che apre l'assistente: una fascia, non un pulsante. È la via
+     principale per chi non sa cosa cercare, e sta sopra un box di ricerca alto:
+     alla misura di un pulsante perdeva il confronto con quello che doveva
+     precedere. In rem, così cresce sul totem come il resto. */
+  /* Le due vie affiancate dove ci stanno, in colonna dove no. `auto-fit` con il
+     minimo in rem: sul totem e sul televisore tornano una sopra l'altra da sé,
+     perché il minimo cresce con la radice. */
+  .hd__vie {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: 0.75rem;
+    max-width: 52rem;
     margin: 0 0 1.5rem;
-    min-height: 3.25rem;
-    display: inline-flex;
+  }
+
+  /* La seconda via: contornata, e alta come la prima. `align-items: center` sul
+     contenitore le avrebbe fatte di altezze diverse, che accanto si vede. */
+  .hd__vie__staff {
+    display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
-    gap: 0.15rem;
-    padding: 0.7rem 1.4rem;
+    gap: 0.2rem;
+    min-height: 4.5rem;
+    padding: 1rem 1.4rem;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 0.875rem;
+    background: transparent;
+    color: var(--color-white);
+    font-family: var(--font-body);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) ease, border-color var(--dur-fast) ease;
+  }
+
+  .hd__vie__staff:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .hd__vie__staff__nome {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: var(--text-lg);
+    --lh: 1;
+    letter-spacing: 0.01em;
+  }
+
+  .hd__vie__staff__nota {
+    font-size: var(--text-sm);
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .hd__chat {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    /* Non a tutta pagina: oltre questa misura la fascia diventa un nastro con
+       due parole in mezzo e tre quarti di arancione vuoto. */
+    max-width: none;
+    margin: 0;
+    min-height: 4.5rem;
+    padding: 1rem 1.4rem;
     border: none;
-    border-radius: 0.75rem;
+    border-radius: 0.875rem;
     background: var(--color-primary);
     color: var(--color-white);
     font-family: var(--font-body);
-    font-size: var(--text-sm);
-    font-weight: 600;
     text-align: left;
     cursor: pointer;
-    transition: opacity var(--dur-fast) ease;
+    transition: background-color var(--dur-fast) ease, transform var(--dur-fast) ease;
   }
 
-  .hd__assistente:hover {
-    opacity: 0.9;
+  .hd__chat:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
   }
 
-  .hd__assistente-nota {
-    font-weight: 400;
-    font-size: var(--text-2xs);
-    opacity: 0.85;
+  /* Il tondo dietro l'icona la stacca dall'arancione: senza, il tratto bianco su
+     arancione pieno si legge come una macchia. */
+  .hd__chat__icona {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .hd__chat__icona svg {
+    width: 1.625rem;
+    height: 1.625rem;
+  }
+
+  /* Il battito è quello del pulsante nell'header e del floating in basso a
+     destra: lo stesso comando si muove allo stesso modo in tutti i posti in cui
+     compare. */
+  .hd__chat__icona svg circle {
+    animation: hd-chat-punti 1.4s ease-in-out infinite;
+  }
+
+  .hd__chat__icona svg circle:nth-of-type(2) {
+    animation-delay: 0.2s;
+  }
+
+  .hd__chat__icona svg circle:nth-of-type(3) {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes hd-chat-punti {
+    0%,
+    60%,
+    100% {
+      opacity: 0.45;
+    }
+    30% {
+      opacity: 1;
+    }
+  }
+
+  .hd__chat__testo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .hd__chat__nome {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: var(--text-xl);
+    --lh: 1;
+    letter-spacing: 0.01em;
+  }
+
+  .hd__chat__nota {
+    font-size: var(--text-sm);
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .hd__chat__freccia {
+    flex: none;
+    margin-left: auto;
+    font-size: var(--text-lg);
+    transition: transform var(--dur-fast) ease;
+  }
+
+  .hd__chat:hover .hd__chat__freccia {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hd__chat,
+    .hd__chat__freccia,
+    .hd__chat__icona svg circle {
+      animation: none;
+      transition: none;
+      transform: none;
+    }
   }
 
   .ask__hint {
@@ -1485,6 +1687,58 @@ window.__ATHLON_ACTIVITIES__ = ${JSON.stringify(ACTIVITY_TAGS)};`}
   }
 
   /* Two columns of folded categories. */
+  /* La riga di chiusura: un fondo suo, perché sotto un elenco lungo un
+     paragrafo senza contorno si legge come l'ultima voce dell'elenco. */
+  .hd__staff {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--border-dark);
+    border-radius: 0.875rem;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .hd__staff__testo {
+    margin: 0;
+    max-width: 34rem;
+    font-size: var(--text-sm);
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.68);
+  }
+
+  .hd__staff__testo strong {
+    color: var(--color-white);
+    font-weight: 600;
+  }
+
+  /* Contornato e non pieno: l'arancione pieno in questa sezione è della chat,
+     che è la via da provare prima. Questa è la strada che resta, e deve essere
+     visibile senza contendere. */
+  .hd__staff__btn {
+    flex: none;
+    min-height: 3rem;
+    padding: 0.8rem 1.5rem;
+    border: 1px solid var(--color-primary);
+    border-radius: 100px;
+    background: transparent;
+    color: var(--color-primary);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
+  }
+
+  .hd__staff__btn:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
   .hd__groups {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
