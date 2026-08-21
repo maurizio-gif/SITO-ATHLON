@@ -917,6 +917,10 @@ Dove finisce cosa:
 | `athlon-referral` | `richieste_referral` |
 | `athlon-verifica-iscritto`, `athlon-reset-password` | `eventi_email` |
 
+E sopra tutte c'è `utenti`, l'anagrafica: ogni riga di queste tabelle porta una
+`utente_id` che un trigger riempie da sola, deduplicando per id PerfectGym e
+per email. Sta più sotto, e non va toccata da n8n.
+
 **Gli scarti si registrano come i successi**, ed è la riga che manca più spesso.
 Il referral rifiutava due casi — chi invita non è socio, l'amico lo è già —
 mandandoli su un nodo `No-Op`: gli inviti persi non esistevano, quindi nessuno
@@ -943,6 +947,66 @@ per indirizzo). Sono `security_invoker`, senza il quale scavalcherebbero la RLS
 di tutto quello che c'è sotto. **Aggiungendo un form, aggiungi il suo ramo a
 `email_tutte`**: una vista che non copre tutte le sorgenti risponde con
 sicurezza a una domanda sbagliata, ed è peggio di una vista che non c'è.
+
+### `utenti` è l'anagrafica, e la deduplica sta nel database
+
+Una riga per persona, non per richiesta. Ogni tabella dei form porta una
+`utente_id` che un trigger riempie da sola: `richieste_referral` ne porta due,
+`utente_invitante_id` e `utente_amico_id`, perché quella riga contiene due
+persone.
+
+**La deduplica sta in Postgres e non in n8n**, ed è la scelta che regge tutto il
+resto: i workflow continuano a scrivere quello che scrivevano, e aggiungere un
+form vuol dire aggiungere una colonna e un trigger invece di rimettere le mani
+in nove automazioni. Le righe già scritte si agganciano rieseguendo la `update`
+di ripopolamento in fondo alla migrazione.
+
+Due chiavi, in quest'ordine, e l'ordine è la regola:
+
+1. **`pgm_member_id`**, e vince sempre. Lo dice il gestionale, non chi compila:
+   due indirizzi diversi con lo stesso id sono la stessa persona, ed è il caso
+   normale di chi scrive dal lavoro e poi da casa. Vince *anche* quando l'email
+   punterebbe a un'altra scheda.
+2. **`email_norm`**, minuscola e senza spazi, calcolata dalla colonna. È l'unica
+   chiave che abbiamo per chi non è ancora su PerfectGym — cioè per ogni
+   contatto nuovo, che è la ragione per cui esiste il sito.
+
+**Il telefono non è una chiave**, ed è deliberato: al club i figli si iscrivono
+col cellulare del genitore, quindi accorparli automaticamente fonderebbe tre
+persone in una. Sta nella vista `utenti_da_unire`, che propone le coppie e
+lascia decidere.
+
+`trova_o_crea_utente()` **riempie i buchi e non sovrascrive**. Il primo dato che
+abbiamo di una persona è quello che ha scritto lei; una riga di referral porta
+il nome dell'amico come lo ha digitato un terzo, e non deve poter correggere
+l'originale. L'email non si sostituisce mai: lì è l'identità, e cambiarla
+staccherebbe tutto quello che è già agganciato.
+
+`primo_contatto` e `ultimo_contatto` si scrivono con `least` e `greatest` e non
+con «l'ultimo che passa», così ripopolare le righe vecchie dà lo stesso
+risultato in qualunque ordine giri — che è quello che rende la migrazione
+rieseguibile senza pensarci.
+
+**Il trigger non può far fallire un form, e questa è la riga da non togliere.**
+Sta in `BEFORE INSERT`, quindi se solleva, la richiesta della persona non viene
+salvata: sarebbe il modo più stupido di perdere un lead. Quindi tre reti, e
+ognuna copre un caso vero:
+
+- l'`INSERT` su `utenti` è dentro un `exception when unique_violation`, perché
+  due richieste della stessa persona nello stesso istante passano entrambe la
+  `select` e poi una delle due sbatte sull'indice unico. Si rilegge la riga che
+  ha creato l'altra;
+- l'`UPDATE` lo stesso, per l'id PerfectGym che nel frattempo è finito altrove:
+  si aggiorna tutto il resto e lo si lascia dov'è;
+- e sopra tutto, `assegna_utente()` cattura *qualunque* errore, scrive un
+  `warning` e mette `utente_id` a null. Un aggancio mancato si ricalcola, una
+  richiesta perduta no.
+
+Le viste: `utente_attivita` è la scheda di una persona in ordine di tempo,
+`utenti_completi` l'elenco per la segreteria. In tutte e due, le righe con
+fonte `eventi_email` sono **tocchi e non richieste** — una verifica di email non
+è una conversione: `utenti_completi.richieste` le esclude, `attivita_totali` le
+conta.
 
 ### Un nodo Supabase in bozza non scrive niente
 

@@ -3,6 +3,9 @@
 -- posti diversi, uno per form.
 --
 -- Progetto Supabase: app-athlon. Da eseguire dopo le tabelle.
+-- Nota d'ordine: questo file va eseguito **dopo**
+-- 20260821_utenti_deduplica.sql, perche' email_tutte porta anche la colonna
+-- utente_id che quella migrazione aggiunge alle tabelle.
 
 
 -- ---------------------------------------------------------------------------
@@ -19,43 +22,50 @@
 create or replace view public.email_tutte as
   select e.created_at as momento, e.email, e.email_norm,
          'eventi_email'::text as fonte, e.tipo, e.esito,
-         e.nome, e.cognome, e.telefono, e.pagina, e.vid, e.id as fonte_id
+         e.nome, e.cognome, e.telefono, e.pagina, e.vid, e.id as fonte_id,
+         e.utente_id
   from public.eventi_email e where e.email is not null
 
   union all
   select p.created_at, p.email, lower(btrim(p.email)),
          'richieste_prova', 'prova', p.stato,
-         p.nome, p.cognome, coalesce(p.cellulare, p.telefono), p.pagina, p.vid, p.id
+         p.nome, p.cognome, coalesce(p.cellulare, p.telefono), p.pagina, p.vid, p.id,
+         p.utente_id
   from public.richieste_prova p where p.email is not null
 
   union all
   select c.created_at, c.email, lower(btrim(c.email)),
          'richieste_contatto', 'contatto', c.stato,
-         c.nome, c.cognome, coalesce(c.cellulare, c.telefono), c.pagina, c.vid, c.id
+         c.nome, c.cognome, coalesce(c.cellulare, c.telefono), c.pagina, c.vid, c.id,
+         c.utente_id
   from public.richieste_contatto c where c.email is not null
 
   union all
   select h.created_at, h.email, lower(btrim(h.email)),
          'richieste_help_desk', 'help-desk', h.topic,
-         h.first_name, h.last_name, null, h.pagina, null, h.id
+         h.first_name, h.last_name, null, h.pagina, null, h.id,
+         h.utente_id
   from public.richieste_help_desk h where h.email is not null
 
   union all
   select k.created_at, k.email, lower(btrim(k.email)),
          'chat_conversazioni', 'chat', k.stato_pgm,
-         null, null, null, k.pagina, k.vid, k.id
+         null, null, null, k.pagina, k.vid, k.id,
+         k.utente_id
   from public.chat_conversazioni k where k.email is not null
 
   union all
   select l.created_at, l.email, lower(btrim(l.email)),
          'chat_lead', 'chat-dati', l.stato_pgm,
-         l.nome, l.cognome, l.telefono, l.pagina, null, l.id
+         l.nome, l.cognome, l.telefono, l.pagina, null, l.id,
+         l.utente_id
   from public.chat_lead l where l.email is not null
 
   union all
   select t.created_at, t.email, lower(btrim(t.email)),
          'chat_ticket', 'chat-ticket', t.stato,
-         t.nome, t.cognome, t.telefono, t.pagina, null, t.id
+         t.nome, t.cognome, t.telefono, t.pagina, null, t.id,
+         t.utente_id
   from public.chat_ticket t where t.email is not null
 
   -- Il referral porta due indirizzi per riga, e vanno contati tutti e due:
@@ -63,13 +73,15 @@ create or replace view public.email_tutte as
   union all
   select r.created_at, r.invitante_email, lower(btrim(r.invitante_email)),
          'richieste_referral', 'referral-invitante', r.esito,
-         r.invitante_nome, r.invitante_cognome, null, r.pagina, r.vid, r.id
+         r.invitante_nome, r.invitante_cognome, null, r.pagina, r.vid, r.id,
+         r.utente_invitante_id
   from public.richieste_referral r where r.invitante_email is not null
 
   union all
   select r.created_at, r.amico_email, lower(btrim(r.amico_email)),
          'richieste_referral', 'referral-amico', r.esito,
-         r.amico_nome, r.amico_cognome, r.amico_cellulare, r.pagina, r.vid, r.id
+         r.amico_nome, r.amico_cognome, r.amico_cellulare, r.pagina, r.vid, r.id,
+         r.utente_amico_id
   from public.richieste_referral r where r.amico_email is not null;
 
 comment on view public.email_tutte is
