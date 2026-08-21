@@ -100,14 +100,38 @@ const trust = [
       {/* No data-anim here: the hero is above the fold, so it plays its own
           CSS entrance on load exactly like the home hero, rather than waiting
           on the scroll observer. */}
-      <span class="eyebrow">Abbonamenti adulti</span>
+      {/* L'hero diceva «Due modi di vivere Athlon», e i due modi erano Smart e
+          Premium: parlava di piani a chi non sa ancora se vuole un piano. Da
+          questa pagina però nel club si entra in più modi, e chi arriva ha in
+          testa una domanda sola — «e se volessi provare una volta e basta?».
+          Lasciarla senza risposta la fa uscire dalla pagina.
+
+          La risposta non è mettere le due cose sullo stesso piano: l'abbonamento
+          resta la proposta, e anche il listino delle singole porta lì. Quindi
+          l'abbonamento è la frase principale e la lezione singola arriva dopo,
+          come possibilità aperta e non come alternativa equivalente — «e se per
+          ora ti serve una lezione sola, si può». Il titolo tiene insieme le due
+          cose senza sceglierne una: il club è quello, la misura la dai tu. */}
+      <span class="eyebrow">Abbonamenti e accessi</span>
       <h1 class="ab-hero__title">
-        Due modi<br />di vivere<br /><em>Athlon.</em>
+        Il club,<br />alla tua<br /><em>misura.</em>
       </h1>
       <p class="ab-hero__sub">
-        Hai già scoperto Athlon. Ora è semplice: <strong>scegli il piano</strong> che fa per te
-        e <strong>iscriviti online</strong> in pochi minuti.
+        L'<strong>abbonamento</strong> è il modo di viverlo per intero: annuale, oppure mensile
+        flex che disdici quando vuoi. E se per ora ti serve <strong>una lezione sola</strong>, si
+        può — la prenoti, paghi quella, e decidi dopo.
       </p>
+      {/* Due porte, ma non della stessa misura, e la differenza è voluta:
+          l'abbonamento è quello che il club propone, la lezione singola è la
+          risposta a chi non lo vuole ancora. Pieno il primo, contornato il
+          secondo — visibile quanto serve a non far uscire nessuno dalla pagina,
+          senza mettersi accanto all'altro come se fossero pari. Nel modal della
+          prova sono pari, perché là chi legge il pass negato non ha una scelta
+          da consigliargli: ha già detto che voleva provare. */}
+      <div class="ab-hero__azioni">
+        <a class="btn btn-primary ab-hero__cta" href="#piani">Scopri gli abbonamenti →</a>
+        <a class="btn btn-outline ab-hero__cta" href="#accessi-singoli">Vorrei una lezione sola →</a>
+      </div>
     </div>
     <div class="ab-trust">
       <div class="container ab-trust__inner">
@@ -117,13 +141,25 @@ const trust = [
   </section>
 
   <!-- PIANI -->
-  <section class="ab-sec">
+  {/* L'ancora serve a chi arriva da fuori questa pagina — dal modal della prova,
+      quando il Guest Pass non è attivabile — e deve trovarsi davanti i piani,
+      non l'inizio della pagina: chi ha già scelto «abbonamento» ha superato
+      l'introduzione. Il nome è `piani` come le altre tre sezioni ancorate
+      (`guest-pass`, `accessi-singoli`, `personal-training`), che portano il
+      nome della cosa e non il titolo che le sta sopra. */}
+  <section class="ab-sec" id="piani">
     <div class="container">
+      {/* «Come vuoi vivere il club?» era il titolo di questa sezione, ed è la
+          domanda che ora fa l'hero — là vale per tutte le modalità di accesso,
+          qui varrebbe per due piani su cinque strade. Il titolo dice invece
+          esattamente cosa c'è sotto, che è anche quello che la persona sta
+          cercando quando arriva qui dal pulsante dell'hero. */}
       <span class="eyebrow" data-anim="from-left">Abbonamenti adulti</span>
-      <h2 class="ab-sec__title" data-anim="reveal">Come vuoi vivere il club?</h2>
+      <h2 class="ab-sec__title" data-anim="reveal">Due abbonamenti, tre modi di pagarli.</h2>
       <p class="ab-sec__sub">
-        Due piani, tre modalità di pagamento ciascuno. La differenza non è quanto paghi: è quante
-        cose del club vuoi usare.
+        Smart o Premium: la differenza non è quanto paghi, è quante cose del club vuoi usare. Poi
+        scegli come pagare — <strong>annuale</strong>, a rate mensili o in una volta, che costa
+        meno; o <strong>mensile flex</strong>, che parte da un mese solo e si disdice dall'app.
       </p>
 
       <div class="plans">
@@ -481,15 +517,27 @@ const trust = [
     animation: hero-rise 0.6s var(--ease-out-crit) 0.85s forwards;
   }
 
-  .ab-trust {
+  /* I due comandi entrano dopo il sommario che li annuncia, e la striscia di
+     garanzie scala di conseguenza: era a 1,05s, che ora cadrebbe prima dei
+     pulsanti. */
+  .ab-hero__azioni {
     opacity: 0;
     animation: hero-rise 0.6s var(--ease-out-crit) 1.05s forwards;
+  }
+
+  .ab-trust {
+    opacity: 0;
+    animation: hero-rise 0.6s var(--ease-out-crit) 1.25s forwards;
   }
 
   @media (prefers-reduced-motion: reduce) {
     .ab-hero__title,
     .ab-hero .eyebrow,
     .ab-hero__sub,
+    /* Senza questa riga i due comandi resterebbero a `opacity: 0` per sempre:
+       `animation: none` ferma l'entrata ma non rimette l'opacità, che parte da
+       zero nella regola sopra. */
+    .ab-hero__azioni,
     .ab-trust {
       animation: none;
       opacity: 1;
@@ -506,6 +554,26 @@ const trust = [
   .ab-hero__sub strong {
     color: var(--color-white);
     font-weight: 600;
+  }
+
+  /* `flex-wrap` e non una media query: le due etichette sono lunghe, e la
+     larghezza a cui non stanno più affiancate dipende da quanto sono lunghe —
+     `wrap` la trova da sé e continua a funzionare se il testo cambia. Restano
+     della stessa misura perché è lo stesso stile, non perché una regola le
+     pareggia: qui affiancate non sono, sono in fila, e pareggiarle in `flex: 1`
+     le stirerebbe fino ai bordi dello schermo su un desktop largo. */
+  .ab-hero__azioni {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+
+  /* Il corpo dell'etichetta dentro la scala e non fuori: un `0.75rem` scritto a
+     mano è la cosa che resta indietro sul totem e sul televisore, dove la
+     radice cresce. */
+  .ab-hero__cta {
+    font-size: var(--text-sm);
   }
 
   .ab-trust {

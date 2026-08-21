@@ -73,8 +73,20 @@ import { TALK } from '../data/cta';
         diciamo qual è la formula giusta per come ti alleni.
       </p>
       <div class="pf__azioni">
-        <a class="btn btn-primary pf__btn" href="/abbonamenti#accessi-singoli">Prenota una lezione singola →</a>
-        <a class="pf__link" href="/abbonamenti">Vedi gli abbonamenti →</a>
+        {/* Due strade alternative, quindi due comandi dello stesso peso: stesso
+            stile, stessa larghezza, affiancati. Prima la lezione singola era il
+            pulsante pieno e l'abbonamento un link sottolineato, cioè la pagina
+            suggeriva una risposta — e non c'è una risposta da suggerire: chi
+            vuole rientrare una volta prende la lezione, chi ha deciso prende
+            l'abbonamento, e il club non ha motivo di spingere l'una o l'altro.
+
+            L'abbonamento punta a `#piani`, non alla cima della pagina: chi ha
+            già scelto «abbonamento» ha superato l'introduzione, e deve trovarsi
+            davanti «Come vuoi vivere il club?». */}
+        <div class="pf__scelta">
+          <a class="btn btn-primary pf__btn" href="/abbonamenti#accessi-singoli">Lezione singola →</a>
+          <a class="btn btn-primary pf__btn" href="/abbonamenti#piani">Abbonamenti →</a>
+        </div>
         {/* Questo apre il modulo contatti, e il `data-cta="talk"` è tutto il
             meccanismo: `ContattaciModal` ascolta sul documento. L'`href` resta
             per chi non ha JavaScript. Il gestore qui sotto chiude questo
@@ -453,6 +465,22 @@ import { TALK } from '../data/cta';
     gap: 0.75rem;
   }
 
+  /* Le due alternative sulla stessa riga e della stessa misura: `flex: 1 1 0`
+     le rende identiche qualunque sia la lunghezza dell'etichetta, che è la
+     condizione perché leggano come pari — con `flex-basis: auto` la più lunga
+     si prenderebbe più spazio e tornerebbe a sembrare la principale. */
+  .pf__scelta {
+    display: flex;
+    gap: 0.625rem;
+    width: 100%;
+  }
+
+  .pf__scelta .pf__btn {
+    flex: 1 1 0;
+    justify-content: center;
+    text-align: center;
+  }
+
   .pf__link {
     display: inline-flex;
     align-items: center;
@@ -602,6 +630,16 @@ import { TALK } from '../data/cta';
     }
     .pf__panel {
       padding: 1.75rem 1.25rem 1.5rem;
+    }
+  }
+
+  /* Su un telefono stretto le due alternative non ci stanno affiancate: a 375px
+     il pannello lascia 303px di contenuto, cioè 146px a pulsante, e
+     «Lezione singola →» ne chiede 165 — la parola si spezzerebbe. In colonna
+     restano comunque identiche, che è la cosa che conta. */
+  @media (max-width: 420px) {
+    .pf__scelta {
+      flex-direction: column;
     }
   }
 

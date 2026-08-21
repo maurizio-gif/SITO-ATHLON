@@ -224,6 +224,22 @@
 
 html {
   scroll-behavior: smooth;
+
+  /* L'header è appiccicoso, quindi un'ancora atterra **sotto** di lui: misurato
+     su `/abbonamenti#piani`, l'occhiello «Abbonamenti adulti» finiva a 56px con
+     un header alto 73, cioè coperto. Valeva per tutte le ancore del sito — la
+     striscia del Club Life, gli orari delle pagine dei corsi, le quattro
+     sezioni degli abbonamenti — e nessuna pagina compensava.
+     `scroll-padding-top` sul documento lo risolve in una riga per tutte, e vale
+     anche per gli `scrollIntoView` degli script, non solo per il salto da hash.
+
+     L'altezza viene da `--header-h`, che `Header.astro` pubblica con un
+     `ResizeObserver`: un numero scritto a mano qui sarebbe sbagliato sul totem e
+     sul televisore, dove l'header cresce con la radice. Il ripiego è lo stesso
+     `73px` dichiarato là, per il momento fra il primo paint e il primo callback.
+     Il rem in più è aria: l'occhiello attaccato al bordo dell'header legge come
+     se fosse dentro l'header. */
+  scroll-padding-top: calc(var(--header-h, 73px) + 1rem);
 }
 
 body {
