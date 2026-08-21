@@ -1,17 +1,21 @@
 /**
  * Termini e Condizioni del Club — testo contrattuale.
  *
- * Il contenuto in `termini.json` è estratto dal PDF ufficiale
- * "Termini e Condizioni Athlon — Agosto 2025" e va trattato come testo di
+ * Il contenuto in `termini.json` è estratto dal documento ufficiale
+ * "Termini e Condizioni Athlon Club — Aprile 2026" e va trattato come testo di
  * contratto: si aggiorna sostituendolo, non riscrivendolo a pezzi. Le uniche
- * cose aggiunte qui sono i titoli di navigazione delle clausole che nel PDF non
- * ne avevano uno, e i tag attività per sezione.
+ * cose aggiunte qui sono i titoli di navigazione delle clausole che nel
+ * documento non ne avevano uno, e i tag attività per sezione.
  *
- * A quella regola c'è oggi una deroga, dichiarata in `MODIFICHE_DOPO_PDF` qui
- * sotto: alcune clausole sono state emendate per allinearle a ciò che il club
- * applica davvero. **Finché il PDF non viene riemesso, il testo pubblicato non
- * è più identico a quello sottoscritto** — leggere quella lista prima di
- * toccare qualsiasi cosa qui dentro.
+ * **Il testo pubblicato è di nuovo identico a quello sottoscritto.** La versione
+ * di Agosto 2025 portava cinque emendamenti — elencati allora in
+ * `MODIFICHE_DOPO_PDF` — fatti per allineare il contratto a ciò che il club
+ * applicava davvero. Il documento di Aprile 2026 **non li ha recepiti**, e
+ * pubblicare il contratto verbatim ha quindi voluto dire rimetterli come stanno
+ * nel documento firmato. Quello che ne resta aperto sta in
+ * `DISALLINEAMENTI_COL_SITO` qui sotto: sono contraddizioni fra il contratto e
+ * altre pagine di questo sito, e si chiudono da una parte o dall'altra — non
+ * riscrivendo di nuovo il contratto da qui.
  *
  * Due consumatori, una fonte: la pagina /regolamento e il box dell'Help Desk, che
  * indicizza ogni clausola e ci linka direttamente con l'ancora.
@@ -69,50 +73,49 @@ export const TERMINI: SezioneTermini[] = (raw as Omit<SezioneTermini, 'attivita'
 }));
 
 /** Versione del documento, come sul PDF firmato. */
-export const TERMINI_VERSIONE = 'Agosto 2025';
+export const TERMINI_VERSIONE = 'Aprile 2026';
 
 /**
- * Le modifiche apportate al testo **dopo** l'estrazione dal PDF di Agosto 2025.
- *
- * Esistono perché il contratto e ciò che il club fa davvero si erano allontanati
- * su due punti, e il sito li raccontava in un terzo modo ancora. Sanare il sito
- * lasciando il contratto com'era avrebbe solo spostato la contraddizione.
- *
- * **Il PDF firmato non cambia da qui.** Finché non viene riemesso, quello che
- * `/regolamento` pubblica non è più identico a quello che gli iscritti hanno
- * sottoscritto — che è un miglioramento solo se il documento segue. Questa lista
- * è ciò che serve a chi lo riemette per sapere cosa cambiare, e va svuotata
- * quando il nuovo PDF arriva e `termini.json` viene rigenerato da quello.
+ * Gli unici due punti in cui il testo pubblicato non è identico al documento, e
+ * sono due refusi del documento stesso: la 8.4 apre con «lLa prenotazione» e il
+ * titolo della 1.4 dice «Bagde Accesso». Non sono differenze di contenuto e non
+ * si riproducono; se il documento verrà corretto, questa lista si svuota.
  */
-export const MODIFICHE_DOPO_PDF = [
+export const SCOSTAMENTI_DAL_DOCUMENTO = [
+  { clausole: ['8.4'], cosa: 'Corretto il refuso iniziale «lLa prenotazione».' },
+  { clausole: ['1.4'], cosa: 'Corretto il refuso «Bagde» nel titolo di navigazione.' },
+] as const;
+
+/**
+ * Dove il contratto di Aprile 2026 e il resto del sito dicono cose diverse.
+ *
+ * Non è una lista di cose da sistemare qui dentro: il contratto è il contratto,
+ * e va pubblicato com'è. È la lista di ciò che qualcuno deve decidere — o si
+ * riemette il documento, o si correggono le pagine che lo contraddicono.
+ * Finché resta aperta, una persona che legge due pagine di questo sito trova
+ * due risposte diverse alla stessa domanda.
+ *
+ * Tutti e tre i punti erano già stati sanati sul testo di Agosto 2025 e sono
+ * tornati indietro con il documento nuovo, che non li ha recepiti.
+ */
+export const DISALLINEAMENTI_COL_SITO = [
   {
     clausole: ['7.6', '8.4'],
-    cosa: 'Blocco delle prenotazioni dopo le mancate disdette: da 4 a 3 giorni.',
-    perche:
-      'Tre è quanto applica il sistema, ed è quanto la scheda dell’Help Desk e il planning dicono da sempre. Il contratto era l’unico a dirne quattro.',
+    contratto: 'Il blocco dopo le mancate disdette dura 4 giorni.',
+    sito: 'Le schede dell’Help Desk dicono 3 giorni, in quattro punti fra `generali/prenotazioni` e `generali/prenotazioni-problemi`.',
+    nota: 'Tre è quanto risultava applicare il sistema. Il contratto è l’unico a dirne quattro.',
   },
   {
     clausole: ['4.1', '7.1', '10.1', '11.1'],
-    cosa: 'Certificato medico non agonistico: entro 14 giorni dall’inizio dell’attività.',
-    perche:
-      'Il contratto lo chiedeva prima dell’inizio, il sito concedeva una finestra — quindici giorni in due punti, due settimane in altri quattro. La tolleranza dei quattordici giorni è quella vera e ora è scritta uguale ovunque. La 10.1 un termine non ce l’aveva affatto.',
-  },
-  {
-    clausole: ['6.2'],
-    cosa: 'Lasciata invariata: resta «prima dell’inizio dell’attività».',
-    perche:
-      'È l’unica che riguarda il certificato AGONISTICO, per il settore agonistico e la pallanuoto. Lì la visita deve precedere l’attività e non è una scelta del club: concedere una finestra sarebbe stato un errore, non un allineamento.',
+    contratto: 'Il certificato medico non agonistico va inviato prima dell’inizio dell’attività; la 10.1 non dà un termine.',
+    sito: '`generali/certificato-medico` concede 14 giorni dall’inizio dell’attività.',
+    nota: 'La 6.2 non c’entra e resta com’è: riguarda il certificato AGONISTICO, dove la visita deve precedere l’attività per legge.',
   },
   {
     clausole: ['4.3', '7.6', '8.4'],
-    cosa: 'Gli indirizzi delle schede citate passano da wiki.athlonroma.it a www.athlonroma.it.',
-    perche:
-      'Il wiki è dentro questo sito da quando è stato rifatto. Le clausole 7.6 e 8.4 dichiarano vincolante ciò che è pubblicato a quell’indirizzo, e la 4.3 ci fa decorrere un preavviso: un contratto che rimanda a un dominio dismesso rende inesigibile la parte che ci rimanda.',
-  },
-  {
-    clausole: ['8.4'],
-    cosa: 'Corretto il refuso iniziale «lLa prenotazione».',
-    perche: 'Errore di trascrizione dal PDF, non una differenza di contenuto.',
+    contratto: 'Le clausole rimandano a wiki.athlonroma.it, e la 7.6 e la 8.4 dichiarano vincolante ciò che è pubblicato lì.',
+    sito: 'Il wiki è dentro questo sito da quando è stato rifatto, e vive su www.athlonroma.it/wikiathlon.',
+    nota: 'I redirect per quel sottodominio stanno in `vercel.json` ma non sono attivi finché il dominio non è agganciato al progetto: fino a quel giorno le clausole rimandano a un indirizzo che non risponde.',
   },
 ] as const;
 
