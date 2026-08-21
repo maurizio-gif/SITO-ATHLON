@@ -47,24 +47,28 @@ export const SITE = (
  * due, perché lo stato intermedio — nessun banner e già niente attribuzione —
  * perderebbe i dati senza che nessuno possa acconsentire.
  *
- * ## Perché adesso è vuota, e quando va rimessa
+ * ## Perché è stata vuota per un periodo
  *
- * La chiave è `3e76f0f799c6d1d94882361d`, e va rimessa **il giorno che
- * `www.athlonroma.it` punta su Vercel**. Non un momento prima, e la ragione è
- * quella scritta sopra, capitata per davvero: CookieYes serve il banner solo sui
- * domini registrati nell'account, e l'account ha quel dominio solo — piano Free,
- * uno. Finché la produzione sta su `sito-athlon.vercel.app`, CookieYes non
- * decide niente su questo host: `getCkyConsent()` non esiste, il cookie
- * `cookieyes-consent` non compare, e `consenso()` risponde «negato» per
- * costruzione, perché un fornitore che non risponde non è un consenso.
+ * Impostata su un host che CookieYes non conosce, questa chiave non accende il
+ * banner: il fornitore lo serve solo per i **domini registrati** nell'account, e
+ * l'account Athlon ne ha uno — `www.athlonroma.it`, piano Free. Finché la
+ * produzione stava su `sito-athlon.vercel.app` la chiave impostata metteva il
+ * sito **esattamente nello stato intermedio** che il paragrafo qui sopra
+ * dichiara sbagliato: nessun banner e già niente memorizzato, perché
+ * `getCkyConsent()` non esisteva, il cookie `cookieyes-consent` non compariva e
+ * `consenso()` rispondeva «negato» per costruzione — un fornitore che non
+ * risponde non è un consenso.
  *
- * Cioè: con la chiave impostata qui il sito stava **esattamente nello stato
- * intermedio** che questo commento dichiara sbagliato — nessun banner e già
- * niente memorizzato. Si vedeva da fuori come «l'email non si ricorda», che è il
- * sintomo piccolo; quello grosso era che `vid` e UTM non venivano scritti, e
- * ogni richiesta risultava senza campagna.
+ * Si vedeva da fuori come «l'email non si ricorda», che è il sintomo piccolo.
+ * Quello grosso era che `vid` e UTM non venivano scritti, e ogni richiesta
+ * risultava senza campagna.
+ *
+ * Per questo è stata svuotata, e per questo **ora è di nuovo qui**: il dominio è
+ * passato su Vercel, quindi l'host e l'account combaciano. Se un domani la
+ * produzione tornasse su un indirizzo che CookieYes non conosce, va svuotata di
+ * nuovo — non lasciata «tanto è giusta».
  *
  * Il promemoria non è questo commento: `scripts/consenso.ts` avvisa in console
  * quando la configurazione e l'host non combaciano, nei due versi.
  */
-export const COOKIEYES_KEY = '';
+export const COOKIEYES_KEY = '3e76f0f799c6d1d94882361d';
