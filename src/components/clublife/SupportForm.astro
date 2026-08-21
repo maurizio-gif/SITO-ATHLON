@@ -35,33 +35,54 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
   <div class="sup" role="dialog" aria-modal="true" aria-labelledby="sup-title">
     <button type="button" class="sup__close" data-support-close aria-label="Chiudi">×</button>
 
+    {/* «Parla» era la parola sbagliata: da qui non parte una telefonata ma un
+        messaggio, e chi legge «parla con il nostro team» si aspetta qualcuno in
+        linea. Il verbo dice cosa succede davvero.
+
+        E il tempo di risposta sta nel testo grande e non in fondo in corpo
+        minuscolo, perché è la cosa che decide se una persona scrive o rinuncia:
+        «ti risponde una persona, in breve tempo» non è una promessa, è una
+        formula. «In pochi minuti» lo è. */}
     <div class="sup__head">
-      <span class="sup__eyebrow">Scrivi all'assistenza</span>
-      <h3 class="sup__title u-display" id="sup-title">Parla con il nostro team</h3>
+      <span class="sup__eyebrow">Richiedi assistenza</span>
+      <h3 class="sup__title u-display" id="sup-title">Scrivi al nostro team</h3>
       <p class="sup__lede">
-        Mandaci la domanda: ti risponde una persona del club, via email, in breve tempo.
+        La tua richiesta la legge una persona del club, non un risponditore
+        automatico: <strong>ti rispondiamo per email in pochi minuti</strong>.
       </p>
     </div>
 
   <form class="sup__form" data-support-form novalidate>
-    {/* Era un paragrafo di sola lettura: l'attività la scegliava il primo passo
-        del box dell'Help Desk, e qui si mostrava soltanto perché nessuno
-        dovesse chiedersi se sapevamo di cosa stava parlando.
+    {/* Una tendina, e a scelta **multipla**.
 
-        Funzionava finché al form si arrivava dal box. Da quando il pulsante in
-        fondo alla sezione lo apre da solo, chi entra da lì vede scritto
-        «Non specificata» e non ha nessun modo di correggerlo — il box è dietro
-        un pannello modale. Quindi qui c'è un controllo vero.
+        Era un paragrafo di sola lettura: l'attività la scegliava il primo passo
+        del box dell'Help Desk, e qui si mostrava soltanto. Funzionava finché al
+        form si arrivava dal box — da quando il pulsante «richiedi assistenza»
+        lo apre da solo, chi entra da lì non aveva modo di dire di cosa parla.
+
+        `multiple` perché il box ne fa scegliere più di una, e una tendina a
+        scelta singola non sa rappresentare «Gym Floor e Aqua Fitness»: la
+        selezione della persona sarebbe stata troncata a una voce senza dirlo.
 
         Il dato inviato resta il campo nascosto qui sotto, che è quello che il
         workflow legge e che il box riempie: la tendina lo comanda, non lo
-        sostituisce. Due elementi e una sola verità, e così `HelpDesk.astro`
-        continua a scrivere dove ha sempre scritto — anche quando manda più
-        attività insieme, che una tendina da sola non saprebbe rappresentare. */}
+        sostituisce. Le voci hanno per valore l'**etichetta** e non l'id, perché
+        il workflow riceve «Gym Floor, Aqua Fitness» e la mail al desk le stampa
+        così — è il formato che il flusso vecchio scriveva.
+
+        Niente voce «Non specificata»: in una scelta multipla il non specificato
+        è non selezionare niente, e una voce che vuol dire «nessuna» accanto a
+        dodici che si possono spuntare insieme è una contraddizione da cliccare.
+        Il ripiego lo mette lo script all'apertura. */}
     <div class="fld">
       <label class="fld__label" for="sup-attivita">Attività di interesse</label>
-      <select class="fld__input" id="sup-attivita" data-support-activity-select>
-        <option value="Non specificata">Non specificata</option>
+      <select
+        class="fld__input fld__multi"
+        id="sup-attivita"
+        multiple
+        size="6"
+        data-support-activity-select
+      >
         {GRUPPI.map((g) => (
           <optgroup label={g.label}>
             {g.voci.map((a) => <option value={a.label}>{a.label}</option>)}
@@ -69,8 +90,8 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
         ))}
       </select>
       <p class="fld__hint">
-        Se la richiesta riguarda un'attività in particolare, scegliela: ci aiuta a mandarla alla
-        persona giusta.
+        Puoi scegliere più di una — su desktop con <kbd>Ctrl</kbd> o <kbd>Cmd</kbd> — oppure
+        nessuna. Ci aiuta a mandare la richiesta alla persona giusta.
       </p>
     </div>
 
@@ -248,17 +269,20 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
         activityField.value = 'Non specificata';
       }
       if (activitySelect && activityField) {
-        const valore = activityField.value;
-        activitySelect.querySelectorAll('[data-temporanea]').forEach((o) => o.remove());
-        const previsto = Array.from(activitySelect.options).some((o) => o.value === valore);
-        if (!previsto) {
-          const opt = document.createElement('option');
-          opt.value = valore;
-          opt.textContent = valore;
-          opt.dataset.temporanea = '1';
-          activitySelect.insertBefore(opt, activitySelect.firstChild);
-        }
-        activitySelect.value = valore;
+        /* Il campo nascosto porta una stringa separata da virgole, perché è così
+           che il box la scrive e così che il workflow la legge. Qui si spacchetta
+           per accendere le righe corrispondenti.
+
+           `Non specificata` non è una voce della tendina: è il valore che vale
+           quando non se n'è scelta nessuna, quindi non corrisponde a niente e
+           lascia la lista vuota — che è esattamente quello che deve mostrare. */
+        const scelte = activityField.value
+          .split(',')
+          .map((v) => v.trim())
+          .filter(Boolean);
+        Array.from(activitySelect.options).forEach((o) => {
+          o.selected = scelte.includes(o.value);
+        });
       }
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
@@ -283,7 +307,12 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
        avrebbe fatto perdere le scelte multiple del box, che una tendina non sa
        tenere. */
     activitySelect?.addEventListener('change', () => {
-      if (activityField) activityField.value = activitySelect.value;
+      if (!activityField) return;
+      /* `select.value` su una tendina multipla restituisce **una sola** voce, la
+         prima scelta: usarlo qui avrebbe buttato via tutte le altre senza dare
+         segno. Le selezionate si leggono da `selectedOptions`. */
+      const scelte = Array.from(activitySelect.selectedOptions).map((o) => o.value);
+      activityField.value = scelte.length ? scelte.join(', ') : 'Non specificata';
     });
 
     root.querySelectorAll('[data-support-close]').forEach((el) =>
@@ -461,6 +490,11 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
     margin: 8px 0 6px;
   }
 
+  .sup__lede strong {
+    color: var(--color-white);
+    font-weight: 600;
+  }
+
   .sup__lede {
     margin: 0 0 22px;
     max-width: 40rem;
@@ -535,6 +569,52 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
      ridisegnato — sostituirlo del tutto vorrebbe dire nascondere l'input e
      mettergli davanti un'etichetta, e allora il nome del file scelto va
      stampato a mano, che è codice in più per un campo facoltativo. */
+  /* La tendina multipla è una lista, non un menu che si apre: il browser la
+     disegna come un riquadro con le righe dentro, quindi le regole della
+     freccia native non servono e va tolto il `padding` orizzontale che le
+     lasciava spazio. L'altezza la dà `size`, non il CSS. */
+  .fld__multi {
+    padding: 0.375rem;
+    background-image: none;
+    padding-right: 0.375rem;
+    line-height: 1.9;
+  }
+
+  .fld__multi optgroup {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .fld__multi option {
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.375rem;
+    color: var(--color-white);
+    font-size: var(--text-sm);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  /* La riga scelta col colore del marchio: il grigio di sistema su questo fondo
+     scuro non si distingue da una riga qualunque, ed è l'unico segnale che dice
+     cosa si è selezionato. `checked` e non `:hover`, così vale anche dopo che il
+     puntatore è andato via. */
+  .fld__multi option:checked {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .fld__hint kbd {
+    padding: 0.05rem 0.3rem;
+    border: 1px solid var(--border-dark);
+    border-radius: 0.25rem;
+    background: rgba(255, 255, 255, 0.06);
+    font-family: var(--font-body);
+    font-size: 0.95em;
+  }
+
   .fld__file {
     padding: 0.6rem 0.75rem;
     font-size: var(--text-sm);

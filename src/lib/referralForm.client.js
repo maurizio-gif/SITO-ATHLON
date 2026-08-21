@@ -19,7 +19,7 @@
 // la verifica sta davanti a un pulsante e chi aspetta abbandona, l'invio è la
 // cosa che la persona è venuta a fare e la aspetta.
 import { WEBHOOK_VERIFICA, eSocio } from '../data/contatto';
-import { WEBHOOK_REFERRAL, CANALI } from '../data/referral';
+import { WEBHOOK_REFERRAL, CANALI, AMICI } from '../data/referral';
 
 (function () {
   var modal = document.getElementById('referral-modal');
@@ -36,14 +36,30 @@ import { WEBHOOK_REFERRAL, CANALI } from '../data/referral';
     fatto: modal.querySelector('#rfr-step-fatto'),
   };
 
+  /** Fino a tre, dalla costante: il markup ne genera altrettanti. */
+  var QUANTI = AMICI;
+
   var campi = {
     email: modal.querySelector('#rfr-email'),
-    nome: modal.querySelector('#rfr-nome'),
-    cognome: modal.querySelector('#rfr-cognome'),
-    cellulare: modal.querySelector('#rfr-cellulare'),
-    amicoEmail: modal.querySelector('#rfr-amico-email'),
     consenso: modal.querySelector('[data-rfr-consenso]'),
   };
+
+  /** I tre blocchi, ognuno coi suoi quattro campi. */
+  var blocchi = [];
+  for (var i = 1; i <= QUANTI; i++) {
+    blocchi.push({
+      n: i,
+      root: modal.querySelector('[data-rfr-blocco="' + i + '"]'),
+      nome: modal.querySelector('#rfr-nome-' + i),
+      cognome: modal.querySelector('#rfr-cognome-' + i),
+      email: modal.querySelector('#rfr-email-' + i),
+      cellulare: modal.querySelector('#rfr-cell-' + i),
+    });
+  }
+
+  var btnAggiungi = modal.querySelector('[data-rfr-aggiungi]');
+  var etichettaInvio = modal.querySelector('[data-rfr-etichetta-invio]');
+  var fuori = modal.querySelector('[data-rfr-fuori]');
 
   var btnVerifica = modal.querySelector('[data-rfr-verifica]');
   var btnInvia = modal.querySelector('[data-rfr-invia]');
@@ -85,8 +101,11 @@ import { WEBHOOK_REFERRAL, CANALI } from '../data/referral';
   function pulisciErrore(passo) {
     var e = erroreDi(passo);
     if (e) e.hidden = true;
-    Object.keys(campi).forEach(function (k) {
-      if (campi[k] && campi[k].classList) campi[k].classList.remove('segnalato');
+    if (campi.email) campi.email.classList.remove('segnalato');
+    blocchi.forEach(function (b) {
+      [b.nome, b.cognome, b.email, b.cellulare].forEach(function (c) {
+        if (c) c.classList.remove('segnalato');
+      });
     });
   }
 
@@ -185,41 +204,147 @@ import { WEBHOOK_REFERRAL, CANALI } from '../data/referral';
         : 'Chi vuoi invitare';
     }
     mostra('amico');
-    if (campi.nome) campi.nome.focus();
+    if (blocchi[0].nome) blocchi[0].nome.focus();
   }
 
-  // ── Passo 2: l'amico ──────────────────────────────────────────────────────
-  async function mandaInvito() {
-    var nome = campi.nome ? campi.nome.value.trim() : '';
-    var cognome = campi.cognome ? campi.cognome.value.trim() : '';
-    var email = campi.amicoEmail ? campi.amicoEmail.value.trim().toLowerCase() : '';
-    var cellulare = cellulareNormale(campi.cellulare ? campi.cellulare.value : '');
+  // ── Passo 2: gli amici ────────────────────────────────────────────────────
 
-    if (!nome) return sbaglia('amico', 'Manca il nome del tuo amico.', campi.nome);
-    if (!cognome) return sbaglia('amico', 'Manca il cognome.', campi.cognome);
-    if (!emailValida(email)) {
-      return sbaglia('amico', 'Serve la sua email: è lì che arriva il pass.', campi.amicoEmail);
+  /** Quanti blocchi sono aperti in questo momento. */
+  function apertiOra() {
+    return blocchi.filter(function (b) {
+      return b.root && !b.root.hidden;
+    }).length;
+  }
+
+  /** Apre il prossimo blocco chiuso, e nasconde il comando quando finiscono. */
+  function aggiungiBlocco() {
+    var prossimo = blocchi.find(function (b) {
+      return b.root && b.root.hidden;
+    });
+    if (prossimo) {
+      prossimo.root.hidden = false;
+      if (prossimo.nome) prossimo.nome.focus();
     }
-    if (cellulare === null) {
-      return sbaglia('amico', 'Il cellulare sembra incompleto. Puoi anche lasciarlo vuoto.', campi.cellulare);
+    aggiornaComandi();
+  }
+
+  function togliBlocco(n) {
+    var b = blocchi[n - 1];
+    if (!b || !b.root) return;
+    /* Si svuota **e** si chiude: un blocco chiuso ma pieno manderebbe un invito
+       che la persona ha appena detto di non volere. `hidden` nasconde, non
+       cancella. */
+    [b.nome, b.cognome, b.email, b.cellulare].forEach(function (c) {
+      if (c) c.value = '';
+    });
+    b.root.hidden = true;
+    aggiornaComandi();
+  }
+
+  /**
+   * L'etichetta del pulsante segue quanti amici ci sono, e il comando
+   * «aggiungi» sparisce al terzo. Sono due dettagli, e insieme sono la ragione
+   * per cui la schermata non mente: «Manda gli inviti» con un blocco solo
+   * aperto prometterebbe più di quello che sta per fare.
+   */
+  function aggiornaComandi() {
+    var n = apertiOra();
+    if (btnAggiungi) btnAggiungi.hidden = n >= QUANTI;
+    if (etichettaInvio) {
+      etichettaInvio.textContent = n > 1 ? "Manda gli inviti" : "Manda l'invito";
     }
-    if (email === invitante.email) {
-      return sbaglia('amico', 'Questa è la tua email: serve quella della persona che vuoi invitare.', campi.amicoEmail);
+  }
+
+  /** I blocchi compilati, letti e normalizzati. `null` se un dato è sbagliato. */
+  function leggiAmici() {
+    var fuoriUso = null;
+    var lista = [];
+    for (var k = 0; k < blocchi.length; k++) {
+      var b = blocchi[k];
+      if (!b.root || b.root.hidden) continue;
+      var nome = b.nome ? b.nome.value.trim() : '';
+      var cognome = b.cognome ? b.cognome.value.trim() : '';
+      var email = b.email ? b.email.value.trim().toLowerCase() : '';
+      var cell = b.cellulare ? b.cellulare.value.trim() : '';
+
+      /* Un blocco aperto e completamente vuoto si salta invece di dare errore:
+         chi ha premuto «aggiungi» e poi ha cambiato idea senza chiudere il
+         blocco non sta sbagliando niente. Uno riempito a metà invece è un
+         errore, e va detto dove. */
+      if (!nome && !cognome && !email && !cell) continue;
+
+      if (!nome) return { errore: 'Manca il nome dell’amico ' + b.n + '.', campo: b.nome };
+      if (!cognome) return { errore: 'Manca il cognome dell’amico ' + b.n + '.', campo: b.cognome };
+      if (!emailValida(email)) {
+        return { errore: 'Serve l’email dell’amico ' + b.n + ': è lì che arriva il pass.', campo: b.email };
+      }
+      var cellulare = cellulareNormale(cell);
+      if (cellulare === null) {
+        return { errore: 'Il cellulare dell’amico ' + b.n + ' sembra incompleto. Puoi anche lasciarlo vuoto.', campo: b.cellulare };
+      }
+      if (email === invitante.email) {
+        return { errore: 'L’amico ' + b.n + ' ha la tua email: serve quella della persona che vuoi invitare.', campo: b.email };
+      }
+      /* Due blocchi con lo stesso indirizzo manderebbero due pass alla stessa
+         persona e scriverebbero due righe su Airtable. */
+      for (var z = 0; z < lista.length; z++) {
+        if (lista[z].email === email) {
+          return { errore: 'L’amico ' + b.n + ' ha la stessa email dell’amico ' + lista[z].n + '.', campo: b.email };
+        }
+      }
+      lista.push({ n: b.n, nome: nome, cognome: cognome, email: email, cellulare: cellulare });
     }
+    if (!lista.length) {
+      return { errore: 'Compila almeno un amico da invitare.', campo: blocchi[0].nome };
+    }
+    return { lista: lista, fuoriUso: fuoriUso };
+  }
+
+  /** «Marco», «Marco e Giulia», «Marco, Giulia e Luca». */
+  function elenca(nomi) {
+    if (nomi.length === 1) return nomi[0];
+    return nomi.slice(0, -1).join(', ') + ' e ' + nomi[nomi.length - 1];
+  }
+
+  async function mandaInvito() {
+    var letti = leggiAmici();
+    if (letti.errore) return sbaglia('amico', letti.errore, letti.campo);
     if (campi.consenso && !campi.consenso.checked) {
-      return sbaglia('amico', 'Serve la conferma di aver informato la persona che stai segnalando.');
+      return sbaglia('amico', 'Serve la conferma di aver informato le persone che stai segnalando.');
     }
     pulisciErrore('amico');
 
     attendi(btnInvia, spinnerInvio, true);
 
-    /* La verifica dell'amico **prima** dell'invio, e non dopo: nel flusso
-       vecchio si compilava, si mandava, e la pagina dopo diceva no. Così invece
-       nessuna riga viene scritta su Airtable per un invito che non parte. */
-    var suo = await verifica(email, ATTESA_VERIFICA);
-    if (suo && eSocio({ memberType: suo.memberType, stato: suo.stato })) {
+    /* Le verifiche **tutte insieme** e non una dopo l'altra: sono chiamate
+       indipendenti, e in fila tre amici vorrebbero dire fino a diciotto secondi
+       davanti a uno spinner. `Promise.all` le fa costare quanto la più lenta. */
+    var esiti = await Promise.all(
+      letti.lista.map(function (a) {
+        return verifica(a.email, ATTESA_VERIFICA);
+      })
+    );
+
+    var daInvitare = [];
+    var giaSoci = [];
+    letti.lista.forEach(function (a, k) {
+      var e = esiti[k];
+      /* Come sempre: se la verifica non ha risposto si passa, e il workflow
+         rifà il controllo prima di scrivere. */
+      if (e && eSocio({ memberType: e.memberType, stato: e.stato })) giaSoci.push(a);
+      else {
+        a.stato = e ? e.stato : 'non-verificato';
+        daInvitare.push(a);
+      }
+    });
+
+    /* Se sono tutti già soci non c'è niente da mandare, e la schermata è quella
+       che spiega cosa possono fare invece. */
+    if (!daInvitare.length) {
       attendi(btnInvia, spinnerInvio, false);
-      if (nomeAmico) nomeAmico.textContent = nome;
+      if (nomeAmico) {
+        nomeAmico.textContent = elenca(giaSoci.map(function (a) { return a.nome; }));
+      }
       return mostra('amicoSocio');
     }
 
@@ -239,16 +364,18 @@ import { WEBHOOK_REFERRAL, CANALI } from '../data/referral';
             cognome: invitante.cognome,
             memberId: invitante.memberId,
           },
-          amico: {
-            nome: nome,
-            cognome: cognome,
-            email: email,
-            cellulare: cellulare,
-            /* Quello che la verifica sa di lui: `nuovo` o `esiste`. Il workflow
-               lo scrive su Airtable nella colonna «Nuovo?», che è la stessa
-               informazione che il flusso vecchio ricavava da una chiamata sua. */
-            stato: suo ? suo.stato : 'non-verificato',
-          },
+          /* Un array, e sempre un array anche con un amico solo: il workflow
+             cicla sugli item, e un contratto che cambia forma quando l'elenco
+             ha un elemento è un contratto che si rompe sul caso di mezzo. */
+          amici: daInvitare.map(function (a) {
+            return {
+              nome: a.nome,
+              cognome: a.cognome,
+              email: a.email,
+              cellulare: a.cellulare,
+              stato: a.stato,
+            };
+          }),
           consenso: true,
           pagina: location.pathname,
           vid: window.athlonGetVid ? window.athlonGetVid() : null,
@@ -266,19 +393,45 @@ import { WEBHOOK_REFERRAL, CANALI } from '../data/referral';
     if (!risposta || risposta.esito !== 'inviato') {
       return sbaglia(
         'amico',
-        'Non è riuscito a partire. Riprova fra poco: se insiste, scrivici e lo mandiamo noi.'
+        'Non è riuscito a partire. Riprova fra poco: se insiste, scrivici e li mandiamo noi.'
       );
     }
 
     if (esitoTesto) {
-      /* I canali si nominano tutti e due, e con l'indirizzo: chi invita vuole
-         sapere che è partito davvero, e «gli abbiamo scritto» senza dire dove
-         non è una conferma. Quando il cellulare manca si nomina solo la mail,
-         invece di promettere un WhatsApp che non parte. */
-      esitoTesto.textContent = cellulare
-        ? 'Il pass è in viaggio verso ' + nome + ': per ' + CANALI[0] + ' su ' + email +
-          ' e via ' + CANALI[1] + ' al ' + cellulare + '.'
-        : 'Il pass è in viaggio verso ' + nome + ', per ' + CANALI[0] + ' su ' + email + '.';
+      /* Con più amici l'elenco degli indirizzi diventa illeggibile, quindi si
+         nominano le persone e si dice come. Con uno solo l'indirizzo si scrive:
+         è la conferma che serve a chi ha appena digitato una mail che potrebbe
+         aver sbagliato. */
+      var nomi = elenca(daInvitare.map(function (a) { return a.nome; }));
+      var conCell = daInvitare.filter(function (a) { return a.cellulare; }).length;
+      if (daInvitare.length === 1) {
+        var uno = daInvitare[0];
+        esitoTesto.textContent = uno.cellulare
+          ? 'Il pass è in viaggio verso ' + uno.nome + ': per ' + CANALI[0] + ' su ' + uno.email +
+            ' e via ' + CANALI[1] + ' al ' + uno.cellulare + '.'
+          : 'Il pass è in viaggio verso ' + uno.nome + ', per ' + CANALI[0] + ' su ' + uno.email + '.';
+      } else {
+        esitoTesto.textContent =
+          'Il pass è in viaggio verso ' + nomi + ': per ' + CANALI[0] +
+          (conCell === daInvitare.length
+            ? ' e via ' + CANALI[1] + '.'
+            : conCell
+              ? ' e via ' + CANALI[1] + ' a chi ci ha lasciato il numero.'
+              : '.');
+      }
+    }
+
+    if (fuori) {
+      if (giaSoci.length) {
+        var esclusi = elenca(giaSoci.map(function (a) { return a.nome; }));
+        fuori.textContent =
+          giaSoci.length === 1
+            ? esclusi + ' invece no: ci risulta già dei nostri, e il pass di prova è per chi non frequenta. Può venire con una lezione singola o un abbonamento.'
+            : esclusi + ' invece no: ci risultano già dei nostri, e il pass di prova è per chi non frequenta. Possono venire con una lezione singola o un abbonamento.';
+        fuori.hidden = false;
+      } else {
+        fuori.hidden = true;
+      }
     }
     mostra('fatto');
   }
@@ -288,12 +441,22 @@ import { WEBHOOK_REFERRAL, CANALI } from '../data/referral';
     /* Come nel form dei contatti, e per la stessa ragione: sul totem in sede il
        pannello si riapre davanti alla persona dopo, e i dati di un amico
        segnalato da qualcun altro non devono restare nei campi. */
-    [campi.nome, campi.cognome, campi.cellulare, campi.amicoEmail].forEach(function (c) {
-      if (c) c.value = '';
+    blocchi.forEach(function (b) {
+      [b.nome, b.cognome, b.email, b.cellulare].forEach(function (c) {
+        if (c) c.value = '';
+      });
+      /* Il primo blocco resta aperto, gli altri due tornano chiusi: la
+         schermata si riapre come la prima volta. */
+      if (b.root) b.root.hidden = b.n > 1;
     });
     if (campi.consenso) campi.consenso.checked = false;
     if (nomeAmico) nomeAmico.textContent = '';
     if (esitoTesto) esitoTesto.textContent = '';
+    if (fuori) {
+      fuori.textContent = '';
+      fuori.hidden = true;
+    }
+    aggiornaComandi();
     invitante = { email: '', nome: '', cognome: '', memberId: null };
     pulisciErrore('email');
     pulisciErrore('amico');
@@ -345,13 +508,22 @@ import { WEBHOOK_REFERRAL, CANALI } from '../data/referral';
       }
     });
   }
-  [campi.nome, campi.cognome, campi.cellulare, campi.amicoEmail].forEach(function (c) {
-    if (!c) return;
-    c.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        mandaInvito();
-      }
+  blocchi.forEach(function (b) {
+    [b.nome, b.cognome, b.email, b.cellulare].forEach(function (c) {
+      if (!c) return;
+      c.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          mandaInvito();
+        }
+      });
+    });
+  });
+
+  if (btnAggiungi) btnAggiungi.addEventListener('click', aggiungiBlocco);
+  modal.querySelectorAll('[data-rfr-togli]').forEach(function (x) {
+    x.addEventListener('click', function () {
+      togliBlocco(Number(x.getAttribute('data-rfr-togli')));
     });
   });
 
@@ -376,7 +548,7 @@ import { WEBHOOK_REFERRAL, CANALI } from '../data/referral';
   if (altroAmico) {
     altroAmico.addEventListener('click', function () {
       mostra('amico');
-      if (campi.nome) campi.nome.focus();
+      if (blocchi[0].nome) blocchi[0].nome.focus();
     });
   }
 
@@ -386,13 +558,18 @@ import { WEBHOOK_REFERRAL, CANALI } from '../data/referral';
   var altro = modal.querySelector('[data-rfr-altro]');
   if (altro) {
     altro.addEventListener('click', function () {
-      [campi.nome, campi.cognome, campi.cellulare, campi.amicoEmail].forEach(function (c) {
-        if (c) c.value = '';
+      blocchi.forEach(function (b) {
+        [b.nome, b.cognome, b.email, b.cellulare].forEach(function (c) {
+          if (c) c.value = '';
+        });
+        if (b.root) b.root.hidden = b.n > 1;
       });
       if (campi.consenso) campi.consenso.checked = false;
+      if (fuori) fuori.hidden = true;
+      aggiornaComandi();
       pulisciErrore('amico');
       mostra('amico');
-      if (campi.nome) campi.nome.focus();
+      if (blocchi[0].nome) blocchi[0].nome.focus();
     });
   }
 

@@ -26,7 +26,7 @@
  */
 import Layout from '../layouts/Layout.astro';
 import ReferralModal from '../components/ReferralModal.astro';
-import { PASS, VOUCHER, COMPRESO } from '../data/referral';
+import { PASS, VOUCHER, COMPRESO, AMICI } from '../data/referral';
 import { fotoHero } from '../data/foto';
 
 const FOTO = '/wp-content/uploads/2025/03/Athlon95-scaled.jpg';
@@ -50,19 +50,30 @@ const FOTO = '/wp-content/uploads/2025/03/Athlon95-scaled.jpg';
 
     <div class="container rp-hero__inner">
       <span class="eyebrow">Solo per i soci</span>
-      <h1 class="rp-hero__title">Invita<br />un <em class="accent">amico</em></h1>
+      <h1 class="rp-hero__title">Invita i tuoi<br /><em class="accent">amici</em></h1>
       <p class="rp-hero__lede">
-        Allenarsi in due è un'altra cosa.
+        Da soli si comincia. In gruppo si continua.
       </p>
+      {/* Il perché prima del cosa: chi arriva qui non sta cercando un'offerta,
+          sta decidendo se disturbare tre amici. La ragione per cui il club lo
+          incoraggia — chi si allena in compagnia molla meno — è quello che
+          rende l'invito una cosa da fare e non un favore da chiedere.
+
+          «Praticamente in regalo» e non «gratis»: il badge costa €5, e una
+          promessa di gratuità smentita alla cassa vale meno di zero. Allo stesso
+          modo «fino a tre alla volta» e non «quanti vuoi»: tre è il limite del
+          modulo, e si può tornare. */}
       <p class="rp-hero__sub">
-        Il tuo amico prova <strong>tutto il club per {PASS.giorni} giorni</strong> pagando solo il
-        badge di accesso, <strong>€{PASS.prezzo}</strong> invece dei €{PASS.prezzoPieno} del Guest
-        Pass. E se dopo la prova si iscrive, a te arriva
+        Chi si allena in compagnia si ferma meno: ci si aspetta, ci si tira, si torna. Per questo
+        puoi invitare <strong>fino a {AMICI} amici alla volta</strong> — e puoi tornare a invitarne
+        altri. Ognuno prova <strong>tutto il club per {PASS.giorni} giorni</strong> praticamente in
+        regalo: paga solo il badge di accesso, <strong>€{PASS.prezzo}</strong> invece dei
+        €{PASS.prezzoPieno} del Guest Pass. E per ognuno che poi si iscrive, a te arriva
         un <strong>voucher da €{VOUCHER.valore}</strong> {VOUCHER.uso}.
       </p>
 
       <button type="button" class="btn btn-primary rp-hero__cta" data-cta="referral">
-        Manda l'invito →
+        Manda gli inviti →
       </button>
     </div>
   </section>
@@ -72,8 +83,8 @@ const FOTO = '/wp-content/uploads/2025/03/Athlon95-scaled.jpg';
       <span class="eyebrow" data-anim="from-left">Cosa prova</span>
       <h2 class="rp-sec__title" data-anim="reveal">Tutto il club, per {PASS.giorni} giorni.</h2>
       <p class="rp-sec__sub">
-        Il pass apre il palinsesto completo: le stesse attività dell'abbonamento Premium, senza
-        limitazioni sui giorni.
+        Il pass apre il palinsesto completo — le stesse attività dell'abbonamento Premium, senza
+        limitazioni sui giorni — e vale così per ognuno degli amici che inviti.
       </p>
 
       <ul class="rp-lista">
@@ -98,15 +109,15 @@ const FOTO = '/wp-content/uploads/2025/03/Athlon95-scaled.jpg';
         <li>
           <span class="rp-passi__num u-display">02</span>
           <span class="rp-passi__testo">
-            <strong>Ci dai il suo nome, la sua email e il suo cellulare.</strong> Il pass gli arriva
-            per email e su WhatsApp, a nome tuo.
+            <strong>Aggiungi i tuoi amici</strong>, fino a {AMICI}: nome, cognome, email e
+            cellulare di ognuno. Il pass gli arriva per email e su WhatsApp, a nome tuo.
           </span>
         </li>
         <li>
           <span class="rp-passi__num u-display">03</span>
           <span class="rp-passi__testo">
-            <strong>Lui attiva il pass</strong> e viene ad allenarsi. Se poi si iscrive, il voucher
-            da €{VOUCHER.valore} arriva a te.
+            <strong>Vengono ad allenarsi</strong> con te. Per ognuno che si iscrive, un voucher da
+            €{VOUCHER.valore} arriva a te.
           </span>
         </li>
       </ol>
@@ -119,8 +130,9 @@ const FOTO = '/wp-content/uploads/2025/03/Athlon95-scaled.jpg';
             fondo in corpo minuscolo: sono le sole due ragioni per cui il form
             può dire no, e chi le legge prima non ci sbatte contro dopo. */}
         <p class="rp-chiusura__nota">
-          Serve un abbonamento attivo per invitare, e il tuo amico non deve avere un abbonamento
-          Athlon in corso: il pass è per chi non frequenta.
+          Serve un abbonamento attivo per invitare, e chi inviti non deve essere già iscritto: il
+          pass è per chi non frequenta. Lo controlliamo noi mentre compili, così non mandi un
+          invito che non può partire.
         </p>
       </div>
     </div>

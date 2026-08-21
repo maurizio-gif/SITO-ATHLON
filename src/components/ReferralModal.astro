@@ -36,7 +36,12 @@
  * un invito perso per un timeout. Il workflow rifà il controllo, che è dove
  * conta.
  */
-import { PASS, VOUCHER, COMPRESO, LIBERATORIA } from '../data/referral';
+import { PASS, VOUCHER, COMPRESO, LIBERATORIA, AMICI } from '../data/referral';
+
+/* I blocchi li genera il numero, non tre righe copiate: `AMICI` è la stessa
+   costante che legge il client e che la landing stampa, quindi cambiarlo cambia
+   tutto insieme. */
+const BLOCCHI = Array.from({ length: AMICI }, (_, i) => i + 1);
 ---
 
 <div class="rfr" id="referral-modal" aria-hidden="true">
@@ -46,13 +51,13 @@ import { PASS, VOUCHER, COMPRESO, LIBERATORIA } from '../data/referral';
 
     {/* ── 1. Chi invita ──────────────────────────────────────────────────── */}
     <section class="rfr__step" id="rfr-step-email">
-      <span class="rfr__eyebrow">Invita un amico</span>
+      <span class="rfr__eyebrow">Invita i tuoi amici</span>
       <h3 class="rfr__title" id="rfr-titolo" tabindex="-1" data-rfr-fuoco>
         Regala {PASS.giorni} giorni di Athlon.
       </h3>
       <p class="rfr__claim">
-        A lui {PASS.giorni} giorni di club a €{PASS.prezzo}. A te €{VOUCHER.valore} {VOUCHER.uso},
-        se poi si iscrive.
+        A loro {PASS.giorni} giorni di club a €{PASS.prezzo} ciascuno. A te €{VOUCHER.valore}
+        {VOUCHER.uso} per ognuno che si iscrive.
       </p>
 
       {/* Le sette attività per nome, e non «tutto il club»: il pass apre il
@@ -109,54 +114,73 @@ import { PASS, VOUCHER, COMPRESO, LIBERATORIA } from '../data/referral';
       </p>
     </section>
 
-    {/* ── 2. L'amico ─────────────────────────────────────────────────────── */}
+    {/* ── 2. Gli amici, fino a tre ─────────────────────────────────────────
+
+        Tre e non uno, e tre e non «quanti vuoi». Uno era il flusso vecchio, e
+        costringeva a rifare tutto il percorso — email, verifica, dati — per il
+        secondo amico: chi ne ha due in mente ne invita uno. Illimitati sarebbero
+        una lista di indirizzi comprati, non amici.
+
+        **Quattro campi per amico e non uno.** Si potrebbe chiedere solo l'email,
+        ed è la prima idea che viene: ma il cellulare serve perché il pass parte
+        anche su WhatsApp — che su un invito fra amici è il canale che arriva —
+        e il nome serve perché la mail e il messaggio lo chiamano per nome. Un
+        campo email solo avrebbe dimezzato la consegna senza dirlo.
+
+        Il secondo e il terzo blocco nascono chiusi: tre blocchi aperti sono
+        dodici campi in faccia a chi voleva invitarne uno. */}
     <section class="rfr__step" id="rfr-step-amico" hidden>
       <span class="rfr__eyebrow" data-rfr-saluto>Chi vuoi invitare</span>
-      <h3 class="rfr__title" tabindex="-1" data-rfr-fuoco>I suoi dati.</h3>
+      <h3 class="rfr__title" tabindex="-1" data-rfr-fuoco>I loro dati.</h3>
       <p class="rfr__lead">
-        Gli mandiamo il pass per email e su WhatsApp. Il cellulare serve per il secondo: senza,
-        l'invito arriva solo via mail.
+        Il pass arriva per email e su WhatsApp, a nome tuo. Puoi invitarne fino a {AMICI}: compila
+        solo quelli che ti servono.
       </p>
 
-      <div class="rfr__coppia">
-        <div>
-          <label class="rfr__label" for="rfr-nome">Nome</label>
-          <input class="rfr__input" id="rfr-nome" type="text" autocomplete="off" placeholder="Mario" />
-        </div>
-        <div>
-          <label class="rfr__label" for="rfr-cognome">Cognome</label>
-          <input class="rfr__input" id="rfr-cognome" type="text" autocomplete="off" placeholder="Rossi" />
-        </div>
-      </div>
+      {BLOCCHI.map((n) => (
+        <fieldset class="rfr__amico" data-rfr-blocco={n} hidden={n > 1}>
+          <legend class="rfr__amico__capo">
+            Amico {n}
+            {n > 1 && (
+              <button type="button" class="rfr__amico__togli" data-rfr-togli={n}>togli</button>
+            )}
+          </legend>
 
-      <label class="rfr__label" for="rfr-cellulare">Il suo cellulare</label>
-      <input
-        class="rfr__input"
-        id="rfr-cellulare"
-        type="tel"
-        inputmode="tel"
-        autocomplete="off"
-        placeholder="320 112 2333"
-      />
+          <div class="rfr__coppia">
+            <div>
+              <label class="rfr__label" for={`rfr-nome-${n}`}>Nome</label>
+              <input class="rfr__input" id={`rfr-nome-${n}`} type="text" autocomplete="off" placeholder="Mario" />
+            </div>
+            <div>
+              <label class="rfr__label" for={`rfr-cognome-${n}`}>Cognome</label>
+              <input class="rfr__input" id={`rfr-cognome-${n}`} type="text" autocomplete="off" placeholder="Rossi" />
+            </div>
+          </div>
 
-      <label class="rfr__label" for="rfr-amico-email">La sua email</label>
-      <input
-        class="rfr__input"
-        id="rfr-amico-email"
-        type="email"
-        inputmode="email"
-        autocomplete="off"
-        placeholder="amico@email.it"
-      />
+          <div class="rfr__coppia">
+            <div>
+              <label class="rfr__label" for={`rfr-email-${n}`}>Email</label>
+              <input class="rfr__input" id={`rfr-email-${n}`} type="email" inputmode="email" autocomplete="off" placeholder="amico@email.it" />
+            </div>
+            <div>
+              <label class="rfr__label" for={`rfr-cell-${n}`}>Cellulare</label>
+              <input class="rfr__input" id={`rfr-cell-${n}`} type="tel" inputmode="tel" autocomplete="off" placeholder="320 112 2333" />
+            </div>
+          </div>
+        </fieldset>
+      ))}
+
+      <button type="button" class="rfr__aggiungi" data-rfr-aggiungi>+ Aggiungi un altro amico</button>
 
       <p class="rfr__errore" data-rfr-errore hidden></p>
 
       {/* La liberatoria è una casella da spuntare e non un testo da leggere di
           sfuggita: qui si dichiara di avere l'autorizzazione a comunicare i dati
-          di un'altra persona, e quella dichiarazione è la base del trattamento.
+          di altre persone, e quella dichiarazione è la base del trattamento.
           Nel form vecchio era un blocco di HTML sopra il pulsante — cioè
           l'accettazione era implicita nell'invio. Uno spunto esplicito è la
-          stessa cosa detta in modo verificabile. */}
+          stessa cosa detta in modo verificabile, e vale per tutti gli amici che
+          si stanno segnalando insieme. */}
       <label class="rfr__consenso">
         <input type="checkbox" data-rfr-consenso />
         <span>
@@ -165,7 +189,7 @@ import { PASS, VOUCHER, COMPRESO, LIBERATORIA } from '../data/referral';
       </label>
 
       <button type="button" class="btn btn-primary rfr__btn" data-rfr-invia>
-        <span class="rfr__btn-testo">Manda l'invito</span>
+        <span class="rfr__btn-testo" data-rfr-etichetta-invio>Manda l'invito</span>
         <span class="rfr__spinner" data-rfr-spinner-invio hidden aria-hidden="true"></span>
       </button>
     </section>
@@ -175,8 +199,8 @@ import { PASS, VOUCHER, COMPRESO, LIBERATORIA } from '../data/referral';
       <span class="rfr__eyebrow">Il pass no, ma provare sì</span>
       <h3 class="rfr__title" tabindex="-1" data-rfr-fuoco>Ci risulta già dei nostri.</h3>
       <p class="rfr__lead">
-        <strong data-rfr-nome-amico></strong> ha già un abbonamento con noi, quindi il pass di prova
-        non si attiva — è riservato a chi non frequenta. Ma per tornare in palestra non serve:
+        <strong data-rfr-nome-amico></strong>: il pass di prova non si attiva, perché è riservato a
+        chi non frequenta. Ma per tornare in palestra non serve —
         può <strong>prenotare una lezione singola</strong> e pagare solo quella,
         oppure scegliere <strong>uno dei nostri abbonamenti</strong>.
       </p>
@@ -185,7 +209,7 @@ import { PASS, VOUCHER, COMPRESO, LIBERATORIA } from '../data/referral';
         <a class="btn btn-primary rfr__btn" href="/abbonamenti#piani">Abbonamenti →</a>
       </div>
       <p class="rfr__nota">
-        Volevi invitare un'altra persona? <button type="button" class="rfr__ripeti" data-rfr-altro-amico>Cambia i dati</button>.
+        Volevi invitare qualcun altro? <button type="button" class="rfr__ripeti" data-rfr-altro-amico>Cambia i dati</button>.
       </p>
     </section>
 
@@ -194,6 +218,10 @@ import { PASS, VOUCHER, COMPRESO, LIBERATORIA } from '../data/referral';
       <span class="rfr__eyebrow">Invito partito</span>
       <h3 class="rfr__title" tabindex="-1" data-rfr-fuoco>Fatto.</h3>
       <p class="rfr__lead" data-rfr-esito></p>
+      {/* Chi è rimasto fuori, quando qualcuno è rimasto fuori: dire «fatto» e
+          tacere di un amico che non ha ricevuto niente è la cosa che si scopre
+          una settimana dopo, chiedendoglielo. */}
+      <p class="rfr__nota rfr__nota--fuori" data-rfr-fuori hidden></p>
       <p class="rfr__nota">
         Quando attiva il pass e poi si iscrive, il voucher da €{VOUCHER.valore} arriva a te: te lo
         diciamo per email.
@@ -424,6 +452,75 @@ import { PASS, VOUCHER, COMPRESO, LIBERATORIA } from '../data/referral';
   .rfr__consenso a {
     color: var(--accent-text);
     text-decoration: underline;
+  }
+
+  /* Il blocco di un amico: un contorno leggero che lo tiene insieme, e la sua
+     etichetta. Senza, quattro campi dopo altri quattro sono otto campi in fila
+     e non si vede dove finisce uno e comincia l'altro. */
+  .rfr__amico {
+    margin: 0 0 0.75rem;
+    padding: 0.875rem 0.875rem 0.25rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 0.875rem;
+  }
+
+  .rfr__amico__capo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 0.35rem;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .rfr__amico__togli {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    letter-spacing: 0.06em;
+    color: rgba(39, 36, 35, 0.5);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .rfr__amico__togli:hover {
+    color: var(--accent-text);
+  }
+
+  /* Il comando che apre il blocco dopo: a forma di parola, perché aggiungere un
+     amico è un ripensamento e non l'azione della schermata. Il bersaglio però è
+     pieno: `min-height` e non solo il testo. */
+  .rfr__aggiungi {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    margin: 0 0 0.5rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--accent-text);
+    cursor: pointer;
+  }
+
+  .rfr__aggiungi:hover {
+    text-decoration: underline;
+  }
+
+  .rfr__aggiungi[hidden] {
+    display: none;
+  }
+
+  .rfr__nota--fuori {
+    padding: 0.7rem 0.9rem;
+    border-radius: 0.625rem;
+    background: rgba(39, 36, 35, 0.05);
   }
 
   .rfr__btn {

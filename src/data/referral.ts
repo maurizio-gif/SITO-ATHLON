@@ -25,6 +25,20 @@
  * Le due domande le risponde `eSocio()` in `data/contatto.ts`, dai due lati.
  */
 
+/**
+ * Quanti amici si possono invitare in una volta.
+ *
+ * Tre, e il numero sta qui perché lo dicono in quattro posti: la landing, i tre
+ * blocchi del modulo, l'etichetta del pulsante e il conteggio nel client. Uno
+ * era il flusso vecchio, e costringeva a rifare tutto il percorso per il secondo
+ * amico — chi ne ha due in mente ne invita uno. Illimitati sarebbero una lista
+ * di indirizzi comprati, non amici: il programma vive sul fatto che chi invita
+ * conosce chi riceve.
+ *
+ * Non è un tetto sulla vita del socio: finito un invito se ne può fare un altro.
+ */
+export const AMICI = 3;
+
 /** Dove finisce l'invito completo: Airtable, WhatsApp e la mail all'amico. */
 export const WEBHOOK_REFERRAL = 'https://automazione.n8ndevelop.it/webhook/athlon-referral';
 

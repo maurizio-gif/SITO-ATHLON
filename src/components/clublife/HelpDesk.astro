@@ -218,6 +218,18 @@ const SUGGESTIONS: Record<string, string[]> = {
         parole si riconosce, detta in due modi sembra due cose.
 
         L'icona è quella dell'header, identica: tre punti in una nuvoletta. */}
+    {/* Le due strade insieme, e in cima: chiedere all'assistente o scrivere al
+        team. Il comando dello staff stava in fondo, dopo l'elenco delle schede,
+        e questo diceva una cosa sbagliata sull'ordine — che scrivere sia
+        l'ultima spiaggia dopo aver cercato. Per chi ha una domanda che nessuna
+        scheda può risolvere — «il mio abbonamento è sbagliato» — cercare fra le
+        schede è tempo perso, e la deve trovare subito.
+
+        L'alternativa resta asimmetrica di proposito: la chat è piena e larga,
+        l'assistenza è contornata. La prima risponde in un secondo e la seconda
+        in qualche ora, quindi non sono pari — ma sono entrambe qui, ed è quello
+        che conta. */}
+    <div class="hd__vie">
     <button type="button" class="hd__chat" data-cta="assistente" aria-haspopup="dialog">
       <span class="hd__chat__icona" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor"
@@ -234,6 +246,12 @@ const SUGGESTIONS: Record<string, string[]> = {
       </span>
       <span class="hd__chat__freccia" aria-hidden="true">→</span>
     </button>
+
+      <button type="button" class="hd__vie__staff" data-open-support>
+        <span class="hd__vie__staff__nome">Scrivi al team</span>
+        <span class="hd__vie__staff__nota">Ti rispondiamo in pochi minuti</span>
+      </button>
+    </div>
 
     {/* Ask-a-question box, in two steps: the activity, then the question.
         Matching runs in the browser against an index built at compile time — no
@@ -359,10 +377,14 @@ const SUGGESTIONS: Record<string, string[]> = {
         `data-open-support` è lo stesso attributo che usa la chat quando offre
         di scrivere al team: un aggancio solo, e l'ascoltatore sta sulla sezione
         e non sull'area delle risposte, così vale anche per questo pulsante. */}
+    {/* Il comando resta anche qui, e non è una ripetizione da togliere: chi ha
+        scorso tutte le schede fino in fondo è a mille pixel da quello in cima,
+        e mandarlo a cercarlo su è la cosa che fa chiudere la pagina. È lo stesso
+        `data-open-support`, quindi un ascoltatore per due posti. */}
     <div class="hd__staff">
       <p class="hd__staff__testo">
-        Non hai trovato la risposta? <strong>Contatta il nostro staff</strong>: leggiamo la tua
-        richiesta e ti rispondiamo via email.
+        Non hai trovato la risposta? <strong>Scrivi al nostro team</strong>: la legge una persona
+        del club e ti risponde per email in pochi minuti.
       </p>
       <button type="button" class="hd__staff__btn" data-open-support>
         Richiedi assistenza →
@@ -1268,6 +1290,56 @@ window.__ATHLON_ACTIVITIES__ = ${JSON.stringify(ACTIVITY_TAGS)};`}
      principale per chi non sa cosa cercare, e sta sopra un box di ricerca alto:
      alla misura di un pulsante perdeva il confronto con quello che doveva
      precedere. In rem, così cresce sul totem come il resto. */
+  /* Le due vie affiancate dove ci stanno, in colonna dove no. `auto-fit` con il
+     minimo in rem: sul totem e sul televisore tornano una sopra l'altra da sé,
+     perché il minimo cresce con la radice. */
+  .hd__vie {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: 0.75rem;
+    max-width: 52rem;
+    margin: 0 0 1.5rem;
+  }
+
+  /* La seconda via: contornata, e alta come la prima. `align-items: center` sul
+     contenitore le avrebbe fatte di altezze diverse, che accanto si vede. */
+  .hd__vie__staff {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.2rem;
+    min-height: 4.5rem;
+    padding: 1rem 1.4rem;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 0.875rem;
+    background: transparent;
+    color: var(--color-white);
+    font-family: var(--font-body);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) ease, border-color var(--dur-fast) ease;
+  }
+
+  .hd__vie__staff:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .hd__vie__staff__nome {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: var(--text-lg);
+    --lh: 1;
+    letter-spacing: 0.01em;
+  }
+
+  .hd__vie__staff__nota {
+    font-size: var(--text-sm);
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
   .hd__chat {
     display: flex;
     align-items: center;
@@ -1275,8 +1347,8 @@ window.__ATHLON_ACTIVITIES__ = ${JSON.stringify(ACTIVITY_TAGS)};`}
     width: 100%;
     /* Non a tutta pagina: oltre questa misura la fascia diventa un nastro con
        due parole in mezzo e tre quarti di arancione vuoto. */
-    max-width: 34rem;
-    margin: 0 0 1.5rem;
+    max-width: none;
+    margin: 0;
     min-height: 4.5rem;
     padding: 1rem 1.4rem;
     border: none;
