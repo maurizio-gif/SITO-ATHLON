@@ -8,7 +8,22 @@
  * richieste_help_desk). The field names below are the contract with it — rename
  * one here and it stops arriving in the email and in the database.
  */
+import { ACTIVITY_TAGS } from '../../data/activities';
+
 const SUPPORT_ENDPOINT = 'https://automazione.n8ndevelop.it/webhook/help-desk-athlon';
+
+/* Le stesse voci del primo passo del box, dalla stessa lista: `ACTIVITY_TAGS` è
+   la sorgente unica — popola la tendina di Tina, la validazione delle
+   collezioni, il box dell'Help Desk e adesso anche questa. Aggiungere
+   un'attività là la fa comparire qui senza toccare niente.
+
+   Divise per pubblico come nel box, perché «Scuola Nuoto» esiste in due
+   versioni e le due procedure non sono la stessa: senza i due gruppi la tendina
+   avrebbe due voci quasi identiche in un elenco piatto di dodici. */
+const GRUPPI = [
+  { label: 'Adulti', voci: ACTIVITY_TAGS.filter((a) => a.audience === 'adulti') },
+  { label: 'Junior', voci: ACTIVITY_TAGS.filter((a) => a.audience === 'junior') },
+];
 
 /** The five standard campaign parameters, captured as-is when present. */
 const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
@@ -29,12 +44,34 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
     </div>
 
   <form class="sup__form" data-support-form novalidate>
-    {/* Not a field: the activity comes from the first step of the Help Desk box,
-        which is where the choice belongs. Shown so nobody wonders whether we
-        know what they are asking about. */}
+    {/* Era un paragrafo di sola lettura: l'attività la scegliava il primo passo
+        del box dell'Help Desk, e qui si mostrava soltanto perché nessuno
+        dovesse chiedersi se sapevamo di cosa stava parlando.
+
+        Funzionava finché al form si arrivava dal box. Da quando il pulsante in
+        fondo alla sezione lo apre da solo, chi entra da lì vede scritto
+        «Non specificata» e non ha nessun modo di correggerlo — il box è dietro
+        un pannello modale. Quindi qui c'è un controllo vero.
+
+        Il dato inviato resta il campo nascosto qui sotto, che è quello che il
+        workflow legge e che il box riempie: la tendina lo comanda, non lo
+        sostituisce. Due elementi e una sola verità, e così `HelpDesk.astro`
+        continua a scrivere dove ha sempre scritto — anche quando manda più
+        attività insieme, che una tendina da sola non saprebbe rappresentare. */}
     <div class="fld">
-      <span class="fld__label">Attività di interesse <span class="fld__req">*</span></span>
-      <p class="sup__activity" data-support-activity-label></p>
+      <label class="fld__label" for="sup-attivita">Attività di interesse</label>
+      <select class="fld__input" id="sup-attivita" data-support-activity-select>
+        <option value="Non specificata">Non specificata</option>
+        {GRUPPI.map((g) => (
+          <optgroup label={g.label}>
+            {g.voci.map((a) => <option value={a.label}>{a.label}</option>)}
+          </optgroup>
+        ))}
+      </select>
+      <p class="fld__hint">
+        Se la richiesta riguarda un'attività in particolare, scegliela: ci aiuta a mandarla alla
+        persona giusta.
+      </p>
     </div>
 
     {/* I due campi Nome e Cognome non ci sono più, e il loro contenuto è finito
@@ -144,7 +181,7 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
   const message = document.querySelector<HTMLTextAreaElement>('[data-support-message]');
   const status = document.querySelector<HTMLElement>('[data-support-status]');
   const activityField = document.querySelector<HTMLInputElement>('[data-support-activity]');
-  const activityLabel = document.querySelector<HTMLElement>('[data-support-activity-label]');
+  const activitySelect = document.querySelector<HTMLSelectElement>('[data-support-activity-select]');
   const fileField = document.querySelector<HTMLInputElement>('[data-support-file]');
 
   /** Il file in base64, senza il prefisso `data:` che il webhook non usa. */
@@ -193,21 +230,36 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
 
     const openModal = () => {
       lastFocus = document.activeElement as HTMLElement;
-      /* L'attività la riempie il box dell'Help Desk appena prima di aprire
-         questo pannello — ma non sempre: il pulsante «Richiedi assistenza» in
-         fondo alla sezione apre il form senza passare dal box, e chi arriva da
-         lì non ha scelto niente.
+      /* La tendina si allinea al campo nascosto, che è quello che il box
+         dell'Help Desk riempie appena prima di aprire questo pannello. Tre
+         casi, e il terzo è la ragione per cui questo non è un `select.value =`
+         e basta:
 
-         Prima quel caso era un vicolo: il campo mostrava «—», l'invio veniva
-         rifiutato con «scegli l'attività nel box qui sopra», e il box era
-         dietro un pannello modale. Una cosa da correggere fuori da dove la si
-         legge non è un errore, è una porta chiusa. Adesso vale «Non
-         specificata», che è la verità e che il desk sa leggere: la richiesta
-         dice di quale attività parla nel testo, o non parla di un'attività. */
+          - **niente** — si arriva dal pulsante in fondo alla sezione, e vale
+            «Non specificata», che è la prima voce;
+          - **una attività** — la tendina la trova fra le sue voci e la mostra;
+          - **più attività** insieme, «Gym Floor, Aqua Fitness», perché il box
+            ne fa scegliere quante se ne vuole. Nessuna voce corrisponde, e un
+            `value` che non corrisponde viene ignorato in silenzio: la tendina
+            tornerebbe su «Non specificata» e la scelta della persona sarebbe
+            **cancellata senza dirlo**. Quindi si aggiunge una voce con quel
+            testo esatto, e si toglie alla riapertura. */
       if (activityField && !activityField.value.trim()) {
         activityField.value = 'Non specificata';
       }
-      if (activityLabel) activityLabel.textContent = activityField?.value || 'Non specificata';
+      if (activitySelect && activityField) {
+        const valore = activityField.value;
+        activitySelect.querySelectorAll('[data-temporanea]').forEach((o) => o.remove());
+        const previsto = Array.from(activitySelect.options).some((o) => o.value === valore);
+        if (!previsto) {
+          const opt = document.createElement('option');
+          opt.value = valore;
+          opt.textContent = valore;
+          opt.dataset.temporanea = '1';
+          activitySelect.insertBefore(opt, activitySelect.firstChild);
+        }
+        activitySelect.value = valore;
+      }
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
       document.body.classList.add('supm-locked');
@@ -225,6 +277,14 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
     // The chat flow opens it; keeping the handle on window avoids coupling the
     // two components through the DOM.
     (window as any).__athlonOpenSupport = openModal;
+
+    /* Il campo nascosto resta la verità, quindi la tendina ci scrive dentro. Il
+       contrario — mettere `name="attivita"` sulla tendina e togliere il campo —
+       avrebbe fatto perdere le scelte multiple del box, che una tendina non sa
+       tenere. */
+    activitySelect?.addEventListener('change', () => {
+      if (activityField) activityField.value = activitySelect.value;
+    });
 
     root.querySelectorAll('[data-support-close]').forEach((el) =>
       el.addEventListener('click', closeModal)
@@ -515,17 +575,6 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
     font-size: var(--text-xs);
     line-height: 1.45;
     color: rgba(255, 255, 255, 0.38);
-  }
-
-  /* Reads as a stated fact, not as an empty input. */
-  .sup__activity {
-    margin: 0;
-    padding: 13px 15px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 87, 1, 0.35);
-    background: rgba(255, 87, 1, 0.1);
-    font-weight: 600;
-    color: var(--color-white);
   }
 
   .sup__note {
