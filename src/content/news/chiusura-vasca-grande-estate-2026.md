@@ -1,10 +1,10 @@
 ---
-title: "Vasca grande in ristrutturazione a luglio e agosto"
+title: "Vasca grande: i lavori procedono, ecco come sarà"
 date: 2026-06-20
 category: "Struttura"
-excerpt: "La piscina grande chiude per rifare vasca, bordo, rivestimenti e volte. Le lezioni restano quasi tutte attive e l'accesso al club è senza restrizioni."
-image: "/wp-content/uploads/2025/03/Athlon85-scaled.jpg"
-imageAlt: "La vasca grande da 25 metri di Athlon Club"
+excerpt: "Un'estate di lavoro sulla vasca grande: sette giorni su sette, Ferragosto compreso. Ecco il render di come sta venendo, e cosa trovi sul planning di settembre."
+image: "/wp-content/uploads/2026/08/render-vasca-grande-2026.jpg"
+imageAlt: "Render della vasca grande ristrutturata di Athlon Club: sei corsie, volte grigie e grafiche arancioni sulla balconata"
 ctaLabel: "Consulta il planning"
 ctaHref: "/planning"
 attivita:
@@ -18,76 +18,38 @@ attivita:
   - nuoto-agonistico
 ---
 
-Athlon non smette mai di migliorare: in 53 anni abbiamo rinnovato la struttura anno dopo anno. Nei mesi di **luglio e agosto** la piscina grande resta chiusa per un intervento su vasca, bordo vasca, rivestimenti e volte.
+## Un'estate di lavoro, e si vede
 
-Gran parte delle lezioni rimane regolarmente in programma e le attività di **Aqua Gym vengono intensificate nella vasca media**. Per quei due mesi, qualsiasi abbonamento che includa la vasca grande dà accesso a **tutte le attività del club**, Group Reformer compreso, senza restrizioni.
+Questa è la nostra vasca grande come sarà: il render del progetto su cui abbiamo lavorato tutta l'estate. Vasca, bordo vasca, rivestimenti, volte, illuminazione — non un ritocco, ma un intervento profondo su tutto l'ambiente.
 
-## Ristrutturazione vasca grande — luglio e agosto 2026
+<!-- Lo stesso render della hero, ma pulito: lì il titolo e lo scrim ci stanno
+     sopra, qui si vede il progetto. `srcset` scritto a mano perché nel markdown
+     non si può chiamare `fotoPiccola`, e le due larghezze sono quelle vere del
+     file, non il 2560 che `foto.ts` dichiara per convenzione. Nessun link
+     attorno: le foto della prosa delle news non aprono niente. -->
+<img
+  src="/wp-content/uploads/2026/08/render-vasca-grande-2026.jpg"
+  srcset="/wp-content/uploads/2026/08/render-vasca-grande-2026-1280.jpg 1280w, /wp-content/uploads/2026/08/render-vasca-grande-2026.jpg 1672w"
+  sizes="(max-width: 900px) 92vw, 1280px"
+  width="1672"
+  height="941"
+  loading="lazy"
+  decoding="async"
+  alt="Render della vasca grande ristrutturata: sei corsie, volte grigie, la scritta Athlon Club sulla parete di fondo e le grafiche arancioni sulla balconata"
+/>
 
-Athlon non smette mai di migliorare. In **53 anni di attività** abbiamo rinnovato radicalmente la nostra struttura, anno dopo anno, per offrire servizi sempre più moderni e all'altezza delle aspettative di chi si allena con noi.
+**È stato impegnativo, e lo diciamo senza girarci intorno.** Mentre molti di voi si riposavano, in cantiere si è lavorato ogni giorno: sette giorni su sette, Ferragosto compreso, per rispettare il programma e consegnare un lavoro fatto come si deve. I lavori sono proceduti al meglio, e sul **planning di settembre** trovate già gli orari di nuoto libero, Scuola Nuoto Adulti e Aqua Fitness in vasca grande.
 
-Nei mesi di **luglio e agosto** la piscina grande sarà chiusa per un nuovo importante intervento di ristrutturazione.
+## Perché un intervento così
 
-L'intervento riguarderà:
-- La **vasca** e il **bordo vasca**
-- I **rivestimenti**
-- Le **volte** (soffitto)
+Athlon non smette mai di migliorare: in **53 anni** abbiamo rinnovato la struttura anno dopo anno. Ma una ristrutturazione di questa portata non è manutenzione ordinaria — è la scelta di alzare in modo importante lo standard di un club storico, che questo tipo di investimento se lo merita.
 
----
+Da quando siamo ripartiti dopo il periodo del Covid abbiamo continuato a investire ogni anno sulla struttura, e i numeri ci stanno dando ragione: **iscrizioni e adesioni continuano a crescere anno dopo anno**. Ma il dato che ci dice di più è un altro, ed è la **fidelizzazione, anche lei in crescita**: chi si iscrive resta, e rinnova. Vuol dire che i nostri iscritti apprezzano il percorso che stiamo facendo insieme — ed è la conferma più chiara che la direzione presa è quella giusta, oltre che il motivo per cui continuiamo a investire.
 
-## Cosa rimane attivo
+## La vasca in cui avete imparato a nuotare
 
-Abbiamo lavorato per mantenere attiva la quasi totalità delle lezioni. In particolare:
+In tanti ci avete scritto per sapere come procedeva, e non ci ha sorpreso: in questa vasca hanno imparato a nuotare e hanno mosso i primi passi generazioni di persone del quartiere. È una piscina a cui si è affezionati, e lo capiamo — è la stessa ragione per cui volevamo fosse rifatta bene.
 
-- **Gran parte delle lezioni** rimangono regolarmente in programma
-- Le attività di **Acqua Gym** vengono intensificate nella **vasca media**
+**Innovazione e tradizione**: è quello che questa vasca rappresenta per Athlon, ed è quello per cui abbiamo lavorato tutta l'estate.
 
----
-
-## Accesso libero a tutto il club — senza limiti
-
-Per i mesi di luglio e agosto, **qualsiasi abbonamento che include l'accesso alle attività in vasca grande** dà accesso a **tutte le attività del club** (Group Reformer compreso), senza restrizioni.
-
-Questo include:
-
-- 🏋️ **Gym Floor**
-- 🎵 **Corsi Fitness**
-- 🧘 **Group Reformer**
-- 💧 **Aqua Fitness**
-
-> È un'ottima occasione per scoprire e provare tutte le attività del club che normalmente non rientrano nel tuo abbonamento — senza costi aggiuntivi, per tutta l'estate.
-
----
-
-## Attività sospese
-
-A causa della chiusura della vasca grande, le seguenti attività sono temporaneamente sospese:
-
-- 🚫 **Nuoto libero** in vasca grande
-- 🚫 **Scuola Nuoto Adulti**
-
-Entrambe le attività **riprenderanno regolarmente il 1° settembre**.
-
----
-
-## Sospensione gratuita
-
-Se il tuo abbonamento comprende l'uso della **Piscina Grande**, puoi **sospendere gratuitamente** i mesi di luglio e agosto tramite la **Sospensione Straordinaria**.
-
-### Come richiederla
-
-1. Accedi alla tua [area riservata](https://athlon.perfectgym.com/ClientPortal2/#/Login)
-2. Vai su **Abbonamenti**
-3. Seleziona il tuo abbonamento attivo
-4. Clicca su **Sospensioni**
-5. Seleziona **Sospensione Straordinaria**
-
-> ⚠️ La richiesta deve essere inserita **entro 10 giorni dalla fine del mese precedente**:
-> - Entro il **20 giugno** per sospendere **luglio**
-> - Entro il **21 luglio** per sospendere **agosto**
-
----
-
-<div class="ci-cta">
-  <a href="/planning" class="ci-btn-primary" style="color:#000 !important">CONSULTA IL PLANNING COMPLETO</a>
-</div>
+Ci vediamo in acqua: **ti riaspettiamo con tutte le attività al completo a partire dal 1° settembre**. Più carichi che mai.
