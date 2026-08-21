@@ -882,6 +882,106 @@ o uno script Python prendono `403 Authorization data is wrong!`, che sembra un
 problema di credenziali e non lo è. Per provarlo si passa dal browser, dal form
 vero, che è comunque la prova che conta.
 
+## Ogni dato raccolto finisce su Supabase, e Airtable è il passeggero
+
+Il database del sito è il progetto Supabase **`app-athlon`**
+(`kdbcwwpdazvtmjolybdm`), e ci scrivono le automazioni n8n, mai il browser: la
+chiave che scrive è la service key, che sta solo in n8n. Tutte le tabelle hanno
+RLS attiva e **zero policy**, che è il modo di dire «solo la service key passa».
+Una policy `anon` su una di queste tabelle è un elenco di lead pubblicato.
+
+Lo schema sta in `supabase/migrations/`, e va tenuto in pari: una colonna
+aggiunta dalla dashboard e non qui è una colonna che il prossimo ambiente non
+avrà. Non c'è un `db push` in CI — le migrazioni si eseguono a mano nella SQL
+Editor — quindi il file è documentazione eseguibile, non un meccanismo.
+
+**Airtable resta, e resta secondario.** `athlon-contatto-compilato` e
+`athlon-referral` scrivono ancora la loro riga su `ATHLON CLUB / RICHIESTE`, e
+va bene finché il desk lavora di lì. Ma la fonte di verità è Supabase, e si
+vede dall'ordine dei nodi: la riga sul database si scrive **prima** di Airtable,
+prima di SendGrid, prima di Spoki e prima di PerfectGym. Non è estetica — quei
+nodi hanno `onError: continueRegularOutput`, quindi falliscono in silenzio, e
+nell'ordine inverso un timeout del CRM sarebbe un contatto perduto senza che
+nessuno se ne accorga.
+
+Dove finisce cosa:
+
+| webhook | tabella |
+| --- | --- |
+| `athlon-prova-compilata` | `richieste_prova` |
+| `athlon-contatto-compilato` | `richieste_contatto` |
+| `help-desk-athlon` | `richieste_help_desk` |
+| `chat-athlon` | `chat_conversazioni`, `chat_messaggi` |
+| `chat-athlon-dati` | `chat_lead` |
+| `chat-athlon-ticket` | `chat_ticket` |
+| `athlon-referral` | `richieste_referral` |
+| `athlon-verifica-iscritto`, `athlon-reset-password` | `eventi_email` |
+
+**Gli scarti si registrano come i successi**, ed è la riga che manca più spesso.
+Il referral rifiutava due casi — chi invita non è socio, l'amico lo è già —
+mandandoli su un nodo `No-Op`: gli inviti persi non esistevano, quindi nessuno
+poteva sapere quanti fossero né perché. Ora hanno una riga con `esito` e
+`motivo_scarto`. Stessa idea per l'email malformata in `eventi_email`: se sono
+tante, il problema è il campo, non chi scrive.
+
+### `eventi_email` è il funnel, le `richieste_*` sono le conversioni
+
+Le tabelle `richieste_*` contengono chi è arrivato in fondo. `eventi_email`
+contiene chi ha cominciato: **una riga ogni volta che qualcuno digita un
+indirizzo**, quale che sia il form e quale che sia l'esito. La distanza fra le
+due è quanti si fermano a metà.
+
+Il buco era grosso e invisibile: `athlon-verifica-iscritto` è l'endpoint più
+trafficato del sito — ci passano la prova, «contattaci», la chat, l'Help Desk e
+i pulsanti *Iscriviti* di `/abbonamenti` e `/promo` — e non scriveva niente da
+nessuna parte. Chi digitava l'email, leggeva «hai già un account» e chiudeva la
+pagina non era mai esistito.
+
+Due viste rispondono alla domanda che nessuna tabella può:
+`email_tutte` (ogni tocco, da tutte le sorgenti) e `email_contatti` (una riga
+per indirizzo). Sono `security_invoker`, senza il quale scavalcherebbero la RLS
+di tutto quello che c'è sotto. **Aggiungendo un form, aggiungi il suo ramo a
+`email_tutte`**: una vista che non copre tutte le sorgenti risponde con
+sicurezza a una domanda sbagliata, ed è peggio di una vista che non c'è.
+
+### Un nodo Supabase in bozza non scrive niente
+
+Questa istanza n8n ha bozze e versioni pubblicate, e **`update_workflow` non
+pubblica**: crea una versione e la lascia lì. Le esecuzioni manuali girano la
+bozza, il webhook di produzione gira la versione attiva — quindi si può provare
+un nodo, vederlo scrivere la riga, ed essere convinti che sia vivo mentre non lo
+è. Dopo ogni modifica va chiamato `publish_workflow`, e il controllo è
+`versionId == activeVersionId` in `get_workflow_details`.
+
+Non è teoria: `richieste_prova` era vuota da giorni perché il nodo
+«Supabase RICHIESTE PROVA» esisteva **solo in bozza**. Il workflow sembrava a
+posto guardandolo, e la tabella restava a zero.
+
+Attenzione a cosa ci si porta dietro quando si pubblica: le versioni sono
+istantanee, non diff, quindi pubblicare la propria modifica pubblica anche le
+bozze di chi è passato prima. Prima di farlo, confronta `activeVersion.nodes`
+con `nodes`. Un diff che tocca *tutti* i nodi di solito non è una modifica vera
+ma l'editor che ha tolto i valori uguali al default (`action: hash`,
+`encoding: hex`, `type: SHA256` sul nodo Crypto sono tutti default): verificalo
+con `get_node_types` invece di indovinare, perché il caso in cui non lo fossero
+— un hash che cambia — romperebbe l'abbinamento delle conversioni Meta senza
+dare errore.
+
+### Il nodo che scrive non deve poter fermare il form
+
+Ogni nodo Supabase aggiunto porta `onError: continueRegularOutput`, e sta fuori
+dal percorso della risposta al browser. Vale la regola dei form: perdere una
+riga è brutto, impedire a una persona di chiedere una prova è peggio.
+
+Una trappola sola, e morde in silenzio: **il nodo Supabase restituisce la riga
+inserita, non l'item che ha ricevuto.** Da lì in poi `$json` ha i nomi delle
+colonne (`member_id`, `stato_pgm`) e non quelli del form (`memberId`,
+`statoPgm`), quindi ogni espressione a valle legge `undefined` — e con
+`typeValidation: loose` un `IF` non dà errore, prende semplicemente il ramo
+sbagliato. Se l'inserimento sta *in mezzo* alla catena serve un Code node che
+rimetta i dati buoni (`Ripristina Dati` in `CHAT ATHLON — DATI` è l'esempio);
+altrimenti si mette il nodo su un ramo parallelo e si legge `$('Nodo').item`.
+
 ## Le pagine senza intestazione azzerano `--header-h`
 
 `global.css` tiene le ancore sotto l'header appiccicoso con
