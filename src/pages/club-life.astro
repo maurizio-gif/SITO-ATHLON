@@ -7,7 +7,6 @@ import Servizi from '../components/clublife/Servizi.astro';
 import { upcomingEvents } from '../data/eventi';
 import { getCollection } from 'astro:content';
 import { fotoHero } from '../data/foto';
-import { PASS, VOUCHER } from '../data/referral';
 /* Qui il modal serve davvero: i due comandi di questa pagina — la fascia e il
    pulsante fluttuante — devono aprire il form sul posto, non portare via. Sulle
    altre pagine non c'è, e là `data-cta="referral"` resta un link a /referral. */
@@ -179,28 +178,11 @@ const altre = sections.filter((s) => s.id !== 'help-desk');
 
   <Servizi id="servizi" />
 
-  {/* L'invito, dopo i servizi e non altrove: quella sezione dice cosa comprende
-      l'abbonamento, e invitare un amico è l'ultima voce di quell'elenco — un
-      vantaggio che si ha perché si è soci. Prima dell'Help Desk, che è dove si
-      va quando qualcosa non torna.
-
-      Il comando non sta qui: sta nel pulsante che galleggia in alto, che è
-      sempre a portata mentre si scorre e apre lo stesso `ReferralModal` che
-      questa pagina già carica. Un secondo pulsante a metà pagina diceva la
-      stessa cosa due volte, e quello in alto la dice meglio. */}
-  <section class="cl-invita">
-    <div class="container cl-invita__inner">
-      <div class="cl-invita__testo">
-        <span class="eyebrow" data-anim="from-left">Un vantaggio da socio</span>
-        <h2 class="cl-invita__titolo" data-anim="reveal">Porta un amico.</h2>
-        <p class="cl-invita__sub">
-          Lui prova tutto il club per {PASS.giorni} giorni pagando solo il badge, €{PASS.prezzo}
-          invece di €{PASS.prezzoPieno}. Se poi si iscrive, a te arriva un voucher da
-          €{VOUCHER.valore} {VOUCHER.uso}.
-        </p>
-      </div>
-    </div>
-  </section>
+  {/* La fascia «Porta un amico» stava qui, fra i servizi e l'Help Desk, e non
+      c'è più: l'invito è diventato una voce della sezione Servizi — dove sono
+      le altre cose che si hanno perché si è soci — e il comando resta la
+      pastiglia che galleggia in cima. Tre posti per la stessa offerta erano
+      due di troppo. */}
 
   {/* Last on the page: it is the deepest of the four, and it closes with its own
       way out — the chat's "scrivi al team" button. */}
@@ -672,41 +654,6 @@ const altre = sections.filter((s) => s.id !== 'help-desk');
     }
   }
 
-  /* ---- L'invito a un amico ---- */
-  /* Una fascia scura fra due sezioni chiare: è un'offerta e non un contenuto
-     della pagina, e deve leggersi come tale senza gridare come l'arancione. */
-  .cl-invita {
-    padding: var(--space-section-sm) 0;
-    background: var(--color-dark);
-    color: var(--color-white);
-  }
-
-  .cl-invita__inner {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.5rem;
-  }
-
-  .cl-invita__testo {
-    max-width: 40rem;
-  }
-
-  .cl-invita__titolo {
-    font-size: var(--text-xl);
-    --lh: 1;
-    letter-spacing: 0.01em;
-    margin: 0.5rem 0 0.5rem;
-  }
-
-  .cl-invita__sub {
-    margin: 0;
-    font-size: var(--text-sm);
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.72);
-  }
-
   /* Le quattro sezioni non hanno più bisogno di uno scarto: la barra
      appiccicosa che copriva il loro inizio non c'è più, e questa pagina è senza
      intestazione — `Layout.astro` le mette `--header-h: 0`, quindi lo
@@ -715,9 +662,44 @@ const altre = sections.filter((s) => s.id !== 'help-desk');
 
 
   @media (max-width: 760px) {
+    /* Il comando fisso «Invita i tuoi amici» sta in cima e su un telefono
+       occupa la stessa banda dell'occhiello: misurato, finiva a 60px dal bordo
+       mentre l'occhiello partiva a 99, e i 39px in mezzo non si leggevano come
+       spazio ma come sovrapposizione. La hero parte sotto di lui. */
     .cl-hero__inner {
-      padding-top: var(--space-section-md);
+      padding-top: 5.5rem;
+      /* Serve solo a poter riordinare i figli qui sotto. */
+      display: flex;
+      flex-direction: column;
     }
 
+    /* L'ordine sul telefono non è quello del documento, e la ragione è la
+       lunghezza: il paragrafo che spiega di cosa è fatta la pagina occupa
+       cinque righe, e teneva i comandi — che sono il motivo per cui la pagina
+       si apre — sotto la piega. Prima le carte, poi la spiegazione per chi la
+       vuole. Su desktop resta l'ordine scritto, dove ci stanno insieme. */
+    .cl-hero__inner > .eyebrow { order: 1; }
+    .cl-hero__title { order: 2; }
+    .cl-hero__lede { order: 3; }
+    .cl-chat { order: 4; }
+    .cl-porte { order: 5; }
+    .cl-hero__sub {
+      order: 6;
+      margin-top: 1.5rem;
+      margin-bottom: 0;
+    }
+
+    /* A sinistra e non centrato: al centro restavano ventitré pixel fra il
+       comando e il marchio, che su questa pagina è l'unico segno del club —
+       `chrome={false}`, quindi l'header non c'è. Agli angoli opposti nessuno
+       dei due schiaccia l'altro. */
+    .cl-invita-fab {
+      left: 1rem;
+      transform: none;
+    }
+
+    .cl-invita-fab:hover {
+      transform: translateY(-1px);
+    }
   }
 </style>

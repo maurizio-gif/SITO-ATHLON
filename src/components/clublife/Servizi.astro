@@ -4,6 +4,7 @@
  * One line each, the rest behind a disclosure so the list stays scannable.
  */
 import { getCollection } from 'astro:content';
+import { conNumeri } from '../../data/servizi';
 
 interface Props {
   id?: string;
@@ -14,6 +15,7 @@ const { id = 'servizi' } = Astro.props;
 const items = (await getCollection('servizi'))
   .filter((s) => !s.data.draft)
   .sort((a, b) => a.data.order - b.data.order);
+
 ---
 
 <section class="sv" id={id}>
@@ -22,7 +24,7 @@ const items = (await getCollection('servizi'))
     <h2 class="sv__title" data-anim="reveal">Un account, e il club a portata di mano</h2>
     <p class="sv__sub">
       Sei servizi che non sono sei cose separate: l'app con cui prenoti e segui il programma, gli
-      allenamenti da casa, il trainer, la settimana di prova, gli spogliatoi e le pratiche. Un solo
+      allenamenti da casa, il trainer, l'invito agli amici, gli spogliatoi e le pratiche. Un solo
       accesso per tutti.
     </p>
 
@@ -40,9 +42,22 @@ const items = (await getCollection('servizi'))
             </summary>
 
             <div class="svi__detail">
-              <p>{s.data.detail}</p>
+              <p>{conNumeri(s.data.detail)}</p>
+              {/* `data-cta="referral"` quando la destinazione è /referral: su
+                  questa pagina il `ReferralModal` intercetta quel comando e
+                  apre il modulo sul posto, invece di portare via da Club Life.
+                  L'`href` resta e fa da ripiego — senza JavaScript, e con un
+                  click modificato o la rotellina, si va alla pagina come
+                  prima. Dedotto dalla destinazione e non da un campo nuovo
+                  nello schema: un campo in più andrebbe aggiunto in
+                  `content.config.ts` **e** in `tina/config.ts`, e sarebbe una
+                  casella da riempire per un caso solo. */}
               {s.data.href && (
-                <a href={s.data.href} class="svi__link">
+                <a
+                  href={s.data.href}
+                  class="svi__link"
+                  {...(s.data.href === '/referral' ? { 'data-cta': 'referral' } : {})}
+                >
                   {s.data.hrefLabel ?? 'Scopri di più'} →
                 </a>
               )}

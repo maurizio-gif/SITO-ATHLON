@@ -12,6 +12,7 @@ import { ACTIVITY_TAGS } from '../../data/activities';
 import { clausole, urlClausola } from '../../data/termini';
 import { formatEventDate } from '../../data/eventi';
 import { toPlain, clamp } from '../../data/testo';
+import { conNumeri } from '../../data/servizi';
 import SupportForm from './SupportForm.astro';
 
 interface Props {
@@ -119,8 +120,12 @@ const newsIndex = news.map((n) => ({
 const serviziIndex = servizi.map((sv) => ({
   kind: 'Servizio',
   title: sv.data.title,
-  facts: sv.data.desc,
-  answer: clamp(sv.data.detail, 260),
+  /* `conNumeri` anche qui: questo indice finisce in uno `<script>` della pagina
+     e l'Help Desk lo mostra come risposta. Senza, il pannello rispondeva «fino
+     a {ref-amici} amici» — gli stessi segnaposto che la sezione Servizi
+     sostituisce, in una seconda copia degli stessi testi. */
+  facts: conNumeri(sv.data.desc),
+  answer: clamp(conNumeri(sv.data.detail), 260),
   url: sv.data.href || '#servizi',
   linkLabel: sv.data.hrefLabel || 'Vedi il servizio',
   area: 'Servizi del club',

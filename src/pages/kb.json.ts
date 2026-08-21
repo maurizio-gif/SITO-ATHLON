@@ -25,6 +25,7 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { CORSI, type Corso } from '../data/corsi';
+import { conNumeri } from '../data/servizi';
 import { JUNIOR, type CorsoJunior, type CorsoStagione } from '../data/junior';
 import { clausole, urlClausola, TERMINI_VERSIONE } from '../data/termini';
 import {
@@ -373,7 +374,7 @@ export const GET: APIRoute = async () => {
         : `${SITE}${s.data.href ?? '/club-life#servizi'}`,
       area: 'Servizi del club',
       attivita: s.data.attivita,
-      testo: blocchi(pulito(s.data.desc), pulito(s.data.detail)),
+      testo: blocchi(pulito(conNumeri(s.data.desc)), pulito(conNumeri(s.data.detail))),
     });
   }
 
