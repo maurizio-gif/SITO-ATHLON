@@ -289,7 +289,10 @@ export function initContattaciForm(root, options) {
       var r = await fetch(WEBHOOK_VERIFICA, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: dati.email, pagina: dati.pagina, vid: vid() }),
+        /* Con le UTM oltre al `vid`: la verifica registra ogni email su
+           `eventi_email`, ed è il primo tocco. Senza, un contatto nato da qui
+           risultava senza provenienza fino al secondo invio. */
+        body: JSON.stringify({ email: dati.email, pagina: dati.pagina, utm: utm(), vid: vid() }),
       });
       var body = await r.json();
       if (body && body.stato) {

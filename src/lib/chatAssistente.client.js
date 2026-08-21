@@ -264,7 +264,17 @@ export function initChatAssistente(root, options) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: stop.signal,
-        body: JSON.stringify({ email: dati.email, pagina: dati.pagina }),
+        /* Con l'attribuzione, come la stessa verifica chiamata dalla prova e dai
+           pulsanti «Iscriviti»: questo endpoint registra **ogni email** del sito
+           su `eventi_email`, quindi è il primo tocco di tutti — ed era l'unico
+           chiamante a non dire da dove arrivava. Sul totem quel primo tocco
+           risultava senza `TOUR`. */
+        body: JSON.stringify({
+          email: dati.email,
+          pagina: dati.pagina,
+          utm: window.athlonGetUtm ? window.athlonGetUtm() : {},
+          vid: window.athlonGetVid ? window.athlonGetVid() : null,
+        }),
       });
       window.clearTimeout(scaduta);
       esito = await r.json();
@@ -599,6 +609,11 @@ export function initChatAssistente(root, options) {
           pagina: dati.pagina,
           messaggio: messaggio,
           conversazione: trascritto,
+          /* Anche il ticket: chi chiede di parlare con una persona è un contatto
+             come gli altri, e il desk deve poter sapere se sta rispondendo a
+             qualcuno arrivato da una campagna o dal totem in sede. */
+          utm: window.athlonGetUtm ? window.athlonGetUtm() : {},
+          vid: window.athlonGetVid ? window.athlonGetVid() : null,
         }),
       });
       if (!r.ok) throw new Error(String(r.status));
@@ -969,6 +984,13 @@ export function initChatAssistente(root, options) {
             : null,
           consenso: junior ? !!(campi.consenso && campi.consenso.checked) : true,
           conversazione: trascritto,
+          /* L'attribuzione: questo è il payload che **crea il lead**, quindi è
+             quello che deve portarla. Ci mancava, mentre `CHAT` — la
+             conversazione — la mandava già: il risultato era che di un contatto
+             nato dalla chat non si sapeva da dove venisse, e sul totem non
+             portava `TOUR`. */
+          utm: window.athlonGetUtm ? window.athlonGetUtm() : {},
+          vid: window.athlonGetVid ? window.athlonGetVid() : null,
         }),
       });
       if (!r.ok) throw new Error(String(r.status));
