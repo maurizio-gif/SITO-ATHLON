@@ -32,12 +32,44 @@ export const WEBHOOK_VERIFICA = 'https://automazione.n8ndevelop.it/webhook/athlo
  */
 export const WEBHOOK_CONTATTO = 'https://automazione.n8ndevelop.it/webhook/athlon-contatto-compilato';
 
+/**
+ * L'endpoint che chiede a PerfectGym di mandare la mail per reimpostare la
+ * password. Riceve `{ email }` e risponde `inviata`, `errore` o
+ * `email_non_valida`.
+ *
+ * Esiste per togliere un attrito preciso: chi ha già un account arrivava sulla
+ * pagina `ForgotPassword` del portale e là doveva **ridigitare** l'indirizzo che
+ * aveva appena scritto nel nostro campo, in un'applicazione con un'altra grafica
+ * e in un'altra scheda. Ora il pulsante fa partire la mail e la persona resta
+ * qui.
+ *
+ * Dietro c'è `POST /Api/v2.2/MemberAuth/SendResetPasswordLink`, e come sempre la
+ * chiamata la fa n8n: le chiavi di PerfectGym non stanno nel browser.
+ *
+ * **`inviata` non è una prova di consegna**, e sono due cose distinte. La prima:
+ * quell'endpoint risponde `200` anche per un indirizzo che non esiste — provato,
+ * `content-length: 0` — perché non deve rivelare a un estraneo se un account c'è.
+ * Qui non è un problema, perché il pulsante lo vede solo chi la verifica ha già
+ * riconosciuto. La seconda: la mail parte solo se in PerfectGym c'è la regola di
+ * automazione «User password reset has been requested». Senza quella la risposta
+ * è `200` e non parte niente — è la sola parte di questo percorso che non si può
+ * verificare dal codice.
+ */
+export const WEBHOOK_RESET = 'https://automazione.n8ndevelop.it/webhook/athlon-reset-password';
+
 /* Il calendario e i suoi indirizzi non stanno più qui: sono in
    `data/calendly.ts`, perché i posti che lo usano sono tre — questo form,
    quello della prova e l'assistente in chat — e la logica dell'embed è in
    `lib/calendario.client.js`. */
 
-/** Il portale, per chi risulta già registrato: reset password e accesso. */
+/**
+ * Il portale, per chi risulta già registrato: reset password e accesso.
+ *
+ * `reset` non è più la strada principale — la mail la fa partire
+ * `WEBHOOK_RESET` — ma resta, ed è il ripiego che serve: se la chiamata non
+ * riesce, la persona deve avere ancora un modo di reimpostare la password, e
+ * quel modo è la pagina del portale.
+ */
 export const PORTALE = {
   reset: 'https://athlon.perfectgym.com/ClientPortal2/#/ForgotPassword',
   login: 'https://athlon.perfectgym.com/ClientPortal2/#/Login',
