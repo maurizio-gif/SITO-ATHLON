@@ -54,14 +54,14 @@ const prova = trialCta({ source: '/' });
   <div class="hero-spot"></div>
 
   <div class="hero-content">
-    <span class="eyebrow hero-eyebrow">
-      <span class="hero-eyebrow__intera">Club Sportivo dal 1973 · Roma Talenti</span>
-      {/* Sotto i 900px la riga unica si spezzava in un punto scomodo: qui a
-          capo dopo l'anno, non dopo il pallino. */}
-      <span class="hero-eyebrow__spezzata">Club sportivo a Talenti dal 1973<br />Roma Talenti</span>
-    </span>
+    <span class="eyebrow hero-eyebrow">Club Sportivo a Talenti dal 1973</span>
     <h1 class="hero-title">Athlon Club <em class="accent">4.0</em></h1>
-    <p class="hero-lede">Innovare è la nostra<br />miglior tradizione.</p>
+    {/* Il `<br>` sta sul suo file per il desktop, dove il taglio in due righe è
+        voluto — la stessa forma dell'accoppiata condensato/corsivo di App. In
+        mobile e sul totem `.hero-lede__br` lo spegne e la frase torna su una
+        riga sola: lo spazio prima del tag resta lì apposta, per non fondere le
+        due parole quando il ritorno a capo sparisce. */}
+    <p class="hero-lede">Innovare è la nostra <br class="hero-lede__br" />miglior tradizione.</p>
 
     <div class="hero-actions">
       <a
@@ -277,10 +277,6 @@ const prova = trialCta({ source: '/' });
        titolo già grande e un video, un pelo meno pesante basta a farla leggere
        come introduzione e non come un secondo titolo. */
     font-weight: 600;
-  }
-
-  .hero-eyebrow__spezzata {
-    display: none;
   }
 
   .hero-title {
@@ -565,7 +561,18 @@ const prova = trialCta({ source: '/' });
       opacity: 1;
       text-shadow: none;
       margin: 6px 0 20px;
-      font-size: var(--text-xl);
+      /* In `vw` e non nella scala fissa: su una riga sola la frase deve
+         restringersi con lo schermo per non uscire dal contenitore — la stessa
+         idea del titolo, qui applicata a un testo più lungo. */
+      font-size: clamp(0.85rem, 4.3vw, 1.2rem);
+      white-space: nowrap;
+    }
+
+    /* Spegne il ritorno a capo del desktop: qui la frase sta su una riga sola,
+       e la dimensione del testo scala con la larghezza per restarci anche sul
+       telefono più stretto — vale anche sul totem, che condivide la query. */
+    .hero-lede__br {
+      display: none;
     }
 
     .hero-chat__hint {
@@ -581,14 +588,29 @@ const prova = trialCta({ source: '/' });
 
     /* Shrinks to the leftover space instead of holding a fixed ratio, which is
        what used to push the CTA off screen. It crops rather than letterboxes.
-       The video stays absolute inside it and fills it. */
+       The video stays absolute inside it and fills it.
+
+       `min-height` e non `flex-basis`: il video resta `flex: 1 1 auto` e
+       cresce oltre il minimo quando il testo lascia spazio, ma non scende
+       sotto. Un secondo pulsante pieno più uno alto come «Prova» lo
+       schiacciavano sotto la metà dell'altezza residua: tolto un comando e
+       abbassato l'altro, il video riprende la parte che gli spetta — qui e
+       sul totem, che condivide questa stessa fascia video/testo. */
     .hero-media {
       order: 1;
       position: relative;
       inset: auto;
       width: 100%;
       flex: 1 1 auto;
-      min-height: 0;
+      min-height: 55%;
+    }
+
+    .hero-secondary {
+      display: none;
+    }
+
+    .hero-actions .btn-primary {
+      padding: 12px 26px;
     }
 
     /* In rem, non in px: questa regola vale anche per il totem (la media query
@@ -602,36 +624,15 @@ const prova = trialCta({ source: '/' });
     }
   }
 
-  /* Solo il telefono, non il totem: lì il video ha già tutto lo spazio che la
-     fascia condivisa sopra gli lascia, e i due comandi ci stanno comodi fianco
-     a fianco su una superficie enorme. Qui il video perdeva contro il blocco
-     testo — un secondo pulsante pieno e uno alto come l'altro home lo
-     riducevano a una striscia. Tolto un comando e abbassato l'altro, il video
-     torna a essere la prima cosa che si vede. */
-  @media (max-width: 900px) {
-    /* `min-height` e non `flex-basis`: il video resta `flex: 1 1 auto` e cresce
-       oltre la metà quando il testo lascia spazio, ma non scende sotto. */
+  /* Sul totem il blocco testo, già compatto, lascia molto più margine del 55%
+     minimo qui sopra: la stessa fascia video/testo, con un pavimento più alto
+     perché sui 1920px di altezza reali il testo ne occupa una parte piccola.
+     Da sola, non toccherebbe mai il telefono — le due condizioni si escludono
+     a vicenda per costruzione (`min-width: 900px` qui, `max-width: 900px` nel
+     blocco condiviso sopra). */
+  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
     .hero-media {
-      min-height: 50%;
-    }
-
-    .hero-secondary {
-      display: none;
-    }
-
-    .hero-actions .btn-primary {
-      padding: 12px 26px;
-    }
-  }
-
-  /* Solo il telefono, non il totem che condivide la stessa media query sopra:
-     a 1080px di larghezza la riga unica ci sta comoda, qui no. */
-  @media (max-width: 700px) {
-    .hero-eyebrow__intera {
-      display: none;
-    }
-    .hero-eyebrow__spezzata {
-      display: inline;
+      min-height: 72%;
     }
   }
 
@@ -644,8 +645,11 @@ const prova = trialCta({ source: '/' });
     .hero-title {
       font-size: clamp(2.5rem, 12vw, 3.5rem);
     }
+    /* Non il font-size: resta il `clamp()` in `vw` del blocco condiviso, che
+       già si restringe da solo — un valore fisso qui aveva vinto per
+       specificità e rimandato la riga singola fuori dal contenitore sui
+       telefoni bassi e stretti insieme (es. iPhone SE). */
     .hero-lede {
-      font-size: var(--text-md);
       margin: 4px 0 14px;
     }
   }
