@@ -507,6 +507,10 @@ What follows from all this, when writing a page:
   club-life were both correct at a 16 px root and both wrong on the panel, by
   81 px and 63 px — enough to push the CTA and the only navigation the page has
   below the bottom edge. Express it in the same unit as the thing it tracks.
+  Neither survives: the hero's was moved to `var(--header-h)`, and club-life's
+  sticky strip was replaced by the card menu inside its hero, so `--cl-menu-h`
+  is gone. The lesson is the one to keep — grep for the pattern, not for the
+  names.
 - **A table that does not fit scrolls inside itself**, like the planning week:
   `display: block; overflow-x: auto`. The page must never scroll sideways.
 - **A grid column is `minmax(0, 1fr)`, not `auto`.** At double scale one long
@@ -759,6 +763,78 @@ curl -sI https://wiki.athlonroma.it/wikiathlon/generali/certificato-medico/ | he
 
 Deve dire `301` e `location: https://www.athlonroma.it/wikiathlon/generali/certificato-medico`.
 Un `200` vuol dire che il dominio non è ancora sul progetto.
+
+## Il form dell'assistenza chiede poco, e il resto lo va a prendere
+
+Il form dell'Help Desk — `components/clublife/SupportForm.astro`, dentro
+`/club-life` — manda a `help-desk-athlon` su n8n, che scrive al desk, conferma a
+chi ha scritto e archivia su Supabase (`app-athlon`, `richieste_help_desk`). I
+nomi dei campi sono il contratto con quel workflow: rinominarne uno qui lo fa
+sparire dall'email e dal database.
+
+**Non chiede nome e cognome, e non è una semplificazione: è che li sapeva già.**
+C'erano due campi obbligatori, «nome dell'utente per il quale si richiede
+assistenza», e chiedevano un dato che l'email identifica meglio di chi lo digita
+— chi scrive per un figlio si fermava a decidere di chi fosse il nome richiesto.
+Ora il workflow interroga PerfectGym con l'email (`PGM Cerca Anagrafica`, la
+stessa OData di `athlon-verifica-iscritto`) e ricava nome, cognome, telefono,
+`member_id` e `memberType`. Il body resta letto come ripiego, per le richieste
+che arrivassero da form più vecchi.
+
+Quella chiamata ha `onError: continueRegularOutput` e `alwaysOutputData`, e
+`pgm_stato` distingue tre casi che non sono lo stesso: `trovato`, `sconosciuto`
+(email non nostra) e `non-verificato` (PerfectGym non ha risposto). **Una
+richiesta di assistenza non si perde perché il gestionale è giù** — senza il
+nome la mail al desk è più povera, senza la richiesta non c'è niente.
+
+**Quello che resta da chiedere è il contesto, e il contesto non entra in una
+casella.** Sta nel testo, e il segnaposto lo chiede per nome: chi è l'iscritto,
+di quale corso o orario si tratta, le date. Un campo in meno da compilare e una
+richiesta più completa di prima.
+
+### L'allegato viaggia in base64 dentro il JSON
+
+Un file solo, immagine o PDF, cinque megabyte. Tre cose non ovvie:
+
+- **Base64 e non `multipart/form-data`.** Il webhook riceve un oggetto JSON e da
+  quello escono due email e una riga di database: passare a multipart vorrebbe
+  dire riscrivere il contratto per un campo facoltativo. Il costo è un terzo di
+  byte in più, che su 5 MB sono 6,7 MB di richiesta — dentro il limite.
+- **Il tetto si controlla nel browser**, prima di leggere il file. Un rifiuto
+  immediato è più gentile di trenta secondi di caricamento che finiscono in un
+  errore, e il limite del server non spiega mai cosa fare.
+- **Il base64 non entra in `out`** dentro `Prepara richiesta`, e questa è la
+  riga da non toccare: `out.payload` è una copia di `out` e finisce in una
+  colonna `jsonb`. Nel record restano nome, tipo e peso — misurato, 1,2 kB
+  invece di megabyte. Il file torna binario solo alla fine, e il nodo SendGrid
+  lo attacca con `{{ Object.keys($binary).join(',') }}`, che quando non c'è
+  niente non attacca niente.
+
+Il campo file non ha `name`: `FormData` non lo raccoglierebbe comunque in modo
+utile — un `File` dentro `JSON.stringify` diventa `{}`, cioè un campo che sembra
+inviato e non contiene niente — e i tre pezzi si aggiungono a mano.
+
+**Il webhook rifiuta i client che sembrano bot** (`ignoreBots: true`): un `curl`
+o uno script Python prendono `403 Authorization data is wrong!`, che sembra un
+problema di credenziali e non lo è. Per provarlo si passa dal browser, dal form
+vero, che è comunque la prova che conta.
+
+## Le pagine senza intestazione azzerano `--header-h`
+
+`global.css` tiene le ancore sotto l'header appiccicoso con
+`scroll-padding-top: calc(var(--header-h, 73px) + 1rem)`, e `--header-h` la
+pubblica il `ResizeObserver` dentro `Header.astro`. Sulle pagine con
+`chrome={false}` — `/club-life`, le schede dell'Help Desk, `/attiva`, `/promo` —
+quel componente non c'è, quindi nessuno la scrive e il ripiego di 73px diventa
+89px di vuoto sopra ogni ancora di una pagina che in cima non ha niente.
+`Layout.astro` mette `data-senza-intestazione` sull'`<html>` e `global.css` ci
+azzera la variabile.
+
+**Un attributo e non uno `<style is:inline>`**, e la ragione è una trappola che
+vale in generale: `is:inline` passa il contenuto **alla lettera**, espressioni
+comprese. `<style is:inline>{`:root{--header-h:0px}`}</style>` finisce in pagina
+con i backtick e le graffe come testo, e `{'{'}` pure. Dentro un `is:inline` non
+si scrivono espressioni Astro.
 
 ## Documentation
 
