@@ -104,7 +104,11 @@ export const DESTINATARI: Destinatario[] = [
     nome: 'n8n (automazione del club)',
     dominio: 'automazione.n8ndevelop.it',
     perche:
-      "Riceve i dati del modulo «prova gratuita» e dell'assistente: nome, cognome, email, cellulare, l'attività di interesse e, se acconsentito, l'attribuzione della campagna.",
+      /* Non «prova gratuita»: il Guest Pass costa 19 € (data/abbonamenti.ts).
+         La stessa confusione era già stata corretta una volta sulla f.a.q.
+         del sito (vedi il commento su GUEST_PASS in data/faq.ts) — il nome
+         vero, quello che compare sul pulsante e nel modal, è «Prova Athlon». */
+      "Riceve i dati del modulo «Prova Athlon» e dell'assistente: nome, cognome, email, cellulare, l'attività di interesse e, se acconsentito, l'attribuzione della campagna.",
   },
   {
     nome: 'Calendly',
@@ -200,7 +204,7 @@ export const INFORMATIVA: Sezione[] = [
       '<h3>a) Navigazione sul sito</h3>',
       '<p>Durante la navigazione i sistemi acquisiscono automaticamente alcuni dati tecnici necessari al funzionamento e alla sicurezza del sito: indirizzo IP, tipo di browser, sistema operativo, pagine visitate, data e ora dell\'accesso. Sono usati per finalità statistiche in forma aggregata e per la sicurezza.</p>',
       '<h3>b) Moduli di contatto</h3>',
-      '<p>Il sito ha due punti in cui puoi lasciarci i tuoi dati: il modulo <strong>«prova gratuita»</strong> e l\'<strong>assistente</strong> del Club Life. In entrambi i casi raccogliamo nome, cognome, indirizzo email, numero di cellulare e l\'attività che ti interessa, più quello che scegli di scriverci.</p>',
+      '<p>Il sito ha due punti in cui puoi lasciarci i tuoi dati: il modulo <strong>«Prova Athlon»</strong> e l\'<strong>assistente</strong> del Club Life. In entrambi i casi raccogliamo nome, cognome, indirizzo email, numero di cellulare e l\'attività che ti interessa, più quello che scegli di scriverci.</p>',
       '<p>I moduli non sono gestiti da un server del club: i dati vengono trasmessi a una <strong>piattaforma di automazione</strong> che li instrada verso i nostri sistemi e verso la banca dati del club, ospitata su server nell\'Unione Europea (Irlanda). Chi la gestisce agisce come responsabile del trattamento.</p>',
       '<h3>c) L\'assistente e la richiesta di richiamo telefonico</h3>',
       '<p>L\'assistente del Club Life è una conversazione: quello che scrivi viene trasmesso alla piattaforma di automazione per produrre la risposta e per permetterci di ricontattarti.</p>',
