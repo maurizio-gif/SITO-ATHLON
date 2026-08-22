@@ -73,6 +73,44 @@ import CampoTelefono from '../CampoTelefono.astro';
           />
         </svg>
       </button>
+
+      {/* ── Scrivi al team, accanto alla telefonata ──────────────────────
+          Stava **sotto ogni risposta**, con la sua riga «Vuoi parlarne con
+          noi?», e da lì è salito qui per due ragioni che vanno insieme.
+
+          La prima è che era ripetuto: la stessa coppia riga-più-pulsante
+          ricompariva alla fine di ogni bolla, per tutta la conversazione,
+          mentre la cosa che dice — «se non ti basto, ti risponde una persona»
+          — si dice una volta e vale sempre. La seconda è lo spazio che
+          libera: sotto le risposte adesso restano i rimandi agli articoli,
+          che prima venivano schiacciati fra la risposta e quel blocco.
+
+          **A differenza della telefonata, questa non è riservata a nessuno.**
+          Il richiamo commerciale è per chi non ha un abbonamento vivo; questa
+          è la porta verso una persona, e a un socio serve più che agli altri.
+          Per questo non porta `hidden` nel markup e lo script non la nasconde.
+
+          Le due icone stanno vicine e devono restare distinguibili al primo
+          sguardo: la cornetta chiama, il foglio scrive. Il contorno invece
+          del pieno arancione dice anche la gerarchia — la telefonata è
+          l'eccezione, scrivere è la strada normale. */}
+      <button
+        type="button"
+        class="ca__scrivi"
+        data-ca-ticket
+        hidden
+        title="Scrivi al nostro team"
+        aria-label="Scrivi al nostro team"
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+          <path
+            d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v9a1.5 1.5 0 0 1-1.5 1.5H9l-5 4Z"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
       <button type="button" class="ca__close" data-ca-close aria-label="Chiudi">×</button>
     </header>
 
@@ -498,6 +536,29 @@ import CampoTelefono from '../CampoTelefono.astro';
     transition: opacity var(--dur-fast) ease;
   }
 
+  /* Il gemello scritto: stessa misura e stessa forma della telefonata, perche'
+     stanno accanto e una coppia disallineata si nota subito. Contorno invece
+     del pieno, che dice la gerarchia — scrivere e' la strada normale, la
+     telefonata e' l'eccezione per chi dentro non c'e' ancora. */
+  .ca__scrivi {
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--color-primary);
+    border-radius: 50%;
+    background: none;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: background var(--dur-fast) ease, color var(--dur-fast) ease;
+  }
+
+  .ca__scrivi:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
   .ca__telefonata:hover {
     opacity: 0.85;
   }
@@ -820,11 +881,62 @@ import CampoTelefono from '../CampoTelefono.astro';
     .ca__panel { transition: none; }
   }
 
-  /* Le fonti non sono una nota a piè di pagina: sono dove si va a leggere il
-     resto — gli orari, il listino — e la risposta le nomina («qui sotto trovi
-     gli orari»). Quindi hanno la forma di un comando, non di un rimando in
-     grigio: pastiglie con il bordo del colore del club, che si separano da sé
-     senza puntini in mezzo. */
+  /* I rimandi sotto una risposta: dove si va a leggere il resto — gli orari, il
+     listino — e la risposta li nomina («qui sotto trovi gli orari»).
+
+     Hanno preso il posto del blocco «Vuoi parlarne con noi?», che era ripetuto
+     alla fine di ogni bolla ed è salito in intestazione. Con quello spazio
+     libero sono passati da pastiglie schiacciate a una riga propria, con
+     l'etichetta che dice cosa sono — non erano mai stati presentati — e sono
+     **rimpiccioliti**: qui non comandano niente, invitano a leggere. Il bordo
+     del club resta, perché restano cliccabili e vanno distinti dal testo.
+
+     `min-height` sotto la misura del pollice è una scelta, non una svista: sono
+     link dentro un discorso, non bersagli da premere al buio, e la stessa
+     eccezione vale sul totem per i link dentro il testo che scorre. */
+  .ca__conversazione :global(.ca__rimandi) {
+    margin: 0.7rem 0 0;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(39, 36, 35, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    line-height: 1.3;
+  }
+
+  .ca__conversazione :global(.ca__rimandi-lead) {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-right: 0.15rem;
+  }
+
+  .ca__conversazione :global(.ca__rimandi-link) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.75rem;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid rgba(255, 87, 1, 0.45);
+    border-radius: 999px;
+    color: var(--color-primary);
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background var(--dur-fast) ease, color var(--dur-fast) ease,
+      border-color var(--dur-fast) ease;
+  }
+
+  .ca__conversazione :global(.ca__rimandi-link:hover) {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  /* `.ca__fonti` resta: la usano la bolla del saluto e la conferma dei dati,
+     che non sono risposte del modello e non hanno rimandi da presentare. */
   .ca__conversazione :global(.ca__fonti) {
     margin: 0.7rem 0 0;
     display: flex;
@@ -850,53 +962,6 @@ import CampoTelefono from '../CampoTelefono.astro';
   .ca__conversazione :global(.ca__fonti a:hover) {
     background: var(--color-primary);
     color: var(--color-white);
-  }
-
-  /* La via d'uscita, sotto ogni risposta: discreta ma sempre lì, perché «non mi
-     hai convinto» è un giudizio della persona, non del modello. */
-  .ca__conversazione :global(.ca__uscita) {
-    margin-top: 0.6rem;
-    padding-top: 0.5rem;
-    border-top: 1px solid rgba(39, 36, 35, 0.1);
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.45rem;
-  }
-
-  .ca__conversazione :global(.ca__uscita-lead) {
-    font-size: var(--text-2xs);
-    color: var(--text-muted);
-  }
-
-  .ca__conversazione :global(.ca__uscita-btn) {
-    min-height: 2rem;
-    padding: 0 0.75rem;
-    border: 1px solid rgba(255, 87, 1, 0.5);
-    border-radius: 999px;
-    background: none;
-    color: var(--color-primary);
-    font-family: var(--font-body);
-    font-size: var(--text-2xs);
-    font-weight: 600;
-    cursor: pointer;
-    transition: background var(--dur-fast) ease, color var(--dur-fast) ease;
-  }
-
-  .ca__conversazione :global(.ca__uscita-btn:hover) {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
-    color: var(--color-white);
-  }
-
-  .ca__conversazione :global(.ca__uscita-btn--pieno) {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
-    color: var(--color-white);
-  }
-
-  .ca__conversazione :global(.ca__uscita-btn--pieno:hover) {
-    opacity: 0.9;
   }
 
   /* ---- Il form dei dati ---- */
@@ -1115,7 +1180,15 @@ import CampoTelefono from '../CampoTelefono.astro';
      Il fondo bianco invece del crema e i due filetti orizzontali fanno il resto
      del lavoro che chiedeva «piu' distinto»: si legge come un pannello aperto
      sopra la chat, non come una bolla piu' grande delle altre. */
-  .ca__conversazione :global(.ca__richiamo) {
+  /* `.ca__azione` sono le schede di iscrizione e Guest Pass: stesso aspetto del
+     calendario perche' sono la stessa idea — una cosa da fare dentro la
+     conversazione — ma **classe diversa**, e non e' pedanteria. Finche' erano
+     `ca__richiamo` anche loro, `mostraRichiamo()` le trovava con la sua ricerca
+     «esiste gia' un calendario?» e si limitava a scorrerci sopra: dopo una
+     qualsiasi azione l'icona telefono smetteva di aprire il calendario, in
+     silenzio. L'aspetto si condivide qui, l'identita' no. */
+  .ca__conversazione :global(.ca__richiamo),
+  .ca__conversazione :global(.ca__azione) {
     align-self: stretch;
     margin: 0.5rem -1rem;
     padding: 0.9rem 0.5rem;
