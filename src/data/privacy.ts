@@ -20,7 +20,7 @@ import { CLUB } from './club';
 
 /** Chi risponde del trattamento, con i soli dati che il repository ha. */
 export const TITOLARE = {
-  ragioneSociale: 'Point 2000 Srl Società Sportiva Dilettantistica',
+  ragioneSociale: CLUB.legale.ragione,
   nomeCommerciale: CLUB.brand,
   email: CLUB.email,
 };
@@ -104,7 +104,11 @@ export const DESTINATARI: Destinatario[] = [
     nome: 'n8n (automazione del club)',
     dominio: 'automazione.n8ndevelop.it',
     perche:
-      "Riceve i dati del modulo «prova gratuita» e dell'assistente: nome, cognome, email, cellulare, l'attività di interesse e, se acconsentito, l'attribuzione della campagna.",
+      /* Non «prova gratuita»: il Guest Pass costa 19 € (data/abbonamenti.ts).
+         La stessa confusione era già stata corretta una volta sulla f.a.q.
+         del sito (vedi il commento su GUEST_PASS in data/faq.ts) — il nome
+         vero, quello che compare sul pulsante e nel modal, è «Prova Athlon». */
+      "Riceve i dati del modulo «Prova Athlon» e dell'assistente: nome, cognome, email, cellulare, l'attività di interesse e, se acconsentito, l'attribuzione della campagna.",
   },
   {
     nome: 'Calendly',
@@ -189,8 +193,8 @@ export const INFORMATIVA: Sezione[] = [
   {
     titolo: 'Titolare del trattamento e responsabile della protezione dei dati',
     corpo: [
-      '<p><strong>Titolare del trattamento</strong> è Point 2000 S.S.D.r.l. (Athlon Club), con sede in Via Ugo Ojetti 134, 00137 Roma. Puoi scrivere a <a href="mailto:desk@athlonroma.it">desk@athlonroma.it</a> oppure, per le comunicazioni che richiedono valore legale, a <a href="mailto:point2000srl@pec.it">point2000srl@pec.it</a>.</p>',
-      '<p><strong>Responsabile della protezione dei dati (DPO)</strong> è Mario Cuccia, che risponde all\'indirizzo <a href="mailto:privacy@athlonroma.it">privacy@athlonroma.it</a>. È l\'indirizzo a cui rivolgersi per qualunque richiesta sui tuoi dati.</p>',
+      `<p><strong>Titolare del trattamento</strong> è ${TITOLARE.ragioneSociale} (Athlon Club), con sede in Via Ugo Ojetti 134, 00137 Roma. Puoi scrivere a <a href="mailto:desk@athlonroma.it">desk@athlonroma.it</a> oppure, per le comunicazioni che richiedono valore legale, a <a href="mailto:point2000srl@pec.it">point2000srl@pec.it</a>.</p>`,
+      '<p><strong>Responsabile della protezione dei dati (DPO)</strong> è Mario Cuccia, che risponde all\'indirizzo <a href="mailto:desk@athlonroma.it">desk@athlonroma.it</a>. È l\'indirizzo a cui rivolgersi per qualunque richiesta sui tuoi dati.</p>',
     ],
   },
   {
@@ -200,7 +204,7 @@ export const INFORMATIVA: Sezione[] = [
       '<h3>a) Navigazione sul sito</h3>',
       '<p>Durante la navigazione i sistemi acquisiscono automaticamente alcuni dati tecnici necessari al funzionamento e alla sicurezza del sito: indirizzo IP, tipo di browser, sistema operativo, pagine visitate, data e ora dell\'accesso. Sono usati per finalità statistiche in forma aggregata e per la sicurezza.</p>',
       '<h3>b) Moduli di contatto</h3>',
-      '<p>Il sito ha due punti in cui puoi lasciarci i tuoi dati: il modulo <strong>«prova gratuita»</strong> e l\'<strong>assistente</strong> del Club Life. In entrambi i casi raccogliamo nome, cognome, indirizzo email, numero di cellulare e l\'attività che ti interessa, più quello che scegli di scriverci.</p>',
+      '<p>Il sito ha due punti in cui puoi lasciarci i tuoi dati: il modulo <strong>«Prova Athlon»</strong> e l\'<strong>assistente</strong> del Club Life. In entrambi i casi raccogliamo nome, cognome, indirizzo email, numero di cellulare e l\'attività che ti interessa, più quello che scegli di scriverci.</p>',
       '<p>I moduli non sono gestiti da un server del club: i dati vengono trasmessi a una <strong>piattaforma di automazione</strong> che li instrada verso i nostri sistemi e verso la banca dati del club, ospitata su server nell\'Unione Europea (Irlanda). Chi la gestisce agisce come responsabile del trattamento.</p>',
       '<h3>c) L\'assistente e la richiesta di richiamo telefonico</h3>',
       '<p>L\'assistente del Club Life è una conversazione: quello che scrivi viene trasmesso alla piattaforma di automazione per produrre la risposta e per permetterci di ricontattarti.</p>',
@@ -264,13 +268,13 @@ export const INFORMATIVA: Sezione[] = [
     corpo: [
       '<p>Come interessato hai i diritti previsti dagli articoli 15–21 e 77 del GDPR:</p>',
       '<ul><li><strong>Accesso</strong> (art. 15): sapere se trattiamo i tuoi dati e riceverne una copia.</li><li><strong>Rettifica</strong> (art. 16): correggere dati inesatti o incompleti.</li><li><strong>Cancellazione</strong> (art. 17): ottenere la cancellazione dei tuoi dati, nei casi previsti.</li><li><strong>Limitazione</strong> (art. 18): limitare il trattamento in determinati casi.</li><li><strong>Portabilità</strong> (art. 20): ricevere i tuoi dati in un formato leggibile da una macchina.</li><li><strong>Opposizione</strong> (art. 21): opporti al trattamento per marketing o per motivi legittimi personali.</li><li><strong>Revoca del consenso</strong> (art. 7): revocarlo quando vuoi, senza che questo tocchi i trattamenti già svolti.</li><li><strong>Reclamo</strong> (art. 77): rivolgerti al <a href="https://www.garanteprivacy.it" target="_blank" rel="noopener">Garante per la protezione dei dati personali</a>.</li></ul>',
-      '<p><strong>Per uscire dal marketing</strong> puoi revocare il consenso quando vuoi, con effetto su tutti i canali: scrivi a <a href="mailto:privacy@athlonroma.it">privacy@athlonroma.it</a> o usa il link di disiscrizione in fondo a ogni nostra comunicazione. <strong>Per i cookie</strong> c\'è il pulsante <a href="#cambia-scelta">più avanti in questa pagina</a>.</p>',
+      '<p><strong>Per uscire dal marketing</strong> puoi revocare il consenso quando vuoi, con effetto su tutti i canali: scrivi a <a href="mailto:desk@athlonroma.it">desk@athlonroma.it</a> o usa il link di disiscrizione in fondo a ogni nostra comunicazione. <strong>Per i cookie</strong> c\'è il pulsante <a href="#cambia-scelta">più avanti in questa pagina</a>.</p>',
     ],
   },
   {
     titolo: 'Come esercitare i tuoi diritti',
     corpo: [
-      '<p>Scrivi al DPO all\'indirizzo <a href="mailto:privacy@athlonroma.it">privacy@athlonroma.it</a>, oppure al titolare: Point 2000 S.S.D.r.l., Via Ugo Ojetti 134, 00137 Roma — <a href="mailto:desk@athlonroma.it">desk@athlonroma.it</a>, <a href="mailto:point2000srl@pec.it">point2000srl@pec.it</a>.</p>',
+      `<p>Scrivi al DPO all'indirizzo <a href="mailto:desk@athlonroma.it">desk@athlonroma.it</a>, oppure al titolare: ${TITOLARE.ragioneSociale}, Via Ugo Ojetti 134, 00137 Roma — <a href="mailto:desk@athlonroma.it">desk@athlonroma.it</a>, <a href="mailto:point2000srl@pec.it">point2000srl@pec.it</a>.</p>`,
       '<p>Rispondiamo entro <strong>30 giorni</strong> dalla ricezione, come prevede l\'art. 12 del GDPR. Nei casi complessi il termine può essere prorogato di altri 60 giorni, e in quel caso te lo comunichiamo spiegando perché.</p>',
     ],
   },
