@@ -1707,6 +1707,19 @@ volta che l'anagrafica cresce, perché la volta prima quelle persone non
 c'erano. Non è una limitazione da aggirare: è la stessa regola del filtro sul
 mittente, applicata al passato.
 
+**Le caselle del club escono dal giro, e questo lo ha insegnato il primo
+importo.** Su 84 righe, **47 erano sulla scheda di una collega**
+(`valentina@athlonroma.it`, che in `utenti` c'è come tutti gli altri): ventuno
+avvisi automatici sul suo certificato medico, e una serie di «Fwd:
+Candidatura…», cioè i curriculum di altre persone nella scheda CRM di chi
+lavora qui — esattamente ciò che `candidature` tiene fuori dall'anagrafica
+commerciale di proposito. Le 47 righe sono state cancellate, e adesso
+`DOMINI_NOSTRI = ['athlonroma.it']` toglie quegli indirizzi in due punti: dalla
+lista delle ricerche dell'importo, e dal mittente della posta in arrivo — dove
+basta svuotarlo, perché la ricerca su `utenti` non trova niente e l'item si
+ferma da solo. Aggiungendo un dominio del club (una casella nuova, un secondo
+club), va aggiunto in tutti e due.
+
 Le due manopole — da quando importare e quanto lunga può essere una ricerca —
 stanno in cima al Code node `Componi le ricerche`. La finestra è **un anno**, che
 è il ciclo di un abbonamento: più vecchia di così, la corrispondenza di una
