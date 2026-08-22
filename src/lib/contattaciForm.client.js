@@ -548,6 +548,7 @@ export function initContattaciForm(root, options) {
       saNuotare: livello.saNuotare,
       stileLibero: livello.stileLibero,
     };
+    mostraMotivoGenitore();
     mostraStep('genitore');
   }
 
@@ -725,6 +726,16 @@ export function initContattaciForm(root, options) {
         // appuntamento fissato invece di un'intenzione dichiarata.
         spedisci(null, { aggiornamento: 'richiamo' });
       },
+    });
+  }
+
+  /** Il passo «E di te» spiega perché servono quei dati, e il perché cambia
+   *  con l'attività: la Scuola Nuoto Bambini, l'agonistico e la pallanuoto
+   *  (ramo `junior`) danno accesso a turni e costi, il Baby Nuoto (ramo
+   *  `baby`) dà la prenotazione delle lezioni. */
+  function mostraMotivoGenitore() {
+    qa('[data-cf-genitore-motivo]').forEach(function (blocco) {
+      blocco.hidden = blocco.dataset.cfGenitoreMotivo !== dati.ramo;
     });
   }
 
