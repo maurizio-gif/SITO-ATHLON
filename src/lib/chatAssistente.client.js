@@ -253,6 +253,36 @@ export function initChatAssistente(root, options) {
     });
   };
 
+  /**
+   * Il grassetto delle risposte, e perché passa da qui invece che dal modello.
+   *
+   * Il prompt gli concede **una sola** cosa di markdown — `**così**`, per il
+   * prezzo, il nome dell'attività, l'orario — perché in una chat quelli sono i
+   * tre pezzi che si cercano con l'occhio invece di leggerli. Tutto il resto
+   * del markdown resta vietato: un titolo o un elenco in una bolla non hanno
+   * senso, e l'assistente li produrrebbe volentieri.
+   *
+   * **Si converte dopo l'escape, non prima**, ed è la riga da non invertire:
+   * `escape()` ha già trasformato `<` in `&lt;`, quindi qui dentro non può più
+   * entrare markup di nessun tipo — né dal modello, né da quello che una
+   * persona ha scritto e che il modello potrebbe ripetere. Convertire prima
+   * significherebbe fidarsi del testo, che è esattamente la cosa che non si fa.
+   *
+   * Solo le coppie: un `**` spaiato resta com'è invece di mangiarsi il resto
+   * della frase. Si vede, ed è il verso giusto in cui sbagliare.
+   */
+  var conGrassetto = function (escapato) {
+    return escapato.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  };
+
+  /**
+   * Gli asterischi non vanno nel trascritto: quello finisce nell'email al desk
+   * e nel contesto di Calendly, dove `**75 €**` è solo rumore da leggere.
+   */
+  var senzaMarcatori = function (testo) {
+    return String(testo).replace(/\*\*/g, '');
+  };
+
   // ── Passo 1: l'email ──────────────────────────────────────────────────────
   function emailValida(v) {
     return /^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$/.test(String(v).trim());
@@ -668,18 +698,26 @@ export function initChatAssistente(root, options) {
   /** Il montaggio in corso, per poterlo smontare alla chiusura. */
   var montaggioRichiamo = null;
 
-  // ── L'azione: iscrizione o prova ──────────────────────────────────────────
+  // ── L'azione: iscrizione, prova o richiamo ────────────────────────────────
   /**
    * Il segnale che il modello manda quando la persona ha appena confermato di
-   * voler procedere (regole 7, 8 e 12 del prompt di `CHAT ATHLON`): non è
+   * voler procedere (regole 7, 8, 8bis e 12 del prompt di `CHAT ATHLON`): non è
    * testo, è un innesco. `n8n` lo valida gia' contro un enum fisso prima di
    * mandarlo qui — vedi «Leggi la risposta» nel workflow — ma si tratta comunque
    * come un dato esterno: un tipo che non riconosciamo non fa niente.
+   *
+   * `richiamo` è l'unico dei tre che non apre niente di nuovo: chiama la stessa
+   * `mostraRichiamo()` dell'icona ☎ in intestazione, quindi valgono le sue
+   * guardie — niente calendario a chi ha un abbonamento vivo, e uno solo per
+   * conversazione. Il calendario torna così ad apparire **solo su richiesta**,
+   * come dopo la rimozione dell'offerta automatica: la differenza è che qui la
+   * richiesta è arrivata a parole invece che da un pulsante.
    */
   function eseguiAzione(azione) {
     if (!azione || !conversazione) return;
     if (azione.tipo === 'iscrizione') mostraIscrizione(azione);
     else if (azione.tipo === 'prova') mostraProva();
+    else if (azione.tipo === 'richiamo') mostraRichiamo();
   }
 
   /** Annuale/mensile, Annuale/unico, Mensile Flex: l'ordine fisso delle tre
@@ -1156,19 +1194,20 @@ export function initChatAssistente(root, options) {
           '</p>'
         : '';
 
-      /* Il modello ha l'ordine di scrivere in prosa e senza markdown, perché
-         qui il testo si stampa come testo. Ma se un capoverso arriva comunque,
-         va reso un capoverso e non una riga incollata alla precedente: è la
-         differenza fra una risposta che si legge e un muro. */
+      /* Il modello scrive in prosa, con il solo `**grassetto**` che il prompt
+         gli concede. Il capoverso resta un capoverso e non una riga incollata
+         alla precedente — è la differenza fra una risposta che si legge e un
+         muro — e il grassetto si converte **dopo** l'escape, mai prima: vedi
+         `conGrassetto`. */
       var paragrafi = risposta.risposta
         .split(/\n{1,}/)
         .map(function (r) { return r.trim(); })
         .filter(Boolean)
-        .map(function (r) { return '<p>' + escape(r) + '</p>'; })
+        .map(function (r) { return '<p>' + conGrassetto(escape(r)) + '</p>'; })
         .join('');
 
       attesa.innerHTML = paragrafi + rimandi + scappatoia(!!risposta.senzaRisposta);
-      trascritto.push({ ruolo: 'assistente', testo: risposta.risposta });
+      trascritto.push({ ruolo: 'assistente', testo: senzaMarcatori(risposta.risposta) });
       /* Solo qui, dopo che la risposta e' gia' a schermo: e' il turno esatto
          in cui la persona ha confermato (regole 7, 8, 12 del prompt), non
          un'anticipazione. */
