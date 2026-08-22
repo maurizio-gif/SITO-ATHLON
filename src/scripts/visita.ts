@@ -96,9 +96,16 @@ function manda(): void {
       athlonGetUtm?: () => Record<string, string>;
       athlonGetVid?: () => string;
       athlonGetSid?: () => string;
+      athlonVidStabile?: () => boolean;
     };
+    /* Prima `athlonGetVid()`, poi `athlonVidStabile()`: è la prima a scrivere
+       nello storage quando il consenso c'è, e la seconda legge il risultato. */
+    const idVisitatore = w.athlonGetVid ? w.athlonGetVid() : null;
     const corpo = JSON.stringify({
-      vid: w.athlonGetVid ? w.athlonGetVid() : null,
+      vid: idVisitatore,
+      /* Senza consenso pubblicitario il vid qui sopra vale una pagina sola:
+         va detto, o chi conta i visitatori unici conta le pagine. */
+      vidStabile: w.athlonVidStabile ? w.athlonVidStabile() : false,
       sid: w.athlonGetSid ? w.athlonGetSid() : null,
       pagina: location.pathname + location.search,
       referrer: document.referrer || null,

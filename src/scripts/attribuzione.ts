@@ -252,10 +252,36 @@ function sid(): string {
   return nuovo;
 }
 
+/**
+ * Se il `vid` di questa pagina sopravvivrà alla prossima.
+ *
+ * È la differenza fra un identificativo e un numero casuale, e senza saperla
+ * i conteggi mentono: con il consenso pubblicitario il `vid` sta in
+ * `localStorage` e riconosce chi torna; **senza consenso ne nasce uno nuovo a
+ * ogni caricamento**, perché la copia in memoria muore con la pagina e questo
+ * è un sito a pagine separate.
+ *
+ * Contare `distinct vid` senza distinguere i due casi vuol dire contare una
+ * persona che gira nove pagine come nove visitatori. Chi legge i numeri deve
+ * poter separare «visitatori riconoscibili» da «pagine viste da qualcuno»: il
+ * registro delle visite se lo porta dietro riga per riga, e la vista
+ * `visitatori` conta solo i primi.
+ *
+ * Va chiamata **dopo** `athlonGetVid()`, che è quella che eventualmente scrive.
+ */
+function vidStabile(): boolean {
+  try {
+    return localStorage.getItem(KEY_VID) !== null;
+  } catch {
+    return false;
+  }
+}
+
 const w = window as unknown as {
   athlonGetUtm: () => Utm;
   athlonGetVid: () => string;
   athlonGetSid: () => string;
+  athlonVidStabile: () => boolean;
 };
 
 w.athlonGetUtm = () => {
@@ -265,5 +291,6 @@ w.athlonGetUtm = () => {
 
 w.athlonGetVid = vid;
 w.athlonGetSid = sid;
+w.athlonVidStabile = vidStabile;
 
 export {};
