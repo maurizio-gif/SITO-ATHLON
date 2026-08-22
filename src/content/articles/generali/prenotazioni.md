@@ -11,6 +11,9 @@ tags:
   - corsi
   - app
   - blocco
+  - capienza
+  - posti
+  - affluenza
 attivita: []
 ---
 
@@ -86,6 +89,33 @@ Oltre il termine la cancellazione non è possibile, e la segreteria non ha facol
 <summary><strong>Il corso è pieno: potete aggiungere un posto?</strong></summary>
 
 No. Il numero massimo di partecipanti per corso e di bambini per vasca **non è superabile su richiesta**, nemmeno in via eccezionale: dipende dalle norme di sicurezza e dal rapporto istruttore-allievi. Iscriviti in lista d'attesa, che scorre in ordine cronologico.
+
+</details>
+
+<details>
+<summary><strong>Qual è la capienza dei corsi?</strong></summary>
+
+Varia per sala, non per corso: due lezioni diverse nella stessa sala hanno la stessa capienza. Come indicazione di massima:
+
+| Sala / vasca | Capienza |
+|:---|:---:|
+| Sala A | 28-30 posti |
+| Sala B | 15 posti |
+| Sala C (Reformer) | 10 posti |
+| Vasca Piccola (Aqua Fitness) | 16-18 posti |
+| Vasca Grande (Aqua Fitness) | 30 posti |
+| Scuola Nuoto Adulti | 7 posti per corsia |
+| Nuoto Libero | 20 posti totali in vasca, fra i due turni che si sovrappongono |
+| Gym Floor | Nessun limite di capienza |
+
+Per il numero esatto di posti liberi su una lezione specifica, il dato in tempo reale è quello che vedi prenotando dall'app o dal [portale](https://athlon.perfectgym.com/ClientPortal2/#/Classes/1/Calendar).
+
+</details>
+
+<details>
+<summary><strong>In quali orari c'è meno affluenza ai Corsi Fitness?</strong></summary>
+
+Non teniamo una classifica degli orari meno affollati: l'affluenza cambia da settimana a settimana. Il modo più preciso per farsene un'idea è guardare il [portale delle prenotazioni](https://athlon.perfectgym.com/ClientPortal2/#/Classes/1/Calendar): mostra live istruttori, orari e posti disponibili per ogni lezione dei Corsi Fitness, che si tengono dalle 7:40 alle 21:00 dal lunedì al sabato.
 
 </details>
 

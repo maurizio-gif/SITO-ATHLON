@@ -389,6 +389,14 @@ export const GET: APIRoute = async () => {
       testo: blocchi(
         `${e.data.date.toISOString().slice(0, 10)}${e.data.time ? ` · ${e.data.time}` : ''}`,
         e.data.free ? 'Gratuito.' : e.data.price && `Quota: ${pulito(e.data.price)}.`,
+        /* `ctaHref` è già il segnale che l'editor imposta: un evento annunciato
+           prima delle sue modalità lo svuota apposta (vedi `eventi/[slug].astro`).
+           Dirlo qui in chiaro evita che il bot, senza questa riga, risponda "non
+           trovo l'informazione" invece di "le prenotazioni non sono ancora
+           aperte" — la stessa domanda che si è già presentata una volta. */
+        e.data.ctaHref
+          ? `Prenotazioni aperte: ${e.data.ctaHref}`
+          : 'Le prenotazioni per questo evento non sono ancora aperte: modalità e programma saranno comunicati più avanti.',
         pulito(e.data.excerpt),
         testoCompleto(e.body ?? ''),
         elenco(e.data.notes),
