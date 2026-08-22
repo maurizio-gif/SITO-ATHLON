@@ -46,6 +46,7 @@ import { CLUB } from './club';
 import { GUEST_PASS } from './abbonamenti';
 import { POSIZIONI } from './lavora';
 import { PAGINE_ADULTI } from './pagine';
+import { CORSI } from './corsi';
 import { JUNIOR } from './junior';
 import { TALK, TRIAL } from './cta';
 
@@ -181,18 +182,45 @@ export interface VoceSemplice {
  * file — è la stessa ragione per cui `ACTIVITY_TAGS` alimenta tre posti in
  * una volta (vedi AGENTS.md).
  *
- * Gli adulti sono in ordine alfabetico italiano, come fa `Header.astro` con
- * i corsi fitness: sono ventidue voci, e senza un ordine riconoscibile
- * diventano un elenco da leggere invece che da scorrere. I corsi junior sono
- * quattro e restano nell'ordine in cui li scrive `junior.ts` — la
+ * **I quindici corsi fitness sono una voce sola**, «Corsi Fitness», e non
+ * quindici: da una bio non si sceglie fra Antigravity e Booty Workout, si
+ * decide se l'attività di gruppo interessa, e `/corsi-fitness` è la pagina
+ * che aiuta a scegliere quale. Gli altri corsi per adulti — le tre attività
+ * in acqua, la ginnastica in gravidanza, Gym Floor, Group Reformer — restano
+ * voci proprie: sono l'attività, non una famiglia di corsi con un orario
+ * proprio ciascuno.
+ *
+ * **Quali sono i quindici lo dice `eyebrow`, non un elenco scritto qui.**
+ * `[corso].astro` mostra `corso.eyebrow ?? 'Corso Fitness'`: chi non ha un
+ * `eyebrow` proprio in `corsi.ts` — le quindici classi — prende quel
+ * ripiego, mentre le tre attività in acqua e la ginnastica in gravidanza ne
+ * dichiarano uno loro («Athlon Aqua», «Nuoto», «Scuola Nuoto Athlon»). È lo
+ * stesso segnale che il sito già usa per etichettare la pagina, quindi un
+ * corso fitness nuovo senza `eyebrow` finisce sotto la voce unica da solo,
+ * e uno che ne dichiara uno proprio ne esce — nessun elenco di slug da
+ * tenere in pari qui.
+ *
+ * Il resto è in ordine alfabetico italiano, come fa `Header.astro` con i
+ * corsi fitness: sono sette voci contando quella unica, e un ordine
+ * riconoscibile le rende da scorrere invece che da leggere. I corsi junior
+ * sono quattro e restano nell'ordine in cui li scrive `junior.ts` — la
  * progressione per età, che per soli quattro nomi si legge più naturale di
  * un ordine alfabetico.
  */
 export function attivitaLink(): { adulti: VoceSemplice[]; junior: VoceSemplice[] } {
+  const fitnessSlugs = new Set(CORSI.filter((c) => !c.eyebrow).map((c) => c.slug));
+
+  const adulti = [
+    { id: 'corsi-fitness', label: 'Corsi Fitness', href: '/corsi-fitness' },
+    ...PAGINE_ADULTI.filter((c) => !fitnessSlugs.has(c.slug)).map((c) => ({
+      id: c.slug,
+      label: c.nome,
+      href: `/${c.slug}`,
+    })),
+  ].sort((a, b) => a.label.localeCompare(b.label, 'it'));
+
   return {
-    adulti: [...PAGINE_ADULTI]
-      .sort((a, b) => a.nome.localeCompare(b.nome, 'it'))
-      .map((c) => ({ id: c.slug, label: c.nome, href: `/${c.slug}` })),
+    adulti,
     junior: JUNIOR.map((c) => ({ id: c.slug, label: c.nome, href: `/${c.slug}` })),
   };
 }

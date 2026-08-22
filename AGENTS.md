@@ -364,11 +364,18 @@ pulsanti: chi arriva già sapendo cosa cerca — «fate acqua fitness?», «a ch
 è il pilates?» — vuole la pagina di quel corso, non un modulo. `attivitaLink()`
 in `data/link.ts` le legge da `PAGINE_ADULTI` e `JUNIOR`, la stessa fonte che
 alimenta i rimandi fra pagine e il menu dell'header: un corso nuovo in
-`corsi.ts` o `junior.ts` compare qui da solo, senza toccare questo file. Sono
-ventisei nomi in tutto, e per questo vivono dentro un `<p>` e non in righe di
-link: il totem esenta i link dentro testo che scorre dalla misura minima di
-48px proprio perché si leggono e non si premono al buio — ventisei bersagli
-pieni sarebbero una seconda pagina fatta solo di quello.
+`corsi.ts` o `junior.ts` compare qui da solo, senza toccare questo file.
+
+**I quindici corsi fitness sono una voce sola**, «Corsi Fitness» verso
+`/corsi-fitness`, e non quindici: da una bio non si scelgono Antigravity o
+Booty Workout uno per uno. Quali siano i quindici lo dice `eyebrow` — chi non
+ne dichiara uno in `corsi.ts` prende il ripiego `'Corso Fitness'` che
+`[corso].astro` già usa per l'occhiello — non un elenco di slug scritto in
+`link.ts`: un corso fitness nuovo senza `eyebrow` ci finisce da solo. Con
+quella voce le attività adulti sono sette, i corsi junior quattro, e per
+questo vivono dentro un `<p>` e non in righe di link: il totem esenta i link
+dentro testo che scorre dalla misura minima di 48px proprio perché si leggono
+e non si premono al buio.
 
 **Sta nel sito e non su linktr.ee** per una ragione misurabile: i modal della
 prova, dei contatti e dell'assistente vivono nel Layout, quindi vivono anche
