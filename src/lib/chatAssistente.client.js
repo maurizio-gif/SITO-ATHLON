@@ -40,6 +40,9 @@ import { validaTelefono } from '../data/prefissi';
 import { CALENDLY } from '../data/calendly';
 import { suTotem } from '../scripts/totem';
 import { montaCalendario } from './calendario.client.js';
+import { plans, GUEST_PASS } from '../data/abbonamenti';
+import { REGISTRAZIONE, PASSI_ATTIVAZIONE } from '../data/guestPass';
+import { WEBHOOK_RESET, PORTALE, haGiaAccount } from '../data/contatto';
 
 export function initChatAssistente(root, options) {
   var onChiudi = (options && options.onChiudi) || function () {};
@@ -48,6 +51,11 @@ export function initChatAssistente(root, options) {
   var CHAT = 'https://automazione.n8ndevelop.it/webhook/chat-athlon';
   var TICKET = 'https://automazione.n8ndevelop.it/webhook/chat-athlon-ticket';
   var DATI = 'https://automazione.n8ndevelop.it/webhook/chat-athlon-dati';
+  /* Lo stesso endpoint che riceve il lead di «Prova Athlon» dal sito: una
+     conferma in chat deve produrre la stessa riga su `richieste_prova`, la
+     stessa email e lo stesso WhatsApp — non un codice mostrato senza che da
+     nessuna parte risulti che qualcuno l'ha chiesto. Vedi `provaForm.client.js`. */
+  var PROVA = 'https://automazione.n8ndevelop.it/webhook/athlon-prova-compilata';
 
   /** Dove finisce il percorso junior, comunque vada. */
   var LANDING_JUNIOR = '/wikiathlon/snb/preiscrizioni-nuoto/';
@@ -164,6 +172,12 @@ export function initChatAssistente(root, options) {
       stato: '',
       statoNucleo: '',
       memberId: null,
+      /** Lead | Guest | Member, da PerfectGym: il gate del Guest Pass e
+          dell'accesso gia' esistente, sempre e solo questo campo — non
+          `statoNucleo`, che dice se il nucleo ha un contratto vivo *oggi* e
+          non se la persona e' mai stata socia. Vuoto se la verifica non
+          risponde: in quel caso nessuna delle due azioni si offre da sola. */
+      memberType: '',
       nome: '',
       cognome: '',
       telefono: '',
@@ -310,6 +324,7 @@ export function initChatAssistente(root, options) {
        vecchia del workflow, il campo non c'è e si ricade su `stato`. */
     dati.statoNucleo = (esito && esito.statoNucleo) || dati.stato;
     dati.memberId = (esito && esito.memberId) || null;
+    dati.memberType = (esito && esito.memberType) || '';
     dati.nome = (esito && esito.nome) || '';
     dati.cognome = (esito && esito.cognome) || '';
     dati.telefono = (esito && esito.telefono) || '';
@@ -680,6 +695,212 @@ export function initChatAssistente(root, options) {
   /** Il montaggio in corso, per poterlo smontare alla chiusura. */
   var montaggioRichiamo = null;
 
+  // ── L'azione: iscrizione o prova ──────────────────────────────────────────
+  /**
+   * Il segnale che il modello manda quando la persona ha appena confermato di
+   * voler procedere (regole 7, 8 e 12 del prompt di `CHAT ATHLON`): non è
+   * testo, è un innesco. `n8n` lo valida gia' contro un enum fisso prima di
+   * mandarlo qui — vedi «Leggi la risposta» nel workflow — ma si tratta comunque
+   * come un dato esterno: un tipo che non riconosciamo non fa niente.
+   */
+  function eseguiAzione(azione) {
+    if (!azione || !conversazione) return;
+    if (azione.tipo === 'iscrizione') mostraIscrizione(azione);
+    else if (azione.tipo === 'prova') mostraProva();
+  }
+
+  /** Annuale/mensile, Annuale/unico, Mensile Flex: l'ordine fisso delle tre
+      opzioni di ogni piano in `data/abbonamenti.ts`. Il modello manda solo
+      queste tre chiavi (mai un indice, mai un importo): il resto — nome del
+      piano, cifra, periodo, risparmio, `PaymentPlanId` — si legge qui, dall'unico
+      posto dove quei dati vivono davvero. Il modello non li vede nemmeno: non
+      sono nel testo della KB (vedi `kb.json.ts`), quindi non potrebbe inventarli
+      in modo che sembrasse plausibile. */
+  var INDICE_OPZIONE = { 'annuale-mensile': 0, 'annuale-unico': 1, 'mensile-flex': 2 };
+
+  function trovaOpzione(pianoId, opzioneChiave) {
+    var piano = plans.filter(function (p) { return p.id === pianoId; })[0];
+    var indice = INDICE_OPZIONE[opzioneChiave];
+    var opzione = piano && indice !== undefined ? piano.options[indice] : null;
+    return opzione ? { piano: piano, opzione: opzione } : null;
+  }
+
+  /**
+   * La card dell'iscrizione, dentro la conversazione. Riusa esattamente la
+   * gerarchia gia' scritta per il pulsante «Iscriviti» del sito
+   * (`iscrizione.client.js`, `haGiaAccount` da `data/contatto.ts`): chi ha gia'
+   * un account — Member o Guest — non si registra di nuovo, l'accesso e' il
+   * comando pieno e il reset e' la deviazione sotto; chi non ce l'ha va dritto
+   * al link PerfectGym con il `PaymentPlanId` del piano scelto.
+   */
+  function mostraIscrizione(azione) {
+    var trovato = trovaOpzione(azione.piano, azione.opzione);
+    if (!trovato) return;
+
+    var box = document.createElement('div');
+    box.className = 'ca__richiamo';
+
+    if (haGiaAccount({ memberType: dati.memberType, stato: dati.statoNucleo })) {
+      box.innerHTML =
+        '<p class="ca__richiamo-titolo">Hai già un account</p>' +
+        '<p class="ca__richiamo-lead">Accedi al portale e aggiungi l’abbonamento da lì: Abbonamenti → Aggiungi abbonamento.</p>' +
+        '<a class="ca__richiamo-btn" href="' + escape(PORTALE.login) + '" target="_blank" rel="noopener">Accedi al portale →</a>' +
+        '<button type="button" class="ca__azione-link" data-ca-reset>Non ricordi la password? Richiedi il reset</button>' +
+        '<p class="ca__azione-esito" data-ca-reset-esito hidden></p>';
+    } else {
+      box.innerHTML =
+        '<p class="ca__richiamo-titolo">' + escape(trovato.piano.name) + ' — ' + escape(trovato.opzione.amount) + ' ' + escape(trovato.opzione.period) + '</p>' +
+        '<p class="ca__richiamo-lead">' + escape(trovato.opzione.title) + (trovato.opzione.sub ? ' · ' + escape(trovato.opzione.sub) : '') + '</p>' +
+        '<a class="ca__richiamo-btn" href="' + escape(trovato.opzione.href) + '" target="_blank" rel="noopener">Vai all’iscrizione →</a>';
+    }
+
+    conversazione.appendChild(box);
+    conversazione.scrollTop = conversazione.scrollHeight;
+
+    var btnReset = box.querySelector('[data-ca-reset]');
+    if (btnReset) {
+      btnReset.addEventListener('click', function () {
+        richiediResetPassword(btnReset, box.querySelector('[data-ca-reset-esito]'));
+      });
+    }
+  }
+
+  /**
+   * Il reset password dalla chat: stessa chiamata di `iscrizione.client.js`,
+   * stessa regola su cosa fare se non risponde — si apre comunque la pagina del
+   * portale, perché quello è quello che la persona voleva. L'email è quella già
+   * verificata in questa conversazione, non se ne chiede un'altra.
+   */
+  async function richiediResetPassword(btn, esito) {
+    if (!dati.email) return;
+    btn.disabled = true;
+    try {
+      var stop = new AbortController();
+      var scaduta = window.setTimeout(function () { stop.abort(); }, 10000);
+      var r = await fetch(WEBHOOK_RESET, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: stop.signal,
+        body: JSON.stringify({
+          email: dati.email,
+          pagina: dati.pagina,
+          origine: 'chat-reset',
+          vid: window.athlonGetVid ? window.athlonGetVid() : null,
+          sid: window.athlonGetSid ? window.athlonGetSid() : null,
+        }),
+      });
+      window.clearTimeout(scaduta);
+      var corpo = await r.json();
+      if (corpo && corpo.esito === 'inviata') {
+        if (esito) {
+          esito.textContent = 'Fatto: ti abbiamo mandato via email il link per reimpostarla.';
+          esito.hidden = false;
+        }
+        btn.hidden = true;
+        return;
+      }
+      throw new Error('esito non inviata');
+    } catch (e) {
+      /* Qualunque errore o timeout: si apre comunque il portale, che è dove la
+         persona voleva arrivare — vedi la stessa scelta in `iscrizione.client.js`. */
+      btn.disabled = false;
+      var scheda = null;
+      try {
+        scheda = window.open(PORTALE.reset, '_blank', 'noopener');
+      } catch (e2) {
+        scheda = null;
+      }
+      if (!scheda) window.location.href = PORTALE.reset;
+    }
+  }
+
+  /**
+   * La card del Guest Pass, dentro la conversazione: solo qui — non prima —
+   * parte davvero la richiesta prova, con lo stesso contratto del webhook che
+   * usa `ProvaModal.astro` (`athlon-prova-compilata`). Senza questa chiamata il
+   * codice mostrato non produrrebbe nessuna riga su `richieste_prova`, nessuna
+   * email e nessun WhatsApp di conferma: una prova richiesta a voce che per il
+   * resto del sistema non esiste.
+   *
+   * Il gate `memberType !== 'Member'` e' lo stesso della pagina del club: Lead
+   * e Guest possono provare, Member no. Se `memberType` manca — la verifica non
+   * ha risposto — non si offre in automatico: e' lo stesso verso in cui si
+   * preferisce sbagliare per tutto il resto del sito.
+   */
+  function mostraProva() {
+    if (dati.memberType && /member/i.test(dati.memberType)) {
+      var negato = document.createElement('div');
+      negato.className = 'ca__richiamo';
+      negato.innerHTML =
+        '<p class="ca__richiamo-titolo">Il Guest Pass non si può attivare</p>' +
+        '<p class="ca__richiamo-lead">Risulta già un tesseramento Athlon a questa email, e il Pass è riservato a chi non ne ha mai avuto uno. Puoi comunque prenotare una lezione singola o scegliere un abbonamento.</p>' +
+        '<a class="ca__richiamo-btn" href="/abbonamenti#accessi-singoli">Vedi gli accessi singoli →</a>';
+      conversazione.appendChild(negato);
+      conversazione.scrollTop = conversazione.scrollHeight;
+      return;
+    }
+    if (!dati.memberType || !dati.email) return;
+
+    var box = document.createElement('div');
+    box.className = 'ca__richiamo';
+    box.innerHTML =
+      '<p class="ca__richiamo-titolo">Il tuo Guest Pass</p>' +
+      '<p class="ca__richiamo-lead">Copialo, poi aprilo sul portale: si incolla in fase di iscrizione e sblocca la settimana Premium a ' + escape(GUEST_PASS.prezzo) + ' €.</p>' +
+      '<button type="button" class="ca__richiamo-btn" data-copy-code="' + escape(GUEST_PASS.codice) + '" style="border:0;cursor:pointer;">Codice: ' + escape(GUEST_PASS.codice) + ' · copia</button>' +
+      '<ol class="ca__richiamo-lead" style="padding-left:1.1rem;">' +
+      PASSI_ATTIVAZIONE.map(function (p) { return '<li>' + p + '</li>'; }).join('') +
+      '</ol>' +
+      '<a class="ca__richiamo-btn" href="' + escape(REGISTRAZIONE) + '" target="_blank" rel="noopener">Vai all’iscrizione →</a>';
+    conversazione.appendChild(box);
+    conversazione.scrollTop = conversazione.scrollHeight;
+
+    var btnCopia = box.querySelector('[data-copy-code]');
+    if (btnCopia) {
+      btnCopia.addEventListener('click', async function () {
+        var testoOriginale = btnCopia.textContent;
+        try {
+          await navigator.clipboard.writeText(GUEST_PASS.codice);
+          btnCopia.textContent = GUEST_PASS.codice + ' · copiato ✓';
+        } catch (e) {
+          btnCopia.textContent = GUEST_PASS.codice + ' · copia a mano';
+        }
+        window.setTimeout(function () { btnCopia.textContent = testoOriginale; }, 2000);
+      });
+    }
+
+    /* La richiesta vera, in parallelo a quello che la persona gia' vede: al
+       browser si e' gia' risposto col codice, che e' suo comunque anche se
+       questa chiamata fallisce — stessa scelta di `provaForm.client.js`. */
+    fetch(PROVA, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tipo: 'prova',
+        email: dati.email,
+        nome: dati.nome,
+        cognome: dati.cognome,
+        cellulare: dati.telefono,
+        telefono: dati.telefono,
+        stato: dati.stato,
+        codice: GUEST_PASS.codice,
+        pagina: dati.pagina,
+        origine: 'chat',
+        cta: 'assistente',
+        attivita: dati.attivita ? [dati.attivita] : [],
+        utm: window.athlonGetUtm ? window.athlonGetUtm() : {},
+        vid: window.athlonGetVid ? window.athlonGetVid() : null,
+        sid: window.athlonGetSid ? window.athlonGetSid() : null,
+      }),
+    }).then(function () {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: 'lead_submit', lead_source: 'chat-prova' });
+    }).catch(function () {
+      /* Il codice resta suo comunque: il lead perso e' un problema nostro, e
+         n8n lo vede dal log del webhook — vedi la stessa scelta in
+         `provaForm.client.js`. */
+    });
+  }
+
   /**
    * Toglie il calendario e restituisce la conversazione.
    *
@@ -980,6 +1201,10 @@ export function initChatAssistente(root, options) {
       attesa.innerHTML = paragrafi + rimandi + scappatoia(!!risposta.senzaRisposta);
       trascritto.push({ ruolo: 'assistente', testo: risposta.risposta });
       proponiRichiamo();
+      /* Solo qui, dopo che la risposta e' gia' a schermo: e' il turno esatto
+         in cui la persona ha confermato (regole 7, 8, 12 del prompt), non
+         un'anticipazione. */
+      eseguiAzione(risposta.azione);
     } catch (e) {
       /* Nel modal non c'è la ricerca locale a cui ricadere — quella è rimasta
          nel box della pagina. Qui si dice come stanno le cose e si offre la
