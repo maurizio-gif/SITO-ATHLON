@@ -274,6 +274,7 @@ export function initChatAssistente(root, options) {
           pagina: dati.pagina,
           utm: window.athlonGetUtm ? window.athlonGetUtm() : {},
           vid: window.athlonGetVid ? window.athlonGetVid() : null,
+          sid: window.athlonGetSid ? window.athlonGetSid() : null,
         }),
       });
       window.clearTimeout(scaduta);
@@ -614,6 +615,7 @@ export function initChatAssistente(root, options) {
              qualcuno arrivato da una campagna o dal totem in sede. */
           utm: window.athlonGetUtm ? window.athlonGetUtm() : {},
           vid: window.athlonGetVid ? window.athlonGetVid() : null,
+          sid: window.athlonGetSid ? window.athlonGetSid() : null,
         }),
       });
       if (!r.ok) throw new Error(String(r.status));
@@ -685,6 +687,7 @@ export function initChatAssistente(root, options) {
           statoNucleo: dati.statoNucleo,
           utm: window.athlonGetUtm ? window.athlonGetUtm() : {},
           vid: window.athlonGetVid ? window.athlonGetVid() : null,
+          sid: window.athlonGetSid ? window.athlonGetSid() : null,
         }),
       });
       window.clearTimeout(scaduta);
@@ -991,6 +994,7 @@ export function initChatAssistente(root, options) {
              portava `TOUR`. */
           utm: window.athlonGetUtm ? window.athlonGetUtm() : {},
           vid: window.athlonGetVid ? window.athlonGetVid() : null,
+          sid: window.athlonGetSid ? window.athlonGetSid() : null,
         }),
       });
       if (!r.ok) throw new Error(String(r.status));

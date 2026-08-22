@@ -65,6 +65,13 @@ export function initProvaForm(root, options) {
   function vid() {
     return window.athlonGetVid ? window.athlonGetVid() : null;
   }
+  /* L'id della visita, che viaggia accanto al vid e non al suo posto: senza
+     consenso pubblicitario il vid vale una pagina sola, mentre il sid regge
+     tutta la sessione — è lui a legare questa richiesta alle pagine viste
+     prima (vista `percorso_conversione`), anche per chi resta anonimo. */
+  function sid() {
+    return window.athlonGetSid ? window.athlonGetSid() : null;
+  }
 
   // ── Nodi ──────────────────────────────────────────────────────────────────
   function q(sel) {
@@ -242,6 +249,7 @@ export function initProvaForm(root, options) {
           attivita: dati.attivita,
           utm: utm(),
           vid: vid(),
+          sid: sid(),
         }),
       });
       var body = await r.json();
@@ -319,6 +327,7 @@ export function initProvaForm(root, options) {
           attivita: dati.attivita,
           utm: utm(),
           vid: vid(),
+          sid: sid(),
         }),
       });
 

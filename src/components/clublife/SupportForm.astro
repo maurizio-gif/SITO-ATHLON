@@ -223,9 +223,12 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
     <input type="hidden" name="userId" data-prefill="userid,userId,user_id" />
     <input type="hidden" name="userNumber" data-prefill="usernumber,userNumber,user_number" />
     {UTM_FIELDS.map((f) => <input type="hidden" name={f} data-prefill={f} />)}
-    {/* Come le UTM: valorizzato all'apertura del pannello da `athlonGetVid()`,
-        non qui — vedi il commento su `versaUtm` più sotto. */}
+    {/* Come le UTM: valorizzati all'apertura del pannello da `athlonGetVid()` e
+        `athlonGetSid()`, non qui — vedi il commento su `versaUtm` più sotto.
+        Il `sid` è quello che lega la richiesta alle pagine viste prima anche
+        senza consenso pubblicitario, dove il `vid` vale una pagina sola. */}
     <input type="hidden" name="vid" data-support-vid />
+    <input type="hidden" name="sid" data-support-sid />
     {/* Context the person answering will want: which page, and what was typed
         into the search before giving up on it. */}
     <input type="hidden" name="pagina" data-support-page />
@@ -319,6 +322,9 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
       const vidField = form.querySelector<HTMLInputElement>('[data-support-vid]');
       const getVid = (window as unknown as { athlonGetVid?: () => string }).athlonGetVid;
       if (vidField && getVid) vidField.value = getVid();
+      const sidField = form.querySelector<HTMLInputElement>('[data-support-sid]');
+      const getSid = (window as unknown as { athlonGetSid?: () => string }).athlonGetSid;
+      if (sidField && getSid) sidField.value = getSid();
     };
 
     /* L'email dall'URL vince su quella ricordata dal browser
