@@ -1,5 +1,6 @@
 ---
 import { trialCta, talkCta, joinCta } from '../data/cta';
+import { CORSI_FITNESS } from '../data/corsi';
 
 /* La prova è un prodotto solo e vale per tutto il club, quindi qui non porta
    nessuna attività: la pagina di provenienza è l'header, su qualunque pagina. */
@@ -13,26 +14,27 @@ const contatta = talkCta({ source: 'header' });
    abbonamenti nel menu. */
 const iscriviti = joinCta({ source: 'header' });
 
-/* I corsi fitness sono il secondo livello del menu, in ordine alfabetico —
-   ordinati qui e non a mano, così aggiungerne uno non richiede di rimetterli
-   in fila. localeCompare con 'it' perché ® e accenti non devono contare. */
-const corsiFitness = [
-  { label: 'Antigravity®', href: '/antigravity' },
-  { label: 'Balli di Gruppo', href: '/balli-di-gruppo' },
-  { label: 'Body Pump®', href: '/body-pump' },
-  { label: 'Body Sculpt', href: '/body-sculpt' },
-  { label: 'Booty Workout', href: '/booty-workout' },
-  { label: 'Calisthenics', href: '/calisthenics' },
-  { label: 'Difesa Personale', href: '/difesa-personale' },
-  { label: 'GP Coreo', href: '/gpcoreo' },
-  { label: 'Ginnastica Dolce', href: '/ginnastica-dolce' },
-  { label: 'Ginnastica Posturale', href: '/ginnastica-posturale' },
-  { label: 'HBX', href: '/hbx' },
-  { label: 'Motr®', href: '/motr' },
-  { label: 'Pilates', href: '/pilates' },
-  { label: 'Strenght', href: '/strenght' },
-  { label: 'Yoga', href: '/yoga' },
-].sort((a, b) => a.label.localeCompare(b.label, 'it'));
+/* I corsi fitness sono il secondo livello del menu: non le quindici pagine,
+   ma le lezioni distinte che offrono — la stessa unità che conta
+   `NUMERO_CORSI_FITNESS` in `data/corsi.ts`, e che la pagina /corsi-fitness
+   enumera per intero. Un corso con più lezioni (Yoga: Hatha, Power, Yogassè)
+   ne mette una voce a testa, con l'ancora della sua variante; un corso con una
+   lezione sola resta una voce, senza ancora.
+
+   Prima erano quindici voci scritte a mano, ferme al giorno in cui furono
+   copiate da `CORSI`: non sapevano di Matwork 4.1, e la pagina che elencava
+   diciannove lezioni stava accanto a un menu che ne contava quindici — la
+   stessa domanda, due risposte diverse. Derivarle da qui vuol dire che
+   aggiungere una lezione a un corso la aggiunge anche al menu, da sola.
+
+   In ordine alfabetico, e non a mano: localeCompare con 'it' perché ® e
+   accenti non devono contare. */
+const corsiFitness = CORSI_FITNESS.flatMap((c) => {
+  const varianti = c.varianti.filter((v) => v.nome);
+  return varianti.length > 1
+    ? varianti.map((v) => ({ label: v.nome as string, href: `/${c.slug}#${v.id}` }))
+    : [{ label: c.nome, href: `/${c.slug}` }];
+}).sort((a, b) => a.label.localeCompare(b.label, 'it'));
 
 /* Primo livello: le otto attività per adulti come le nomina il club. Solo
    "Corsi Fitness" si apre, e dentro ci sono i singoli corsi. */

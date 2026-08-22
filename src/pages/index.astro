@@ -10,10 +10,19 @@ import AppSection from '../components/home/AppSection.astro';
 import ComeFunziona from '../components/home/ComeFunziona.astro';
 import EventiPreview from '../components/eventi/EventiPreview.astro';
 import NewsPreview from '../components/clublife/NewsPreview.astro';
+import { NUMERO_CORSI_FITNESS } from '../data/corsi';
 
 const adultiItems = [
   { title: 'Gym Floor', image: '/wp-content/uploads/2024/08/IMG_2065-scaled.jpg', desc: '400 mq. Da soli o con un trainer in sala.', href: '/gym-floor' },
-  { title: 'Corsi Fitness', image: '/wp-content/uploads/2024/08/WM_08332-scaled.jpg', desc: 'Diciotto corsi in due sale, dalle 7:40 alle 21.', href: '/corsi-fitness' },
+  {
+    title: 'Corsi Fitness',
+    image: '/wp-content/uploads/2024/08/WM_08332-scaled.jpg',
+    /* Era «Diciotto corsi», scritto a mano: sbagliato da tempo, e nessuno se
+       n'era accorto perché non doveva coincidere con niente. Ora coincide con
+       /corsi-fitness per costruzione, non per manutenzione. */
+    desc: `${NUMERO_CORSI_FITNESS} corsi in due sale, dalle 7:40 alle 21.`,
+    href: '/corsi-fitness',
+  },
   { title: 'Group Reformer', image: '/wp-content/uploads/2025/03/Athlon130-scaled.jpg', desc: 'Dieci Reformer, cinquanta minuti, un coach.', href: '/reformer' },
   { title: 'Personal Training', image: '/wp-content/uploads/2024/08/WM_07530-scaled.jpg', desc: 'Sei trainer, ognuno con le sue specializzazioni.', href: '/personal-training' },
   { title: 'Nuoto Libero Assistito', image: '/wp-content/uploads/2025/03/Athlon85-scaled.jpg', desc: 'Cinque corsie a capienza controllata, tecnico a bordo vasca.', href: '/nuoto-libero' },

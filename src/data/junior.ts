@@ -25,6 +25,16 @@ const U = '/wp-content/uploads';
  */
 const FORM = 'https://automazione.n8ndevelop.it/form/a4283d20-5832-46a3-9d88-df3561060e12?source=SitoWeb&';
 
+/**
+ * L'intervallo di nascita della Scuola Nuoto Bambini per la stagione corrente,
+ * in un posto solo. Prima era scritto a mano in tre punti — due qui sotto e
+ * uno nel modulo contatti (`data/contatto.ts`) — e a inizio stagione si è
+ * aggiornato solo due dei tre: il modulo diceva ancora «dal 2012 al 2022»,
+ * un anno indietro, mentre questa pagina era già passata a «2013 al 2023».
+ * Cambia una volta a stagione, qui soltanto.
+ */
+export const SNB_ETA = { dal: 2013, al: 2023 };
+
 export interface CorsoStagione {
   nome: string;
   /** Le annate o l'età, come le scrive il club. */
@@ -393,7 +403,7 @@ export const JUNIOR: CorsoJunior[] = [
     video: 'https://www.athlonroma.it/wp-content/uploads/2024/11/SCUOLA-NUOTO-BAMBINI-2.mp4',
     poster: `${U}/2024/08/P1120372-scaled.jpg`,
     facts: [
-      'Per i nati dal 2013 al 2023',
+      `Per i nati dal ${SNB_ETA.dal} al ${SNB_ETA.al}`,
       'Dal 14 settembre 2026 al 20 giugno 2027',
       'Turni divisi per età, gruppi divisi per livello',
       'Brevetto federale a fine stagione',
@@ -405,7 +415,7 @@ export const JUNIOR: CorsoJunior[] = [
         sottotitolo: 'Stagione 2026/27',
         dettagli: [
           { l: 'Durata corso', v: 'Dal 14 settembre 2026 al 20 giugno 2027' },
-          { l: 'Fascia d’età', v: 'Per i nati dal 2023 al 2013' },
+          { l: 'Fascia d’età', v: `Per i nati dal ${SNB_ETA.al} al ${SNB_ETA.dal}` },
           {
             l: 'Turni',
             v: 'Gli orari sono divisi per età. All’interno dello stesso orario i bambini vengono divisi per livello, e per ognuno si stabilisce un percorso didattico individuale',
