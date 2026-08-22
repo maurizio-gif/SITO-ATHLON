@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection, render } from 'astro:content';
 import { AREA_LABELS } from '../../data/helpdesk';
+import BottoneChat from '../../components/BottoneChat.astro';
 import '../../styles/prosa.css';
 import { ACTIVITY_LABEL } from '../../data/activities';
 
@@ -164,6 +165,11 @@ const scheda = {
             attivita.map((a) => <span class="wa__tag">{ACTIVITY_LABEL[a] ?? a}</span>)
           )}
         </div>
+
+        {/* Questa e' la pagina che si legge quando la propria domanda non ha
+            trovato risposta in una FAQ: se non basta nemmeno l'articolo, il
+            comando per chiedere sta subito qui, non in fondo dopo la lettura. */}
+        <BottoneChat sorgente="hero-wikiathlon" classe="wa__chat" />
       </div>
     </header>
 
@@ -315,6 +321,12 @@ const scheda = {
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.55);
+  }
+
+  /* Margine in rem: sul totem e sulla televisione il comando cresce con la
+     pagina invece di restare un bersaglio da telefono. */
+  .wa__chat {
+    margin-top: 1.375rem;
   }
 
   .wa__tag {

@@ -28,6 +28,7 @@ import Layout from '../../layouts/Layout.astro';
 import { getCollection, render } from 'astro:content';
 import { formatEventDate } from '../../data/eventi';
 import { fotoHero } from '../../data/foto';
+import BottoneChat from '../../components/BottoneChat.astro';
 import '../../styles/prosa.css';
 
 export async function getStaticPaths() {
@@ -107,6 +108,10 @@ const schema = {
           <span class="nws__cat">{d.category}</span>
           <span class="nws__date">{formatEventDate(d.date, true)}</span>
         </div>
+
+        {/* Chi legge una news e ha una domanda non deve scorrere fino al
+            footer per trovare un modo di farla. */}
+        <BottoneChat sorgente="hero-news" classe="nws__chat" />
       </div>
     </header>
 
@@ -243,6 +248,14 @@ const schema = {
     flex-wrap: wrap;
     gap: 0.5rem 0.75rem;
     margin-top: 1.125rem;
+  }
+
+  /* Sta a parte dal `.nws__meta`: quello e' un gruppo di etichette in linea,
+     questo e' un comando, e il margine sopra deve valere anche quando il
+     bottone e' l'unica cosa nella riga - una news senza data (`draft`, che
+     qui non si vede, o un campo vuoto) non deve far collassare lo spazio. */
+  .nws__chat {
+    margin-top: 1.375rem;
   }
 
   .nws__cat {

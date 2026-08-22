@@ -1,0 +1,78 @@
+---
+/**
+ * Il comando della chat dentro una hero.
+ *
+ * Nasce per le tre pagine che si leggono — le schede dell'Help Desk, gli eventi
+ * e le news — dove il primo schermo non aveva **nessun** modo di chiedere.
+ * `ChatFab` non compare in cima di proposito (sul telefono la sua zona è
+ * occupata dalla riga dell'area riservata), e le schede dell'Help Desk hanno
+ * `chrome={false}`, quindi lì manca anche la pastiglia della barra: chi apriva
+ * un articolo e non trovava la risposta doveva scorrere fino in fondo per
+ * scoprire che si poteva domandare.
+ *
+ * Tre cose sono volute:
+ *
+ *   - **è un `<a>` e non un `<button>`.** Il gestore di `ChatModal` è delegato
+ *     al documento e fa `preventDefault()`, quindi con JavaScript apre il
+ *     pannello; senza, il link porta all'Help Desk, dove l'assistente c'è
+ *     comunque. Stessa regola dei pulsanti *Iscriviti*: l'intercettazione è un
+ *     miglioramento, non un requisito.
+ *   - **il glifo è quello della barra**, bolla e tre punti: è lo stesso comando
+ *     e deve avere la stessa faccia. Le misure in `rem` e non in px, o sul
+ *     totem e sulla televisione resterebbe un bersaglio da telefono.
+ *   - **`sorgente` è obbligatoria** e finisce in `data-cta-source`, che
+ *     `athlon-evento` scrive nella colonna `origine` di `eventi_interazione`:
+ *     senza, le aperture di queste tre pagine si mescolerebbero fra loro e con
+ *     quelle della home.
+ */
+interface Props {
+  /** Da dove si apre: `hero-news`, `hero-evento`, `hero-wikiathlon`. */
+  sorgente: string;
+  /** L'etichetta. Cambiarla per pagina è possibile e per ora non serve. */
+  testo?: string;
+  /** Una classe della pagina ospite, per la posizione dentro la sua hero. */
+  classe?: string;
+}
+
+const { sorgente, testo = 'Chatta con noi', classe } = Astro.props;
+---
+
+<a
+  href="/club-life#help-desk"
+  class:list={['btn', 'btn-primary', 'bchat', classe]}
+  data-cta="assistente"
+  data-cta-source={sorgente}
+  aria-haspopup="dialog"
+>
+  <svg
+    class="bchat__glifo"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M20.5 11.6a8 8 0 0 1-8 8H8.3L4 22.4v-4.3a8 8 0 0 1 8.5-14 8 8 0 0 1 8 7.5Z" />
+    <circle cx="9" cy="11.5" r="1.1" fill="currentColor" stroke="none" />
+    <circle cx="12.5" cy="11.5" r="1.1" fill="currentColor" stroke="none" />
+    <circle cx="16" cy="11.5" r="1.1" fill="currentColor" stroke="none" />
+  </svg>
+  <span>{testo}</span>
+</a>
+
+<style>
+  /* `.btn` porta già forma, corpo e spaziatura: qui restano il glifo e il fatto
+     che non si vada a capo fra icona e parole. */
+  .bchat {
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .bchat__glifo {
+    flex: none;
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+</style>

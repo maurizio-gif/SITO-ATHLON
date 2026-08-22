@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import { getCollection, render } from 'astro:content';
 import { formatEventDate } from '../../data/eventi';
 import { fotoHero } from '../../data/foto';
+import BottoneChat from '../../components/BottoneChat.astro';
 
 export async function getStaticPaths() {
   const events = await getCollection('eventi', ({ data }) => !data.draft);
@@ -72,6 +73,10 @@ const evento = {
           {d.price && <span class="evd__badge">{d.price}</span>}
           {isPast && <span class="evd__badge evd__badge--past">Evento concluso</span>}
         </div>
+
+        {/* Chi legge la scheda di un evento e ha una domanda sulle modalita'
+            di partecipazione non deve scorrere fino al footer per chiederla. */}
+        <BottoneChat sorgente="hero-evento" classe="evd__chat" />
       </div>
     </header>
 
@@ -219,6 +224,12 @@ const evento = {
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.75);
+  }
+
+  /* Margine in rem e non px come i badge accanto: sul totem e sulla
+     televisione un comando cresce con la pagina, un distacco fisso no. */
+  .evd__chat {
+    margin-top: 1.375rem;
   }
 
   .evd__badge--free {
