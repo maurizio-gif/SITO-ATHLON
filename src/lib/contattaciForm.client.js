@@ -792,14 +792,20 @@ export function initContattaciForm(root, options) {
   if (btnInviaGenitore) btnInviaGenitore.addEventListener('click', inviaGenitore);
 
   /* «cambia» rinuncia alla preselezione: da qui in poi i passi tornano tre, e
-     il contatore lo dice. */
+     il contatore lo dice. Non salta a `mostraStep('macro')` — e prima lo
+     faceva, saltando anche `verifica()`: chi cambiava attività proseguiva
+     senza email né stato PGM, e il resto del flusso (precompilazione, wiki
+     dell'anagrafica, statoPgm nel payload) restava vuoto per l'intera
+     richiesta. Il pulsante compare solo sul passo email (`cf-step-email`),
+     quindi restarci — e lasciare che sia `verifica()` a portare al passo
+     macro una volta verificata l'email, come nel percorso senza contesto —
+     è tutto quello che serve. */
   var btnCambia = q('[data-cf-contesto-cambia]');
   if (btnCambia) {
     btnCambia.addEventListener('click', function () {
       dati.macroDaCta = '';
       numeraPassi();
       mostraContesto();
-      mostraStep('macro');
     });
   }
 
