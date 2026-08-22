@@ -61,11 +61,17 @@ export function initChatAssistente(root, options) {
   var LANDING_JUNIOR = '/wikiathlon/snb/preiscrizioni-nuoto/';
 
   /* ── Il richiamo telefonico ──────────────────────────────────────────────
-     Si propone **solo a chi non è ancora dei nostri** — adulto o genitore non
-     fa differenza, conta che sia nuovo — e **non subito**: dopo qualche
-     risposta. Offrirlo al primo messaggio è un venditore che interrompe una
-     domanda; offrirlo dopo tre è una porta aperta a chi si è già fatto un'idea
-     e adesso vuole parlarne.
+     Si apre **solo su richiesta**, e la richiesta è una sola: l'icona ☎ in
+     intestazione, disponibile a chi non è ancora dei nostri (`puoRichiamo`).
+
+     Prima si apriva anche da sé dopo due risposte, e in prova è risultato
+     esattamente quello che l'automatismo rischiava di essere: un modulo da
+     trentaquattro rem che si prende lo schermo in mezzo a una conversazione
+     che nessuno aveva chiesto di interrompere. Un calendario è la fine di un
+     percorso, non un suggerimento — chi lo vuole lo cerca, e l'icona in alto
+     è lì dal primo istante con la riga che la annuncia nella bolla del saluto.
+     Per la stessa ragione non c'è più nemmeno un pulsante sotto le risposte:
+     quel posto è di «Contatta il team», che è la via scritta.
 
      I dati li abbiamo già tutti, perché per un nuovo il form viene prima della
      conversazione: si passano precompilati a Calendly così la persona trova il
@@ -93,17 +99,6 @@ export function initChatAssistente(root, options) {
        il giorno in cui un evento viene rinominato — e un link Calendly rotto non
        dà errore, dà «questo evento non esiste» a chi stava per prenotare. */
     url: CALENDLY.recall,
-    /**
-     * Quante risposte dell'assistente prima di proporlo da sé.
-     *
-     * Due e non tre: da quando l'icona in intestazione c'è dal primo istante,
-     * questo non è più l'unico modo di arrivarci — è il promemoria per chi non
-     * ha guardato in alto, e un promemoria alla terza risposta arriva dopo che
-     * la persona ha già deciso di arrangiarsi. A una non si mette: chi ha letto
-     * una riga sola non sa ancora se gli serve una telefonata, e un calendario
-     * in faccia subito è la finestra che si chiude senza leggere.
-     */
-    dopoRisposte: 2,
     campi: { telefono: 'location', contesto: 'a1' },
     /* Il trascritto intero non ci sta in una query string, e un url troppo
        lungo lo troncano il browser o Calendly: si tengono gli ultimi scambi,
@@ -522,17 +517,15 @@ export function initChatAssistente(root, options) {
    * sicurezza una cosa che non c'entra.
    */
   function scappatoia(senzaRisposta) {
-    /* Due comandi in parallelo, e sono due cose diverse — non la stessa con due
-       nomi. «Contatta il team» è scritta: parte il trascritto, la legge una
-       persona, risponde quando può. «Fissa una telefonata» è una voce a un'ora
-       che scegle chi chiama. Chi ha una domanda lunga preferisce la prima, chi
-       ne ha una da decidere preferisce la seconda, e indovinare per loro
-       significa sbagliare metà delle volte.
+    /* Un comando solo, ed è quello scritto: parte il trascritto, lo legge una
+       persona, risponde quando può.
 
-       La telefonata **solo a chi non ha un abbonamento vivo**: per un socio
-       resta il comando solo, com'era. E resta la seconda delle due, in
-       contorno: chi sta leggendo una risposta scritta ha già scelto il canale
-       scritto, e il pieno arancione sull'altro lo contraddirebbe.
+       Qui c'era anche «Fissa una telefonata», e non c'è più. Sotto una risposta
+       scritta il canale l'ha già scelto la persona, e affiancare un secondo
+       comando a ogni bolla trasformava la fine di ogni risposta in un bivio —
+       due volte per risposta, per tutta la conversazione. La telefonata resta,
+       ma dove si va a cercarla: l'icona ☎ in intestazione, annunciata nella
+       bolla del saluto a chi può prenotarla.
 
        I dati, quando servono, li ha già chiesti il form prima della
        conversazione — riproporli qui sarebbe chiedere due volte la stessa
@@ -543,22 +536,16 @@ export function initChatAssistente(root, options) {
       (senzaRisposta ? 'Su questo serve una persona.' : 'Vuoi parlarne con noi?') +
       '</span>' +
       '<button type="button" class="ca__uscita-btn" data-ca-ticket>Contatta il team →</button>' +
-      (dati.puoRichiamo
-        ? '<button type="button" class="ca__uscita-btn" data-ca-richiamo>☎ Fissa una telefonata</button>'
-        : '') +
       '</div>'
     );
   }
 
   // ── Il richiamo telefonico ────────────────────────────────────────────────
   /**
-   * Compare una volta sola, dopo `RICHIAMO.dopoRisposte` risposte, e solo a chi
-   * non è ancora iscritto. Non è la via d'uscita della `scappatoia()`, che è
-   * scritta e va al desk: questa è una telefonata, e la chiede chi ha letto un
-   * po' e adesso vuole una voce.
+   * Si monta **solo quando la persona lo chiede**, dall'icona ☎ in
+   * intestazione. Non è la via d'uscita della `scappatoia()`, che è scritta e
+   * va al desk: questa è una telefonata a un'ora scelta da chi la vuole.
    */
-  var risposteDate = 0;
-  var richiamoOfferto = false;
 
   /** Quello che finisce nel campo libero del modulo: il contesto della chiamata. */
   function contestoRichiamo() {
@@ -592,20 +579,7 @@ export function initChatAssistente(root, options) {
      `RICHIAMO.campi` qui sopra, che è dove si guarda se il modulo cambia. */
 
   /**
-   * L'offerta automatica: una volta sola, dopo `RICHIAMO.dopoRisposte`
-   * risposte. Non è più l'unica strada — l'icona in cima e il pulsante sotto
-   * ogni risposta ci arrivano quando vuole la persona — quindi qui resta solo
-   * il ruolo che le è proprio: ricordarlo a chi non ha guardato in alto.
-   */
-  function proponiRichiamo() {
-    risposteDate++;
-    if (richiamoOfferto || !dati.puoRichiamo) return;
-    if (risposteDate < RICHIAMO.dopoRisposte) return;
-    mostraRichiamo();
-  }
-
-  /**
-   * Il calendario dentro la conversazione, chiesto da un gesto o proposto da sé.
+   * Il calendario dentro la conversazione, e ci si arriva **solo con un gesto**.
    *
    * **Uno solo, sempre.** Se c'è già si scorre lì invece di montarne un
    * secondo: due iframe di Calendly nella stessa conversazione sono due
@@ -625,10 +599,9 @@ export function initChatAssistente(root, options) {
 
     /* Senza email non c'è niente da precompilare, e un modulo vuoto è una
        richiesta in più invece di una scorciatoia. In pratica non capita — il
-       primo passo della chat è l'email — ma il gesto ora può arrivare da un
-       pulsante, e un pulsante lo si può premere prima del previsto. */
+       primo passo della chat è l'email — ma il gesto arriva da un pulsante, e
+       un pulsante lo si può premere prima del previsto. */
     if (!dati.email) return;
-    richiamoOfferto = true;
 
     /* Il calendario dentro la conversazione, al posto del pulsante che portava
        fuori. Qui vale più che altrove: la chat è una conversazione in corso, e
@@ -904,10 +877,10 @@ export function initChatAssistente(root, options) {
   /**
    * Toglie il calendario e restituisce la conversazione.
    *
-   * `richiamoOfferto` resta vero di proposito: chi l'ha chiuso ha detto no, e
-   * riproporglielo da sé dopo due risposte sarebbe insistere. L'icona in
-   * intestazione però continua a funzionare — riaprirlo è una sua scelta, e
-   * `mostraRichiamo()` ne monta uno nuovo perché il vecchio non c'è più.
+   * Chiuderlo non lo mette al bando: l'icona in intestazione continua a
+   * funzionare, e `mostraRichiamo()` ne monta uno nuovo perché il vecchio non
+   * c'è più. Non serve ricordarsi che è stato chiuso — da quando il calendario
+   * si apre solo su richiesta, riproporlo da sé non capita più.
    */
   async function chiudiRichiamo() {
     var box = conversazione && conversazione.querySelector('.ca__richiamo');
@@ -936,13 +909,9 @@ export function initChatAssistente(root, options) {
     dati = statoIniziale();
     trascritto = [];
     ticketInviato = false;
-    /* Anche il contatore e la memoria dell'offerta: senza, la persona dopo
-       eredita «il calendario l'ho già proposto» da una conversazione che non
-       è la sua. Il pulsante torna nascosto per la stessa ragione: `puoRichiamo`
-       si riscopre dalla verifica dell'email, e fino ad allora non sappiamo se
-       questa persona può prenotare. */
-    risposteDate = 0;
-    richiamoOfferto = false;
+    /* Il pulsante torna nascosto: `puoRichiamo` si riscopre dalla verifica
+       dell'email, e fino ad allora non sappiamo se questa persona può
+       prenotare. */
     if (btnRichiamo) btnRichiamo.hidden = true;
     if (campoEmail) campoEmail.value = '';
     if (campoDomanda) campoDomanda.value = '';
@@ -1200,7 +1169,6 @@ export function initChatAssistente(root, options) {
 
       attesa.innerHTML = paragrafi + rimandi + scappatoia(!!risposta.senzaRisposta);
       trascritto.push({ ruolo: 'assistente', testo: risposta.risposta });
-      proponiRichiamo();
       /* Solo qui, dopo che la risposta e' gia' a schermo: e' il turno esatto
          in cui la persona ha confermato (regole 7, 8, 12 del prompt), non
          un'anticipazione. */
@@ -1526,9 +1494,9 @@ export function initChatAssistente(root, options) {
       scegliAttivita(scelta.dataset.caAttivitaScelta);
       return;
     }
-    /* Lo stesso attributo per l'icona in intestazione e per il pulsante sotto
-       le risposte: sono lo stesso gesto, e due gestori diversi sarebbero due
-       occasioni di farli divergere. */
+    /* `data-ca-richiamo` lo porta ormai la sola icona in intestazione: la
+       delega resta perché il gesto è uno e il gestore deve restare uno anche
+       se un domani quell'attributo tornasse su un secondo comando. */
     /* La chiusura prima dell'apertura: il pulsante × sta **dentro** il blocco
        del calendario, e il blocco non porta `data-ca-richiamo` — ma se un
        domani lo portasse, l'ordine inverso lo riaprirebbe subito dopo averlo
