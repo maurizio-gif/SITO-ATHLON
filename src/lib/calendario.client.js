@@ -91,6 +91,45 @@ window.addEventListener('message', function (e) {
 });
 
 /**
+ * Il nome nelle tre forme che Calendly può chiedere.
+ *
+ * **Un evento con «Nome» e «Cognome» in due campi ignora `name`**, e questo è
+ * il difetto che questa funzione chiude: il calendario della chat ha il nome
+ * diviso in due, quindi arrivava con i due campi vuoti mentre l'email era
+ * compilata — e i due campi sono obbligatori, quindi la persona che voleva
+ * essere richiamata doveva ridigitare quello che il club sapeva già.
+ *
+ * Si mandano **tutte e tre** le chiavi: un evento a campo unico legge `name` e
+ * scarta le altre due, uno a campi separati fa il contrario. Nessuna delle due
+ * configurazioni va dichiarata da questa parte, ed è il punto — quale sia lo
+ * decide chi configura l'evento su Calendly, e da qui non si vede.
+ *
+ * Se il chiamante ha già nome e cognome separati li passa (`firstName`,
+ * `lastName`) ed è la strada giusta; se ha solo la stringa intera si divide sul
+ * primo spazio. La divisione è un ripiego e sbaglia sui nomi doppi — «Maria
+ * Teresa Rossi» diventa «Maria» + «Teresa Rossi» — quindi vale la pena passarli
+ * separati dove ci sono.
+ */
+function nomiCompleti(prefill) {
+  var d = Object.assign({}, prefill || {});
+  var intero = String(d.name || '').trim();
+  var primo = String(d.firstName || '').trim();
+  var resto = String(d.lastName || '').trim();
+
+  if (!primo && !resto && intero) {
+    var pezzi = intero.split(/\s+/);
+    primo = pezzi.shift() || '';
+    resto = pezzi.join(' ');
+  }
+  if (!intero) intero = [primo, resto].filter(Boolean).join(' ');
+
+  if (intero) d.name = intero;
+  if (primo) d.firstName = primo;
+  if (resto) d.lastName = resto;
+  return d;
+}
+
+/**
  * Monta il calendario, e restituisce una maniglia per smontarlo.
  *
  * @param {object} o
@@ -124,7 +163,7 @@ export async function montaCalendario(o) {
   window.Calendly.initInlineWidget({
     url: o.url + '?' + CALENDLY_ASPETTO,
     parentElement: riquadro,
-    prefill: o.prefill || {},
+    prefill: nomiCompleti(o.prefill),
   });
 
   var montaggio = {
@@ -160,8 +199,13 @@ export async function montaCalendario(o) {
 export function linkDiretto(url, prefill) {
   var p = new URLSearchParams();
   p.set('hide_gdpr_banner', '1');
-  var d = prefill || {};
+  var d = nomiCompleti(prefill);
   if (d.name) p.set('name', d.name);
+  /* `first_name` e `last_name` oltre a `name`: gli eventi con il nome in due
+     campi ignorano il secondo, e gli altri ignorano i primi due. Vedi
+     `nomiCompleti`. */
+  if (d.firstName) p.set('first_name', d.firstName);
+  if (d.lastName) p.set('last_name', d.lastName);
   if (d.email) p.set('email', d.email);
   if (d.location) p.set('location', d.location);
   var risposte = d.customAnswers || {};

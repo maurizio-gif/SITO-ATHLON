@@ -974,7 +974,14 @@ export function initContattaciForm(root, options) {
       «chiamata» di Calendly, cioè il numero su cui il club richiama. */
   function precompilato() {
     return {
-      name: (dati.nome + ' ' + dati.cognome).trim(),
+      /* Nome e cognome separati: un evento Calendly con i due campi distinti
+         **ignora `name`**, e chi ci arrivava trovava i due campi vuoti con
+         l'email compilata. `nomiCompleti` in `calendario.client.js` manda
+         comunque tutte e tre le chiavi, così va bene per entrambe le
+         configurazioni; passarli separati evita di dividere una stringa e
+         sbagliare sui nomi doppi. */
+      firstName: dati.nome,
+      lastName: dati.cognome,
       email: dati.email,
       location: dati.cellulare || '',
     };

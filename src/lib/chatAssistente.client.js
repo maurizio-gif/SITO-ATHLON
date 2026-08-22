@@ -626,7 +626,17 @@ export function initChatAssistente(root, options) {
     var box = document.createElement('div');
     box.className = 'ca__richiamo';
     box.innerHTML =
+      /* La testa col titolo e la **chiusura**, e quel pulsante non è un
+         ornamento: prima, aperto il calendario, non c'era modo di rimandarlo
+         indietro — chi ci ripensava e voleva continuare a chiedere si trovava
+         un modulo da trentaquattro rem in mezzo alla conversazione e nessuna
+         uscita. Chiudendolo la chat riprende, e l'icona ☎ in intestazione lo
+         riapre quando serve. */
+      '<div class="ca__richiamo-testa">' +
       '<p class="ca__richiamo-titolo">Vuoi essere ricontattato?</p>' +
+      '<button type="button" class="ca__richiamo-chiudi" data-ca-richiamo-chiudi ' +
+      'aria-label="Chiudi il calendario e torna alla chat" title="Chiudi">×</button>' +
+      '</div>' +
       '<p class="ca__richiamo-lead">Ti richiamiamo noi: scegli giorno e ora, i tuoi dati e quello di cui abbiamo parlato sono già compilati.</p>' +
       '<div class="ca__richiamo-cal" data-ca-calendario></div>' +
       '<div class="ca__richiamo-ripiego" data-ca-cal-ripiego hidden>' +
@@ -637,14 +647,20 @@ export function initChatAssistente(root, options) {
     conversazione.appendChild(box);
     conversazione.scrollTop = conversazione.scrollHeight;
 
-    var nome = [dati.nome, dati.cognome].filter(Boolean).join(' ');
-    montaCalendario({
+    /* La maniglia si tiene: chiudere il blocco senza chiamare `distruggi()`
+       lascerebbe il widget vivo e il singolo `attivo` di
+       `calendario.client.js` puntato a un nodo staccato dal documento. */
+    montaggioRichiamo = montaCalendario({
       riquadro: box.querySelector('[data-ca-calendario]'),
       ripiego: box.querySelector('[data-ca-cal-ripiego]'),
       link: box.querySelector('[data-ca-cal-link]'),
       url: RICHIAMO.url,
       prefill: {
-        name: nome,
+        /* Separati: il modulo di `recall` ha «Nome» e «Cognome» in due campi, e
+           un evento cosi' **ignora `name`** — arrivavano vuoti mentre l'email
+           era compilata. Vedi `nomiCompleti` in `calendario.client.js`. */
+        firstName: dati.nome,
+        lastName: dati.cognome,
         email: dati.email,
         location: dati.telefono || '',
         customAnswers: { a1: contestoRichiamo() },
@@ -652,9 +668,34 @@ export function initChatAssistente(root, options) {
       onPrenotato: function () {
         var fatto = box.querySelector('[data-ca-cal-fatto]');
         if (fatto) fatto.hidden = false;
+        /* Prenotato: la chiusura non serve più e diventa rumore accanto a una
+           conferma. Il blocco resta, che è quello che dice cosa è successo. */
+        var chiudi = box.querySelector('[data-ca-richiamo-chiudi]');
+        if (chiudi) chiudi.hidden = true;
         conversazione.scrollTop = conversazione.scrollHeight;
       },
     });
+  }
+
+  /** Il montaggio in corso, per poterlo smontare alla chiusura. */
+  var montaggioRichiamo = null;
+
+  /**
+   * Toglie il calendario e restituisce la conversazione.
+   *
+   * `richiamoOfferto` resta vero di proposito: chi l'ha chiuso ha detto no, e
+   * riproporglielo da sé dopo due risposte sarebbe insistere. L'icona in
+   * intestazione però continua a funzionare — riaprirlo è una sua scelta, e
+   * `mostraRichiamo()` ne monta uno nuovo perché il vecchio non c'è più.
+   */
+  async function chiudiRichiamo() {
+    var box = conversazione && conversazione.querySelector('.ca__richiamo');
+    try {
+      var m = await montaggioRichiamo;
+      if (m) m.distruggi();
+    } catch (e) {}
+    montaggioRichiamo = null;
+    if (box) box.remove();
   }
 
   // ── L'oblio sul totem ─────────────────────────────────────────────────────
@@ -1263,6 +1304,15 @@ export function initChatAssistente(root, options) {
     /* Lo stesso attributo per l'icona in intestazione e per il pulsante sotto
        le risposte: sono lo stesso gesto, e due gestori diversi sarebbero due
        occasioni di farli divergere. */
+    /* La chiusura prima dell'apertura: il pulsante × sta **dentro** il blocco
+       del calendario, e il blocco non porta `data-ca-richiamo` — ma se un
+       domani lo portasse, l'ordine inverso lo riaprirebbe subito dopo averlo
+       chiuso. */
+    if (e.target.closest && e.target.closest('[data-ca-richiamo-chiudi]')) {
+      chiudiRichiamo();
+      return;
+    }
+
     if (e.target.closest && e.target.closest('[data-ca-richiamo]')) {
       mostraRichiamo();
       return;

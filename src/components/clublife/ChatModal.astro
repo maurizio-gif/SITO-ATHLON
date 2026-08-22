@@ -1104,13 +1104,34 @@ import CampoTelefono from '../CampoTelefono.astro';
      vanno in `:global` e l'aspetto scritto per intero, o arriva senza. È un
      invito, non un allarme: fondo crema, bordo tenue, e il comando pieno solo
      perché è l'unica cosa cliccabile del riquadro. */
+  /* ---- Il blocco del richiamo ----
+     **Una fascia che arriva ai bordi del pannello, non una scheda dentro due
+     padding.** Il widget di Calendly perdeva 61 px di larghezza — 16 per lato
+     della conversazione piu' 14 per lato della scheda — e su un telefono quei
+     61 px sono un quinto dello spazio: il calendario ci stava dentro
+     schiacciato. I margini negativi annullano il padding della conversazione e
+     lo spazio interno resta solo dove serve al testo.
+
+     Il fondo bianco invece del crema e i due filetti orizzontali fanno il resto
+     del lavoro che chiedeva «piu' distinto»: si legge come un pannello aperto
+     sopra la chat, non come una bolla piu' grande delle altre. */
   .ca__conversazione :global(.ca__richiamo) {
     align-self: stretch;
-    margin: 0.35rem 0;
-    padding: 0.9rem;
-    border-radius: 1rem;
-    background: var(--color-cream);
-    border: 1px solid rgba(39, 36, 35, 0.1);
+    margin: 0.5rem -1rem;
+    padding: 0.9rem 0.5rem;
+    background: var(--color-white);
+    border-top: 1px solid rgba(39, 36, 35, 0.12);
+    border-bottom: 1px solid rgba(39, 36, 35, 0.12);
+  }
+
+  /* La testa: il titolo e la chiusura sulla stessa riga, il titolo che prende
+     lo spazio che resta. */
+  .ca__conversazione :global(.ca__richiamo-testa) {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0 0.4rem;
   }
 
   .ca__conversazione :global(.ca__richiamo-titolo) {
@@ -1121,6 +1142,31 @@ import CampoTelefono from '../CampoTelefono.astro';
     color: var(--color-dark);
   }
 
+  /* Tonda e discreta, come la chiusura del pannello: è un'uscita, non
+     un'azione. La misura è in `rem` e sta sopra la soglia del pollice, perché
+     un comando che si preme per sbaglio qui costa la prenotazione. */
+  .ca__conversazione :global(.ca__richiamo-chiudi) {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    margin: -0.15rem -0.15rem 0 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--color-cream);
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background var(--dur-fast) ease, color var(--dur-fast) ease;
+  }
+
+  .ca__conversazione :global(.ca__richiamo-chiudi:hover) {
+    background: var(--color-sand);
+    color: var(--color-dark);
+  }
+
   /* `height` e non `min-height`: il widget prende l'altezza del contenitore
      solo se il contenitore ce l'ha, altrimenti resta ai suoi 150px iniziali.
      Più basso che negli altri due pannelli, perché qui il riquadro sta dentro
@@ -1128,6 +1174,7 @@ import CampoTelefono from '../CampoTelefono.astro';
      altro, e non sequestrano la chat. */
   .ca__conversazione :global(.ca__richiamo-cal) {
     height: 34rem;
+    margin-top: 0.4rem;
     margin-bottom: 0.2rem;
     border-radius: 0.75rem;
     overflow: hidden;
@@ -1152,6 +1199,7 @@ import CampoTelefono from '../CampoTelefono.astro';
 
   .ca__conversazione :global(.ca__richiamo-lead) {
     margin: 0 0 0.7rem;
+    padding: 0 0.4rem;
     font-size: var(--text-xs);
     line-height: 1.5;
     color: var(--color-dark);

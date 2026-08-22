@@ -44,6 +44,57 @@ below its own padding-box top. Measure with canvas `TextMetrics` —
 `padding-top + (line-height - (fontBoundingBoxAscent + fontBoundingBoxDescent)) / 2
 + fontBoundingBoxAscent - actualBoundingBoxAscent` must be `>= 0`.
 
+## Una colonna di testo si misura in `ch`, non in px e non in rem
+
+La larghezza di un paragrafo non è una lunghezza: è un numero di caratteri per
+riga, e l'obiettivo è 45–75, con la mediana sopra 38 sul totem. `ch` è l'unica
+unità che lo tiene fermo, perché cresce col carattere. Le altre due lo fanno
+ballare, e nei due versi opposti — misurato sull'intro di `Struttura`, la stessa
+frase su due schermi:
+
+| `max-width` | scrivania (radice 16) | televisione (radice 31,5) |
+| --- | --- | --- |
+| `640px` | **93** caratteri per riga | 47 |
+| `48rem` | 111 | **111** |
+| `52ch` | 72 | 61 |
+
+Un valore in **px** si stringe dove lo schermo è più grande: il testo cresce con
+la radice, la colonna no. Un valore in **rem** cresce insieme al testo, quindi i
+caratteri per riga restano quelli — e se erano già troppi restano troppi su ogni
+schermo. `ch` è l'unico che li governa.
+
+Da qui due cose da sapere prima di toccare la larghezza di un paragrafo.
+
+**«Si legge stretto» non vuol dire «è stretto».** L'intro di `Struttura` sembrava
+rimpicciolita e faceva 93 caratteri per riga, cioè venti oltre il limite:
+allargarla l'ha peggiorata a 111. Quello che la rimpiccioliva era il **corpo** —
+testo base sotto un titolo grande, su fondo scuro. La cura è alzare il corpo e
+tenere la misura, non il contrario: la colonna diventa più larga in pixel *e* la
+riga torna leggibile, perché `ch` scala con lei.
+
+**Si misura col canvas, non a occhio e non contando le righe.** Dividere i
+caratteri per il numero di righe sbaglia ogni volta che il paragrafo contiene un
+elemento a blocco con un'interlinea sua — un `<strong>` che fa da titolo dà 21
+caratteri per riga su una colonna che ne tiene 54 — o quando l'elemento è
+`hidden`, dove le righe risultano una. La misura vera:
+
+```js
+const st = getComputedStyle(el);
+const c = document.createElement('canvas').getContext('2d');
+c.font = `${st.fontWeight} ${st.fontSize} ${st.fontFamily}`;
+const t = el.textContent.trim();
+const cpr = el.getBoundingClientRect().width / (c.measureText(t).width / t.length);
+```
+
+E lo stesso vale per **l'altezza di un riquadro incorporato**: l'iframe del tour
+virtuale aveva `height="500"`, che su un monitor largo era una fessura in una
+colonna da 1300 e sul totem restava 500 mentre il testo intorno cresceva di due
+terzi. L'altezza di una cosa che inquadra uno spazio è un **rapporto** —
+`aspect-ratio: 16/9`, 4/3 sul telefono dove 16:9 fa duecento pixel — con un
+freno in `svh` perché su un pannello verticale il rapporto la farebbe alta due
+schermate. L'attributo `height` resta nel markup: è il ripiego per chi legge la
+pagina senza CSS.
+
 ## Fonts are served from this repo, and stay that way
 
 Both faces are ours: Tusker in `public/wp-content/uploads/2024/07/`, Inter — the
@@ -1069,6 +1120,90 @@ Per **verificare un prefisso**: la lista ufficiale è ITU-T E.164. Un prefisso
 sbagliato non dà errore, manda un messaggio a un numero che non esiste, e non lo
 si scopre mai.
 
+## `/prova` è la pagina del Guest Pass, e la barra dice la scala
+
+La prova è la conversione più importante del sito — ogni pagina ha un pulsante
+che la chiede — e per un pezzo non aveva una pagina. Il ripiego senza JavaScript
+di tutte quelle CTA era `/abbonamenti#guest-pass`: **un blocco dentro un
+listino**, tre righe e un prezzo in mezzo a due abbonamenti da novanta euro al
+mese, che è il contesto peggiore per una cosa che costa diciannove. Ora
+`TRIAL_FALLBACK` in `data/cta.ts` porta a `/prova`; l'ancora esiste ancora ed è
+giusta per chi sta leggendo i piani, ma non è il ripiego di un pulsante «prova».
+
+**Nessun numero della pagina è scritto a mano**, e questa è la riga da non
+rompere:
+
+- giorni, prezzo, codice e requisito vengono da `GUEST_PASS`
+  (`data/abbonamenti.ts`). Il prezzo era ricopiato in tre punti — due volte in
+  `ProvaModal`, una in `guestPass.ts` — e ora no;
+- le lezioni e le ore le conta il palinsesto (`totalLessons()`, `openHours()`,
+  `bandHours(getBand('nuoto-libero'))`), quindi cambia il planning e cambia la
+  pagina. **Tre unità diverse e non una**: una lezione ha un istruttore e un
+  orario, la sala e le corsie sono aperte. Contare il nuoto libero in lezioni
+  darebbe diciotto invece di quarantaquattro ore d'acqua — la regola è
+  `FASCE_A_ORE` e vale per tutto il sito;
+- **il perimetro è la lista di attività del Premium**, letta da `plans`. Il Pass
+  è un Premium di sette giorni, quindi non comprende il personal training né i
+  corsi junior. Scrivere «provi tutto» e intenderlo alla lettera è la promessa
+  che manda una persona al desk a sentirsi dire no.
+
+L'elenco delle attività cliccabili è `AttivitaComprese.astro`, e va usato con
+**`AttivitaModal` una volta nella pagina** — è lui che intercetta
+`data-activity`. Uno senza l'altro dà un elenco di pulsanti che non fanno
+niente. Il componente esiste perché quella lista era già scritta due volte
+(`/abbonamenti` con le icone, `/promo` senza) e `/prova` sarebbe stata la terza;
+le icone stanno in `ICONE_ATTIVITA` (`data/activities.ts`), non nel markup di
+una pagina, e sono chiavate sull'**etichetta** che `plans` usa — non sullo slug
+di `ACTIVITY_TAGS`, che è un'altra lista e non coincide.
+
+### I tre posti della barra, e il solo comando di contatto sul telefono
+
+Nella riga desktop ci sono tre posti e dicono la scala delle intenzioni:
+**provare** (contornato), **comprare** (pieno), **parlare adesso** (la chat). Il
+contornato era Contattaci: la prova gli ha preso il posto perché è la cosa che
+il club vende a chi non lo conosce ancora, e provare viene prima di farsi
+contattare.
+
+Sul telefono ce n'è uno solo, e la ragione è una misura: a 375 px, fra la chat e
+i comandi dell'account restano dodici pixel, e «Chatta con noi» ne chiede
+novanta di solo testo. Due comandi per «farsi rispondere» obbligano uno dei due
+a essere un'icona muta — e un'icona muta la trova chi la cerca. Resta la chat,
+che è quella che risponde adesso e che quando non basta ha «Contatta il team»
+dentro la conversazione.
+
+**Quindi Contattaci vive in tre posti e nella barra del telefono no**: il menu
+del telefono (terzo pulsante, dove prima non c'era affatto), il footer di ogni
+pagina, e i comandi `data-cta="talk"` dentro le pagine. Prima di questa riga,
+dal telefono si arrivava a scrivere a una persona solo scorrendo fino al footer.
+
+Tre dettagli che sono misure e non gusto:
+
+- **la pastiglia è centrata sulla barra, non nello spazio che le resta.** Il
+  logo occupa 52 px a sinistra e i comandi 77 a destra, quindi il vuoto in mezzo
+  non è centrato nello schermo: con i margini automatici restavano sedici pixel
+  di errore, e prima trentasei. Si centra con `left: 0; right: 0` e
+  `margin-inline: auto`, **non** con `translateX(-50%)`: il `transform` lì è già
+  occupato dallo schiacciamento alla pressione, e due trasformazioni sullo stesso
+  elemento si mangiano — premendola tornerebbe a sinistra;
+- **lo stampatello costa larghezza.** «CHATTA CON NOI» con la crenatura piena
+  degli altri comandi (0,104em) porta la pastiglia a toccare i comandi
+  dell'account a 360 px. Sta a 0,02em, col pieno limato e l'icona a 18 px invece
+  di 20 — che accanto a un testo da 12 era il pezzo più grande. Restano cinque
+  pixel di respiro a 360 e tredici a 375;
+- **sotto i 360 px la pastiglia si nasconde**, e si nasconde questa e non altro:
+  la chat ha un ripiego suo, il pulsante fisso in basso a destra, che non
+  dipende dalla barra.
+
+E «Lavora con noi» sta in fondo al menu in corpo piccolo, come su `/link` e per
+la stessa ragione — chi cerca lavoro lo cerca sapendo già di volerlo, e un
+pulsante pieno lo metterebbe in concorrenza con la prova. **Senza la condizione
+su `POSIZIONI`** che `/link` ha invece: là la voce compare solo con un annuncio
+aperto, perché da una bio non si manda nessuno su un elenco vuoto; qui è una
+voce di menu, e la pagina regge l'elenco vuoto per intero. Il link è
+`inline-flex` e non in linea, o il `padding` verticale non riserva spazio e
+ruberebbe i tocchi al pulsante sopra — la trappola già vista sul reset della
+password.
+
 ## «Contattaci»: chi ha un abbonamento non chiede informazioni
 
 Il form nasce dai 55 nodi di `CONTATTACI - ATHLON`, e la prima stesura del
@@ -1216,6 +1351,69 @@ Tre cose da non rompere:
 E il `reset` azzera `risposteDate`, `richiamoOfferto` e nasconde l'icona: sul
 totem all'ingresso la persona dopo esiste davvero, e senza questo erediterebbe
 «il calendario l'ho già proposto» da una conversazione che non è la sua.
+
+### Il calendario in chat: il nome in due campi, la larghezza e l'uscita
+
+Tre difetti dello stesso blocco, e il primo era invisibile.
+
+**Un evento Calendly con «Nome» e «Cognome» in due campi ignora il prefill
+`name`.** Il modulo di `recall` è così: arrivava con i due campi vuoti — e
+obbligatori — mentre l'email era compilata, quindi chi voleva essere richiamato
+doveva ridigitare quello che il club sapeva già. `nomiCompleti()` in
+`calendario.client.js` manda **tutte e tre** le chiavi (`name`, `firstName`,
+`lastName`; nel link diretto `name`, `first_name`, `last_name`): un evento a
+campo unico legge la prima e scarta le altre, uno a campi separati fa il
+contrario. Quale sia lo decide chi configura l'evento su Calendly, e da qui non
+si vede — mandarle tutte è il solo modo di non dipendere da quella scelta.
+
+I chiamanti passano **nome e cognome separati** dove li hanno, e li hanno tutti
+e tre (prova, contattaci, chat). La divisione della stringa intera resta come
+ripiego e sbaglia sui nomi doppi: «Maria Teresa Rossi» diventa «Maria» +
+«Teresa Rossi».
+
+**Il blocco è una fascia, non una scheda dentro due padding.** Il widget perdeva
+61 px — 16 per lato della conversazione più 14 per lato della scheda — che su un
+telefono sono un quinto dello spazio. Con i margini negativi il calendario passa
+da 314 a 359 px su uno schermo da 375.
+
+**E si chiude.** Prima, una volta aperto, non c'era modo di rimandarlo indietro:
+chi ci ripensava e voleva continuare a chiedere si trovava un modulo da
+trentaquattro rem in mezzo alla conversazione e nessuna uscita. Il × sta nella
+testa del blocco, e `chiudiRichiamo()` chiama `distruggi()` del montaggio prima
+di togliere il nodo — senza, il widget resta vivo e il singolo `attivo` di
+`calendario.client.js` punta a un nodo staccato dal documento.
+
+Due dettagli del comportamento dopo la chiusura: `richiamoOfferto` **resta
+vero**, perché chi ha chiuso ha detto no e riproporglielo da sé dopo due
+risposte sarebbe insistere; l'icona ☎ in intestazione invece continua a
+funzionare, e `mostraRichiamo()` ne monta uno nuovo. E a prenotazione fatta il ×
+si nasconde: accanto a una conferma è rumore.
+
+### Chi si registra dalla chat arriva anche su Airtable
+
+`CHAT ATHLON — DATI` scriveva su Supabase (`chat_lead`, `eventi_email`) e creava
+le anagrafiche su PerfectGym, e non scriveva la riga su `ATHLON CLUB /
+RICHIESTE`: un contatto raccolto dall'assistente non arrivava nel posto dove il
+desk lavora. Ora le tre strade — figlio creato, adulto che aveva già
+un'anagrafica, lead adulto creato — confluiscono in `Raccogli PGM Chat`, e da lì
+parte Airtable.
+
+È lo stesso schema di `athlon-contatto-compilato`, e per la stessa ragione:
+l'id PerfectGym esiste solo **dopo** la creazione, quindi la riga va scritta a
+valle o `UserID` e `PGM` restano vuoti. Il ramo sta **in parallelo a
+`Conferma`**, non prima: al browser si risponde subito.
+
+Il trascritto della conversazione non finisce in Airtable — vive in
+`chat_conversazioni` e `chat_messaggi`, e incollarlo in una cella lo rende
+illeggibile in entrambi i posti. Nel `Messaggio` ci sono i fatti che servono ad
+aprire la pratica, il ramo compreso: dice come l'assistente ha parlato a quella
+persona, che è il contesto che al desk manca leggendo la sola anagrafica.
+
+**Questo webhook non si prova con `curl`**: ha `ignoreBots: true`, quindi
+risponde `403 Authorization data is wrong!`, che sembra un problema di
+credenziali e non lo è. Si passa dal browser. E attenzione all'errore che ho
+fatto io: se nella pagina hai sostituito `window.fetch` per finire le risposte,
+il `200 {ok:true}` che leggi è il tuo stesso stub e a n8n non arriva niente.
 
 ### Sul totem la chat dimentica dopo tre minuti, altrove no
 

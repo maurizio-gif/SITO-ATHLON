@@ -175,7 +175,12 @@ export function initProvaForm(root, options) {
       link: q('[data-pf-cal-link]'),
       url: CALENDLY.richiamami,
       prefill: {
-        name: (dati.nome + ' ' + dati.cognome).trim(),
+        /* Separati e non uniti: l'evento con «Nome» e «Cognome» in due campi
+           li vuole cosi', e far ricomporre e poi ridividere la stringa
+           sbaglierebbe sui nomi doppi. Vedi `nomiCompleti` in
+           `calendario.client.js`. */
+        firstName: dati.nome,
+        lastName: dati.cognome,
         email: dati.email,
         // `location` è il campo del telefono negli eventi «chiamata».
         location: dati.cellulare || '',
