@@ -194,20 +194,61 @@ export function initChatAssistente(root, options) {
   }
   var dati = statoIniziale();
 
+  var CHIAVE_SESSIONE = 'athlon:assistente:sessione';
+
+  function idNuovo() {
+    return typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : String(Date.now()) + Math.random().toString(16).slice(2);
+  }
+
   function sessione() {
-    var CHIAVE = 'athlon:assistente:sessione';
     try {
-      var salvata = sessionStorage.getItem(CHIAVE);
+      var salvata = sessionStorage.getItem(CHIAVE_SESSIONE);
       if (salvata) return salvata;
-      var nuova =
-        typeof crypto !== 'undefined' && crypto.randomUUID
-          ? crypto.randomUUID()
-          : String(Date.now()) + Math.random().toString(16).slice(2);
-      sessionStorage.setItem(CHIAVE, nuova);
+      var nuova = idNuovo();
+      sessionStorage.setItem(CHIAVE_SESSIONE, nuova);
       return nuova;
     } catch (e) {
       return String(Date.now());
     }
+  }
+
+  /**
+   * Una conversazione appartiene a **una persona sola**, e questa funzione è
+   * quello che lo garantisce.
+   *
+   * `sessione` vive in `sessionStorage`, quindi sopravvive a un ricaricamento
+   * della pagina e all'oblio del totem — mentre `dati.email` no, si riazzera.
+   * Il risultato, misurato su una sessione vera: la riga di
+   * `chat_conversazioni` nasce col primo messaggio e **si tiene per sempre la
+   * prima email**, perché gli inserimenti successivi trovano la stessa
+   * `sessione` e non cambiano niente. Chi cominciava a scrivere con un
+   * indirizzo e poi ne confermava un altro finiva con la conversazione
+   * attaccata a una persona e la richiesta prova a un'altra: nel pannello del
+   * desk la scheda di chi ha chiesto la prova non mostrava la conversazione,
+   * che era rimasta sulla scheda di prima.
+   *
+   * Sul totem è peggio che un fastidio: `pulisciStato()` dimentica la persona
+   * ma non l'identificativo, quindi i messaggi di chi arriva dopo si
+   * accodavano alla conversazione di chi era passato prima, sotto la sua
+   * email.
+   *
+   * Quindi: **identità nuova, conversazione nuova.** Non si aggiorna la riga
+   * vecchia — sarebbe spostare a una persona quello che ne ha detto un'altra —
+   * se ne apre una accanto. La memoria del modello riparte con lei, ed è
+   * giusto: sta parlando con qualcun altro.
+   */
+  function rinnovaSessione() {
+    try {
+      sessionStorage.setItem(CHIAVE_SESSIONE, idNuovo());
+    } catch (e) {}
+  }
+
+  function dimenticaSessione() {
+    try {
+      sessionStorage.removeItem(CHIAVE_SESSIONE);
+    } catch (e) {}
   }
 
   // ── Nodi ──────────────────────────────────────────────────────────────────
@@ -310,6 +351,16 @@ export function initChatAssistente(root, options) {
     }
 
     dati.email = campoEmail.value.trim().toLowerCase();
+    /* L'identità di questa sessione, decisa qui e una volta sola. Se
+       l'indirizzo non è quello con cui la sessione stava parlando, da adesso
+       si parla con qualcun altro: sessione nuova, conversazione nuova. Vedi
+       `rinnovaSessione`. Al primo giro `emailSessione` è vuota e non si
+       rinnova niente — sarebbe buttare via la sessione appena nata. */
+    try {
+      var emailPrima = sessionStorage.getItem('athlon:assistente:email');
+      if (emailPrima && emailPrima !== dati.email) rinnovaSessione();
+      sessionStorage.setItem('athlon:assistente:email', dati.email);
+    } catch (e) {}
     if (window.athlonRicordaEmail) window.athlonRicordaEmail(dati.email);
     attendi(btnEmail, true);
 
@@ -527,6 +578,10 @@ export function initChatAssistente(root, options) {
     mostra('chat');
     /* Da qui c'è una conversazione da dimenticare: sul totem il conto parte. */
     armaOblio();
+    /* E il silenzio si misura da subito: la bolla del saluto finisce con una
+       domanda, e se resta senza risposta è proprio il momento in cui si perde
+       una persona. */
+    armaSollecito();
   }
 
   /** Il trascritto, nell'ordine in cui è comparso: è ciò che finisce nel ticket. */
@@ -970,6 +1025,18 @@ export function initChatAssistente(root, options) {
     dati = statoIniziale();
     trascritto = [];
     ticketInviato = false;
+    fermaSollecito();
+    sollecitato = false;
+    /* **Anche l'identificativo della sessione**, ed è la parte che mancava:
+       senza, sul totem i messaggi di chi arriva dopo si accodano alla
+       conversazione di chi è passato prima, sotto la sua email — perché la
+       riga di `chat_conversazioni` esiste già e non cambia più. Dimenticare la
+       persona senza dimenticare la sua conversazione è mezzo oblio, e la metà
+       che resta è quella con dentro i dati di qualcun altro. */
+    dimenticaSessione();
+    try {
+      sessionStorage.removeItem('athlon:assistente:email');
+    } catch (e) {}
     /* Il pulsante torna nascosto: `puoRichiamo` si riscopre dalla verifica
        dell'email, e fino ad allora non sappiamo se questa persona può
        prenotare. */
@@ -1004,6 +1071,67 @@ export function initChatAssistente(root, options) {
    * risposta lenta e un visitatore paziente sarebbero indistinguibili da una
    * sala vuota.
    */
+  // ── Il sollecito: trenta secondi di silenzio ──────────────────────────────
+  /**
+   * Se dopo una risposta non arriva più niente, l'assistente riprende lui.
+   *
+   * **Una volta sola per conversazione**, e la ragione è la stessa della
+   * regola 6quater del prompt: riprendere il filo una volta è ingaggio,
+   * riprenderlo tre volte è assillo, e chi si sente inseguito chiude. Qui il
+   * limite è più stretto che nel prompt perché lì a rispondere è una persona
+   * che ha scritto qualcosa; qui non ha scritto niente, e insistere nel vuoto
+   * è la definizione di molesto.
+   *
+   * **Solo a chi non è già iscritto.** Un socio che ha avuto la sua risposta e
+   * se ne va ha finito: sollecitarlo è chiedergli di continuare una pratica
+   * che per lui è chiusa. L'ingaggio serve a chi sta decidendo se entrare.
+   *
+   * **Non tocca l'oblio del totem.** Il conto dei tre minuti si arma sugli
+   * eventi della persona e sui punti in cui nasce uno stato, non su quello che
+   * scrive l'assistente: il sollecito a trenta secondi cade dentro quella
+   * finestra e la lascia correre, quindi al minuto tre la conversazione si
+   * cancella lo stesso. Sarebbe il difetto peggiore da introdurre qui — un
+   * pannello che si tiene i dati di uno sconosciuto perché il bot ha parlato
+   * da solo.
+   *
+   * La domanda cambia col ramo perché una domanda generica («posso aiutarti?»)
+   * non riapre niente: quello che riapre è una scelta fra due cose, a cui si
+   * risponde con una parola.
+   */
+  var SOLLECITO = 30 * 1000;
+  var orologioSollecito = null;
+  var sollecitato = false;
+
+  var SOLLECITI = {
+    adulti: 'Ci sei? Dimmi solo una cosa e ti dico io da dove partire: ti alleneresti più la mattina presto o dopo il lavoro?',
+    junior: 'Ci sei? Se mi dici quanti anni ha, ti dico subito qual è il turno giusto per lui.',
+  };
+
+  function fermaSollecito() {
+    if (orologioSollecito) {
+      clearTimeout(orologioSollecito);
+      orologioSollecito = null;
+    }
+  }
+
+  function armaSollecito() {
+    fermaSollecito();
+    if (sollecitato || dati.ramo === 'iscritto' || !SOLLECITI[dati.ramo]) return;
+    orologioSollecito = window.setTimeout(function () {
+      orologioSollecito = null;
+      /* Le tre condizioni al momento dello scatto, non a quello dell'armamento:
+         mezzo minuto è lungo abbastanza perché la persona nel frattempo abbia
+         chiuso il pannello, cominciato a scrivere, o mandato un'altra domanda
+         che è ancora in volo. In tutti e tre i casi il sollecito è fuori posto. */
+      if (!root.classList.contains('open')) return;
+      if (dati.passo !== 'chat' || inCorso) return;
+      if (campoDomanda && (campoDomanda.value || '').trim()) return;
+      sollecitato = true;
+      var testo = SOLLECITI[dati.ramo];
+      bolla('assistente', '<p>' + escape(testo) + '</p>', testo);
+    }, SOLLECITO);
+  }
+
   var INATTIVITA = 3 * 60 * 1000;
   var orologioOblio = null;
 
@@ -1165,6 +1293,8 @@ export function initChatAssistente(root, options) {
     var precedente = domandaPrecedente();
 
     inCorso = true;
+    /* Ha scritto: il sollecito non ha piu' niente da sollecitare. */
+    fermaSollecito();
     campoDomanda.value = '';
     if (btnDomanda) btnDomanda.disabled = true;
     bolla('utente', escape(domanda), domanda);
@@ -1248,6 +1378,10 @@ export function initChatAssistente(root, options) {
          i suoi. Riparte il conto da capo — non da quando la domanda è partita,
          che avrebbe fatto scadere il tempo durante l'attesa. */
       armaOblio();
+      /* E i trenta secondi dopo i quali l'assistente riprende lui, se non
+         arriva niente. Da qui e non da prima: il silenzio si misura dalla
+         risposta, non dalla domanda. */
+      armaSollecito();
     }
   }
 
@@ -1611,6 +1745,9 @@ export function initChatAssistente(root, options) {
   if (campoDomanda) {
     campoDomanda.addEventListener('input', function () {
       if (btnDomanda) btnDomanda.disabled = campoDomanda.value.trim().length < 3;
+      /* Sta scrivendo: interromperlo con un "ci sei?" mentre digita e' il modo
+         peggiore di chiedere se c'e'. */
+      if (campoDomanda.value.trim()) fermaSollecito();
     });
     campoDomanda.addEventListener('keydown', function (e) {
       if (e.key !== 'Enter' || e.shiftKey) return;
