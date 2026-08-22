@@ -1571,6 +1571,11 @@ Dove finisce cosa:
 | `athlon-referral` | `richieste_referral` |
 | `athlon-verifica-iscritto`, `athlon-reset-password` | `eventi_email` |
 
+E le automazioni della posta non partono da un webhook: `INBOX EMAIL DESK -
+SUPABASE` ha un trigger Gmail, `INBOX EMAIL DESK - IMPORTO STORICO` si preme a
+mano, e scrivono entrambe su `email_messaggi` passando dallo stesso
+sotto-workflow. Stanno qui sotto.
+
 E sopra tutte c'è `utenti`, l'anagrafica: ogni riga di queste tabelle porta una
 `utente_id` che un trigger riempie da sola, deduplicando per id PerfectGym e
 per email. Sta più sotto, e non va toccata da n8n.
@@ -1581,6 +1586,158 @@ mandandoli su un nodo `No-Op`: gli inviti persi non esistevano, quindi nessuno
 poteva sapere quanti fossero né perché. Ora hanno una riga con `esito` e
 `motivo_scarto`. Stessa idea per l'email malformata in `eventi_email`: se sono
 tante, il problema è il campo, non chi scrive.
+
+### La casella del desk entra nell'anagrafica, e solo per i mittenti noti
+
+`INBOX EMAIL DESK - SUPABASE` guarda la casella ogni minuto, chiede a `utenti`
+chi è il mittente e scrive su `email_messaggi` **solo se lo trova**. Da lì la
+scheda di una persona nel pannello mostra le sue email accanto ai form e alle
+conversazioni: prima quel canale — quello su cui il desk passa la giornata —
+non compariva da nessuna parte, e la stessa persona risultava «un form e
+nient'altro» mentre in casella c'erano cinque scambi.
+
+Il filtro sul mittente non è un'ottimizzazione, ed è la riga da non togliere:
+una casella è fatta in gran parte di cose che non sono persone — newsletter,
+notifiche, ricevute, posta indesiderata — e archiviarla tutta farebbe
+dell'anagrafica un archivio di posta, conservando dati di terzi raccolti per
+niente. `email_messaggi.utente_id` è `not null` con `on delete cascade`
+proprio per questo: a differenza delle `richieste_*`, che valgono anche senza
+aggancio, un'email senza la sua persona non è niente, e cancellare un contatto
+deve portarsi via la sua corrispondenza.
+
+**Le automazioni sono tre, e il perché è una riga sola scritta in un posto
+solo.** `INBOX EMAIL DESK - SUPABASE` (la posta in arrivo) e `INBOX EMAIL DESK -
+IMPORTO STORICO` (quella già ricevuta) sanno due cose che l'altra non sa —
+quale messaggio, e di chi è — e finiscono entrambe in **`EMAIL DESK - SCRIVI UN
+MESSAGGIO`**, il sotto-workflow che legge l'email intera, compone le colonne e
+scrive. Il mapping di `email_messaggi` sta là dentro e da nessun'altra parte:
+due copie di quel nodo divergerebbero, e la seconda divergenza non la vedrebbe
+nessuno finché una colonna non resta vuota su una sola delle due strade.
+
+Il contratto del sotto-workflow è di due campi, `gmail_id` e `utente_id`, più
+l'anteprima. Il mittente, i destinatari, l'oggetto e le date li ricava dall'email
+stessa: chi lo chiama non li deve ricopiare.
+
+Quattro cose da sapere prima di toccarla.
+
+- **La ricerca della persona *è* il filtro, e non serve nessun `IF`.** Il nodo
+  Supabase che interroga `utenti` non produce righe per un mittente
+  sconosciuto, quindi quell'item smette semplicemente di esistere. Ed è il
+  motivo per cui quel nodo **non** ha `alwaysOutputData`: con quello arriverebbe
+  a valle un item vuoto, cioè un'email da scrivere senza persona.
+- **L'email intera si legge dopo la ricerca, non prima.** Il trigger sta sulla
+  forma semplificata (`simple: true`), e il `simple: false` vive nel
+  sotto-workflow, che gira solo per i mittenti già passati dal filtro. Al
+  contrario si parserebbe l'email grezza di ogni newsletter per buttarla un nodo
+  dopo — che è la causa nota di esaurimento memoria di quel nodo.
+- **`corpo` esce sempre pieno.** Chi scrive da un telefono manda spesso solo
+  HTML, e la parte testuale non c'è: il testo lo ricava l'automazione, così chi
+  legge la tabella ha una colonna da guardare e non due da provare in ordine.
+  `corpo_html` resta accanto per fedeltà, e il pannello non lo chiede.
+- **L'indice unico è sulla coppia `(gmail_id, utente_id)` e non sul solo
+  messaggio**, e la ragione è la posta inviata: un'email che il desk manda a due
+  contatti è una riga nella scheda di ognuno dei due. Con l'unico sul solo
+  `gmail_id` la seconda veniva rifiutata e uno dei due non l'avrebbe vista mai,
+  **in silenzio** — perché il nodo che scrive ha `onError:
+  continueRegularOutput`, che serve a non fare di una consegna ripetuta
+  un'esecuzione rossa. Le chiamate hanno `retryOnFail`: il trigger Gmail non
+  riconsegna, quindi un'esecuzione fallita è un'email perduta per sempre.
+
+Gli allegati non hanno colonne, deliberatamente: il nodo Gmail butta i loro
+metadati a meno che non li scarichi, e una colonna che nessuno riempie è peggio
+di una colonna che manca. Il giorno che servono si accende
+`downloadAttachments` e il file va su Storage, come per l'allegato dell'Help
+Desk — nella riga nome, tipo e peso, non il base64.
+
+Un'email conta come **richiesta** e non come tocco in `utente_attivita`: chi
+scrive alla casella ha chiesto qualcosa davvero, a differenza di chi digita un
+indirizzo in un form e chiude la pagina. La vista `email_thread` raggruppa per
+scambio, che è la forma in cui una casella si legge.
+
+#### L'importo storico si rifà, e va rifatto quando l'anagrafica cresce
+
+`INBOX EMAIL DESK - IMPORTO STORICO` ha un trigger manuale: non parte da sé, si
+preme. Legge gli indirizzi da `utenti` **una volta sola**, li impacchetta in
+ricerche Gmail `from:(a OR b OR …) after:… -in:chats` e passa quello che trova
+al sotto-workflow, a gruppi di cinquanta.
+
+- **Le due direzioni in una ricerca sola.** `(from:(a OR b …) OR (in:sent
+  to:(a OR b …))) after:… -in:chats` prende quello che quelle persone hanno
+  scritto **e** quello che il desk ha scritto a loro: insieme fanno lo scambio,
+  e con la sola posta in arrivo la scheda mostrava le domande e non le risposte.
+  Quale delle due sia lo dice l'etichetta `SENT` del messaggio e non la query
+  che lo ha trovato — l'etichetta resta vera anche se la query cambia.
+- **La controparte cambia con la direzione**: su una ricevuta è il mittente, su
+  una inviata sono i destinatari, e un'inviata a due contatti diventa **due
+  righe**, una per scheda. Il limite noto: i destinatari si leggono da `To`,
+  perché la forma semplificata dell'elenco di Gmail non porta il `Cc` — un
+  contatto solo in copia non viene agganciato, e finisce fra gli scarti del log.
+- **È Gmail a filtrare, non noi**, e questo è il capovolgimento rispetto alla
+  posta in arrivo: là arriva tutto e si scarta, qui si chiede solo la posta
+  delle persone che abbiamo. Elencare la casella intera per buttarne il novanta
+  per cento vorrebbe dire decine di migliaia di chiamate per niente.
+- **Le ricerche stanno sotto i 1500 caratteri**, contati sulla stringa finale.
+  Gmail tronca le query lunghe senza dirlo, quindi il gruppo si chiude quando la
+  query completa sforerebbe. L'elenco degli indirizzi compare due volte nella
+  query — una per direzione — quindi gli indirizzi per ricerca sono la metà:
+  misurato su quattromila indirizzi sono 267 ricerche, la più lunga di 1499
+  caratteri. Contare i soli indirizzi la faceva sforare di una quarantina.
+- **L'aggancio si fa in memoria e non con una query per email**, e non è solo
+  velocità: `from:` in Gmail può pescare anche per nome visualizzato, quindi il
+  confronto esatto con gli indirizzi dell'anagrafica è il controllo vero. Gli
+  scartati si contano e si scrivono nel log — se sono tanti, la ricerca sta
+  pescando più del dovuto.
+- **Le email già prese non si riscaricano.** Prima di chiedere un corpo a Gmail
+  si guarda in `email_gia_prese`, la vista di due colonne fatta per questo: la
+  parte costosa dell'importo è una chiamata per messaggio, e senza quel
+  controllo ogni giro rifarebbe da capo tutto lo scaricato per farlo poi
+  rifiutare dall'indice unico. Il nodo che la legge ha `executeOnce` (la domanda
+  è una, gli indirizzi in ingresso molti) e `alwaysOutputData`, perché al primo
+  giro la tabella è vuota e senza un item in uscita l'importo si fermerebbe lì.
+- **A gruppi di cinquanta**, e il `Loop Over Items` è lì per la memoria: senza,
+  tutte le email trovate verrebbero lette e parsate nella stessa esecuzione, che
+  è il modo di far cadere il nodo Gmail su una casella vera.
+
+**Si può rieseguire quando si vuole**, ed è il modo in cui questo importo
+sostituisce l'idea di archiviare la casella: `email_gia_prese` fa saltare quello
+che c'è già, e l'indice unico sulla coppia è la rete sotto. Il che porta alla cosa da sapere e non ovvia:
+**l'importo prende solo la posta di chi è già in `utenti`**, quindi una casella
+di anni può rendere poche righe se l'anagrafica è piccola — e va rifatto ogni
+volta che l'anagrafica cresce, perché la volta prima quelle persone non
+c'erano. Non è una limitazione da aggirare: è la stessa regola del filtro sul
+mittente, applicata al passato.
+
+**Le caselle del club escono dal giro, e questo lo ha insegnato il primo
+importo.** Su 84 righe, **47 erano sulla scheda di una collega**
+(`valentina@athlonroma.it`, che in `utenti` c'è come tutti gli altri): ventuno
+avvisi automatici sul suo certificato medico, e una serie di «Fwd:
+Candidatura…», cioè i curriculum di altre persone nella scheda CRM di chi
+lavora qui — esattamente ciò che `candidature` tiene fuori dall'anagrafica
+commerciale di proposito. Le 47 righe sono state cancellate, e adesso
+`DOMINI_NOSTRI = ['athlonroma.it']` toglie quegli indirizzi in due punti: dalla
+lista delle ricerche dell'importo, e dal mittente della posta in arrivo — dove
+basta svuotarlo, perché la ricerca su `utenti` non trova niente e l'item si
+ferma da solo. Aggiungendo un dominio del club (una casella nuova, un secondo
+club), va aggiunto in tutti e due.
+
+Le due manopole — da quando importare e quanto lunga può essere una ricerca —
+stanno in cima al Code node `Componi le ricerche`. La finestra è **un anno**, che
+è il ciclo di un abbonamento: più vecchia di così, la corrispondenza di una
+persona serve a un archivio e non al desk, e resta un dato personale in più da
+conservare.
+
+E la domanda che tornerà, con la risposta: **importare tutta la casella e
+mostrare nel pannello solo ciò che combacia è la strada sbagliata.** Il
+vantaggio che sembra dare — «quando una persona entra in anagrafica la sua posta
+è già lì» — lo dà anche rieseguire l'importo, perché la casella *è* già
+l'archivio e Gmail non perde niente. Quello che aggiunge è tutto costo: dati di
+terzi senza scopo nel database del CRM (fatture dei fornitori, curriculum,
+certificati medici di gente che non si è mai iscritta), una chiamata a Gmail per
+ogni messaggio della casella, i corpi HTML delle newsletter come grosso dei
+byte, e una tabella che smette di essere «la corrispondenza delle persone» per
+diventare un archivio di posta con una colonna facoltativa. «Non visibile nel
+pannello» non è una misura di protezione: è un filtro nella vetrina mentre il
+magazzino resta pieno.
 
 ### `eventi_email` è il funnel, le `richieste_*` sono le conversioni
 
