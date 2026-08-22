@@ -964,14 +964,23 @@ export function initContattaciForm(root, options) {
   // quale dei tre eventi, con quale precompilato, e cosa fare quando Calendly
   // conferma.
 
+  /* `richiamami` non ha la domanda personalizzata che serve a portare il
+     messaggio nella conferma — solo `recall` (lo stesso evento della chat)
+     ce l'ha, in posizione 0. Qui la persona scrive sempre un testo libero
+     prima di arrivare al calendario, quindi serve quello e non `richiamami`,
+     che lo perderebbe. */
   function baseCalendario() {
-    if (dati.ramo === 'adulti') return CALENDLY.richiamami;
+    if (dati.ramo === 'adulti') return CALENDLY.recall;
     if (dati.ramo === 'baby') return CALENDLY.baby;
     return CALENDLY.assistenza;
   }
 
   /** Il precompilato: `location` è il campo del telefono negli eventi
-      «chiamata» di Calendly, cioè il numero su cui il club richiama. */
+      «chiamata» di Calendly, cioè il numero su cui il club richiama.
+      `customAnswers.a1` è la domanda personalizzata di `recall`, obbligatoria:
+      vuota blocca la prenotazione, quindi ci va sempre il testo scritto nel
+      passo «di cosa hai bisogno» — vedi `RICHIAMO.campi` in
+      `chatAssistente.client.js` per la stessa mappatura. */
   function precompilato() {
     return {
       /* Nome e cognome separati: un evento Calendly con i due campi distinti
@@ -984,6 +993,7 @@ export function initContattaciForm(root, options) {
       lastName: dati.cognome,
       email: dati.email,
       location: dati.cellulare || '',
+      customAnswers: dati.ramo === 'adulti' ? { a1: dati.richiesta || '(nessun dettaglio)' } : undefined,
     };
   }
 
