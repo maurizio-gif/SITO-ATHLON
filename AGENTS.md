@@ -1603,6 +1603,19 @@ proprio per questo: a differenza delle `richieste_*`, che valgono anche senza
 aggancio, un'email senza la sua persona non è niente, e cancellare un contatto
 deve portarsi via la sua corrispondenza.
 
+**Le automazioni sono tre, e il perché è una riga sola scritta in un posto
+solo.** `INBOX EMAIL DESK - SUPABASE` (la posta in arrivo) e `INBOX EMAIL DESK -
+IMPORTO STORICO` (quella già ricevuta) sanno due cose che l'altra non sa —
+quale messaggio, e di chi è — e finiscono entrambe in **`EMAIL DESK - SCRIVI UN
+MESSAGGIO`**, il sotto-workflow che legge l'email intera, compone le colonne e
+scrive. Il mapping di `email_messaggi` sta là dentro e da nessun'altra parte:
+due copie di quel nodo divergerebbero, e la seconda divergenza non la vedrebbe
+nessuno finché una colonna non resta vuota su una sola delle due strade.
+
+Il contratto del sotto-workflow è di due campi, `gmail_id` e `utente_id`, più
+l'anteprima. Il mittente, i destinatari, l'oggetto e le date li ricava dall'email
+stessa: chi lo chiama non li deve ricopiare.
+
 Quattro cose da sapere prima di toccarla.
 
 - **La ricerca della persona *è* il filtro, e non serve nessun `IF`.** Il nodo
@@ -1611,11 +1624,10 @@ Quattro cose da sapere prima di toccarla.
   motivo per cui quel nodo **non** ha `alwaysOutputData`: con quello arriverebbe
   a valle un item vuoto, cioè un'email da scrivere senza persona.
 - **L'email intera si legge dopo la ricerca, non prima.** Il trigger sta sulla
-  forma semplificata (`simple: true`): il corpo lo va a prendere `Prendi l'email
-  intera` con `simple: false`, e solo per i mittenti che sono già passati dal
-  filtro. Al contrario si parserebbe l'email grezza di ogni newsletter per
-  buttarla un nodo dopo — che è la causa nota di esaurimento memoria di quel
-  nodo.
+  forma semplificata (`simple: true`), e il `simple: false` vive nel
+  sotto-workflow, che gira solo per i mittenti già passati dal filtro. Al
+  contrario si parserebbe l'email grezza di ogni newsletter per buttarla un nodo
+  dopo — che è la causa nota di esaurimento memoria di quel nodo.
 - **`corpo` esce sempre pieno.** Chi scrive da un telefono manda spesso solo
   HTML, e la parte testuale non c'è: il testo lo ricava l'automazione, così chi
   legge la tabella ha una colonna da guardare e non due da provare in ordine.
@@ -1636,6 +1648,46 @@ Un'email conta come **richiesta** e non come tocco in `utente_attivita`: chi
 scrive alla casella ha chiesto qualcosa davvero, a differenza di chi digita un
 indirizzo in un form e chiude la pagina. La vista `email_thread` raggruppa per
 scambio, che è la forma in cui una casella si legge.
+
+#### L'importo storico si rifà, e va rifatto quando l'anagrafica cresce
+
+`INBOX EMAIL DESK - IMPORTO STORICO` ha un trigger manuale: non parte da sé, si
+preme. Legge gli indirizzi da `utenti` **una volta sola**, li impacchetta in
+ricerche Gmail `from:(a OR b OR …) after:… -in:chats` e passa quello che trova
+al sotto-workflow, a gruppi di cinquanta.
+
+- **È Gmail a filtrare, non noi**, e questo è il capovolgimento rispetto alla
+  posta in arrivo: là arriva tutto e si scarta, qui si chiede solo la posta
+  delle persone che abbiamo. Elencare la casella intera per buttarne il novanta
+  per cento vorrebbe dire decine di migliaia di chiamate per niente.
+- **Le ricerche stanno sotto i 1500 caratteri**, contati sulla stringa finale.
+  Gmail tronca le query lunghe senza dirlo, quindi il gruppo si chiude quando la
+  query completa sforerebbe: misurato su quattromila indirizzi sono 133
+  ricerche, la più lunga di 1492 caratteri. Contare i soli indirizzi la faceva
+  sforare di una quarantina.
+- **L'aggancio si fa in memoria e non con una query per email**, e non è solo
+  velocità: `from:` in Gmail può pescare anche per nome visualizzato, quindi il
+  confronto esatto con gli indirizzi dell'anagrafica è il controllo vero. Gli
+  scartati si contano e si scrivono nel log — se sono tanti, la ricerca sta
+  pescando più del dovuto.
+- **A gruppi di cinquanta**, e il `Loop Over Items` è lì per la memoria: senza,
+  tutte le email trovate verrebbero lette e parsate nella stessa esecuzione, che
+  è il modo di far cadere il nodo Gmail su una casella vera.
+
+**Si può rieseguire quando si vuole**, e l'indice unico su `gmail_id` è quello
+che lo rende possibile: le email già importate vengono rifiutate una per una
+senza fermare le altre. Il che porta alla cosa da sapere e non ovvia:
+**l'importo prende solo la posta di chi è già in `utenti`**, quindi una casella
+di anni può rendere poche righe se l'anagrafica è piccola — e va rifatto ogni
+volta che l'anagrafica cresce, perché la volta prima quelle persone non
+c'erano. Non è una limitazione da aggirare: è la stessa regola del filtro sul
+mittente, applicata al passato.
+
+Le due manopole — da quando importare e quanto lunga può essere una ricerca —
+stanno in cima al Code node `Componi le ricerche`. La data di partenza è **due
+anni indietro** e non «tutto»: più vecchia di così, la corrispondenza di una
+persona serve a un archivio e non al desk, e resta un dato personale in più da
+conservare.
 
 ### `eventi_email` è il funnel, le `richieste_*` sono le conversioni
 
