@@ -1170,16 +1170,16 @@ import CampoTelefono from '../CampoTelefono.astro';
      invito, non un allarme: fondo crema, bordo tenue, e il comando pieno solo
      perché è l'unica cosa cliccabile del riquadro. */
   /* ---- Il blocco del richiamo ----
-     **Una fascia che arriva ai bordi del pannello, non una scheda dentro due
-     padding.** Il widget di Calendly perdeva 61 px di larghezza — 16 per lato
-     della conversazione piu' 14 per lato della scheda — e su un telefono quei
-     61 px sono un quinto dello spazio: il calendario ci stava dentro
-     schiacciato. I margini negativi annullano il padding della conversazione e
-     lo spazio interno resta solo dove serve al testo.
+     **Piu' larga di una bolla, e non e' un vezzo: e' il calendario.** Dentro i
+     due padding pieni — 16 px per lato della conversazione piu' 14 della
+     scheda — il widget di Calendly perdeva 61 px, che su un telefono da 375
+     sono un quinto dello spazio, e ci stava schiacciato. Il margine negativo
+     ne restituisce una parte allargando la scheda oltre il padding della
+     conversazione.
 
-     Il fondo bianco invece del crema e i due filetti orizzontali fanno il resto
-     del lavoro che chiedeva «piu' distinto»: si legge come un pannello aperto
-     sopra la chat, non come una bolla piu' grande delle altre. */
+     Il fondo bianco invece del crema fa il resto del lavoro che chiedeva «piu'
+     distinto»: si legge come un pannello aperto sopra la chat, non come una
+     bolla piu' grande delle altre. */
   /* `.ca__azione` sono le schede di iscrizione e Guest Pass: stesso aspetto del
      calendario perche' sono la stessa idea — una cosa da fare dentro la
      conversazione — ma **classe diversa**, e non e' pedanteria. Finche' erano
@@ -1187,14 +1187,25 @@ import CampoTelefono from '../CampoTelefono.astro';
      «esiste gia' un calendario?» e si limitava a scorrerci sopra: dopo una
      qualsiasi azione l'icona telefono smetteva di aprire il calendario, in
      silenzio. L'aspetto si condivide qui, l'identita' no. */
+  /* La larghezza: piu' larga di una bolla, ma **non** a filo del pannello. La
+     fascia da bordo a bordo (`margin: -1rem`, che annullava il padding della
+     conversazione) era nata per il calendario, dove ogni pixel di larghezza e'
+     una colonna di giorni in piu'; applicata anche alle schede di iscrizione e
+     Guest Pass faceva sembrare che il pannello si fosse rotto — un rettangolo
+     bianco incollato ai due lati, senza angoli, in mezzo a bolle stondate.
+     Meta' del padding (`-0.5rem`) lascia 0.5rem di aria per lato: la scheda
+     resta la cosa piu' larga della conversazione, e resta una **scheda**. Da
+     qui seguono le altre due: il bordo gira tutt'intorno invece di essere due
+     filetti orizzontali, e gli angoli si stondano come quelli delle bolle. */
   .ca__conversazione :global(.ca__richiamo),
   .ca__conversazione :global(.ca__azione) {
     align-self: stretch;
-    margin: 0.5rem -1rem;
-    padding: 0.9rem 0.5rem;
+    margin: 0.5rem -0.5rem;
+    padding: 0.9rem 0.85rem;
     background: var(--color-white);
-    border-top: 1px solid rgba(39, 36, 35, 0.12);
-    border-bottom: 1px solid rgba(39, 36, 35, 0.12);
+    border: 1px solid rgba(39, 36, 35, 0.12);
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px rgba(39, 36, 35, 0.05);
   }
 
   /* La testa: il titolo e la chiusura sulla stessa riga, il titolo che prende
