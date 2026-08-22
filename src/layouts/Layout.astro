@@ -298,6 +298,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   // che il form della prova manda a n8n.
   import '../scripts/attribuzione';
   import '../scripts/emailNota';
+  // Il registro di ogni pagina vista. Importato dopo attribuzione: legge
+  // window.athlonGetVid/Sid/Utm, che quel modulo deve aver già definito.
+  import '../scripts/visita';
 </script>
 
 <script>

@@ -80,6 +80,13 @@ export const STORAGE: Voce[] = [
     durata: 'La sessione del browser',
     categoria: 'necessario',
   },
+  {
+    chiave: 'athlon_sid',
+    dove: 'sessionStorage',
+    cosa: "Un identificativo della visita, senza dati personali dentro, che raggruppa le pagine viste nella stessa scheda: dice quante pagine ha avuto una visita, non chi l'ha fatta. Come per athlon_utm, non serve il tuo consenso perché muore con la scheda e non identifica nessuno da solo.",
+    durata: 'La sessione del browser',
+    categoria: 'necessario',
+  },
 ];
 
 export interface Destinatario {
@@ -108,7 +115,7 @@ export const DESTINATARI: Destinatario[] = [
          La stessa confusione era già stata corretta una volta sulla f.a.q.
          del sito (vedi il commento su GUEST_PASS in data/faq.ts) — il nome
          vero, quello che compare sul pulsante e nel modal, è «Prova Athlon». */
-      "Riceve i dati del modulo «Prova Athlon» e dell'assistente: nome, cognome, email, cellulare, l'attività di interesse e, se acconsentito, l'attribuzione della campagna.",
+      "Riceve i dati del modulo «Prova Athlon» e dell'assistente: nome, cognome, email, cellulare, l'attività di interesse e, se acconsentito, l'attribuzione della campagna. Riceve anche, ad ogni pagina caricata, l'identificativo di visita e la pagina stessa: è il conteggio di quante pagine vengono viste, non un modulo compilato.",
   },
   {
     nome: 'Calendly',
