@@ -223,6 +223,8 @@ export function initContattaciForm(root, options) {
     var riga = q('[data-cf-contesto]');
     var area = q('[data-cf-contesto-area]');
     var occhiello = q('[data-cf-occhiello]');
+    var titolo = q('#cf-titolo-corrente');
+    var leadTeam = q('[data-cf-lead-team]');
     var macro = dati.macroDaCta ? MACRO_BY_ID[dati.macroDaCta] : null;
     if (riga) riga.hidden = !macro;
     if (macro) {
@@ -232,8 +234,17 @@ export function initContattaciForm(root, options) {
       var precisa = ATTIVITA_ADULTI.filter(function (a) { return a.id === dati.attivitaOrigine; })[0];
       if (area) area.textContent = precisa ? precisa.label : macro.label;
       if (occhiello) occhiello.textContent = 'Richiesta · ' + macro.label;
-    } else if (occhiello) {
-      occhiello.textContent = 'Richiesta al team';
+      /* Chi arriva da un pulsante junior/baby («trova il corso giusto per tuo
+         figlio») sa già perché sta scrivendo: il titolo lungo e il paragrafo
+         sul Team di Assistenza sono per l'adulto che scrive di sé, dove il
+         motivo non è già dichiarato dal pulsante che ha premuto. */
+      var junior = macro.ramo !== 'adulti';
+      if (titolo) titolo.textContent = junior ? 'Richiesta informazioni.' : 'Contatta il nostro team.';
+      if (leadTeam) leadTeam.hidden = junior;
+    } else {
+      if (occhiello) occhiello.textContent = 'Richiesta al team';
+      if (titolo) titolo.textContent = 'Contatta il nostro team.';
+      if (leadTeam) leadTeam.hidden = false;
     }
   }
 

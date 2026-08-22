@@ -81,7 +81,12 @@ import CampoTelefono from './CampoTelefono.astro';
           promette «o al telefono, come preferisci» sarebbe una promessa che il
           suo percorso non mantiene. Quello che vale per tutti è che risponde
           una persona, e che è online. */}
-      <p class="cf__lead">
+      {/* Nascosto per le attività junior/baby: chi arriva da «trova il corso
+          giusto per tuo figlio» sa già perché sta scrivendo, e il titolo
+          diventa «Richiesta informazioni.» — vedi mostraContesto() in
+          contattaciForm.client.js. Resta per chi contatta da adulto, dove il
+          contesto è meno definito. */}
+      <p class="cf__lead" data-cf-lead-team>
         Apri una richiesta di informazioni o di assistenza: la prende in carico il nostro Team di
         Assistenza, e ti risponde in pochi minuti.
       </p>
