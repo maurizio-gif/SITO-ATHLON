@@ -13,6 +13,7 @@
 import Layout from '../layouts/Layout.astro';
 import { TERMINI, TERMINI_VERSIONE, anchorClausola, totaleClausole } from '../data/termini';
 import { ACTIVITY_LABEL } from '../data/activities';
+import { CLUB } from '../data/club';
 ---
 
 {/* Senza header e footer, come il resto dei documenti del club: la pagina si
@@ -34,7 +35,7 @@ import { ACTIVITY_LABEL } from '../data/activities';
         dall'attività che frequenti.
       </p>
       <p class="tc-hero__meta">
-        Versione {TERMINI_VERSIONE} · Point 2000 Srl Società Sportiva Dilettantistica
+        Versione {TERMINI_VERSIONE} · {CLUB.legale.ragione}
       </p>
     </div>
   </section>
