@@ -1,24 +1,22 @@
 ---
 title: Iscrizione Corsi 2026/27
-description: Prezzi, modalità e procedura di iscrizione per la stagione 2026/2027.
-# È la destinazione del percorso junior della chat: ci si arriva dopo aver
-# lasciato i dati, non da una ricerca su Google.
+description: 'Prezzi, modalità e procedura di iscrizione per la stagione 2026/2027.'
 area:
   - Scuola Nuoto Bambini
   - News
-order: 2
 tags:
   - iscrizione
-  - "2026"
-  - "2027"
+  - '2026'
+  - '2027'
   - mensile
   - prezzi
   - quota attivazione
-draft: false
 attivita:
   - scuola-nuoto-bambini
-  - baby-nuoto
+order: 2
+draft: false
 ---
+
 <div class="ci-hero">
   📅 Stagione <strong>14 Settembre 2026 – 20 Giugno 2027</strong><br>
   🟢 Iscrizioni aperte, con <strong>abbonamento mensile</strong>
@@ -28,42 +26,42 @@ attivita:
 
 > Clicca sulla fascia d'età per visualizzare gli orari disponibili.
 
-* Per i nati **2023** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=5&vacancies=1)
-* Per i nati **2021-22** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=1&vacancies=1)
-* Per i nati **2019-20** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=12&vacancies=1)
-* Per i nati **2016-17-18** (e Pallanuoto Acquagol) → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=13&vacancies=1)
-* Per i nati **2013-14-15** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=14&vacancies=1)
-* **Pallanuoto Under 14** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=14&vacancies=1)
-* **Nuoto Propaganda (2014-2018)** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=25&vacancies=1)
-* **Nuoto Agonistico (2008-2015)** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=22&vacancies=1)
+* Per i nati **2023** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=5\&vacancies=1)
+* Per i nati **2021-22** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=1\&vacancies=1)
+* Per i nati **2019-20** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=12\&vacancies=1)
+* Per i nati **2016-17-18** (e Pallanuoto Acquagol) → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=13\&vacancies=1)
+* Per i nati **2013-14-15** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=14\&vacancies=1)
+* **Pallanuoto Under 14** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=14\&vacancies=1)
+* **Nuoto Propaganda (2014-2018)** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=25\&vacancies=1)
+* **Nuoto Agonistico (2008-2015)** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=22\&vacancies=1)
 
-- - -
+***
 
 ## Prezzi e dettagli economici
 
 <details>
 <summary><strong>Visualizza prezzi, pro-rata e dettagli abbonamento</strong></summary>
 
-| Frequenza | Mensile |
-|:---|:---:|
-| Monosettimanale | **€89/mese** |
-| Bisettimanale | **€109/mese** |
+| Frequenza               |    Mensile    |
+| :---------------------- | :-----------: |
+| Monosettimanale         |  **€89/mese** |
+| Bisettimanale           | **€109/mese** |
 | Agonistico / Pallanuoto | **€119/mese** |
 
 > 💡 L'abbonamento è mensile, con rinnovo automatico il giorno 1 di ogni mese (punto 4.11).
 
 **Pro-rata mesi di apertura e chiusura:** per i mesi di Settembre (inizio 14/09) e Giugno (fine 20/06) viene addebitato l'importo proporzionale ai giorni effettivi di frequenza.
 
-| | Monosettimanale | Bisettimanale | Agonistico/Pallanuoto |
-|:---|:---:|:---:|:---:|
-| **Settembre** (17 gg) | €50 | €62 | €67 |
-| **Giugno** (20 gg) | €59 | €73 | €79 |
+|                       | Monosettimanale | Bisettimanale | Agonistico/Pallanuoto |
+| :-------------------- | :-------------: | :-----------: | :-------------------: |
+| **Settembre** (17 gg) |       €50       |      €62      |          €67          |
+| **Giugno** (20 gg)    |       €59       |      €73      |          €79          |
 
 *Calcolo: quota mensile ÷ 30 × giorni effettivi*
 
 </details>
 
-- - -
+***
 
 ## Come iscriversi
 
@@ -82,14 +80,14 @@ attivita:
 <details>
 <summary><strong>Note su orari e istruttori</strong></summary>
 
-- Gli orari visualizzati sono suddivisi per **età**; successivamente anche per **livello**
-- L'istruttore viene assegnato dopo l'inizio dei corsi
-- I progressi sono visibili in app nella sezione **Brevetti**
-- A fine stagione: **diploma ufficiale** dopo la sessione di brevetto di Giugno
+* Gli orari visualizzati sono suddivisi per **età**; successivamente anche per **livello**
+* L'istruttore viene assegnato dopo l'inizio dei corsi
+* I progressi sono visibili in app nella sezione **Brevetti**
+* A fine stagione: **diploma ufficiale** dopo la sessione di brevetto di Giugno
 
 </details>
 
-- - -
+***
 
 ## Hai bisogno di maggiori informazioni?
 
@@ -98,34 +96,35 @@ Vuoi saperne di più sull'organizzazione dei corsi, i gruppi, gli orari o sempli
 <!-- Calendly inline widget begin -->
 
 <!-- Calendly inline widget begin -->
+
 <div class="calendly-inline-widget" data-url="https://calendly.com/athlonclub/assistenza?hide_event_type_details=1&hide_gdpr_banner=1&primary_color=ff5701" style="min-width:320px;height:700px;"></div>
 <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
 <!-- Calendly inline widget end -->
 
 <!-- Calendly inline widget end -->
 
-- - -
+***
 
 ## Estratto Regolamento – Scuola Nuoto Bambini
 
 <details>
 <summary><strong>4.1 – Certificato Medico</strong></summary>
 
-Prima dell'inizio dell'attività è obbligatorio inviare in allegato via e-mail copia del Certificato Medico di idoneità all'attività sportiva non agonistica a **desk@athlonroma.it**. Sono esentati i soli bambini fino ai 5 anni di età. Nel caso in cui questo non avvenga, verrà tenuto sospeso il Badge personale fino a quando l'Iscritto non invierà il Certificato Medico dovuto.
+Prima dell'inizio dell'attività è obbligatorio inviare in allegato via e-mail copia del Certificato Medico di idoneità all'attività sportiva non agonistica a **[desk@athlonroma.it](mailto:desk@athlonroma.it)**. Sono esentati i soli bambini fino ai 5 anni di età. Nel caso in cui questo non avvenga, verrà tenuto sospeso il Badge personale fino a quando l'Iscritto non invierà il Certificato Medico dovuto.
 
 </details>
 
 <details>
 <summary><strong>4.2 – Tesseramento</strong></summary>
 
-La nostra Società Sportiva Dilettantistica è affiliata ad ASI (Associazioni Sportive e Sociali Italiane). Per accedere ai nostri Corsi Sportivi in qualità di utente è obbligatorio essere in possesso del Tesserino ASI come Atleta. Al momento dell'iscrizione verificheremo il possesso sul database ASI; se assente, provvederemo automaticamente all'emissione di un nuovo tesseramento ASI (Tipologia B), comprensivo di copertura assicurativa per infortuni personali. Per una tipologia diversa scrivere a **desk@athlonroma.it** prima dell'attivazione.
+La nostra Società Sportiva Dilettantistica è affiliata ad ASI (Associazioni Sportive e Sociali Italiane). Per accedere ai nostri Corsi Sportivi in qualità di utente è obbligatorio essere in possesso del Tesserino ASI come Atleta. Al momento dell'iscrizione verificheremo il possesso sul database ASI; se assente, provvederemo automaticamente all'emissione di un nuovo tesseramento ASI (Tipologia B), comprensivo di copertura assicurativa per infortuni personali. Per una tipologia diversa scrivere a **[desk@athlonroma.it](mailto:desk@athlonroma.it)** prima dell'attivazione.
 
 </details>
 
 <details>
 <summary><strong>4.3 – Riprese Fotografiche</strong></summary>
 
-Durante l'anno potranno essere effettuate riprese fotografiche o video. La comunicazione ufficiale verrà pubblicata con almeno **10 giorni di preavviso** su www.athlonroma.it. Point 2000 non è titolare del trattamento dei dati fotografici, gestiti in autonomia dallo studio fotografico incaricato (titolare ai sensi del GDPR). I file saranno conservati per massimo **90 giorni**. L'utente può esercitare i diritti di accesso, opposizione o cancellazione direttamente presso lo studio fotografico. La partecipazione agli eventi comporta consenso tacito, salvo opposizione scritta preventiva.
+Durante l'anno potranno essere effettuate riprese fotografiche o video. La comunicazione ufficiale verrà pubblicata con almeno **10 giorni di preavviso** su [www.athlonroma.it](http://www.athlonroma.it). Point 2000 non è titolare del trattamento dei dati fotografici, gestiti in autonomia dallo studio fotografico incaricato (titolare ai sensi del GDPR). I file saranno conservati per massimo **90 giorni**. L'utente può esercitare i diritti di accesso, opposizione o cancellazione direttamente presso lo studio fotografico. La partecipazione agli eventi comporta consenso tacito, salvo opposizione scritta preventiva.
 
 </details>
 
@@ -174,7 +173,7 @@ Durante la stagione sarà possibile partecipare a Gare di Nuoto del circuito ASI
 <details>
 <summary><strong>4.10 – Inabilità Temporanea alla Pratica Sportiva</strong></summary>
 
-In caso di malattia o infortunio con inidoneità documentata per almeno **60 giorni continuativi**, è possibile richiedere la sospensione inviando certificato medico (struttura pubblica o privata) a **desk@athlonroma.it**. La sospensione decorre dalla data di ricezione della documentazione.
+In caso di malattia o infortunio con inidoneità documentata per almeno **60 giorni continuativi**, è possibile richiedere la sospensione inviando certificato medico (struttura pubblica o privata) a **[desk@athlonroma.it](mailto:desk@athlonroma.it)**. La sospensione decorre dalla data di ricezione della documentazione.
 
 La sospensione è **alternativa** al recupero lezioni (punto 4.7): non è possibile cumulare i due meccanismi. Durante la sospensione il pagamento mensile rimane dovuto. Il recupero avverrà tramite un credito pari ad almeno **2 mensilità** pagate, utilizzabile entro **6 mesi** dalla fine del corso. Il credito non è trasferibile.
 
@@ -183,19 +182,19 @@ La sospensione è **alternativa** al recupero lezioni (punto 4.7): non è possib
 <details>
 <summary><strong>4.11 – Modalità di Adesione Mensile con Rinnovo Automatico</strong></summary>
 
-Piano mensile con rinnovo ogni **giorno 1 del mese**. Per disdire inviare email a **disdetta@athlonroma.it** entro 10 giorni dal successivo ciclo (= 240 ore prima della mezzanotte del giorno 1).
+Piano mensile con rinnovo ogni **giorno 1 del mese**. Per disdire inviare email a **[disdetta@athlonroma.it](mailto:disdetta@athlonroma.it)** entro 10 giorni dal successivo ciclo (= 240 ore prima della mezzanotte del giorno 1).
 
-| Durata del mese | Disdetta entro |
-|:---|:---:|
-| 31 giorni | mezzanotte del **21** |
-| 30 giorni | mezzanotte del **20** |
-| 28 giorni | mezzanotte del **18** |
+| Durata del mese |     Disdetta entro    |
+| :-------------- | :-------------------: |
+| 31 giorni       | mezzanotte del **21** |
+| 30 giorni       | mezzanotte del **20** |
+| 28 giorni       | mezzanotte del **18** |
 
 In caso di disdetta e successiva iscrizione si sarà tenuti al pagamento di una nuova quota di attivazione.
 
 </details>
 
-- - -
+***
 
 ## Estratto Regolamento – Settore Agonistico / Preagonistico / Pallanuoto
 
@@ -244,20 +243,20 @@ Orari e sede degli allenamenti sono stabiliti nel foglio del programma agonistic
 <details>
 <summary><strong>6.7 – Inabilità Temporanea alla Pratica Sportiva</strong></summary>
 
-Stessa procedura del punto 4.10: inidoneità documentata per almeno **60 giorni**, certificato medico a **desk@athlonroma.it**. Durante la sospensione il pagamento mensile rimane dovuto. Credito pari ad almeno **2 mensilità**, utilizzabile entro **6 mesi** dalla fine del corso. Non trasferibile.
+Stessa procedura del punto 4.10: inidoneità documentata per almeno **60 giorni**, certificato medico a **[desk@athlonroma.it](mailto:desk@athlonroma.it)**. Durante la sospensione il pagamento mensile rimane dovuto. Credito pari ad almeno **2 mensilità**, utilizzabile entro **6 mesi** dalla fine del corso. Non trasferibile.
 
 </details>
 
 <details>
 <summary><strong>6.8 – Modalità di Adesione Mensile con Rinnovo Automatico</strong></summary>
 
-Stesse modalità del punto 4.11. Disdetta a **disdetta@athlonroma.it** entro 10 giorni dal ciclo successivo.
+Stesse modalità del punto 4.11. Disdetta a **[disdetta@athlonroma.it](mailto:disdetta@athlonroma.it)** entro 10 giorni dal ciclo successivo.
 
-| Durata del mese | Disdetta entro |
-|:---|:---:|
-| 31 giorni | mezzanotte del **21** |
-| 30 giorni | mezzanotte del **20** |
-| 28 giorni | mezzanotte del **18** |
+| Durata del mese |     Disdetta entro    |
+| :-------------- | :-------------------: |
+| 31 giorni       | mezzanotte del **21** |
+| 30 giorni       | mezzanotte del **20** |
+| 28 giorni       | mezzanotte del **18** |
 
 </details>
 
