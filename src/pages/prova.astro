@@ -364,11 +364,17 @@ const faqs = await faqPagina([
   .pv-hero__title {
     max-width: 34ch;
     font-size: var(--text-4xl);
-    letter-spacing: var(--tracking-2xl);
-    /* `--lh` e non `line-height`: la headroom della faccia display si calcola
-       da questa variabile, e scriverla a mano rimetterebbe le accentate sotto
-       la lama. */
-    --lh: 0.95;
+    /* **Più larga della crenatura di default** (−0.02em degli h1): a cinquanta
+       pixel di corpo quella chiude le lettere una sull'altra, e in un titolo di
+       otto parole tutte maiuscole diventa un blocco. −0.005em lascia aria e
+       resta negativa, che è quello che la faccia display vuole in grande.
+
+       `--lh` e non `line-height`: la headroom si calcola da questa variabile —
+       scrivere `line-height` lascerebbe il padding al valore di prima e
+       rimetterebbe le accentate sotto la lama. Da 0.95 a 1.06 il padding scende
+       da 6,4 a 3,6 px da solo, che è esattamente il meccanismo. */
+    letter-spacing: -0.005em;
+    --lh: 1.06;
     margin: 0.5rem 0 0;
   }
 

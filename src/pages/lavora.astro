@@ -425,7 +425,13 @@ const CI_SONO_POSIZIONI = POSIZIONI.length > 0;
 
   .lv-hero__titolo {
     font-size: var(--text-3xl);
-    --lh: 0.95;
+    /* Stessa apertura del titolo di `/prova`, e per la stessa ragione: a questi
+       corpi la crenatura di default degli h1 (−0.02em) chiude le lettere una
+       sull'altra, e `--lh: 0.95` incollava le due righe di «Unisciti al / team
+       Athlon». Su `--lh` e non su `line-height`, o la headroom della faccia
+       display resta quella di prima e le accentate si tagliano. */
+    letter-spacing: -0.005em;
+    --lh: 1.06;
     margin: 0.5rem 0 1rem;
   }
 

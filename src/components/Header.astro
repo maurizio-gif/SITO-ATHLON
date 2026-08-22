@@ -2,11 +2,16 @@
 import { trialCta, talkCta, joinCta } from '../data/cta';
 
 /* La prova è un prodotto solo e vale per tutto il club, quindi qui non porta
-   nessuna attività: la pagina di provenienza è l'header, su qualunque pagina. */
+   nessuna attività: la pagina di provenienza è l'header, su qualunque pagina.
+   Nella barra è la contornata — il posto che era di Contattaci — e nel menu del
+   telefono è il primo dei tre pulsanti in fondo. */
 const prova = trialCta({ source: 'header' });
 
-/* Contattaci sta in fondo alla barra e, su mobile, come pastiglia al centro:
-   da qualunque pagina si arriva a chiedere qualcosa a una persona. */
+/* Contattaci è **uscito dalla barra e sta nel menu del telefono**: nella riga
+   desktop il posto contornato l'ha preso la prova, e nella barra del telefono
+   due comandi per «farsi rispondere» obbligavano uno dei due a essere un'icona
+   muta — è rimasta la sola chat, che è quella che risponde adesso. Nel menu
+   invece c'è, e là è la sua unica casa su quello schermo. */
 const contatta = talkCta({ source: 'header' });
 
 /* Iscriviti gli sta accanto: chi ha già deciso non deve cercare la pagina degli
@@ -205,10 +210,22 @@ const accountBlocks = [
         </a>
       ))}
 
-      {/* Le due azioni in fondo alla riga: contornata quella che chiede, piena
-          quella che compra. Contattaci ha lo stesso contorno arancio della
-          pastiglia mobile, così è la stessa cosa su tutti gli schermi. */}
-      <a href={contatta.href} class="nav-cta nav-cta--ghost" {...contatta.attrs}>{contatta.label}</a>
+      {/* Le due azioni in fondo alla riga: contornata quella che prova, piena
+          quella che compra.
+
+          La contornata era **Contattaci**, ed è diventata **Prova Athlon** da
+          quando la prova ha una pagina sua (`/prova`). Le due non sono
+          equivalenti: «contattaci» chiede a qualcuno di richiamarti, la prova è
+          la cosa che il club vende a chi non lo conosce ancora — sette giorni a
+          diciannove euro — ed è la conversione da cui passa tutto il resto.
+          Nella barra sta la scala delle intenzioni, e provare viene prima di
+          farsi contattare.
+
+          **Contattaci non se n'è andato**: resta la pastiglia nella barra del
+          telefono, il footer di ogni pagina, l'Help Desk, e ogni comando
+          `data-cta="talk"` sparso nel sito. Quello che ha perso è il posto
+          nella riga desktop, dove i posti sono tre. */}
+      <a href={prova.href} class="nav-cta nav-cta--ghost" {...prova.attrs}>{prova.label}</a>
       <a href={iscriviti.href} class="nav-cta" {...iscriviti.attrs}>{iscriviti.label}</a>
 
       {/* Terza azione, dopo il chiedere e il comprare: la chat.
@@ -241,15 +258,17 @@ const accountBlocks = [
       </button>
     </nav>
 
-    {/* Solo su mobile: la barra non ha spazio per la riga di navigazione, e
-        chiedere qualcosa non deve richiedere di aprire il menu. */}
-    <a href={contatta.href} class="header-contact-mobile" {...contatta.attrs}>{contatta.label}</a>
+    {/* Il solo comando di contatto nella barra del telefono, e col testo.
+        Contattaci stava qui accanto, prima come pastiglia e poi come icona: è
+        uscito perché due comandi per «farsi rispondere» in una barra da 375 px
+        obbligavano uno dei due a essere un'icona muta, e un'icona muta la trova
+        chi la cerca. Meglio uno che si legge.
 
-    {/* Accanto a Contattaci, e non al suo posto: sono le due strade per farsi
-        rispondere, e in questa barra convivono. Solo l'icona, perche' lo spazio
-        e' contato — misurato a 360 px ne restano 88, e la pastiglia di
-        Contattaci ne prende 119: due testi non ci stanno. Piena invece che
-        contornata, cosi' fra le due si vede quale risponde subito. */}
+        Resta la chat, e non è un ripiego: è quella che risponde adesso, e
+        quando non basta ha «Contatta il team» dentro la conversazione, che
+        porta il trascritto al desk. Contattaci resta nel footer di ogni pagina
+        e nei comandi dentro le pagine; **non è nel menu del telefono**, dove ci
+        sono Prova Athlon e Iscriviti. */}
     <button
       type="button"
       class="header-chat-mobile"
@@ -259,13 +278,17 @@ const accountBlocks = [
       aria-label="Chatta con noi: apri l’assistente del club"
       title="Chatta con noi"
     >
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+      {/* 18 e non 20: accanto a un testo da 12 px l'icona da 20 era il pezzo
+          piu' grande della pastiglia, e sono anche i due pixel che a 360 px
+          fanno la differenza fra quattro pixel di respiro a destra e otto. */}
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M20.5 11.6a8 8 0 0 1-8 8H8.3L4 22.4v-4.3a8 8 0 0 1 8.5-14 8 8 0 0 1 8 7.5Z" />
         <circle cx="9" cy="11.5" r="1.1" fill="currentColor" stroke="none" />
         <circle cx="12.5" cy="11.5" r="1.1" fill="currentColor" stroke="none" />
         <circle cx="16" cy="11.5" r="1.1" fill="currentColor" stroke="none" />
       </svg>
+      <span class="header-chat-mobile__testo">Chatta con noi</span>
     </button>
 
     <div class="header-actions">
@@ -388,6 +411,30 @@ const accountBlocks = [
       <a class="btn btn-outline-dark mobile-cta" href={iscriviti.href} {...iscriviti.attrs}>
         {iscriviti.label}
       </a>
+
+      {/* Contattaci torna qui, e questa è la sua unica casa sul telefono: dalla
+          barra è uscito — là due comandi per «farsi rispondere» obbligavano uno
+          dei due a essere un'icona muta — e nel menu non c'era mai stato. Senza
+          questa riga, sul telefono si arrivava a chiedere qualcosa a una
+          persona solo scorrendo fino al footer.
+
+          Stesso peso di Iscriviti e non meno: sono due intenzioni diverse allo
+          stesso livello — chi ha deciso e chi vuole parlarne — e la scala la
+          fa il pieno di Prova Athlon sopra. */}
+      <a class="btn btn-outline-dark mobile-cta" href={contatta.href} {...contatta.attrs}>
+        {contatta.label}
+      </a>
+
+      {/* In fondo e in corpo piccolo, come su `/link`: chi cerca lavoro lo cerca
+          sapendo già di volerlo, e un pulsante pieno lo metterebbe in
+          concorrenza con la prova, che è la cosa che questo menu deve ottenere.
+
+          **Senza condizione su `POSIZIONI`**, a differenza di `/link`: là la
+          voce compare solo con un annuncio aperto, perché da una bio non si
+          manda nessuno su un elenco vuoto. Qui è una voce di menu di un sito, e
+          la pagina regge l'elenco vuoto per intero — la candidatura spontanea
+          resta, ed è quella che al club serve tutto l'anno. */}
+      <a class="mobile-lavora" href="/lavora">Lavora con noi</a>
     </div>
   </div>
 
@@ -701,8 +748,7 @@ const accountBlocks = [
     transform: scale(0.92);
   }
 
-  /* Mobile-only pill in the bar — desktop keeps the CTA inside the nav. */
-  .header-contact-mobile,
+  /* Mobile-only in the bar — desktop keeps the CTA inside the nav. */
   .header-chat-mobile {
     display: none;
   }
@@ -1514,65 +1560,41 @@ const accountBlocks = [
       height: auto;
     }
 
-    /* Sta sopra l'overlay come il logo e l'hamburger: col menu aperto resta
-       toccabile, perché è da lì che si chiede qualcosa. */
-    .header-contact-mobile {
-      position: relative;
-      z-index: 2;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      /* Auto solo a sinistra: la coppia con la chat resta centrata nella barra
-         come prima ci stava la sola pastiglia. */
-      margin: 0 0 0 auto;
-      /* Il formato della pastiglia desktop, non uno suo: `.nav-cta--ghost` è
-         9px di pieno verticale e un raggio pieno, e la stessa cosa su due
-         schermi deve avere la stessa forma. Prima erano 2,75rem di altezza
-         minima — 44px, la soglia del pollice — e nella barra sembravano un
-         blocco: 2,25rem sono 36px, gli stessi della desktop.
 
-         La soglia dei 44px la si perde per davvero, e vale la pena dirlo: in
-         una barra alta 56 una pastiglia da 44 non lascia respiro sopra e sotto,
-         ed è quello che la faceva sembrare alta. Il bersaglio resta largo — il
-         testo è «Contattaci», non un'icona — e la barra non ha niente di
-         cliccabile appena sopra o sotto, quindi un tocco un po' fuori centro
-         non colpisce altro. */
-      min-height: 2.25rem;
-      padding: 0.5rem 1.1rem;
-      /* Arancione del marchio, per scelta: dodici pixel di testo sul bianco
-         danno 3,17:1 contro il 4,5:1 che servirebbe, e resta così. Non
-         sostituirlo con `--accent-text` senza chiedere. */
-      border: 1px solid var(--color-primary);
-      border-radius: 100px;
-      background: var(--color-white);
-      color: var(--color-primary);
-      font-size: 0.8125rem;
-      font-weight: 500;
-      /* In em: la spaziatura segue il corpo, così a scala doppia non resta la
-         crenatura di un testo da 12px. */
-      letter-spacing: 0.104em;
-      line-height: 1;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    /* Il gemello della pastiglia: tonda, piena, senza testo. `auto` a destra
-       per chiudere il centraggio della coppia. Sopra l'overlay del menu come
-       tutto quello che sta nella barra, perche' col menu aperto una domanda si
-       fa comunque. */
+    /* La pastiglia piena, con l'icona e il testo. `auto` a destra per chiudere
+       il centraggio della coppia. Sopra l'overlay del menu come tutto quello
+       che sta nella barra, perche' col menu aperto una domanda si fa comunque.
+       La forma è quella che era di Contattaci: le due si sono scambiate. */
     .header-chat-mobile {
       position: relative;
       z-index: 2;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 0 0;
-      width: 2.75rem;
-      height: 2.75rem;
+      gap: 0.35rem;
+      /* **Centrata sulla barra, non nello spazio che le resta.** Con i margini
+         automatici finiva sedici pixel a sinistra del centro, e prima
+         trentasei: il logo occupa 52 px a sinistra e i comandi 77 a destra,
+         quindi il vuoto in mezzo non è centrato nello schermo e centrarsi
+         dentro di lui non basta.
+
+         `left: 0; right: 0` con `margin-inline: auto` e non
+         `left: 50%; transform: translateX(-50%)`: il `transform` qui è già
+         occupato dallo schiacciamento alla pressione, e due trasformazioni
+         sullo stesso elemento si mangiano a vicenda — la pastiglia
+         schiacciandosi tornerebbe a sinistra. */
+      position: absolute;
+      left: 0;
+      right: 0;
+      width: fit-content;
+      margin-inline: auto;
+      min-height: 2.25rem;
       flex-shrink: 0;
-      padding: 0;
+      /* Meno pieno a sinistra che a destra: l'icona ha già il suo margine
+         ottico, e i due lati uguali facevano la pastiglia sbilanciata. */
+      padding: 0.4rem 0.7rem 0.4rem 0.55rem;
       border: none;
-      border-radius: 50%;
+      border-radius: 100px;
       background: var(--color-primary);
       color: var(--color-white);
       cursor: pointer;
@@ -1581,6 +1603,26 @@ const accountBlocks = [
 
     .header-chat-mobile:active {
       transform: scale(0.94);
+    }
+
+    /* Il testo della pastiglia, **in stampatello** come gli altri comandi della
+       barra. La crenatura è però piu' stretta della loro (0,02em contro
+       0,104em), e anche il pieno e lo spazio interno sono limati: sono tutte
+       misure, non gusto. Con la spaziatura piena «CHATTA CON NOI» porta la
+       pastiglia a 159 px, e a 360 px di schermo i pixel liberi a destra
+       diventano zero — la pastiglia tocca i comandi dell'account. Cosi' ne
+       restano nove, e lo stampatello si legge uguale. */
+    .header-chat-mobile__testo {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      line-height: 1;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .header-chat-mobile svg {
+      flex-shrink: 0;
     }
 
     /* I tre punti pulsano di continuo, come nella pastiglia in basso a destra:
@@ -1616,10 +1658,14 @@ const accountBlocks = [
       }
     }
 
-    /* Sotto i 360 px non ci sta: la barra ne lascia liberi 48 e questo ne
-       chiede 44 piu' il divario. Chi ha uno schermo cosi' la chat la trova
-       comunque nel pulsante fisso in basso a destra, che non dipende dalla
-       barra. */
+    /* Sotto i 360 px non ci sta: la pastiglia col testo ne chiede 143 piu' il
+       divario, e a quella misura la barra non li ha.
+
+       **Si nasconde questa e non l'icona di Contattaci**, anche se togliere la
+       piu' grande sembra sbrigativo: la chat ha un ripiego suo, il pulsante
+       fisso in basso a destra, che non dipende dalla barra; Contattaci no,
+       fuori dal menu non avrebbe nessun altro posto. Togliere i 44 px
+       dell'icona non basterebbe comunque. */
     @media (max-width: 359px) {
       .header-chat-mobile {
         display: none;
@@ -1952,6 +1998,28 @@ const accountBlocks = [
     .mobile-cta {
       justify-content: center;
       padding: 0.9375rem 1.25rem;
+    }
+
+    /* Corpo piccolo e nessuna pastiglia: è l'uscita rara, non l'azione del
+       menu. Ma resta un bersaglio da dito — `min-height` in `rem`, così la
+       misura tiene anche dove la radice cresce — e `inline-flex` per riservare
+       lo spazio verticale che un elemento in linea non riserva: in linea, il
+       `padding` sborderebbe sul pulsante sopra e gliene ruberebbe i tocchi sul
+       bordo, che è la trappola già vista sul reset della password. */
+    .mobile-lavora {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 3rem;
+      margin-top: 0.25rem;
+      color: var(--text-muted);
+      font-size: var(--text-sm);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .mobile-lavora:hover {
+      color: var(--color-primary);
     }
   }
 
