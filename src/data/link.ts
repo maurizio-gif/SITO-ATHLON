@@ -45,6 +45,9 @@ import { getCollection } from 'astro:content';
 import { CLUB } from './club';
 import { GUEST_PASS } from './abbonamenti';
 import { POSIZIONI } from './lavora';
+import { PAGINE_ADULTI } from './pagine';
+import { CORSI } from './corsi';
+import { JUNIOR } from './junior';
 import { TALK, TRIAL } from './cta';
 
 export interface VoceLink {
@@ -160,25 +163,81 @@ export async function comandiLink(): Promise<VoceLink[]> {
   ];
 }
 
+/** Una voce di testo: nessun `nota`, nessun `cta` — solo un nome e un indirizzo. */
+export interface VoceSemplice {
+  id: string;
+  label: string;
+  href: string;
+}
+
 /**
- * Le voci secondarie: testo e non pulsanti.
+ * Le due liste di attività, per chi scorre la bio già sapendo cosa cerca —
+ * «fate acqua fitness?», «a che ora è il pilates?» — e vuole la pagina di
+ * quel corso, non un pulsante generico.
  *
- * Non sono comandi di serie B per pigrizia — sono le pagine che qualcuno cerca
- * *sapendo già* di volerle. Chi vuole invitare un amico è socio e sa cos'è;
- * chi cerca lavoro cerca lavoro. Un pulsante pieno per ognuna le metterebbe in
- * concorrenza con la prova, che è la cosa che questa pagina deve ottenere.
+ * **La fonte è quella che usa già il resto del sito**, non una copia scritta
+ * qui: `PAGINE_ADULTI` e `JUNIOR` sono gli stessi elenchi che popolano i
+ * rimandi fra pagine e il menu dell'header. Aggiungere un corso in
+ * `corsi.ts` o `junior.ts` lo fa comparire anche qui, senza toccare questo
+ * file — è la stessa ragione per cui `ACTIVITY_TAGS` alimenta tre posti in
+ * una volta (vedi AGENTS.md).
  *
- * «Lavora con noi» segue le posizioni aperte: `POSIZIONI` vuoto è uno stato
- * legittimo — la pagina lo dice per intero e la candidatura spontanea resta —
- * ma dalla bio non si manda nessuno su un elenco vuoto.
+ * **I quindici corsi fitness sono una voce sola**, «Corsi Fitness», e non
+ * quindici: da una bio non si sceglie fra Antigravity e Booty Workout, si
+ * decide se l'attività di gruppo interessa, e `/corsi-fitness` è la pagina
+ * che aiuta a scegliere quale. Gli altri corsi per adulti — le tre attività
+ * in acqua, la ginnastica in gravidanza, Gym Floor, Group Reformer — restano
+ * voci proprie: sono l'attività, non una famiglia di corsi con un orario
+ * proprio ciascuno.
+ *
+ * **Quali sono i quindici lo dice `eyebrow`, non un elenco scritto qui.**
+ * `[corso].astro` mostra `corso.eyebrow ?? 'Corso Fitness'`: chi non ha un
+ * `eyebrow` proprio in `corsi.ts` — le quindici classi — prende quel
+ * ripiego, mentre le tre attività in acqua e la ginnastica in gravidanza ne
+ * dichiarano uno loro («Athlon Aqua», «Nuoto», «Scuola Nuoto Athlon»). È lo
+ * stesso segnale che il sito già usa per etichettare la pagina, quindi un
+ * corso fitness nuovo senza `eyebrow` finisce sotto la voce unica da solo,
+ * e uno che ne dichiara uno proprio ne esce — nessun elenco di slug da
+ * tenere in pari qui.
+ *
+ * Il resto è in ordine alfabetico italiano, come fa `Header.astro` con i
+ * corsi fitness: sono sette voci contando quella unica, e un ordine
+ * riconoscibile le rende da scorrere invece che da leggere. I corsi junior
+ * sono quattro e restano nell'ordine in cui li scrive `junior.ts` — la
+ * progressione per età, che per soli quattro nomi si legge più naturale di
+ * un ordine alfabetico.
  */
-export function secondarieLink(): { label: string; href: string; id: string }[] {
-  return [
-    { id: 'abbonamenti', label: 'Abbonamenti e prezzi', href: '/abbonamenti' },
-    { id: 'tv', label: 'Athlon TV', href: '/athlon-tv' },
-    { id: 'referral', label: 'Invita un amico', href: '/referral' },
-    ...(POSIZIONI.length
-      ? [{ id: 'lavora', label: 'Lavora con noi', href: '/lavora' }]
-      : []),
-  ];
+export function attivitaLink(): { adulti: VoceSemplice[]; junior: VoceSemplice[] } {
+  const fitnessSlugs = new Set(CORSI.filter((c) => !c.eyebrow).map((c) => c.slug));
+
+  const adulti = [
+    { id: 'corsi-fitness', label: 'Corsi Fitness', href: '/corsi-fitness' },
+    ...PAGINE_ADULTI.filter((c) => !fitnessSlugs.has(c.slug)).map((c) => ({
+      id: c.slug,
+      label: c.nome,
+      href: `/${c.slug}`,
+    })),
+  ].sort((a, b) => a.label.localeCompare(b.label, 'it'));
+
+  return {
+    adulti,
+    junior: JUNIOR.map((c) => ({ id: c.slug, label: c.nome, href: `/${c.slug}` })),
+  };
+}
+
+/**
+ * Le voci secondarie: testo e non un pulsante.
+ *
+ * Ne resta una sola, «Lavora con noi», e segue le posizioni aperte:
+ * `POSIZIONI` vuoto è uno stato legittimo — la pagina lo dice per intero e la
+ * candidatura spontanea resta — ma dalla bio non si manda nessuno su un
+ * elenco vuoto.
+ *
+ * Abbonamenti, Athlon TV e il referral sono usciti da questa pagina: erano
+ * link di serie B che non parlavano a chi arriva da un video su Instagram.
+ * Chi vuole abbonarsi lo trova dal Guest Pass o dalla promo; chi è già socio
+ * conosce già `/referral`.
+ */
+export function secondarieLink(): VoceSemplice[] {
+  return POSIZIONI.length ? [{ id: 'lavora', label: 'Lavora con noi', href: '/lavora' }] : [];
 }
