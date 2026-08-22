@@ -64,7 +64,6 @@ const fasce = bands.map((b) => ({
 }));
 
 const contatta = talkCta({ source: '/promo' });
-const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 ---
 
 <Layout
@@ -119,28 +118,6 @@ const PG = 'https://athlon.perfectgym.com/ClientPortal2';
         Lo sconto è già applicato: scegli la formula e prosegui sul portale. La quota di attivazione,
         normalmente €{promo.quotaBarrata} una tantum, in promozione non si paga.
       </p>
-
-      {/* Le due vie, prima delle schede e non dopo: sono la domanda che uno si
-          fa guardandole — «devo registrarmi prima?». La risposta è no, e vale
-          la pena dirla dove la domanda nasce. Chi un account ce l'ha già entra
-          da qui e trova la sua procedura più sotto: i cinque passi sono dentro
-          il portale, quindi sono roba sua e non di chi si iscrive adesso. */}
-      <div class="vie">
-        <article class="via via--nuovo" data-anim="fade">
-          <span class="via__kicker">{promo.senzaAccountTitolo}</span>
-          <p class="via__testo">{promo.senzaAccountTesto}</p>
-          <a href="#formule" class="via__cta">Scegli il piano ↓</a>
-        </article>
-
-        <article class="via" data-anim="fade" data-anim-delay="80">
-          <span class="via__kicker">{promo.conAccountTitolo}</span>
-          <p class="via__testo">{promo.conAccountTesto}</p>
-          <div class="via__azioni">
-            <a href={`${PG}/#/Login`} class="via__cta" data-cta="member">Accedi al portale →</a>
-            <a href={`${PG}/#/ForgotPassword`} class="via__reset">Reimposta la password</a>
-          </div>
-        </article>
-      </div>
 
       <div class="piani" id="formule">
         {piani.map((p, i) => (
@@ -534,88 +511,6 @@ const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 
   .pr-sec--dark .pr-sec__sub {
     color: rgba(255, 255, 255, 0.62);
-  }
-
-  /* ---- Le due vie ---- */
-  .vie {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(21rem, 100%), 1fr));
-    gap: 14px;
-    margin-bottom: 26px;
-  }
-
-  .via {
-    display: flex;
-    flex-direction: column;
-    padding: 20px 22px 22px;
-    border-radius: 18px;
-    border: 1px solid var(--border);
-    background: var(--color-cream);
-  }
-
-  /* Quella di chi si iscrive adesso porta il segno del marchio: è la via che
-     la pagina sta chiedendo di prendere. L'altra è un servizio per chi c'è già,
-     e non deve competere. */
-  .via--nuovo {
-    border-color: rgba(255, 87, 1, 0.4);
-    background: rgba(255, 87, 1, 0.06);
-  }
-
-  .via__kicker {
-    font-size: var(--text-2xs);
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--accent-text);
-  }
-
-  .via__testo {
-    margin: 10px 0 16px;
-    font-size: var(--text-sm);
-    color: var(--text-muted);
-  }
-
-  .via__azioni {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px 18px;
-    margin-top: auto;
-  }
-
-  .via__cta {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
-    margin-top: auto;
-    font-size: var(--text-sm);
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--accent-text);
-  }
-
-  .via__azioni .via__cta {
-    margin-top: 0;
-  }
-
-  .via__cta:hover {
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
-
-  .via__reset {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
-    font-size: var(--text-sm);
-    color: var(--text-muted);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  .via__reset:hover {
-    color: var(--color-dark);
   }
 
   /* ---- I due piani ---- */
