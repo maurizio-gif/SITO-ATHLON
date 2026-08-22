@@ -122,7 +122,7 @@ export const DESTINATARI: Destinatario[] = [
          La stessa confusione era già stata corretta una volta sulla f.a.q.
          del sito (vedi il commento su GUEST_PASS in data/faq.ts) — il nome
          vero, quello che compare sul pulsante e nel modal, è «Prova Athlon». */
-      "Riceve i dati del modulo «Prova Athlon» e dell'assistente: nome, cognome, email, cellulare, l'attività di interesse e, se acconsentito, l'attribuzione della campagna. Riceve anche, ad ogni pagina caricata, l'identificativo di visita e la pagina stessa, e allo stesso modo quando apri l'assistente: è il conteggio di quante pagine vengono viste e di quante volte quel pannello viene aperto, non un modulo compilato.",
+      "Riceve i dati del modulo «Prova Athlon» e dell'assistente: nome, cognome, email, cellulare, l'attività di interesse e, se acconsentito, l'attribuzione della campagna. Riceve anche, ad ogni pagina caricata, l'identificativo di visita e la pagina stessa, e allo stesso modo quando apri l'assistente o premi un pulsante «Iscriviti»: è il conteggio di quante pagine vengono viste e di quante volte quei comandi vengono premuti, non un modulo compilato.",
   },
   {
     nome: 'Calendly',

@@ -269,8 +269,19 @@ const trust = [
                       PerfectGym (vedi `IscrizioneModal.astro`): chi ha già un
                       account viene mandato al login invece di scoprire a fine
                       registrazione che la sua email esiste già. L'`href` resta
-                      quello di prima, e senza JavaScript vale lui. */}
-                  <a href={o.href} class="plan__cta" data-cta="buy" data-iscrizione={p.name}>
+                      quello di prima, e senza JavaScript vale lui.
+
+                      `data-iscrizione-opzione` è quello che il click manda alla
+                      misura, e porta **titolo e sottotitolo insieme** perché il
+                      titolo da solo non distingue: le due formule annuali di uno
+                      stesso piano si chiamano tutte e due «Annuale». */}
+                  <a
+                    href={o.href}
+                    class="plan__cta"
+                    data-cta="buy"
+                    data-iscrizione={p.name}
+                    data-iscrizione-opzione={o.sub ? `${o.title} · ${o.sub}` : o.title}
+                  >
                     Iscriviti a {p.name} →
                   </a>
                 </div>
