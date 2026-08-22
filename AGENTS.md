@@ -1571,8 +1571,10 @@ Dove finisce cosa:
 | `athlon-referral` | `richieste_referral` |
 | `athlon-verifica-iscritto`, `athlon-reset-password` | `eventi_email` |
 
-E una sola automazione non parte da un webhook: `INBOX EMAIL DESK - SUPABASE`,
-che ha un trigger Gmail e scrive su `email_messaggi`. Sta qui sotto.
+E le automazioni della posta non partono da un webhook: `INBOX EMAIL DESK -
+SUPABASE` ha un trigger Gmail, `INBOX EMAIL DESK - IMPORTO STORICO` si preme a
+mano, e scrivono entrambe su `email_messaggi` passando dallo stesso
+sotto-workflow. Stanno qui sotto.
 
 E sopra tutte c'è `utenti`, l'anagrafica: ogni riga di queste tabelle porta una
 `utente_id` che un trigger riempie da sola, deduplicando per id PerfectGym e
@@ -1632,11 +1634,14 @@ Quattro cose da sapere prima di toccarla.
   HTML, e la parte testuale non c'è: il testo lo ricava l'automazione, così chi
   legge la tabella ha una colonna da guardare e non due da provare in ordine.
   `corpo_html` resta accanto per fedeltà, e il pannello non lo chiede.
-- **L'indice unico su `gmail_id` è la difesa dai doppioni**, e il nodo che
-  scrive ha `onError: continueRegularOutput` per non fare di una consegna
-  ripetuta un'esecuzione rossa. Le tre chiamate (ricerca, Gmail, scrittura)
-  hanno `retryOnFail`: il trigger Gmail non riconsegna, quindi un'esecuzione
-  fallita è un'email perduta per sempre.
+- **L'indice unico è sulla coppia `(gmail_id, utente_id)` e non sul solo
+  messaggio**, e la ragione è la posta inviata: un'email che il desk manda a due
+  contatti è una riga nella scheda di ognuno dei due. Con l'unico sul solo
+  `gmail_id` la seconda veniva rifiutata e uno dei due non l'avrebbe vista mai,
+  **in silenzio** — perché il nodo che scrive ha `onError:
+  continueRegularOutput`, che serve a non fare di una consegna ripetuta
+  un'esecuzione rossa. Le chiamate hanno `retryOnFail`: il trigger Gmail non
+  riconsegna, quindi un'esecuzione fallita è un'email perduta per sempre.
 
 Gli allegati non hanno colonne, deliberatamente: il nodo Gmail butta i loro
 metadati a meno che non li scarichi, e una colonna che nessuno riempie è peggio
@@ -1656,27 +1661,46 @@ preme. Legge gli indirizzi da `utenti` **una volta sola**, li impacchetta in
 ricerche Gmail `from:(a OR b OR …) after:… -in:chats` e passa quello che trova
 al sotto-workflow, a gruppi di cinquanta.
 
+- **Le due direzioni in una ricerca sola.** `(from:(a OR b …) OR (in:sent
+  to:(a OR b …))) after:… -in:chats` prende quello che quelle persone hanno
+  scritto **e** quello che il desk ha scritto a loro: insieme fanno lo scambio,
+  e con la sola posta in arrivo la scheda mostrava le domande e non le risposte.
+  Quale delle due sia lo dice l'etichetta `SENT` del messaggio e non la query
+  che lo ha trovato — l'etichetta resta vera anche se la query cambia.
+- **La controparte cambia con la direzione**: su una ricevuta è il mittente, su
+  una inviata sono i destinatari, e un'inviata a due contatti diventa **due
+  righe**, una per scheda. Il limite noto: i destinatari si leggono da `To`,
+  perché la forma semplificata dell'elenco di Gmail non porta il `Cc` — un
+  contatto solo in copia non viene agganciato, e finisce fra gli scarti del log.
 - **È Gmail a filtrare, non noi**, e questo è il capovolgimento rispetto alla
   posta in arrivo: là arriva tutto e si scarta, qui si chiede solo la posta
   delle persone che abbiamo. Elencare la casella intera per buttarne il novanta
   per cento vorrebbe dire decine di migliaia di chiamate per niente.
 - **Le ricerche stanno sotto i 1500 caratteri**, contati sulla stringa finale.
   Gmail tronca le query lunghe senza dirlo, quindi il gruppo si chiude quando la
-  query completa sforerebbe: misurato su quattromila indirizzi sono 133
-  ricerche, la più lunga di 1492 caratteri. Contare i soli indirizzi la faceva
-  sforare di una quarantina.
+  query completa sforerebbe. L'elenco degli indirizzi compare due volte nella
+  query — una per direzione — quindi gli indirizzi per ricerca sono la metà:
+  misurato su quattromila indirizzi sono 267 ricerche, la più lunga di 1499
+  caratteri. Contare i soli indirizzi la faceva sforare di una quarantina.
 - **L'aggancio si fa in memoria e non con una query per email**, e non è solo
   velocità: `from:` in Gmail può pescare anche per nome visualizzato, quindi il
   confronto esatto con gli indirizzi dell'anagrafica è il controllo vero. Gli
   scartati si contano e si scrivono nel log — se sono tanti, la ricerca sta
   pescando più del dovuto.
+- **Le email già prese non si riscaricano.** Prima di chiedere un corpo a Gmail
+  si guarda in `email_gia_prese`, la vista di due colonne fatta per questo: la
+  parte costosa dell'importo è una chiamata per messaggio, e senza quel
+  controllo ogni giro rifarebbe da capo tutto lo scaricato per farlo poi
+  rifiutare dall'indice unico. Il nodo che la legge ha `executeOnce` (la domanda
+  è una, gli indirizzi in ingresso molti) e `alwaysOutputData`, perché al primo
+  giro la tabella è vuota e senza un item in uscita l'importo si fermerebbe lì.
 - **A gruppi di cinquanta**, e il `Loop Over Items` è lì per la memoria: senza,
   tutte le email trovate verrebbero lette e parsate nella stessa esecuzione, che
   è il modo di far cadere il nodo Gmail su una casella vera.
 
-**Si può rieseguire quando si vuole**, e l'indice unico su `gmail_id` è quello
-che lo rende possibile: le email già importate vengono rifiutate una per una
-senza fermare le altre. Il che porta alla cosa da sapere e non ovvia:
+**Si può rieseguire quando si vuole**, ed è il modo in cui questo importo
+sostituisce l'idea di archiviare la casella: `email_gia_prese` fa saltare quello
+che c'è già, e l'indice unico sulla coppia è la rete sotto. Il che porta alla cosa da sapere e non ovvia:
 **l'importo prende solo la posta di chi è già in `utenti`**, quindi una casella
 di anni può rendere poche righe se l'anagrafica è piccola — e va rifatto ogni
 volta che l'anagrafica cresce, perché la volta prima quelle persone non
@@ -1684,10 +1708,23 @@ c'erano. Non è una limitazione da aggirare: è la stessa regola del filtro sul
 mittente, applicata al passato.
 
 Le due manopole — da quando importare e quanto lunga può essere una ricerca —
-stanno in cima al Code node `Componi le ricerche`. La data di partenza è **due
-anni indietro** e non «tutto»: più vecchia di così, la corrispondenza di una
+stanno in cima al Code node `Componi le ricerche`. La finestra è **un anno**, che
+è il ciclo di un abbonamento: più vecchia di così, la corrispondenza di una
 persona serve a un archivio e non al desk, e resta un dato personale in più da
 conservare.
+
+E la domanda che tornerà, con la risposta: **importare tutta la casella e
+mostrare nel pannello solo ciò che combacia è la strada sbagliata.** Il
+vantaggio che sembra dare — «quando una persona entra in anagrafica la sua posta
+è già lì» — lo dà anche rieseguire l'importo, perché la casella *è* già
+l'archivio e Gmail non perde niente. Quello che aggiunge è tutto costo: dati di
+terzi senza scopo nel database del CRM (fatture dei fornitori, curriculum,
+certificati medici di gente che non si è mai iscritta), una chiamata a Gmail per
+ogni messaggio della casella, i corpi HTML delle newsletter come grosso dei
+byte, e una tabella che smette di essere «la corrispondenza delle persone» per
+diventare un archivio di posta con una colonna facoltativa. «Non visibile nel
+pannello» non è una misura di protezione: è un filtro nella vetrina mentre il
+magazzino resta pieno.
 
 ### `eventi_email` è il funnel, le `richieste_*` sono le conversioni
 
