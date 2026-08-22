@@ -182,6 +182,10 @@ FAQs elsewhere on the site, without needing any JavaScript. */
   line-height: 1.6;
 }
 
+.prosa .ci-hero strong {
+  color: inherit;
+}
+
 .prosa .ci-cta {
   display: flex;
   flex-wrap: wrap;
