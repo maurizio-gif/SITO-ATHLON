@@ -17,6 +17,7 @@
  * chiave nel browser, nessuna route server, il sito resta statico.
  */
 import { REGISTRAZIONE, PASSI_ATTIVAZIONE as PASSI } from '../data/guestPass';
+import { GUEST_PASS } from '../data/abbonamenti';
 import { SINGOLI } from '../data/abbonamenti';
 import { TALK } from '../data/cta';
 import CampoTelefono from './CampoTelefono.astro';
@@ -33,7 +34,7 @@ import CampoTelefono from './CampoTelefono.astro';
       <h3 class="pf__title" id="pf-titolo-corrente" tabindex="-1" data-pf-fuoco>Prova Athlon.</h3>
       <p class="pf__claim">Senza impegno, senza rinnovo automatico: provi, poi decidi.</p>
       <p class="pf__lead">
-        Una settimana con accesso a tutto il club, a 19 €. Iniziamo dalla tua email: controlliamo che il
+        Una settimana con accesso a tutto il club, a {GUEST_PASS.prezzo} €. Iniziamo dalla tua email: controlliamo che il
         Guest Pass sia attivabile.
       </p>
 
@@ -139,7 +140,7 @@ import CampoTelefono from './CampoTelefono.astro';
       <h3 class="pf__title" tabindex="-1" data-pf-fuoco>Ecco il codice.</h3>
       <p class="pf__lead">
         Copialo, poi aprilo sul portale: si incolla in fase di iscrizione e sblocca la settimana Premium
-        a 19 €.
+        a {GUEST_PASS.prezzo} €.
       </p>
 
       <button type="button" class="pf__codice" data-copy-code="GOLD7">Codice: GOLD7 · copia</button>

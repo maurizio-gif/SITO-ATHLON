@@ -1,0 +1,676 @@
+---
+/**
+ * /prova — la pagina che racconta il Guest Pass.
+ *
+ * Nasce da una mancanza precisa: la prova è la conversione più importante del
+ * sito — ogni pagina ha un pulsante che la chiede — e non aveva una pagina sua.
+ * Il ripiego senza JavaScript di tutte quelle CTA era `/abbonamenti#guest-pass`,
+ * cioè **un blocco dentro un listino**: chi ci arrivava trovava tre righe e un
+ * prezzo in mezzo a due abbonamenti da novanta euro al mese, che è il contesto
+ * peggiore possibile per una cosa che costa diciannove.
+ *
+ * Qui la prova ha lo spazio per dire le due cose che la vendono, e sono
+ * entrambe fatti misurati e non aggettivi:
+ *
+ *  - **quanto è grande quello che si prova** — le lezioni e le ore le conta il
+ *    palinsesto vero (`data/planning.ts`), quindi il giorno che il planning
+ *    cambia cambia anche questa pagina;
+ *  - **quanto poco si rischia** — sette giorni, diciannove euro, e la decisione
+ *    di abbonarsi resta dopo.
+ *
+ * **Nessun numero è scritto a mano.** Giorni, prezzo, codice e requisito
+ * vengono da `GUEST_PASS`; il perimetro di quello che si prova è la lista di
+ * attività del piano **Premium**, letta da `plans`. Questa seconda cosa è la
+ * più importante da non rompere: il Pass è un Premium di sette giorni, quindi
+ * non comprende il personal training né i corsi junior. Scrivere «provi tutto»
+ * e intendere «tutto tutto» è la promessa che manda una persona al desk a
+ * sentirsi dire no.
+ *
+ * Gli elementi grafici sono quelli che il sito ha già: la clip della home in
+ * cima, la striscia di foto degli spazi (`SpacesGallery`) e il tour virtuale
+ * (`Struttura`), che portano con sé i loro stili e le loro animazioni. Un hero
+ * suo invece serve — quello della home ha titolo, pulsante della chat e
+ * «scroll down» cuciti addosso alla home, e parametrizzarlo per una pagina sola
+ * vorrebbe dire cinque props per non ripetere venti righe di markup.
+ */
+import Layout from '../layouts/Layout.astro';
+import SpacesGallery from '../components/home/SpacesGallery.astro';
+import AttivitaComprese from '../components/AttivitaComprese.astro';
+import AttivitaModal from '../components/AttivitaModal.astro';
+import Struttura from '../components/home/Struttura.astro';
+import Faq from '../components/Faq.astro';
+import { GUEST_PASS, plans } from '../data/abbonamenti';
+import { PASSI_ATTIVAZIONE } from '../data/guestPass';
+import { totalLessons, openHours, bandHours, getBand, PLANNING_MONTH } from '../data/planning';
+import { faqPagina } from '../data/faq';
+import { trialCta, talkCta } from '../data/cta';
+
+const prova = trialCta({ source: '/prova' });
+const contatta = talkCta({ source: '/prova' });
+
+/* Il perimetro della prova: le attività del Premium, che è il piano che il Pass
+   apre per sette giorni. `Athlon TV` esce dall'elenco — è un servizio in
+   streaming, non una cosa che si viene a provare in sede — e resta nella riga
+   di testo qui sotto, dove non promette una sala. */
+const premium = plans.find((p) => p.id === 'premium');
+if (!premium) throw new Error('Piano Premium non trovato in data/abbonamenti.ts: /prova non sa cosa si prova.');
+const attivita = premium.activities.filter((a) => a !== 'Athlon TV');
+
+/* La clip è quella della home, con il suo poster: lo stesso file, quindi il
+   secondo visitatore che passa da qui l'ha già in cache. */
+const VIDEO = '/wp-content/uploads/2026/08/Athlon-Hero-2026.mp4';
+const POSTER = '/wp-content/uploads/2026/08/Athlon-Hero-2026-poster.webp';
+
+const faqs = await faqPagina([
+  /* La prima è quella che decide se la persona può proseguire, e va detta
+     prima di ogni altra: scoprire il requisito al primo passo del form, dopo
+     aver letto una pagina intera, è il modo peggiore di dirlo. */
+  {
+    q: 'Chi può attivare il Guest Pass?',
+    a: `Chi non ha e non ha mai avuto un abbonamento Athlon dal ${GUEST_PASS.dal} in poi. È una prova per conoscere il club, quindi vale una volta. Se hai già avuto un abbonamento, il modulo te lo dice al primo passo e ti porta alle alternative — <a href="/abbonamenti#accessi-singoli">gli accessi singoli</a> non hanno requisiti.`,
+  },
+  {
+    q: `Cosa succede quando finiscono i ${GUEST_PASS.giorni} giorni?`,
+    a: 'Finiscono. Il Pass è un accesso a termine e non un abbonamento: se vuoi continuare scegli un piano, e se non vuoi non devi disdire niente.',
+  },
+  {
+    q: 'Quando devo attivarlo?',
+    a: `Entro <strong>30 giorni</strong> da quando ricevi il codice, e il giorno di inizio lo scegli tu durante l'attivazione: puoi farti mandare le istruzioni oggi e cominciare la settimana quando ti torna comodo.`,
+  },
+  {
+    q: 'Serve il certificato medico?',
+    a: 'Sì, come per qualsiasi attività in club: certificato di idoneità all\'attività sportiva non agonistica, da inviare a <a href="mailto:desk@athlonroma.it">desk@athlonroma.it</a>. Sono esentati i bambini fino ai 5 anni.',
+  },
+  'prenotazione-come',
+]);
+---
+
+<Layout
+  title={`Prova Athlon ${GUEST_PASS.giorni} giorni a ${GUEST_PASS.prezzo} € | Athlon Club Roma Talenti`}
+  description={`Il Guest Pass Premium: ${GUEST_PASS.giorni} giorni con accesso a tutto il club a ${GUEST_PASS.prezzo} €, senza impegno. Compila il modulo e ricevi le istruzioni per attivarlo.`}
+  breadcrumb={[{ name: 'Prova Athlon', path: '/prova' }]}
+  lcpImage={POSTER}
+>
+  {/* ── HERO ────────────────────────────────────────────────────────────
+      La clip sotto, il prezzo sopra. Il prezzo è l'elemento più grande della
+      pagina dopo il titolo, ed è voluto: diciannove euro *è* l'argomento, e
+      finché stava in una riga di testo lo leggeva chi arrivava in fondo. */}
+  <section class="pv-hero">
+    <div class="pv-hero__media">
+      {/* Muta, in ciclo, e parte da sé: è scenografia. Le regole stanno in
+          AGENTS.md — niente `preload="none"`, che su un telefono vince e
+          lascia il poster con sopra un pulsante di play. */}
+      <video class="pv-hero__video" autoplay muted loop playsinline poster={POSTER}>
+        <source src={VIDEO} type="video/mp4" />
+      </video>
+      <div class="pv-hero__scrim"></div>
+    </div>
+
+    <div class="container pv-hero__inner">
+      <span class="eyebrow pv-hero__eyebrow" data-anim="from-left">Guest Pass Premium · senza impegno</span>
+      <h1 class="pv-hero__title" data-anim="reveal">
+        Richiedi subito la tua prova di {GUEST_PASS.giorni} giorni
+      </h1>
+
+      {/* Il cartellino. `u-display` perché la faccia display fuori da h1–h4 va
+          dichiarata, o le maiuscole accentate finiscono tagliate: il perché sta
+          in AGENTS.md, nella sezione sulla headroom. */}
+      <p class="pv-prezzo u-display" data-anim="pop" data-anim-delay="80">
+        <span class="pv-prezzo__n">{GUEST_PASS.prezzo}</span>
+        <span class="pv-prezzo__val">
+          <span class="pv-prezzo__eur">€</span>
+          <span class="pv-prezzo__nota">una volta sola</span>
+        </span>
+      </p>
+
+      <p class="pv-hero__lede" data-anim data-anim-delay="140">
+        Una settimana con accesso a tutto il club: corsi, sale, vasche. Non è un abbonamento e non si
+        rinnova — finita la settimana decidi tu, e se non vuoi continuare non devi disdire niente.
+      </p>
+
+      <div class="pv-hero__actions" data-anim data-anim-delay="200">
+        <a href={prova.href} class="btn btn-primary" {...prova.attrs}>
+          Compila il modulo <span aria-hidden="true">→</span>
+        </a>
+        <a href="#cosa-provi" class="btn btn-outline pv-hero__secondo">Cosa comprende</a>
+      </div>
+
+      <p class="pv-hero__micro" data-anim data-anim-delay="240">
+        Ti arrivano via email e WhatsApp il codice e i {PASSI_ATTIVAZIONE.length} passi per attivarlo.
+      </p>
+    </div>
+  </section>
+
+  {/* ── COSA SI PROVA ───────────────────────────────────────────────────
+      La sezione che il committente chiama «la vastità dell'offerta», e che qui
+      non è un aggettivo: i due numeri li conta il palinsesto. */}
+  <section class="pv-sec" id="cosa-provi">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Cosa comprende</span>
+      <h2 class="pv-sec__title" data-anim="reveal">Tutto il club, per una settimana.</h2>
+      <p class="pv-sec__sub">
+        Il Pass apre il perimetro dell'abbonamento <strong>Premium</strong>, che è il più ampio: per
+        {' '}{GUEST_PASS.giorni} giorni entri in tutto quello che c'è qui sotto e scegli ogni giorno cosa
+        fare. Athlon TV, i corsi in streaming, sono compresi.
+      </p>
+
+      {/* Lo stesso elenco della scheda Premium su /abbonamenti, e per la stessa
+          ragione: dietro ogni voce c'è una spiegazione, e chi non sa cos'è il
+          Group Reformer non deve andarselo a cercare. Il componente porta le
+          icone e il punto di domanda; `AttivitaModal`, qui sotto, è quello che
+          apre il pannello — uno senza l'altro dà pulsanti che non fanno niente. */}
+      <div class="pv-attivita-spazio" data-anim="scale">
+        <AttivitaComprese voci={attivita} titolo="Attività comprese" />
+      </div>
+
+      {/* Tre numeri e tre unità diverse, e la differenza non è pignoleria: una
+          lezione ha un istruttore e un orario, la sala e le corsie sono aperte.
+          Contare le corsie del nuoto libero come «lezioni» darebbe diciotto al
+          posto di quarantaquattro ore d'acqua — la regola sta in
+          `data/planning.ts` (`FASCE_A_ORE`) e vale per tutto il sito.
+
+          Nessuno dei tre è scritto a mano: li conta il palinsesto del mese. */}
+      <div class="pv-numeri">
+        <div class="pv-numero" data-anim="pop">
+          <span class="pv-numero__n u-display">{totalLessons()}</span>
+          <span class="pv-numero__t">lezioni a settimana, a orario fisso e con istruttore</span>
+        </div>
+        <div class="pv-numero" data-anim="pop" data-anim-delay="80">
+          <span class="pv-numero__n u-display">{openHours()}</span>
+          <span class="pv-numero__t">ore a settimana di Gym Floor aperta</span>
+        </div>
+        <div class="pv-numero" data-anim="pop" data-anim-delay="160">
+          <span class="pv-numero__n u-display">{bandHours(getBand('nuoto-libero'))}</span>
+          <span class="pv-numero__t">ore di corsie per il nuoto libero assistito</span>
+        </div>
+      </div>
+
+      {/* Il planning è la prova di quei numeri, ed è a un clic: chi vuole
+          controllare se c'è la lezione che gli serve al giovedì sera lo deve
+          poter fare prima di lasciare l'email, non dopo. */}
+      <div class="pv-planning" data-anim="scale">
+        <div>
+          <p class="pv-planning__pre">Palinsesto di {PLANNING_MONTH}</p>
+          <p class="pv-planning__t">Guarda gli orari veri prima di decidere.</p>
+          <p class="pv-planning__s">
+            Sala, acqua, corsi e nuoto libero, giorno per giorno: è lo stesso palinsesto che avresti
+            durante la prova.
+          </p>
+        </div>
+        <a href="/planning" class="btn btn-outline pv-planning__btn">Apri il planning →</a>
+      </div>
+    </div>
+  </section>
+
+  {/* ── COME FUNZIONA ───────────────────────────────────────────────────
+      Tre passi e non i sei dell'attivazione: quelli arrivano nell'email, e
+      metterli qui vorrebbe dire far leggere una procedura del portale a chi
+      deve ancora decidere se lasciare l'email. */}
+  <section class="pv-sec pv-sec--alt">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Come si fa</span>
+      <h2 class="pv-sec__title" data-anim="reveal">Tre passi, e il primo è qui.</h2>
+      <p class="pv-sec__sub">
+        Il modulo chiede l'email e controlla subito se il Pass è attivabile: se lo è, i dati sono tre
+        campi e il codice arriva alla fine.
+      </p>
+
+      <ol class="pv-passi">
+        <li class="pv-passo" data-anim data-anim-delay="0">
+          <span class="pv-passo__n u-display">1</span>
+          <span class="pv-passo__t">
+            <strong>Compili il modulo</strong>
+            Email, nome e cellulare. La verifica dice subito se puoi attivarlo.
+          </span>
+        </li>
+        <li class="pv-passo" data-anim data-anim-delay="60">
+          <span class="pv-passo__n u-display">2</span>
+          <span class="pv-passo__t">
+            <strong>Ricevi il codice e le istruzioni</strong>
+            A schermo, e le stesse via email e WhatsApp: {PASSI_ATTIVAZIONE.length} passi sul portale,
+            dove scegli il giorno di inizio e paghi i {GUEST_PASS.prezzo} €.
+          </span>
+        </li>
+        <li class="pv-passo" data-anim data-anim-delay="120">
+          <span class="pv-passo__n u-display">3</span>
+          <span class="pv-passo__t">
+            <strong>Vieni a provare</strong>
+            {GUEST_PASS.giorni} giorni dal giorno che hai scelto. Prenoti le lezioni dall'app, come
+            tutti gli altri.
+          </span>
+        </li>
+      </ol>
+
+      <p class="pv-passi__nota">
+        Hai <strong>30 giorni</strong> per attivarlo, e il requisito è uno solo: non aver mai avuto un
+        abbonamento Athlon dal {GUEST_PASS.dal} in poi. Se preferisci farlo insieme a qualcuno,
+        {' '}<a href={contatta.href} {...contatta.attrs}>scrivici</a> e ti richiamiamo noi.
+      </p>
+    </div>
+  </section>
+
+  {/* ── GLI SPAZI, E IL TOUR ────────────────────────────────────────────
+      La striscia di foto ha gli stili scritti per il fondo antracite, quindi
+      sta in una sezione scura — e sopra `Struttura`, che è scura anche lei e
+      porta il tour virtuale: i due blocchi si leggono come uno. */}
+  <section class="pv-sec pv-sec--dark">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Dove vieni a provare</span>
+      <h2 class="pv-sec__title" data-anim="reveal">Guardalo prima di venire.</h2>
+      {/* Niente metri quadri e niente ristrutturazioni qui: li dice `Struttura`
+          due blocchi sotto, e ripeterli a due schermate di distanza fa sembrare
+          la pagina scritta da due persone che non si parlano. Questa riga dice
+          la sola cosa che le foto aggiungono — sono vere. */}
+      <p class="pv-sec__sub">
+        Le sale, le due vasche e gli spogliatoi in fotografie vere, non in rendering. Trascina la
+        striscia; il tour virtuale è appena sotto.
+      </p>
+    </div>
+    <SpacesGallery hint="Trascina o usa le frecce" divider={false} />
+  </section>
+
+  <Struttura />
+
+  {/* ── L'INVITO ────────────────────────────────────────────────────────
+      L'ultima schermata ripete le due cose che tolgono il rischio — il prezzo
+      e il fatto che non si rinnova — perché è il punto in cui la persona
+      decide, e la prima schermata è lontana. */}
+  <section class="pv-sec pv-sec--invito">
+    <div class="container pv-invito">
+      <span class="eyebrow" data-anim="from-left">Un passo solo</span>
+      <h2 class="pv-sec__title" data-anim="reveal">
+        Compila il modulo: ricevi le istruzioni per attivare la tua settimana.
+      </h2>
+      <p class="pv-sec__sub">
+        {GUEST_PASS.giorni} giorni a {GUEST_PASS.prezzo} €, accesso completo, <strong>senza impegno</strong>:
+        non è un abbonamento, non si rinnova, e alla fine decidi tu.
+      </p>
+
+      <a href={prova.href} class="btn btn-primary pv-invito__btn" {...prova.attrs}>
+        Compila il modulo <span aria-hidden="true">→</span>
+      </a>
+
+      <p class="pv-invito__micro">
+        Non sai se ti conviene? <a href={contatta.href} {...contatta.attrs}>Parlane con noi</a> —
+        oppure guarda <a href="/abbonamenti">gli abbonamenti</a> e <a href="/planning">il planning</a>.
+      </p>
+    </div>
+  </section>
+
+  {/* Il pannello che spiega un'attività: una volta per pagina, e lo apre
+      qualunque comando con `data-activity`. */}
+  <AttivitaModal />
+
+  {/* ── DOMANDE ─────────────────────────────────────────────────────── */}
+  <section class="pv-sec">
+    <div class="container">
+      <span class="eyebrow" data-anim="from-left">Prima di cominciare</span>
+      <h2 class="pv-sec__title" data-anim="reveal">Domande frequenti</h2>
+      <Faq entries={faqs} />
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* ---- Hero ----
+     La clip riempie la schermata meno la barra, e l'altezza è espressa con
+     `var(--header-h)`: un valore fisso al suo posto sarebbe giusto a radice 16px
+     e sbagliato di ottanta pixel sul totem, dove la barra è più alta. È la
+     trappola descritta in AGENTS.md, e la home l'ha già pagata. */
+  .pv-hero {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: min(46rem, calc(100svh - var(--header-h, 73px)));
+    padding: var(--space-section-lg) 0 calc(var(--space-section-lg) * 0.8);
+    overflow: hidden;
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .pv-hero__media {
+    position: absolute;
+    inset: 0;
+  }
+
+  .pv-hero__video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* `pointer-events` glielo toglie `global.css` per ogni video senza
+       `controls`: un clic passa alla pagina invece di mettere in pausa la
+       scenografia. Qui non serve aggiungere niente. */
+  }
+
+  /* Due sfumature e non una: quella dal basso regge il testo, quella piatta
+     abbassa tutto il fotogramma perché il bianco stia sopra qualunque scena
+     passi nel ciclo. */
+  .pv-hero__scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to top, rgba(23, 21, 20, 0.92) 0%, rgba(23, 21, 20, 0.55) 45%, rgba(23, 21, 20, 0.15) 100%),
+      rgba(23, 21, 20, 0.22);
+  }
+
+  .pv-hero__inner {
+    position: relative;
+  }
+
+  .pv-hero__eyebrow {
+    color: var(--color-primary);
+  }
+
+  .pv-hero__title {
+    max-width: 34ch;
+    font-size: var(--text-4xl);
+    letter-spacing: var(--tracking-2xl);
+    /* `--lh` e non `line-height`: la headroom della faccia display si calcola
+       da questa variabile, e scriverla a mano rimetterebbe le accentate sotto
+       la lama. */
+    --lh: 0.95;
+    margin: 0.5rem 0 0;
+  }
+
+  /* ---- Il cartellino del prezzo ----
+     Il numero e il resto su due colonne, allineate in basso: «19» e «€» sulla
+     stessa linea di base, e sotto l'euro la nota che spiega che si paga una
+     volta. Il numero è enorme di proposito — è l'argomento — ma resta sotto al
+     titolo nella gerarchia perché il titolo dice *cosa* si compra. */
+  .pv-prezzo {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    margin: 1.25rem 0 0;
+    line-height: 1;
+  }
+
+  .pv-prezzo__n {
+    font-size: clamp(4.5rem, 14vw, 8.5rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-primary);
+    /* Il numero non ha accenti, quindi qui la headroom non serve e mangerebbe
+       spazio: si annulla, e l'allineamento con l'euro torna esatto. */
+    padding-top: 0;
+  }
+
+  .pv-prezzo__val {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding-bottom: 0.7rem;
+  }
+
+  .pv-prezzo__eur {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+  }
+
+  .pv-prezzo__nota {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    color: rgba(255, 255, 255, 0.72);
+    white-space: nowrap;
+  }
+
+  .pv-hero__lede {
+    max-width: 46rem;
+    margin: 1rem 0 0;
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  .pv-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+
+  /* Il contorno sul fondo scuro va ridichiarato: `btn-outline` nasce per il
+     crema, e su antracite il suo bordo scuro non si vede. */
+  .pv-hero__secondo {
+    border-color: rgba(255, 255, 255, 0.45);
+    color: var(--color-white);
+  }
+
+  .pv-hero__secondo:hover {
+    border-color: var(--color-white);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .pv-hero__micro {
+    margin: 1rem 0 0;
+    color: rgba(255, 255, 255, 0.62);
+    font-size: var(--text-xs);
+  }
+
+  /* ---- Sezioni ----
+     Stesse misure e stessa alternanza delle altre landing del sito. */
+  .pv-sec {
+    padding: var(--space-section-lg) 0;
+  }
+
+  .pv-sec--alt {
+    background: var(--color-cream);
+  }
+
+  .pv-sec--dark {
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .pv-sec__title {
+    font-size: var(--text-3xl);
+    letter-spacing: var(--tracking-2xl);
+    margin: 0.625rem 0 0.5rem;
+  }
+
+  .pv-sec__sub {
+    max-width: 48rem;
+    margin-bottom: 1.875rem;
+    color: var(--text-muted);
+  }
+
+  .pv-sec--dark .pv-sec__sub,
+  .pv-sec--invito .pv-sec__sub {
+    color: rgba(255, 255, 255, 0.68);
+  }
+
+  /* ---- Cosa comprende ----
+     L'elenco delle attività se lo stila `AttivitaComprese`; qui resta lo spazio
+     che lo separa dai numeri. */
+  .pv-attivita-spazio {
+    margin-bottom: 2.5rem;
+  }
+
+  .pv-numeri {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .pv-numero {
+    padding: 1.4rem 1.5rem;
+    border-radius: 1.25rem;
+    background: var(--color-cream);
+    border: 1px solid var(--border);
+  }
+
+  .pv-numero__n {
+    display: block;
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--color-primary);
+  }
+
+  .pv-numero__t {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: var(--text-muted);
+  }
+
+  /* ---- Il richiamo al planning ---- */
+  .pv-planning {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    padding: 1.5rem 1.75rem;
+    border-radius: 1.25rem;
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .pv-planning__pre {
+    margin: 0;
+    color: var(--color-primary);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .pv-planning__t {
+    margin: 0.35rem 0 0;
+    font-size: var(--text-lg);
+    font-weight: 700;
+  }
+
+  .pv-planning__s {
+    max-width: 40rem;
+    margin: 0.35rem 0 0;
+    color: rgba(255, 255, 255, 0.68);
+    font-size: var(--text-sm);
+  }
+
+  .pv-planning__btn {
+    flex-shrink: 0;
+    border-color: rgba(255, 255, 255, 0.45);
+    color: var(--color-white);
+  }
+
+  .pv-planning__btn:hover {
+    border-color: var(--color-white);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* ---- I tre passi ----
+     Il minimo è **20rem e non 17**, e il valore viene da una misura: a 17rem la
+     griglia teneva due colonne anche sul totem, dove la radice è 27px, e i
+     passi scendevano a venticinque caratteri per riga — sotto il pavimento del
+     leggibile. A 20rem restano tre colonne sulla scrivania e diventano una sola
+     dove la radice cresce, che per una sequenza numerata è anche la forma
+     giusta. Nessuna media query: la griglia si dimensiona da sé perché il
+     minimo è in `rem`. */
+  .pv-passi {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    gap: 1.25rem;
+    margin: 0 0 1.5rem;
+    padding: 0;
+  }
+
+  .pv-passo {
+    display: flex;
+    gap: 1rem;
+    padding: 1.4rem 1.5rem;
+    border-radius: 1.25rem;
+    background: var(--color-white);
+    border: 1px solid var(--border);
+  }
+
+  .pv-passo__n {
+    flex-shrink: 0;
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--color-primary);
+  }
+
+  .pv-passo__t {
+    display: block;
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  .pv-passo__t strong {
+    display: block;
+    margin-bottom: 0.2rem;
+    color: var(--color-dark);
+    font-size: var(--text-base);
+  }
+
+  .pv-passi__nota {
+    max-width: 48rem;
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+  }
+
+  /* ---- L'invito ---- */
+  .pv-sec--invito {
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .pv-invito__btn {
+    margin-top: 0.5rem;
+  }
+
+  .pv-invito__micro {
+    margin: 1.25rem 0 0;
+    color: rgba(255, 255, 255, 0.62);
+    font-size: var(--text-sm);
+  }
+
+  .pv-invito__micro a {
+    color: var(--color-white);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ---- Telefono ---- */
+  @media (max-width: 700px) {
+    .pv-hero {
+      min-height: auto;
+      padding: calc(var(--space-section-lg) * 1.1) 0 var(--space-section);
+    }
+
+    .pv-planning {
+      padding: 1.25rem;
+    }
+
+    .pv-planning__btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  /* Il titolo dell'hero è la riga più lunga della pagina: sul totem e sulla
+     televisione la misura in `ch` la tiene leggibile, ma il corpo va scalato
+     di un gradino o su un pannello verticale il titolo prende mezza schermata.
+     + totem + tv */
+  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10),
+    (min-width: 1700px) and (min-height: 1020px) and (max-aspect-ratio: 37/20) {
+    .pv-hero__title {
+      font-size: var(--text-3xl);
+    }
+
+    .pv-prezzo__n {
+      font-size: clamp(4.5rem, 9vw, 8rem);
+    }
+  }
+</style>

@@ -6,6 +6,7 @@
  * poter divergere il giorno in cui il portale cambia un passaggio.
  */
 import { PG } from './cta';
+import { GUEST_PASS } from './abbonamenti';
 
 /** Dove si incolla il codice: la registrazione del portale, non la home. */
 export const REGISTRAZIONE = `${PG}/#/Registration`;
@@ -15,7 +16,7 @@ export const PASSI_ATTIVAZIONE = [
   'Clicca su <strong>Abbonamenti</strong>',
   'Scegli una categoria e clicca su <strong>Ho un codice promozionale</strong>',
   'Clicca su <strong>Avanti</strong> e scegli il giorno di inizio del Pass',
-  'Nel riepilogo trovi il pagamento di <strong>19 €</strong>',
+  `Nel riepilogo trovi il pagamento di <strong>${GUEST_PASS.prezzo} €</strong>`,
   'Accetta il regolamento, firma e clicca su <strong>Attiva Abbonamento</strong>',
   'Inserisci il metodo di pagamento: carta o conto corrente',
 ];

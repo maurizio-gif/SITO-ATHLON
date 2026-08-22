@@ -48,8 +48,24 @@
     margin-bottom: 12px;
   }
 
+  /* ---- L'intro ----
+     **La misura è in `ch` e il corpo di un gradino sopra**, e le due cose
+     insieme rispondono a due problemi che sembravano uno.
+
+     Il paragrafo si leggeva stretto, ma stretto non era: a 640px sulla
+     scrivania faceva **93 caratteri per riga**, cioè venti oltre il limite del
+     leggibile. Quello che lo faceva sembrare rimpicciolito era il corpo — testo
+     base, 15px, sotto un titolo grande e su fondo scuro. Allargarlo avrebbe
+     peggiorato la riga: a 48rem si arrivava a 111.
+
+     `ch` è l'unità del testo: la colonna cresce col carattere, quindi i
+     caratteri per riga restano gli stessi su ogni schermo — 72, misurati, alla
+     scrivania come sul totem e sulla televisione. Un `max-width` in px o in rem
+     invece li fa ballare, e nei due versi opposti: 93 sulla scrivania e 47 sulla
+     televisione, dove la radice è il doppio. */
   .intro {
-    max-width: 640px;
+    max-width: 52ch;
+    font-size: var(--text-lg);
     opacity: 0.9;
   }
 
@@ -89,16 +105,40 @@
     }
   }
 
+  /* ---- Il riquadro del tour ----
+     **L'altezza è un rapporto, non un numero.** L'iframe porta `height="500"`
+     come ripiego per chi non ha CSS, ma governarla con quel valore la
+     schiacciava: su un monitor largo il tour diventava una fessura da 500px in
+     una colonna da 1300, e sul totem quei 500px restavano 500 mentre il testo
+     intorno cresceva di due terzi — la trappola dei numeri fissi che AGENTS.md
+     descrive.
+
+     16/9 su schermo largo, perché è la forma di una stanza inquadrata; 4/3 sul
+     telefono, dove 16:9 di una colonna da 350px fa duecento pixel di altezza e
+     dentro non si distingue niente. Il `max-height` in `svh` è il freno: senza,
+     su un pannello verticale il rapporto lo farebbe alto quasi due schermate. */
   .tour {
     margin: 24px 0 40px;
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
     border: 1px solid var(--border-dark);
+    aspect-ratio: 16 / 9;
+    max-height: 80svh;
   }
 
   .tour iframe {
     display: block;
     border: 0;
+    /* L'altezza la decide il contenitore: `height="500"` sull'attributo resta
+       per chi legge la pagina senza CSS. */
+    width: 100%;
+    height: 100%;
+  }
+
+  @media (max-width: 700px) {
+    .tour {
+      aspect-ratio: 4 / 3;
+    }
   }
 </style>

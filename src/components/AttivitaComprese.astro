@@ -1,0 +1,180 @@
+---
+/**
+ * L'elenco delle attività comprese, con l'icona e il punto di domanda che apre
+ * la spiegazione.
+ *
+ * Esiste perché la stessa lista era già scritta due volte — su `/abbonamenti`
+ * con le icone, su `/promo` senza — e `/prova` sarebbe stata la terza. Tre
+ * copie di un elenco di attività sono tre posti da toccare il giorno che il
+ * club ne aggiunge una, e il terzo resta indietro.
+ *
+ * Si usa così: questo componente per la lista, e **`AttivitaModal` una volta
+ * nella pagina** — è lui che intercetta `data-activity` e apre il pannello. Uno
+ * senza l'altro dà un elenco di pulsanti che non fanno niente.
+ *
+ * Le voci arrivano da fuori (`plans` per un piano, la lista del Guest Pass per
+ * la prova) e le icone da `ICONE_ATTIVITA`: chi non ha un'icona prende il
+ * pallino, che è il verso giusto in cui sbagliare — una voce senza glifo si
+ * legge, una voce che non compare no.
+ */
+import { ICONE_ATTIVITA } from '../data/activities';
+
+interface Props {
+  /** Le attività, con l'etichetta che `AttivitaModal` sa spiegare. */
+  voci: readonly string[];
+  /** Su fondo scuro: cambia solo i colori, non la forma. */
+  scuro?: boolean;
+  /** La riga sopra l'elenco. Assente, non si stampa. */
+  titolo?: string;
+}
+
+const { voci, scuro = false, titolo } = Astro.props;
+---
+
+<div class:list={['ac', scuro && 'ac--scuro']}>
+  {titolo && (
+    <span class="ac__titolo">
+      {titolo}
+      <em>tocca per i dettagli</em>
+    </span>
+  )}
+
+  <ul class="ac__lista">
+    {voci.map((a) => (
+      <li>
+        <button type="button" class="ac__voce" data-activity={a}>
+          <span class="ac__icona" aria-hidden="true">
+            {ICONE_ATTIVITA[a] ? (
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" set:html={ICONE_ATTIVITA[a]} />
+            ) : (
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            )}
+          </span>
+          <span class="ac__etichetta">{a}</span>
+          <span class="ac__segno" aria-hidden="true">?</span>
+        </button>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .ac__titolo {
+    display: block;
+    margin-bottom: 0.75rem;
+    color: var(--text-muted);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .ac__titolo em {
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    opacity: 0.75;
+  }
+
+  .ac--scuro .ac__titolo {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  /* La griglia si dimensiona da sé, e il minimo è in `rem`: al crescere della
+     radice — totem, televisione — perde una colonna invece di stringere le
+     righe, quindi non serve una media query. */
+  .ac__lista {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 0.4rem 1rem;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Una riga per attività, ed è tutta il bersaglio: `min-height` in `rem` così
+     resta un bersaglio da dito anche dove la radice cresce. */
+  .ac__voce {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.35rem 0.5rem 0.35rem 0;
+    border: 0;
+    border-radius: 0.6rem;
+    background: none;
+    color: inherit;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    text-align: left;
+    cursor: pointer;
+    transition: background var(--dur-fast) ease;
+  }
+
+  .ac__voce:hover {
+    background: rgba(255, 87, 1, 0.08);
+  }
+
+  .ac--scuro .ac__voce:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .ac__icona {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: rgba(255, 87, 1, 0.12);
+    color: var(--color-primary);
+  }
+
+  .ac--scuro .ac__icona {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .ac__etichetta {
+    flex: 1;
+    min-width: 0;
+    font-weight: 600;
+    color: var(--color-dark);
+  }
+
+  .ac--scuro .ac__etichetta {
+    color: var(--color-white);
+  }
+
+  /* Il punto di domanda dice che c'è qualcosa da leggere: senza, l'elenco
+     sembra un inventario e nessuno lo tocca. */
+  .ac__segno {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    border: 1px solid rgba(39, 36, 35, 0.25);
+    color: var(--text-muted);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    transition: background var(--dur-fast) ease, color var(--dur-fast) ease,
+      border-color var(--dur-fast) ease;
+  }
+
+  .ac--scuro .ac__segno {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .ac__voce:hover .ac__segno {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-white);
+  }
+</style>

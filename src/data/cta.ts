@@ -38,11 +38,16 @@ export const APP = 'https://onelink.to/athlon';
  * query string.
  *
  * L'`href` qui sotto è il ripiego per chi non ha JavaScript, e per il click
- * con il tasto centrale che apre una scheda: porta alla sezione Guest Pass
- * degli abbonamenti, dove ci sono lo stesso codice e lo stesso prezzo. Non è
- * più un indirizzo esterno — il percorso della prova vive dentro al sito.
+ * con il tasto centrale che apre una scheda.
+ *
+ * Porta a **`/prova`**, che è la pagina della prova. Prima portava a
+ * `/abbonamenti#guest-pass`, cioè a un blocco dentro un listino: chi ci
+ * arrivava trovava tre righe e un prezzo in mezzo a due abbonamenti da novanta
+ * euro al mese, che è il contesto peggiore per una cosa che costa diciannove.
+ * L'ancora esiste ancora e resta giusta per chi sta leggendo i piani; il
+ * ripiego di un pulsante «prova», no.
  */
-const TRIAL_FALLBACK = '/abbonamenti#guest-pass';
+const TRIAL_FALLBACK = '/prova';
 
 export const TRIAL = {
   label: 'Prova Athlon',
