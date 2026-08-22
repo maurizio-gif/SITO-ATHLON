@@ -314,6 +314,10 @@ export function initChatAssistente(root, options) {
 
   function salva() {
     if (ricostruendo || suTotem()) return;
+    /* Niente email e niente conversazione vuol dire che non c'e' ancora niente
+       da ritrovare: si evita di scrivere un record vuoto, e soprattutto di
+       riscriverne uno subito dopo `pulisciStato()`, che l'aveva appena tolto. */
+    if (!dati.email && !scena.length) return;
     try {
       if (scena.length > SCENA_MAX) scena = scena.slice(-SCENA_MAX);
       sessionStorage.setItem(
@@ -380,6 +384,25 @@ export function initChatAssistente(root, options) {
       void fuoco.offsetWidth;
       fuoco.focus();
     }
+    /* **Il passo si salva qui, dove cambia**, e non dove capita.
+     *
+     * Prima il salvataggio partiva solo da `registra()`, cioè da una battuta
+     * nuova, e il passo era quello del momento in cui la battuta e' comparsa.
+     * Basta guardare l'ordine di `apriConversazione()` per vedere il guaio: la
+     * bolla del saluto si scrive **prima** di `mostra('chat')`, quindi
+     * l'unico salvataggio di quella conversazione diceva `passo: 'attivita'`.
+     * Chi cambiava pagina dopo il saluto e prima di scrivere si ritrovava
+     * l'elenco delle attivita' e nessun campo dove scrivere: il campo sta
+     * dentro il passo `chat`, e quel passo era tornato nascosto.
+     *
+     * Stessa causa un passo piu' in la': chi cambiava pagina mentre compilava
+     * il form dei dati tornava all'elenco delle attivita', perche' l'ultimo
+     * salvataggio era quello di `verifica()`.
+     *
+     * `dati.passo` lo scrive questa funzione e nessun'altra, quindi il posto
+     * dove registrarlo e' questo — trovato provando la navigazione, non
+     * leggendo il codice. */
+    salva();
   }
 
   var escape = function (s) {
