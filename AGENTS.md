@@ -1571,6 +1571,9 @@ Dove finisce cosa:
 | `athlon-referral` | `richieste_referral` |
 | `athlon-verifica-iscritto`, `athlon-reset-password` | `eventi_email` |
 
+E una sola automazione non parte da un webhook: `INBOX EMAIL DESK - SUPABASE`,
+che ha un trigger Gmail e scrive su `email_messaggi`. Sta qui sotto.
+
 E sopra tutte c'è `utenti`, l'anagrafica: ogni riga di queste tabelle porta una
 `utente_id` che un trigger riempie da sola, deduplicando per id PerfectGym e
 per email. Sta più sotto, e non va toccata da n8n.
@@ -1581,6 +1584,58 @@ mandandoli su un nodo `No-Op`: gli inviti persi non esistevano, quindi nessuno
 poteva sapere quanti fossero né perché. Ora hanno una riga con `esito` e
 `motivo_scarto`. Stessa idea per l'email malformata in `eventi_email`: se sono
 tante, il problema è il campo, non chi scrive.
+
+### La casella del desk entra nell'anagrafica, e solo per i mittenti noti
+
+`INBOX EMAIL DESK - SUPABASE` guarda la casella ogni minuto, chiede a `utenti`
+chi è il mittente e scrive su `email_messaggi` **solo se lo trova**. Da lì la
+scheda di una persona nel pannello mostra le sue email accanto ai form e alle
+conversazioni: prima quel canale — quello su cui il desk passa la giornata —
+non compariva da nessuna parte, e la stessa persona risultava «un form e
+nient'altro» mentre in casella c'erano cinque scambi.
+
+Il filtro sul mittente non è un'ottimizzazione, ed è la riga da non togliere:
+una casella è fatta in gran parte di cose che non sono persone — newsletter,
+notifiche, ricevute, posta indesiderata — e archiviarla tutta farebbe
+dell'anagrafica un archivio di posta, conservando dati di terzi raccolti per
+niente. `email_messaggi.utente_id` è `not null` con `on delete cascade`
+proprio per questo: a differenza delle `richieste_*`, che valgono anche senza
+aggancio, un'email senza la sua persona non è niente, e cancellare un contatto
+deve portarsi via la sua corrispondenza.
+
+Quattro cose da sapere prima di toccarla.
+
+- **La ricerca della persona *è* il filtro, e non serve nessun `IF`.** Il nodo
+  Supabase che interroga `utenti` non produce righe per un mittente
+  sconosciuto, quindi quell'item smette semplicemente di esistere. Ed è il
+  motivo per cui quel nodo **non** ha `alwaysOutputData`: con quello arriverebbe
+  a valle un item vuoto, cioè un'email da scrivere senza persona.
+- **L'email intera si legge dopo la ricerca, non prima.** Il trigger sta sulla
+  forma semplificata (`simple: true`): il corpo lo va a prendere `Prendi l'email
+  intera` con `simple: false`, e solo per i mittenti che sono già passati dal
+  filtro. Al contrario si parserebbe l'email grezza di ogni newsletter per
+  buttarla un nodo dopo — che è la causa nota di esaurimento memoria di quel
+  nodo.
+- **`corpo` esce sempre pieno.** Chi scrive da un telefono manda spesso solo
+  HTML, e la parte testuale non c'è: il testo lo ricava l'automazione, così chi
+  legge la tabella ha una colonna da guardare e non due da provare in ordine.
+  `corpo_html` resta accanto per fedeltà, e il pannello non lo chiede.
+- **L'indice unico su `gmail_id` è la difesa dai doppioni**, e il nodo che
+  scrive ha `onError: continueRegularOutput` per non fare di una consegna
+  ripetuta un'esecuzione rossa. Le tre chiamate (ricerca, Gmail, scrittura)
+  hanno `retryOnFail`: il trigger Gmail non riconsegna, quindi un'esecuzione
+  fallita è un'email perduta per sempre.
+
+Gli allegati non hanno colonne, deliberatamente: il nodo Gmail butta i loro
+metadati a meno che non li scarichi, e una colonna che nessuno riempie è peggio
+di una colonna che manca. Il giorno che servono si accende
+`downloadAttachments` e il file va su Storage, come per l'allegato dell'Help
+Desk — nella riga nome, tipo e peso, non il base64.
+
+Un'email conta come **richiesta** e non come tocco in `utente_attivita`: chi
+scrive alla casella ha chiesto qualcosa davvero, a differenza di chi digita un
+indirizzo in un form e chiude la pagina. La vista `email_thread` raggruppa per
+scambio, che è la forma in cui una casella si legge.
 
 ### `eventi_email` è il funnel, le `richieste_*` sono le conversioni
 
