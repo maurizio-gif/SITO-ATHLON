@@ -8,9 +8,9 @@
  *  - **`visite_pagina`** — un caricamento di pagina, con lo stesso `vid`/`sid`
  *    di `scripts/attribuzione.ts`. È la risposta a «quanti accessi».
  *  - **`eventi_interazione`** — un gesto compiuto in pagina che non è né un
- *    caricamento né un invio: oggi l'apertura dell'assistente. Misura
- *    l'intenzione che non arriva in fondo, e prima non lasciava traccia da
- *    nessuna parte.
+ *    caricamento né un invio: l'apertura dell'assistente e la pressione di un
+ *    «Iscriviti». Misura l'intenzione che non arriva in fondo, e prima non
+ *    lasciava traccia da nessuna parte.
  *
  * `window.athlonEvento(tipo, extra)` manda il secondo, e lo manda **in due
  * posti insieme**: la riga su Supabase e l'evento nel `dataLayer`, da cui GTM
@@ -173,22 +173,37 @@ function mandaVisita(): void {
 /**
  * Un gesto: la riga su Supabase e l'evento nel `dataLayer`, insieme.
  *
- * `tipo` è il nome del gesto (`chat_open`), `origine` da quale comando è
- * partito — cioè il `data-cta-source` del pulsante premuto, che il sito mette
- * già nel markup di ogni CTA.
+ * `tipo` è il nome del gesto (`chat_open`, `iscrizione_click`), `origine` da
+ * quale comando è partito — il `data-cta-source` del pulsante per l'assistente,
+ * il nome del piano per un «Iscriviti».
+ *
+ * **`dettaglio` esiste perché `origine` da sola non basta**, e il caso che l'ha
+ * imposto sono i pulsanti d'iscrizione: ogni piano ne ha tre — annuale a rate,
+ * annuale in unica soluzione, mensile flex — e su `/promo`, che mostra le sole
+ * formule annuali, i due pulsanti di uno stesso piano avrebbero avuto origine e
+ * titolo identici. È «quale variante del gesto», non «quale piano»: generico
+ * come `tipo`, così il prossimo evento che ne ha bisogno lo trova già qui.
  *
  * Non solleva mai: un evento di misura che rompe il gesto che sta misurando è
  * il peggior baratto possibile.
  */
-function evento(tipo: string, origine?: string | null): void {
+function evento(tipo: string, origine?: string | null, dettaglio?: string | null): void {
   try {
     if (!tipo || escluso()) return;
     const c = contesto();
-    spedisci(URL_EVENTO, JSON.stringify({ ...c, tipo, origine: origine || null }));
+    spedisci(
+      URL_EVENTO,
+      JSON.stringify({ ...c, tipo, origine: origine || null, dettaglio: dettaglio || null })
+    );
 
     const w = window as unknown as Finestra;
     w.dataLayer = w.dataLayer || [];
-    w.dataLayer.push({ event: tipo, evento_origine: origine || null, evento_pagina: c.pagina });
+    w.dataLayer.push({
+      event: tipo,
+      evento_origine: origine || null,
+      evento_dettaglio: dettaglio || null,
+      evento_pagina: c.pagina,
+    });
   } catch {
     /* idem */
   }
@@ -196,7 +211,7 @@ function evento(tipo: string, origine?: string | null): void {
 
 const w = window as unknown as Finestra & {
   athlonNoTrack: () => boolean;
-  athlonEvento: (tipo: string, origine?: string | null) => void;
+  athlonEvento: (tipo: string, origine?: string | null, dettaglio?: string | null) => void;
 };
 
 w.athlonNoTrack = () => {

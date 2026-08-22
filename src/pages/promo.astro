@@ -171,8 +171,19 @@ const contatta = talkCta({ source: '/promo' });
 
                   {/* Come su /abbonamenti: `data-iscrizione` mette il controllo
                       dell'email davanti a PerfectGym, l'`href` resta la strada
-                      per chi non ha JavaScript. */}
-                  <a href={o.href} class="btn btn-primary formula__cta" data-cta="buy" data-iscrizione={p.name}>
+                      per chi non ha JavaScript.
+
+                      Qui il sottotitolo dentro `data-iscrizione-opzione` non è
+                      un di più ma l'unica cosa che distingue: questa pagina
+                      mostra le sole formule annuali, quindi i due pulsanti di
+                      un piano si chiamano entrambi «Annuale». */}
+                  <a
+                    href={o.href}
+                    class="btn btn-primary formula__cta"
+                    data-cta="buy"
+                    data-iscrizione={p.name}
+                    data-iscrizione-opzione={o.sub ? `${o.title} · ${o.sub}` : o.title}
+                  >
                     Iscriviti a {p.name} →
                   </a>
                 </div>

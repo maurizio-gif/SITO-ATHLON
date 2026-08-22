@@ -153,6 +153,26 @@ import { WEBHOOK_VERIFICA, WEBHOOK_RESET, PORTALE, haGiaAccount } from '../data/
   document.addEventListener('click', function (e) {
     var link = e.target && e.target.closest ? e.target.closest('[data-iscrizione]') : null;
     if (!link) return;
+
+    /* La misura sta **prima** del controllo sui modificatori, e non e' una
+       svista: un click col tasto centrale e' un'intenzione d'acquisto come le
+       altre, e contarla e' piu' fedele che perderla. Il prezzo e' che nel
+       funnel quella persona risulta ferma al click — non digitera' mai l'email,
+       perche' il pannello non lo vede — ed e' il verso giusto in cui sbagliare:
+       un acquisto invisibile e' peggio di un abbandono di troppo.
+
+       Il piano sta in `origine`, la formula in `dettaglio`: i tre pulsanti di
+       uno stesso piano portano tutti il suo nome, e su /promo due di loro si
+       chiamano entrambi «Annuale». Senza il secondo campo sarebbero la stessa
+       riga. */
+    if (window.athlonEvento) {
+      window.athlonEvento(
+        'iscrizione_click',
+        link.getAttribute('data-iscrizione'),
+        link.getAttribute('data-iscrizione-opzione')
+      );
+    }
+
     /* Un click con un modificatore vuol dire «apri in un'altra scheda», e chi
        lo fa sa cosa vuole: non gli si mette davanti un pannello. */
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
