@@ -20,3 +20,5 @@ Athlon nasce nel **1973 come centro di educazione sportiva**, e da allora fa la 
 ## Il programma arriva
 
 **Modalità e programma della giornata li comunichiamo a breve.** Per ora una cosa sola: **tieniti libera la data**, perché è un evento da non perdere.
+
+Le prenotazioni non sono ancora aperte: si aprono insieme all'annuncio del programma, non prima.
