@@ -17,6 +17,15 @@
  * governati da qui, il font e l'anteprima condivisa sono già quelli giusti, e
  * il conto dei domini terzi nel `<head>` resta a uno (vedi AGENTS.md).
  *
+ * ## Il contenitore è un `div`, e il `<main>` è quello del Layout
+ *
+ * `Layout.astro` avvolge lo slot in `<main>`, quindi tutto quello che questa
+ * pagina scrive ci sta già dentro. Aprirne un secondo qui — che è come era
+ * nata — mette in pagina **due `<main>` annidati**: un documento con due
+ * elementi di riferimento non ne ha nessuno, e l'albero di accessibilità che
+ * Lighthouse legge risulta malformato esattamente come per un pannello chiuso
+ * ancora tabulabile. Il contenitore di questa pagina è un `div`.
+ *
  * ## `ProvaModal` è montato qui, e non è una ripetizione
  *
  * Nel Layout quel modal sta **dentro** il gate `chrome`, a differenza del
@@ -93,7 +102,7 @@ function attrsDi(v: VoceLink): Record<string, string> {
   noindex
   lcpImage={HERO}
 >
-  <main class="lk">
+  <div class="lk">
     {/* La foto è scenografia, non contenuto: `aria-hidden` e nessun alt utile,
         perché quello che la pagina dice sta nei sei comandi. Resta comunque
         l'elemento più grande della prima schermata, quindi passa da `fotoHero`
@@ -161,10 +170,15 @@ function attrsDi(v: VoceLink): Record<string, string> {
         </p>
       </footer>
     </div>
-  </main>
+  </div>
 
   {/* Il pannello della prova. Il perché sta in testa al file, nella sezione che
-      spiega il gate `chrome` del Layout. */}
+      spiega il gate `chrome` del Layout.
+
+      Sta fuori dal `.lk`, non dentro: quel contenitore è la scenografia della
+      pagina — `position: relative`, `overflow: hidden` e una patina in
+      `::after` — e un pannello `position: fixed` dentro un antenato con
+      `overflow` ritagliato è un pannello che si può tagliare. */}
   <ProvaModal />
 </Layout>
 
