@@ -546,23 +546,30 @@ function attrsDi(v: VoceLink): Record<string, string> {
      quel bianco galleggerebbe da solo sullo sfondo scuro della pagina. Lo
      stesso riquadro sul FIN — che ha davvero lo sfondo trasparente — è
      coerenza visiva, non necessità: due pesi diversi per due loghi vicini si
-     sarebbero notati di più della cornice che li unisce. */
+     sarebbero notati di più della cornice che li unisce.
+
+     **L'altezza è fissa, la larghezza no**, e non è un dettaglio: i due file
+     hanno proporzioni diverse — l'ASI è quasi un quadrato (512×358), il FIN è
+     una striscia larga (320×144) — e chiuderli in un riquadro di *entrambe*
+     le misure fisse forzava `object-fit: contain` a scalarli sull'altezza:
+     il FIN riempiva quasi tutto il riquadro, l'ASI ci finiva dentro con un
+     bordo bianco ai lati, molto più piccolo dell'altro benché sulla stessa
+     riga. Con solo l'altezza fissata, ogni logo riempie la stessa striscia
+     verticale e la sua larghezza segue la propria proporzione: stesso peso,
+     non stessa scatola. */
   .lk__logo-chip {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 5.5rem;
     height: 2.75rem;
-    padding: 0.4rem 0.6rem;
+    padding: 0.4rem 0.75rem;
     border-radius: 0.5rem;
     background: var(--color-white);
   }
 
   .lk__logo-chip img {
-    max-width: 100%;
-    max-height: 100%;
+    height: 100%;
     width: auto;
-    height: auto;
     object-fit: contain;
   }
 
