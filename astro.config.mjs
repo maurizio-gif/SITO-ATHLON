@@ -61,6 +61,10 @@ export default defineConfig({
            e poi si dichiara nella sitemap è la contraddizione che questa riga
            evita, la stessa di `/attiva`. */
         !page.includes('/referral') &&
+        /* `/link` è la pagina della bio di Instagram: un elenco di comandi verso
+           pagine che sono già in sitemap per conto loro. Indicizzarla vorrebbe
+           dire mettere in concorrenza un indice con i contenuti che indicizza. */
+        !page.includes('/link') &&
         !page.includes('/wikiathlon/'),
 
       /* Priorità e frequenza sono suggerimenti, e Google li ignora — restano

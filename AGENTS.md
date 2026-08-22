@@ -342,6 +342,83 @@ indirizzo che non è suo deve avere qualcosa da cliccare. Quel comando **toglie
 ogni campo vuoto che lo porta, quindi svuotare e mettere il fuoco rimetterebbe
 dentro la stessa email. L'attributo è l'adesione, e lì si ritira.
 
+## `/link` è la bio di Instagram, e non è l'indice del sito
+
+Una pagina sola, sei comandi, `noindex` e fuori dalla sitemap come `/attiva` e
+`/referral`. I contenuti stanno in `src/data/link.ts`, la pagina in
+`src/pages/link.astro`.
+
+**Non elenca le pagine del sito**, e questa è la scelta da cui dipende tutto il
+resto: una linktree che elenca è il menu scritto due volte, e la seconda copia
+divergerà. Risponde ai motivi per cui si tocca il link di una bio, che sono gli
+intenti già dichiarati in `cta.ts` — provare, sapere quando, parlare con
+qualcuno, venire in sede. **Sei comandi pieni è un tetto**: al settimo la
+pagina torna a essere il menu che voleva sostituire. Il resto — abbonamenti,
+Athlon TV, referral, lavora — sta sotto come testo, perché chi cerca quelle
+pagine sa già di volerle e un pulsante pieno le metterebbe in concorrenza con
+la prova, che è la cosa che questa pagina deve ottenere.
+
+**Sta nel sito e non su linktr.ee** per una ragione misurabile: i modal della
+prova, dei contatti e dell'assistente vivono nel Layout, quindi vivono anche
+qui, e la conversione avviene **sulla pagina** invece di costare un secondo
+caricamento su una rete telefonica. In più il consenso e l'attribuzione sono
+già governati, e i domini terzi nel `<head>` restano uno.
+
+Quattro cose da sapere prima di toccarla.
+
+**L'UTM sta nell'indirizzo incollato nella bio, non nei pulsanti.** Il browser
+interno di Instagram non passa il referrer: senza
+`?utm_source=instagram&utm_medium=bio` ogni richiesta nata da qui risulta senza
+campagna nelle tabelle `richieste_*`. `scripts/attribuzione.ts` memorizza il
+**primo tocco**, quindi taggare quel solo indirizzo copre tutta la visita — e i
+comandi in pagina non portano UTM di proposito, o riscriverebbero il primo
+tocco a ogni passaggio. Quale comando è stato premuto lo dice `data-link`, che
+un tag di GTM legge da solo. Un secondo profilo o il QR di un volantino cambiano
+solo la query string: la pagina è la stessa e le sorgenti si distinguono.
+
+**`ProvaModal` è montato dalla pagina, non dal Layout.** Nel Layout quel modal
+sta *dentro* il gate `chrome`, a differenza del modulo contatti e
+dell'assistente, perché finora nessuna pagina senza intestazione aveva un
+comando di prova — e montarlo lì sarebbe peso su ottanta schede dell'Help Desk
+che non lo usano. Questa è la prima, e ce l'ha come comando principale: senza il
+pannello «Prova Athlon» cadrebbe sul suo ripiego (`/abbonamenti#guest-pass`),
+cioè esattamente il salto in più che è la ragione per cui la pagina sta nel
+sito. **Quindi `chrome` resta `false`**: rimettendo l'intestazione ci sarebbero
+due pannelli con gli stessi `id` e due gestori sullo stesso click.
+
+**Il pulsante fisso della chat si nasconde, e serve `!important`.** Qui
+l'assistente è già uno dei sei comandi, e su una pagina che sta in una schermata
+il `ChatFab` compare subito — è il caso «pagina che non scorre» del suo script —
+appoggiandosi sopra la lista. `ChatFab` dichiara `.cfab { display: inline-flex }`
+nel proprio `<style>`, che Astro compila in `.cfab[data-astro-cid-…]`: due
+classi contro una, quindi senza `!important` vince lui e il pulsante resta in
+pagina (misurato: `display` risultava `flex`). Stessa ragione del
+`[hidden] { display: none !important }` di `global.css`. E `display: none` e non
+`visibility`, così esce anche dal giro del tab.
+
+**Due voci sono condizionate, e la condizione vive accanto al dato.** La promo
+compare solo se il documento Tina non è una bozza **e** la scadenza non è
+passata; «Lavora con noi» solo se `POSIZIONI` non è vuoto. Vale la regola di
+`lavora.ts`: dalla bio non si manda nessuno su un'offerta finita o su un elenco
+vuoto. Si valuta al build — il sito è statico — e va bene perché cambiare la
+promo da Tina *è* un commit, quindi un deploy: la condizione si rivaluta quando
+il dato cambia. Resta scoperta solo la promo che scade senza che nessuno tocchi
+niente, e la chiude il deploy successivo.
+
+Un dettaglio di forma che è un vincolo e non un gusto: **la nota di una voce sta
+in una riga su un telefono da 390px**, circa trentacinque caratteri. Quella che
+va a capo alza la sua scheda e sola fra sei, e sei schede di altezze diverse si
+leggono come un elenco disordinato invece che come un menu. Per la stessa
+ragione il footer legale non ha i «·» che il resto del sito mette fra quei link:
+a 390px vanno a capo e il separatore resta appeso a fine riga.
+
+Per verificare: la pagina passa le due spazzate del totem e della televisione
+(nessun overflow, niente sotto i 19px, nessun comando sotto i 48px in tutti e
+quattro i formati), i tre comandi con `data-cta` aprono il loro pannello **senza
+navigare** e con `body.amodal-locked`, il `dataLayer` ha i suoi due comandi
+`consent`, e `.cfab` calcola `display: none`. L'ultima passata: 196 kB di HTML,
+29 gzippati — la seconda pagina più leggera del sito dopo `/attiva`.
+
 ## A hidden overlay must be hidden from the keyboard too
 
 `opacity: 0` and `pointer-events: none` hide an overlay from the eyes and the
