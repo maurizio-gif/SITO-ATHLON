@@ -1,0 +1,92 @@
+---
+/**
+ * La pagina 404 del sito. Astro la costruisce da questo file per costruzione
+ * — `dist/404.html` — e Vercel la riconosce per lo stesso motivo: qualunque
+ * richiesta a un indirizzo che non esiste sui file statici del sito riceve
+ * questa pagina con lo stato HTTP 404 vero, non un 200 travestito.
+ *
+ * **Non è un redirect verso la home**, ed è la scelta che conta: un redirect
+ * dice ai motori di ricerca «questo contenuto si è spostato qui», e un
+ * indirizzo morto rediretto in home finisce per far sembrare che decine di
+ * pagine diverse siano la stessa — è un *soft 404*, e Google lo tratta peggio
+ * di un 404 onesto. La sezione sui redirect di WordPress in AGENTS.md lo dice
+ * per la stessa ragione: un indirizzo senza destinazione vera resta senza
+ * destinazione, non diventa la home.
+ *
+ * Ha l'intestazione e il piè di pagina del sito (`chrome` di default, non
+ * `false` come le landing autonome): chi arriva qui è arrivato per errore — un
+ * link vecchio, un indirizzo digitato a mano — e deve poter ripartire dal
+ * resto del sito, non solo dai quattro comandi di questa pagina.
+ */
+import Layout from '../layouts/Layout.astro';
+import { talkCta } from '../data/cta';
+
+const contatta = talkCta({ source: '/404' });
+---
+
+<Layout
+  title="Pagina non trovata | Athlon Club Roma Talenti"
+  description="L'indirizzo richiesto non esiste. Ecco da dove ripartire sul sito di Athlon Club."
+  noindex
+>
+  <section class="err-hero">
+    <div class="container-narrow">
+      <span class="eyebrow err-hero__eyebrow" data-anim="from-left">Errore 404</span>
+      <h1 class="err-hero__title" data-anim="reveal">
+        Questa pagina <em class="accent">non esiste</em>.
+      </h1>
+      <p class="err-hero__lede" data-anim data-anim-delay="80">
+        L'indirizzo che hai seguito è sbagliato o non è più valido: può essere un link vecchio, o un
+        errore di battitura. Non è successo niente al resto del sito — ecco da dove ripartire.
+      </p>
+
+      <div class="err-hero__link" data-anim data-anim-delay="140">
+        <a href="/" class="btn btn-primary">Vai alla home →</a>
+        <a href="/abbonamenti" class="btn btn-outline-dark">Vedi gli abbonamenti</a>
+        <a href="/planning" class="btn btn-outline-dark">Orari e planning</a>
+        <a href={contatta.href} class="btn btn-outline-dark" {...contatta.attrs}>{contatta.label}</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .err-hero {
+    padding: var(--space-section-lg) 0;
+    text-align: center;
+  }
+
+  .err-hero__eyebrow {
+    display: block;
+  }
+
+  .err-hero__title {
+    font-size: var(--text-4xl);
+    --lh: var(--leading-4xl);
+    letter-spacing: var(--tracking-4xl);
+    margin-top: 14px;
+  }
+
+  /* Non è una classe globale: ogni hero del sito colora il proprio accento
+     allo stesso modo, di proposito (vedi AGENTS.md, i pattern `.xx-hero__title
+     .accent`). Qui non c'è un prefisso di pagina perché questa è l'unica
+     hero della pagina. */
+  .err-hero__title .accent {
+    color: var(--color-primary);
+  }
+
+  .err-hero__lede {
+    max-width: 34rem;
+    margin: 16px auto 0;
+    font-size: var(--text-md);
+    color: var(--text-muted);
+  }
+
+  .err-hero__link {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 32px;
+  }
+</style>
