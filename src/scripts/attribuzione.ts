@@ -210,9 +210,52 @@ function vid(): string {
 
 catturaUtm();
 
+const KEY_SID = 'athlon_sid';
+
+/**
+ * L'id della visita: raggruppa le pagine viste nella stessa scheda.
+ *
+ * Vive in `sessionStorage`, non chiede consenso e non è una deroga nuova: è la
+ * stessa scelta già fatta per `athlon_utm` — un dato che muore con la scheda e
+ * non identifica nessuno da solo non è archiviazione che il consenso debba
+ * governare. Senza di lui il beacon di pageview (`scripts/visita.ts`) potrebbe
+ * solo contare pagine, non visite: «quante pagine per visita» richiede di
+ * sapere quali pagine appartengono alla stessa visita.
+ */
+let sidInMemoria: string | null = null;
+
+function sid(): string {
+  if (sidInMemoria) return sidInMemoria;
+  try {
+    const salvato = sessionStorage.getItem(KEY_SID);
+    if (salvato) {
+      sidInMemoria = salvato;
+      return salvato;
+    }
+  } catch {
+    /* storage negato: si prosegue con un id che vale solo per questa pagina */
+  }
+  const nuovo =
+    typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+          const r = (Math.random() * 16) | 0;
+          const v = c === 'x' ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        });
+  sidInMemoria = nuovo;
+  try {
+    sessionStorage.setItem(KEY_SID, nuovo);
+  } catch {
+    /* niente storage: resta la copia in memoria, vale per questa pagina */
+  }
+  return nuovo;
+}
+
 const w = window as unknown as {
   athlonGetUtm: () => Utm;
   athlonGetVid: () => string;
+  athlonGetSid: () => string;
 };
 
 w.athlonGetUtm = () => {
@@ -221,5 +264,6 @@ w.athlonGetUtm = () => {
 };
 
 w.athlonGetVid = vid;
+w.athlonGetSid = sid;
 
 export {};

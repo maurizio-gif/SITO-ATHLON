@@ -223,6 +223,9 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
     <input type="hidden" name="userId" data-prefill="userid,userId,user_id" />
     <input type="hidden" name="userNumber" data-prefill="usernumber,userNumber,user_number" />
     {UTM_FIELDS.map((f) => <input type="hidden" name={f} data-prefill={f} />)}
+    {/* Come le UTM: valorizzato all'apertura del pannello da `athlonGetVid()`,
+        non qui — vedi il commento su `versaUtm` più sotto. */}
+    <input type="hidden" name="vid" data-support-vid />
     {/* Context the person answering will want: which page, and what was typed
         into the search before giving up on it. */}
     <input type="hidden" name="pagina" data-support-page />
@@ -313,6 +316,9 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
       root.querySelectorAll<HTMLInputElement>('input[name^="utm_"]').forEach((campo) => {
         if (!campo.value && memorizzate[campo.name]) campo.value = memorizzate[campo.name];
       });
+      const vidField = form.querySelector<HTMLInputElement>('[data-support-vid]');
+      const getVid = (window as unknown as { athlonGetVid?: () => string }).athlonGetVid;
+      if (vidField && getVid) vidField.value = getVid();
     };
 
     /* L'email dall'URL vince su quella ricordata dal browser
