@@ -815,6 +815,33 @@ export const CORSI: Corso[] = [
   },
 ];
 
+/**
+ * I quindici corsi fitness — le classi di sala, non le tre attività in acqua
+ * né la ginnastica in gravidanza, che hanno un `eyebrow` proprio e restano
+ * fuori (vedi `link.ts` per lo stesso filtro).
+ */
+export const CORSI_FITNESS = CORSI.filter((c) => !c.eyebrow);
+
+/**
+ * Quanti corsi fitness ci sono davvero: non le quindici pagine, ma le lezioni
+ * distinte che quelle pagine offrono. Yoga ne ha tre — Hatha, Power, Yogassè —
+ * Pilates due, HBX due: ognuna con nome e orario propri nel palinsesto.
+ *
+ * È il numero che il sito cita ovunque dice «N corsi fitness»: l'header e la
+ * home lo leggono da qui, non lo ricontano ciascuno per conto suo. Prima lo
+ * facevano — tre liste scritte a mano in tre file, e a un certo punto
+ * dicevano 15, 18 e 19 per la stessa domanda. La pagina `/corsi-fitness`
+ * enumera queste lezioni per intero, foto e classificazione comprese: quella
+ * lista resta scritta a mano perché porta dati che qui non ci sono, ma la sua
+ * lunghezza deve restare uguale a questo numero — lo controlla lei stessa al
+ * build, per la stessa ragione per cui `planning.ts` controlla che ogni sala
+ * abbia il suo colore.
+ */
+export const NUMERO_CORSI_FITNESS = CORSI_FITNESS.reduce(
+  (n, c) => n + Math.max(1, c.varianti.filter((v) => v.nome).length),
+  0
+);
+
 export function getCorso(slug: string): Corso {
   const c = CORSI.find((x) => x.slug === slug);
   if (!c) throw new Error(`Corso non trovato: ${slug}`);

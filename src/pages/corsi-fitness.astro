@@ -16,6 +16,7 @@ import { getBand, countLessons, roomsOf } from '../data/planning';
 import { trialCta, ctaAttrs } from '../data/cta';
 import { serviceSchema } from '../data/club';
 import { GUEST_PASS } from '../data/abbonamenti';
+import { NUMERO_CORSI_FITNESS } from '../data/corsi';
 import { fotoPiccola, fotoHero } from '../data/foto';
 /* Il dominio di produzione, per gli @id assoluti degli schemi. */
 const SITE = 'https://www.athlonroma.it';
@@ -110,6 +111,22 @@ const corsi = [
   );
   return { ...c, volte };
 });
+
+/* Questa lista è scritta a mano perché porta cose che `data/corsi.ts` non ha
+   — la foto di ogni card e la famiglia (Forza, Fiato, Musica...) per i filtri
+   qui sotto — quindi non si può sostituire con una derivazione automatica
+   come si è fatto per l'header e per la home. Ma la sua *lunghezza* deve
+   restare uguale a `NUMERO_CORSI_FITNESS`, o si torna esattamente al
+   problema che l'ha resa necessaria: una pagina che dice diciannove corsi
+   accanto a un menu che ne conta quindici, perché una delle due liste non
+   sapeva dell'ultima lezione aggiunta. Rumoroso di proposito: un conteggio
+   silenziosamente sbagliato in produzione è peggio di un build rotto. */
+if (corsi.length !== NUMERO_CORSI_FITNESS) {
+  throw new Error(
+    `/corsi-fitness elenca ${corsi.length} corsi ma data/corsi.ts ne conta ${NUMERO_CORSI_FITNESS}: ` +
+      'la lista qui sopra è rimasta indietro rispetto a CORSI (o viceversa).'
+  );
+}
 
 /* L'elenco per le risposte esce dalle card: se un corso entra o esce, la
    risposta segue. */

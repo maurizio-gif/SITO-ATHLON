@@ -17,6 +17,7 @@
  * gli interessa è la domanda che fa chiudere la pagina.
  */
 import { ACTIVITY_TAGS } from './activities';
+import { SNB_ETA } from './junior';
 
 /** L'endpoint che verifica l'email su PerfectGym: lo stesso del form di prova. */
 export const WEBHOOK_VERIFICA = 'https://automazione.n8ndevelop.it/webhook/athlon-verifica-iscritto';
@@ -162,7 +163,12 @@ export const MACRO: Macro[] = [
   {
     id: 'scuola-nuoto-bambini',
     label: 'Scuola Nuoto Bambini',
-    nota: 'Nati dal 2012 al 2022.',
+    /* Da `data/junior.ts`, non riscritto: era fermo a «dal 2012 al 2022» — la
+       stagione prima — mentre la pagina della Scuola Nuoto era già passata
+       alla successiva. Un valore stagionale scritto in un secondo file è
+       esattamente il tipo di dato che questo progetto deriva da un'unica
+       fonte per non farlo invecchiare in silenzio (vedi AGENTS.md). */
+    nota: `Nati dal ${SNB_ETA.dal} al ${SNB_ETA.al}.`,
     ramo: 'junior',
     gruppo: 'junior',
   },
