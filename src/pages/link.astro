@@ -203,6 +203,23 @@ function attrsDi(v: VoceLink): Record<string, string> {
           <a href="/regolamento">Termini e condizioni</a>
           <a href="/privacy">Privacy policy</a>
         </p>
+
+        {/* ASI e FIN, gli stessi due file del nastro nel footer del sito
+            (`Footer.astro`, array `affiliazioni`) — non una seconda copia:
+            sono le due affiliazioni che contano per chi legge da qui, CSEN e
+            CONI restano nel footer completo. Ogni logo porta il suo riquadro
+            chiaro perché uno dei due file (`logo-asi-ok.jpg`) è un JPEG con
+            fondo bianco opaco: senza un riquadro proprio, quel bianco
+            galleggerebbe da solo sullo sfondo scuro della pagina. */}
+        <p class="lk__affiliazione">Attività Sportiva Dilettantistica</p>
+        <div class="lk__loghi">
+          <span class="lk__logo-chip">
+            <img src="/wp-content/uploads/2024/07/logo-asi-ok.jpg" alt="ASI" loading="lazy" />
+          </span>
+          <span class="lk__logo-chip">
+            <img src="/wp-content/uploads/2024/08/FIN_logo.png" alt="Federazione Italiana Nuoto" loading="lazy" />
+          </span>
+        </div>
       </footer>
     </div>
   </div>
@@ -507,6 +524,46 @@ function attrsDi(v: VoceLink): Record<string, string> {
 
   .lk__legale a:hover {
     color: var(--color-white);
+  }
+
+  .lk__affiliazione {
+    margin-top: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .lk__loghi {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.65rem;
+  }
+
+  /* Il riquadro chiaro è per l'ASI, un JPEG con fondo bianco opaco: senza,
+     quel bianco galleggerebbe da solo sullo sfondo scuro della pagina. Lo
+     stesso riquadro sul FIN — che ha davvero lo sfondo trasparente — è
+     coerenza visiva, non necessità: due pesi diversi per due loghi vicini si
+     sarebbero notati di più della cornice che li unisce. */
+  .lk__logo-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 5.5rem;
+    height: 2.75rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 0.5rem;
+    background: var(--color-white);
+  }
+
+  .lk__logo-chip img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
   }
 
   /* Sotto i 380px la nota non si tronca e non sparisce: è la riga che dice
