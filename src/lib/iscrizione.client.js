@@ -126,6 +126,7 @@ import { WEBHOOK_VERIFICA, WEBHOOK_RESET, PORTALE, haGiaAccount } from '../data/
           pagina: location.pathname,
           origine: 'iscrizione',
           vid: window.athlonGetVid ? window.athlonGetVid() : null,
+          sid: window.athlonGetSid ? window.athlonGetSid() : null,
           utm: window.athlonGetUtm ? window.athlonGetUtm() : {},
         }),
         signal: taglia.signal,
@@ -233,6 +234,7 @@ import { WEBHOOK_VERIFICA, WEBHOOK_RESET, PORTALE, haGiaAccount } from '../data/
           pagina: location.pathname,
           origine: 'iscrizione-reset',
           vid: window.athlonGetVid ? window.athlonGetVid() : null,
+          sid: window.athlonGetSid ? window.athlonGetSid() : null,
         }),
         signal: taglia.signal,
       });

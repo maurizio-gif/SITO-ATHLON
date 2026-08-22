@@ -126,6 +126,13 @@ export function initContattaciForm(root, options) {
   function vid() {
     return window.athlonGetVid ? window.athlonGetVid() : null;
   }
+  /* L'id della visita, accanto al vid e non al suo posto: senza consenso
+     pubblicitario il vid vale una pagina sola, mentre il sid regge tutta la
+     sessione — è lui a legare questa richiesta alle pagine viste prima
+     (vista `percorso_conversione`), anche per chi resta anonimo. */
+  function sid() {
+    return window.athlonGetSid ? window.athlonGetSid() : null;
+  }
 
   // ── Nodi ──────────────────────────────────────────────────────────────────
   function q(sel) {
@@ -303,7 +310,7 @@ export function initContattaciForm(root, options) {
         /* Con le UTM oltre al `vid`: la verifica registra ogni email su
            `eventi_email`, ed è il primo tocco. Senza, un contatto nato da qui
            risultava senza provenienza fino al secondo invio. */
-        body: JSON.stringify({ email: dati.email, pagina: dati.pagina, utm: utm(), vid: vid() }),
+        body: JSON.stringify({ email: dati.email, pagina: dati.pagina, utm: utm(), vid: vid(), sid: sid() }),
       });
       var body = await r.json();
       if (body && body.stato) {
@@ -649,6 +656,7 @@ export function initContattaciForm(root, options) {
       macroDaCta: dati.macroDaCta,
       utm: utm(),
       vid: vid(),
+      sid: sid(),
     };
     if (extra) Object.keys(extra).forEach(function (k) { base[k] = extra[k]; });
     return base;
