@@ -1,0 +1,437 @@
+---
+/**
+ * /link — la pagina che sta nella bio di Instagram.
+ *
+ * Non è una pagina del sito nel senso delle altre: non ha voce nel menu, non è
+ * in sitemap ed è `noindex`, come `/attiva` e `/referral`. Ci arriva solo chi
+ * tocca il link di un profilo social, e per lui questa pagina è **l'unica
+ * schermata** fra un video e una richiesta di prova.
+ *
+ * ## Perché è nel sito e non su un servizio di linktree
+ *
+ * Perché i tre modal — prova, richiesta al team, assistente — stanno in
+ * `Layout.astro`, quindi stanno anche qui: chi tocca «Prova Athlon» compila il
+ * modulo **su questa pagina**, senza un secondo caricamento su una rete
+ * telefonica. Su un servizio esterno lo stesso gesto vale due salti, e ogni
+ * salto è gente che si perde. In più: il consenso e l'attribuzione sono già
+ * governati da qui, il font e l'anteprima condivisa sono già quelli giusti, e
+ * il conto dei domini terzi nel `<head>` resta a uno (vedi AGENTS.md).
+ *
+ * ## `ProvaModal` è montato qui, e non è una ripetizione
+ *
+ * Nel Layout quel modal sta **dentro** il gate `chrome`, a differenza del
+ * modulo contatti e dell'assistente: finora nessuna pagina senza intestazione
+ * aveva un comando di prova, quindi montarlo lì sarebbe stato peso su ottanta
+ * schede dell'Help Desk che non lo usano. Questa pagina è la prima che ce l'ha,
+ * e ce l'ha come **comando principale**: senza il pannello, «Prova Athlon»
+ * cadrebbe sul suo ripiego — `/abbonamenti#guest-pass` — cioè esattamente il
+ * salto in più che è la ragione per cui questa pagina sta nel sito.
+ *
+ * Quindi si monta qui, dove serve, invece di allargare il gate. La condizione
+ * da non rompere: **`chrome` resta `false`.** Rimettendo l'intestazione, il
+ * Layout monterebbe il suo e in pagina ci sarebbero due pannelli con gli stessi
+ * `id` e due gestori sullo stesso click.
+ *
+ * ## L'UTM va nell'indirizzo incollato nella bio
+ *
+ * `https://www.athlonroma.it/link?utm_source=instagram&utm_medium=bio`
+ *
+ * Il browser interno di Instagram non passa il referrer: senza quei due
+ * parametri ogni richiesta nata da qui risulta senza campagna nelle tabelle
+ * `richieste_*`. `scripts/attribuzione.ts` memorizza il primo tocco, quindi
+ * taggare quel solo indirizzo copre tutta la visita — e i comandi qui sotto
+ * **non** portano UTM di proposito, o riscriverebbero il primo tocco a ogni
+ * passaggio. Quale comando è stato premuto lo dice `data-link`, che un tag di
+ * GTM legge da solo senza attributi aggiunti a mano.
+ *
+ * Un secondo profilo — Facebook, il QR di un volantino — cambia solo la query
+ * string: la pagina è la stessa, e le due sorgenti si distinguono comunque.
+ *
+ * ## Il pulsante fisso della chat non c'è, e va tolto a mano
+ *
+ * `ChatFab` sta in ogni pagina, e qui l'assistente è già uno dei sei comandi:
+ * due bersagli per la stessa cosa a un centimetro l'uno dall'altro, con quello
+ * fisso appoggiato sopra la lista. Su una pagina che sta in una schermata il
+ * fab compare **subito** — è il caso «pagina che non scorre» del suo script —
+ * quindi non è un rischio teorico. `display: none` lo toglie anche dal tab,
+ * che è la sola forma accettabile di nasconderlo (vedi AGENTS.md).
+ */
+import Layout from '../layouts/Layout.astro';
+import ProvaModal from '../components/ProvaModal.astro';
+import { CLUB } from '../data/club';
+import { comandiLink, secondarieLink, type VoceLink } from '../data/link';
+import { ctaAttrs } from '../data/cta';
+import { fotoHero } from '../data/foto';
+
+const comandi = await comandiLink();
+const secondarie = secondarieLink();
+
+const HERO = '/wp-content/uploads/2025/11/ATHLON79-scaled.jpg';
+
+/**
+ * Gli attributi che aprono il modal, quando la voce ne apre uno.
+ *
+ * Passano da `ctaAttrs` e non da tre oggetti scritti a mano: `data-cta-source`
+ * è quello che il modal manda a n8n come origine della richiesta, e la
+ * convenzione sta in `cta.ts`. L'assistente non è un `CtaKind` — non è un
+ * intento commerciale, è una conversazione — quindi il suo attributo è diretto.
+ */
+function attrsDi(v: VoceLink): Record<string, string> {
+  if (v.cta === 'trial') return ctaAttrs('trial', 'trial', { source: '/link' });
+  if (v.cta === 'talk') return ctaAttrs('talk', 'contact', { source: '/link' });
+  if (v.cta === 'assistente') return { 'data-cta': 'assistente', 'data-cta-source': '/link' };
+  return {};
+}
+---
+
+<Layout
+  title="Athlon Club 4.0 — tutti i link"
+  description="La prova, gli orari, i contatti: quello che si cerca più spesso del club, in una pagina."
+  image={HERO}
+  imageAlt="La sala pesi di Athlon Club"
+  chrome={false}
+  noindex
+  lcpImage={HERO}
+>
+  <main class="lk">
+    {/* La foto è scenografia, non contenuto: `aria-hidden` e nessun alt utile,
+        perché quello che la pagina dice sta nei sei comandi. Resta comunque
+        l'elemento più grande della prima schermata, quindi passa da `fotoHero`
+        e da `lcpImage`. */}
+    <img class="lk__bg" src={HERO} alt="" aria-hidden="true" {...fotoHero(HERO)} />
+
+    <div class="lk__inner">
+      <header class="lk__testa">
+        <a href="/" class="lk__logo" aria-label={`${CLUB.brand} — vai al sito`}>
+          <img src={CLUB.logo} alt={CLUB.brand} width="834" height="159" />
+        </a>
+        <span class="eyebrow lk__occhiello">{CLUB.area}</span>
+        <h1 class="lk__titolo" data-anim="reveal">Tutto Athlon, da qui.</h1>
+        <p class="lk__lede" data-anim data-anim-delay="80">
+          La prova, gli orari, le risposte: quello che ci si chiede più spesso, in una pagina.
+        </p>
+      </header>
+
+      <nav class="lk__lista" aria-label="I link del club">
+        {comandi.map((v, i) => (
+          <a
+            class:list={['lk__voce', i === 0 && 'lk__voce--primaria']}
+            href={v.href}
+            data-link={v.id}
+            data-anim="pop"
+            data-anim-delay={String(i * 55)}
+            {...attrsDi(v)}
+            {...(v.esterno ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+          >
+            <span class="lk__voce-testo">
+              <span class="lk__voce-label">{v.label}</span>
+              {v.nota && <span class="lk__voce-nota">{v.nota}</span>}
+            </span>
+            <svg class="lk__voce-freccia" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h13" />
+              <path d="M12 5.5 18.5 12 12 18.5" />
+            </svg>
+          </a>
+        ))}
+      </nav>
+
+      {/* Testo e non pulsanti: chi cerca queste pagine sa già di volerle, e sei
+          pulsanti pieni più quattro sarebbero dieci comandi pari — cioè il menu
+          del sito, che è esattamente quello che questa pagina non è. */}
+      <nav class="lk__altro" aria-label="Altre pagine del club">
+        {secondarie.map((s) => (
+          <a class="lk__altro-link" href={s.href} data-link={s.id}>{s.label}</a>
+        ))}
+      </nav>
+
+      {/* La pagina gira senza il footer del sito: senza queste tre righe la
+          privacy e le condizioni non avrebbero nessuna strada da qui. Stessa
+          ragione del blocco in fondo a `/attiva`. */}
+      <footer class="lk__piede">
+        <p class="lk__indirizzo">{CLUB.street}, {CLUB.postalCode} {CLUB.city}</p>
+        {/* Senza i «·» che il resto del sito mette fra questi link, e non per
+            distrazione: qui sono tre e su uno schermo da 390px vanno a capo,
+            lasciando un separatore appeso a fine riga — visto. Lo spazio del
+            `gap` fa lo stesso lavoro a qualunque larghezza. */}
+        <p class="lk__legale">
+          <a href="/">Vai al sito</a>
+          <a href="/regolamento">Termini e condizioni</a>
+          <a href="/privacy">Privacy policy</a>
+        </p>
+      </footer>
+    </div>
+  </main>
+
+  {/* Il pannello della prova. Il perché sta in testa al file, nella sezione che
+      spiega il gate `chrome` del Layout. */}
+  <ProvaModal />
+</Layout>
+
+<style>
+  /* Il pulsante fisso della chat: qui l'assistente è già in lista, e il perché
+     sta in testa al file. La regola è `:global` dentro una pagina, quindi vive
+     solo nel CSS di questa pagina e non tocca le altre.
+
+     **`!important` è necessario, e la ragione è la specificità.** `ChatFab`
+     dichiara `.cfab { display: inline-flex }` nel proprio `<style>`, che Astro
+     compila in `.cfab[data-astro-cid-…]`: due classi contro la mia una, quindi
+     senza `!important` vince lei e il pulsante resta in pagina — misurato,
+     `display` risultava `flex`. È lo stesso motivo per cui `global.css` scrive
+     `[hidden] { display: none !important }`.
+
+     `display: none` e non `visibility`: così il pulsante esce anche dal giro
+     del tab, che è la sola forma accettabile di nasconderlo (vedi AGENTS.md). */
+  :global(.cfab) {
+    display: none !important;
+  }
+
+  .lk {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1.25rem 2rem;
+    background: var(--color-dark);
+    color: var(--color-white);
+    overflow: hidden;
+  }
+
+  /* La foto sotto tutto, spenta: deve dire «sei nel posto giusto» e non
+     competere con sei etichette da leggere. Il gradiente non è decorazione —
+     senza, le note in corpo piccolo cadono sopra le zone chiare della sala. */
+  .lk__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.4;
+  }
+
+  .lk::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(39, 36, 35, 0.35) 0%, rgba(39, 36, 35, 0.82) 45%,
+      rgba(39, 36, 35, 0.95) 72%, var(--color-dark) 100%);
+  }
+
+  .lk__inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    /* 27rem e non una misura in px: sul totem e sulla televisione la colonna
+       cresce col root invece di restare una striscia da telefono in mezzo allo
+       schermo. Vedi AGENTS.md. */
+    max-width: 27rem;
+  }
+
+  .lk__testa {
+    text-align: center;
+    margin-bottom: 1.75rem;
+  }
+
+  .lk__logo {
+    display: inline-flex;
+    /* Il logo è un comando: porta al sito, e da qui è la sola via d'uscita
+       oltre alle tre righe in fondo. Alto come un bersaglio da dito. */
+    min-height: 3rem;
+    align-items: center;
+    margin-bottom: 1.25rem;
+  }
+
+  .lk__logo img {
+    width: 9.5rem;
+    height: auto;
+  }
+
+  .lk__occhiello {
+    margin-bottom: 0.5rem;
+  }
+
+  /* `--lh` e non `line-height`: il calcolo dello spazio sopra le maiuscole
+     accentate parte da lì (vedi AGENTS.md). Qui il titolo non ha accenti, ma
+     la prossima persona che riscrive questa riga in italiano ne metterà uno. */
+  .lk__titolo {
+    font-size: var(--text-2xl);
+    --lh: 1;
+    letter-spacing: var(--tracking-2xl);
+  }
+
+  .lk__lede {
+    margin-top: 0.65rem;
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .lk__lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .lk__voce {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    /* Tutto in rem: l'altezza minima è ben oltre i 48px di bersaglio a root 16,
+       e cresce insieme al testo dove il root cresce. */
+    min-height: 4rem;
+    padding: 0.9rem 1.1rem;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(0.5rem);
+    -webkit-backdrop-filter: blur(0.5rem);
+    color: var(--color-white);
+    transition: transform var(--dur-instant) ease-out,
+      background-color var(--dur-fast) var(--ease-out-crit),
+      border-color var(--dur-fast) var(--ease-out-crit);
+  }
+
+  .lk__voce:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.28);
+    transform: translateY(-1px);
+  }
+
+  .lk__voce:active {
+    transform: scale(0.985);
+    transition-duration: var(--dur-press);
+  }
+
+  /* Un solo comando pieno, e non è una preferenza grafica: se due pulsanti
+     pesano uguale non c'è un primo. La prova è quello che questa pagina deve
+     ottenere. */
+  .lk__voce--primaria {
+    background: var(--color-primary);
+    border-color: transparent;
+  }
+
+  .lk__voce--primaria:hover {
+    background: var(--accent-hover);
+    border-color: transparent;
+  }
+
+  .lk__voce-testo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    /* `min-width: 0` o una nota lunga allarga la riga e la freccia esce dal
+       bordo: è la stessa trappola di `minmax(0, 1fr)` sul totem. */
+    min-width: 0;
+    flex: 1;
+  }
+
+  .lk__voce-label {
+    font-size: var(--text-md);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .lk__voce-nota {
+    font-size: var(--text-sm);
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .lk__voce--primaria .lk__voce-nota {
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .lk__voce-freccia {
+    flex-shrink: 0;
+    width: 1.15rem;
+    height: 1.15rem;
+    opacity: 0.65;
+    transition: transform var(--dur-fast) var(--ease-out-crit);
+  }
+
+  .lk__voce:hover .lk__voce-freccia {
+    transform: translateX(0.2rem);
+  }
+
+  .lk__altro {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem 1.1rem;
+    margin-top: 1.5rem;
+  }
+
+  /* I richiami secondari del sito prendono l'altezza da un elenco esplicito in
+     `global.css`, e lì la misura è 1,8rem — che alla radice del totem fa 49px
+     ma sul telefono ne fa 29. Altrove è una scelta giusta: sono link dentro a
+     una pagina, e un dito che appoggia sul vetro si centra bene su 30px.
+
+     Qui no, e la differenza è la pagina: questa è la bio di Instagram, quindi
+     è **tutta** comandi e si usa con una mano sola su un telefono. 3rem fa 48px
+     alla radice da 16 — la misura piena di un bersaglio — e cresce come le
+     altre dove il root cresce. Restano testo per come sono scritti — corpo
+     piccolo, sottolineati — e bersagli per come si toccano. */
+  .lk__altro-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    font-size: var(--text-xs);
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.78);
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.25);
+    text-underline-offset: 0.2em;
+  }
+
+  .lk__altro-link:hover {
+    color: var(--color-white);
+    text-decoration-color: var(--color-primary);
+  }
+
+  .lk__piede {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: var(--text-2xs);
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .lk__indirizzo {
+    margin-bottom: 0.35rem;
+  }
+
+  .lk__legale {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.15rem 1.1rem;
+  }
+
+  .lk__legale a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.8rem;
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .lk__legale a:hover {
+    color: var(--color-white);
+  }
+
+  /* Sotto i 380px la nota non si tronca e non sparisce: è la riga che dice
+     cosa costa la prova, e senza di lei l'etichetta va indovinata. Si stringe
+     il resto. */
+  @media (max-width: 380px) {
+    .lk {
+      padding-inline: 1rem;
+    }
+
+    .lk__voce {
+      gap: 0.7rem;
+      padding: 0.85rem 0.95rem;
+    }
+  }
+</style>
