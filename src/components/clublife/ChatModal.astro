@@ -286,6 +286,19 @@ import CampoTelefono from '../CampoTelefono.astro';
 
     async function apri(comando: HTMLElement) {
       ultimoComando = comando;
+      /* Chi apre l'assistente e lo chiude senza scrivere non lasciava traccia
+         da nessuna parte: `chat_conversazioni` nasce al primo messaggio, non
+         all'apertura. Questo è il gradino che mancava fra «è passato di qui» e
+         «ha chiesto qualcosa», e dice anche da quale dei sei comandi è partito.
+
+         `athlonEvento` (scripts/visita.ts) scrive la riga su Supabase e spinge
+         l'evento nel dataLayer da cui GTM costruisce il tag GA4: una chiamata,
+         due destinazioni, e la stessa esclusione `?athlon-notrack=1` per
+         entrambe. Prima dell'`await`, perché quello che si misura è il gesto,
+         non il caricamento del modulo che ne consegue. */
+      (
+        window as unknown as { athlonEvento?: (t: string, o?: string | null) => void }
+      ).athlonEvento?.('chat_open', comando.dataset.ctaSource || null);
       modal!.classList.add('open');
       modal!.setAttribute('aria-hidden', 'false');
       document.body.classList.add('amodal-locked');
