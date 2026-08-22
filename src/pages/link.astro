@@ -68,12 +68,13 @@
 import Layout from '../layouts/Layout.astro';
 import ProvaModal from '../components/ProvaModal.astro';
 import { CLUB } from '../data/club';
-import { comandiLink, secondarieLink, type VoceLink } from '../data/link';
+import { comandiLink, secondarieLink, attivitaLink, type VoceLink } from '../data/link';
 import { ctaAttrs } from '../data/cta';
 import { fotoHero } from '../data/foto';
 
 const comandi = await comandiLink();
 const secondarie = secondarieLink();
+const attivita = attivitaLink();
 
 const HERO = '/wp-content/uploads/2025/11/ATHLON79-scaled.jpg';
 
@@ -145,14 +146,48 @@ function attrsDi(v: VoceLink): Record<string, string> {
         ))}
       </nav>
 
-      {/* Testo e non pulsanti: chi cerca queste pagine sa già di volerle, e sei
-          pulsanti pieni più quattro sarebbero dieci comandi pari — cioè il menu
-          del sito, che è esattamente quello che questa pagina non è. */}
-      <nav class="lk__altro" aria-label="Altre pagine del club">
-        {secondarie.map((s) => (
-          <a class="lk__altro-link" href={s.href} data-link={s.id}>{s.label}</a>
-        ))}
+      {/* Le attività, per chi scorre la bio già sapendo cosa cerca: «fate
+          acqua fitness?», «a che ora è il pilates?». Testo e non pulsanti,
+          per la stessa ragione delle voci qui sotto — ventisei link pieni
+          sarebbero un catalogo, non una bio. Le due liste vengono da
+          `attivitaLink()`, che legge `PAGINE_ADULTI` e `JUNIOR`: la stessa
+          fonte che usa il resto del sito, quindi un corso nuovo compare qui
+          da solo. */}
+      <nav class="lk__attivita" aria-label="Le attività del club">
+        <div class="lk__attivita-gruppo">
+          <span class="eyebrow lk__attivita-eyebrow">Attività Adulti</span>
+          <p class="lk__attivita-lista">
+            {attivita.adulti.map((a, i) => (
+              <>
+                <a href={a.href} data-link={a.id}>{a.label}</a>
+                {i < attivita.adulti.length - 1 && <span aria-hidden="true"> &middot;&nbsp;</span>}
+              </>
+            ))}
+          </p>
+        </div>
+        <div class="lk__attivita-gruppo">
+          <span class="eyebrow lk__attivita-eyebrow">Corsi Junior</span>
+          <p class="lk__attivita-lista">
+            {attivita.junior.map((a, i) => (
+              <>
+                <a href={a.href} data-link={a.id}>{a.label}</a>
+                {i < attivita.junior.length - 1 && <span aria-hidden="true"> &middot;&nbsp;</span>}
+              </>
+            ))}
+          </p>
+        </div>
       </nav>
+
+      {/* Quello che resta delle voci secondarie: solo «Lavora con noi», e solo
+          se ci sono posizioni aperte. Non è più un elenco di pagine miste — lo
+          spazio l'hanno preso le attività qui sopra. */}
+      {secondarie.length > 0 && (
+        <nav class="lk__altro" aria-label="Altre pagine del club">
+          {secondarie.map((s) => (
+            <a class="lk__altro-link" href={s.href} data-link={s.id}>{s.label}</a>
+          ))}
+        </nav>
+      )}
 
       {/* La pagina gira senza il footer del sito: senza queste tre righe la
           privacy e le condizioni non avrebbero nessuna strada da qui. Stessa
@@ -366,6 +401,45 @@ function attrsDi(v: VoceLink): Record<string, string> {
 
   .lk__voce:hover .lk__voce-freccia {
     transform: translateX(0.2rem);
+  }
+
+  /* Le due liste di attività: un paragrafo che scorre, non righe di pulsanti.
+     Ventisei nomi come bersagli da 48px sarebbero una pagina intera solo di
+     quello — qui sono testo dentro un `<p>`, e il totem li esenta dalla
+     misura minima per la stessa ragione per cui esenta un link di un
+     paragrafo: si legge, non si preme al buio (vedi AGENTS.md, «i link dentro
+     testo che scorre non sono bersagli»). */
+  .lk__attivita {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .lk__attivita-gruppo + .lk__attivita-gruppo {
+    margin-top: 1rem;
+  }
+
+  .lk__attivita-eyebrow {
+    margin-bottom: 0.5rem;
+    font-size: var(--text-2xs);
+  }
+
+  .lk__attivita-lista {
+    font-size: var(--text-sm);
+    line-height: 1.85;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .lk__attivita-lista a {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.25);
+    text-underline-offset: 0.15em;
+  }
+
+  .lk__attivita-lista a:hover {
+    color: var(--color-white);
+    text-decoration-color: var(--color-primary);
   }
 
   .lk__altro {

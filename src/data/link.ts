@@ -45,6 +45,8 @@ import { getCollection } from 'astro:content';
 import { CLUB } from './club';
 import { GUEST_PASS } from './abbonamenti';
 import { POSIZIONI } from './lavora';
+import { PAGINE_ADULTI } from './pagine';
+import { JUNIOR } from './junior';
 import { TALK, TRIAL } from './cta';
 
 export interface VoceLink {
@@ -160,25 +162,54 @@ export async function comandiLink(): Promise<VoceLink[]> {
   ];
 }
 
+/** Una voce di testo: nessun `nota`, nessun `cta` — solo un nome e un indirizzo. */
+export interface VoceSemplice {
+  id: string;
+  label: string;
+  href: string;
+}
+
 /**
- * Le voci secondarie: testo e non pulsanti.
+ * Le due liste di attività, per chi scorre la bio già sapendo cosa cerca —
+ * «fate acqua fitness?», «a che ora è il pilates?» — e vuole la pagina di
+ * quel corso, non un pulsante generico.
  *
- * Non sono comandi di serie B per pigrizia — sono le pagine che qualcuno cerca
- * *sapendo già* di volerle. Chi vuole invitare un amico è socio e sa cos'è;
- * chi cerca lavoro cerca lavoro. Un pulsante pieno per ognuna le metterebbe in
- * concorrenza con la prova, che è la cosa che questa pagina deve ottenere.
+ * **La fonte è quella che usa già il resto del sito**, non una copia scritta
+ * qui: `PAGINE_ADULTI` e `JUNIOR` sono gli stessi elenchi che popolano i
+ * rimandi fra pagine e il menu dell'header. Aggiungere un corso in
+ * `corsi.ts` o `junior.ts` lo fa comparire anche qui, senza toccare questo
+ * file — è la stessa ragione per cui `ACTIVITY_TAGS` alimenta tre posti in
+ * una volta (vedi AGENTS.md).
  *
- * «Lavora con noi» segue le posizioni aperte: `POSIZIONI` vuoto è uno stato
- * legittimo — la pagina lo dice per intero e la candidatura spontanea resta —
- * ma dalla bio non si manda nessuno su un elenco vuoto.
+ * Gli adulti sono in ordine alfabetico italiano, come fa `Header.astro` con
+ * i corsi fitness: sono ventidue voci, e senza un ordine riconoscibile
+ * diventano un elenco da leggere invece che da scorrere. I corsi junior sono
+ * quattro e restano nell'ordine in cui li scrive `junior.ts` — la
+ * progressione per età, che per soli quattro nomi si legge più naturale di
+ * un ordine alfabetico.
  */
-export function secondarieLink(): { label: string; href: string; id: string }[] {
-  return [
-    { id: 'abbonamenti', label: 'Abbonamenti e prezzi', href: '/abbonamenti' },
-    { id: 'tv', label: 'Athlon TV', href: '/athlon-tv' },
-    { id: 'referral', label: 'Invita un amico', href: '/referral' },
-    ...(POSIZIONI.length
-      ? [{ id: 'lavora', label: 'Lavora con noi', href: '/lavora' }]
-      : []),
-  ];
+export function attivitaLink(): { adulti: VoceSemplice[]; junior: VoceSemplice[] } {
+  return {
+    adulti: [...PAGINE_ADULTI]
+      .sort((a, b) => a.nome.localeCompare(b.nome, 'it'))
+      .map((c) => ({ id: c.slug, label: c.nome, href: `/${c.slug}` })),
+    junior: JUNIOR.map((c) => ({ id: c.slug, label: c.nome, href: `/${c.slug}` })),
+  };
+}
+
+/**
+ * Le voci secondarie: testo e non un pulsante.
+ *
+ * Ne resta una sola, «Lavora con noi», e segue le posizioni aperte:
+ * `POSIZIONI` vuoto è uno stato legittimo — la pagina lo dice per intero e la
+ * candidatura spontanea resta — ma dalla bio non si manda nessuno su un
+ * elenco vuoto.
+ *
+ * Abbonamenti, Athlon TV e il referral sono usciti da questa pagina: erano
+ * link di serie B che non parlavano a chi arriva da un video su Instagram.
+ * Chi vuole abbonarsi lo trova dal Guest Pass o dalla promo; chi è già socio
+ * conosce già `/referral`.
+ */
+export function secondarieLink(): VoceSemplice[] {
+  return POSIZIONI.length ? [{ id: 'lavora', label: 'Lavora con noi', href: '/lavora' }] : [];
 }

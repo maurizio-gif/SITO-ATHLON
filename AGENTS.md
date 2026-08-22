@@ -348,15 +348,27 @@ Una pagina sola, sei comandi, `noindex` e fuori dalla sitemap come `/attiva` e
 `/referral`. I contenuti stanno in `src/data/link.ts`, la pagina in
 `src/pages/link.astro`.
 
-**Non elenca le pagine del sito**, e questa è la scelta da cui dipende tutto il
-resto: una linktree che elenca è il menu scritto due volte, e la seconda copia
-divergerà. Risponde ai motivi per cui si tocca il link di una bio, che sono gli
-intenti già dichiarati in `cta.ts` — provare, sapere quando, parlare con
-qualcuno, venire in sede. **Sei comandi pieni è un tetto**: al settimo la
-pagina torna a essere il menu che voleva sostituire. Il resto — abbonamenti,
-Athlon TV, referral, lavora — sta sotto come testo, perché chi cerca quelle
-pagine sa già di volerle e un pulsante pieno le metterebbe in concorrenza con
-la prova, che è la cosa che questa pagina deve ottenere.
+**Non elenca le pagine del sito con un pulsante a testa**, e questa è la scelta
+da cui dipende tutto il resto: una linktree che elenca ogni pagina come un
+pulsante è il menu scritto due volte, e la seconda copia divergerà. I sei
+comandi pieni rispondono ai motivi per cui si tocca il link di una bio, che
+sono gli intenti già dichiarati in `cta.ts` — provare, sapere quando, parlare
+con qualcuno, venire in sede. **Sei comandi pieni è un tetto**: al settimo la
+pagina torna a essere il menu che voleva sostituire. «Lavora con noi» sta
+sotto come testo, per la stessa ragione — chi cerca lavoro lo cerca sapendo già
+di volerlo, e un pulsante pieno lo metterebbe in concorrenza con la prova, che
+è la cosa che questa pagina deve ottenere.
+
+**Le attività sono l'eccezione**, e sono un paragrafo che scorre, non
+pulsanti: chi arriva già sapendo cosa cerca — «fate acqua fitness?», «a che ora
+è il pilates?» — vuole la pagina di quel corso, non un modulo. `attivitaLink()`
+in `data/link.ts` le legge da `PAGINE_ADULTI` e `JUNIOR`, la stessa fonte che
+alimenta i rimandi fra pagine e il menu dell'header: un corso nuovo in
+`corsi.ts` o `junior.ts` compare qui da solo, senza toccare questo file. Sono
+ventisei nomi in tutto, e per questo vivono dentro un `<p>` e non in righe di
+link: il totem esenta i link dentro testo che scorre dalla misura minima di
+48px proprio perché si leggono e non si premono al buio — ventisei bersagli
+pieni sarebbero una seconda pagina fatta solo di quello.
 
 **Sta nel sito e non su linktr.ee** per una ragione misurabile: i modal della
 prova, dei contatti e dell'assistente vivono nel Layout, quindi vivono anche
