@@ -1,12 +1,27 @@
 /**
- * Il registro di ogni pagina vista, non solo di chi compila un modulo.
+ * Quello che il sito registra da solo: ogni pagina vista, e i gesti che non
+ * lasciano altra traccia.
  *
  * Le tabelle `richieste_*` e `eventi_email` contengono solo chi è arrivato in
- * fondo a un modulo. Per sapere «quanti accessi» e «quanti mi hanno lasciato
- * dei dati» serve anche il numeratore che manca: ogni caricamento di pagina,
- * con lo stesso `vid`/`sid` di `scripts/attribuzione.ts`, verso la tabella
- * `visite_pagina` (vedi `supabase/migrations/20260822_tracciamento_completo.sql`)
- * e la vista `visitatori` che la aggrega.
+ * fondo a un modulo. Qui sotto ci sono i due gradini prima:
+ *
+ *  - **`visite_pagina`** — un caricamento di pagina, con lo stesso `vid`/`sid`
+ *    di `scripts/attribuzione.ts`. È la risposta a «quanti accessi».
+ *  - **`eventi_interazione`** — un gesto compiuto in pagina che non è né un
+ *    caricamento né un invio: oggi l'apertura dell'assistente. Misura
+ *    l'intenzione che non arriva in fondo, e prima non lasciava traccia da
+ *    nessuna parte.
+ *
+ * `window.athlonEvento(tipo, extra)` manda il secondo, e lo manda **in due
+ * posti insieme**: la riga su Supabase e l'evento nel `dataLayer`, da cui GTM
+ * costruisce il tag GA4. Una chiamata sola perché contare due volte lo stesso
+ * gesto in due modi diversi è il modo di ritrovarsi due numeri che non
+ * tornano — e perché l'esclusione qui sotto deve valere per entrambi.
+ *
+ * Nel `dataLayer` si spinge **sempre**, anche senza consenso: è GTM a decidere
+ * se il tag parte, ed è il Consent Mode a dirglielo (vedi `scripts/consenso.ts`).
+ * Un `push` non è un tag. È la stessa forma dei `lead_submit` che i form già
+ * mandano.
  *
  * ## Il corpo è `text/plain`, e non è un dettaglio: è la ragione per cui prima
  * non arrivava niente
@@ -25,8 +40,8 @@
  *
  * `text/plain` è uno dei tre content-type che non fanno scattare il preflight,
  * quindi il POST parte e basta. Il corpo resta la stessa stringa JSON: a
- * cambiare è solo l'etichetta, e il nodo `Normalizza` del workflow la rilegge
- * con `JSON.parse` quando arriva come stringa.
+ * cambiare è solo l'etichetta, e i nodi `Normalizza` dei due workflow la
+ * rileggono con `JSON.parse`.
  *
  * **E il guasto era silenzioso**, che è la parte da ricordare: `sendBeacon()`
  * restituisce `true` quando ha *accodato* la richiesta, non quando è arrivata.
@@ -48,9 +63,12 @@
  * numeri che il sito serve a leggere. Da qui l'esclusione, che si accende una
  * volta per dispositivo aprendo una pagina qualsiasi con `?athlon-notrack=1`
  * e resta finché non si svuota il browser (o si apre `?athlon-notrack=0`).
- * `window.athlonNoTrack()` dice cosa vede il browser adesso.
+ * `window.athlonNoTrack()` dice cosa vede il browser adesso. Vale per le
+ * pagine, per gli eventi **e per il `dataLayer`**: un'esclusione che lascia
+ * passare metà dei segnali non esclude niente.
  */
-const URL = 'https://automazione.n8ndevelop.it/webhook/athlon-visita-pagina';
+const URL_VISITA = 'https://automazione.n8ndevelop.it/webhook/athlon-visita-pagina';
+const URL_EVENTO = 'https://automazione.n8ndevelop.it/webhook/athlon-evento';
 
 const KEY_NOTRACK = 'athlon_notrack';
 const PARAM_NOTRACK = 'athlon-notrack';
@@ -88,57 +106,108 @@ function escluso(): boolean {
   }
 }
 
-function manda(): void {
+interface Finestra {
+  athlonGetUtm?: () => Record<string, string>;
+  athlonGetVid?: () => string;
+  athlonGetSid?: () => string;
+  athlonVidStabile?: () => boolean;
+  dataLayer?: unknown[];
+}
+
+/** Chi è, quale visita, da dove: la parte comune di ogni cosa che spediamo. */
+function contesto() {
+  const w = window as unknown as Finestra;
+  /* Prima `athlonGetVid()`, poi `athlonVidStabile()`: è la prima a scrivere
+     nello storage quando il consenso c'è, e la seconda legge il risultato. */
+  const vid = w.athlonGetVid ? w.athlonGetVid() : null;
+  return {
+    vid,
+    /* Senza consenso pubblicitario il vid vale una pagina sola: va detto, o
+       chi conta i visitatori unici conta le pagine. */
+    vidStabile: w.athlonVidStabile ? w.athlonVidStabile() : false,
+    sid: w.athlonGetSid ? w.athlonGetSid() : null,
+    pagina: location.pathname + location.search,
+    utm: w.athlonGetUtm ? w.athlonGetUtm() : {},
+  };
+}
+
+/**
+ * Il beacon, con il ripiego.
+ *
+ * `text/plain` per la ragione in testa al file. `sendBeacon` e non `fetch`
+ * perché quello che spediamo può essere seguito da una navigazione immediata —
+ * un clic che apre un pannello, o un caricamento di pagina — e sopravvivere
+ * alla navigazione è il suo scopo.
+ */
+function spedisci(url: string, corpo: string): void {
+  const blob = new Blob([corpo], { type: 'text/plain;charset=UTF-8' });
+  if (navigator.sendBeacon && navigator.sendBeacon(url, blob)) return;
+  /* Browser senza sendBeacon, o coda piena: un fetch con keepalive è il
+     ripiego, non la strada principale — non aspetta risposta e non blocca
+     niente se fallisce. Stesso content-type, per non avere due formati da
+     gestire dall'altra parte. */
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+    body: corpo,
+    keepalive: true,
+  }).catch(() => {});
+}
+
+function mandaVisita(): void {
   try {
     if (escluso()) return;
-
-    const w = window as unknown as {
-      athlonGetUtm?: () => Record<string, string>;
-      athlonGetVid?: () => string;
-      athlonGetSid?: () => string;
-      athlonVidStabile?: () => boolean;
-    };
-    /* Prima `athlonGetVid()`, poi `athlonVidStabile()`: è la prima a scrivere
-       nello storage quando il consenso c'è, e la seconda legge il risultato. */
-    const idVisitatore = w.athlonGetVid ? w.athlonGetVid() : null;
-    const corpo = JSON.stringify({
-      vid: idVisitatore,
-      /* Senza consenso pubblicitario il vid qui sopra vale una pagina sola:
-         va detto, o chi conta i visitatori unici conta le pagine. */
-      vidStabile: w.athlonVidStabile ? w.athlonVidStabile() : false,
-      sid: w.athlonGetSid ? w.athlonGetSid() : null,
-      pagina: location.pathname + location.search,
-      referrer: document.referrer || null,
-      titolo: document.title || null,
-      utm: w.athlonGetUtm ? w.athlonGetUtm() : {},
-    });
-    /* `text/plain` e non `application/json`: vedi il blocco in testa al file.
-       Il contenuto resta JSON, ed è il nodo `Normalizza` a rileggerlo. */
-    const blob = new Blob([corpo], { type: 'text/plain;charset=UTF-8' });
-    if (navigator.sendBeacon && navigator.sendBeacon(URL, blob)) return;
-    /* Browser senza sendBeacon, o coda piena: un fetch con keepalive è il
-       ripiego, non la strada principale — non aspetta risposta e non blocca
-       niente se fallisce. Stesso content-type, per non avere due formati da
-       gestire dall'altra parte. */
-    fetch(URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-      body: corpo,
-      keepalive: true,
-    }).catch(() => {});
+    spedisci(
+      URL_VISITA,
+      JSON.stringify({
+        ...contesto(),
+        referrer: document.referrer || null,
+        titolo: document.title || null,
+      })
+    );
   } catch {
     /* Un pageview mancato non deve mai rompere la pagina che lo genera. */
   }
 }
 
-(window as unknown as { athlonNoTrack: () => boolean }).athlonNoTrack = () => {
+/**
+ * Un gesto: la riga su Supabase e l'evento nel `dataLayer`, insieme.
+ *
+ * `tipo` è il nome del gesto (`chat_open`), `origine` da quale comando è
+ * partito — cioè il `data-cta-source` del pulsante premuto, che il sito mette
+ * già nel markup di ogni CTA.
+ *
+ * Non solleva mai: un evento di misura che rompe il gesto che sta misurando è
+ * il peggior baratto possibile.
+ */
+function evento(tipo: string, origine?: string | null): void {
+  try {
+    if (!tipo || escluso()) return;
+    const c = contesto();
+    spedisci(URL_EVENTO, JSON.stringify({ ...c, tipo, origine: origine || null }));
+
+    const w = window as unknown as Finestra;
+    w.dataLayer = w.dataLayer || [];
+    w.dataLayer.push({ event: tipo, evento_origine: origine || null, evento_pagina: c.pagina });
+  } catch {
+    /* idem */
+  }
+}
+
+const w = window as unknown as Finestra & {
+  athlonNoTrack: () => boolean;
+  athlonEvento: (tipo: string, origine?: string | null) => void;
+};
+
+w.athlonNoTrack = () => {
   try {
     return localStorage.getItem(KEY_NOTRACK) === '1';
   } catch {
     return false;
   }
 };
+w.athlonEvento = evento;
 
-manda();
+mandaVisita();
 
 export {};
