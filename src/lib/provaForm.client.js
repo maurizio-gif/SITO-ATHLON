@@ -382,7 +382,26 @@ export function initProvaForm(root, options) {
     });
   });
 
-  function reset() {
+  /**
+   * Svuota tutto: lo stato, i campi, i segni di errore, il calendario.
+   *
+   * Sta fuori da `reset()` perche' serve in due momenti diversi, e il secondo
+   * mancava: alla fine del percorso e **all'apertura**. `reset()` la chiama
+   * chi arriva in fondo, ma chi chiude il pannello a meta' non ci passa — il
+   * pulsante di chiusura e Escape chiudono e basta, la chiusura e' una classe
+   * che va via. Quindi riaprendo si trovavano compilati email, nome, cognome e
+   * cellulare di chi l'aveva aperto prima.
+   *
+   * Su un computer personale e' un fastidio; sul **totem all'ingresso del
+   * club** sono i dati personali di un visitatore mostrati al successivo. E' la
+   * stessa ragione per cui `ContattaciModal` si apre vuoto sempre e per cui la
+   * chat, la', dimentica dopo tre minuti.
+   *
+   * `chiudiCalendario()` resta qui e non solo in `mostraStep`, che lo
+   * chiamerebbe comunque uscendo dal passo dell'esito: cosi' la funzione fa
+   * quello che il suo nome promette anche se un domani `mostraStep` cambia.
+   */
+  function pulisci() {
     chiudiCalendario();
     dati = stato();
     [campoEmail, campoNome, campoCognome, campoCellulare].forEach(function (c) {
@@ -394,11 +413,19 @@ export function initProvaForm(root, options) {
       if (steps[k]) pulisciErrore(steps[k]);
     });
     mostraStep('email');
+  }
+
+  function reset() {
+    pulisci();
     onReset();
   }
 
   return {
     open: function (origine, cta, attivita) {
+      // Prima si svuota — e `pulisci()` riporta anche al primo passo — poi si
+      // scrive la provenienza: nell'ordine inverso `stato()` la cancellerebbe
+      // subito dopo averla scritta.
+      pulisci();
       // La pagina la sa il browser. `origine` e' il punto del sito da cui
       // parte il comando — "header" o "/gym-floor" — e non sempre coincide
       // con la pagina: l'header e' su tutte.
@@ -406,7 +433,6 @@ export function initProvaForm(root, options) {
       dati.origine = origine || '';
       dati.cta = cta || '';
       dati.attivita = attivita || '';
-      mostraStep('email');
     },
     reset: reset,
   };
