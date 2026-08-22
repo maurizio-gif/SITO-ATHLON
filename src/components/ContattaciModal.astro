@@ -81,7 +81,12 @@ import CampoTelefono from './CampoTelefono.astro';
           promette «o al telefono, come preferisci» sarebbe una promessa che il
           suo percorso non mantiene. Quello che vale per tutti è che risponde
           una persona, e che è online. */}
-      <p class="cf__lead">
+      {/* Nascosto per le attività junior/baby: chi arriva da «trova il corso
+          giusto per tuo figlio» sa già perché sta scrivendo, e il titolo
+          diventa «Richiesta informazioni.» — vedi mostraContesto() in
+          contattaciForm.client.js. Resta per chi contatta da adulto, dove il
+          contesto è meno definito. */}
+      <p class="cf__lead" data-cf-lead-team>
         Apri una richiesta di informazioni o di assistenza: la prende in carico il nostro Team di
         Assistenza, e ti risponde in pochi minuti.
       </p>
@@ -206,7 +211,7 @@ import CampoTelefono from './CampoTelefono.astro';
     <section class="cf__step" id="cf-step-bambino" hidden>
       <span class="cf__eyebrow" data-cf-passo="2">Passo 2 di 3</span>
       <h3 class="cf__title" tabindex="-1" data-cf-fuoco>Parlaci di lui o lei.</h3>
-      <p class="cf__lead">Sono i dati con cui la direzione tecnica trova il gruppo giusto.</p>
+      <p class="cf__lead">Sono i dati con cui ti indichiamo il gruppo adatto alla sua fascia d'età.</p>
 
       <div class="cf__coppia">
         <div>
@@ -256,8 +261,19 @@ import CampoTelefono from './CampoTelefono.astro';
     <section class="cf__step" id="cf-step-genitore" hidden>
       <span class="cf__eyebrow" data-cf-passo="3">Passo 3 di 3</span>
       <h3 class="cf__title" tabindex="-1" data-cf-fuoco>E di te.</h3>
-      <p class="cf__lead">
-        L'iscrizione di un minore si intesta a un adulto: sei tu il titolare del nucleo sul portale.
+      {/* Il motivo cambia con l'attività, non solo le parole: la Scuola Nuoto
+          Bambini, l'agonistico e la pallanuoto danno accesso a turni e costi
+          da consultare, il Baby Nuoto dà la prenotazione delle lezioni — sono
+          due percorsi diversi su PerfectGym, non la stessa frase riscritta.
+          `mostraMotivoGenitore()` in contattaciForm.client.js sceglie quale
+          mostrare in base a `dati.ramo`, appena si lascia il passo del
+          bambino. */}
+      <p class="cf__lead" data-cf-genitore-motivo="junior" hidden>
+        Servono a creare il tuo account sul portale: da lì vedi tutti i turni disponibili e i
+        costi.
+      </p>
+      <p class="cf__lead" data-cf-genitore-motivo="baby" hidden>
+        Servono a creare il tuo account sul portale, con cui prenoti le lezioni quando vuoi.
       </p>
 
       <div class="cf__coppia">
