@@ -87,6 +87,13 @@ export const STORAGE: Voce[] = [
     durata: 'La sessione del browser',
     categoria: 'necessario',
   },
+  {
+    chiave: 'athlon_notrack',
+    dove: 'localStorage',
+    cosa: "Il contrassegno di chi ha chiesto di non essere conteggiato fra le visite: lo usa chi lavora al sito, perché le sue prove non falsino i numeri. Esiste solo se è stato acceso, e il suo effetto è che da questo browser non viene registrata nessuna pagina vista.",
+    durata: 'Finché non si svuota il browser',
+    categoria: 'necessario',
+  },
 ];
 
 export interface Destinatario {
