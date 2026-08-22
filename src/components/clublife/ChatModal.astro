@@ -1247,6 +1247,41 @@ import CampoTelefono from '../CampoTelefono.astro';
     font-size: var(--text-xs);
   }
 
+  /* ---- L'azione: iscrizione o prova ----
+     Stessa forma della card del richiamo (`.ca__richiamo*`), che riusa il
+     titolo, il testo e il pulsante pieno: sono la stessa idea, «una cosa da
+     fare dentro la conversazione», e due famiglie di classi per la stessa idea
+     sarebbero due posti da tenere allineati. Qui in più il link secondario del
+     reset password, sullo stesso registro di `.ca__link` ma `:global` — questo
+     blocco lo costruisce lo script con `innerHTML` e non porta l'attributo di
+     scope di Astro, quindi una regola senza `:global` non lo raggiungerebbe. */
+  .ca__conversazione :global(.ca__azione-link) {
+    margin-top: 0.6rem;
+    padding: 0 0.4rem;
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    border: 0;
+    background: none;
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .ca__conversazione :global(.ca__azione-link:hover) {
+    color: var(--color-dark);
+  }
+
+  .ca__conversazione :global(.ca__azione-esito) {
+    margin: 0.4rem 0 0;
+    padding: 0 0.4rem;
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    color: var(--color-dark);
+  }
+
   /* ---- La barra di scrittura ----
      Ferma in fondo, staccata dalla conversazione da un filo di bordo: è la
      stessa gerarchia di un'app di messaggi, dove il campo non scorre via. */
