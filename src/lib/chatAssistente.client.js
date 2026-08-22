@@ -232,6 +232,10 @@ export function initChatAssistente(root, options) {
      e non dentro la conversazione: quella si svuota a ogni riapertura, questa
      resta. */
   var btnRichiamo = q('[data-ca-richiamo]');
+  /* Il gemello scritto della telefonata, nell'intestazione. Si cerca fra i
+     figli del modal e non dentro la conversazione, che si svuota a ogni
+     riapertura: questo deve restare. */
+  var btnScrivi = q('[data-ca-ticket]');
 
   function mostra(nome) {
     dati.passo = nome;
@@ -251,6 +255,36 @@ export function initChatAssistente(root, options) {
     return String(s).replace(/[&<>"]/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
     });
+  };
+
+  /**
+   * Il grassetto delle risposte, e perché passa da qui invece che dal modello.
+   *
+   * Il prompt gli concede **una sola** cosa di markdown — `**così**`, per il
+   * prezzo, il nome dell'attività, l'orario — perché in una chat quelli sono i
+   * tre pezzi che si cercano con l'occhio invece di leggerli. Tutto il resto
+   * del markdown resta vietato: un titolo o un elenco in una bolla non hanno
+   * senso, e l'assistente li produrrebbe volentieri.
+   *
+   * **Si converte dopo l'escape, non prima**, ed è la riga da non invertire:
+   * `escape()` ha già trasformato `<` in `&lt;`, quindi qui dentro non può più
+   * entrare markup di nessun tipo — né dal modello, né da quello che una
+   * persona ha scritto e che il modello potrebbe ripetere. Convertire prima
+   * significherebbe fidarsi del testo, che è esattamente la cosa che non si fa.
+   *
+   * Solo le coppie: un `**` spaiato resta com'è invece di mangiarsi il resto
+   * della frase. Si vede, ed è il verso giusto in cui sbagliare.
+   */
+  var conGrassetto = function (escapato) {
+    return escapato.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  };
+
+  /**
+   * Gli asterischi non vanno nel trascritto: quello finisce nell'email al desk
+   * e nel contesto di Calendly, dove `**75 €**` è solo rumore da leggere.
+   */
+  var senzaMarcatori = function (testo) {
+    return String(testo).replace(/\*\*/g, '');
   };
 
   // ── Passo 1: l'email ──────────────────────────────────────────────────────
@@ -486,6 +520,9 @@ export function initChatAssistente(root, options) {
        dell'email e dell'attività non c'è ancora niente di cui parlare al
        telefono, e un calendario aperto da lì partirebbe senza contesto. */
     if (btnRichiamo) btnRichiamo.hidden = !dati.puoRichiamo;
+    /* Scrivere al team invece vale per tutti, socio compreso: nessuna
+       condizione, solo il momento — quando c'è una conversazione da mandare. */
+    if (btnScrivi) btnScrivi.hidden = false;
 
     mostra('chat');
     /* Da qui c'è una conversazione da dimenticare: sul totem il conto parte. */
@@ -508,34 +545,42 @@ export function initChatAssistente(root, options) {
     return div;
   }
 
-  // ── La via d'uscita: contattare il team ───────────────────────────────────
+  // ── Sotto la risposta: i rimandi, e nient'altro ───────────────────────────
   /**
-   * Il pulsante compare **sotto ogni risposta**, non solo quando l'assistente
-   * non sa: «non mi hai convinto» è un giudizio della persona, non del modello,
-   * e nasconderlo finché il modello ammette di non sapere vuol dire non
-   * offrirlo proprio quando serve di più — cioè quando ha risposto con
-   * sicurezza una cosa che non c'entra.
+   * Quello che sta sotto una risposta sono **le fonti**, e da oggi solo quelle.
+   *
+   * Prima c'era anche il blocco «Vuoi parlarne con noi? / Contatta il team»,
+   * ripetuto identico alla fine di ogni bolla. Quella coppia diceva una cosa
+   * che si dice **una volta e vale sempre** — se non ti basto, ti risponde una
+   * persona — e ripeterla a ogni risposta la trasformava in arredamento, oltre
+   * a schiacciare i rimandi fra la risposta e il pulsante. È salita in
+   * intestazione, accanto alla telefonata, dove sta ferma e si trova sempre.
+   *
+   * Nello spazio che libera i rimandi diventano quello che sono: un invito a
+   * leggere, in corpo piccolo, con la loro riga che dice cosa sono. Non erano
+   * mai stati presentati — comparivano come due pastiglie senza nome — e
+   * «Approfondisci» costa tre parole e li rende una scelta invece che un
+   * ornamento.
+   *
+   * Senza fonti non si stampa niente: una riga «Approfondisci» sopra il vuoto
+   * è peggio del vuoto.
    */
-  function scappatoia(senzaRisposta) {
-    /* Un comando solo, ed è quello scritto: parte il trascritto, lo legge una
-       persona, risponde quando può.
-
-       Qui c'era anche «Fissa una telefonata», e non c'è più. Sotto una risposta
-       scritta il canale l'ha già scelto la persona, e affiancare un secondo
-       comando a ogni bolla trasformava la fine di ogni risposta in un bivio —
-       due volte per risposta, per tutta la conversazione. La telefonata resta,
-       ma dove si va a cercarla: l'icona ☎ in intestazione, annunciata nella
-       bolla del saluto a chi può prenotarla.
-
-       I dati, quando servono, li ha già chiesti il form prima della
-       conversazione — riproporli qui sarebbe chiedere due volte la stessa
-       cosa. */
+  function rimandi(fonti) {
+    if (!fonti.length) return '';
     return (
-      '<div class="ca__uscita">' +
-      '<span class="ca__uscita-lead">' +
-      (senzaRisposta ? 'Su questo serve una persona.' : 'Vuoi parlarne con noi?') +
-      '</span>' +
-      '<button type="button" class="ca__uscita-btn" data-ca-ticket>Contatta il team →</button>' +
+      '<div class="ca__rimandi">' +
+      '<span class="ca__rimandi-lead">Approfondisci</span>' +
+      fonti
+        .map(function (f) {
+          return (
+            '<a class="ca__rimandi-link" href="' +
+            escape(f.url) +
+            '" target="_blank" rel="noopener">' +
+            escape(f.titolo || 'Leggi l’articolo completo') +
+            ' →</a>'
+          );
+        })
+        .join('') +
       '</div>'
     );
   }
@@ -587,6 +632,14 @@ export function initChatAssistente(root, options) {
    * l'altro aperto a dire che non è stato fissato niente. È anche il motivo
    * per cui l'icona in intestazione non si disabilita dopo il primo clic —
    * riportare al calendario è una risposta giusta quanto aprirlo.
+   *
+   * **`ca__richiamo` è il calendario e nient'altro**, ed è una riga che è
+   * costata un guasto: le schede delle azioni — iscrizione, Guest Pass —
+   * riusavano quella classe perché ne riusano l'aspetto, e questa ricerca le
+   * scambiava per un calendario già aperto. Il risultato era che dopo una
+   * qualsiasi azione l'icona ☎ smetteva di funzionare: scorreva sulla scheda
+   * e non apriva niente, senza dare errore. Le schede ora sono `ca__azione`;
+   * l'aspetto resta condiviso dal CSS, l'identità no.
    */
   function mostraRichiamo() {
     if (!dati.puoRichiamo || !conversazione) return;
@@ -668,18 +721,26 @@ export function initChatAssistente(root, options) {
   /** Il montaggio in corso, per poterlo smontare alla chiusura. */
   var montaggioRichiamo = null;
 
-  // ── L'azione: iscrizione o prova ──────────────────────────────────────────
+  // ── L'azione: iscrizione, prova o richiamo ────────────────────────────────
   /**
    * Il segnale che il modello manda quando la persona ha appena confermato di
-   * voler procedere (regole 7, 8 e 12 del prompt di `CHAT ATHLON`): non è
+   * voler procedere (regole 7, 8, 8bis e 12 del prompt di `CHAT ATHLON`): non è
    * testo, è un innesco. `n8n` lo valida gia' contro un enum fisso prima di
    * mandarlo qui — vedi «Leggi la risposta» nel workflow — ma si tratta comunque
    * come un dato esterno: un tipo che non riconosciamo non fa niente.
+   *
+   * `richiamo` è l'unico dei tre che non apre niente di nuovo: chiama la stessa
+   * `mostraRichiamo()` dell'icona ☎ in intestazione, quindi valgono le sue
+   * guardie — niente calendario a chi ha un abbonamento vivo, e uno solo per
+   * conversazione. Il calendario torna così ad apparire **solo su richiesta**,
+   * come dopo la rimozione dell'offerta automatica: la differenza è che qui la
+   * richiesta è arrivata a parole invece che da un pulsante.
    */
   function eseguiAzione(azione) {
     if (!azione || !conversazione) return;
     if (azione.tipo === 'iscrizione') mostraIscrizione(azione);
     else if (azione.tipo === 'prova') mostraProva();
+    else if (azione.tipo === 'richiamo') mostraRichiamo();
   }
 
   /** Annuale/mensile, Annuale/unico, Mensile Flex: l'ordine fisso delle tre
@@ -711,7 +772,7 @@ export function initChatAssistente(root, options) {
     if (!trovato) return;
 
     var box = document.createElement('div');
-    box.className = 'ca__richiamo';
+    box.className = 'ca__azione';
 
     if (haGiaAccount({ memberType: dati.memberType, stato: dati.statoNucleo })) {
       box.innerHTML =
@@ -803,7 +864,7 @@ export function initChatAssistente(root, options) {
   function mostraProva() {
     if (dati.memberType && /member/i.test(dati.memberType)) {
       var negato = document.createElement('div');
-      negato.className = 'ca__richiamo';
+      negato.className = 'ca__azione';
       negato.innerHTML =
         '<p class="ca__richiamo-titolo">Il Guest Pass non si può attivare</p>' +
         '<p class="ca__richiamo-lead">Risulta già un tesseramento Athlon a questa email, e il Pass è riservato a chi non ne ha mai avuto uno. Puoi comunque prenotare una lezione singola o scegliere un abbonamento.</p>' +
@@ -815,7 +876,7 @@ export function initChatAssistente(root, options) {
     if (!dati.memberType || !dati.email) return;
 
     var box = document.createElement('div');
-    box.className = 'ca__richiamo';
+    box.className = 'ca__azione';
     box.innerHTML =
       '<p class="ca__richiamo-titolo">Il tuo Guest Pass</p>' +
       '<p class="ca__richiamo-lead">Copialo, poi aprilo sul portale: si incolla in fase di iscrizione e sblocca la settimana Premium a ' + escape(GUEST_PASS.prezzo) + ' €.</p>' +
@@ -913,6 +974,7 @@ export function initChatAssistente(root, options) {
        dell'email, e fino ad allora non sappiamo se questa persona può
        prenotare. */
     if (btnRichiamo) btnRichiamo.hidden = true;
+    if (btnScrivi) btnScrivi.hidden = true;
     if (campoEmail) campoEmail.value = '';
     if (campoDomanda) campoDomanda.value = '';
     if (conversazione) conversazione.innerHTML = '';
@@ -996,7 +1058,16 @@ export function initChatAssistente(root, options) {
 
   /** Il modulo che compare quando si chiede di essere contattati. */
   function apriTicket(dopo) {
-    if (ticketInviato) return;
+    /* Gia' mandato: non se ne apre un secondo, ma non si resta nemmeno senza
+       risposta. Da quando il comando sta in intestazione capita di premerlo di
+       nuovo per controllare che sia partito, e un pulsante che non fa niente
+       lascia esattamente il dubbio che si voleva togliere: si torna alla
+       conferma, che e' l'unica cosa che risponde alla domanda. */
+    if (ticketInviato) {
+      var fatto = root.querySelector('[data-ca-ticket-form]');
+      if (fatto) fatto.scrollIntoView({ block: 'nearest' });
+      return;
+    }
     /* Uno solo per volta: aprirne due sotto due risposte diverse porterebbe a
        due email con lo stesso trascritto. */
     var vecchio = root.querySelector('[data-ca-ticket-form]');
@@ -1138,47 +1209,36 @@ export function initChatAssistente(root, options) {
       var fonti = (risposta.fonti || []).filter(function (f) {
         return f && f.url;
       });
-      /* Senza separatore fra i link: adesso sono pastiglie, e si separano da
-         sé. Il puntino in mezzo era la spaziatura di due link in fila. */
-      var rimandi = fonti.length
-        ? '<p class="ca__fonti">' +
-          fonti
-            .map(function (f) {
-              return (
-                '<a href="' +
-                escape(f.url) +
-                '" target="_blank" rel="noopener">' +
-                escape(f.titolo || 'Leggi l’articolo completo') +
-                ' →</a>'
-              );
-            })
-            .join('') +
-          '</p>'
-        : '';
 
-      /* Il modello ha l'ordine di scrivere in prosa e senza markdown, perché
-         qui il testo si stampa come testo. Ma se un capoverso arriva comunque,
-         va reso un capoverso e non una riga incollata alla precedente: è la
-         differenza fra una risposta che si legge e un muro. */
+      /* Il modello scrive in prosa, con il solo `**grassetto**` che il prompt
+         gli concede. Il capoverso resta un capoverso e non una riga incollata
+         alla precedente — è la differenza fra una risposta che si legge e un
+         muro — e il grassetto si converte **dopo** l'escape, mai prima: vedi
+         `conGrassetto`. */
       var paragrafi = risposta.risposta
         .split(/\n{1,}/)
         .map(function (r) { return r.trim(); })
         .filter(Boolean)
-        .map(function (r) { return '<p>' + escape(r) + '</p>'; })
+        .map(function (r) { return '<p>' + conGrassetto(escape(r)) + '</p>'; })
         .join('');
 
-      attesa.innerHTML = paragrafi + rimandi + scappatoia(!!risposta.senzaRisposta);
-      trascritto.push({ ruolo: 'assistente', testo: risposta.risposta });
+      attesa.innerHTML = paragrafi + rimandi(fonti);
+      trascritto.push({ ruolo: 'assistente', testo: senzaMarcatori(risposta.risposta) });
       /* Solo qui, dopo che la risposta e' gia' a schermo: e' il turno esatto
          in cui la persona ha confermato (regole 7, 8, 12 del prompt), non
          un'anticipazione. */
       eseguiAzione(risposta.azione);
     } catch (e) {
       /* Nel modal non c'è la ricerca locale a cui ricadere — quella è rimasta
-         nel box della pagina. Qui si dice come stanno le cose e si offre la
-         via che funziona sempre: scrivere a una persona. */
-      var scusa = 'Non riesco a risponderti in questo momento.';
-      attesa.innerHTML = '<p>' + scusa + '</p>' + scappatoia(true);
+         nel box della pagina. Qui si dice come stanno le cose e si indica la
+         via che funziona sempre: scrivere a una persona.
+         Il comando non si ristampa qui sotto — sta in intestazione ed è lì da
+         quando la conversazione è cominciata — ma nominarlo sì: è il momento in
+         cui serve, e un'icona che non si sa a cosa serva non aiuta nessuno. */
+      var scusa =
+        'Non riesco a risponderti in questo momento. Se ti serve subito, ' +
+        'scrivi al nostro team con l’icona in alto: la conversazione gli arriva insieme al messaggio.';
+      attesa.innerHTML = '<p>' + escape(scusa) + '</p>';
       trascritto.push({ ruolo: 'assistente', testo: scusa });
     } finally {
       inCorso = false;
