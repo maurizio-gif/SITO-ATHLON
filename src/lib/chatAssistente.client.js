@@ -38,6 +38,7 @@
 import { ACTIVITY_AUDIENCE } from '../data/activities';
 import { validaTelefono } from '../data/prefissi';
 import { CALENDLY } from '../data/calendly';
+import { suTotem } from '../scripts/totem';
 import { montaCalendario } from './calendario.client.js';
 
 export function initChatAssistente(root, options) {
@@ -84,8 +85,17 @@ export function initChatAssistente(root, options) {
        il giorno in cui un evento viene rinominato — e un link Calendly rotto non
        dà errore, dà «questo evento non esiste» a chi stava per prenotare. */
     url: CALENDLY.recall,
-    /** Quante risposte dell'assistente prima di proporlo. */
-    dopoRisposte: 3,
+    /**
+     * Quante risposte dell'assistente prima di proporlo da sé.
+     *
+     * Due e non tre: da quando l'icona in intestazione c'è dal primo istante,
+     * questo non è più l'unico modo di arrivarci — è il promemoria per chi non
+     * ha guardato in alto, e un promemoria alla terza risposta arriva dopo che
+     * la persona ha già deciso di arrangiarsi. A una non si mette: chi ha letto
+     * una riga sola non sa ancora se gli serve una telefonata, e un calendario
+     * in faccia subito è la finestra che si chiude senza leggere.
+     */
+    dopoRisposte: 2,
     campi: { telefono: 'location', contesto: 'a1' },
     /* Il trascritto intero non ci sta in una query string, e un url troppo
        lungo lo troncano il browser o Calendly: si tengono gli ultimi scambi,
@@ -163,6 +173,8 @@ export function initChatAssistente(root, options) {
       ambito: '',
       /** Vero se PerfectGym conosce già l'email: allora il form non si chiede. */
       conosciuto: false,
+      /** Se può fissare una telefonata: nessun abbonamento vivo nel nucleo. */
+      puoRichiamo: false,
       /** Lo slug dell'attività scelta, o '' se non ne ha scelta nessuna. */
       attivita: '',
       attivitaJunior: '',
@@ -207,6 +219,10 @@ export function initChatAssistente(root, options) {
   var btnDomanda = q('[data-ca-invia]');
   var intestazione = q('[data-ca-intestazione]');
   var elencoAttivita = q('[data-ca-attivita]');
+  /* L'icona della telefonata nell'intestazione. Si cerca fra i figli del modal
+     e non dentro la conversazione: quella si svuota a ogni riapertura, questa
+     resta. */
+  var btnRichiamo = q('[data-ca-richiamo]');
 
   function mostra(nome) {
     dati.passo = nome;
@@ -315,8 +331,26 @@ export function initChatAssistente(root, options) {
       dati.stato === 'iscritto' ||
       dati.stato === 'esiste';
 
+    /* Chi può fissare una telefonata: **chi non ha un abbonamento vivo nel
+       nucleo**, e nessun altro.
+
+       Prima il gate era `conosciuto`, ed era la domanda sbagliata: quella è
+       vera anche per un Lead — chi ha un'anagrafica da una prova di due anni fa
+       e nessun contratto — cioè esattamente la persona a cui la telefonata
+       serve. Si vedeva come «il calendario non compare mai», e non si sarebbe
+       notato dalla chat: sembra solo che l'assistente non lo proponga.
+
+       Dall'altra parte a un socio non si offre, e non è una limitazione: la sua
+       è assistenza, e la strada è «contatta il team» — scritta, con il
+       trascritto allegato, che arriva al desk. Un appuntamento fra tre giorni a
+       chi segnala un badge sospeso è un'attesa al posto di una risposta. */
+    dati.puoRichiamo = dati.statoNucleo !== 'iscritto';
+
     dipingiAttivita();
     mostra('attivita');
+    /* L'email è il primo dato che vale la pena non lasciare a chi arriva dopo:
+       il conto parte da qui, non dalla prima risposta. */
+    armaOblio();
   }
 
   // ── Passo 2: quale attività ───────────────────────────────────────────────
@@ -422,8 +456,30 @@ export function initChatAssistente(root, options) {
     }
 
     var apertura = APERTURE[dati.ramo]();
+    /* La riga che rende scopribile l'icona in cima. Un'icona muta la trova chi
+       la cerca, e qui il punto è l'opposto: la telefonata deve essere una cosa
+       che si sa di poter fare **prima** di averne bisogno. Costa una riga, e la
+       dice l'assistente nella stessa bolla del saluto invece di essere un
+       avviso a parte — un cartello sopra la conversazione si legge come
+       pubblicità e si salta.
+
+       Solo a chi può prenotarla: a un socio prometterebbe un comando che non
+       vede. */
+    if (dati.puoRichiamo) {
+      apertura +=
+        '<p class="ca__fonti">Preferisci parlarne al telefono? Tocca ☎ in alto: ' +
+        'scegli tu giorno e ora, e ti chiamiamo noi.</p>';
+    }
     bolla('assistente', apertura, apertura.replace(/<[^>]+>/g, ''));
+
+    /* Il comando compare quando la conversazione comincia, non prima: nei passi
+       dell'email e dell'attività non c'è ancora niente di cui parlare al
+       telefono, e un calendario aperto da lì partirebbe senza contesto. */
+    if (btnRichiamo) btnRichiamo.hidden = !dati.puoRichiamo;
+
     mostra('chat');
+    /* Da qui c'è una conversazione da dimenticare: sul totem il conto parte. */
+    armaOblio();
   }
 
   /** Il trascritto, nell'ordine in cui è comparso: è ciò che finisce nel ticket. */
@@ -451,15 +507,30 @@ export function initChatAssistente(root, options) {
    * sicurezza una cosa che non c'entra.
    */
   function scappatoia(senzaRisposta) {
-    /* Un comando solo, e sempre lo stesso: parlare con una persona. I dati,
-       quando servono, li ha già chiesti il form prima della conversazione —
-       riproporli qui sarebbe chiedere due volte la stessa cosa. */
+    /* Due comandi in parallelo, e sono due cose diverse — non la stessa con due
+       nomi. «Contatta il team» è scritta: parte il trascritto, la legge una
+       persona, risponde quando può. «Fissa una telefonata» è una voce a un'ora
+       che scegle chi chiama. Chi ha una domanda lunga preferisce la prima, chi
+       ne ha una da decidere preferisce la seconda, e indovinare per loro
+       significa sbagliare metà delle volte.
+
+       La telefonata **solo a chi non ha un abbonamento vivo**: per un socio
+       resta il comando solo, com'era. E resta la seconda delle due, in
+       contorno: chi sta leggendo una risposta scritta ha già scelto il canale
+       scritto, e il pieno arancione sull'altro lo contraddirebbe.
+
+       I dati, quando servono, li ha già chiesti il form prima della
+       conversazione — riproporli qui sarebbe chiedere due volte la stessa
+       cosa. */
     return (
       '<div class="ca__uscita">' +
       '<span class="ca__uscita-lead">' +
       (senzaRisposta ? 'Su questo serve una persona.' : 'Vuoi parlarne con noi?') +
       '</span>' +
       '<button type="button" class="ca__uscita-btn" data-ca-ticket>Contatta il team →</button>' +
+      (dati.puoRichiamo
+        ? '<button type="button" class="ca__uscita-btn" data-ca-richiamo>☎ Fissa una telefonata</button>'
+        : '') +
       '</div>'
     );
   }
@@ -505,13 +576,43 @@ export function initChatAssistente(root, options) {
      modi di sbagliarlo diversamente. La mappatura dei campi resta descritta in
      `RICHIAMO.campi` qui sopra, che è dove si guarda se il modulo cambia. */
 
+  /**
+   * L'offerta automatica: una volta sola, dopo `RICHIAMO.dopoRisposte`
+   * risposte. Non è più l'unica strada — l'icona in cima e il pulsante sotto
+   * ogni risposta ci arrivano quando vuole la persona — quindi qui resta solo
+   * il ruolo che le è proprio: ricordarlo a chi non ha guardato in alto.
+   */
   function proponiRichiamo() {
     risposteDate++;
-    if (richiamoOfferto || dati.conosciuto) return;
+    if (richiamoOfferto || !dati.puoRichiamo) return;
     if (risposteDate < RICHIAMO.dopoRisposte) return;
+    mostraRichiamo();
+  }
+
+  /**
+   * Il calendario dentro la conversazione, chiesto da un gesto o proposto da sé.
+   *
+   * **Uno solo, sempre.** Se c'è già si scorre lì invece di montarne un
+   * secondo: due iframe di Calendly nella stessa conversazione sono due
+   * moduli che chiedono la stessa cosa, e il primo che si compila lascia
+   * l'altro aperto a dire che non è stato fissato niente. È anche il motivo
+   * per cui l'icona in intestazione non si disabilita dopo il primo clic —
+   * riportare al calendario è una risposta giusta quanto aprirlo.
+   */
+  function mostraRichiamo() {
+    if (!dati.puoRichiamo || !conversazione) return;
+
+    var esistente = conversazione.querySelector('.ca__richiamo');
+    if (esistente) {
+      esistente.scrollIntoView({ block: 'nearest' });
+      return;
+    }
+
     /* Senza email non c'è niente da precompilare, e un modulo vuoto è una
-       richiesta in più invece di una scorciatoia. */
-    if (!dati.email || !conversazione) return;
+       richiesta in più invece di una scorciatoia. In pratica non capita — il
+       primo passo della chat è l'email — ma il gesto ora può arrivare da un
+       pulsante, e un pulsante lo si può premere prima del previsto. */
+    if (!dati.email) return;
     richiamoOfferto = true;
 
     /* Il calendario dentro la conversazione, al posto del pulsante che portava
@@ -555,6 +656,110 @@ export function initChatAssistente(root, options) {
       },
     });
   }
+
+  // ── L'oblio sul totem ─────────────────────────────────────────────────────
+  /**
+   * Svuota lo stato senza toccare il pannello.
+   *
+   * Sta separato da `reset` per una ragione precisa: `reset` chiama anche
+   * `onChiudi()`, che fra le altre cose toglie `amodal-locked` dal `body`. Se
+   * l'oblio scattasse a pannello chiuso — cioè il caso normale, la persona se
+   * n'è andata dopo aver chiuso — e nel frattempo fosse aperto **un altro**
+   * modal, quella riga sbloccherebbe lo scorrimento sotto il pannello di
+   * qualcun altro. Il fondo comincerebbe a scorrere dietro il modulo dei
+   * contatti, e nessuno collegherebbe la cosa a una chat chiusa tre minuti
+   * prima.
+   */
+  function pulisciStato() {
+    dati = statoIniziale();
+    trascritto = [];
+    ticketInviato = false;
+    /* Anche il contatore e la memoria dell'offerta: senza, la persona dopo
+       eredita «il calendario l'ho già proposto» da una conversazione che non
+       è la sua. Il pulsante torna nascosto per la stessa ragione: `puoRichiamo`
+       si riscopre dalla verifica dell'email, e fino ad allora non sappiamo se
+       questa persona può prenotare. */
+    risposteDate = 0;
+    richiamoOfferto = false;
+    if (btnRichiamo) btnRichiamo.hidden = true;
+    if (campoEmail) campoEmail.value = '';
+    if (campoDomanda) campoDomanda.value = '';
+    if (conversazione) conversazione.innerHTML = '';
+    mostra('email');
+  }
+
+  /**
+   * Tre minuti di inattività, e **solo sul totem**, azzerano la conversazione.
+   *
+   * La chat riprende dove stava di proposito: chiudere il pannello per sbaglio
+   * non deve costare l'email e il ramo, e su un computer personale quella è la
+   * scelta giusta — la conversazione è di chi ha quel dispositivo. Sul pannello
+   * all'ingresso del club no: lì la persona dopo esiste davvero, e trova
+   * l'indirizzo email e le domande di chi è passato prima.
+   *
+   * **Tre minuti**, e la misura viene dal costo dei due errori, che non sono
+   * simmetrici. Troppo presto si cancella il lavoro di qualcuno che è ancora
+   * lì a leggere, e lo vede: deve ridigitare l'email. Troppo tardi si mostra
+   * l'indirizzo di uno sconosciuto a chi riapre il pannello. Il primo è un
+   * fastidio visibile e recuperabile, il secondo è un dato di un'altra persona
+   * — quindi si sta dalla parte breve, ma non tanto da colpire chi legge una
+   * risposta lunga.
+   *
+   * **L'attesa di una risposta non è inattività**, ed è l'unico caso in cui
+   * stare davanti allo schermo non produce eventi: mentre l'assistente pensa,
+   * il conto è sospeso e riparte quando la risposta arriva. Senza questo, una
+   * risposta lenta e un visitatore paziente sarebbero indistinguibili da una
+   * sala vuota.
+   */
+  var INATTIVITA = 3 * 60 * 1000;
+  var orologioOblio = null;
+
+  function fermaOblio() {
+    if (orologioOblio) {
+      clearTimeout(orologioOblio);
+      orologioOblio = null;
+    }
+  }
+
+  function armaOblio() {
+    if (!suTotem()) return;
+    fermaOblio();
+    orologioOblio = setTimeout(function () {
+      orologioOblio = null;
+      /* Una domanda in volo: la persona è lì e aspetta, e cancellarle la
+         conversazione mezzo secondo prima della risposta è il modo peggiore di
+         sbagliare. Si riparte da capo col conto. */
+      if (inCorso) {
+        armaOblio();
+        return;
+      }
+      /* Chiude solo se è aperto. Da chiuso si svuota e basta: vedi il commento
+         di `pulisciStato`. */
+      var aperto = root.classList.contains('open');
+      pulisciStato();
+      if (aperto) onChiudi();
+    }, INATTIVITA);
+  }
+
+  /* Cosa conta come presenza: un tocco, un tasto, una scrittura, uno
+     scorrimento della conversazione. Su un pannello touch il movimento del
+     puntatore non esiste, quindi non lo si ascolta — sarebbe un evento che su
+     quel dispositivo non arriva mai. `capture` perché alcuni gestori più sotto
+     fermano la propagazione.
+
+     **Ma il conto non dipende solo da questi eventi**, e la differenza l'ha
+     trovata una prova: `armaOblio` è chiamata anche dai punti in cui lo stato
+     *nasce* — la verifica dell'email, l'apertura della conversazione, ogni
+     risposta. Legarlo ai soli eventi voleva dire che il timer partiva perché
+     qualcuno aveva toccato lo schermo, non perché c'era qualcosa da dimenticare:
+     basta un percorso che arriva a destinazione senza un `pointerdown` — un
+     invio da tastiera, un comando premuto da fuori il pannello, un ramo che
+     salta un passo — e l'email resta lì per sempre. Il conto deve seguire il
+     dato, non il dito. */
+  ['pointerdown', 'keydown', 'input'].forEach(function (evento) {
+    root.addEventListener(evento, armaOblio, true);
+  });
+  if (conversazione) conversazione.addEventListener('scroll', armaOblio, { passive: true });
 
   var ticketInviato = false;
 
@@ -745,6 +950,10 @@ export function initChatAssistente(root, options) {
       inCorso = false;
       if (btnDomanda) btnDomanda.disabled = (campoDomanda.value || '').trim().length < 3;
       if (conversazione) conversazione.scrollTop = conversazione.scrollHeight;
+      /* La risposta è arrivata: da adesso i tre minuti sono di lettura, e sono
+         i suoi. Riparte il conto da capo — non da quando la domanda è partita,
+         che avrebbe fatto scadere il tempo durante l'attesa. */
+      armaOblio();
     }
   }
 
@@ -1051,6 +1260,14 @@ export function initChatAssistente(root, options) {
       scegliAttivita(scelta.dataset.caAttivitaScelta);
       return;
     }
+    /* Lo stesso attributo per l'icona in intestazione e per il pulsante sotto
+       le risposte: sono lo stesso gesto, e due gestori diversi sarebbero due
+       occasioni di farli divergere. */
+    if (e.target.closest && e.target.closest('[data-ca-richiamo]')) {
+      mostraRichiamo();
+      return;
+    }
+
     var chiedeTeam = e.target.closest && e.target.closest('[data-ca-ticket]');
     if (chiedeTeam) {
       apriTicket(chiedeTeam.closest('.ca__msg'));
@@ -1108,13 +1325,7 @@ export function initChatAssistente(root, options) {
       else mostra(dati.passo);
     },
     reset: function () {
-      dati = statoIniziale();
-      trascritto = [];
-      ticketInviato = false;
-      if (campoEmail) campoEmail.value = '';
-      if (campoDomanda) campoDomanda.value = '';
-      if (conversazione) conversazione.innerHTML = '';
-      mostra('email');
+      pulisciStato();
       onChiudi();
     },
   };

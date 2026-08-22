@@ -39,6 +39,40 @@ import CampoTelefono from '../CampoTelefono.astro';
         <span class="ca__nome">Athlon Club</span>
         <span class="ca__stato" data-ca-intestazione>Assistente Virtuale</span>
       </span>
+      {/* ── Fissa una telefonata, sempre a portata ──────────────────────
+          Sta **nell'intestazione** e non fra i suggerimenti, e la ragione è
+          quando serve: l'intenzione di sentire una voce non nasce alla terza
+          risposta, nasce quando l'assistente non basta — e quel momento non lo
+          decidiamo noi. Prima il calendario compariva da sé dopo tre risposte e
+          una volta sola: chi lo chiudeva, o chi lo voleva alla prima riga, non
+          aveva più niente da toccare.
+
+          **Solo per chi non ha un abbonamento vivo nel nucleo.** A un socio la
+          telefonata commerciale non si offre — la sua è assistenza, e la strada
+          è «contatta il team», che è scritta e arriva al desk. Lo script lo
+          scopre alla verifica dell'email e scopre il pulsante di conseguenza.
+
+          Icona e non testo, perché l'intestazione ha già tre elementi e il
+          nome del club non si accorcia. La scoperta la fa la riga che
+          l'assistente scrive nella prima bolla — un'icona muta la troverebbe
+          solo chi la cerca. */}
+      <button
+        type="button"
+        class="ca__telefonata"
+        data-ca-richiamo
+        hidden
+        title="Fissa un appuntamento telefonico"
+        aria-label="Fissa un appuntamento telefonico"
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+          <path
+            d="M6.6 3h-2A1.6 1.6 0 0 0 3 4.6c0 8.7 7.7 16.4 16.4 16.4A1.6 1.6 0 0 0 21 19.4v-2a1.6 1.6 0 0 0-1.3-1.6l-2.6-.5a1.6 1.6 0 0 0-1.6.7l-.7 1a12.6 12.6 0 0 1-5.4-5.4l1-.7a1.6 1.6 0 0 0 .7-1.6l-.5-2.6A1.6 1.6 0 0 0 8.2 3.4Z"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
       <button type="button" class="ca__close" data-ca-close aria-label="Chiudi">×</button>
     </header>
 
@@ -444,6 +478,28 @@ import CampoTelefono from '../CampoTelefono.astro';
     height: 0.4rem;
     border-radius: 50%;
     background: #3fbf5f;
+  }
+
+  /* Stessa forma e stessa misura del pulsante di chiusura, colore diverso:
+     è un'azione e non un comando di finestra, e il pieno arancione la fa
+     leggere come tale accanto al grigio della chiusura. Più grande sarebbe
+     sbilanciato, più piccola sembrerebbe un'icona decorativa. */
+  .ca__telefonata {
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: grid;
+    place-items: center;
+    border: none;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: var(--color-white);
+    cursor: pointer;
+    transition: opacity var(--dur-fast) ease;
+  }
+
+  .ca__telefonata:hover {
+    opacity: 0.85;
   }
 
   .ca__close {

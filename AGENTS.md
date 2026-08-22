@@ -1069,6 +1069,220 @@ Per **verificare un prefisso**: la lista ufficiale è ITU-T E.164. Un prefisso
 sbagliato non dà errore, manda un messaggio a un numero che non esiste, e non lo
 si scopre mai.
 
+## «Contattaci»: chi ha un abbonamento non chiede informazioni
+
+Il form nasce dai 55 nodi di `CONTATTACI - ATHLON`, e la prima stesura del
+porting aveva perso tre cose che quel flusso faceva. Vanno tenute, perché
+ognuna era un pezzo di percorso e non un abbellimento.
+
+**La domanda che smista non è «ha un account», è «ha un abbonamento vivo».**
+`statoNucleo === 'iscritto'` — che `athlon-verifica-iscritto` calcola
+interrogando i contratti del titolare **e dei primi tre figli** (`Current`,
+`NotStarted`, `Freezed`, con quota diversa da zero) — separa due percorsi che
+non hanno niente in comune:
+
+| | abbonamento vivo nel nucleo | nessun abbonamento |
+| --- | --- | --- |
+| passi | email → area → testo libero | email → area → dati → invio |
+| dati personali | **non si chiedono**: li abbiamo da PerfectGym | si chiedono, e creano l'anagrafica |
+| appuntamento telefonico | **mai** | il calendario del ramo |
+| classificazione | `assistenza` | `informazioni` |
+| email a chi scrive | presa in carico | modalità di iscrizione (junior/baby) |
+
+Ed è la stessa condizione dello switch `SE ISCRITTO` del flusso originale, che
+infatti mandava questi utenti sul wiki **prima** di chiedere l'attività.
+
+Quattro cose da sapere prima di toccarlo.
+
+**La regola dell'abbonamento vince su quella dell'account, e si controlla per
+prima** (`scegliMacro` in `contattaciForm.client.js`). Un abbonato è per
+costruzione anche uno che ha un account, quindi l'ordine è tutto: al contrario
+vedrebbe la schermata «ecco come iscriverti», che a chi è già dentro non serve,
+e riceverebbe l'email con le modalità di iscrizione — una lettera al cliente
+sbagliato.
+
+**Il calendario si toglie con `hidden`, non si nasconde.** L'appuntamento
+telefonico è lo strumento di chi deve ancora decidere se iscriversi: offrirlo a
+un socio che segnala un badge sospeso vuol dire rispondergli «ti richiamiamo fra
+tre giorni» a una domanda che ha una risposta di due righe. E il pannello
+direbbe due cose insieme — «richiesta presa in carico» e «scegli quando ti
+chiamiamo».
+
+**La classificazione la ricalcola n8n, non la prende dal browser.**
+`tipoRichiesta` arriva nel payload perché è quello che la persona *ha visto*, ma
+`Normalizza e Componi Email` la rifà da `statoNucleo`: la verifica dell'email
+può essere di dieci minuti prima con il pannello rimasto aperto, e ciò che
+finisce nell'oggetto di un'email al desk e in una colonna di Airtable deve
+nascere dal dato. Si conservano entrambe (`tipoRichiestaVista`), perché una
+divergenza fra le due è un sintomo e nessuno la vedrebbe tenendone una sola.
+
+**La parola «preiscrizione» non si usa più.** La scheda è `Iscrizione Corsi
+2026/27` e le iscrizioni sono aperte ad abbonamento mensile: dire a un genitore
+che si preiscrive lo manda a cercare un passaggio che non esiste. Lo **slug**
+invece resta `preiscrizioni-nuoto` — è indicizzato, è la destinazione di
+`/snb-landing` in `vercel.json`, ed è uno dei 22 percorsi identici al wiki
+vecchio. La costante si chiama `ISCRIZIONI`.
+
+### Le due chiusure del ramo junior, e le tre email
+
+Chi ha un account ma non un abbonamento vede una chiusura diversa per ramo, e
+non una schermata sola con una parola scambiata: la scuola nuoto **sceglie un
+turno** e lo trova nella scheda, il baby nuoto **non sceglie niente prima** e
+compra dentro il portale. Una schermata sola può dire solo una delle due cose,
+ed è il motivo per cui nel primo porting il ramo baby era rimasto senza
+istruzioni.
+
+- **`ISTRUZIONI` ha due voci e non tre.** `adulti` non c'è: l'adulto scrive in
+  testo libero e gli risponde una persona, e inventargli una pagina di
+  procedura vorrebbe dire far leggere una procedura a chi ha chiesto di parlare
+  con qualcuno.
+- **L'accesso è l'azione, il reset è la deviazione**, come davanti a
+  «Iscriviti». Il pulsante pieno era «Reimposta la password», che a chi ce l'ha
+  nel gestore dice che la sua password non funziona. E il reset passa da
+  `WEBHOOK_RESET` — che esisteva già e questo form non usava — invece di
+  mandare la persona a ridigitare su `ForgotPassword` l'indirizzo appena
+  scritto.
+- **Il nucleo familiare si spiega in tre passi**, con le parole del portale. Il
+  passo che manca quando si riassume in una riga è sempre lo stesso: «Crea
+  Account» sta in fondo alla scheda, sotto i campi, e chi non scorre conclude
+  che l'account non si può creare.
+
+Le email a chi compila stanno in `Componi Email Utente`, e sono tre varianti e
+non quattro: `assistenza`, `junior`, `baby`. **Il ramo adulti informativo non
+riceve niente**, come nell'originale — un'email automatica che non dice niente
+più della schermata appena letta è una notifica, non una risposta. Il gate è
+`return []`, così la condizione sta accanto ai testi che governa invece che in
+un ramo del canvas, e un filtro dopo il compositore impedisce che un template
+che solleva faccia partire un'email bianca a una persona vera.
+
+Due dettagli che sono trappole vere:
+
+- **`istruzioniUrl` lo manda il sito, non lo scrive n8n.** Il giorno che quella
+  scheda si sposta, il redirect e il link nell'email cambiano nello stesso
+  commit; un percorso scritto in un template resta indietro senza dare errore,
+  e un'email con un link morto non fallisce — arriva.
+- **Il logo dell'email è `Logo-oriz-full.png` e sta in `public/`.** È una copia
+  di `Logo-oriz-full-2.png` fatta di proposito: l'originale WordPress serve il
+  primo nome, questo repository aveva solo il secondo, e senza la copia
+  l'immagine muore il giorno dello spostamento del dominio. I due template
+  Spoki portati dall'originale avevano invece **i Calendly scambiati** — la
+  scuola nuoto mandava a `/richiamami`, che è l'evento degli adulti; qui si
+  segue `data/calendly.ts`.
+
+### La stessa regola vale nella chat, e lì aveva la condizione sbagliata
+
+L'assistente classifica sull'email come il form — `dati.ramo = 'iscritto'`
+quando `statoNucleo === 'iscritto'`, e da lì cambiano tono, conoscenza e bolla
+d'apertura — ma l'**offerta della telefonata** guardava un'altra cosa:
+`dati.conosciuto`, che è vera per chiunque abbia un'anagrafica. Compreso un
+Lead: chi ha fatto una prova due anni fa e non ha mai avuto un abbonamento,
+cioè esattamente la persona a cui la telefonata serve. Il gate è
+`statoNucleo !== 'iscritto'` (`dati.puoRichiamo`).
+
+Era invisibile, e vale la pena sapere perché: un calendario che non compare in
+una chat non sembra un guasto, sembra un assistente che non lo propone.
+
+**La telefonata si chiede in tre modi, e sono tre momenti diversi.**
+
+- l'**icona ☎ in intestazione**, dal primo istante della conversazione. Prima
+  l'unica strada era l'offerta automatica dopo tre risposte, una volta sola:
+  chi la chiudeva, o chi la voleva alla prima riga, non aveva più niente da
+  toccare. L'intenzione di sentire una voce non nasce alla terza risposta.
+- il **pulsante sotto ogni risposta**, in parallelo a «Contatta il team». Sono
+  due cose diverse e non la stessa con due nomi: il team è scritto e porta il
+  trascritto al desk, la telefonata è una voce a un'ora scelta. Resta il
+  secondo dei due, in contorno — chi sta leggendo una risposta scritta ha già
+  scelto quel canale.
+- l'**offerta automatica**, ora dopo due risposte: non è più l'unica strada,
+  quindi le resta il ruolo di promemoria per chi non ha guardato in alto.
+
+Tre cose da non rompere:
+
+- **Un calendario solo, sempre.** `mostraRichiamo()` scorre a quello esistente
+  invece di montarne un secondo: due iframe di Calendly nella stessa
+  conversazione sono due moduli che chiedono la stessa cosa, e il primo che si
+  compila lascia l'altro a dire che non è stato fissato niente. Per la stessa
+  ragione l'icona non si disabilita dopo il primo clic — riportare al
+  calendario è una risposta giusta quanto aprirlo.
+- **L'icona compare all'inizio della conversazione, non prima.** Nei passi
+  dell'email e dell'attività non c'è ancora niente di cui parlare al telefono,
+  e il contesto che finisce in `a1` sarebbe vuoto — su quell'evento Calendly
+  quella domanda è obbligatoria.
+- **La riga che la rende scopribile sta nella bolla del saluto.** Un'icona muta
+  la trova chi la cerca, e qui serve il contrario: che si sappia di poterla
+  usare *prima* di averne bisogno. Un cartello sopra la conversazione si legge
+  come pubblicità e si salta.
+
+E il `reset` azzera `risposteDate`, `richiamoOfferto` e nasconde l'icona: sul
+totem all'ingresso la persona dopo esiste davvero, e senza questo erediterebbe
+«il calendario l'ho già proposto» da una conversazione che non è la sua.
+
+### Sul totem la chat dimentica dopo tre minuti, altrove no
+
+La chat riprende dove stava di proposito: chiudere il pannello per sbaglio non
+deve costare l'email e il ramo. Su un dispositivo personale è la scelta giusta —
+quella conversazione è di chi ha quel dispositivo. Sul pannello all'ingresso del
+club è l'opposto: chi arriva dopo trova l'indirizzo email e le domande di chi è
+passato prima. È la stessa ragione per cui `emailNota.ts` non precompila l'email
+là, e per cui il form dei contatti si apre vuoto sempre.
+
+Il riconoscimento è `suTotem()` di `scripts/totem.ts`, condiviso con
+`emailNota.ts` e `attribuzione.ts`: le tre condizioni non si ricopiano.
+
+- **Tre minuti, e la misura viene dal costo dei due errori.** Troppo presto si
+  cancella il lavoro di qualcuno che è ancora lì, e lo vede: deve ridigitare
+  l'email. Troppo tardi si mostra l'indirizzo di uno sconosciuto. Il primo è un
+  fastidio visibile e recuperabile, il secondo è il dato di un'altra persona —
+  quindi si sta dalla parte breve, ma non tanto da colpire chi legge una
+  risposta lunga.
+- **Il conto segue il dato, non il dito.** Le prime versioni lo armavano solo
+  sugli eventi di interazione, e una prova l'ha smontato: basta un percorso che
+  arriva a destinazione senza un `pointerdown` — un invio da tastiera, un
+  comando premuto da fuori il pannello — e l'email resta lì per sempre.
+  `armaOblio()` è chiamata anche dopo la verifica dell'email, all'apertura della
+  conversazione e alla fine di ogni risposta.
+- **L'attesa di una risposta non è inattività**, ed è il solo caso in cui stare
+  davanti allo schermo non produce eventi. Se il conto scade mentre `inCorso` è
+  vero, riparte invece di azzerare.
+- **A pannello chiuso si svuota lo stato ma non si chiama `onChiudi()`**, ed è
+  il motivo per cui `pulisciStato()` esiste separato da `reset()`: quella
+  funzione toglie `amodal-locked` dal `body`, e farlo tre minuti dopo — quando
+  nel frattempo può essere aperto **un altro** modal — farebbe scorrere il fondo
+  dietro il pannello di qualcun altro. Nessuno collegherebbe la cosa a una chat
+  chiusa tre minuti prima.
+
+Per verificare: a 1080×1920 il conto si arma (`suTotem()` vero) e alla scadenza
+il pannello torna al passo dell'email con i campi vuoti, la conversazione
+svuotata, l'icona nascosta e `amodal-locked` rimosso; a 1400×900 non si arma
+mai e la conversazione sopravvive. Attenzione a provarlo con la scheda in primo
+piano: a scheda nascosta i browser rallentano i timer e la prova non dice
+niente.
+
+### L'id PerfectGym arriva dopo, quindi l'email al desk parte dopo
+
+`Email al Desk` e `Airtable RICHIESTE` partivano in parallelo alla creazione
+dell'anagrafica, quindi per un contatto nuovo l'id non esisteva ancora: le
+colonne `UserID` e `PGM` del flusso originale erano rimaste fuori, e il desk
+riceveva un'email senza il link alla scheda della persona di cui parla.
+
+Ora le tre strade dello Switch confluiscono in `Raccogli PGM` — e la terza,
+`nessuna`, prima non era collegata a niente. Da lì partono l'email al desk,
+Airtable, l'email a chi compila e il WhatsApp. Costa due chiamate HTTP di
+ritardo, che non si vedono: al browser ha già risposto `Rispondi con Id` su un
+ramo parallelo.
+
+- **`Raccogli PGM` legge da `$('Normalizza e Componi Email')`, non da
+  `$input`.** Su due strade su tre l'item arriva da un nodo Supabase, che
+  restituisce **la riga inserita**: da lì `$json` ha i nomi delle colonne
+  (`member_id`) e non quelli del form (`memberId`), e ogni espressione a valle
+  leggerebbe `undefined` in silenzio.
+- **`isExecuted` prima di `first()`.** Su un nodo che non ha girato `first()`
+  solleva, e un errore lì fermerebbe la sola email che avvisa una persona che
+  c'è una richiesta da lavorare.
+- **L'id è quello del genitore**, come in tutti e sei i nodi Airtable
+  dell'originale: la richiesta è sua, ed è la sua scheda che il desk apre.
+  Quella del figlio si porta a parte e compare solo quando c'è.
+
 ## Il form dell'assistenza chiede poco, e il resto lo va a prendere
 
 Il form dell'Help Desk — `components/clublife/SupportForm.astro`, dentro

@@ -48,11 +48,15 @@
 import {
   WEBHOOK_VERIFICA,
   WEBHOOK_CONTATTO,
-  PREISCRIZIONI,
+  WEBHOOK_RESET,
+  ISCRIZIONI,
+  ISTRUZIONI,
+  PORTALE,
   MACRO_BY_ID,
   ATTIVITA_ADULTI,
   haGiaAccount,
 } from '../data/contatto';
+import { SITE } from '../data/sito';
 import { CALENDLY } from '../data/calendly';
 import { validaTelefono } from '../data/prefissi';
 import { montaCalendario } from './calendario.client.js';
@@ -82,6 +86,8 @@ export function initContattaciForm(root, options) {
       // Quello che la verifica ha trovato su PerfectGym.
       statoPgm: 'nuovo',
       statoNucleo: 'nuovo',
+      /** Quanti contratti vivi ha il nucleo: il numero da cui nasce `abbonato()`. */
+      contrattiVivi: 0,
       memberId: null,
       memberType: '',
       // La scelta del secondo passo.
@@ -146,6 +152,7 @@ export function initContattaciForm(root, options) {
     email: q('#' + P + '-step-email'),
     macro: q('#' + P + '-step-macro'),
     adulti: q('#' + P + '-step-adulti'),
+    assistenza: q('#' + P + '-step-assistenza'),
     dati: q('#' + P + '-step-dati'),
     bambino: q('#' + P + '-step-bambino'),
     genitore: q('#' + P + '-step-genitore'),
@@ -213,15 +220,36 @@ export function initContattaciForm(root, options) {
    * un contatore che mente è peggio di un contatore assente, perché chi legge
    * si prepara a una schermata che non arriva.
    */
+  /**
+   * «Passo N di M», con M che dipende da chi sta compilando.
+   *
+   * Due cose lo accorciano, e si sommano: l'area già scelta dal pulsante di
+   * partenza toglie il primo passo, e un abbonamento vivo toglie l'ultimo —
+   * quello dei dati, che a un iscritto non si chiedono. Un contatore che dice
+   * «di 3» a chi ne compilerà due è una promessa di lavoro che non arriva, e
+   * si nota: è il numero che una persona guarda per decidere se ha tempo.
+   *
+   * Per questo va richiamata **dopo la verifica dell'email**, che è il momento
+   * in cui si sa se il nucleo è abbonato: all'apertura del pannello non lo
+   * sappiamo ancora.
+   */
   function numeraPassi() {
     var salta = !!dati.macroDaCta;
+    var totale = (salta ? 0 : 1) + 1 + (abbonato() ? 0 : 1);
     qa('[data-cf-passo]').forEach(function (el) {
       var n = parseInt(el.dataset.cfPasso, 10);
       if (salta) n -= 1;
-      el.textContent = 'Passo ' + n + ' di ' + (salta ? 2 : 3);
-      // Con l'area già scelta il passo «1» non esiste: il suo occhiello
-      // sparisce invece di dire «Passo 0».
-      el.hidden = n < 1;
+      el.textContent = 'Passo ' + n + ' di ' + totale;
+      /* Tre modi in cui un contatore non ha senso, e tutti e tre capitano.
+         Con l'area già scelta il passo «1» non esiste, e il suo occhiello
+         sparisce invece di dire «Passo 0». Un contatore «di 1» non conta
+         niente — è una schermata sola, e dirlo la fa sembrare l'inizio di
+         qualcosa di più lungo. E un passo **oltre** il totale è il caso
+         dell'abbonato: il passo dei dati non lo farà mai, ma il suo occhiello
+         diceva «Passo 3 di 2». Sta dentro una sezione nascosta, quindi non si
+         vedeva — ed è esattamente il tipo di frase che ricompare il giorno che
+         qualcuno riusa quel passo. */
+      el.hidden = n < 1 || n > totale || totale <= 1;
     });
   }
 
@@ -316,6 +344,7 @@ export function initContattaciForm(root, options) {
       if (body && body.stato) {
         dati.statoPgm = String(body.stato);
         dati.statoNucleo = String(body.statoNucleo || body.stato);
+        dati.contrattiVivi = Number(body.contrattiVivi) || 0;
         dati.memberId = body.memberId || null;
         dati.memberType = String(body.memberType || '');
         // L'anagrafica c'è: i suoi dati diventano il precompilato dei campi
@@ -337,6 +366,10 @@ export function initContattaciForm(root, options) {
       segnala(campoEmail);
       return;
     }
+
+    /* Ora si sa se il nucleo è abbonato, quindi si sa quanti passi restano:
+       per un iscritto quello dei dati non ci sarà. */
+    numeraPassi();
 
     if (dati.macroDaCta) {
       /* `storia` finta di proposito: «Indietro» dal ramo porta alla scelta
@@ -403,6 +436,30 @@ export function initContattaciForm(root, options) {
     var livello = q('[data-cf-livello]');
     if (livello) livello.hidden = macro.ramo !== 'junior';
 
+    /* **L'abbonamento vince su tutto il resto, e si controlla per primo.**
+       Chi ha un abbonamento vivo — suo o del nucleo — non sta chiedendo
+       informazioni commerciali: sta chiedendo assistenza, e va servito come
+       tale in tutti e tre i rami.
+
+       Quindi salta il passo dei dati, e non e' una scorciatoia: nome, cognome e
+       cellulare li abbiamo gia' da PerfectGym, e ripresentarli precompilati
+       chiede a un iscritto di confermare quello che il club sa di lui da anni.
+       Restano in back end, dove sono.
+
+       E soprattutto **non vede il calendario**: l'appuntamento telefonico e' lo
+       strumento di chi deve ancora decidere se iscriversi. Offrirlo a un
+       abbonato che segnala un problema significa rispondergli «ti richiamiamo
+       fra tre giorni» quando la sua domanda ne ha una da due righe.
+
+       Vale anche per junior e baby: la schermata «ecco come iscriverti» non
+       serve a chi e' gia' dentro, e l'email con le modalita' di iscrizione
+       suonerebbe come una lettera al cliente sbagliato. */
+    if (abbonato()) {
+      mostraAssistenza();
+      mostraStep('assistenza');
+      return;
+    }
+
     if (macro.ramo === 'adulti') {
       /* L'attività da cui si è partiti è già spuntata: una pastiglia sola,
          non tutte — chi arriva dalla pagina del reformer vuole parlare del
@@ -431,6 +488,65 @@ export function initContattaciForm(root, options) {
    */
   function vaAlPortale() {
     return haGiaAccount({ memberType: dati.memberType, stato: dati.statoPgm });
+  }
+
+  /**
+   * Se il nucleo di chi scrive ha un abbonamento vivo.
+   *
+   * `statoNucleo` è `iscritto` quando il titolare **o uno dei suoi primi tre
+   * figli** ha un contratto `Current`, `NotStarted` o `Freezed` con quota
+   * diversa da zero: lo calcola `athlon-verifica-iscritto` interrogando
+   * PerfectGym, e il browser ce l'ha già dal primo passo. Non è la stessa
+   * domanda di `vaAlPortale()` — quella chiede «può fare login», questa
+   * «frequenta».
+   *
+   * **È la domanda del nucleo e non della persona**, e la differenza è il caso
+   * normale del club: il genitore che paga l'abbonamento del figlio non ha un
+   * contratto suo, ma è di casa e le sue domande sono quelle di chi frequenta.
+   * `stato === 'iscritto'` guarda la singola anagrafica e lo lascerebbe fuori.
+   */
+  function abbonato() {
+    return dati.statoNucleo === 'iscritto';
+  }
+
+  /** Come si chiama questa richiesta, per il desk e per chi la scrive. */
+  function tipoRichiesta() {
+    return abbonato() ? 'assistenza' : 'informazioni';
+  }
+
+  // ── L'assistenza: il percorso di chi ha già un abbonamento ────────────────
+  var campoAssistenza = q('#' + P + '-assistenza-testo');
+
+  /** Scrive l'area scelta nella schermata: è l'unica cosa che la contestualizza,
+   *  visto che qui non ci sono né pastiglie né dati. */
+  function mostraAssistenza() {
+    var area = q('[data-cf-assistenza-area]');
+    if (area) area.textContent = (MACRO_BY_ID[dati.macro] || {}).label || '';
+  }
+
+  async function inviaAssistenza() {
+    pulisciErrore(steps.assistenza);
+    togliSegno(campoAssistenza);
+
+    if (!campoAssistenza.value.trim()) {
+      mostraErrore(steps.assistenza, ERR.richiesta);
+      segnala(campoAssistenza);
+      return;
+    }
+    dati.richiesta = campoAssistenza.value.trim();
+
+    /* I dati di chi scrive non si chiedono, ma il payload li porta: la
+       verifica dell'email li ha già presi da PerfectGym (`precompila`), e
+       senza di loro l'email al desk arriverebbe senza un nome da chiamare per
+       una persona che il club conosce. È la differenza fra «non li chiediamo»
+       e «non li abbiamo».
+
+       `privacy` resta falsa e va bene: non e' un consenso mancante, e' un
+       consenso che questa persona ha già dato quando si e' iscritta. Chiederlo
+       di nuovo a un socio per rispondergli su un badge sospeso non aggiunge
+       nulla a quello che il club puo' già fare con i suoi dati. */
+    await spedisci(q('[data-cf-invia-assistenza]'));
+    mostraEsito('assistenza');
   }
 
   // ── Ramo adulti ───────────────────────────────────────────────────────────
@@ -613,15 +729,112 @@ export function initContattaciForm(root, options) {
   }
 
   /** Il ramo di chi ha già l'anagrafica: si registra la richiesta e si spiega
-      come entrare nel portale, invece di creare un secondo profilo. */
+      come iscriversi, invece di creare un secondo profilo.
+ *
+ *  Due blocchi, uno per ramo, perché le due strade finiscono in due posti: la
+ *  scuola nuoto sceglie un turno nella scheda, il baby nuoto compra dentro il
+ *  portale. Il blocco sbagliato non si nasconde e basta — con `hidden`
+ *  scompare dal giro del tab, che è la regola del sito per gli overlay
+ *  chiusi. */
   async function inviaEPortale() {
     await spedisci(null);
     var per = q('[data-cf-portale-ramo]');
-    if (per) per.textContent = dati.ramo === 'baby' ? 'baby nuoto' : 'corsi junior';
-    var seguito = q('[data-cf-portale-seguito]');
-    if (seguito) seguito.hidden = dati.ramo !== 'junior';
+    if (per) per.textContent = dati.ramo === 'baby' ? 'il baby nuoto' : 'i corsi junior';
+    qa('[data-cf-portale-blocco]').forEach(function (blocco) {
+      blocco.hidden = blocco.dataset.cfPortaleBlocco !== dati.ramo;
+    });
+    /* Il pannello si riapre senza ricaricare la pagina: un esito del reset
+       lasciato acceso parlerebbe di una mail mandata all'indirizzo di prima. */
+    resetPulito();
     mostraStep('portale');
   }
+
+  /* ── Il reset della password, senza uscire da qui ──────────────────────────
+     Lo stesso meccanismo di `IscrizioneModal`, e per la stessa ragione: la
+     pagina `ForgotPassword` del portale chiede di **ridigitare** l'indirizzo
+     che la persona ha appena scritto qui, in un'altra applicazione e in
+     un'altra scheda. `WEBHOOK_RESET` esisteva già e questo form non lo usava.
+
+     Tre scelte prese da là, che valgono qui uguali: l'email è quella
+     verificata e non quella nel campo; l'attesa è di dieci secondi, perché chi
+     ha appena chiesto una cosa sola la aspetta; e in caso di errore non si
+     scrive niente, si apre il portale — che è dove la persona voleva
+     andare. */
+  var btnReset = q('[data-cf-reset]');
+  var resetRiga = q('[data-cf-reset-riga]');
+  var resetFatto = q('[data-cf-reset-fatto]');
+  var resetEmail = q('[data-cf-reset-email]');
+  var resetSpinner = q('[data-cf-reset-spinner]');
+
+  function resetPulito() {
+    if (resetRiga) resetRiga.hidden = false;
+    if (resetFatto) resetFatto.hidden = true;
+    /* Anche l'indirizzo, non solo il blocco che lo contiene: nascosto non è
+       cancellato, e su un dispositivo condiviso il testo di chi è passato prima
+       resta nel documento fino al ricaricamento. */
+    if (resetEmail) resetEmail.textContent = '';
+    if (btnReset) btnReset.disabled = false;
+    if (resetSpinner) resetSpinner.hidden = true;
+  }
+
+  async function chiediReset() {
+    if (!btnReset || !dati.email) return;
+    btnReset.disabled = true;
+    if (resetSpinner) resetSpinner.hidden = false;
+
+    var esito = null;
+    try {
+      var taglia = new AbortController();
+      var orologio = setTimeout(function () {
+        taglia.abort();
+      }, 10000);
+      var r = await fetch(WEBHOOK_RESET, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: dati.email,
+          pagina: dati.pagina,
+          origine: 'contattaci-reset',
+          vid: vid(),
+          sid: sid(),
+        }),
+        signal: taglia.signal,
+      });
+      clearTimeout(orologio);
+      esito = await r.json();
+    } catch (e) {
+      esito = null;
+    }
+
+    if (resetSpinner) resetSpinner.hidden = true;
+
+    if (esito && esito.esito === 'inviata') {
+      if (resetEmail) resetEmail.textContent = dati.email;
+      if (resetRiga) resetRiga.hidden = true;
+      if (resetFatto) resetFatto.hidden = false;
+      return;
+    }
+
+    /* Qualunque altra cosa — `errore`, `email_non_valida`, risposta
+       illeggibile, timeout, rete giù — per chi guarda è la stessa: la mail non
+       è partita. Si va sulla pagina del portale che chiede il reset.
+
+       Il pulsante torna premibile **prima** di andare: se la scheda si apre,
+       questo pannello resta dietro intatto invece di mostrare uno spinner
+       fermo a chi ci ritorna. La scheda nuova può essere bloccata — siamo dopo
+       un `await`, quindi fuori dal gesto dell'utente — e allora si naviga
+       nella stessa. */
+    btnReset.disabled = false;
+    var scheda = null;
+    try {
+      scheda = window.open(PORTALE.reset, '_blank', 'noopener');
+    } catch (e) {
+      scheda = null;
+    }
+    if (!scheda) window.location.href = PORTALE.reset;
+  }
+
+  if (btnReset) btnReset.addEventListener('click', chiediReset);
 
   // ── L'invio ───────────────────────────────────────────────────────────────
   function payload(extra) {
@@ -629,6 +842,35 @@ export function initContattaciForm(root, options) {
       tipo: 'contatto',
       /** Quale ramo del form: `adulti`, `baby` o `junior`. */
       flow: dati.ramo,
+      /**
+       * `assistenza` se il nucleo ha un abbonamento vivo, `informazioni` per
+       * tutti gli altri.
+       *
+       * n8n **non si fida di questo campo e lo ricalcola** da `statoNucleo`, e
+       * non è sfiducia nel browser: la verifica dell'email può essere di dieci
+       * minuti prima, il pannello può essere rimasto aperto, e la
+       * classificazione che finisce nell'oggetto di un'email al desk e in una
+       * colonna di Airtable deve nascere dal dato e non da uno stato di
+       * interfaccia. Qui serve perché è quello che la **persona ha visto**, e
+       * le due cose vanno confrontate quando divergono.
+       */
+      tipoRichiesta: tipoRichiesta(),
+      contrattiVivi: dati.contrattiVivi,
+      /**
+       * L'indirizzo assoluto della pagina con le istruzioni di iscrizione,
+       * per il ramo di questa richiesta.
+       *
+       * Lo manda il sito e non lo scrive n8n, ed è la scelta che evita la
+       * divergenza: il giorno che quella scheda si sposta, il redirect e
+       * questo campo cambiano insieme in un commit solo, mentre un percorso
+       * scritto dentro un template su n8n resterebbe indietro senza dare
+       * errore — un'email con un link morto non fallisce, arriva.
+       *
+       * Assoluto perché finisce in un'email: `SITE` porta il dominio giusto
+       * anche da un deploy di anteprima. Vuoto per il ramo adulti, che non ha
+       * una pagina di istruzioni e non riceve questa email.
+       */
+      istruzioniUrl: ISTRUZIONI[dati.ramo] ? SITE + ISTRUZIONI[dati.ramo] : '',
       macro: dati.macro,
       gruppoAttivita: dati.gruppo,
       attivita: dati.attivita,
@@ -688,9 +930,20 @@ export function initContattaciForm(root, options) {
          «genitore/bambino» passano entrambi da qui — e sta dentro il `try`,
          perché il `catch` sotto prosegue in silenzio anche quando la richiesta
          non è mai arrivata. */
+      /* **E una richiesta di assistenza non è un lead**, quindi non manda
+         `lead_submit`: chi ha un abbonamento vivo è già cliente, e contarlo
+         fra le conversioni gonfia il numero con cui si giudicano le campagne —
+         proprio col traffico che non viene da nessuna campagna. Il gesto si
+         conta comunque, con un nome suo, così la distinzione esiste nel
+         `dataLayer` invece di sparire. Il tag su GTM va aggiunto lì; qui il
+         punto è che il conteggio dei lead resti vero da subito. */
       if (!extra || !extra.aggiornamento) {
         window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({ event: 'lead_submit', lead_source: 'contatti' });
+        window.dataLayer.push(
+          abbonato()
+            ? { event: 'assistenza_submit', lead_source: 'contatti' }
+            : { event: 'lead_submit', lead_source: 'contatti' }
+        );
       }
     } catch (e) {
       // Dal punto di vista della persona la richiesta è partita, e dirle il
@@ -765,17 +1018,32 @@ export function initContattaciForm(root, options) {
     qa('[data-cf-esito-link]').forEach(function (a) {
       a.hidden = a.dataset.cfEsitoLink !== variante;
     });
-    qa('[data-cf-preiscrizioni]').forEach(function (el) {
-      el.href = PREISCRIZIONI;
+    qa('[data-cf-iscrizioni]').forEach(function (el) {
+      el.href = ISCRIZIONI;
     });
     var fatto = q('[data-cf-cal-fatto]');
     if (fatto) fatto.hidden = true;
 
+    /* **Il calendario non esiste per chi ha un abbonamento**, e il blocco si
+       toglie dal documento invece di essere solo nascosto: `hidden` lo fa
+       uscire anche dal giro del tab, che è la regola del sito per tutto quello
+       che non deve essere raggiungibile.
+
+       L'appuntamento telefonico serve a chi deve decidere se iscriversi. A un
+       socio che segnala un problema offrirebbe un'attesa al posto di una
+       risposta — e il pannello, che è la cosa che legge, direbbe due cose
+       diverse: «richiesta presa in carico» e «scegli quando ti chiamiamo». */
+    var cal = q('[data-cf-cal-blocco]');
+    var conCalendario = variante !== 'assistenza';
+    if (cal) cal.hidden = !conCalendario;
+
     // Il pannello si allarga prima di montare il widget, così Calendly misura
-    // la larghezza definitiva e non quella di mezzo passaggio.
-    root.classList.add('cf--largo');
+    // la larghezza definitiva e non quella di mezzo passaggio. Senza widget non
+    // c'è niente da allargare, e una schermata di tre righe larga il doppio
+    // sembra un errore di caricamento.
+    root.classList.toggle('cf--largo', conCalendario);
     mostraStep('esito');
-    apriCalendario();
+    if (conCalendario) apriCalendario();
   }
 
   // ── Eventi ────────────────────────────────────────────────────────────────
@@ -792,6 +1060,9 @@ export function initContattaciForm(root, options) {
 
   var btnInviaAdulti = q('[data-cf-invia-adulti]');
   if (btnInviaAdulti) btnInviaAdulti.addEventListener('click', inviaAdulti);
+
+  var btnInviaAssistenza = q('[data-cf-invia-assistenza]');
+  if (btnInviaAssistenza) btnInviaAssistenza.addEventListener('click', inviaAssistenza);
 
   var btnAvantiBambino = q('[data-cf-avanti-bambino]');
   if (btnAvantiBambino) btnAvantiBambino.addEventListener('click', avantiBambino);
@@ -858,6 +1129,10 @@ export function initContattaciForm(root, options) {
     storia = [];
     numeraPassi();
     mostraContesto();
+    /* L'esito del reset non è un campo, quindi il giro qui sopra non lo
+       tocca: è un indirizzo email scritto in `textContent`, cioè esattamente
+       il dato che sul totem non deve arrivare alla persona dopo. */
+    resetPulito();
     root.classList.remove('cf--largo');
     if (calendario) {
       calendario.distruggi();

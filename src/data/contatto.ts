@@ -118,8 +118,20 @@ export function eSocio(esito: { memberType?: string; stato?: string }): boolean 
   return esito.stato === 'iscritto';
 }
 
-/** La scheda con le modalità di preiscrizione: la chiusura del ramo junior. */
-export const PREISCRIZIONI = '/wikiathlon/snb/preiscrizioni-nuoto';
+/**
+ * La scheda con turni, costi e procedura: la chiusura del ramo junior.
+ *
+ * **Non si chiama più «preiscrizioni», e lo slug sì.** Il documento è
+ * `Iscrizione Corsi 2026/27` e le iscrizioni sono aperte ad abbonamento
+ * mensile: la parola «preiscrizione» descriveva la stagione di due anni fa e
+ * dire a un genitore che si preiscrive quando può iscriversi è mandarlo a
+ * cercare un secondo passaggio che non esiste. L'indirizzo invece resta
+ * `preiscrizioni-nuoto`, ed è deliberato: è indicizzato, è la destinazione di
+ * `/snb-landing` in `vercel.json`, ed è uno dei 22 percorsi che il wiki vecchio
+ * ha identici qui — rinominarlo costerebbe tre redirect per guadagnare una
+ * parola che nessuno legge.
+ */
+export const ISCRIZIONI = '/wikiathlon/snb/preiscrizioni-nuoto';
 
 /** Quale percorso segue la richiesta dopo la macro-attività. */
 export type Ramo = 'adulti' | 'baby' | 'junior';
@@ -185,6 +197,73 @@ export const MACRO: Macro[] = [
 export const MACRO_BY_ID: Record<string, Macro> = Object.fromEntries(
   MACRO.map((m) => [m.id, m])
 );
+
+/**
+ * Dove si va a leggere come si fa l'iscrizione, per ramo.
+ *
+ * Due destinazioni e non una, perché i due percorsi finiscono in due posti
+ * diversi: la scuola nuoto ha turni e fasce d'età da scegliere prima di
+ * comprare, e quelli stanno nella scheda; il baby nuoto no — si aggiunge un
+ * abbonamento o si prenota una lezione, e si fa **dentro** il portale. Mandare
+ * un genitore del baby su una scheda di turni sarebbe mandarlo a leggere una
+ * cosa che non deve scegliere.
+ *
+ * `adulti` non c'è, e non è una dimenticanza: l'adulto scrive una richiesta in
+ * testo libero e gli risponde una persona. Non esiste una pagina di istruzioni
+ * a cui mandarlo, e inventarne una vorrebbe dire far leggere una procedura a
+ * chi ha appena chiesto di parlare con qualcuno.
+ */
+export const ISTRUZIONI: Record<Exclude<Ramo, 'adulti'>, string> = {
+  junior: ISCRIZIONI,
+  baby: '/baby-nuoto',
+};
+
+/**
+ * Come si aggiunge il figlio al proprio profilo, passo per passo.
+ *
+ * Sono le tre voci di menu del portale, con le parole che il portale usa: è
+ * l'unico modo perché servano. «Aggiungi tuo figlio dal nucleo familiare» è
+ * una descrizione, non un'istruzione — chi si trova davanti la schermata deve
+ * riconoscere la voce da premere, e le maiuscole sono quelle che legge.
+ *
+ * Il passo di mezzo è il punto in cui le persone si fermano: il comando sta in
+ * fondo alla scheda del nuovo componente, sotto i campi, e chi non scorre
+ * conclude che l'account non si può creare. Per questo «scorri in basso» è un
+ * passo suo e non un incidentale.
+ */
+export const NUCLEO_PASSI = [
+  'Entra nel portale e apri <strong>Nucleo Familiare</strong>.',
+  'Premi <strong>Aggiungi membro al nucleo familiare</strong> e compila i suoi dati.',
+  'Scorri in basso e premi <strong>Crea Account</strong>.',
+] as const;
+
+/**
+ * Le due strade per iscrivere un bambino al Baby Nuoto, dentro il portale.
+ *
+ * Restano due perché sono due prodotti e non due modi di comprare lo stesso:
+ * l'abbonamento tiene il posto ogni settimana, la lezione singola no. Un
+ * genitore che non sa ancora se il bambino reggerà l'acqua compra la singola;
+ * chi ha già deciso vuole il posto fisso. Offrirne una sola vuol dire perdere
+ * l'altra metà.
+ */
+export const MODALITA_BABY = [
+  {
+    titolo: 'Abbonamento mensile',
+    nota: 'Il posto è tenuto ogni settimana.',
+    passi: [
+      'Nella tua area riservata apri <strong>Abbonamenti</strong>.',
+      'Scegli l’anagrafica del bambino in alto, poi <strong>Aggiungi abbonamento</strong>.',
+    ],
+  },
+  {
+    titolo: 'Singola lezione',
+    nota: 'Si prenota e si paga una volta.',
+    passi: [
+      'Apri <strong>Corsi/PT</strong>, poi <strong>Prenota</strong>.',
+      'Categoria <strong>Baby Nuoto</strong>: scegli la lezione e paga.',
+    ],
+  },
+] as const;
 
 /**
  * Le attività fra cui scegliere nel ramo adulti.

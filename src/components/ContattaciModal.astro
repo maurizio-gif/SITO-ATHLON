@@ -31,6 +31,10 @@ import {
   CONSENSO_PRIVACY,
   CONSENSO_MARKETING,
   PORTALE,
+  ISCRIZIONI,
+  ISTRUZIONI,
+  NUCLEO_PASSI,
+  MODALITA_BABY,
 } from '../data/contatto';
 import CampoTelefono from './CampoTelefono.astro';
 ---
@@ -160,6 +164,55 @@ import CampoTelefono from './CampoTelefono.astro';
 
       <button type="button" class="btn btn-primary cf__btn" data-cf-avanti-adulti>
         <span class="cf__btn-testo">Continua</span>
+        <span class="cf__spinner" aria-hidden="true"></span>
+      </button>
+      <button type="button" class="cf__indietro" data-cf-indietro>← Indietro</button>
+    </section>
+
+    {/* ── 3c. L'assistenza: chi ha già un abbonamento ─────────────────────
+        Il percorso di chi frequenta, e sono tre cose in meno rispetto a tutti
+        gli altri: nessun passo dei dati, nessun consenso, nessun calendario.
+
+        **Non è una versione ridotta del form informazioni, è un'altra cosa.**
+        Nome, cognome e cellulare li abbiamo già da PerfectGym — la verifica
+        dell'email li ha presi — e ripresentarli precompilati chiederebbe a un
+        socio di confermare quello che il club sa di lui da anni. Restano in
+        back end e viaggiano nel payload; quello che manca è la digitazione.
+
+        L'occhiello dice «Richiesta di assistenza» e non «Passo 2 di 2» come
+        gli altri, perché è l'informazione che conta di più in questa
+        schermata: chi scrive deve vedere che la sua richiesta è classificata
+        per quello che è, e non finire in una coda commerciale. È la stessa
+        parola che il desk legge nell'oggetto dell'email.
+
+        Il segnaposto chiede il contesto per nome — l'iscritto, il corso, le
+        date — con la stessa logica del form dell'Help Desk: un campo in meno
+        da compilare e una richiesta più completa di prima. */}
+    <section class="cf__step" id="cf-step-assistenza" hidden>
+      <span class="cf__eyebrow">Richiesta di assistenza</span>
+      <h3 class="cf__title" tabindex="-1" data-cf-fuoco>Dicci cosa ti serve.</h3>
+      <p class="cf__lead">
+        Ti riconosciamo: hai un abbonamento attivo, quindi non ti chiediamo di nuovo i tuoi dati.
+        Scrivi la richiesta e la prende in carico il desk.
+      </p>
+
+      <p class="cf__contesto" data-cf-assistenza-riga>
+        <span>Area: <strong data-cf-assistenza-area></strong></span>
+        <button type="button" class="cf__contesto-cambia" data-cf-indietro>cambia</button>
+      </p>
+
+      <label class="cf__label" for="cf-assistenza-testo">La tua richiesta</label>
+      <textarea
+        class="cf__input cf__area"
+        id="cf-assistenza-testo"
+        rows="5"
+        placeholder="Chi è l'iscritto, di quale corso o orario si tratta, e le date se servono."
+      ></textarea>
+
+      <p class="cf__errore" data-cf-errore hidden></p>
+
+      <button type="button" class="btn btn-primary cf__btn" data-cf-invia-assistenza>
+        <span class="cf__btn-testo">Invia la richiesta</span>
         <span class="cf__spinner" aria-hidden="true"></span>
       </button>
       <button type="button" class="cf__indietro" data-cf-indietro>← Indietro</button>
@@ -312,31 +365,109 @@ import CampoTelefono from './CampoTelefono.astro';
     </section>
 
     {/* ── L'anagrafica c'è già ───────────────────────────────────────────
-        Il ramo `Member` degli switch BABY e SNB. Non è un vicolo cieco: la
-        richiesta è già partita al desk, e qui c'è quello che serve davvero a
-        chi ha un profilo — entrarci, e trovare il figlio nel nucleo. Creare
-        una seconda anagrafica sarebbe il danno. */}
+        Il ramo `Member` e `Guest` degli switch BABY e SNB. Non è un vicolo
+        cieco: la richiesta è già partita al desk, l'email con le istruzioni è
+        già in viaggio, e qui c'è quello che serve davvero a chi ha un profilo —
+        sapere dove si compra, entrarci, e trovare il figlio nel nucleo. Creare
+        una seconda anagrafica sarebbe il danno.
+
+        **Due blocchi e non uno**, perché i due rami finiscono in due posti
+        diversi. Prima erano una schermata sola con una parola scambiata —
+        «baby nuoto» al posto di «corsi junior» — e il ramo baby restava senza
+        istruzioni: nel flusso originale erano le due modalità di adesione, che
+        nel porting si erano perse. La scuola nuoto sceglie un turno e lo trova
+        nella scheda; il baby nuoto non sceglie niente prima, compra dentro il
+        portale. Una schermata sola può dire solo una delle due cose. */}
     <section class="cf__step" id="cf-step-portale" hidden>
       <span class="cf__eyebrow">Ci risulti già registrato</span>
       <h3 class="cf__title" tabindex="-1" data-cf-fuoco>Il tuo profilo esiste.</h3>
       <p class="cf__lead">
-        La richiesta per i <strong data-cf-portale-ramo>corsi junior</strong> è arrivata al desk, e ti
-        scriviamo noi. Nel frattempo: la tua email è già sul portale Athlon, quindi non serve un nuovo
-        account — basta rientrare.
-      </p>
-      <p class="cf__nota-blocco">
-        Il profilo di tuo figlio lo trovi sotto <strong>Nucleo Famigliare</strong>. Se non c'è, si
-        aggiunge da <strong>Aggiungi componente al nucleo</strong> e poi <strong>Crea account</strong>.
+        La richiesta per <strong data-cf-portale-ramo>i corsi junior</strong> è arrivata al desk, e ti
+        abbiamo mandato per email le modalità di iscrizione. La tua email è già sul portale Athlon,
+        quindi non serve un nuovo account — basta rientrare.
       </p>
 
-      <div class="cf__azioni">
-        <a class="btn btn-primary cf__btn" href={PORTALE.reset} target="_blank" rel="noopener noreferrer">
-          Reimposta la password →
-        </a>
-        <a class="cf__link" href={PORTALE.login} target="_blank" rel="noopener noreferrer">Entro nel portale</a>
-        <a class="cf__link" data-cf-preiscrizioni data-cf-portale-seguito hidden href="/wikiathlon/snb/preiscrizioni-nuoto">
-          Come funzionano le preiscrizioni
-        </a>
+      {/* Scuola nuoto, agonistico, pallanuoto: prima si sceglie il turno.
+          Il comando pieno porta alla scheda e non al portale, ed è
+          l'inversione che questa schermata aveva sbagliato: chi non ha ancora
+          scelto la fascia d'età non ha niente da fare dentro il portale. */}
+      <div data-cf-portale-blocco="junior" hidden>
+        <ol class="cf__passi">
+          <li>Apri la scheda dei corsi e scegli <strong>fascia d'età e turno</strong>.</li>
+          <li><strong>Accedi al portale</strong> con questa email.</li>
+          <li>Premi <strong>Iscriviti</strong> sul turno scelto e completa l'abbonamento.</li>
+        </ol>
+
+        <div class="cf__azioni">
+          <a class="btn btn-primary cf__btn" data-cf-iscrizioni href={ISCRIZIONI}>
+            Turni, costi e come iscriversi →
+          </a>
+          <a class="cf__link" href={PORTALE.login} target="_blank" rel="noopener noreferrer">
+            Entro nel portale
+          </a>
+        </div>
+      </div>
+
+      {/* Baby nuoto: si compra dentro il portale, in due modi. Le due
+          modalità sono quelle del flusso originale, con le voci di menu
+          scritte come le legge chi ha la schermata davanti. */}
+      <div data-cf-portale-blocco="baby" hidden>
+        <p class="cf__sottolead">Dentro il portale scegli come iscriverlo:</p>
+
+        <div class="cf__modalita">
+          {MODALITA_BABY.map((m) => (
+            <div class="cf__modalita-card">
+              <p class="cf__modalita-titolo">{m.titolo}</p>
+              <p class="cf__modalita-nota">{m.nota}</p>
+              <ol class="cf__passi cf__passi--stretti">
+                {m.passi.map((p) => <li set:html={p} />)}
+              </ol>
+            </div>
+          ))}
+        </div>
+
+        <div class="cf__azioni">
+          <a class="btn btn-primary cf__btn" href={PORTALE.login} target="_blank" rel="noopener noreferrer">
+            Entro nel portale →
+          </a>
+          <a class="cf__link" href={ISTRUZIONI.baby}>La pagina del Baby Nuoto</a>
+        </div>
+      </div>
+
+      {/* Il reset è la deviazione, non l'azione, ed è la regola che questa
+          schermata violava: il pulsante pieno era «Reimposta la password», che
+          a chi ce l'ha nel gestore dice che la sua password non funziona.
+
+          E non è più un link che porta via: il pulsante fa partire la mail da
+          `WEBHOOK_RESET` e la persona resta qui, invece di ridigitare su
+          `ForgotPassword` l'indirizzo che ha appena scritto. È lo stesso
+          meccanismo di `IscrizioneModal`, e lo stesso codice in
+          `iscrizione.client.js` — un endpoint che esisteva già e che questo
+          form non usava. */}
+      <p class="cf__reset" data-cf-reset-riga>
+        Non ricordi la password?
+        <button type="button" class="cf__reset-btn" data-cf-reset>
+          Inviami l'email per reimpostarla
+          <span class="cf__reset-spinner" data-cf-reset-spinner hidden aria-hidden="true"></span>
+        </button>
+      </p>
+
+      <p class="cf__reset-esito" data-cf-reset-fatto hidden aria-live="polite">
+        Controlla la tua email <strong data-cf-reset-email></strong> e clicca sul link che ti abbiamo
+        inviato per impostare una nuova password.
+      </p>
+
+      {/* Il nucleo familiare, in tre passi e non in una riga.
+          È il pezzo che il flusso originale spiegava per intero e che qui era
+          diventato una frase: «si aggiunge da Aggiungi componente al nucleo».
+          Il passo che manca in una riga è sempre lo stesso — il comando «Crea
+          Account» sta in fondo alla scheda, sotto i campi, e chi non scorre
+          conclude che l'account non si può creare. */}
+      <div class="cf__nucleo">
+        <p class="cf__nucleo-titolo">Tuo figlio non è ancora nel tuo profilo?</p>
+        <ol class="cf__passi cf__passi--stretti">
+          {NUCLEO_PASSI.map((p) => <li set:html={p} />)}
+        </ol>
       </div>
     </section>
 
@@ -368,8 +499,16 @@ import CampoTelefono from './CampoTelefono.astro';
         Le modalità di iscrizione sono nella tua email. Per l'inserimento nel gruppo giusto serve una
         parola con chi lo segue.
       </p>
+      {/* L'abbonato: nessun calendario sotto questa riga, quindi la riga deve
+          dire da sé cosa succede adesso. «Ti risponde una persona» e non «ti
+          ricontattiamo»: è la differenza fra una risposta e un'attesa, ed è la
+          ragione per cui a un socio non si offre un appuntamento telefonico. */}
+      <p class="cf__lead" data-cf-esito="assistenza" hidden>
+        La tua richiesta di assistenza è al desk con il tuo profilo allegato, quindi nessuno ti
+        richiederà i dati. Ti risponde una persona, di solito entro il giorno lavorativo successivo.
+      </p>
 
-      <div class="cf__cal">
+      <div class="cf__cal" data-cf-cal-blocco>
         <h4 class="cf__cal-titolo">Vuoi essere ricontattato?</h4>
         <p class="cf__cal-nota">Scegli quando: dieci minuti, e ti chiamiamo noi.</p>
 
@@ -404,12 +543,21 @@ import CampoTelefono from './CampoTelefono.astro';
         <a class="cf__link" data-cf-esito-link="adulti" hidden href="/club-life#help-desk">
           Preferisco leggere: vado all'Help Desk
         </a>
-        <a class="cf__link" data-cf-esito-link="baby" hidden href="/baby-nuoto">
+        {/* Per un abbonato l'Help Desk non è un ripiego, è spesso la risposta:
+            ottanta schede su procedure, sospensioni, recuperi e certificati,
+            cioè le domande di chi frequenta. */}
+        <a class="cf__link" data-cf-esito-link="assistenza" hidden href="/club-life#help-desk">
+          Intanto cerco fra le schede dell'Help Desk
+        </a>
+        <a class="cf__link" data-cf-esito-link="baby" hidden href={ISTRUZIONI.baby}>
           Preferisco leggere: la pagina del Baby Nuoto
         </a>
-        <a class="cf__link" data-cf-esito-link="junior" data-cf-preiscrizioni hidden
-          href="/wikiathlon/snb/preiscrizioni-nuoto">
-          Preferisco leggere: le modalità di preiscrizione
+        {/* «Preiscrizione» non si dice più: la scheda è `Iscrizione Corsi
+            2026/27` e le iscrizioni sono aperte ad abbonamento mensile. La
+            parola vecchia mandava a cercare un passaggio intermedio che non
+            esiste. L'indirizzo invece è lo stesso — vedi `ISCRIZIONI`. */}
+        <a class="cf__link" data-cf-esito-link="junior" data-cf-iscrizioni hidden href={ISCRIZIONI}>
+          Preferisco leggere: turni, costi e iscrizione
         </a>
       </div>
 
@@ -912,6 +1060,176 @@ import CampoTelefono from './CampoTelefono.astro';
 
   .cf__indietro:hover {
     color: var(--color-primary);
+  }
+
+  /* ---- La chiusura di chi ha già un profilo ----
+     I passi numerati, le due modalità del baby, il reset in riga e il blocco
+     del nucleo. Le misure sono in `rem` e i corpi escono dalla scala `--text-*`
+     per la ragione del totem e della televisione: un valore in px qui resta
+     grande come un telefono su un pannello da 27 pollici. */
+
+  .cf__passi {
+    counter-reset: cfpasso;
+    list-style: none;
+    display: grid;
+    gap: 0.7rem;
+    margin: 0 0 1.375rem;
+    padding: 0;
+  }
+
+  .cf__passi--stretti {
+    gap: 0.5rem;
+    margin-bottom: 0;
+  }
+
+  .cf__passi li {
+    counter-increment: cfpasso;
+    position: relative;
+    padding-left: 2.4rem;
+    min-height: 1.6rem;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    /* Le voci di menu del portale sono parole intere e in maiuscolo: senza
+       questo, «Aggiungi membro al nucleo familiare» allarga il pannello
+       invece di andare a capo. */
+    overflow-wrap: anywhere;
+  }
+
+  .cf__passi li strong {
+    color: var(--color-dark);
+  }
+
+  /* Centrata sulla prima riga e ricavata dall'interlinea, non spostata a
+     occhio: se `--text-sm` cambia, la pastiglia resta dov'è. */
+  .cf__passi li::before {
+    content: counter(cfpasso);
+    position: absolute;
+    left: 0;
+    top: calc((1.5em - 1.6rem) / 2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .cf__sottolead {
+    margin: 0 0 0.75rem;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  /* Due schede affiancate dove c'è spazio, in colonna sul telefono. Si
+     dimensionano da sé con `auto-fit` e un minimo in `rem`: al crescere della
+     radice sul totem la griglia passa a una colonna senza una media query. */
+  .cf__modalita {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: 0.75rem;
+    margin: 0 0 1.375rem;
+  }
+
+  .cf__modalita-card {
+    padding: 0.9rem 1.1rem;
+    border-radius: 0.85rem;
+    background: var(--color-cream);
+  }
+
+  .cf__modalita-titolo {
+    margin: 0 0 0.15rem;
+    color: var(--color-dark);
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .cf__modalita-nota {
+    margin: 0 0 0.6rem;
+    color: var(--text-muted);
+    font-size: var(--text-2xs);
+  }
+
+  .cf__reset {
+    margin: 1rem 0 0;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+  }
+
+  /* `inline-block` e non in linea: il `padding` verticale su un elemento in
+     linea non riserva spazio, quindi il bersaglio sborderebbe sul pulsante
+     sopra e — venendo dopo nel documento — gliene rubberebbe i click sul bordo
+     inferiore. È la stessa ragione del link di reset in `IscrizioneModal`. */
+  .cf__reset-btn {
+    display: inline-block;
+    padding: 0.8rem 0.4rem;
+    border: 0;
+    background: none;
+    color: var(--color-primary);
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 600;
+    line-height: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .cf__reset-btn:disabled {
+    cursor: progress;
+    opacity: 0.6;
+  }
+
+  /* Lo spinner della riga è un elemento suo e non `.cf__spinner`: quello è in
+     posizione assoluta dentro un pulsante pieno e lo accende
+     `.cf__btn--attesa`. Qui sta dentro una parola, quindi in linea e del
+     colore del testo. */
+  .cf__reset-spinner {
+    display: inline-block;
+    width: 0.85em;
+    height: 0.85em;
+    margin-left: 0.4rem;
+    vertical-align: -0.1em;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: cf-gira 0.7s linear infinite;
+  }
+
+  .cf__reset-esito {
+    margin: 1rem 0 0;
+    padding: 0.7rem 0.9rem;
+    border-radius: 0.5rem;
+    background: rgba(111, 207, 151, 0.14);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+  }
+
+  .cf__reset-esito strong {
+    /* L'indirizzo è lungo e senza spazi: senza questo allarga il pannello. */
+    overflow-wrap: anywhere;
+    color: var(--color-dark);
+  }
+
+  .cf__nucleo {
+    margin-top: 1.375rem;
+    padding-top: 1.125rem;
+    border-top: 1px solid rgba(39, 36, 35, 0.1);
+  }
+
+  .cf__nucleo-titolo {
+    margin: 0 0 0.7rem;
+    color: var(--color-dark);
+    font-size: var(--text-sm);
+    font-weight: 700;
   }
 
   .cf__nota-blocco {
