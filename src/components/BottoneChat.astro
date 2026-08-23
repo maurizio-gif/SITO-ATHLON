@@ -90,4 +90,86 @@ const { sorgente, testo = 'Chatta con noi', classe } = Astro.props;
     width: 1.05rem;
     height: 1.05rem;
   }
+
+  /* ---- Il movimento ----
+     Due cose, e fanno due lavori diversi.
+
+     **I tre punti scrivono**, come nel `ChatFab`: stesso ritmo (1,5s, scarto di
+     0,22) e stessa lettura — «di là c'è qualcuno». È il motivo per cui il
+     glifo ha tre punti invece di una bolla vuota, e finora stavano fermi. Un
+     comando che compare in due posti del sito deve avere la stessa faccia
+     **e** lo stesso comportamento, o sembrano due cose.
+
+     **L'alone pulsa tre volte e smette.** Serve a farsi trovare all'arrivo
+     sulla pagina, che è il momento in cui non si sa ancora che si può
+     chiedere; dopo, chi legge sta leggendo, e un pulsante che pulsa in eterno
+     accanto a un articolo è una cosa che si impara a ignorare — o si copre con
+     la mano. Tre giri sono ~7 secondi: il tempo di scorrere il primo schermo.
+
+     È uno `::after` e non un `box-shadow` sul pulsante, perché quello è già
+     occupato da `.btn:hover` e le due cose si mangerebbero. Lo spread in `rem`
+     come tutto il resto. */
+  .bchat {
+    position: relative;
+  }
+
+  .bchat::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    animation: bchat-alone 2.4s ease-out 3;
+  }
+
+  @keyframes bchat-alone {
+    0% {
+      /* Il colore in chiaro come in `.wa__tag`: e' l'arancione del marchio con
+         l'alfa, e `var()` dentro un'ombra non si puo' sfumare a trasparente. */
+      box-shadow: 0 0 0 0 rgba(255, 87, 1, 0.5);
+    }
+    70%,
+    100% {
+      box-shadow: 0 0 0 0.85rem rgba(255, 87, 1, 0);
+    }
+  }
+
+  .bchat__glifo circle {
+    animation: bchat-punto 1.5s ease-in-out infinite;
+  }
+
+  .bchat__glifo circle:nth-of-type(2) {
+    animation-delay: 0.22s;
+  }
+
+  .bchat__glifo circle:nth-of-type(3) {
+    animation-delay: 0.44s;
+  }
+
+  @keyframes bchat-punto {
+    0%,
+    60%,
+    100% {
+      opacity: 0.45;
+      transform: none;
+    }
+    30% {
+      opacity: 1;
+      transform: translateY(-0.06rem);
+    }
+  }
+
+  /* Chi chiede meno movimento chiede meno movimento: restano il pulsante e i
+     tre punti, fermi e pieni — non semispenti, che sarebbe un glifo che sembra
+     disabilitato. */
+  @media (prefers-reduced-motion: reduce) {
+    .bchat::after {
+      animation: none;
+    }
+
+    .bchat__glifo circle {
+      animation: none;
+      opacity: 1;
+    }
+  }
 </style>
