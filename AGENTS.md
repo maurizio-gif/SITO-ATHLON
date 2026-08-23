@@ -1808,6 +1808,29 @@ chi scrive (la sua prenotazione, il suo addebito, la scadenza del suo
 certificato), su una candidatura, e su qualunque cosa chieda di confermare che
 qualcosa è stato fatto. Nessuna bozza è meglio di una bozza da smentire.
 
+**La bozza è in HTML, ma il modello non lo scrive tutto.** L'HTML lo chiedeva la
+leggibilità: la prima bozza vera era un muro con sei importi e tre risparmi in due
+capoversi, e nessuno legge una tabella scritta in prosa. Ma un modello che
+improvvisa attributi `style` produce email che si vedono in tre modi diversi —
+Gmail butta i blocchi `<style>`, non carica font esterni e su alcune app mobili
+riscrive i colori. Quindi il taglio è questo: il modello usa **quattro tag e
+nessun attributo** (`<p>`, `<strong>`, `<ul>`/`<li>`, `<a href>`) e scrive **solo
+il corpo**; `Leggi la bozza` sanifica sulla lista bianca, incolla gli stili in
+linea uno per uno, e aggiunge saluto e firma — che così non possono uscire in due
+copie né in due forme. I link sono `#bb4001` e non `#ff5701` per la stessa ragione
+di `--accent-text` in `global.css`: l'arancio pieno non regge il contrasto sotto i
+24px. L'unico ornamento è un filetto arancione sopra la firma, cioè un bordo su un
+`div`: la sola decorazione che Gmail disegna sempre.
+
+**Due regole sul contenuto vengono da quella stessa bozza.** *Poche cifre*: al
+massimo due prezzi per email, e i risparmi, i confronti fra formule e le
+alternative solo se li ha chiesti — il listino intero sta dietro il link, che è il
+posto giusto per un listino. E *gli orari si danno col planning*: il link di
+`/planning` ci va **sempre** quando la domanda tocca gli orari, e non si affida al
+prompt — se l'ancora `orari` ha sparato e quel link non c'è, lo aggiunge il nodo.
+«Li trovi nell'app» manda a cercare dentro un'applicazione una cosa che sta su una
+pagina.
+
 **Con un allegato si aspetta, e lo scarto si registra.** I certificati medici di
 idoneità non agonistica arrivano così: per ora l'assistente non li guarda e non
 scrive niente — leggerli e dire se vanno bene è il passo dopo, non questo. Una
