@@ -2011,6 +2011,14 @@ export function initChatAssistente(root, options) {
       if (btnRichiamo) btnRichiamo.hidden = !dati.puoRichiamo;
       if (btnScrivi) btnScrivi.hidden = dati.passo !== 'chat';
       if (campoEmail && dati.email) campoEmail.value = dati.email;
+      /* La lista delle attività non è nella scena salvata — è statica, la
+         ridisegna `dipingiAttivita()` — ma su una pagina nuova il modulo
+         riparte da zero e quella lista non l'ha ancora scritta nessuno.
+         Restaurare `passo: 'attivita'` senza questa riga mostrava il titolo
+         "Di cosa parliamo?" con il corpo bianco sotto: il passo tornava,
+         il contenuto no. È idempotente, quindi si chiama comunque, non solo
+         quando il passo restaurato è proprio questo. */
+      dipingiAttivita();
       mostra(dati.passo || 'email');
     } finally {
       ricostruendo = false;

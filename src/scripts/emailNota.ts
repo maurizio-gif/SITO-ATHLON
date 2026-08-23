@@ -49,11 +49,39 @@
  * scritto niente. `leggi()` invece resta quella di sempre — usata da
  * `precompila()` per riempire un campo vuoto — e la fa vincere sull'email
  * ricordata per lo stesso motivo.
+ *
+ * **E resta per tutta la visita, non solo sulla pagina che porta il
+ * parametro.** Il sito è statico e multipagina: chi arriva su `?email=…` e
+ * clicca un link interno si ritrova su un URL pulito, e senza questa riga
+ * `daUrl()` sarebbe tornata vuota — esattamente il problema del `vid` che
+ * `attribuzione.ts` risolve allo stesso modo. La prima pagina che vede il
+ * parametro lo scrive in `sessionStorage`; quelle dopo, senza il parametro,
+ * lo trovano lì. Come il `sid`: dura la sessione, non serve un consenso — è
+ * necessario al servizio che la persona ha già chiesto cliccando quel link,
+ * non profilazione.
+ *
+ * **Tranne sul totem.** Lì la persona dopo non è la stessa, e se il
+ * `sessionStorage` sopravvivesse fra un visitatore e il successivo — la
+ * scheda del browser non si chiude da sola — l'email di chi è passato prima
+ * finirebbe scritta per chi viene dopo: lo stesso rischio per cui `leggi()`
+ * non legge `localStorage` lì. `daUrl()` sul totem vede solo il parametro
+ * della pagina corrente, mai quello scritto da una pagina precedente.
  */
 import { quandoConsentito } from './consenso';
 import { suTotem } from './totem';
 
 const CHIAVE = 'athlon_email';
+const CHIAVE_VISITA = 'athlon_email_url';
+
+function dallaPagina(): string {
+  try {
+    const params = new URLSearchParams(location.search);
+    const v = (params.get('email') || params.get('Email') || params.get('user_email') || '').trim();
+    return v.indexOf('@') > 0 ? v.toLowerCase() : '';
+  } catch {
+    return '';
+  }
+}
 
 /**
  * Esportata, non solo globale: i quattro flussi con un passo email→verifica
@@ -61,10 +89,18 @@ const CHIAVE = 'athlon_email';
  * così non dipendono dall'ordine in cui gli script della pagina si caricano.
  */
 export function daUrl(): string {
+  const pagina = dallaPagina();
+  if (suTotem()) return pagina;
+  if (pagina) {
+    try {
+      sessionStorage.setItem(CHIAVE_VISITA, pagina);
+    } catch {
+      /* storage negato: resta valida solo per questa pagina, e va bene */
+    }
+    return pagina;
+  }
   try {
-    const params = new URLSearchParams(location.search);
-    const v = (params.get('email') || params.get('Email') || params.get('user_email') || '').trim();
-    return v.indexOf('@') > 0 ? v.toLowerCase() : '';
+    return sessionStorage.getItem(CHIAVE_VISITA) || '';
   } catch {
     return '';
   }
