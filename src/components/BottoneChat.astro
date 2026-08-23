@@ -63,16 +63,31 @@ const { sorgente, testo = 'Chatta con noi', classe } = Astro.props;
 </a>
 
 <style>
-  /* `.btn` porta già forma, corpo e spaziatura: qui restano il glifo e il fatto
-     che non si vada a capo fra icona e parole. */
+  /* `.btn` porta forma e maiuscoletto, ma **non** la sua taglia: quella è la
+     misura di un comando che chiude una sezione, e qui il comando sta in una
+     hero, sotto un occhiello, un titolo e due pastiglie da `--text-2xs`. Con i
+     `20px 32px` di `.btn` il pulsante era l'oggetto più grande del primo
+     schermo — misurato su un telefono da 390: 61 px di altezza contro i 26
+     della pastiglia dell'attività sopra — e leggeva come l'azione principale
+     della pagina, che non è: la pagina è un articolo, e questo è il modo di
+     chiedere se l'articolo non basta.
+     Sceso a 49 px, cioè appena sopra i 48 che una spazzata del totem pretende
+     da un bersaglio: più piccolo di così non si può, ed è il posto giusto dove
+     fermarsi. Tutto in `rem`, o sul totem e sulla televisione resterebbe un
+     bersaglio da telefono — misurato, diventa 81 px sul totem e 94 sulla
+     televisione. */
   .bchat {
     text-decoration: none;
     white-space: nowrap;
+    gap: 0.5rem;
+    padding: 0.9375rem 1.375rem;
+    font-size: 0.8125rem;
+    line-height: 1.25;
   }
 
   .bchat__glifo {
     flex: none;
-    width: 1.15rem;
-    height: 1.15rem;
+    width: 1.05rem;
+    height: 1.05rem;
   }
 </style>

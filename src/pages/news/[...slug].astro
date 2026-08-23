@@ -254,7 +254,14 @@ const schema = {
      questo e' un comando, e il margine sopra deve valere anche quando il
      bottone e' l'unica cosa nella riga - una news senza data (`draft`, che
      qui non si vede, o un campo vuoto) non deve far collassare lo spazio. */
-  .nws__chat {
+  /* `:global`, e non e' pedanteria: la classe la porta un elemento reso da
+     `BottoneChat.astro`, quindi quell'elemento ha **l'ambito di quel file**.
+     Scritta senza, questa regola diventa `.nws__chat[data-astro-cid-…]` col
+     `cid` di questa pagina e non tocca mai il pulsante: il margine non c'e'
+     mai stato, e il comando risultava incollato alla riga sopra. E' la stessa
+     trappola di `CampoTelefono` documentata in CLAUDE.md — la classe si passa,
+     ma a non attraversare il confine e' la **regola**. */
+  :global(.nws__chat) {
     margin-top: 1.375rem;
   }
 
