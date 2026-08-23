@@ -44,24 +44,45 @@
  * `window.athlonEmailConosciuta()` è la funzione che i quattro flussi con un
  * passo "email → verifica su PerfectGym → ramo" (prova, contattaci,
  * iscrizione, l'assistente) chiamano per **saltare** quel passo: se
- * conosciamo già l'email — dall'URL di questa visita o da un invio
- * precedente ricordato nel browser — non la precompilano soltanto, la
- * mandano da sole alla verifica. Una volta che qualcuno l'ha data, in
+ * conosciamo già l'email — dall'URL, da un altro form di questa visita o da
+ * un invio precedente ricordato nel browser — non la precompilano soltanto,
+ * la mandano da sole alla verifica. Una volta che qualcuno l'ha data, in
  * qualunque forma sul sito, nessun altro form gliela richiede più:
  * `leggi()` è la stessa funzione che `precompila()` usa per riempire un
  * campo vuoto, qui riusata per decidere se il passo va saltato del tutto.
- * `daUrl()` resta la versione più stretta — solo l'URL di questa visita,
- * non il ricordo — per chi ha bisogno di distinguere le due fonti.
+ * `daUrl()` resta la versione più stretta — il solo parametro nell'indirizzo
+ * di questa pagina — per chi ha bisogno di distinguere le fonti.
  *
  * **E resta per tutta la visita, non solo sulla pagina che porta il
  * parametro.** Il sito è statico e multipagina: chi arriva su `?email=…` e
  * clicca un link interno si ritrova su un URL pulito, e senza questa riga
- * `daUrl()` sarebbe tornata vuota — esattamente il problema del `vid` che
+ * l'informazione sarebbe persa — esattamente il problema del `vid` che
  * `attribuzione.ts` risolve allo stesso modo. La prima pagina che vede il
  * parametro lo scrive in `sessionStorage`; quelle dopo, senza il parametro,
  * lo trovano lì. Come il `sid`: dura la sessione, non serve un consenso — è
  * necessario al servizio che la persona ha già chiesto cliccando quel link,
  * non profilazione.
+ *
+ * ## Due memorie, e solo la seconda passa dal consenso
+ *
+ * Questa è la riga che è costata un giro di correzioni. `athlon_email` in
+ * `localStorage` è **funzionale**: sopravvive alla chiusura del browser, e
+ * ricordarsi un indirizzo fra una visita e l'altra è una comodità che si
+ * chiede. Ma la scrittura passa da `quandoConsentito('functional', …)`, e da
+ * quando la chiave CookieYes è tornata attiva quella coda **non si svuota
+ * finché il visitatore non accetta**: chi non tocca il banner digitava
+ * l'email nella prova e se la ritrovava richiesta identica in «contattaci»,
+ * perché `localStorage` era rimasto vuoto e la scrittura in attesa.
+ *
+ * L'email digitata poco fa e portata a un altro form **nella stessa visita**
+ * però non è quella memoria: è la stessa cosa della sessione della chat, che
+ * il sito classifica già come **necessaria** — lo stato del servizio che la
+ * persona ha chiesto, dura la sessione, non profila, e bloccarlo rompe il
+ * servizio invece di proteggerlo. Quindi `ricorda()` scrive **subito** in
+ * `sessionStorage`, senza consenso, e in `localStorage` solo quando il
+ * consenso funzionale arriva. Chi rifiuta i funzionali non viene più
+ * riconosciuto domani; oggi, dentro la sua visita, non gli si richiede tre
+ * volte lo stesso indirizzo.
  *
  * **Tranne sul totem.** Lì la persona dopo non è la stessa, e se il
  * `sessionStorage` sopravvivesse fra un visitatore e il successivo — la
@@ -73,10 +94,13 @@
 import { quandoConsentito } from './consenso';
 import { suTotem } from './totem';
 
+/** Il ricordo fra una visita e l'altra: `localStorage`, dietro il consenso. */
 const CHIAVE = 'athlon_email';
-const CHIAVE_VISITA = 'athlon_email_url';
+/** L'email di questa visita: `sessionStorage`, come il `sid`, senza consenso. */
+const CHIAVE_VISITA = 'athlon_email_visita';
 
-function dallaPagina(): string {
+/** Il solo parametro nell'indirizzo di **questa** pagina. */
+export function daUrl(): string {
   try {
     const params = new URLSearchParams(location.search);
     const v = (params.get('email') || params.get('Email') || params.get('user_email') || '').trim();
@@ -86,22 +110,11 @@ function dallaPagina(): string {
   }
 }
 
-/**
- * Esportata, non solo globale: i quattro flussi con un passo email→verifica
- * la importano direttamente (come già fanno con `suTotem` da `totem.ts`),
- * così non dipendono dall'ordine in cui gli script della pagina si caricano.
- */
-export function daUrl(): string {
-  const pagina = dallaPagina();
-  if (suTotem()) return pagina;
-  if (pagina) {
-    try {
-      sessionStorage.setItem(CHIAVE_VISITA, pagina);
-    } catch {
-      /* storage negato: resta valida solo per questa pagina, e va bene */
-    }
-    return pagina;
-  }
+/** L'email già vista in questa visita, da un link o da un altro form. */
+function diQuestaVisita(): string {
+  /* Mai sul totem: la persona dopo non è la stessa, e la scheda del browser
+     lì non si chiude fra un visitatore e il successivo. */
+  if (suTotem()) return '';
   try {
     return sessionStorage.getItem(CHIAVE_VISITA) || '';
   } catch {
@@ -109,13 +122,35 @@ export function daUrl(): string {
   }
 }
 
+function segnaVisita(email: string): void {
+  if (suTotem()) return;
+  try {
+    sessionStorage.setItem(CHIAVE_VISITA, email);
+  } catch {
+    /* storage negato: l'email vale per questa pagina sola, e va bene */
+  }
+}
+
 /**
- * Esportata come `daUrl()`, per lo stesso motivo: i quattro flussi la
- * importano direttamente invece di passare da `window`.
+ * L'email che conosciamo, da qualunque fonte, in ordine di specificità.
+ *
+ * Esportata come `daUrl()`, per lo stesso motivo: i quattro flussi con un
+ * passo email→verifica la importano direttamente (come già fanno con
+ * `suTotem` da `totem.ts`), così non dipendono dall'ordine in cui gli script
+ * della pagina si caricano.
  */
 export function leggi(): string {
+  /* L'indirizzo nel link vince su tutto e **vale anche sul totem**: non è il
+     residuo di chi è passato prima, è l'informazione con cui quel link è
+     stato costruito. Ed entra nella memoria di visita, così sopravvive al
+     primo click su un link interno. */
   const url = daUrl();
-  if (url) return url;
+  if (url) {
+    segnaVisita(url);
+    return url;
+  }
+  const visita = diQuestaVisita();
+  if (visita) return visita;
   if (suTotem()) return '';
   try {
     return localStorage.getItem(CHIAVE) || '';
@@ -131,6 +166,13 @@ function ricorda(email: string): void {
      una stringa che non è un'email. */
   if (!pulita || pulita.indexOf('@') < 1) return;
   if (suTotem()) return;
+  /* Subito e senza consenso: dentro la visita è lo stato del servizio che la
+     persona ha appena chiesto, come la sessione della chat. Vedi la nota
+     «Due memorie» in cima. */
+  segnaVisita(pulita);
+  /* E fra una visita e l'altra solo con i funzionali: quello è un ricordo, e
+     un ricordo si chiede. Se il consenso non arriva mai questa resta in coda,
+     ed è giusto così — la visita di oggi è già coperta dalla riga sopra. */
   quandoConsentito('functional', () => {
     try {
       localStorage.setItem(CHIAVE, pulita);

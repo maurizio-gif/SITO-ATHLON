@@ -40,9 +40,20 @@ export interface Voce {
  * ma la regola che li governa è la stessa: è archiviazione nel terminale, e
  * quella che non serve al servizio richiesto va chiesta.
  *
- * L'elenco corrisponde a `scripts/attribuzione.ts`, `lib/chatAssistente.client.js`
- * e `components/clublife/HelpDesk.astro`. Toccare uno di quelli senza toccare
- * questo elenco vuol dire un'informativa che descrive un altro sito.
+ * L'elenco corrisponde a `scripts/attribuzione.ts`, `scripts/emailNota.ts`,
+ * `lib/chatAssistente.client.js` e `components/clublife/HelpDesk.astro`.
+ * Toccare uno di quelli senza toccare questo elenco vuol dire un'informativa
+ * che descrive un altro sito.
+ *
+ * **La categoria non la decide il tipo di dato, la decide a cosa serve.**
+ * L'email compare due volte con due categorie diverse e non è una svista:
+ * `athlon_email_visita` tiene in piedi il modulo che la persona sta
+ * compilando adesso — è la stessa cosa della sessione della chat, dura la
+ * scheda e non profila — mentre `athlon_email` la riconosce quando torna
+ * domani, e quello è un ricordo, che si chiede. Se un domani si preferisse la
+ * lettura più prudente, la prima si sposta sotto `funzionale` cambiando la
+ * riga in `emailNota.ts` che la scrive fuori dal consenso: il prezzo è che a
+ * chi rifiuta i funzionali l'email viene richiesta a ogni modulo.
  */
 export const STORAGE: Voce[] = [
   {
@@ -62,9 +73,16 @@ export const STORAGE: Voce[] = [
   {
     chiave: 'athlon_email',
     dove: 'localStorage',
-    cosa: "L'indirizzo email che hai già lasciato in un modulo, per non chiedertelo di nuovo la volta successiva. Resta sul tuo dispositivo: non viene riletto dai nostri sistemi, e sul totem in ingresso al club non viene mai memorizzato né mostrato.",
+    cosa: "L'indirizzo email che hai già lasciato in un modulo, per non chiedertelo di nuovo **quando torni**, anche a giorni di distanza. Resta sul tuo dispositivo: non viene riletto dai nostri sistemi, e sul totem in ingresso al club non viene mai memorizzato né mostrato.",
     durata: 'Finché non si svuota il browser',
     categoria: 'funzionale',
+  },
+  {
+    chiave: 'athlon_email_visita',
+    dove: 'sessionStorage',
+    cosa: "Lo stesso indirizzo, ma per la **visita in corso**: se lo scrivi nel modulo della prova e poi apri «contattaci» o l'assistente, non te lo richiediamo da capo. È la prosecuzione del modulo che stai compilando, muore chiudendo la scheda, non viene mai riletto dai nostri sistemi e sul totem in ingresso al club non viene mai memorizzato. Per questo non passa dal consenso, a differenza di athlon_email che invece ti riconosce alla visita successiva.",
+    durata: 'La sessione del browser',
+    categoria: 'necessario',
   },
   {
     chiave: 'athlon:assistente:sessione',
