@@ -25,7 +25,14 @@ const cards = lessonCardsFor(bands);
         `global.css` traduce in `display: none` per tutto il sito — e va tolto
         dall'altro, o resterebbero in pagina tutti e due. */}
     <div class="lmodal__media" hidden>
-      <video autoplay playsinline muted loop preload="metadata" hidden></video>
+      {/* `preload="auto"` e non `metadata`: qui non e' il video di sfondo che
+          gira sempre, e' l'unico caso del sito in cui il video parte **prima**
+          del gesto che lo mostra — al passaggio del mouse, non al carico della
+          pagina. Senza `auto` il precaricamento (vedi lo script) fermerebbe il
+          browser ai soli metadati, e l'attesa che oggi si vede al click
+          resterebbe identica: sposterebbe l'inizio del download, non
+          l'inizio del buffering vero. */}
+      <video autoplay playsinline muted loop preload="auto" hidden></video>
       <img class="lmodal__pic" alt="" hidden />
     </div>
 
@@ -79,6 +86,7 @@ const cards = lessonCardsFor(bands);
       // Drop the source so a closed panel is not still pulling bytes.
       video.removeAttribute('src');
       video.load();
+      caricata = '';
     }
     lastTrigger?.focus();
   }
@@ -95,7 +103,13 @@ const cards = lessonCardsFor(bands);
     if (video && mediaWrap) {
       if (card.videoUrl) {
         if (pic) pic.hidden = true;
-        video.src = card.videoUrl;
+        /* Se il passaggio del mouse ha già caricato questa clip, riscrivere
+           `src` allo stesso indirizzo butterebbe via il buffering fatto
+           finora: l'attributo scatta comunque, anche a valore identico. */
+        if (caricata !== card.videoUrl) {
+          caricata = card.videoUrl;
+          video.src = card.videoUrl;
+        }
         if (card.videoStart) video.currentTime = card.videoStart;
         video.hidden = false;
         mediaWrap.hidden = false;
@@ -107,6 +121,7 @@ const cards = lessonCardsFor(bands);
         video.hidden = true;
         video.removeAttribute('src');
         video.load();
+        caricata = '';
         pic.src = card.imageUrl;
         pic.alt = `${name} ad Athlon Club`;
         pic.style.objectPosition = card.imageFocus || '';
@@ -147,9 +162,44 @@ const cards = lessonCardsFor(bands);
     modal.querySelector<HTMLElement>('.lmodal__close')?.focus();
   }
 
+  /**
+   * Comincia a scaricare la clip prima del click, cosi' quando il pannello si
+   * apre il video ha gia' un vantaggio invece di partire da zero — stesso
+   * gesto anticipatorio con cui `ChatModal.astro` precarica lo script della
+   * chat al passaggio del mouse, prima che qualcuno tocchi il pulsante.
+   *
+   * `pointerenter` copre il mouse, `focusin` la tastiera, `touchstart` il
+   * telefono: sul telefono non c'e' un "prima" del tocco, ma `touchstart`
+   * arriva comunque qualche decina di millisecondi prima di `click`, ed e'
+   * quel poco che conta quando la clip e' gia' compressa a dovere.
+   *
+   * Si scarica **il video**, non solo i suoi metadati: e' lo stesso elemento
+   * che il pannello mostrera', quindi al click basta chiamare `play()` — se
+   * il buffering e' avanti, parte prima; se non lo e', si comporta come
+   * prima. Un video nascosto (`display: none`, non `hidden` sul contenuto)
+   * continua comunque a scaricare: quello che smette di scaricare e' un video
+   * *staccato dal documento*, e questo resta al suo posto per tutta la vita
+   * della pagina.
+   */
+  /** L'indirizzo gia' caricato nell'unico `<video>` del pannello — non un
+      insieme, perche' un elemento solo non puo' tenerne piu' di uno alla
+      volta: passare il mouse su una seconda lezione sostituisce la prima. */
+  let caricata = '';
+
+  function precarica(name: string) {
+    const card = cards[name];
+    if (!card?.videoUrl || !video || caricata === card.videoUrl) return;
+    caricata = card.videoUrl;
+    video.src = card.videoUrl;
+    video.load();
+  }
+
   document.querySelectorAll<HTMLElement>('[data-lesson]').forEach((el) => {
     el.addEventListener('click', () =>
       open(el.dataset.lesson || '', el.dataset.lessonMeta || '', el)
+    );
+    (['pointerenter', 'focusin', 'touchstart'] as const).forEach((evento) =>
+      el.addEventListener(evento, () => precarica(el.dataset.lesson || ''), { passive: true })
     );
   });
 
