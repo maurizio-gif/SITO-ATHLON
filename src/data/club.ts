@@ -15,9 +15,13 @@
  *
  * Quello che il repository **non** ha non sta qui: nessun numero di telefono
  * del club (i due numeri nella scheda brevetti sono di due tecnici, non del
- * centralino) e nessuna coordinata geografica, perché la mappa lavora
- * sull'indirizzo. Un dato inventato in un JSON-LD è peggio di un dato assente:
- * i motori lo pubblicano come se fosse dichiarato dal club.
+ * centralino) — scelta voluta, non una dimenticanza. Un dato inventato in un
+ * JSON-LD è peggio di un dato assente: i motori lo pubblicano come se fosse
+ * dichiarato dal club.
+ *
+ * Le coordinate geografiche invece ci sono: confermate dal titolare sul punto
+ * esatto del civico, non stimate dall'indirizzo — una stima sbaglia quanto
+ * basta a spostare il marker sul palazzo sbagliato.
  */
 import { gymFloor } from './planning';
 
@@ -33,6 +37,8 @@ export const CLUB = {
   country: 'IT',
   /** La zona come la nomina il club, che è anche come la cercano le persone. */
   area: 'Roma Nord — Talenti',
+  /** Sul civico esatto, non sull'indirizzo geocodificato: vedi la nota in cima al file. */
+  geo: { lat: 41.944300615732175, lng: 12.55176015989571 },
   sqm: 3000,
   social: [
     'https://www.instagram.com/athlon_club/',
@@ -130,6 +136,7 @@ export function clubSchema(site: string) {
     email: CLUB.email,
     foundingDate: String(CLUB.founded),
     address: postalAddress(),
+    geo: { '@type': 'GeoCoordinates', latitude: CLUB.geo.lat, longitude: CLUB.geo.lng },
     areaServed: CLUB.area,
     sameAs: [...CLUB.social],
     openingHoursSpecification: openingHoursSpec(),
