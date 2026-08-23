@@ -39,7 +39,7 @@ import { ACTIVITY_AUDIENCE } from '../data/activities';
 import { validaTelefono } from '../data/prefissi';
 import { CALENDLY } from '../data/calendly';
 import { suTotem } from '../scripts/totem';
-import { daUrl as emailDaUrl } from '../scripts/emailNota';
+import { leggi as emailConosciuta } from '../scripts/emailNota';
 import { montaCalendario } from './calendario.client.js';
 import { plans, GUEST_PASS } from '../data/abbonamenti';
 import { REGISTRAZIONE, PASSI_ATTIVAZIONE } from '../data/guestPass';
@@ -2027,17 +2027,19 @@ export function initChatAssistente(root, options) {
 
   ripristina();
 
-  /* L'email nell'URL salta il passo, non solo lo precompila: chi arriva da un
-     link che la conosce già non deve scriverla una seconda volta. Solo se
-     `ripristina()` non ha già restituito una conversazione in corso — quella
-     di chi sta scrivendo ora vince sempre su quella di un link vecchio
-     riaperto per caso — e solo se la persona non ha già scritto qualcosa
-     (bastano campoEmail e dati.passo, perché è `ripristina()` a rimettere
-     `dati.passo` diverso da 'email' quando c'è una sessione salvata). */
+  /* Un'email già nota — dall'URL di questa visita o ricordata da un invio
+     precedente in un altro form del sito — salta il passo, non solo lo
+     precompila: chi l'ha già data una volta non deve scriverla una seconda
+     volta. Solo se `ripristina()` non ha già restituito una conversazione in
+     corso — quella di chi sta scrivendo ora vince sempre su quella di un
+     link vecchio riaperto per caso — e solo se la persona non ha già scritto
+     qualcosa (bastano campoEmail e dati.passo, perché è `ripristina()` a
+     rimettere `dati.passo` diverso da 'email' quando c'è una sessione
+     salvata). */
   if (dati.passo === 'email' && !dati.email && campoEmail) {
-    var emailUrl = emailDaUrl();
-    if (emailUrl) {
-      campoEmail.value = emailUrl;
+    var emailGiaNota = emailConosciuta();
+    if (emailGiaNota) {
+      campoEmail.value = emailGiaNota;
       verifica();
     }
   }

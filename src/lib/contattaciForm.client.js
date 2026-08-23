@@ -59,7 +59,7 @@ import {
 import { SITE } from '../data/sito';
 import { CALENDLY } from '../data/calendly';
 import { validaTelefono } from '../data/prefissi';
-import { daUrl as emailDaUrl } from '../scripts/emailNota';
+import { leggi as emailConosciuta } from '../scripts/emailNota';
 import { montaCalendario } from './calendario.client.js';
 
 export function initContattaciForm(root, options) {
@@ -1173,12 +1173,13 @@ export function initContattaciForm(root, options) {
       mostraContesto();
       mostraStep('email', true);
 
-      /* L'email nell'URL salta il passo, non solo lo precompila: chi arriva
-         da un link che la conosce già non deve scriverla una seconda volta.
-         `pulisci()` qui sopra ha già riportato tutto al passo 'email'. */
-      var emailUrl = emailDaUrl();
-      if (emailUrl && campoEmail) {
-        campoEmail.value = emailUrl;
+      /* Un'email già nota — dall'URL o ricordata da un altro form — salta il
+         passo, non solo lo precompila: chi l'ha già data una volta non deve
+         scriverla una seconda volta. `pulisci()` qui sopra ha già riportato
+         tutto al passo 'email'. */
+      var emailGiaNota = emailConosciuta();
+      if (emailGiaNota && campoEmail) {
+        campoEmail.value = emailGiaNota;
         verifica();
       }
     },
