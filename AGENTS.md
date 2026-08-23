@@ -1304,6 +1304,41 @@ Due dettagli che sono trappole vere:
   scuola nuoto mandava a `/richiamami`, che è l'evento degli adulti; qui si
   segue `data/calendly.ts`.
 
+### Gli orari in chat hanno due posti, e la domanda decide quale
+
+Il planning è una pagina del sito e si apre senza account: è la risposta a
+**«che orari fate?»**, a «quando c'è il pilates?», a chiunque non sia ancora dei
+nostri. Ma un giorno e un'ora, una lezione per nome, chi la tiene, quanti posti
+restano — quelle quattro cose cambiano di settimana in settimana, e il planning
+non le sa. Lì si manda al **calendario delle prenotazioni** del portale,
+`ClientPortal2/#/Classes/1/Calendar`, che mostra dal vivo istruttori, orari e
+posti disponibili. **Vale soprattutto per chi è già iscritto**, che ci entra col
+suo account ed è il posto da cui prenota comunque.
+
+Tre cose da sapere prima di toccarlo.
+
+**Quell'indirizzo non è un'eccezione alla regola delle fonti, è già dentro la
+knowledge base.** Lo scrive la scheda `generali/prenotazioni`, che lo indica come
+il posto dove si vede il dato in tempo reale: il modello non se lo inventa, lo
+legge. La regola 3 lo nomina esplicitamente perché altrimenti la clausola «solo
+gli url delle righe FONTE» glielo farebbe scartare — un url scritto *dentro* il
+testo di una voce è reale quanto quello della sua FONTE.
+
+**Va fra le `fonti`, non nel testo della bolla.** `chatAssistente.client.js`
+passa la risposta dall'escape e converte solo il `**grassetto**`: un indirizzo
+scritto in prosa resta testo da ricopiare a mano, mentre `rimandi()` disegna le
+fonti come link che si aprono in una scheda nuova. È il solo posto della chat in
+cui un link è cliccabile, e quindi è il solo posto dove ha senso metterlo.
+
+**Capienze e nomi degli istruttori si nominano solo se li ha chiesti.** Il
+calendario li mostra tutti e due, ma metterli in vetrina a chi ha chiesto un
+orario è rispondere a una domanda che non ha fatto — la stessa regola per cui la
+lezione singola non si nomina «per completezza».
+
+E l'orario **di apertura** del club — anche quello stagionale, come l'estivo di
+agosto — resta scritto nel testo e si cita come sta: quello non è una lezione e
+non cambia ogni settimana.
+
 ### La stessa regola vale nella chat, e lì aveva la condizione sbagliata
 
 L'assistente classifica sull'email come il form — `dati.ramo = 'iscritto'`
