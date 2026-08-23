@@ -71,6 +71,13 @@ export const STORAGE: Voce[] = [
     categoria: 'marketing',
   },
   {
+    chiave: 'athlon_prova_suggerita',
+    dove: 'localStorage',
+    cosa: 'Quando ti è stato proposto o hai chiuso il banner che suggerisce una prova gratuita in base alle attività viste in una visita precedente, per non proportelo di nuovo troppo spesso.',
+    durata: 'Fino a 7 giorni dalla chiusura',
+    categoria: 'marketing',
+  },
+  {
     chiave: 'athlon_email',
     dove: 'localStorage',
     cosa: "L'indirizzo email che hai già lasciato in un modulo, per non chiedertelo di nuovo **quando torni**, anche a giorni di distanza. Resta sul tuo dispositivo: non viene riletto dai nostri sistemi, e sul totem in ingresso al club non viene mai memorizzato né mostrato.",
