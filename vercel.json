@@ -94,11 +94,6 @@
       "statusCode": 301
     },
     {
-      "source": "/referral{/}?",
-      "destination": "https://automazione.n8ndevelop.it/form/b433d08f-ec91-4fda-9648-2fc6a8d9b680?source=APP&medium=Pulsante",
-      "statusCode": 301
-    },
-    {
       "source": "/portale{/}?",
       "destination": "https://athlon.perfectgym.com/ClientPortal2/#/Login",
       "statusCode": 301
