@@ -1756,6 +1756,17 @@ differenza per cui in chat l'`azione` si valorizza solo dopo una conferma.
 ramo lo decide `statoNucleo` come per «contattaci» e per la chat: un abbonamento
 vivo nel nucleo è assistenza, tutto il resto è una persona che sta valutando.
 
+**E il ripiego su `stato` è un ripiego, non un'alternativa** — questa riga l'ha
+insegnata la prima bozza vera. Il ramo era `statoNucleo === 'iscritto' || stato
+=== 'iscritto'`, cioè un OR, quindi `stato` vinceva **anche quando `statoNucleo`
+diceva altro**: un Member senza abbonamento vivo nel nucleo (`stato: iscritto`,
+`statoNucleo: esiste`) finiva nel ramo assistenza, e la bozza gli diceva «sei già
+dei nostri, non ti propongo di iscriverti» a una persona che invece va invitata a
+iscriversi. È lo stesso scambio fra le due domande che aveva già morso in chat,
+nel verso opposto. Il ripiego vale solo quando `statoNucleo` **non è arrivato
+affatto**, cioè per un webhook più vecchio che non lo manda:
+`(statoNucleo ? statoNucleo === 'iscritto' : stato === 'iscritto')`.
+
 Cinque cose da sapere prima di toccarlo.
 
 **Il recupero è una copia di «Componi contesto» di `CHAT ATHLON`, e va tenuta in
