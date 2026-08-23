@@ -41,14 +41,17 @@
  * **anche sul totem**: un indirizzo nell'URL non è il residuo di chi è
  * passato prima, è l'informazione con cui quel link è stato costruito.
  *
- * `window.athlonEmailDaUrl()` è la funzione che i quattro flussi con un passo
- * "email → verifica su PerfectGym → ramo" (prova, contattaci, iscrizione,
- * l'assistente) chiamano per **saltare** quel passo: se c'è un'email nell'URL
- * non solo la precompilano, la mandano da sole alla verifica, così chi arriva
- * da un link che la conosce già si ritrova al passo successivo senza aver
- * scritto niente. `leggi()` invece resta quella di sempre — usata da
- * `precompila()` per riempire un campo vuoto — e la fa vincere sull'email
- * ricordata per lo stesso motivo.
+ * `window.athlonEmailConosciuta()` è la funzione che i quattro flussi con un
+ * passo "email → verifica su PerfectGym → ramo" (prova, contattaci,
+ * iscrizione, l'assistente) chiamano per **saltare** quel passo: se
+ * conosciamo già l'email — dall'URL di questa visita o da un invio
+ * precedente ricordato nel browser — non la precompilano soltanto, la
+ * mandano da sole alla verifica. Una volta che qualcuno l'ha data, in
+ * qualunque forma sul sito, nessun altro form gliela richiede più:
+ * `leggi()` è la stessa funzione che `precompila()` usa per riempire un
+ * campo vuoto, qui riusata per decidere se il passo va saltato del tutto.
+ * `daUrl()` resta la versione più stretta — solo l'URL di questa visita,
+ * non il ricordo — per chi ha bisogno di distinguere le due fonti.
  *
  * **E resta per tutta la visita, non solo sulla pagina che porta il
  * parametro.** Il sito è statico e multipagina: chi arriva su `?email=…` e
@@ -106,7 +109,11 @@ export function daUrl(): string {
   }
 }
 
-function leggi(): string {
+/**
+ * Esportata come `daUrl()`, per lo stesso motivo: i quattro flussi la
+ * importano direttamente invece di passare da `window`.
+ */
+export function leggi(): string {
   const url = daUrl();
   if (url) return url;
   if (suTotem()) return '';
@@ -146,10 +153,12 @@ const w = window as unknown as {
   athlonRicordaEmail: (email: string) => void;
   athlonEmailNota: () => string;
   athlonEmailDaUrl: () => string;
+  athlonEmailConosciuta: () => string;
 };
 w.athlonRicordaEmail = ricorda;
 w.athlonEmailNota = leggi;
 w.athlonEmailDaUrl = daUrl;
+w.athlonEmailConosciuta = leggi;
 
 precompila();
 

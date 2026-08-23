@@ -18,7 +18,7 @@
  * risponde chiude la pagina. Sei secondi e si passa.
  */
 import { WEBHOOK_VERIFICA, WEBHOOK_RESET, PORTALE, haGiaAccount } from '../data/contatto';
-import { daUrl as emailDaUrl } from '../scripts/emailNota';
+import { leggi as emailConosciuta } from '../scripts/emailNota';
 
 (function () {
   var modal = document.getElementById('iscrizione-modal');
@@ -72,15 +72,15 @@ import { daUrl as emailDaUrl } from '../scripts/emailNota';
     void modal.offsetWidth;
     mostra('email');
 
-    /* L'email nell'URL salta il passo, non solo lo precompila: chi arriva da
-       un link che la conosce già non deve scriverla una seconda volta.
-       `verifica()` decide da sola dove andare — al portale se l'account
-       c'è già, dritto sulla registrazione altrimenti — quindi qui basta
-       riempire il campo e chiamarla, senza dare il fuoco a un campo che
-       nessuno deve compilare. */
-    var emailUrl = emailDaUrl();
-    if (emailUrl && campo) {
-      campo.value = emailUrl;
+    /* Un'email già nota — dall'URL o ricordata da un altro form — salta il
+       passo, non solo lo precompila: chi l'ha già data una volta non deve
+       scriverla una seconda volta. `verifica()` decide da sola dove andare —
+       al portale se l'account c'è già, dritto sulla registrazione
+       altrimenti — quindi qui basta riempire il campo e chiamarla, senza
+       dare il fuoco a un campo che nessuno deve compilare. */
+    var emailGiaNota = emailConosciuta();
+    if (emailGiaNota && campo) {
+      campo.value = emailGiaNota;
       verifica();
       return;
     }
