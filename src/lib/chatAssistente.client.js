@@ -963,6 +963,21 @@ export function initChatAssistente(root, options) {
    * un account — Member o Guest — non si registra di nuovo, l'accesso e' il
    * comando pieno e il reset e' la deviazione sotto; chi non ce l'ha va dritto
    * al link PerfectGym con il `PaymentPlanId` del piano scelto.
+   *
+   * **Il ripiego guarda `stato`, non `statoNucleo`**, e la differenza si vede
+   * solo nel caso che lo fa sbagliare. `haGiaAccount` decide su `memberType` e
+   * ricade su `stato === 'iscritto'` per una versione del webhook che non lo
+   * mandi; qui gli veniva passato `statoNucleo`, che e' un'altra domanda —
+   * «questo nucleo e' di casa?» invece di «questa persona ha un account?». Un
+   * genitore senza contratto suo, con un figlio iscritto, ha
+   * `statoNucleo: 'iscritto'` e nessun account: si sarebbe visto dire «hai gia'
+   * un account» e mandare a un login che non ha. E' il verso sbagliato in cui
+   * sbagliare, quello che la nota di `haGiaAccount` mette per iscritto: chi ha
+   * un account e viene mandato a registrarsi lo scopre subito, chi non ce l'ha
+   * e viene mandato al login resta fuori senza capire perche'.
+   * `stato` e' anche l'ingresso che passano gli altri due chiamanti
+   * (`iscrizione.client.js`, `contattaciForm.client.js`): una regola sola,
+   * con lo stesso dato in mano.
    */
   function mostraIscrizione(azione) {
     var trovato = trovaOpzione(azione.piano, azione.opzione);
@@ -971,7 +986,7 @@ export function initChatAssistente(root, options) {
     var box = document.createElement('div');
     box.className = 'ca__azione';
 
-    if (haGiaAccount({ memberType: dati.memberType, stato: dati.statoNucleo })) {
+    if (haGiaAccount({ memberType: dati.memberType, stato: dati.stato })) {
       box.innerHTML =
         '<p class="ca__richiamo-titolo">Hai già un account</p>' +
         '<p class="ca__richiamo-lead">Accedi al portale e aggiungi l’abbonamento da lì: Abbonamenti → Aggiungi abbonamento.</p>' +
