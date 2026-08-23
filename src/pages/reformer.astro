@@ -330,7 +330,12 @@ const faqs = await faqPagina([
         {simili.map((s, i) => (
           <li data-anim="fade" data-anim-delay={String(i * 80)}>
             <a class="rf-simile" href={`/${s.corso.slug}`} data-cta="explore">
-              <img class="rf-simile__foto" src={s.corso.hero} alt="" loading="lazy" />
+              <img
+                class="rf-simile__foto"
+                src={s.corso.hero}
+                alt={`Una lezione di ${s.corso.nome} ad Athlon Club`}
+                loading="lazy"
+              />
               <span class="rf-simile__body">
                 <span class="rf-simile__nome u-display">{s.corso.nome}</span>
                 <span class="rf-simile__perche">{s.perche}</span>

@@ -454,7 +454,12 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
         {consigliati.map((s, i) => (
           <li data-anim="fade" data-anim-delay={String(i * 80)}>
             <a class="co-simile" href={`/${s.corso.slug}`}>
-              <img class="co-simile__foto" src={s.corso.hero} alt="" loading="lazy" />
+              <img
+                class="co-simile__foto"
+                src={s.corso.hero}
+                alt={`Una lezione di ${s.corso.nome} ad Athlon Club`}
+                loading="lazy"
+              />
               <span class="co-simile__body">
                 <span class="co-simile__nome u-display">{s.corso.nome}</span>
                 <span class="co-simile__perche">{s.perche}</span>

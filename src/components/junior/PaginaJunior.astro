@@ -444,7 +444,12 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
       {consigliati.map((s, i) => (
         <li data-anim="fade" data-anim-delay={String(i * 80)}>
           <a class="ju-simile" href={`/${s.pagina.slug}`}>
-            <img class="ju-simile__foto" src={s.pagina.hero} alt="" loading="lazy" />
+            <img
+              class="ju-simile__foto"
+              src={s.pagina.hero}
+              alt={`Una lezione di ${s.pagina.nome} ad Athlon Club`}
+              loading="lazy"
+            />
             <span class="ju-simile__body">
               <span class="ju-simile__nome u-display">{s.pagina.nome}</span>
               <span class="ju-simile__perche">{s.perche}</span>
