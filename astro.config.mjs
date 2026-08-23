@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import linkCanonici from './scripts/link-canonici.mjs';
 
 // https://astro.build/config
 export default defineConfig({
@@ -37,6 +38,10 @@ export default defineConfig({
   },
 
   integrations: [
+    /* Gli href interni escono con lo slash finale, come il canonical e come la
+       sitemap: senza, ogni clic interno passerebbe dal 308 di Vercel. Il perché
+       e i tre casi che non tocca stanno in testa allo script. */
+    linkCanonici(),
     sitemap({
       /* Il reindirizzo non è una pagina: la sua stessa pagina generata porta
          `noindex` e il canonical del bersaglio, quindi nella sitemap non ci va.

@@ -925,6 +925,60 @@ says on the screen itself which one is failing and how many millimetres the body
 copy measures. Keep the three numbers identical between `global.css`, that page,
 and every `/* + tv */` query.
 
+## L'indirizzo canonico finisce con lo slash, e vale per tutti e tre i posti
+
+Astro genera `planning/index.html`, quindi la pagina *è* `/planning/`: da lì il
+`<link rel="canonical">` di `Layout.astro` e la sitemap dichiarano la forma con
+lo slash, ed è la forma che Google ha indicizzato. La convenzione è quella, e i
+tre posti che la devono dire sono il canonical, la sitemap e i **link interni**.
+
+Prima ne parlavano due su tre: i 5768 href del sito erano scritti senza slash e
+`/planning` rispondeva **200** come `/planning/`, cioè lo stesso contenuto a due
+indirizzi. Non era un disastro — il canonical li univa — ma era una duplicazione
+gratuita e la si chiude in due mosse:
+
+- **`"trailingSlash": true` in `vercel.json`.** Vercel manda al 308 chi arriva
+  senza slash, esentando gli indirizzi con un'estensione, e conserva la query —
+  quindi le UTM sopravvivono. È un 308 e non un 301 perché la normalizzazione di
+  Vercel è quella: per Google i due sono la stessa cosa, e in cambio non c'è una
+  regola scritta a mano che possa entrare in ciclo con se stessa.
+- **`scripts/link-canonici.mjs`**, che allo `astro:build:done` porta gli href
+  dell'HTML già generato alla forma canonica. Sta lì e non nei 41 file che li
+  scrivono perché una parte degli indirizzi non è scritta ma costruita — da uno
+  slug, dal markdown, dai dati — e perché una regola sola si verifica in blocco:
+  dopo il build, **ogni href interno finisce con `/` e il suo bersaglio esiste**.
+  Non tocca i percorsi con un punto nell'ultimo pezzo (sono file), gli esterni,
+  le ancore pure, e lascia query e frammento dove stavano.
+
+**La direzione non si inverte a cuor leggero.** Passare alla forma senza slash
+vorrebbe dire cambiare 43 canonical e 43 righe di sitemap, cioè cambiare gli
+indirizzi che Google ha già in indice: si fa solo con una ragione, non per
+gusto, e non durante il consolidamento di una migrazione.
+
+### E le sorgenti dei redirect legacy devono accettare tutte e due le forme
+
+Questa riga è costata una migrazione a metà. Le 105 regole importate da
+WordPress avevano la sorgente **senza** slash — `/lead`, `/portale`,
+`/contatti` — e Vercel confronta la sorgente in modo stretto: `/lead` scattava,
+`/lead/` **no**, e finiva in 404. Ma WordPress serviva gli indirizzi *con* lo
+slash, quindi la forma che sta nei link vecchi e nell'indice di Google era
+proprio quella che non scattava. Misurato: `/lead/` (267 041 visite storiche) e
+`/portale/` rispondevano 404 mentre `/lead` e `/portale` reindirizzavano.
+
+Quindi ogni sorgente si scrive `/lead{/}?`, che è la sintassi di path-to-regexp
+per «con o senza lo slash finale» e non cattura niente in più — verificato con
+lo stesso matcher che usa Vercel, e verificato che non prenda i sottopercorsi
+(`/lead/x` resta 404, come deve).
+
+E **le destinazioni interne portano lo slash**, se no il 301 atterra su un
+indirizzo che il 308 sposta ancora: due salti dove ne basta uno.
+
+Per verificare, senza aspettare il deploy: `scripts/` non ha un simulatore
+committato, ma la prova è quella — si prendono le 105 sorgenti nelle due forme
+più le 43 pagine della sitemap nelle due forme, si applicano le regole in ordine
+con path-to-regexp in `strict`, e ognuna delle 295 deve chiudersi in **al massimo
+un salto** su un 200 o su un indirizzo esterno. Nessun ciclo, nessuna catena.
+
 ## I due sottodomini vecchi reindirizzano da `vercel.json`
 
 Prima di questo sito l'ecosistema era su tre host: `athlonroma.it` su WordPress,
