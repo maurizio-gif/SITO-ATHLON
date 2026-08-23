@@ -1875,7 +1875,27 @@ Un'email non è una scheda prodotto: è il modo in cui il club risponde a una
 persona, e chi la legge decide in dieci secondi se vuole saperne di più. Quindi
 l'apertura dice **che cos'è quella cosa e cosa la rende forte**, e poi due o tre
 voci d'elenco che sono **destinazioni, non dati**: il planning per gli orari, la
-pagina degli abbonamenti per i costi, la scheda per una regola. Centoventi parole.
+pagina degli abbonamenti per i costi, la scheda per una regola. Centoquaranta
+parole — erano centoventi, e le venti in più sono per la cortesia, non per i
+dettagli.
+
+**E la cortesia è il registro, non una riga in più.** Chi scrive alla casella sta
+chiedendo una cosa al club, e la risposta si apre ringraziandolo di aver scritto:
+una riga sola, che dà del tu e sta attaccata alla sua domanda — «grazie per averci
+scritto: ti racconto com'è organizzata la scuola nuoto» è già l'inizio della
+risposta, mentre «Gentile cliente, in merito alla Sua richiesta» è un ufficio che
+parla a una pratica. Le formule di cortesia sono **due e sono agli estremi** — il
+ringraziamento e la chiusa — perché una terza in mezzo non aggiunge calore, lo
+diluisce.
+
+Il resto non si aggiunge, si scrive diverso: «volentieri», «se ti va», «quando
+vuoi» al posto dell'imperativo secco; un dispiacere di una parola quando la
+risposta è un no, prima di dire qual è la cosa più vicina che c'è; mai un ordine e
+mai un rimprovero — una scadenza si dice come un'informazione utile, non come un
+richiamo. **E il burocratese non è gentilezza**: «restiamo a disposizione per
+qualsiasi chiarimento» e «non esiti a contattarci» sono le frasi con cui un
+fornitore chiude una pratica, e questo è un club. Vale anche per «cordiali
+saluti», che oltretutto uscirebbe doppio: il saluto e la firma li mette il nodo.
 
 **L'identità è già scritta sul sito, e cambia col soggetto.** Ogni pagina spiega
 che cos'è quello di cui parla — «Allenati in autonomia» per lo Smart, «Vivi tutto
