@@ -1822,14 +1822,26 @@ di `--accent-text` in `global.css`: l'arancio pieno non regge il contrasto sotto
 24px. L'unico ornamento è un filetto arancione sopra la firma, cioè un bordo su un
 `div`: la sola decorazione che Gmail disegna sempre.
 
-**Due regole sul contenuto vengono da quella stessa bozza.** *Poche cifre*: al
-massimo due prezzi per email, e i risparmi, i confronti fra formule e le
-alternative solo se li ha chiesti — il listino intero sta dietro il link, che è il
-posto giusto per un listino. E *gli orari si danno col planning*: il link di
-`/planning` ci va **sempre** quando la domanda tocca gli orari, e non si affida al
-prompt — se l'ancora `orari` ha sparato e quel link non c'è, lo aggiunge il nodo.
-«Li trovi nell'app» manda a cercare dentro un'applicazione una cosa che sta su una
-pagina.
+**L'email introduce, il sito spiega — ed è la regola che decide tutto il resto.**
+Un'email non è una scheda prodotto: è il modo in cui il club risponde a una
+persona, e chi la legge decide in dieci secondi se vuole saperne di più. Quindi
+l'apertura racconta **com'è** quell'attività e **a chi fa bene** — gli stessi fatti
+della knowledge base, ma dal lato di chi legge: non «vasca da 25 metri con
+assistenza a bordo vasca» ma «nuoti per conto tuo senza sentirti solo, perché un
+tecnico a bordo vasca c'è sempre» — e poi due o tre voci d'elenco che sono
+**destinazioni, non dati**: il planning per gli orari, la pagina degli abbonamenti
+per i costi, la scheda per una regola. Centoventi parole.
+
+Da qui **gli importi non si scrivono più nell'email**: una cifra sola, e solo se ha
+chiesto il prezzo di una cosa per nome; il listino, i risparmi e i confronti stanno
+nel link, che è il posto giusto per un listino. Vale anche per un iscritto che
+chiede della sospensione o del certificato: il succo in due o tre righe, con le
+parole di chi lo conosce e non di un ufficio, e poi la scheda per il resto.
+
+*E gli orari si danno col planning*: il link di `/planning` ci va **sempre** quando
+la domanda tocca gli orari, e non si affida al prompt — se l'ancora `orari` ha
+sparato e quel link non c'è, lo aggiunge il nodo. «Li trovi nell'app» manda a
+cercare dentro un'applicazione una cosa che sta su una pagina.
 
 **Con un allegato si aspetta, e lo scarto si registra.** I certificati medici di
 idoneità non agonistica arrivano così: per ora l'assistente non li guarda e non
