@@ -18,9 +18,9 @@
  * sul wiki per chi deve davvero eseguirla. È un `<details>` nativo — niente
  * script, la stessa disclosure che la scheda del wiki usa già per i suoi
  * dettagli. Il tono qui è commerciale e non procedurale: niente termini
- * contrattuali (il preavviso di 10 giorni resta sul wiki, non qui), solo il
- * beneficio — fermarsi senza perdere niente. Il prezzo resta letto da
- * `SOSPENSIONE`, non riscritto qui.
+ * contrattuali (il preavviso di 10 giorni, la scadenza che trasla — restano
+ * sul wiki, non qui), solo la rassicurazione — non puoi venire per un po'?
+ * Nessun problema. Il prezzo resta letto da `SOSPENSIONE`, non riscritto qui.
  *
  * `scuro` è per la card Premium della promo, che ha il fondo nero. I colori se
  * li dà il componente e non il genitore: le classi di Astro sono con ambito, e
@@ -51,10 +51,8 @@ const { scuro = false } = Astro.props;
     </span>
   </summary>
   <p class="sosp__spiegazione">
-    Ti fermi quando vuoi, quante volte vuoi: bastano €{SOSPENSIONE.prezzo} e un mese
-    intero — dal primo all'ultimo giorno — è tutto tuo, senza pensieri. La scadenza
-    del tuo abbonamento si allunga della stessa durata, così non perdi nemmeno un
-    giorno di allenamento.
+    Non puoi frequentare per uno o più mesi? Nessun problema: puoi sospendere
+    quante volte vuoi, al costo di €{SOSPENSIONE.prezzo} per ogni mese solare.
   </p>
 </details>
 
