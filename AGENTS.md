@@ -1304,16 +1304,29 @@ Due dettagli che sono trappole vere:
   scuola nuoto mandava a `/richiamami`, che è l'evento degli adulti; qui si
   segue `data/calendly.ts`.
 
-### Gli orari in chat hanno due posti, e la domanda decide quale
+### Gli orari in chat hanno tre posti, e la domanda decide quali
 
-Il planning è una pagina del sito e si apre senza account: è la risposta a
-**«che orari fate?»**, a «quando c'è il pilates?», a chiunque non sia ancora dei
-nostri. Ma un giorno e un'ora, una lezione per nome, chi la tiene, quanti posti
-restano — quelle quattro cose cambiano di settimana in settimana, e il planning
-non le sa. Lì si manda al **calendario delle prenotazioni** del portale,
-`ClientPortal2/#/Classes/1/Calendar`, che mostra dal vivo istruttori, orari e
-posti disponibili. **Vale soprattutto per chi è già iscritto**, che ci entra col
-suo account ed è il posto da cui prenota comunque.
+Non è un bivio, è una scala, e ogni gradino esiste perché il precedente non
+arriva:
+
+| la domanda | dove va | perché |
+| --- | --- | --- |
+| una lezione o un corso **per nome** | la **pagina di quel corso** | lo racconta per intero, e la pagina porta i suoi orari |
+| gli orari in generale, un giorno, una fascia, **un periodo** | il **planning** | tiene tutto il palinsesto del mese e si apre senza account |
+| **chi la tiene questa settimana, quanti posti restano** | il **calendario del portale** | è il solo posto dove quel dato esiste |
+
+Il link del planning **ci va sempre quando si parla di orari**, anche accanto a
+quello della pagina del corso: è il riferimento del club. E quando ne servono
+due, l'ordine è prima dove la cosa sta scritta e poi il portale per il dato vivo
+— mandare al portale chi ha chiesto «che orari fate» vuol dire chiedergli un
+login per una cosa che sta su una pagina aperta.
+
+**Il terzo gradino non è una comodità, è l'unico posto che ha quel dato**, ed è
+una cosa che va sapendo guardata nei dati e non immaginata: `planning-corrente.json`
+porta per ogni lezione l'orario, il nome e la sala, **e nient'altro** — il nome
+dell'istruttore sul sito non c'è da nessuna parte, né sul planning né sulla pagina
+del corso, e la capienza rimasta nemmeno. Se la regola dicesse «per gli istruttori
+manda al planning», manderebbe su una pagina che quel dato non ha.
 
 Tre cose da sapere prima di toccarlo.
 
