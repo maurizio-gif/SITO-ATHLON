@@ -1857,6 +1857,16 @@ la domanda tocca gli orari, e non si affida al prompt — se l'ancora `orari` ha
 sparato e quel link non c'è, lo aggiunge il nodo. «Li trovi nell'app» manda a
 cercare dentro un'applicazione una cosa che sta su una pagina.
 
+**E il soggetto della procedura è quasi sempre chi scrive.** Le procedure del club
+ne hanno uno, ed è scritto nella scheda: la sospensione si chiede dal portale, la
+disdetta si manda via email, il turno si prenota dall'app. L'email lo dice, con la
+scadenza quando c'è. **«Ci pensiamo noi» non è un eccesso di cortesia, è una frase
+che fa smettere di fare**: chi la legge non chiede la sospensione, il termine passa
+e il mese gli viene addebitato lo stesso — una frase gentile che costa un addebito
+è il modo peggiore di essere gentili. Quello che si offre è il **supporto**, e
+quello si può dire: se qualcosa non torna basta rispondere all'email o passare in
+sede. «Ti diamo una mano» è vero, «lo facciamo noi» no.
+
 **Con un allegato si aspetta, e lo scarto si registra.** I certificati medici di
 idoneità non agonistica arrivano così: per ora l'assistente non li guarda e non
 scrive niente — leggerli e dire se vanno bene è il passo dopo, non questo. Una
