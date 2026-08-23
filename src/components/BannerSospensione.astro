@@ -13,12 +13,14 @@
  * prima o poi dicono cose diverse.
  *
  * «Come funziona» **non porta più al wiki**: mandava fuori pagina per leggere
- * quattro fatti che qui ci stanno in due righe, mentre la procedura vera
- * (portale, tabella delle due sospensioni, sospensione per inabilità) resta
+ * quello che qui ci sta in due righe, mentre la procedura vera (portale,
+ * preavviso, tabella delle due sospensioni, sospensione per inabilità) resta
  * sul wiki per chi deve davvero eseguirla. È un `<details>` nativo — niente
  * script, la stessa disclosure che la scheda del wiki usa già per i suoi
- * dettagli — e i due numeri (prezzo, preavviso) restano letti da
- * `SOSPENSIONE`, non riscritti qui.
+ * dettagli. Il tono qui è commerciale e non procedurale: niente termini
+ * contrattuali (il preavviso di 10 giorni, la scadenza che trasla — restano
+ * sul wiki, non qui), solo la rassicurazione — non puoi venire per un po'?
+ * Nessun problema. Il prezzo resta letto da `SOSPENSIONE`, non riscritto qui.
  *
  * `scuro` è per la card Premium della promo, che ha il fondo nero. I colori se
  * li dà il componente e non il genitore: le classi di Astro sono con ambito, e
@@ -49,11 +51,8 @@ const { scuro = false } = Astro.props;
     </span>
   </summary>
   <p class="sosp__spiegazione">
-    Riguarda un mese solare intero, e va richiesta con almeno {SOSPENSIONE.preavviso}{' '}
-    giorni di anticipo rispetto al 1° del mese — non si può sospendere il mese in
-    corso. Per quel mese non viene prelevata la rata dell'abbonamento, paghi solo i
-    €{SOSPENSIONE.prezzo} della sospensione, e la scadenza del contratto si allunga
-    della stessa durata.
+    Non puoi frequentare per uno o più mesi? Nessun problema: puoi sospendere
+    quante volte vuoi, al costo di €{SOSPENSIONE.prezzo} per ogni mese solare.
   </p>
 </details>
 
