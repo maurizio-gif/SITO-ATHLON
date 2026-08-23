@@ -2157,6 +2157,60 @@ sbagliato. Se l'inserimento sta *in mezzo* alla catena serve un Code node che
 rimetta i dati buoni (`Ripristina Dati` in `CHAT ATHLON — DATI` è l'esempio);
 altrimenti si mette il nodo su un ramo parallelo e si legge `$('Nodo').item`.
 
+## Il banner "hai visto un'attività" si costruisce su quello che il sito registra già
+
+Chi visita la pagina di un'attività per adulti — Calisthenics, per dire — e se
+ne va senza lasciare niente, tornando il giorno dopo non riceveva nessuna
+proposta: il sito non lo riconosceva. `src/scripts/prova_suggerita.ts` mostra
+un banner discreto, non un modal che si apre da solo, con un pulsante verso
+`/prova` — e il grosso di quello che serve esisteva già: `vid` (via
+`attribuzione.ts`), il registro di ogni pageview (`visite_pagina`), e la vista
+`visitatori` che dice se un vid è già un contatto.
+
+**La whitelist è `PAGINE_ADULTI`, non un elenco nuovo.** Il webhook n8n
+(`athlon-suggerisci-prova`) deve confrontare `visite_pagina.pagina` con le
+pagine di attività adulti — mai home, junior, wiki, eventi, news, planning —
+ma quella lista vive nel codice del sito, non in Supabase. Invece di
+duplicarla a mano in n8n (che marcirebbe il giorno che si aggiunge un corso),
+`src/pages/pagine-adulti.json.ts` la espone come endpoint statico generato da
+`PAGINE_ADULTI` (`data/pagine.ts`) — stesso pattern di `/kb.json`/`/llms.txt`.
+**È un oggetto `{ pagine: [...] }` e non un array nudo**, o il nodo HTTP
+Request di n8n lo spezzerebbe in tanti item quante sono le attività, invece di
+un item solo da confrontare.
+
+**L'esclusione "è già un contatto" non chiama PerfectGym.** La vista
+`visitatori` (vedi sopra) affianca già `utente_id` quando lo stesso `vid` ha
+lasciato un dato in qualunque form o chat del sito: `utente_id is not null`
+copre da sola sia "ha già chiesto una prova" sia "è già socio con un contatto
+lasciato altrove", senza nessuna chiamata OData. **E filtra anche su
+`vid_stabile`**, come fa già `visitatori` per il resto: un vid rigenerato
+senza consenso pubblicitario non tornerà mai, e includerlo nel conteggio delle
+pagine viste sarebbe rumore, non un dato.
+
+**Le due finestre**: la pagina va vista **almeno 24 ore fa**, e non oltre 30
+giorni. Fino a **tre attività**, le più recenti per pagina distinta — il
+webhook registra ogni chiamata, scarti compresi, nella tabella
+`prove_suggerite` (`esito`: `proposto` | `scartato-contatto-noto` |
+`scartato-nessuna-pagina-attivita`), sul modello di `richieste_referral`.
+
+**Il consenso è `advertisement`**, lo stesso di `vid`: lo script esce subito
+se `window.athlonVidStabile()` è falso, prima ancora di incapsulare qualunque
+cosa in `quandoConsentito`. **Niente sul totem**, per la stessa ragione di
+`emailNota.ts`: un dispositivo condiviso non deve mostrare a chi arriva dopo
+le attività viste da chi è passato prima.
+
+**Il banner non apre `ProvaModal`.** Un modal che si apre da solo era il
+vincolo da evitare; il pulsante è un link semplice a `/prova`, la pagina che
+già racconta il Guest Pass — nessuna logica di apertura da riusare, nessuna
+modifica al modal.
+
+Per verificare: inserire in `visite_pagina` una riga con `pagina` di
+un'attività adulti, `vid_stabile = true`, `created_at` 25 ore fa, e chiamare
+il webhook con quel `vid` — deve rispondere con l'attività. Con `created_at`
+2 ore fa, o con una pagina non nell'elenco, deve rispondere `{ "attivita": [] }`.
+Con un `vid` che risolve a un `utente_id` (via `visitatori`), deve scartare
+come `scartato-contatto-noto` anche se le pagine ci sono.
+
 ## Le pagine senza intestazione azzerano `--header-h`
 
 `global.css` tiene le ancore sotto l'header appiccicoso con
