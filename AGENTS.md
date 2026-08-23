@@ -1739,6 +1739,83 @@ diventare un archivio di posta con una colonna facoltativa. «Non visibile nel
 pannello» non è una misura di protezione: è un filtro nella vetrina mentre il
 magazzino resta pieno.
 
+### E alla stessa casella l'assistente prepara le bozze, senza mandarle
+
+`ATHLON BOZZE EMAIL` guarda la stessa posta di `INBOX EMAIL DESK - SUPABASE`,
+cerca la risposta nelle voci di `/kb.json` — le stesse della chat — e **lascia
+una bozza nel thread di Gmail**. Non manda niente: la rilegge una persona del
+desk, la corregge o la butta, e la manda lei.
+
+Quella riga è tutto l'impianto. Un assistente che risponde da solo per email
+deve sbagliare quasi mai, perché una risposta sbagliata è già partita; un
+assistente che prepara una bozza deve solo far risparmiare tempo, e il suo
+errore peggiore è farne perdere trenta secondi a chi la rilegge. È la stessa
+differenza per cui in chat l'`azione` si valorizza solo dopo una conferma.
+
+**Chi scrive lo si verifica come sul sito.** `athlon-verifica-iscritto`, e il
+ramo lo decide `statoNucleo` come per «contattaci» e per la chat: un abbonamento
+vivo nel nucleo è assistenza, tutto il resto è una persona che sta valutando.
+
+Cinque cose da sapere prima di toccarlo.
+
+**Il recupero è una copia di «Componi contesto» di `CHAT ATHLON`, e va tenuta in
+pari.** Punteggio, `ANCORE`, `SOLO_ISCRITTI` e la voce dell'accesso singolo sono
+gli stessi: non sono euristiche, sono le regole che tengono il Direttore Tecnico
+e la lezione singola fuori dalla vista di chi non deve vederli — e una regola
+che il modello può ignorare non è una regola, quindi la voce sparisce dal
+contesto invece di essere vietata a parole. Se le due copie divergono, questa
+risposta le offre. Consolidarle in un sotto-workflow è il passo giusto e non è
+stato fatto qui per non toccare la chat viva nello stesso cambiamento.
+
+**Il recupero è anche il filtro, ed è quello che tiene basso il costo.** Se
+nessuna voce del sito somiglia all'email — una fattura, un curriculum, la
+newsletter di un fornitore — il modello non viene chiamato affatto: la soglia è
+un punteggio di 6, e sta scritta accanto a ogni riga in
+`email_bozze.kb_punteggio`. **Le ancore non contano per la soglia**, o la sola
+parola «attività» le farebbe sparare su qualunque cosa. Se gli scarti
+`fuori_ambito` diventano tanti, è quel numero da guardare, non il modello.
+
+**Prima il recupero, poi la verifica, e l'ordine è una scelta sui dati.**
+`athlon-verifica-iscritto` scrive una riga in `eventi_email` per **ogni**
+indirizzo che vede, ed `eventi_email` è l'imbuto di chi ha digitato un'email in
+un form: interrogarlo per ogni mittente della casella lo trasformerebbe
+nell'elenco della posta in arrivo. Si chiede solo per le email che una risposta
+la meritano. Il prezzo è che quando si sceglie il contesto il ramo non si sa
+ancora, quindi l'ordine lo fa il solo punteggio e le voci riservate agli
+iscritti le toglie il nodo dopo.
+
+**Le regole del prompt sono metà quelle della chat e metà nuove, e la linea di
+taglio è il canale.** Restano quelle fattuali — si risponde solo con quello che
+c'è scritto, le cifre si citano e non si calcolano, la fonte si cita, se non sai
+dillo, prima l'attività e poi il prezzo, l'abbonamento prima della lezione
+singola. Cadono quelle della chat: le cento parole, l'icona in alto, il pulsante
+sotto la risposta, l'`azione`, il Guest Pass da attivare. E se ne aggiungono due
+che in chat non servivano: **niente markdown di nessun tipo**, perché la bozza è
+in testo semplice e gli asterischi si vedrebbero, e **l'astensione allargata** —
+si passa la mano su un reclamo, su una domanda che riguarda il caso personale di
+chi scrive (la sua prenotazione, il suo addebito, la scadenza del suo
+certificato), su una candidatura, e su qualunque cosa chieda di confermare che
+qualcosa è stato fatto. Nessuna bozza è meglio di una bozza da smentire.
+
+**Con un allegato si aspetta, e lo scarto si registra.** I certificati medici di
+idoneità non agonistica arrivano così: per ora l'assistente non li guarda e non
+scrive niente — leggerli e dire se vanno bene è il passo dopo, non questo. Una
+domanda **sul** certificato — che tipo serve, quando scade — arriva senza
+allegato e ha la sua risposta come tutte le altre. E vale la regola del
+referral: `email_bozze` ha una riga per ogni email considerata, con `esito` e
+`motivo_scarto`, perché le risposte non date che non lasciano traccia non si
+possono contare né spiegare. Quello che **non** lascia riga sono le newsletter,
+le notifiche e la posta interna: registrarle farebbe di quella tabella un
+archivio di posta, che è l'errore che `email_messaggi` evita filtrando sul
+mittente.
+
+Per verificare: sul workflow, `versionId == activeVersionId` (vale la regola
+delle bozze n8n, `update_workflow` non pubblica); su Supabase,
+`email_bozze_esiti` dice quante bozze e quanti scarti per motivo. In Gmail, ogni
+bozza deve stare **dentro** il thread dell'email a cui risponde e avere un
+destinatario: senza `threadId` è una bozza orfana, senza `sendTo` è una bozza
+che non si può mandare.
+
 ### `eventi_email` è il funnel, le `richieste_*` sono le conversioni
 
 Le tabelle `richieste_*` contengono chi è arrivato in fondo. `eventi_email`
