@@ -12,6 +12,14 @@
  * scritta una volta sola. Due copie della stessa promessa sono due copie che
  * prima o poi dicono cose diverse.
  *
+ * «Come funziona» **non porta più al wiki**: mandava fuori pagina per leggere
+ * quattro fatti che qui ci stanno in due righe, mentre la procedura vera
+ * (portale, tabella delle due sospensioni, sospensione per inabilità) resta
+ * sul wiki per chi deve davvero eseguirla. È un `<details>` nativo — niente
+ * script, la stessa disclosure che la scheda del wiki usa già per i suoi
+ * dettagli — e i due numeri (prezzo, preavviso) restano letti da
+ * `SOSPENSIONE`, non riscritti qui.
+ *
  * `scuro` è per la card Premium della promo, che ha il fondo nero. I colori se
  * li dà il componente e non il genitore: le classi di Astro sono con ambito, e
  * una regola `.piano--premium .sosp__k` scritta nella pagina non raggiungerebbe
@@ -27,38 +35,60 @@ interface Props {
 const { scuro = false } = Astro.props;
 ---
 
-<a class:list={['sosp', scuro && 'sosp--scuro']} href={SOSPENSIONE.scheda}>
-  <span class="sosp__k">Sospensioni illimitate</span>
-  <span class="sosp__v">€{SOSPENSIONE.prezzo} al mese, quante volte vuoi</span>
-  {/* Sul telefono resta la freccia e le due parole spariscono: dentro la card
-      della promo il banner è larga 240 px, e «Come funziona» se ne prendeva
-      centodue — un terzo dello spazio, che mandava a capo prima la cifra e poi
-      l'etichetta. Il testo del link non serve a capire dove si va, perché a
-      essere cliccabile è tutto il banner e chi lo legge ha appena letto di che
-      cosa parla. */}
-  <span class="sosp__l">
-    <span class="sosp__l-testo">Come funziona</span>
-    <span aria-hidden="true">→</span>
-  </span>
-</a>
+<details class:list={['sosp', scuro && 'sosp--scuro']}>
+  <summary class="sosp__summary">
+    <span class="sosp__k">Sospensioni illimitate</span>
+    <span class="sosp__v">€{SOSPENSIONE.prezzo} al mese, quante volte vuoi</span>
+    {/* Sul telefono resta la freccia e le due parole spariscono: dentro la card
+        della promo il banner è larga 240 px, e «Come funziona» se ne prendeva
+        centodue — un terzo dello spazio, che mandava a capo prima la cifra e poi
+        l'etichetta. */}
+    <span class="sosp__l">
+      <span class="sosp__l-testo">Come funziona</span>
+      <span class="sosp__freccia" aria-hidden="true">⌄</span>
+    </span>
+  </summary>
+  <p class="sosp__spiegazione">
+    Riguarda un mese solare intero, e va richiesta con almeno {SOSPENSIONE.preavviso}{' '}
+    giorni di anticipo rispetto al 1° del mese — non si può sospendere il mese in
+    corso. Per quel mese non viene prelevata la rata dell'abbonamento, paghi solo i
+    €{SOSPENSIONE.prezzo} della sospensione, e la scadenza del contratto si allunga
+    della stessa durata.
+  </p>
+</details>
 
 <style>
-  /* Tutto il banner è il link, e non un pezzo dentro di lui: dà un bersaglio
-     grande come la card invece di due parole sottolineate, e sul telefono
-     libera i cento pixel che quelle parole occupavano. */
+  /* Il fondo e il bordo restano sul contenitore, cosi' avvolgono anche il
+     paragrafo quando il dettaglio e' aperto invece di fermarsi alla riga
+     della sintesi. */
   .sosp {
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 0.25rem 0.75rem;
-    /* Nessun margine esterno: lo spazio attorno lo decide chi lo ospita, e i
-       due posti in cui vive hanno gutter diversi. Un margine dentro al
-       componente è un margine che va bene in un posto e stona nell'altro. */
     margin: 0;
     padding: 0.875rem 1rem;
     border-radius: 0.875rem;
     background: rgba(255, 87, 1, 0.09);
     border: 1px solid rgba(255, 87, 1, 0.3);
+  }
+
+  /* Il bersaglio e' la riga, che di suo e' gia' alta piu' di 44 px: qui serve
+     solo che non scenda sotto quella misura se un giorno il testo si accorcia. */
+  .sosp__summary {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    min-height: 2.75rem;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  /* Il triangolo di default del browser non serve: la freccia che ruota e'
+     gia' disegnata a mano qui sotto. */
+  .sosp__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .sosp__summary::marker {
+    content: '';
   }
 
   .sosp__k {
@@ -87,10 +117,22 @@ const { scuro = false } = Astro.props;
     white-space: nowrap;
   }
 
-  /* Il bersaglio è il banner, che di suo è già alto più di 44 px: qui serve
-     solo che non scenda sotto quella misura se un giorno il testo si accorcia. */
-  .sosp {
-    min-height: 2.75rem;
+  .sosp__freccia {
+    display: inline-block;
+    transition: transform 0.2s ease;
+  }
+
+  .sosp[open] .sosp__freccia {
+    transform: rotate(180deg);
+  }
+
+  .sosp__spiegazione {
+    margin: 0.75rem 0 0;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 87, 1, 0.25);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: var(--text-muted);
   }
 
   .sosp:hover {
@@ -106,8 +148,13 @@ const { scuro = false } = Astro.props;
     color: var(--color-primary);
   }
 
-  .sosp--scuro .sosp__v {
+  .sosp--scuro .sosp__v,
+  .sosp--scuro .sosp__spiegazione {
     color: rgba(255, 255, 255, 0.75);
+  }
+
+  .sosp--scuro .sosp__spiegazione {
+    border-top-color: rgba(255, 255, 255, 0.2);
   }
 
   /* ---- Sul telefono: due righe, non tre ----
@@ -115,19 +162,18 @@ const { scuro = false } = Astro.props;
      funziona» finiva su una riga sua: la card cresceva di una quarantina di
      pixel per un link di cento.
 
-     Con due colonne il link ne prende una tutta sua e si allunga sulle due
+     Con due colonne l'etichetta ne prende una tutta sua e si allunga sulle due
      righe, quindi la sua larghezza non entra più nel conto di quando il testo
      va a capo: l'etichetta sopra, la cifra sotto, e l'altezza è quella del
      bersaglio da 44 px invece della somma di tre righe. E la cifra scende di un
      gradino di scala, perché su 360 px lo spazio che le resta accanto al link è
      poco più di duecento pixel. */
   @media (max-width: 700px) {
-    .sosp {
+    .sosp__summary {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
       gap: 0.125rem 0.5rem;
-      padding: 0.75rem 0.875rem;
     }
 
     /* La spaziatura fra le lettere costa venti pixel su una riga di ventidue
