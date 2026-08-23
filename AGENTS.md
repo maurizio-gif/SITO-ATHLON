@@ -1304,6 +1304,54 @@ Due dettagli che sono trappole vere:
   scuola nuoto mandava a `/richiamami`, che è l'evento degli adulti; qui si
   segue `data/calendly.ts`.
 
+### Gli orari in chat hanno tre posti, e la domanda decide quali
+
+Non è un bivio, è una scala, e ogni gradino esiste perché il precedente non
+arriva:
+
+| la domanda | dove va | perché |
+| --- | --- | --- |
+| una lezione o un corso **per nome** | la **pagina di quel corso** | lo racconta per intero, e la pagina porta i suoi orari |
+| gli orari in generale, un giorno, una fascia, **un periodo** | il **planning** | tiene tutto il palinsesto del mese e si apre senza account |
+| **chi la tiene questa settimana, quanti posti restano** | il **calendario del portale** | è il solo posto dove quel dato esiste |
+
+Il link del planning **ci va sempre quando si parla di orari**, anche accanto a
+quello della pagina del corso: è il riferimento del club. E quando ne servono
+due, l'ordine è prima dove la cosa sta scritta e poi il portale per il dato vivo
+— mandare al portale chi ha chiesto «che orari fate» vuol dire chiedergli un
+login per una cosa che sta su una pagina aperta.
+
+**Il terzo gradino non è una comodità, è l'unico posto che ha quel dato**, ed è
+una cosa che va sapendo guardata nei dati e non immaginata: `planning-corrente.json`
+porta per ogni lezione l'orario, il nome e la sala, **e nient'altro** — il nome
+dell'istruttore sul sito non c'è da nessuna parte, né sul planning né sulla pagina
+del corso, e la capienza rimasta nemmeno. Se la regola dicesse «per gli istruttori
+manda al planning», manderebbe su una pagina che quel dato non ha.
+
+Tre cose da sapere prima di toccarlo.
+
+**Quell'indirizzo non è un'eccezione alla regola delle fonti, è già dentro la
+knowledge base.** Lo scrive la scheda `generali/prenotazioni`, che lo indica come
+il posto dove si vede il dato in tempo reale: il modello non se lo inventa, lo
+legge. La regola 3 lo nomina esplicitamente perché altrimenti la clausola «solo
+gli url delle righe FONTE» glielo farebbe scartare — un url scritto *dentro* il
+testo di una voce è reale quanto quello della sua FONTE.
+
+**Va fra le `fonti`, non nel testo della bolla.** `chatAssistente.client.js`
+passa la risposta dall'escape e converte solo il `**grassetto**`: un indirizzo
+scritto in prosa resta testo da ricopiare a mano, mentre `rimandi()` disegna le
+fonti come link che si aprono in una scheda nuova. È il solo posto della chat in
+cui un link è cliccabile, e quindi è il solo posto dove ha senso metterlo.
+
+**Capienze e nomi degli istruttori si nominano solo se li ha chiesti.** Il
+calendario li mostra tutti e due, ma metterli in vetrina a chi ha chiesto un
+orario è rispondere a una domanda che non ha fatto — la stessa regola per cui la
+lezione singola non si nomina «per completezza».
+
+E l'orario **di apertura** del club — anche quello stagionale, come l'estivo di
+agosto — resta scritto nel testo e si cita come sta: quello non è una lezione e
+non cambia ogni settimana.
+
 ### La stessa regola vale nella chat, e lì aveva la condizione sbagliata
 
 L'assistente classifica sull'email come il form — `dati.ramo = 'iscritto'`
