@@ -1825,12 +1825,26 @@ di `--accent-text` in `global.css`: l'arancio pieno non regge il contrasto sotto
 **L'email introduce, il sito spiega — ed è la regola che decide tutto il resto.**
 Un'email non è una scheda prodotto: è il modo in cui il club risponde a una
 persona, e chi la legge decide in dieci secondi se vuole saperne di più. Quindi
-l'apertura racconta **com'è** quell'attività e **a chi fa bene** — gli stessi fatti
-della knowledge base, ma dal lato di chi legge: non «vasca da 25 metri con
-assistenza a bordo vasca» ma «nuoti per conto tuo senza sentirti solo, perché un
-tecnico a bordo vasca c'è sempre» — e poi due o tre voci d'elenco che sono
-**destinazioni, non dati**: il planning per gli orari, la pagina degli abbonamenti
-per i costi, la scheda per una regola. Centoventi parole.
+l'apertura dice **che cos'è quella cosa e cosa la rende forte**, e poi due o tre
+voci d'elenco che sono **destinazioni, non dati**: il planning per gli orari, la
+pagina degli abbonamenti per i costi, la scheda per una regola. Centoventi parole.
+
+**L'identità è già scritta sul sito, e cambia col soggetto.** Ogni pagina spiega
+che cos'è quello di cui parla — «Allenati in autonomia» per lo Smart, «Vivi tutto
+il club» per il Premium, «Prima la passione. Poi i risultati» per la scuola nuoto,
+«79 lezioni a settimana, un'offerta per ogni livello» per i corsi fitness — e
+quella riga arriva nel contesto insieme al resto della voce. L'apertura la prende
+da lì invece di inventarsi un tono, e prende **forme diverse**: una singola
+attività si racconta col suo carattere, un insieme di attività con l'**ampiezza**
+(quante sono, quanto diverse), un corso per bambini col metodo e i livelli, un
+abbonamento con quello che **apre** e non con quello che costa.
+
+**Entusiasta, non lirico**, ed è una riga che è costata un giro: la prima stesura
+diceva al modello di raccontare «dal lato di chi legge», con l'esempio «nuoti per
+conto tuo senza sentirti solo». L'esempio era l'istruzione vera, e produceva
+bozze smielate — aperture evocative, frasi su come si sentirà, poesia. L'entusiasmo
+viene dai fatti, che sono buoni: bastano quelli detti con convinzione. Le metafore
+sono vietate esplicitamente, in due regole, perché una sola non era bastata.
 
 Da qui **gli importi non si scrivono più nell'email**: una cifra sola, e solo se ha
 chiesto il prezzo di una cosa per nome; il listino, i risparmi e i confronti stanno
@@ -1842,6 +1856,16 @@ parole di chi lo conosce e non di un ufficio, e poi la scheda per il resto.
 la domanda tocca gli orari, e non si affida al prompt — se l'ancora `orari` ha
 sparato e quel link non c'è, lo aggiunge il nodo. «Li trovi nell'app» manda a
 cercare dentro un'applicazione una cosa che sta su una pagina.
+
+**E il soggetto della procedura è quasi sempre chi scrive.** Le procedure del club
+ne hanno uno, ed è scritto nella scheda: la sospensione si chiede dal portale, la
+disdetta si manda via email, il turno si prenota dall'app. L'email lo dice, con la
+scadenza quando c'è. **«Ci pensiamo noi» non è un eccesso di cortesia, è una frase
+che fa smettere di fare**: chi la legge non chiede la sospensione, il termine passa
+e il mese gli viene addebitato lo stesso — una frase gentile che costa un addebito
+è il modo peggiore di essere gentili. Quello che si offre è il **supporto**, e
+quello si può dire: se qualcosa non torna basta rispondere all'email o passare in
+sede. «Ti diamo una mano» è vero, «lo facciamo noi» no.
 
 **Con un allegato si aspetta, e lo scarto si registra.** I certificati medici di
 idoneità non agonistica arrivano così: per ora l'assistente non li guarda e non
