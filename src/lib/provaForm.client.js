@@ -22,6 +22,7 @@
 import { CALENDLY } from '../data/calendly';
 import { montaCalendario } from './calendario.client.js';
 import { validaTelefono } from '../data/prefissi';
+import { daUrl as emailDaUrl } from '../scripts/emailNota';
 
 export function initProvaForm(root, options) {
   var P = options.prefix;
@@ -438,6 +439,16 @@ export function initProvaForm(root, options) {
       dati.origine = origine || '';
       dati.cta = cta || '';
       dati.attivita = attivita || '';
+
+      /* L'email nell'URL salta il passo, non solo lo precompila: chi arriva
+         da un link che la conosce già non deve scriverla una seconda volta.
+         `pulisci()` qui sopra ha già riportato tutto al passo 'email', quindi
+         il campo è vuoto e libero di essere scritto e mandato da solo. */
+      var emailUrl = emailDaUrl();
+      if (emailUrl && campoEmail) {
+        campoEmail.value = emailUrl;
+        verifica();
+      }
     },
     reset: reset,
   };

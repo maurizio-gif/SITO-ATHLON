@@ -18,6 +18,7 @@
  * risponde chiude la pagina. Sei secondi e si passa.
  */
 import { WEBHOOK_VERIFICA, WEBHOOK_RESET, PORTALE, haGiaAccount } from '../data/contatto';
+import { daUrl as emailDaUrl } from '../scripts/emailNota';
 
 (function () {
   var modal = document.getElementById('iscrizione-modal');
@@ -70,6 +71,19 @@ import { WEBHOOK_VERIFICA, WEBHOOK_RESET, PORTALE, haGiaAccount } from '../data/
        è ancora `hidden` e il `focus()` di `mostra` non attaccherebbe. */
     void modal.offsetWidth;
     mostra('email');
+
+    /* L'email nell'URL salta il passo, non solo lo precompila: chi arriva da
+       un link che la conosce già non deve scriverla una seconda volta.
+       `verifica()` decide da sola dove andare — al portale se l'account
+       c'è già, dritto sulla registrazione altrimenti — quindi qui basta
+       riempire il campo e chiamarla, senza dare il fuoco a un campo che
+       nessuno deve compilare. */
+    var emailUrl = emailDaUrl();
+    if (emailUrl && campo) {
+      campo.value = emailUrl;
+      verifica();
+      return;
+    }
     if (campo && !campo.value) campo.focus();
   }
 

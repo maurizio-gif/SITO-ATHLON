@@ -32,13 +32,47 @@
  * Il campo che vuole la precompilazione porta `data-email-nota`. Chi conferma
  * un'email — cioè chi la manda alla verifica e non prende un errore — chiama
  * `window.athlonRicordaEmail(email)`.
+ *
+ * ## L'email nell'URL non è un ricordo, è un'informazione più specifica
+ *
+ * Un link con `?email=mario.rossi@…` — una campagna, un invito, un follow-up
+ * mandato dal desk — dice chi sta per arrivare meglio di qualunque cosa il
+ * browser ricordi. `daUrl()` la legge e vince sempre su `localStorage`,
+ * **anche sul totem**: un indirizzo nell'URL non è il residuo di chi è
+ * passato prima, è l'informazione con cui quel link è stato costruito.
+ *
+ * `window.athlonEmailDaUrl()` è la funzione che i quattro flussi con un passo
+ * "email → verifica su PerfectGym → ramo" (prova, contattaci, iscrizione,
+ * l'assistente) chiamano per **saltare** quel passo: se c'è un'email nell'URL
+ * non solo la precompilano, la mandano da sole alla verifica, così chi arriva
+ * da un link che la conosce già si ritrova al passo successivo senza aver
+ * scritto niente. `leggi()` invece resta quella di sempre — usata da
+ * `precompila()` per riempire un campo vuoto — e la fa vincere sull'email
+ * ricordata per lo stesso motivo.
  */
 import { quandoConsentito } from './consenso';
 import { suTotem } from './totem';
 
 const CHIAVE = 'athlon_email';
 
+/**
+ * Esportata, non solo globale: i quattro flussi con un passo email→verifica
+ * la importano direttamente (come già fanno con `suTotem` da `totem.ts`),
+ * così non dipendono dall'ordine in cui gli script della pagina si caricano.
+ */
+export function daUrl(): string {
+  try {
+    const params = new URLSearchParams(location.search);
+    const v = (params.get('email') || params.get('Email') || params.get('user_email') || '').trim();
+    return v.indexOf('@') > 0 ? v.toLowerCase() : '';
+  } catch {
+    return '';
+  }
+}
+
 function leggi(): string {
+  const url = daUrl();
+  if (url) return url;
   if (suTotem()) return '';
   try {
     return localStorage.getItem(CHIAVE) || '';
@@ -75,9 +109,11 @@ function precompila(dove: ParentNode = document): void {
 const w = window as unknown as {
   athlonRicordaEmail: (email: string) => void;
   athlonEmailNota: () => string;
+  athlonEmailDaUrl: () => string;
 };
 w.athlonRicordaEmail = ricorda;
 w.athlonEmailNota = leggi;
+w.athlonEmailDaUrl = daUrl;
 
 precompila();
 
