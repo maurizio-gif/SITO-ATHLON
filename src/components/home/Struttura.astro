@@ -1,4 +1,9 @@
 ---
+/* L'indirizzo del tour, una volta sola: lo porta l'iframe e lo porta il
+   ripiego del comando, e due copie divergerebbero. Il `?play=1` non sta qui
+   dentro — e' quello che il comando aggiunge, ed e' il motivo per cui il
+   comando esiste. */
+const TOUR = 'https://my.mpskin.com/tour/dwg8pjdrkh';
 ---
 
 <section class="struttura">
@@ -10,19 +15,28 @@
       offre spazi all'avanguardia per la pratica sportiva ad ogni età.
     </p>
 
-    <p class="tour-hint" data-anim="pop" data-anim-delay="160">
+    <a
+      class="tour-hint"
+      href={`${TOUR}?play=1`}
+      target="_blank"
+      rel="noopener"
+      data-tour-play
+      data-anim="pop"
+      data-anim-delay="160"
+    >
       <span class="tour-hint__icon" aria-hidden="true">▶</span>
       Clicca play per il virtual tour completo
-    </p>
+    </a>
 
     <div class="tour" data-anim="scale">
       <iframe
         width="100%"
         height="500"
-        src="https://my.mpskin.com/tour/dwg8pjdrkh"
+        src={TOUR}
         frameborder="0"
         allowfullscreen
         loading="lazy"
+        data-tour-riquadro
         title="Tour virtuale 3D Athlon Club"></iframe>
     </div>
 
@@ -69,12 +83,26 @@
     opacity: 0.9;
   }
 
+  /* ---- Il comando del tour ----
+     **Era un `<p>`**, cioe' un cartello che diceva «clicca play» indicando un
+     play dentro un iframe di un altro dominio. Chi lo leggeva doveva capire
+     che il bersaglio era un'altra cosa, piu' in basso, dentro il riquadro.
+     Adesso e' il comando: si preme lui e il tour parte.
+
+     **E' un `<a>` e non un `<button>`**, con dentro l'indirizzo del tour e il
+     suo `?play=1`. Con JavaScript il click e' intercettato e il tour parte
+     **in pagina**; senza, il link porta al tour vero, che e' la cosa che la
+     persona voleva. Stessa regola dei pulsanti *Iscriviti* e di `BottoneChat`:
+     l'intercettazione e' un miglioramento, non un requisito.
+
+     Il bersaglio arriva a 48px — era 45 — perche' da cartello e' diventato una
+     cosa da premere, e sotto i 48 la spazzata del totem lo segnala. */
   .tour-hint {
     display: inline-flex;
     align-items: center;
     gap: 12px;
     margin: 8px 0 0;
-    padding: 12px 22px 12px 14px;
+    padding: 0.8125rem 1.375rem 0.8125rem 0.875rem;
     border: 1px solid rgba(255, 87, 1, 0.45);
     border-radius: 999px;
     background: rgba(255, 87, 1, 0.1);
@@ -82,6 +110,35 @@
     font-weight: 600;
     letter-spacing: 0.01em;
     color: var(--color-white);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--dur-fast, 0.2s) ease, border-color var(--dur-fast, 0.2s) ease,
+      transform var(--dur-instant, 0.1s) ease-out;
+  }
+
+  .tour-hint:hover {
+    background: rgba(255, 87, 1, 0.2);
+    border-color: rgba(255, 87, 1, 0.75);
+  }
+
+  .tour-hint:active {
+    transform: scale(0.97);
+  }
+
+  /* A tour partito il cartello ha finito: «clicca play» sopra un tour che sta
+     gia' andando e' un'istruzione che contraddice quello che si vede. */
+  .tour-hint[hidden] {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tour-hint {
+      transition: background-color var(--dur-fast, 0.2s) ease, border-color var(--dur-fast, 0.2s) ease;
+    }
+
+    .tour-hint:active {
+      transform: none;
+    }
   }
 
   .tour-hint__icon {
@@ -142,3 +199,52 @@
     }
   }
 </style>
+
+<script>
+  /**
+   * Fa partire il tour dentro la pagina.
+   *
+   * Il tour e' un iframe di `my.mpskin.com`: dall'esterno non si puo' premere
+   * il suo play — e' un altro dominio. Quello che si puo' fare e' ricaricarlo
+   * col suo interruttore, `?play=1`, che e' lo stesso che tutte le altre
+   * pagine del sito (`/gym-floor`, `/abbonamenti`, le schede junior) hanno
+   * gia' nell'indirizzo. Qui mancava, ed e' il motivo per cui c'era un
+   * cartello a spiegare cosa premere.
+   *
+   * **L'indirizzo si legge dall'iframe e non si scrive qui**, ed e' la riga da
+   * non cambiare. CookieYes blocca il tour finche' il consenso non arriva, e
+   * lo fa togliendo la sorgente all'iframe: scriverci dentro un indirizzo
+   * nostro vorrebbe dire caricare un dominio terzo **scavalcando il
+   * consenso**. Se quello che troviamo non e' gia' un indirizzo di mpskin non
+   * si tocca niente e il link fa il suo mestiere — si apre il tour, che e' una
+   * navigazione chiesta dalla persona e quindi legittima.
+   */
+  const comando = document.querySelector('[data-tour-play]');
+  const riquadro = document.querySelector('[data-tour-riquadro]');
+
+  if (comando && riquadro) {
+    comando.addEventListener('click', (e) => {
+      // Click modificato o rotellina: e' la richiesta di aprirlo altrove.
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+      let conPlay = null;
+      try {
+        const u = new URL(riquadro.src, location.href);
+        if (/(^|\.)mpskin\.com$/.test(u.hostname)) {
+          u.searchParams.set('play', '1');
+          conPlay = u.toString();
+        }
+      } catch {
+        conPlay = null;
+      }
+      if (!conPlay) return; // bloccato o non caricato: lascia andare il link
+
+      e.preventDefault();
+      riquadro.src = conPlay;
+      comando.hidden = true;
+      /* Far partire un tour che non si vede e' meta' del lavoro: il riquadro
+         sale sotto l'intestazione appiccicosa, che `--header-h` pubblica. */
+      riquadro.closest('.tour').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }
+</script>
