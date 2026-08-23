@@ -1756,6 +1756,17 @@ differenza per cui in chat l'`azione` si valorizza solo dopo una conferma.
 ramo lo decide `statoNucleo` come per «contattaci» e per la chat: un abbonamento
 vivo nel nucleo è assistenza, tutto il resto è una persona che sta valutando.
 
+**E il ripiego su `stato` è un ripiego, non un'alternativa** — questa riga l'ha
+insegnata la prima bozza vera. Il ramo era `statoNucleo === 'iscritto' || stato
+=== 'iscritto'`, cioè un OR, quindi `stato` vinceva **anche quando `statoNucleo`
+diceva altro**: un Member senza abbonamento vivo nel nucleo (`stato: iscritto`,
+`statoNucleo: esiste`) finiva nel ramo assistenza, e la bozza gli diceva «sei già
+dei nostri, non ti propongo di iscriverti» a una persona che invece va invitata a
+iscriversi. È lo stesso scambio fra le due domande che aveva già morso in chat,
+nel verso opposto. Il ripiego vale solo quando `statoNucleo` **non è arrivato
+affatto**, cioè per un webhook più vecchio che non lo manda:
+`(statoNucleo ? statoNucleo === 'iscritto' : stato === 'iscritto')`.
+
 Cinque cose da sapere prima di toccarlo.
 
 **Il recupero è una copia di «Componi contesto» di `CHAT ATHLON`, e va tenuta in
@@ -1796,6 +1807,41 @@ si passa la mano su un reclamo, su una domanda che riguarda il caso personale di
 chi scrive (la sua prenotazione, il suo addebito, la scadenza del suo
 certificato), su una candidatura, e su qualunque cosa chieda di confermare che
 qualcosa è stato fatto. Nessuna bozza è meglio di una bozza da smentire.
+
+**La bozza è in HTML, ma il modello non lo scrive tutto.** L'HTML lo chiedeva la
+leggibilità: la prima bozza vera era un muro con sei importi e tre risparmi in due
+capoversi, e nessuno legge una tabella scritta in prosa. Ma un modello che
+improvvisa attributi `style` produce email che si vedono in tre modi diversi —
+Gmail butta i blocchi `<style>`, non carica font esterni e su alcune app mobili
+riscrive i colori. Quindi il taglio è questo: il modello usa **quattro tag e
+nessun attributo** (`<p>`, `<strong>`, `<ul>`/`<li>`, `<a href>`) e scrive **solo
+il corpo**; `Leggi la bozza` sanifica sulla lista bianca, incolla gli stili in
+linea uno per uno, e aggiunge saluto e firma — che così non possono uscire in due
+copie né in due forme. I link sono `#bb4001` e non `#ff5701` per la stessa ragione
+di `--accent-text` in `global.css`: l'arancio pieno non regge il contrasto sotto i
+24px. L'unico ornamento è un filetto arancione sopra la firma, cioè un bordo su un
+`div`: la sola decorazione che Gmail disegna sempre.
+
+**L'email introduce, il sito spiega — ed è la regola che decide tutto il resto.**
+Un'email non è una scheda prodotto: è il modo in cui il club risponde a una
+persona, e chi la legge decide in dieci secondi se vuole saperne di più. Quindi
+l'apertura racconta **com'è** quell'attività e **a chi fa bene** — gli stessi fatti
+della knowledge base, ma dal lato di chi legge: non «vasca da 25 metri con
+assistenza a bordo vasca» ma «nuoti per conto tuo senza sentirti solo, perché un
+tecnico a bordo vasca c'è sempre» — e poi due o tre voci d'elenco che sono
+**destinazioni, non dati**: il planning per gli orari, la pagina degli abbonamenti
+per i costi, la scheda per una regola. Centoventi parole.
+
+Da qui **gli importi non si scrivono più nell'email**: una cifra sola, e solo se ha
+chiesto il prezzo di una cosa per nome; il listino, i risparmi e i confronti stanno
+nel link, che è il posto giusto per un listino. Vale anche per un iscritto che
+chiede della sospensione o del certificato: il succo in due o tre righe, con le
+parole di chi lo conosce e non di un ufficio, e poi la scheda per il resto.
+
+*E gli orari si danno col planning*: il link di `/planning` ci va **sempre** quando
+la domanda tocca gli orari, e non si affida al prompt — se l'ancora `orari` ha
+sparato e quel link non c'è, lo aggiunge il nodo. «Li trovi nell'app» manda a
+cercare dentro un'applicazione una cosa che sta su una pagina.
 
 **Con un allegato si aspetta, e lo scarto si registra.** I certificati medici di
 idoneità non agonistica arrivano così: per ora l'assistente non li guarda e non
