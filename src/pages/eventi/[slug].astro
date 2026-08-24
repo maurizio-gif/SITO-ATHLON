@@ -4,6 +4,7 @@ import { getCollection, render } from 'astro:content';
 import { formatEventDate } from '../../data/eventi';
 import { fotoHero } from '../../data/foto';
 import BottoneChat from '../../components/BottoneChat.astro';
+import '../../styles/prosa.css';
 
 export async function getStaticPaths() {
   const events = await getCollection('eventi', ({ data }) => !data.draft);
@@ -17,6 +18,12 @@ const d = entry.data;
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 const isPast = d.date < today;
+
+/* Il riquadro laterale con i dati pratici e l'azione compare solo se ha
+   qualcosa da dire: un evento annunciato prima delle sue modalità (niente
+   note, niente CTA) non merita un riquadro vuoto — il corpo prende tutta
+   la larghezza. */
+const haAside = d.notes.length > 0 || (!isPast && !!d.ctaHref);
 
 /* Questo sì che è un evento: ha una data, un posto e un modo di partecipare.
    `startDate` in ISO, il luogo e l'organizzatore puntano al club per `@id` così
@@ -89,27 +96,49 @@ const evento = {
           proposito: a 1320px il corpo fa righe lunghe. Il sommario sopra la
           foto resta corto in `ch`, perché là la riga lunga è illeggibile
           davvero. */}
-      <div class="container">
-        <div class="evd__body">
+      <div class="container evd__layout">
+        <div class="evd__body prosa">
           <Content />
         </div>
 
-        {d.notes.length > 0 && (
-          <div class="notes">
-            <span class="notes__title">Informazioni pratiche</span>
-            <ul class="notes__list">
-              {d.notes.map((n) => (<li>{n}</li>))}
-            </ul>
-          </div>
-        )}
+        {haAside && (
+          <aside class="evd__aside">
+            <div class="evd__card">
+              <dl class="evd__facts">
+                <div class="evd__fact">
+                  <dt>Quando</dt>
+                  <dd>
+                    {formatEventDate(d.date, true)}
+                    {d.time && <span> · {d.time}</span>}
+                  </dd>
+                </div>
+                {(d.free || d.price) && (
+                  <div class="evd__fact">
+                    <dt>Prezzo</dt>
+                    <dd>{d.free ? 'Gratuito' : d.price}</dd>
+                  </div>
+                )}
+              </dl>
 
-        {/* `ctaHref` ha un default nello schema, quindi di norma c'è. Ma un
-            evento annunciato prima delle sue modalità lo svuota di proposito:
-            un pulsante che porta alla registrazione del portale, quando ancora
-            non c'è niente da prenotare, è una promessa che quella pagina non
-            mantiene. */}
-        {!isPast && d.ctaHref && (
-          <a href={d.ctaHref} class="btn btn-primary evd__cta">{d.ctaLabel} →</a>
+              {d.notes.length > 0 && (
+                <>
+                  <span class="evd__card-title">Informazioni pratiche</span>
+                  <ul class="evd__notes">
+                    {d.notes.map((n) => (<li>{n}</li>))}
+                  </ul>
+                </>
+              )}
+
+              {/* `ctaHref` ha un default nello schema, quindi di norma c'è. Ma
+                  un evento annunciato prima delle sue modalità lo svuota di
+                  proposito: un pulsante che porta alla registrazione del
+                  portale, quando ancora non c'è niente da prenotare, è una
+                  promessa che quella pagina non mantiene. */}
+              {!isPast && d.ctaHref && (
+                <a href={d.ctaHref} class="btn btn-primary evd__cta">{d.ctaLabel} →</a>
+              )}
+            </div>
+          </aside>
         )}
       </div>
     </section>
@@ -264,55 +293,86 @@ const evento = {
     margin: 10px 0 28px;
   }
 
-  .evd__body :global(p),
-  .evd__body :global(li) {
-    font-size: var(--prosa-size);
-  }
-
-  .evd__body :global(p) {
-    color: var(--text-muted);
-    line-height: 1.65;
-  }
-
-  .evd__body :global(strong) {
+  /* Il primo capoverso fa da lede: leggermente più grande e scuro del resto
+     della prosa, che resta grigia. Senza, l'apertura dell'evento si perdeva
+     nel muro di testo uniforme — la stessa voce dalla prima riga all'ultima. */
+  .evd__body :global(p:first-of-type) {
+    font-size: var(--text-md);
     color: var(--color-dark);
-    font-weight: 600;
+    line-height: 1.55;
   }
 
-  .evd__body :global(a) {
-    color: var(--color-primary);
-    font-weight: 500;
+  /* ---- Corpo + riquadro laterale ---- */
+  .evd__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
   }
 
-  .evd__cta {
-    margin-top: 10px;
+  .evd__aside {
+    min-width: 0;
   }
 
-  /* ---- Practical notes ---- */
-  .notes {
-    margin: 30px 0 34px;
-    padding: 22px 24px;
+  .evd__card {
+    padding: 26px 26px 28px;
     border-radius: var(--radius);
     background: var(--color-cream);
+    border: 1px solid var(--color-sand);
+    box-shadow: 0 16px 40px rgba(39, 36, 35, 0.1);
   }
 
-  .notes__title {
+  .evd__facts {
+    margin: 0;
+  }
+
+  .evd__fact {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 12px 0;
+  }
+
+  .evd__fact + .evd__fact {
+    border-top: 1px solid var(--border);
+  }
+
+  .evd__fact dt {
+    margin: 0;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .evd__fact dd {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-dark);
+    text-align: right;
+  }
+
+  .evd__card-title {
     display: block;
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
     font-size: var(--text-2xs);
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--color-primary);
-    margin-bottom: 12px;
   }
 
-  .notes__list {
+  .evd__notes {
     list-style: none;
-    margin: 0;
+    margin: 12px 0 0;
     padding: 0;
   }
 
-  .notes__list li {
+  .evd__notes li {
     position: relative;
     padding-left: 16px;
     font-size: var(--text-sm);
@@ -320,11 +380,11 @@ const evento = {
     color: var(--text-muted);
   }
 
-  .notes__list li + li {
+  .evd__notes li + li {
     margin-top: 7px;
   }
 
-  .notes__list li::before {
+  .evd__notes li::before {
     content: '';
     position: absolute;
     left: 0;
@@ -333,6 +393,29 @@ const evento = {
     height: 5px;
     border-radius: 50%;
     background: var(--color-primary);
+  }
+
+  .evd__cta {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin-top: 22px;
+  }
+
+  /* Il riquadro affianca la prosa solo dove c'è spazio vero per farlo, e non
+     sul totem: e' largo quanto un desktop (>= 900px) ma verticale come un
+     telefono, e un secondo riquadro accanto al testo ci starebbe stretto e
+     fuori ordine di lettura. `min-aspect-ratio` lo esclude senza bisogno di
+     nominarlo: sotto 3/4 di rapporto resta un pannello verticale. */
+  @media (min-width: 900px) and (min-aspect-ratio: 3/4) {
+    .evd__layout:has(.evd__aside) {
+      grid-template-columns: minmax(0, 1fr) 22rem;
+    }
+
+    .evd__aside {
+      position: sticky;
+      top: calc(var(--header-h, 73px) + 24px);
+    }
   }
 
   /* ---- Programme ---- */
@@ -350,6 +433,7 @@ const evento = {
   .prog__room {
     padding: 22px 22px 10px;
     background: var(--color-white);
+    border: 1px solid var(--border-strong);
     border-radius: var(--radius);
   }
 
