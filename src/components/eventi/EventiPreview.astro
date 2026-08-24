@@ -1,7 +1,12 @@
 ---
 /**
- * Upcoming events as cards. The same component serves the home page preview and
- * the club-life hub, so both always show the same next events.
+ * Upcoming events. The same component serves the home page preview and the
+ * club-life hub, so both always show the same next events.
+ *
+ * Il primo evento in ordine di data ha una carta a parte, più larga e con la
+ * foto in evidenza: è quello a cui la maggior parte delle persone che aprono
+ * questa sezione stanno effettivamente pensando ("quando è il prossimo?"), e
+ * una griglia di tre caselle identiche lo trattava come gli altri due.
  */
 import { upcomingEvents, formatEventDate, formatEventBadge } from '../../data/eventi';
 import { fotoPiccola } from '../../data/foto';
@@ -26,6 +31,7 @@ const {
 } = Astro.props;
 
 const events = await upcomingEvents(limit);
+const [featured, ...rest] = events;
 ---
 
 <section class:list={['ev', `ev--${variant}`]}>
@@ -42,44 +48,82 @@ const events = await upcomingEvents(limit);
       </p>
     ) : (
       <>
-        <div class="ev__grid">
-          {events.map((e, i) => {
-            const badge = formatEventBadge(e.data.date);
-            return (
-              <article class="evcard" data-anim="scale" data-anim-delay={String(i * 100)}>
-                <a class="evcard__link" href={`/eventi/${e.id}`}>
-                  <div class="evcard__media">
-                    {/* La card è larga ~420px: `sizes` lo dichiara, o il
-                        browser assume la finestra intera e prende l'originale
-                        da 2048px per una casella da 406. */}
-                    <img
-                      src={e.data.image}
-                      alt={e.data.imageAlt ?? e.data.title}
-                      loading="lazy"
-                      {...fotoPiccola(e.data.image, '(max-width: 760px) 88vw, 420px')}
-                    />
-                    <span class="evcard__date">
-                      <span class="evcard__day u-display">{badge.day}</span>
-                      <span class="evcard__month">{badge.month}</span>
-                    </span>
-                    {e.data.free && <span class="evcard__free">Gratuito</span>}
-                  </div>
+        {(() => {
+          const badge = formatEventBadge(featured.data.date);
+          return (
+            <article class="evfeat" data-anim="scale">
+              <a class="evfeat__link" href={`/eventi/${featured.id}`}>
+                <div class="evfeat__media">
+                  {/* La casella è larga circa 620px sul desktop: `sizes` lo
+                      dichiara, o il browser assume la finestra intera. */}
+                  <img
+                    src={featured.data.image}
+                    alt={featured.data.imageAlt ?? featured.data.title}
+                    loading="lazy"
+                    {...fotoPiccola(featured.data.image, '(max-width: 760px) 92vw, 620px')}
+                  />
+                  <span class="evfeat__date">
+                    <span class="evfeat__day u-display">{badge.day}</span>
+                    <span class="evfeat__month">{badge.month}</span>
+                  </span>
+                  {featured.data.free && <span class="evfeat__free">Gratuito</span>}
+                </div>
 
-                  <div class="evcard__body">
-                    <span class="evcard__kicker">{e.data.kicker}</span>
-                    <h3 class="evcard__title">{e.data.title}</h3>
-                    <p class="evcard__when">
-                      {formatEventDate(e.data.date)}
-                      {e.data.time && <span> · {e.data.time}</span>}
-                    </p>
-                    <p class="evcard__excerpt">{e.data.excerpt}</p>
-                    <span class="evcard__more">Scopri l'evento →</span>
-                  </div>
-                </a>
-              </article>
-            );
-          })}
-        </div>
+                <div class="evfeat__body">
+                  <span class="evfeat__kicker">{featured.data.kicker}</span>
+                  <h3 class="evfeat__title">{featured.data.title}</h3>
+                  <p class="evfeat__when">
+                    {formatEventDate(featured.data.date)}
+                    {featured.data.time && <span> · {featured.data.time}</span>}
+                  </p>
+                  <p class="evfeat__excerpt">{featured.data.excerpt}</p>
+                  <span class="btn btn-primary evfeat__cta">Scopri l'evento →</span>
+                </div>
+              </a>
+            </article>
+          );
+        })()}
+
+        {rest.length > 0 && (
+          <div class="ev__grid">
+            {rest.map((e, i) => {
+              const badge = formatEventBadge(e.data.date);
+              return (
+                <article class="evcard" data-anim="scale" data-anim-delay={String(i * 100)}>
+                  <a class="evcard__link" href={`/eventi/${e.id}`}>
+                    <div class="evcard__media">
+                      {/* La card è larga ~420px: `sizes` lo dichiara, o il
+                          browser assume la finestra intera e prende l'originale
+                          da 2048px per una casella da 406. */}
+                      <img
+                        src={e.data.image}
+                        alt={e.data.imageAlt ?? e.data.title}
+                        loading="lazy"
+                        {...fotoPiccola(e.data.image, '(max-width: 760px) 88vw, 420px')}
+                      />
+                      <span class="evcard__date">
+                        <span class="evcard__day u-display">{badge.day}</span>
+                        <span class="evcard__month">{badge.month}</span>
+                      </span>
+                      {e.data.free && <span class="evcard__free">Gratuito</span>}
+                    </div>
+
+                    <div class="evcard__body">
+                      <span class="evcard__kicker">{e.data.kicker}</span>
+                      <h3 class="evcard__title">{e.data.title}</h3>
+                      <p class="evcard__when">
+                        {formatEventDate(e.data.date)}
+                        {e.data.time && <span> · {e.data.time}</span>}
+                      </p>
+                      <p class="evcard__excerpt">{e.data.excerpt}</p>
+                      <span class="evcard__more">Scopri l'evento →</span>
+                    </div>
+                  </a>
+                </article>
+              );
+            })}
+          </div>
+        )}
 
         {showAllLink && (
           <a href="/eventi" class="ev__all" data-anim="pop">Tutti gli eventi →</a>
@@ -133,11 +177,144 @@ const events = await upcomingEvents(limit);
     font-weight: 600;
   }
 
+  /* ---- Featured: il prossimo evento, in una carta a sé ---- */
+  .evfeat {
+    margin-top: 30px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--color-white);
+    border: 1px solid var(--border-strong);
+    transition: box-shadow var(--dur-base) var(--ease-out-crit);
+  }
+
+  .ev--dark .evfeat {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--border-dark);
+  }
+
+  .evfeat:hover {
+    box-shadow: 0 14px 34px rgba(23, 21, 20, 0.16);
+  }
+
+  .evfeat__link {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+  }
+
+  .evfeat__media {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .evfeat__media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s var(--ease-out-crit);
+  }
+
+  .evfeat:hover .evfeat__media img {
+    transform: scale(1.04);
+  }
+
+  .evfeat__date {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 14px 8px;
+    border-radius: 14px;
+    background: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .evfeat__day {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    --lh: 1;
+  }
+
+  .evfeat__month {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--color-primary);
+  }
+
+  .evfeat__free {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    padding: 6px 13px;
+    border-radius: 999px;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .evfeat__body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 44px;
+  }
+
+  .evfeat__kicker {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .evfeat__title {
+    font-size: var(--text-2xl);
+    --lh: 1.05;
+    margin: 10px 0 8px;
+  }
+
+  .ev--dark .evfeat__title {
+    color: var(--color-white);
+  }
+
+  .evfeat__when {
+    margin: 0 0 16px;
+    font-size: var(--text-md);
+    font-weight: 500;
+  }
+
+  .ev--dark .evfeat__when {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .evfeat__excerpt {
+    margin: 0 0 26px;
+    max-width: 36ch;
+    color: var(--text-muted);
+    line-height: 1.55;
+  }
+
+  .ev--dark .evfeat__excerpt {
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  .evfeat__cta {
+    align-self: flex-start;
+  }
+
+  /* ---- Grid: gli eventi che restano dopo quello in evidenza ---- */
   .ev__grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 24px;
-    margin-top: 30px;
+    margin-top: 24px;
   }
 
   .evcard {
@@ -290,6 +467,23 @@ const events = await upcomingEvents(limit);
     text-decoration: underline;
   }
 
+  /* Quando dopo l'evento in evidenza ne restano uno o due, niente colonna
+     vuota: con `repeat(3, 1fr)` una sola card si allarga a un terzo dello
+     spazio lasciando due caselle vuote, e sono esattamente i conti di oggi
+     (tre eventi in tutto: uno in evidenza, due nella griglia). Sotto i 640px
+     la griglia torna a una colonna sola: forzarne due su un telefono le
+     stringerebbe a metà dello spazio già poco, quindi lì l'eccezione non si
+     applica. */
+  @media (min-width: 641px) {
+    .ev__grid:has(> .evcard:only-child) {
+      grid-template-columns: minmax(0, 22rem);
+    }
+
+    .ev__grid:has(> .evcard:nth-child(2):last-child) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
   /* + totem: vedi «Il totem verticale del club» in global.css */
 
   @media (max-width: 900px),
@@ -297,6 +491,28 @@ const events = await upcomingEvents(limit);
     (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
     .ev__grid {
       grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* La carta in evidenza resta affiancata (foto + testo) fino a qui, come le
+     card di `NewsPreview`: si impila solo quando la colonna di testo non ha
+     più spazio per titolo ed estratto, non appena lo schermo si stringe un
+     po'. */
+  @media (max-width: 760px) {
+    .evfeat__link {
+      grid-template-columns: 1fr;
+    }
+
+    .evfeat__media {
+      aspect-ratio: 16 / 9;
+    }
+
+    .evfeat__body {
+      padding: 26px 24px 30px;
+    }
+
+    .evfeat__excerpt {
+      max-width: none;
     }
   }
 
