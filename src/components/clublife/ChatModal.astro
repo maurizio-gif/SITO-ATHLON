@@ -388,15 +388,16 @@ import CampoTelefono from '../CampoTelefono.astro';
       apri(cta);
     });
 
-    /* Chi arriva da un rimando «Approfondisci» della chat (`data-ca-interno`
-       in chatAssistente.client.js) porta con sé un segno lasciato in
-       `sessionStorage` un istante prima di partire — clonato nella scheda
-       nuova insieme al resto della conversazione, che è già lì per la stessa
-       ragione (vedi il commento su `CHIAVE_SCENA` nel modulo). Senza questo,
-       la conversazione sarebbe ricostruita ma invisibile: `ripristina()`
-       nel modulo rimette a posto lo stato, non apre da sola il pannello.
-       La chiave è duplicata qui, non importata: il modulo non è ancora
-       caricato quando questo controllo gira. */
+    /* Chi arriva da un link interno della chat (`data-ca-interno` in
+       chatAssistente.client.js — un rimando «Approfondisci» o una delle due
+       card scritte a mano) porta con sé un segno lasciato in
+       `sessionStorage` un istante prima di partire: naviga nella stessa
+       scheda, quindi è lo stesso storage di prima, con dentro anche il resto
+       della conversazione (vedi il commento su `CHIAVE_SCENA` nel modulo).
+       Senza questo, la conversazione sarebbe ricostruita ma invisibile:
+       `ripristina()` nel modulo rimette a posto lo stato, non apre da sola
+       il pannello. La chiave è duplicata qui, non importata: il modulo non è
+       ancora caricato quando questo controllo gira. */
     (function riapriDaRimando() {
       var riapri = false;
       try {

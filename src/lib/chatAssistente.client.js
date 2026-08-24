@@ -670,7 +670,7 @@ export function initChatAssistente(root, options) {
           (dati.ambito === 'junior'
             ? '<p class="ca__fonti"><a href="' +
               LANDING_JUNIOR +
-              '" target="_blank" rel="noopener" data-ca-interno="1">Come si completa l’iscrizione →</a></p>'
+              '" data-ca-interno="1">Come si completa l’iscrizione →</a></p>'
             : ''),
         conferma
       );
@@ -770,12 +770,15 @@ export function initChatAssistente(root, options) {
    * Senza fonti non si stampa niente: una riga «Approfondisci» sopra il vuoto
    * è peggio del vuoto.
    *
-   * Un rimando **verso il sito stesso** porta anche `data-ca-interno`: è
-   * l'aggancio con cui il click, più sotto, segna la scheda che si apre come
-   * «riprendi qui», così quella pagina — quando ha la sua stessa chat — la
-   * ritrova già scritta invece di ripartire dal passo dell'email. Un rimando
-   * verso il portale PerfectGym non lo porta: è un altro sito, non ha questa
-   * chat da ritrovare.
+   * Un rimando **verso il sito stesso** naviga nella stessa scheda — non
+   * `target="_blank"` — e porta `data-ca-interno`: è l'aggancio con cui il
+   * click, più sotto, lascia il segno che la pagina che arriva legge per
+   * riaprire la chat da sola, già scritta, invece di farla ripartire dal
+   * passo dell'email. `sessionStorage` è lo stesso della scheda di prima,
+   * quindi la conversazione c'è già — non va clonata da nessuna parte.
+   * Un rimando **verso il portale PerfectGym** resta `target="_blank"` e
+   * senza quell'aggancio: è un altro sito, non ha questa chat da ritrovare,
+   * e non deve portarsi via la scheda da cui si è partiti.
    */
   function stessaOrigine(url) {
     try {
@@ -792,11 +795,12 @@ export function initChatAssistente(root, options) {
       '<span class="ca__rimandi-lead">Approfondisci</span>' +
       fonti
         .map(function (f) {
+          var interno = stessaOrigine(f.url);
           return (
             '<a class="ca__rimandi-link" href="' +
             escape(f.url) +
-            '" target="_blank" rel="noopener"' +
-            (stessaOrigine(f.url) ? ' data-ca-interno="1"' : '') +
+            '"' +
+            (interno ? ' data-ca-interno="1"' : ' target="_blank" rel="noopener"') +
             '>' +
             escape(f.titolo || 'Leggi l’articolo completo') +
             ' →</a>'
@@ -1112,7 +1116,7 @@ export function initChatAssistente(root, options) {
       negato.innerHTML =
         '<p class="ca__richiamo-titolo">Il Guest Pass non si può attivare</p>' +
         '<p class="ca__richiamo-lead">Risulta già un tesseramento Athlon a questa email, e il Pass è riservato a chi non ne ha mai avuto uno. Puoi comunque prenotare una lezione singola o scegliere un abbonamento.</p>' +
-        '<a class="ca__richiamo-btn" href="/abbonamenti#accessi-singoli" target="_blank" rel="noopener" data-ca-interno="1">Vedi gli accessi singoli →</a>';
+        '<a class="ca__richiamo-btn" href="/abbonamenti#accessi-singoli" data-ca-interno="1">Vedi gli accessi singoli →</a>';
       conversazione.appendChild(negato);
       conversazione.scrollTop = conversazione.scrollHeight;
       if (!ricostruendo) {
@@ -1968,14 +1972,16 @@ export function initChatAssistente(root, options) {
     /* `data-ca-interno` marca ogni link della conversazione che porta a
        un'altra pagina di **questo** sito — quelli di `rimandi()`, e i due
        scritti a mano più sotto (guest pass negato, dati junior confermati).
-       Un link verso PerfectGym non lo porta mai: è un altro sito, e lì la
-       chat non deve riaprirsi da sola.
-       Il click non blocca la navigazione, si limita a lasciare un segno
-       prima che parta. Si apre in una scheda nuova (`target="_blank"`), e
-       `sessionStorage` viene clonato lì dentro nello stesso istante — quindi
-       la scheda che arriva lo trova già scritto e riapre la chat da sola,
-       invece di lasciarla chiusa in mezzo a una pagina che parlava di quello
-       che stava chiedendo. */
+       Un link verso PerfectGym non lo porta mai: è un altro sito, si apre in
+       una scheda a parte (vedi il suo `target="_blank"`) e lì la chat non
+       deve riaprirsi da sola.
+       Questi invece navigano nella **stessa** scheda — niente
+       `target="_blank"`, sarebbe una seconda scheda per restare sul nostro
+       stesso sito — quindi non c'è niente da clonare: `sessionStorage` è
+       già quello di prima. Il click non blocca la navigazione, si limita a
+       lasciare un segno prima che parta, così la pagina che arriva lo legge
+       e riapre la chat da sola, già scritta, invece di lasciarla chiusa in
+       mezzo a una pagina che parlava di quello che stava chiedendo. */
     var interno = e.target.closest && e.target.closest('[data-ca-interno]');
     if (interno) {
       try {
