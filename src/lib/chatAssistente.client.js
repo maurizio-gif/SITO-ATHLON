@@ -303,6 +303,12 @@ export function initChatAssistente(root, options) {
    * rimonta — è un iframe vivo, non un pezzo di conversazione, e l'icona ☎ lo
    * riapre in un gesto.
    */
+  /* La legge anche `ChatModal.astro`, prima ancora che questo modulo sia
+     caricato — è lui a decidere se vale la pena importarlo appena la pagina
+     arriva. La stringa è duplicata lì, non importata: le due copie vanno
+     tenute uguali a mano. */
+  var CHIAVE_RIAPRI = 'athlon:assistente:riapri';
+
   var CHIAVE_SCENA = 'athlon:assistente:scena';
   /* Un tetto, perché `sessionStorage` è piccolo e una conversazione lunga porta
      dentro l'HTML di ogni bolla: si tiene la coda, che è la parte che si sta
@@ -330,6 +336,7 @@ export function initChatAssistente(root, options) {
           scena: scena,
           ticketInviato: ticketInviato,
           sollecitato: sollecitato,
+          richiamoProposto: richiamoProposto,
         })
       );
     } catch (e) {
@@ -701,6 +708,7 @@ export function initChatAssistente(root, options) {
        domanda, e se resta senza risposta è proprio il momento in cui si perde
        una persona. */
     armaSollecito();
+    armaRichiamoInattivo();
   }
 
   /** Il trascritto, nell'ordine in cui è comparso: è ciò che finisce nel ticket. */
@@ -761,7 +769,22 @@ export function initChatAssistente(root, options) {
    *
    * Senza fonti non si stampa niente: una riga «Approfondisci» sopra il vuoto
    * è peggio del vuoto.
+   *
+   * Un rimando **verso il sito stesso** porta anche `data-ca-interno`: è
+   * l'aggancio con cui il click, più sotto, segna la scheda che si apre come
+   * «riprendi qui», così quella pagina — quando ha la sua stessa chat — la
+   * ritrova già scritta invece di ripartire dal passo dell'email. Un rimando
+   * verso il portale PerfectGym non lo porta: è un altro sito, non ha questa
+   * chat da ritrovare.
    */
+  function stessaOrigine(url) {
+    try {
+      return new URL(url, location.href).origin === location.origin;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function rimandi(fonti) {
     if (!fonti.length) return '';
     return (
@@ -772,7 +795,9 @@ export function initChatAssistente(root, options) {
           return (
             '<a class="ca__rimandi-link" href="' +
             escape(f.url) +
-            '" target="_blank" rel="noopener">' +
+            '" target="_blank" rel="noopener"' +
+            (stessaOrigine(f.url) ? ' data-ca-interno="1"' : '') +
+            '>' +
             escape(f.titolo || 'Leggi l’articolo completo') +
             ' →</a>'
           );
@@ -1207,6 +1232,8 @@ export function initChatAssistente(root, options) {
     ticketInviato = false;
     fermaSollecito();
     sollecitato = false;
+    fermaRichiamoInattivo();
+    richiamoProposto = false;
     /* **Anche l'identificativo della sessione**, ed è la parte che mancava:
        senza, sul totem i messaggi di chi arriva dopo si accodano alla
        conversazione di chi è passato prima, sotto la sua email — perché la
@@ -1313,6 +1340,53 @@ export function initChatAssistente(root, options) {
       var testo = SOLLECITI[dati.ramo];
       bolla('assistente', '<p>' + escape(testo) + '</p>', testo);
     }, SOLLECITO);
+  }
+
+  // ── Il richiamo si propone da sé, dopo un silenzio più lungo ──────────────
+  /**
+   * Il sollecito qui sopra riprende il filo con una domanda; se anche a
+   * quello non arriva niente, il filo non lo si riprende una terza volta
+   * (vale la regola 6quater del prompt) — si propone la strada che non
+   * dipende da altre risposte: farsi richiamare.
+   *
+   * **Propone, non monta il calendario.** Il calendario si apre solo su
+   * richiesta — è la ragione per cui l'apertura automatica dopo due risposte
+   * è stata tolta (vedi il commento in cima a questo file) — quindi qui
+   * arriva soltanto una bolla che ricorda la cornetta in alto, non un iframe
+   * che si prende lo schermo da solo. Chi vuole la telefonata la chiede
+   * cliccandola.
+   *
+   * **Solo a chi non ha un abbonamento vivo nel nucleo** (`dati.puoRichiamo`,
+   * la stessa condizione dell'icona ☎), e **una volta sola per conversazione**
+   * — le stesse due guardie del sollecito, per lo stesso motivo: insistere nel
+   * vuoto è la definizione di molesto.
+   */
+  var RICHIAMO_INATTIVO = 90 * 1000;
+  var orologioRichiamoInattivo = null;
+  var richiamoProposto = false;
+  var PROPOSTA_RICHIAMO =
+    'Se preferisci parlarne al telefono, tocca la cornetta qui sopra: scegli tu giorno e ora, ti chiamiamo noi.';
+
+  function fermaRichiamoInattivo() {
+    if (orologioRichiamoInattivo) {
+      clearTimeout(orologioRichiamoInattivo);
+      orologioRichiamoInattivo = null;
+    }
+  }
+
+  function armaRichiamoInattivo() {
+    fermaRichiamoInattivo();
+    if (richiamoProposto || !dati.puoRichiamo) return;
+    orologioRichiamoInattivo = window.setTimeout(function () {
+      orologioRichiamoInattivo = null;
+      // Le stesse condizioni del sollecito, controllate al momento dello scatto.
+      if (!root.classList.contains('open')) return;
+      if (dati.passo !== 'chat' || inCorso) return;
+      if (campoDomanda && (campoDomanda.value || '').trim()) return;
+      if (!dati.puoRichiamo) return;
+      richiamoProposto = true;
+      bolla('assistente', '<p>' + escape(PROPOSTA_RICHIAMO) + '</p>', PROPOSTA_RICHIAMO);
+    }, RICHIAMO_INATTIVO);
   }
 
   var INATTIVITA = 3 * 60 * 1000;
@@ -1495,8 +1569,10 @@ export function initChatAssistente(root, options) {
     var precedente = domandaPrecedente();
 
     inCorso = true;
-    /* Ha scritto: il sollecito non ha piu' niente da sollecitare. */
+    /* Ha scritto: né il sollecito né la proposta di richiamo hanno più niente
+       da sollecitare o proporre. */
     fermaSollecito();
+    fermaRichiamoInattivo();
     campoDomanda.value = '';
     if (btnDomanda) btnDomanda.disabled = true;
     bolla('utente', escape(domanda), domanda);
@@ -1587,6 +1663,7 @@ export function initChatAssistente(root, options) {
          arriva niente. Da qui e non da prima: il silenzio si misura dalla
          risposta, non dalla domanda. */
       armaSollecito();
+      armaRichiamoInattivo();
     }
   }
 
@@ -1888,6 +1965,20 @@ export function initChatAssistente(root, options) {
   }
 
   root.addEventListener('click', function (e) {
+    /* Un rimando verso il sito stesso (vedi `rimandi()`): non blocca la
+       navigazione, si limita a lasciare un segno prima che parta. Si apre
+       in una scheda nuova, e `sessionStorage` viene clonato lì dentro nello
+       stesso istante — quindi la scheda che arriva lo trova già scritto e
+       riapre la chat da sola, invece di lasciarla chiusa in mezzo a una
+       pagina che parlava di quello che stava chiedendo. */
+    var interno = e.target.closest && e.target.closest('[data-ca-interno]');
+    if (interno) {
+      try {
+        sessionStorage.setItem(CHIAVE_RIAPRI, '1');
+      } catch (err) {}
+      // Non c'è return: il click deve comunque aprire il link.
+    }
+
     var scelta = e.target.closest && e.target.closest('[data-ca-attivita-scelta]');
     if (scelta) {
       scegliAttivita(scelta.dataset.caAttivitaScelta);
@@ -1950,9 +2041,12 @@ export function initChatAssistente(root, options) {
   if (campoDomanda) {
     campoDomanda.addEventListener('input', function () {
       if (btnDomanda) btnDomanda.disabled = campoDomanda.value.trim().length < 3;
-      /* Sta scrivendo: interromperlo con un "ci sei?" mentre digita e' il modo
-         peggiore di chiedere se c'e'. */
-      if (campoDomanda.value.trim()) fermaSollecito();
+      /* Sta scrivendo: interromperlo con un "ci sei?" o con la proposta di
+         richiamo mentre digita e' il modo peggiore di chiedere se c'e'. */
+      if (campoDomanda.value.trim()) {
+        fermaSollecito();
+        fermaRichiamoInattivo();
+      }
     });
     campoDomanda.addEventListener('keydown', function (e) {
       if (e.key !== 'Enter' || e.shiftKey) return;
@@ -2012,6 +2106,7 @@ export function initChatAssistente(root, options) {
       scena = salvato.scena;
       ticketInviato = !!salvato.ticketInviato;
       sollecitato = !!salvato.sollecitato;
+      richiamoProposto = !!salvato.richiamoProposto;
 
       scena.forEach(function (v) {
         if (v.k === 'm') bolla(v.c, v.h, v.t);
@@ -2069,9 +2164,12 @@ export function initChatAssistente(root, options) {
       /* E il silenzio si rimisura da qui. Riaprire una conversazione e non
          scrivere niente è lo stesso momento del saluto rimasto senza risposta,
          e da quando la chat sopravvive al cambio di pagina è anche il modo
-         normale di ritrovarla. `sollecitato` lo tiene comunque a uno per
-         conversazione. */
-      if (dati.passo === 'chat') armaSollecito();
+         normale di ritrovarla. `sollecitato` e `richiamoProposto` lo tengono
+         comunque a uno per conversazione. */
+      if (dati.passo === 'chat') {
+        armaSollecito();
+        armaRichiamoInattivo();
+      }
     },
     reset: function () {
       pulisciStato();
