@@ -2,8 +2,8 @@
 title: "Be Active Day"
 kicker: "Giornata europea dello sport"
 date: 2026-09-27
-image: "/wp-content/uploads/2025/11/ATHLON88-scaled.jpg"
-imageAlt: "La vasca grande di Athlon Club vista dalla balconata, con la scritta Athlon Club sulla parete di fondo"
+image: "/wp-content/uploads/2025/11/ATHLON81-scaled.jpg"
+imageAlt: "La Gym Floor di Athlon Club, l'area funzionale della sala pesi"
 excerpt: "Una masterclass con i nostri migliori istruttori e le nostre lezioni, per la giornata europea dedicata allo sport. Tieniti libera la data: modalità e programma in arrivo."
 ctaHref: ""
 attivita: []

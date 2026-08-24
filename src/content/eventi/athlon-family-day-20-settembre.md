@@ -10,15 +10,22 @@ free: true
 ctaLabel: "Prenota ora"
 ctaHref: "https://athlon.perfectgym.com/ClientPortal2/#/Classes/1/List?date=2026-09-20&categoryId=37"
 notes:
+  - "La prenotazione è individuale: se partecipano più familiari, va registrato e prenotato un posto per ciascuno, bambini compresi"
+  - "Serve un account sul portale Athlon: chi non ne ha già uno lo crea al primo accesso, poi prenota il turno"
   - "Due turni, alle 16:30 e alle 17:30, un'ora ciascuno"
   - "Piscine riservate alle famiglie partecipanti"
   - "Staff qualificato presente per tutta la durata"
   - "Gratuito per iscritti e non iscritti, dai 3 anni in su"
-  - "Si prenota un posto per ogni familiare, bambini compresi, dal portale: Corsi/PT → Prenota → categoria Eventi Gratuiti"
 attivita: []
 ---
 
 Un pomeriggio in acqua per stare insieme, genitori e figli, senza il pensiero di un allenamento da seguire.
+
+## Come funziona la prenotazione
+
+**La prenotazione vale per una persona sola.** Se in famiglia partecipano più persone — un genitore e un figlio, o tutta la famiglia insieme — **va registrato e prenotato un posto per ciascun partecipante**, bambini compresi: non basta prenotare un turno a nome di uno solo per portare tutti gli altri.
+
+**Per prenotare serve un account sul portale Athlon.** Se non ne hai già uno, il primo passo è crearlo: da lì si procede alla prenotazione del turno, come per ogni altro partecipante.
 
 ## Le piscine sono tutte per voi
 
