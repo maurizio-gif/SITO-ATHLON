@@ -397,14 +397,29 @@ import CampoTelefono from '../CampoTelefono.astro';
        Senza questo, la conversazione sarebbe ricostruita ma invisibile:
        `ripristina()` nel modulo rimette a posto lo stato, non apre da sola
        il pannello. La chiave è duplicata qui, non importata: il modulo non è
-       ancora caricato quando questo controllo gira. */
+       ancora caricato quando questo controllo gira.
+
+       **Sul telefono il pannello non si riapre da solo.** Lì `.ca` prende
+       quasi tutto lo schermo (vedi il suo `width: min(32rem, 100%)`), quindi
+       riaprirlo subito coprirebbe esattamente la pagina che la persona ha
+       appena raggiunto cliccando — il contrario di quello che voleva. La
+       conversazione non si perde comunque: resta in `sessionStorage` e torna
+       intera al primo tocco sul pulsante della chat, per la stessa
+       `ripristina()`. La soglia è quella che il sito già considera
+       «telefono» (AGENTS.md, «le soglie da telefono, 700 e sotto»). */
     (function riapriDaRimando() {
       var riapri = false;
       try {
         riapri = sessionStorage.getItem('athlon:assistente:riapri') === '1';
         if (riapri) sessionStorage.removeItem('athlon:assistente:riapri');
       } catch (err) {}
-      if (riapri) apri(null, 'riapri-rimando');
+      if (!riapri) return;
+      var suTelefono = false;
+      try {
+        suTelefono = window.matchMedia('(max-width: 700px)').matches;
+      } catch (err) {}
+      if (suTelefono) return;
+      apri(null, 'riapri-rimando');
     })();
 
     /* Il dito o il puntatore che si avvicina al pulsante è il preavviso che
