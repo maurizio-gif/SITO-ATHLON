@@ -40,6 +40,12 @@ Questa è la nostra vasca grande come sarà: il render del progetto su cui abbia
 
 **È stato impegnativo, e lo diciamo senza girarci intorno.** Mentre molti di voi si riposavano, in cantiere si è lavorato ogni giorno: sette giorni su sette, Ferragosto compreso, per rispettare il programma e consegnare un lavoro fatto come si deve. I lavori sono proceduti al meglio, e sul **planning di settembre** trovate già gli orari di nuoto libero, Scuola Nuoto Adulti e Aqua Fitness in vasca grande.
 
+## Gli interventi, nel dettaglio
+
+Il cuore del lavoro è il **nuovo impianto di distribuzione dell'acqua**, ricostruito da zero con portata controllata: risponde alle normative vigenti e, in particolare, all'articolo 4-bis del Decreto Sport 2026, che ha introdotto nuovi requisiti sui sistemi di aspirazione delle piscine — bocchettoni e griglie di fondo — per eliminare l'effetto ventosa alla base di alcuni gravi incidenti degli ultimi anni.
+
+Intorno a questo, un intervento completo su tutto l'ambiente: il bordo vasca e i blocchi di partenza sono stati rifatti, così come tutti i rivestimenti; le volte hanno ricevuto una manutenzione importante, e l'impianto elettrico è stato ricostruito ex novo.
+
 ## Perché un intervento così
 
 Athlon non smette mai di migliorare: in **53 anni** abbiamo rinnovato la struttura anno dopo anno. Ma una ristrutturazione di questa portata non è manutenzione ordinaria — è la scelta di alzare in modo importante lo standard di un club storico, che questo tipo di investimento se lo merita.
