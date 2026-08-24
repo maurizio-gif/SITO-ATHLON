@@ -980,3 +980,18 @@ video:not([controls])::-webkit-media-controls-panel {
 .prova-sugg__btn:hover {
   opacity: 0.9;
 }
+
+/* Il banner di CookieYes ha un z-index pensato per stare sopra qualunque
+   cosa, e su questo sito vuol dire sopra l'assistente aperto (.ca, 320) o
+   qualunque altro modal — copriva la conversazione invece di starci dietro.
+   Stessa cura già data a `.prova-sugg` qui sopra e a `.cfab`: sparisce solo
+   mentre un modal è aperto (`body.amodal-locked`), non sempre — a modal
+   chiuso il banner resta dov'era e raggiungibile come su ogni altra pagina.
+   `!important` perché deve battere lo stile inline che CookieYes stesso
+   applica per mostrarsi. */
+:global(body.amodal-locked) #cookieyes,
+:global(body.amodal-locked) [class^="cky-"] {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
