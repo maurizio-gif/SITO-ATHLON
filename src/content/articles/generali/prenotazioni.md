@@ -27,7 +27,7 @@ Gym Floor · Corsi Fitness · Aqua Fitness · Scuola Nuoto Adulti · Nuoto Liber
 
 ## Regole principali
 
-- Prenotazione possibile **3 giorni in anticipo** (72 ore prima)
+- Le prenotazioni si aprono **3 giorni prima** (72 ore) e da quel momento restano aperte **fino all'inizio della lezione**: puoi prenotare in qualsiasi momento della finestra, anche all'ultimo secondo — non c'è un termine anticipato entro cui prenotare.
 - Disdetta possibile entro **1 ora** dall'inizio della lezione
 - **Corsi Fitness, Aqua Fitness, Scuola Nuoto Adulti**: max **3 prenotazioni attive** contemporanee
 - **Group Reformer**: max **1 prenotazione attiva** per volta

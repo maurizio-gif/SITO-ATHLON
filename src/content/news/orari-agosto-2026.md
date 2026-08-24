@@ -4,6 +4,7 @@ date: 2026-08-23
 category: "Orari"
 excerpt: "Ad agosto 2026 il club resta aperto con orario estivo: lunedì-venerdì 8:00-21:00, sabato 9:30-13:00, chiuso la domenica. Si torna all'orario pieno dal 1° settembre 2026."
 attivita: []
+draft: true
 ---
 
 Ad agosto 2026 il club segue l'orario estivo:

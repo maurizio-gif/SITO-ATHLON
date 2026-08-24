@@ -14,6 +14,11 @@ interface Props {
   variant?: 'light' | 'alt';
   /** Anchor id, when the hub links to this section. */
   id?: string;
+  /** Il link "Tutte le news →" verso l'indice completo del Club Life. Non c'è
+      una pagina /news a parte: qui "tutte" è la sezione News di /club-life,
+      quindi il link resta spento di default e si accende solo dov'è la home
+      — sulla pagina di Club Life punterebbe a se stessa. */
+  showAllLink?: boolean;
 }
 
 const {
@@ -23,6 +28,7 @@ const {
   sub,
   variant = 'alt',
   id,
+  showAllLink = false,
 } = Astro.props;
 
 const items = (await getCollection('news'))
@@ -63,6 +69,10 @@ const items = (await getCollection('news'))
           </article>
         ))}
       </div>
+
+      {showAllLink && (
+        <a href="/club-life#news" class="nw__all" data-anim="pop">Tutte le news →</a>
+      )}
     </div>
   </section>
 )}
@@ -170,6 +180,20 @@ const items = (await getCollection('news'))
   }
 
   .nwcard__cta:hover {
+    text-decoration: underline;
+  }
+
+  .nw__all {
+    display: inline-block;
+    margin-top: 30px;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .nw__all:hover {
     text-decoration: underline;
   }
 
