@@ -127,6 +127,30 @@ const coppie = (dati?: { l: string; v: string }[]) =>
   elenco((dati ?? []).map((d) => `${d.l}: ${d.v}`));
 
 /**
+ * I link di iscrizione per fascia di nascita della scuola nuoto bambini.
+ *
+ * `testoCompleto` butta via l'indirizzo di ogni link markdown e lascia solo
+ * il testo cliccabile — corretto per leggere la scheda, sbagliato per questi
+ * otto: quale sia quello giusto dipende dall'anno di nascita del bambino, e
+ * senza l'indirizzo la chat non può citarlo, solo descriverlo. Le righe
+ * `FONTE:` qui sotto seguono lo stesso formato con cui `Componi contesto` ne
+ * cita già altre (il planning, il calendario prenotazioni): il validatore
+ * delle fonti scandisce ogni riga che comincia per `FONTE: ` in tutto il
+ * contesto, non solo la prima di ogni voce.
+ */
+function turniScuolaNuoto(md: string): string {
+  const righe: string[] = [];
+  const rx = /^\*\s+(.+?)\s+→\s+\[[^\]]+\]\(([^)]+)\)/gm;
+  let m: RegExpExecArray | null;
+  while ((m = rx.exec(md))) {
+    righe.push(`${pulito(m[1])}:\nFONTE: ${m[2].replace(/\\&/g, '&')}`);
+  }
+  return righe.length
+    ? blocchi('Link diretti di iscrizione per fascia di nascita', righe.join('\n'))
+    : '';
+}
+
+/**
  * A quale attività appartiene un corso.
  *
  * Per le attività in acqua lo slug della pagina *è* già l'id dell'attività
@@ -230,7 +254,11 @@ export const GET: APIRoute = async () => {
       url: `${SITE}/wikiathlon/${a.id}/`,
       area: AREA_LABELS[a.id.split('/')[0]]?.label ?? 'Help Desk',
       attivita: a.data.attivita,
-      testo: blocchi(a.data.description, testoCompleto(a.body ?? '')),
+      testo: blocchi(
+        a.data.description,
+        testoCompleto(a.body ?? ''),
+        a.id === 'snb/preiscrizioni-nuoto' ? turniScuolaNuoto(a.body ?? '') : ''
+      ),
     });
   }
 
