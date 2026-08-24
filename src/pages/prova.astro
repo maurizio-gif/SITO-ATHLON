@@ -648,11 +648,59 @@ const faqs = await faqPagina([
     text-underline-offset: 3px;
   }
 
-  /* ---- Telefono ---- */
+  /* ---- Telefono ----
+     Sul telefono il video smette di essere lo sfondo dietro al testo: il
+     titolo si legge meglio su un fondo pieno (`var(--color-dark)`, già quello
+     di base — senza più lo scrim sopra non serve dichiararlo di nuovo), e il
+     video diventa una scheda nel flusso, sotto a tutto il blocco di testo.
+     `.pv-hero` resta lo stesso flex container di sempre: qui basta impilare i
+     due figli (`align-items: stretch`, o l'eredità di `flex-end` li
+     restringerebbe al loro contenuto invece di farli larghi quanto la sezione)
+     e usare `order` per deciderne la sequenza — `.pv-hero__media` non è dentro
+     `.container`, quindi resta libero di restare full-bleed sul desktop
+     (`position: absolute; inset: 0`, sopra) senza bisogno di spostarlo nel
+     markup. */
   @media (max-width: 700px) {
     .pv-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
       min-height: auto;
-      padding: calc(var(--space-section-lg) * 1.1) 0 var(--space-section);
+      padding: calc(var(--space-section-lg) * 1.1) 0 var(--space-section-md);
+    }
+
+    .pv-hero__inner {
+      order: 1;
+    }
+
+    .pv-hero__eyebrow {
+      /* Il sopratitolo altrimenti tocca il padding della sezione e sembra
+         appoggiato all'header sticky sopra: un margine suo, indipendente
+         dal ritmo delle sezioni, lo stacca senza toccare quel ritmo. */
+      margin-top: 1.25rem;
+    }
+
+    .pv-hero__media {
+      order: 2;
+      position: relative;
+      inset: auto;
+      /* Il margine orizzontale replica il gutter di `.container`
+         (global.css, 24px qui e 14px sotto i 640px): questa scheda non vive
+         dentro `.container` — deve restare full-bleed sul desktop — quindi
+         l'allineamento va ridichiarato invece di arrivare gratis. */
+      margin: 1.75rem 24px 0;
+      border-radius: 1.25rem;
+      overflow: hidden;
+      /* 4/3 e non 16/9: la clip è ripresa in orizzontale, e un riquadro più
+         alto (come l'iframe del tour in AGENTS.md, stessa misura sul
+         telefono) le lascia più aria senza tagliarla quasi a metà. */
+      aspect-ratio: 4 / 3;
+    }
+
+    .pv-hero__scrim {
+      /* Serviva a far leggere il testo sopra il video pieno schermo; qui il
+         video è una scheda a parte e il testo sta già sul fondo neutro. */
+      display: none;
     }
 
     .pv-planning {
@@ -662,6 +710,12 @@ const faqs = await faqPagina([
     .pv-planning__btn {
       width: 100%;
       justify-content: center;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .pv-hero__media {
+      margin: 1.75rem 14px 0;
     }
   }
 
