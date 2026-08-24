@@ -260,7 +260,7 @@ export const JUNIOR: CorsoJunior[] = [
       {
         titolo: 'Come si accede',
         testo:
-          'Tutti i corsi sono a prenotazione: si prenota fino a 3 giorni prima e si disdice entro 1 ora dall’inizio della lezione, da app o da web. Serve un account a nome del genitore con il bambino registrato — e il modulo qui sotto serve proprio a questo.',
+          'Tutti i corsi sono a prenotazione: si prenota a partire da 3 giorni prima e fino all’inizio della lezione, e si disdice entro 1 ora dall’inizio, da app o da web. Serve un account a nome del genitore con il bambino registrato — e il modulo qui sotto serve proprio a questo.',
       },
     ],
     titoloCorsi: 'I turni',

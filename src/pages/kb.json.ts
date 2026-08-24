@@ -648,7 +648,7 @@ export const GET: APIRoute = async () => {
     area: 'Il club',
     attivita: [],
     testo: blocchi(
-      'Le lezioni e le sessioni si prenotano dall’app Athlon Club o dal portale web, fino a tre giorni prima.',
+      'Le lezioni e le sessioni si prenotano dall’app Athlon Club o dal portale web: le prenotazioni si aprono a partire da tre giorni prima e restano aperte fino all’inizio della lezione, senza un termine anticipato entro cui prenotare.',
       elenco([`Portale: ${PG}`, `App: ${APP}`]),
       'L’iscrizione online parte dalla pagina abbonamenti, che apre la registrazione del piano scelto.'
     ),

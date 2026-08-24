@@ -82,9 +82,11 @@ export const PRENOTAZIONE = {
 export const termineCertificato = () =>
   `entro ${CERTIFICATO.giorni} giorni dall'inizio dell'attività`;
 
-/** «fino a 3 giorni prima (72 ore)» */
+/** «a partire da 3 giorni prima (72 ore)», e resta aperta fino alla lezione.
+    «A partire da», non «fino a»: la finestra si apre a 72 ore dalla lezione
+    e non si richiude prima — è la stessa regola opposta corretta in faq.ts. */
 export const finestraPrenotazione = () =>
-  `fino a ${PRENOTAZIONE.anticipoGiorni} giorni prima (${PRENOTAZIONE.anticipoOre} ore)`;
+  `a partire da ${PRENOTAZIONE.anticipoGiorni} giorni prima (${PRENOTAZIONE.anticipoOre} ore) e fino all'inizio della lezione`;
 
 /**
  * La finestra di disdetta, che dipende dal tipo di lezione. Senza argomento dà
