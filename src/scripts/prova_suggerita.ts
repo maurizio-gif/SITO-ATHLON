@@ -36,7 +36,6 @@
  */
 import { quandoConsentito } from './consenso';
 import { suTotem } from './totem';
-import { GUEST_PASS } from '../data/abbonamenti';
 
 const URL_SUGGERISCI = 'https://automazione.n8ndevelop.it/webhook/athlon-suggerisci-prova';
 
@@ -96,15 +95,14 @@ function elencoNomi(voci: Attivita[]): string {
 }
 
 function mostraBanner(voci: Attivita[]): void {
-  const giorni = GUEST_PASS.giorni;
   const box = document.createElement('div');
   box.className = 'prova-sugg';
   box.setAttribute('role', 'status');
   box.innerHTML = `
     <button type="button" class="prova-sugg__chiudi" aria-label="Chiudi">×</button>
     <p class="prova-sugg__testo">
-      Hai visto <strong class="u-display">${elencoNomi(voci)}</strong>?
-      Provalo${voci.length > 1 ? 'li' : ''} gratis per ${giorni} giorni.
+      <strong class="u-display">${elencoNomi(voci)}</strong> ${voci.length > 1 ? 'ti interessano' : 'ti interessa'}?
+      Provalo${voci.length > 1 ? 'li' : ''} per una settimana.
     </p>
     <a class="prova-sugg__btn" href="/prova?source=banner-ritorno">Attiva la prova</a>
   `;

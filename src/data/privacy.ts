@@ -73,7 +73,7 @@ export const STORAGE: Voce[] = [
   {
     chiave: 'athlon_prova_suggerita',
     dove: 'localStorage',
-    cosa: 'Quando ti è stato proposto o hai chiuso il banner che suggerisce una prova gratuita in base alle attività viste in una visita precedente, per non proportelo di nuovo troppo spesso.',
+    cosa: 'Quando ti è stato proposto o hai chiuso il banner che suggerisce di provare per una settimana le attività viste in una visita precedente, per non proportelo di nuovo troppo spesso.',
     durata: 'Fino a 7 giorni dalla chiusura',
     categoria: 'marketing',
   },
