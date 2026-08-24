@@ -66,7 +66,7 @@ export const activityInfo: Record<string, { title: string; body: string; href?: 
   'Aqua Fitness': {
     title: 'Aqua Fitness',
     body:
-      'Allenamento cardio a basso impatto in acqua: Aqua Gym e Hydrobike nella vasca da 12 metri, con temperatura fra 30 °C e 31,8 °C. Ideale anche per chi cerca un carico dolce sulle articolazioni.',
+      'Allenamento cardio a basso impatto in acqua, su due vasche: Aqua Aerobic, Aqua Soft, Aqua Tonic e Hydrobike nella vasca piccola, a una temperatura fra 30 °C e 30,5 °C; l’Aqua Training si svolge invece in vasca grande, sempre fra 28 °C e 28,5 °C. Ideale anche per chi cerca un carico dolce sulle articolazioni.',
     href: '/aqua-fitness',
   },
   'Scuola Nuoto Adulti': {
