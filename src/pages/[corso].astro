@@ -241,7 +241,7 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
       )}
 
       <div class="co-cta">
-        <a href={PRENOTA} class="btn btn-primary" data-cta="member">{labelPrenota} →</a>
+        <a href={PRENOTA} class="btn btn-primary" data-cta="member" target="_blank" rel="noopener noreferrer">{labelPrenota} →</a>
         <a href="#orari" class="co-link" data-cta="explore">{corso.ctaOrari ?? 'Vedi gli orari'} →</a>
       </div>
     </div>
@@ -350,7 +350,7 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
       <LessonSchedule lezioni={corso.lezioni} nome={corso.nome} unita={unita} ore={aOre} />
 
       <div class="co-cta">
-        <a href={PRENOTA} class="btn btn-primary">Prenota una lezione →</a>
+        <a href={PRENOTA} class="btn btn-primary" target="_blank" rel="noopener noreferrer">Prenota una lezione →</a>
         <a href="/corsi-fitness" class="co-link">Tutti i corsi fitness →</a>
       </div>
     </div>
@@ -392,7 +392,7 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
               <span class="co-prezzo__per">/ lezione</span>
             </p>
             <p class="co-plan__text">{corso.singola.testo}</p>
-            <a href={PRENOTA} class="co-plan__cta">Prenota una lezione →</a>
+            <a href={PRENOTA} class="co-plan__cta" target="_blank" rel="noopener noreferrer">Prenota una lezione →</a>
           </article>
         ) : (
         <article class="co-plan co-plan--on" data-anim="fade" data-anim-delay="160">

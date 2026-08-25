@@ -59,6 +59,6 @@ C'è una scheda che elenca dove si controlla, operazione per operazione: [come v
 </details>
 
 <div class="ci-cta">
-  <a href="http://onelink.to/athlon" class="ci-btn-primary">SCARICA L'APP</a>
-  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-secondary">APRI IL PORTALE</a>
+  <a href="http://onelink.to/athlon" class="ci-btn-primary" target="_blank" rel="noopener noreferrer">SCARICA L'APP</a>
+  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-secondary" target="_blank" rel="noopener noreferrer">APRI IL PORTALE</a>
 </div>

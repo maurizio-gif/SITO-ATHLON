@@ -64,8 +64,8 @@ Controlla **Scadenze**: se non compare più nulla di aperto, il pagamento è reg
 </details>
 
 <div class="ci-cta">
-  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary">APRI L'AREA RISERVATA</a>
-  <a href="http://onelink.to/athlon" class="ci-btn-secondary">SCARICA L'APP</a>
+  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary" target="_blank" rel="noopener noreferrer">APRI L'AREA RISERVATA</a>
+  <a href="http://onelink.to/athlon" class="ci-btn-secondary" target="_blank" rel="noopener noreferrer">SCARICA L'APP</a>
 </div>
 
 ---

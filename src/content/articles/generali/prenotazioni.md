@@ -108,18 +108,18 @@ Varia per sala, non per corso: due lezioni diverse nella stessa sala hanno la st
 | Nuoto Libero | 20 posti totali in vasca, fra i due turni che si sovrappongono |
 | Gym Floor | Nessun limite di capienza |
 
-Per il numero esatto di posti liberi su una lezione specifica, il dato in tempo reale è quello che vedi prenotando dall'app o dal [portale](https://athlon.perfectgym.com/ClientPortal2/#/Classes/1/Calendar).
+Per il numero esatto di posti liberi su una lezione specifica, il dato in tempo reale è quello che vedi prenotando dall'app o dal <a href="https://athlon.perfectgym.com/ClientPortal2/#/Classes/1/Calendar" target="_blank" rel="noopener noreferrer">portale</a>.
 
 </details>
 
 <details>
 <summary><strong>In quali orari c'è meno affluenza ai Corsi Fitness?</strong></summary>
 
-Non teniamo una classifica degli orari meno affollati: l'affluenza cambia da settimana a settimana. Il modo più preciso per farsene un'idea è guardare il [portale delle prenotazioni](https://athlon.perfectgym.com/ClientPortal2/#/Classes/1/Calendar): mostra live istruttori, orari e posti disponibili per ogni lezione dei Corsi Fitness, che si tengono dalle 7:40 alle 21:00 dal lunedì al sabato.
+Non teniamo una classifica degli orari meno affollati: l'affluenza cambia da settimana a settimana. Il modo più preciso per farsene un'idea è guardare il <a href="https://athlon.perfectgym.com/ClientPortal2/#/Classes/1/Calendar" target="_blank" rel="noopener noreferrer">portale delle prenotazioni</a>: mostra live istruttori, orari e posti disponibili per ogni lezione dei Corsi Fitness, che si tengono dalle 7:40 alle 21:00 dal lunedì al sabato.
 
 </details>
 
 <div class="ci-cta">
-  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary">ACCEDI AL PORTALE</a>
-  <a href="http://onelink.to/athlon" class="ci-btn-secondary">SCARICA L'APP</a>
+  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary" target="_blank" rel="noopener noreferrer">ACCEDI AL PORTALE</a>
+  <a href="http://onelink.to/athlon" class="ci-btn-secondary" target="_blank" rel="noopener noreferrer">SCARICA L'APP</a>
 </div>

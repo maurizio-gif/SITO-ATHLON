@@ -21,11 +21,11 @@ Possibile all'interno dello stesso contratto (bisettimanale↔bisettimanale, mon
 <summary><strong>Come fare il cambio turno</strong></summary>
 
 1. Cerca un turno disponibile per la fascia d'età:
-   - [Nati 2023](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=5&vacancies=1)
-   - [Nati 2021-22](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=1&vacancies=1)
-   - [Nati 2019-20](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=12&vacancies=1)
-   - [Nati 2016-17-18](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=13&vacancies=1)
-   - [Nati 2013-14-15](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=14&vacancies=1)
+   - <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=5&vacancies=1" target="_blank" rel="noopener noreferrer">Nati 2023</a>
+   - <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=1&vacancies=1" target="_blank" rel="noopener noreferrer">Nati 2021-22</a>
+   - <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=12&vacancies=1" target="_blank" rel="noopener noreferrer">Nati 2019-20</a>
+   - <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=13&vacancies=1" target="_blank" rel="noopener noreferrer">Nati 2016-17-18</a>
+   - <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=14&vacancies=1" target="_blank" rel="noopener noreferrer">Nati 2013-14-15</a>
 2. Contattaci tramite **"Richiedi Assistenza"** indicando **2-3 turni di interesse** tra quelli disponibili
 3. Se idoneo, il cambio viene effettuato dalla Segreteria
 

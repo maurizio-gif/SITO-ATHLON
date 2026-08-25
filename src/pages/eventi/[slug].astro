@@ -25,6 +25,11 @@ const isPast = d.date < today;
    la larghezza. */
 const haAside = d.notes.length > 0 || (!isPast && !!d.ctaHref);
 
+/* Il portale di prenotazione è un'altra applicazione: chi clicca non deve
+   perdere la pagina dell'evento per arrivarci. Un `ctaHref` interno (vedi
+   Matwork 4.1, che manda a `/pilates`) resta invece nella stessa scheda. */
+const ctaEsterno = d.ctaHref?.startsWith('http');
+
 /* Questo sì che è un evento: ha una data, un posto e un modo di partecipare.
    `startDate` in ISO, il luogo e l'organizzatore puntano al club per `@id` così
    indirizzo e orari non si ripetono. Il prezzo compare solo come lo dichiara la
@@ -135,7 +140,12 @@ const evento = {
                   portale, quando ancora non c'è niente da prenotare, è una
                   promessa che quella pagina non mantiene. */}
               {!isPast && d.ctaHref && (
-                <a href={d.ctaHref} class="btn btn-primary evd__cta">{d.ctaLabel} →</a>
+                <a
+                  href={d.ctaHref}
+                  class="btn btn-primary evd__cta"
+                  target={ctaEsterno ? '_blank' : undefined}
+                  rel={ctaEsterno ? 'noopener noreferrer' : undefined}
+                >{d.ctaLabel} →</a>
               )}
             </div>
           </aside>

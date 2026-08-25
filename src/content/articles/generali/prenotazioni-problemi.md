@@ -158,7 +158,7 @@ Serve una cosa sola, ma serve subito: **uno screenshot della schermata con l'err
 </details>
 
 <div class="ci-cta">
-  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary">VAI ALL'AREA RISERVATA</a>
+  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary" target="_blank" rel="noopener noreferrer">VAI ALL'AREA RISERVATA</a>
   <a href="/wikiathlon/generali/prenotazioni/" class="ci-btn-secondary">REGOLE DI PRENOTAZIONE</a>
 </div>
 

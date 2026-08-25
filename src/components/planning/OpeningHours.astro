@@ -34,8 +34,11 @@ const ore = openHours();
     ))}
   </ul>
 
+  {/* `href` è sempre il calendario del portale PerfectGym, nelle due pagine
+      che oggi la usano: si apre in una scheda nuova, come ogni link verso
+      un'altra applicazione. */}
   {href && (
-    <a href={href} class="hours__cta">Prenota la tua sessione →</a>
+    <a href={href} class="hours__cta" target="_blank" rel="noopener noreferrer">Prenota la tua sessione →</a>
   )}
 </div>
 

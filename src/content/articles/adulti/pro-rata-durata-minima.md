@@ -80,7 +80,7 @@ Perché la disdetta ferma il **rinnovo**, non la durata minima ancora in corso. 
 > 💡 **Prima di iscriverti:** se puoi scegliere, far partire l'abbonamento il **1° del mese** rende tutto più semplice — nessun pro-rata, e la scadenza minima è la fine di quello stesso mese.
 
 <div class="ci-cta">
-  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary">VEDI LA TUA SCADENZA</a>
+  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary" target="_blank" rel="noopener noreferrer">VEDI LA TUA SCADENZA</a>
   <a href="/regolamento#c7-9-1" class="ci-btn-secondary">LEGGI LA CLAUSOLA 7.9.1</a>
 </div>
 

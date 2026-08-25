@@ -251,6 +251,8 @@ const faqs: FaqEntry[] = await faqPagina([
         class="btn btn-primary"
         data-anim="pop"
         data-cta="member"
+        target="_blank"
+        rel="noopener noreferrer"
       >
         Prenota una lezione →
       </a>
@@ -303,7 +305,7 @@ const faqs: FaqEntry[] = await faqPagina([
       <PlanningBand id="corsi-fitness" showTitle={false} />
 
       <div class="cf-cta-row">
-        <a href={`${PG}/#/Classes/1/Calendar?categoryId=1`} class="btn btn-primary">Prenota una lezione →</a>
+        <a href={`${PG}/#/Classes/1/Calendar?categoryId=1`} class="btn btn-primary" target="_blank" rel="noopener noreferrer">Prenota una lezione →</a>
         <a href="/planning" class="cf-link">Planning completo del club →</a>
       </div>
     </div>
@@ -345,7 +347,7 @@ const faqs: FaqEntry[] = await faqPagina([
       </div>
 
       <p class="cf-prova__alt">
-        Se il Guest Pass non è per te, puoi <a href={`${PG}/#/Classes/1/Calendar?categoryId=1`}>prenotare
+        Se il Guest Pass non è per te, puoi <a href={`${PG}/#/Classes/1/Calendar?categoryId=1`} target="_blank" rel="noopener noreferrer">prenotare
         e pagare una singola lezione</a>: nessuna quota di attivazione.
       </p>
     </div>

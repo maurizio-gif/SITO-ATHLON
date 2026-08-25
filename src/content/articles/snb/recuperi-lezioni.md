@@ -20,7 +20,7 @@ attivita:
 <details>
 <summary><strong>Passo 1 — Disdici la lezione</strong></summary>
 
-Accedi all'[App](http://onelink.to/athlon) o al [Portale](https://athlon.perfectgym.com/ClientPortal2/#/Login):
+Accedi all'<a href="http://onelink.to/athlon" target="_blank" rel="noopener noreferrer">App</a> o al <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" target="_blank" rel="noopener noreferrer">Portale</a>:
 
 1. Clicca su **"Le mie prenotazioni"**
 2. Cancella la prenotazione nel giorno di assenza

@@ -104,8 +104,20 @@ import { leggi as emailConosciuta } from '../scripts/emailNota';
   }
 
   function vai() {
-    if (destinazione) window.location.href = destinazione;
-    else chiudi();
+    if (!destinazione) {
+      chiudi();
+      return;
+    }
+    /* Come il reset più sotto: prima la scheda nuova, e se il browser la
+       blocca si passa nella stessa. È l'iscrizione a PerfectGym, non una
+       lettura — la persona non deve perdere questa pagina per completarla. */
+    var scheda = null;
+    try {
+      scheda = window.open(destinazione, '_blank', 'noopener');
+    } catch (e) {
+      scheda = null;
+    }
+    if (!scheda) window.location.href = destinazione;
   }
 
   async function verifica() {

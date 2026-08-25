@@ -8,7 +8,7 @@ imageAlt: "Tre persone in posizione del cane a testa in giù sui tappetini, nell
 excerpt: "Cinquanta minuti sul radicamento, per ripartire dopo l'estate: piedi, postura, asana in piedi e respirazione. Il primo dei workshop con Emanuela Cardoni, aperto a tutti i livelli. Gratuito per gli iscritti."
 price: "Gratuito per gli iscritti · 10 € per gli esterni"
 ctaLabel: "Prenota dal portale"
-ctaHref: "https://athlon.perfectgym.com/ClientPortal2/#/Classes/1/Calendar?categoryId=39"
+ctaHref: "https://athlon.perfectgym.com/ClientPortal2/#/Classes/1/List?date=2026-09-19&categoryId=39"
 notes:
   - "Durata 50 minuti"
   - "Aperto a tutti i livelli, anche a chi non ha mai praticato"
