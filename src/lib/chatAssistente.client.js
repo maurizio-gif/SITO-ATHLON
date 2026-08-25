@@ -322,6 +322,21 @@ export function initChatAssistente(root, options) {
   /** Vero mentre si ridisegna: sopprime i salvataggi e gli effetti esterni. */
   var ricostruendo = false;
 
+  /* L'attività con cui la chat parte già scelta, quando la apre un comando che
+     la conosce: il pulsante «Trova il corso giusto per tuo figlio» della scuola
+     nuoto sa di parlare di scuola nuoto bambini, quindi il passo «di quale
+     attività si tratta?» è una domanda a cui la persona ha già risposto
+     arrivando da lì. La si consuma una volta sola, all'arrivo al passo
+     dell'attività: una conversazione già in corso non si sposta di corso. */
+  var preselezioneAttivita = '';
+
+  /** Vero se `id` è una delle voci pickabili nel passo dell'attività. */
+  function attivitaEsiste(id) {
+    return !!id && ATTIVITA.some(function (a) {
+      return a.id === id;
+    });
+  }
+
   function salva() {
     if (ricostruendo || suTotem()) return;
     /* Niente email e niente conversazione vuol dire che non c'e' ancora niente
@@ -566,7 +581,17 @@ export function initChatAssistente(root, options) {
     dati.puoRichiamo = dati.statoNucleo !== 'iscritto';
 
     dipingiAttivita();
-    mostra('attivita');
+    /* Se il comando che ha aperto la chat portava già l'attività — «Trova il
+       corso giusto per tuo figlio» sulla scuola nuoto — si salta la scelta e si
+       va dritti nel ramo di quel corso, lo stesso che aprirebbe un clic sulla
+       voce. Si consuma qui, così un reset o una seconda email non la ereditano. */
+    if (attivitaEsiste(preselezioneAttivita)) {
+      var pre = preselezioneAttivita;
+      preselezioneAttivita = '';
+      scegliAttivita(pre);
+    } else {
+      mostra('attivita');
+    }
     /* Si salva già qui, prima che ci sia una conversazione: chi verifica
        l'email e poi apre una pagina del sito per guardare l'attività di cui
        stavamo parlando deve ritrovare il passo dell'attività, non ridigitare
@@ -1241,6 +1266,9 @@ export function initChatAssistente(root, options) {
     sollecitato = false;
     fermaRichiamoInattivo();
     richiamoProposto = false;
+    /* Una preselezione non consumata non deve sopravvivere a un reset: la
+       persona dopo, sul totem, non sta cercando quel corso. */
+    preselezioneAttivita = '';
     /* **Anche l'identificativo della sessione**, ed è la parte che mancava:
        senza, sul totem i messaggi di chi arriva dopo si accodano alla
        conversazione di chi è passato prima, sotto la sua email — perché la
@@ -2225,8 +2253,17 @@ export function initChatAssistente(root, options) {
   }
 
   return {
-    apri: function (pagina) {
+    apri: function (pagina, attivita) {
       dati.pagina = pagina || location.pathname;
+      /* L'attività preselezionata vale solo per una chat che parte ora: se la
+         persona ha una conversazione già avviata (o è già oltre l'email), il
+         corso lo ha scelto lei e non lo si cambia sotto le mani. Al passo
+         dell'attività ripristinato si applica subito; all'email si tiene da
+         parte e la consuma la verifica. */
+      if (attivitaEsiste(attivita)) {
+        if (dati.passo === 'attivita') scegliAttivita(attivita);
+        else if (dati.passo === 'email') preselezioneAttivita = attivita;
+      }
       // Una conversazione già avviata riprende da dove stava: chiudere il
       // modal per sbaglio non deve costare l'email e il ramo.
       if (dati.passo === 'email') mostra('email');
