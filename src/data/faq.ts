@@ -74,7 +74,7 @@ export const REGISTRO: VoceRegistro[] = [
     /* Sì anche per la lezione singola: è un obbligo di legge e la clausola 10.1
        lo impone esplicitamente per lezioni singole e pacchetti. Prima
        personal-training diceva il contrario. */
-    a: `Sì, quello di idoneità all'attività sportiva <strong>non agonistica</strong> — lo rilascia il tuo medico di base, il pediatra o uno specialista in medicina dello sport. Hai tempo ${termineCertificato()}, quindi non è qualcosa da risolvere prima di cominciare: si invia in formato digitale, non serve più il cartaceo. Se scade prima che tu riesca a rinnovarlo, hai un margine di 14 giorni per non restare senza accesso. Serve anche se prenoti e paghi una singola lezione: è un obbligo di legge, non una condizione dell'abbonamento.`,
+    a: `Sì, il certificato di idoneità all'attività sportiva <strong>non agonistica</strong>: deve riportare che hai fatto almeno una volta nella vita l'elettrocardiogramma (ECG), e può rilasciarlo il tuo medico curante, un medico sportivo o un medico della Federazione Medico Sportiva Italiana. Si invia in formato digitale, non serve più il cartaceo. Serve anche se prenoti e paghi una singola lezione: è un obbligo di legge, non una condizione dell'abbonamento.`,
   },
   {
     id: 'certificato-junior',
