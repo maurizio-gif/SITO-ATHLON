@@ -337,8 +337,9 @@ import CampoTelefono from '../CampoTelefono.astro';
 
   if (modal) {
     let ultimoComando: HTMLElement | null = null;
-    let chat: { apri: (pagina: string, attivita?: string) => void; reset: () => void } | null =
-      null;
+    let chat:
+      | { apri: (pagina: string, attivita?: string, ctaTesto?: string) => void; reset: () => void }
+      | null = null;
     let inArrivo: Promise<void> | null = null;
 
     function chiudi() {
@@ -379,8 +380,17 @@ import CampoTelefono from '../CampoTelefono.astro';
       /* Un comando può dire con quale attività la chat deve partire già scelta
          (`data-cta-activity`, la stessa convenzione di `ctaAttrs`): il pulsante
          «Trova il corso giusto per tuo figlio» della scuola nuoto la porta, così
-         la conversazione salta il passo «di quale attività si tratta?». */
-      chat?.apri(location.pathname, comando?.dataset.ctaActivity || undefined);
+         la conversazione salta il passo «di quale attività si tratta?».
+         E porta anche il proprio testo, con cui la chat contestualizza il primo
+         messaggio (es. «Richiedi assistenza» → apertura d'assistenza). Si legge
+         un'etichetta pulita: `data-cta-testo` se c'è, poi l'`aria-label`, poi il
+         testo visibile del pulsante. */
+      const ctaTesto =
+        comando?.dataset.ctaTesto ||
+        comando?.getAttribute('aria-label') ||
+        comando?.textContent?.trim() ||
+        undefined;
+      chat?.apri(location.pathname, comando?.dataset.ctaActivity || undefined, ctaTesto);
     }
 
     /* Delegato al documento, come per la prova: un comando che apre

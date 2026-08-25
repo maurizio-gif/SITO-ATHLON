@@ -185,6 +185,11 @@ export function initChatAssistente(root, options) {
       /** Lo slug dell'attività scelta, o '' se non ne ha scelta nessuna. */
       attivita: '',
       attivitaJunior: '',
+      /** L'intento del comando che ha aperto la chat, dedotto dal testo della
+          CTA: 'assistenza' apre con un saluto d'aiuto invece della
+          presentazione del club, '' lascia l'apertura al ramo. Vedi
+          `intentoDaCta` e le APERTURE. */
+      ctaIntento: '',
       /** La data di nascita del bambino, come l'ha scritta nel form dei dati
           (YYYY-MM-DD). Non serve a PerfectGym da qui — quella l'ha già
           ricevuta `inviaDati()` — serve a non richiederla una seconda volta
@@ -335,6 +340,19 @@ export function initChatAssistente(root, options) {
     return !!id && ATTIVITA.some(function (a) {
       return a.id === id;
     });
+  }
+
+  /* L'intento del pulsante che ha aperto la chat, letto dal suo testo. Chi
+     arriva da «Richiedi assistenza» vuole aiuto, non la presentazione del
+     club: l'apertura lo rispecchia, qualunque sia il ramo (tranne junior, che
+     ha la sua apertura sull'attività). «Chatta con noi» e ogni altro pulsante
+     generico non danno un intento e lasciano l'apertura al ramo. Si guarda al
+     testo e non alla sorgente perché è il testo che la persona ha letto e
+     cliccato — ed è quello che il committente ha chiesto di rispecchiare. */
+  function intentoDaCta(testo) {
+    var t = String(testo || '').toLowerCase();
+    if (/assistenz|aiuto|supporto/.test(t)) return 'assistenza';
+    return '';
   }
 
   function salva() {
@@ -660,6 +678,16 @@ export function initChatAssistente(root, options) {
         'Cosa ti interessa sapere?'
       );
     },
+    /* Chi apre la chat da «Richiedi assistenza» sta chiedendo aiuto, non un
+       depliant: l'apertura parte dall'assistenza a prescindere dal ramo. È la
+       stessa materia dell'apertura `iscritto`, perché l'assistenza è quella per
+       tutti — quello che cambia è il pulsante da cui si arriva, non le risposte. */
+    assistenza: function () {
+      return (
+        'Ciao, come possiamo aiutarti? Rispondo su prenotazioni, certificato medico, ' +
+        'sospensioni, disdette e tutto quello che c’è nelle schede e nel regolamento. Dimmi pure.'
+      );
+    },
     junior: function () {
       return (
         'Ciao. Ti dico tutto su ' +
@@ -672,11 +700,14 @@ export function initChatAssistente(root, options) {
   function apriConversazione() {
     if (conversazione) conversazione.innerHTML = '';
     if (intestazione) {
+      /* Il titolo segue l'apertura: se si arriva da «Richiedi assistenza» il
+         pannello dice «Assistenza» anche a chi non è socio, così testata e
+         primo messaggio non si contraddicono. Il ramo junior tiene il suo. */
       intestazione.textContent =
-        dati.ramo === 'iscritto'
-          ? 'Assistenza'
-          : dati.ramo === 'junior'
-            ? 'Corsi per bambini'
+        dati.ramo === 'junior'
+          ? 'Corsi per bambini'
+          : dati.ramo === 'iscritto' || dati.ctaIntento === 'assistenza'
+            ? 'Assistenza'
             : 'Informazioni';
     }
     /* Chi ha appena compilato il form vuole sapere che è servito, e lo vuole
@@ -704,7 +735,16 @@ export function initChatAssistente(root, options) {
       );
     }
 
-    var apertura = APERTURE[dati.ramo]();
+    /* L'apertura la sceglie il ramo, ma un intento «assistenza» dal pulsante
+       vince — tranne nel ramo junior, che ha già la sua apertura sull'attività
+       (quella del pulsante «Trova il corso giusto per tuo figlio»). */
+    var apertura = (
+      dati.ramo === 'junior'
+        ? APERTURE.junior
+        : dati.ctaIntento === 'assistenza'
+          ? APERTURE.assistenza
+          : APERTURE[dati.ramo] || APERTURE.adulti
+    )();
     /* La riga che rende scopribile l'icona in cima. Un'icona muta la trova chi
        la cerca, e qui il punto è l'opposto: la telefonata deve essere una cosa
        che si sa di poter fare **prima** di averne bisogno. Costa una riga, e la
@@ -2253,8 +2293,12 @@ export function initChatAssistente(root, options) {
   }
 
   return {
-    apri: function (pagina, attivita) {
+    apri: function (pagina, attivita, ctaTesto) {
       dati.pagina = pagina || location.pathname;
+      /* L'intento del pulsante plasma l'apertura, ma solo per una chat che
+         parte ora (passo email): una conversazione già avviata tiene la sua, e
+         chi la riapre non deve vederla cambiare per il pulsante di stavolta. */
+      if (dati.passo === 'email') dati.ctaIntento = intentoDaCta(ctaTesto);
       /* L'attività preselezionata vale solo per una chat che parte ora: se la
          persona ha una conversazione già avviata (o è già oltre l'email), il
          corso lo ha scelto lei e non lo si cambia sotto le mani. Al passo
