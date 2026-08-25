@@ -119,8 +119,15 @@ import CampoTelefono from '../CampoTelefono.astro';
         abbonamento in casa riceve l'assistenza, chi non ce l'ha riceve il
         club raccontato. Chiederlo dopo vorrebbe dire cambiare tono a metà. */}
     <section class="ca__step" data-ca-step="email">
-      <h3 class="ca__title" id="ca-titolo" tabindex="-1" data-ca-fuoco>Come possiamo aiutarti?</h3>
-      <p class="ca__lead">
+      {/* Titolo e intro di questo passo li riscrive il modulo in base al testo
+          della CTA che ha aperto la chat (`data-ca-email-titolo`/`-lead`): chi
+          arriva da «Richiedi assistenza» legge «Come possiamo aiutarti?», chi
+          arriva da «Chatta con noi» un invito più generico. Il testo qui sotto
+          è il default che si vede prima che il modulo giri. */}
+      <h3 class="ca__title" id="ca-titolo" tabindex="-1" data-ca-fuoco data-ca-email-titolo>
+        Come possiamo aiutarti?
+      </h3>
+      <p class="ca__lead" data-ca-email-lead>
         Iniziamo dalla tua email: serve a capire se sei già dei nostri, così ti do le risposte
         giuste invece di quelle generiche.
       </p>
@@ -337,8 +344,9 @@ import CampoTelefono from '../CampoTelefono.astro';
 
   if (modal) {
     let ultimoComando: HTMLElement | null = null;
-    let chat: { apri: (pagina: string, attivita?: string) => void; reset: () => void } | null =
-      null;
+    let chat:
+      | { apri: (pagina: string, attivita?: string, ctaTesto?: string) => void; reset: () => void }
+      | null = null;
     let inArrivo: Promise<void> | null = null;
 
     function chiudi() {
@@ -379,8 +387,17 @@ import CampoTelefono from '../CampoTelefono.astro';
       /* Un comando può dire con quale attività la chat deve partire già scelta
          (`data-cta-activity`, la stessa convenzione di `ctaAttrs`): il pulsante
          «Trova il corso giusto per tuo figlio» della scuola nuoto la porta, così
-         la conversazione salta il passo «di quale attività si tratta?». */
-      chat?.apri(location.pathname, comando?.dataset.ctaActivity || undefined);
+         la conversazione salta il passo «di quale attività si tratta?».
+         E porta anche il proprio testo, con cui la chat contestualizza il primo
+         messaggio (es. «Richiedi assistenza» → apertura d'assistenza). Si legge
+         un'etichetta pulita: `data-cta-testo` se c'è, poi l'`aria-label`, poi il
+         testo visibile del pulsante. */
+      const ctaTesto =
+        comando?.dataset.ctaTesto ||
+        comando?.getAttribute('aria-label') ||
+        comando?.textContent?.trim() ||
+        undefined;
+      chat?.apri(location.pathname, comando?.dataset.ctaActivity || undefined, ctaTesto);
     }
 
     /* Delegato al documento, come per la prova: un comando che apre
