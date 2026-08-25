@@ -36,26 +36,29 @@ faq:
       pro-rata. Da lì in poi paghi le mensilità piene. Una cosa da sapere: la
       durata minima si conta dal primo mese intero, quindi con un'attivazione a
       mese iniziato la scadenza cade un mese più in là di quanto verrebbe da
-      pensare. <a href="/wikiathlon/adulti/pro-rata-durata-minima/">Come funziona
-      il pro-rata →</a>
+      pensare. Se puoi scegliere, far partire l'abbonamento il 1° del mese evita
+      il pro-rata e semplifica tutto.
   - q: Come si paga?
     a: >-
       Con carta di credito o debito, oppure con addebito diretto sul conto
-      corrente (IBAN). L'addebito è automatico alla scadenza, così non devi
-      ricordartene. <a href="/wikiathlon/generali/metodo-di-pagamento/">Metodi di
-      pagamento →</a>
+      corrente (IBAN): non si accettano contanti, POS in reception, bonifico o
+      voucher regionali. L'addebito è automatico alla scadenza, così non devi
+      ricordartene.
   - q: Serve il certificato medico?
     a: >-
       Sì, quello di idoneità alla pratica sportiva <strong>non agonistica</strong>
-      — lo stesso che serve in qualunque palestra. Puoi cominciare ad allenarti
-      subito e inviarlo entro 14 giorni dall'inizio dell'attività.
-      <a href="/wikiathlon/generali/certificato-medico/">Requisiti e modulo →</a>
+      — lo rilascia il tuo medico di base, il pediatra o uno specialista in
+      medicina dello sport. Puoi cominciare ad allenarti subito e inviarlo in
+      formato digitale entro 14 giorni dall'inizio dell'attività; se scade prima
+      che tu riesca a rinnovarlo, hai un margine di altri 14 giorni per non
+      restare senza accesso.
   - q: E se mi fermo un periodo?
     a: >-
       Puoi sospendere quando vuoi, quante volte vuoi, a 15 € al mese: la
       sospensione parte dal primo del mese e va chiesta almeno dieci giorni
-      prima. Il tempo sospeso non lo perdi, si aggiunge in fondo.
-      <a href="/wikiathlon/adulti/sospensione/">Come si sospende →</a>
+      prima. Il tempo sospeso non lo perdi, si aggiunge in fondo. Se il motivo è
+      un infortunio o una malattia documentata, la sospensione è invece
+      gratuita, con una durata minima di due mesi.
   - q: L'abbonamento annuale si rinnova da solo?
     a: >-
       Sì, e si disdice con una email a

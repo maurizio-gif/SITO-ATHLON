@@ -3,11 +3,19 @@
  *
  * Chi legge le pagine delle attività non è ancora iscritto: la domanda è «mi
  * trovo bene qui?», non «cosa succede se salto una lezione». Le risposte quindi
- * sono brevi, trasparenti sull'essenziale e scritte per rassicurare — mentre la
- * procedura, con termini e conseguenze, resta nella scheda dell'Help Desk, che
- * è scritta per chi è già dentro. Il testo della scheda non viene ricopiato di
- * proposito: era il modo più rapido per riempire la sezione, ed era anche il
- * modo più rapido per spaventare qualcuno che sta ancora decidendo.
+ * restano brevi e scritte per rassicurare, ma **stanno in piedi da sole**: non
+ * mandano più a leggere la procedura completa nella scheda dell'Help Desk.
+ *
+ * Prima lo facevano — un link in coda a ogni risposta con una scheda associata
+ * — ed è stata una scelta deliberata quanto quella di adesso, per la ragione
+ * opposta: si temeva che il testo della procedura, con termini e conseguenze,
+ * spaventasse chi sta ancora decidendo. Il prezzo di quella scelta era un altro
+ * problema, uguale e contrario: mandare fuori da athlonroma.it, verso il wiki
+ * dell'Help Desk, chi non ha ancora deciso di entrare. Ora **il fatto più utile
+ * della scheda entra nella risposta stessa** — uno o due, non l'intera
+ * procedura — e il link sparisce. Non è ricopiare la scheda: è scegliere, da
+ * quello che dice, la frase che una persona che sta ancora valutando vorrebbe
+ * sapere adesso.
  *
  * **Perché un registro e non un array per pagina.** Perché è così che è nato, e
  * si è rotto: la stessa domanda esisteva fino a nove volte, e le copie
@@ -25,10 +33,6 @@
  *    la riscrivono;
  *  - **i numeri arrivano da `data/regole.ts`** e i prezzi da
  *    `data/abbonamenti.ts`: qui non si scrive una cifra a mano;
- *  - **ogni voce dichiara la sua scheda** dell'Help Desk, e il link in coda lo
- *    compone `faqConSchede` leggendo il titolo dalla scheda stessa. Rinominarla
- *    aggiorna tutte le pagine che la citano, e un id inesistente fa fallire la
- *    build invece di pubblicare un link rotto;
  *  - **i tag `attivita`** sono gli stessi di `data/activities.ts` che taggano
  *    schede, eventi e sezioni del regolamento: sono ciò che permette a una
  *    pagina di chiedere «le domande che riguardano il gym floor» e a
@@ -39,7 +43,6 @@
  * le risposte che interpolano numeri del planning, che senza quel contesto non
  * si possono comporre.
  */
-import { getCollection } from 'astro:content';
 import { CERTIFICATO, PRENOTAZIONE, finestraDisdetta, termineCertificato } from './regole';
 import { SOSPENSIONE, GUEST_PASS } from './abbonamenti';
 
@@ -49,12 +52,7 @@ export interface FaqEntry {
   a: string;
 }
 
-export interface VoceFaq extends FaqEntry {
-  /** Id della scheda dell'Help Desk, es. 'generali/prenotazioni'. */
-  scheda?: string;
-  /** Testo del rimando, quando "Tutti i dettagli" non è la frase giusta. */
-  rimando?: string;
-}
+export type VoceFaq = FaqEntry;
 
 /** Una voce del registro: come `VoceFaq`, ma con un nome per essere citata. */
 export interface VoceRegistro extends VoceFaq {
@@ -76,18 +74,14 @@ export const REGISTRO: VoceRegistro[] = [
     /* Sì anche per la lezione singola: è un obbligo di legge e la clausola 10.1
        lo impone esplicitamente per lezioni singole e pacchetti. Prima
        personal-training diceva il contrario. */
-    a: `Sì, quello di idoneità all'attività sportiva <strong>non agonistica</strong> — lo rilascia anche il tuo medico di base. Hai tempo ${termineCertificato()}, quindi non è qualcosa da risolvere prima di cominciare. Serve anche se prenoti e paghi una singola lezione: è un obbligo di legge, non una condizione dell'abbonamento.`,
-    scheda: CERTIFICATO.scheda,
-    rimando: 'Requisiti e modello',
+    a: `Sì, quello di idoneità all'attività sportiva <strong>non agonistica</strong> — lo rilascia il tuo medico di base, il pediatra o uno specialista in medicina dello sport. Hai tempo ${termineCertificato()}, quindi non è qualcosa da risolvere prima di cominciare: si invia in formato digitale, non serve più il cartaceo. Se scade prima che tu riesca a rinnovarlo, hai un margine di 14 giorni per non restare senza accesso. Serve anche se prenoti e paghi una singola lezione: è un obbligo di legge, non una condizione dell'abbonamento.`,
   },
   {
     id: 'certificato-junior',
     q: 'Serve il certificato medico?',
     /* Variante vera, non una divergenza: sotto i sei anni il certificato non
        serve, e per il Baby Nuoto non serve mai. */
-    a: `Per i bambini dai ${CERTIFICATO.etaMinima} anni compiuti sì: serve il certificato di idoneità all'attività sportiva non agonistica, da inviare ${termineCertificato()}. Sotto quell'età non è richiesto.`,
-    scheda: CERTIFICATO.scheda,
-    rimando: 'Requisiti e modello',
+    a: `Per i bambini dai ${CERTIFICATO.etaMinima} anni compiuti sì: serve il certificato di idoneità all'attività sportiva non agonistica — lo rilascia il pediatra o il medico di famiglia — da inviare in formato digitale ${termineCertificato()}. Sotto quell'età non è richiesto. Per le attività agonistiche (pallanuoto, nuoto agonistico) serve invece il certificato agonistico, rilasciato solo da un medico sportivo.`,
     attivita: ['scuola-nuoto-bambini', 'pallanuoto', 'nuoto-agonistico'],
   },
   {
@@ -107,53 +101,39 @@ export const REGISTRO: VoceRegistro[] = [
     q: 'Come si prenota una lezione?',
     /* «A partire da», non «fino a»: la finestra si apre a 72 ore dalla lezione.
        Metà del sito diceva il contrario, che è la regola opposta. */
-    a: `Dall'app Athlon Club o dal portale web, a partire da ${PRENOTAZIONE.anticipoGiorni} giorni prima della lezione (${PRENOTAZIONE.anticipoOre} ore). I posti sono limitati, quindi la prenotazione serve a garantirti il posto.`,
-    scheda: PRENOTAZIONE.scheda,
-    rimando: 'Regole complete',
+    a: `Dall'app Athlon Club o dal portale web, a partire da ${PRENOTAZIONE.anticipoGiorni} giorni prima della lezione (${PRENOTAZIONE.anticipoOre} ore) e resta aperta finché la lezione non comincia: puoi prenotare anche all'ultimo momento, non c'è un termine anticipato. I posti sono limitati — massimo ${PRENOTAZIONE.attiveCorsi} prenotazioni attive insieme per Corsi Fitness, Aqua Fitness e Scuola Nuoto Adulti, ${PRENOTAZIONE.attiveReformer} per il Group Reformer — e se un corso è pieno puoi iscriverti in lista d'attesa: se qualcuno disdice, subentri in ordine cronologico.`,
   },
   {
     id: 'disdetta-lezione',
     q: 'Se non posso venire, entro quando disdico?',
-    a: `Puoi disdire ${finestraDisdetta()}. Se avevi acquistato una lezione singola e disdici in tempo, ti viene riaccreditata per una nuova prenotazione — e il posto va a chi è in lista d'attesa.`,
-    scheda: PRENOTAZIONE.scheda,
-    rimando: 'Tempi e conseguenze',
+    a: `Puoi disdire ${finestraDisdetta()}: quel margine serve a dare tempo a chi è in lista d'attesa di essere avvisato e prendere il tuo posto. Dopo quel termine non si può più disdire, nemmeno passando dal desk. Se avevi acquistato una lezione singola e disdici in tempo, ti viene riaccreditata per una nuova prenotazione.`,
   },
   {
     id: 'no-show',
     q: 'Cosa succede se non mi presento o disdico in ritardo?',
     a: `Se non disdici e non sei presente per più di <strong>${PRENOTAZIONE.noShowSoglia} volte in ${PRENOTAZIONE.noShowFinestraGiorni} giorni</strong>, la prenotazione viene bloccata per ${PRENOTAZIONE.noShowBloccoGiorni} giorni. È l'unico modo per tenere liberi i posti di chi vuole allenarsi.`,
-    scheda: PRENOTAZIONE.scheda,
-    rimando: 'Come funziona il blocco',
   },
   {
     id: 'lista-attesa',
     q: "Come funziona la lista d'attesa?",
     a: `Se il corso è al completo puoi iscriverti in lista d'attesa: quando un prenotato disdice, la lista scorre in ordine cronologico e chi subentra riceve un'email, fino a ${PRENOTAZIONE.disdettaOreGruppo} ora dall'inizio. Attenzione: la lista d'attesa occupa uno slot come una prenotazione confermata.`,
-    scheda: PRENOTAZIONE.scheda,
-    rimando: "Lista d'attesa e limiti",
   },
   {
     id: 'prenotazioni-attive',
     q: 'Quante prenotazioni attive posso avere insieme?',
     a: `Massimo <strong>${PRENOTAZIONE.attiveCorsi}</strong> per Corsi Fitness, Aqua Fitness e Scuola Nuoto Adulti; <strong>${PRENOTAZIONE.attiveReformer}</strong> per il Group Reformer, che si prenota una lezione per volta.`,
-    scheda: PRENOTAZIONE.scheda,
-    rimando: 'Tutti i limiti',
   },
   {
     id: 'sospensione',
     q: 'Se poi devo fermarmi, posso sospendere?',
     /* Le sospensioni sono a pagamento, illimitate e con preavviso: corsi-fitness
        le dava gratuite, immediate e una sola. */
-    a: `Sì, quante volte vuoi, a <strong>${SOSPENSIONE.prezzo} €</strong> al mese. La sospensione parte dal primo del mese e va chiesta almeno ${SOSPENSIONE.preavviso} giorni prima; il tempo sospeso non lo perdi, si aggiunge in fondo all'abbonamento.`,
-    scheda: 'adulti/sospensione',
-    rimando: 'Come si sospende',
+    a: `Sì, quante volte vuoi, a <strong>${SOSPENSIONE.prezzo} €</strong> al mese: si richiede dal portale, alla voce Abbonamenti → Sospensioni, almeno ${SOSPENSIONE.preavviso} giorni prima e parte sempre dal primo del mese successivo — il tempo sospeso non lo perdi, si aggiunge in fondo all'abbonamento. Se il motivo è un infortunio o una malattia documentata, la sospensione è invece gratuita, con una durata minima di due mesi.`,
   },
   {
     id: 'disdetta-abbonamento',
     q: 'Come disdico il rinnovo automatico?',
-    a: `I mensili si disdicono dalla tua area riservata, alla voce Abbonamenti → Disdici rinnovo automatico. Gli annuali via email, almeno ${SOSPENSIONE.preavviso} giorni prima della scadenza. In entrambi i casi lo fai da solo, senza passare dalla segreteria.`,
-    scheda: 'adulti/disdetta-contratti-adulti',
-    rimando: 'Termini per ogni tipo di contratto',
+    a: `I mensili si disdicono dalla tua area riservata, alla voce Abbonamenti → Disdici rinnovo automatico — per la Formula 12 l'effetto parte solo dopo i 12 mesi di impegno iniziale. Gli annuali via email, almeno ${SOSPENSIONE.preavviso} giorni prima della scadenza. In entrambi i casi lo fai da solo, senza passare dalla segreteria. Se poi ti iscrivi di nuovo, si paga una nuova quota di attivazione.`,
   },
   {
     id: 'guest-pass',
@@ -161,16 +141,12 @@ export const REGISTRO: VoceRegistro[] = [
     /* Il prezzo e il requisito ci vanno: la formulazione di prima — «puoi
        richiedere un Guest Pass Premium di una settimana» — lasciava credere a
        una prova gratuita, e chi è già stato iscritto lo scopriva alla fine. */
-    a: `Sì, con il <strong>Guest Pass Premium</strong>: ${GUEST_PASS.giorni} giorni con accesso a tutto il club a <strong>${GUEST_PASS.prezzo} €</strong>. È riservato a chi non ha e non ha mai avuto un abbonamento Athlon dal ${GUEST_PASS.dal} in poi. In alternativa puoi prenotare e pagare una singola lezione, senza quota di attivazione.`,
-    scheda: 'generali/referral-guest-pass',
-    rimando: 'Anche su invito di un amico',
+    a: `Sì, con il <strong>Guest Pass Premium</strong>: ${GUEST_PASS.giorni} giorni con accesso a tutto il club a <strong>${GUEST_PASS.prezzo} €</strong>. È riservato a chi non ha e non ha mai avuto un abbonamento Athlon dal ${GUEST_PASS.dal} in poi. Se te lo manda un socio che ti invita, hai 30 giorni di tempo per attivarlo da quando ricevi l'invito. In alternativa puoi prenotare e pagare una singola lezione, senza quota di attivazione.`,
   },
   {
     id: 'pagamenti',
     q: 'Come posso pagare?',
-    a: `Con carta di credito o di debito, oppure con addebito diretto sul conto corrente (IBAN). L'addebito è automatico alla scadenza, così non devi ricordartene.`,
-    scheda: 'generali/metodo-di-pagamento',
-    rimando: 'Metodi accettati',
+    a: `Con carta di credito o di debito, oppure con addebito diretto sul conto corrente (IBAN): non si accettano contanti, POS in reception, bonifico o voucher regionali. L'addebito è automatico alla scadenza, così non devi ricordartene, e puoi cambiare il metodo associato al contratto quando vuoi dal portale.`,
   },
 ];
 
@@ -235,26 +211,13 @@ export function vociFaq(voci: RichiestaFaq[]): VoceFaq[] {
 }
 
 /**
- * Compone la coda di ogni risposta che dichiara una scheda: il rimando, con il
- * titolo letto dalla scheda stessa.
+ * Il nome resta per non toccare ogni pagina che lo importa, ma non compone più
+ * niente: le risposte non hanno più una coda da aggiungere, perché non mandano
+ * più fuori da questo sito. Vedi il commento in cima al file.
  */
 export async function faqConSchede(voci: VoceFaq[]): Promise<FaqEntry[]> {
-  const schede = await getCollection('articles', ({ data }) => !data.draft);
-  const perId = new Map(schede.map((a) => [a.id, a.data.title]));
-
-  return voci.map(({ q, a, scheda, rimando }) => {
-    if (!scheda) return { q, a };
-
-    const titolo = perId.get(scheda);
-    if (!titolo) throw new Error(`faqConSchede: la scheda "${scheda}" non esiste`);
-
-    const invito = rimando ?? 'Tutti i dettagli';
-    return {
-      q,
-      a: `${a} <a href="/wikiathlon/${scheda}/">${invito} nella scheda “${titolo}” →</a>`,
-    };
-  });
+  return voci.map(({ q, a }) => ({ q, a }));
 }
 
-/** Il caso normale: scegli le voci, e la coda con i rimandi la compone lei. */
+/** Il caso normale: scegli le voci del registro, o scrivine di nuove. */
 export const faqPagina = (voci: RichiestaFaq[]) => faqConSchede(vociFaq(voci));
