@@ -357,17 +357,31 @@ export function initChatAssistente(root, options) {
 
   /* Il titolo del passo email, per intento della CTA — la stessa scelta delle
      APERTURE, un passo prima: chi arriva da «Richiedi assistenza» legge un
-     titolo d'aiuto, chi arriva da «Chatta con noi» un invito generico. Il
-     modulo lo scrive all'apertura di una chat nuova; il markup porta il default
-     che si vede finché il modulo non gira. */
+     titolo d'aiuto, chi arriva da «Trova il corso giusto per tuo figlio» legge
+     già di cosa si sta parlando, chi arriva da «Chatta con noi» un invito
+     generico. Il modulo lo scrive all'apertura di una chat nuova; il markup
+     porta il default che si vede finché il modulo non gira. */
   var EMAIL_TITOLO = {
     assistenza: 'Come possiamo aiutarti?',
+    junior: 'Troviamo il corso giusto per tuo figlio',
+    adulti: 'Troviamo l’attività giusta per te',
     generico: 'Di cosa ti va di parlare?',
   };
   function vestiEmail() {
     if (!emailTitolo) return;
+    /* L'attività preselezionata (`preselezioneAttivita`, valorizzata da
+       `apri()` prima di questa chiamata) conta quanto l'intento: un pulsante
+       di corso non dice «assistenza» nel testo, ma sa benissimo di cosa parla.
+       Il suo pubblico — junior o adulti — decide quale titolo. */
+    var ambito = preselezioneAttivita ? ACTIVITY_AUDIENCE[preselezioneAttivita] : '';
     emailTitolo.textContent =
-      dati.ctaIntento === 'assistenza' ? EMAIL_TITOLO.assistenza : EMAIL_TITOLO.generico;
+      dati.ctaIntento === 'assistenza'
+        ? EMAIL_TITOLO.assistenza
+        : ambito === 'junior'
+          ? EMAIL_TITOLO.junior
+          : ambito === 'adulti'
+            ? EMAIL_TITOLO.adulti
+            : EMAIL_TITOLO.generico;
   }
 
   function salva() {
@@ -2314,6 +2328,16 @@ export function initChatAssistente(root, options) {
   return {
     apri: function (pagina, attivita, ctaTesto) {
       dati.pagina = pagina || location.pathname;
+      /* L'attività preselezionata vale solo per una chat che parte ora: se la
+         persona ha una conversazione già avviata (o è già oltre l'email), il
+         corso lo ha scelto lei e non lo si cambia sotto le mani. Al passo
+         dell'attività ripristinato si applica subito; all'email si tiene da
+         parte e la consuma la verifica. Va **prima** di `vestiEmail()`: il
+         titolo del passo email la deve già vedere per rispecchiarla. */
+      if (attivitaEsiste(attivita)) {
+        if (dati.passo === 'attivita') scegliAttivita(attivita);
+        else if (dati.passo === 'email') preselezioneAttivita = attivita;
+      }
       /* L'intento del pulsante plasma l'apertura, ma solo per una chat che
          parte ora (passo email): una conversazione già avviata tiene la sua, e
          chi la riapre non deve vederla cambiare per il pulsante di stavolta. Il
@@ -2321,15 +2345,6 @@ export function initChatAssistente(root, options) {
       if (dati.passo === 'email') {
         dati.ctaIntento = intentoDaCta(ctaTesto);
         vestiEmail();
-      }
-      /* L'attività preselezionata vale solo per una chat che parte ora: se la
-         persona ha una conversazione già avviata (o è già oltre l'email), il
-         corso lo ha scelto lei e non lo si cambia sotto le mani. Al passo
-         dell'attività ripristinato si applica subito; all'email si tiene da
-         parte e la consuma la verifica. */
-      if (attivitaEsiste(attivita)) {
-        if (dati.passo === 'attivita') scegliAttivita(attivita);
-        else if (dati.passo === 'email') preselezioneAttivita = attivita;
       }
       // Una conversazione già avviata riprende da dove stava: chiudere il
       // modal per sbaglio non deve costare l'email e il ramo.

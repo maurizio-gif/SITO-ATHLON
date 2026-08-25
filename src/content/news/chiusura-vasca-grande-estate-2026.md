@@ -59,3 +59,5 @@ In tanti ci avete scritto per sapere come procedeva, e non ci ha sorpreso: in qu
 **Innovazione e tradizione**: è quello che questa vasca rappresenta per Athlon, ed è quello per cui abbiamo lavorato tutta l'estate.
 
 Ci vediamo in acqua: **ti riaspettiamo con tutte le attività al completo a partire dal 1° settembre**. Più carichi che mai.
+
+<small>Orari di agosto — club e segreteria: dal lunedì al venerdì 8:00–21:00, il sabato 9:30–13:00, la domenica chiuso.</small>
