@@ -125,20 +125,17 @@ export function initChatAssistente(root, options) {
       label: 'Attività adulti',
       nota: 'Gym Floor, Corsi Fitness, Group Reformer, Nuoto Libero, Aqua Fitness, Scuola Nuoto Adulti, Corso Gestanti, Personal Training',
     },
-    /* «Dai 30 mesi» e non «dai 3 anni», che è come il resto del sito lo dice.
-       I tre anni sono la cifra tonda della comunicazione, non un requisito: il
-       criterio vero è l'anno di nascita — per il 2026/27 sono i nati dal 2013
-       al 2023, e un nato a fine 2023 a settembre ha trentatré mesi. Il bot
-       legge i dati del sito e risponde «dai 30 mesi», quindi una nota che
-       dicesse tre anni lo smentirebbe due righe più su. E qui la nota non è
-       una didascalia: è quello che fa scegliere fra queste due voci a chi ha
-       un bambino di trenta mesi.
-
-       Per il Baby Nuoto la nota dice anche del genitore, perché fra i 30 e i
-       36 mesi le due fasce si sovrappongono per davvero e l'età non decide
-       niente: quello che cambia è se in acqua si entra insieme. */
-    { id: 'scuola-nuoto-bambini', label: 'Scuola Nuoto Bambini', nota: 'dai 30 mesi' },
-    { id: 'baby-nuoto', label: 'Baby Nuoto', nota: 'da 3 a 36 mesi, con un genitore in acqua' },
+    /* La scelta fra le due si fa per **anno di nascita**, non in mesi, ed è la
+       regola che toglie la sovrapposizione: i nati dal 2013 al 2023 fanno la
+       Scuola Nuoto Bambini, i nati nel 2024, 2025 e 2026 il Baby Nuoto. Prima
+       le note dicevano «dai 30 mesi» e «da 3 a 36 mesi», e fra i 30 e i 36 mesi
+       le due fasce si sovrapponevano davvero — quello che mandava un bambino
+       del 2023 nel corso sbagliato. Ora l'anno decide da solo, come già fa il
+       portale (sotto «nati 2023» c'è la scuola nuoto). Per il Baby Nuoto la
+       nota dice anche del genitore in acqua, che è l'altra differenza. Gli anni
+       vanno aggiornati ogni stagione. */
+    { id: 'scuola-nuoto-bambini', label: 'Scuola Nuoto Bambini', nota: 'nati dal 2013 al 2023' },
+    { id: 'baby-nuoto', label: 'Baby Nuoto', nota: 'nati nel 2024, 2025 e 2026, con un genitore in acqua' },
     { id: 'nuoto-agonistico', label: 'Nuoto Agonistico', nota: '' },
     { id: 'pallanuoto', label: 'Pallanuoto', nota: '' },
   ];

@@ -152,7 +152,16 @@ export const JUNIOR: CorsoJunior[] = [
   {
     slug: 'baby-nuoto',
     nome: 'Baby Nuoto',
-    eta: 'Dai 3 ai 36 mesi',
+    /* La fascia si dice per **anno di nascita**, non in mesi, ed è la regola che
+       toglie la sovrapposizione col Scuola Nuoto Bambini: baby nuoto è per i
+       nati nei tre anni più recenti (2024, 2025, 2026 per la stagione 2026/27),
+       dai nati nel 2023 in poi si passa alla scuola nuoto. Contava in mesi —
+       «3-36 mesi» — e un nato nel 2023, a trentadue mesi, ci rientrava: è
+       l'ambiguità che mandava un bambino del 2023 nel corso sbagliato. L'anno
+       lo decide come il portale, che sotto «nati 2023» mette già la scuola
+       nuoto (vedi `snb/preiscrizioni-nuoto`). Va aggiornato ogni stagione, come
+       gli anni degli altri corsi junior qui sotto. */
+    eta: 'Nati nel 2024, 2025 e 2026',
     claim: 'In acqua con te, dai tre mesi.',
     cta: 'Registrati per prenotare',
     ctaIntent: 'junior_info',
@@ -227,7 +236,7 @@ export const JUNIOR: CorsoJunior[] = [
       'Ma non è tutto: è un’esperienza che rafforza il legame con te. Quaranta minuti in cui siete in acqua insieme, con lo staff che vi guida.',
     ],
     facts: [
-      'Da 3 a 36 mesi',
+      'Per i nati nel 2024, 2025 e 2026 (dai 3 mesi)',
       'Lezioni da 40 minuti',
       'Un genitore in acqua con il bambino',
       'Sabato e domenica mattina',
@@ -299,7 +308,7 @@ export const JUNIOR: CorsoJunior[] = [
       },
       {
         q: 'A quale età si può cominciare il Baby Nuoto?',
-        a: 'Dai 3 mesi in poi. Lo consigliamo fino ai 30 mesi, con un massimo di 36.',
+        a: 'Dai 3 mesi di età. Il Baby Nuoto è per i bambini nati nel 2024, 2025 e 2026; dai nati nel 2023 in poi si passa alla <a href="/scuola-nuoto-bambini">Scuola Nuoto Bambini</a>, che si fa in acqua senza il genitore. Conta l’anno di nascita, non i mesi.',
       },
       {
         q: 'Cosa serve portare alla lezione di Baby Nuoto?',
@@ -338,7 +347,7 @@ export const JUNIOR: CorsoJunior[] = [
     ],
     titolo: 'Baby Nuoto Roma Talenti – Dai 3 mesi | Athlon Club',
     descrizione:
-      'Baby Nuoto ad Athlon Club Roma Talenti, da 3 a 36 mesi: lezioni da 40 minuti con un genitore in acqua, vasca a 31,5 °C, spogliatoi con fasciatoi e assistenza. Richiedi turni e costi.',
+      'Baby Nuoto ad Athlon Club Roma Talenti, per i nati nel 2024, 2025 e 2026 (dai 3 mesi): lezioni da 40 minuti con un genitore in acqua, vasca a 31,5 °C, spogliatoi con fasciatoi e assistenza. Richiedi turni e costi.',
   },
   {
     slug: 'scuola-nuoto-bambini',
@@ -476,7 +485,7 @@ export const JUNIOR: CorsoJunior[] = [
       },
       {
         q: 'Da che età si può cominciare la scuola nuoto?',
-        a: 'Dai 30 mesi in poi e fino ai 13 anni. Prima dei 30 mesi c’è il <a href="/baby-nuoto">Baby Nuoto</a>, che si fa in acqua con un genitore.',
+        a: 'Dai 3 anni: la Scuola Nuoto Bambini è per i nati dal 2013 al 2023. I più piccoli — i nati nel 2024, 2025 e 2026 — fanno il <a href="/baby-nuoto">Baby Nuoto</a>, in acqua con un genitore. A decidere è l’anno di nascita, non i mesi: un bambino del 2023 fa la scuola nuoto anche se non ha ancora compiuto i 3 anni.',
       },
       {
         q: 'Posso accompagnare mio figlio nello spogliatoio?',
