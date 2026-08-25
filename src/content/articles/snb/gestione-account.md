@@ -11,7 +11,7 @@ attivita: []
   👤 Gestisci tutto dal Portale o App · Prenotazioni, pagamenti, brevetti e nucleo familiare
 </div>
 
-**Web:** [athlonroma.it/portale](https://www.athlonroma.it/portale) &nbsp;·&nbsp; **App:** [Scarica Athlon Club](http://onelink.to/athlon)
+**Web:** [athlonroma.it/portale](https://www.athlonroma.it/portale) &nbsp;·&nbsp; **App:** <a href="http://onelink.to/athlon" target="_blank" rel="noopener noreferrer">Scarica Athlon Club</a>
 
 ---
 
@@ -55,6 +55,6 @@ attivita: []
 </details>
 
 <div class="ci-cta">
-  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary">ACCEDI AL PORTALE</a>
-  <a href="http://onelink.to/athlon" class="ci-btn-secondary">SCARICA L'APP</a>
+  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary" target="_blank" rel="noopener noreferrer">ACCEDI AL PORTALE</a>
+  <a href="http://onelink.to/athlon" class="ci-btn-secondary" target="_blank" rel="noopener noreferrer">SCARICA L'APP</a>
 </div>

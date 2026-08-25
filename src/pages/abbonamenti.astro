@@ -279,6 +279,8 @@ const trust = [
                     data-cta="buy"
                     data-iscrizione={p.name}
                     data-iscrizione-opzione={o.sub ? `${o.title} · ${o.sub}` : o.title}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Iscriviti a {p.name} →
                   </a>
@@ -363,7 +365,7 @@ const trust = [
         ))}
       </ul>
 
-      <a href={`${PG}/#/Classes/1/List`} class="btn btn-primary ab-block-cta">Prenota una lezione →</a>
+      <a href={`${PG}/#/Classes/1/List`} class="btn btn-primary ab-block-cta" target="_blank" rel="noopener noreferrer">Prenota una lezione →</a>
     </div>
   </section>
 
@@ -389,7 +391,7 @@ const trust = [
         Seduta singola: <strong>€{PERSONAL.singolaIscritti}</strong> per iscritti
         · <strong>€{PERSONAL.singolaEsterni}</strong> per esterni
       </p>
-      <a href={`${PG}/#/PersonalTraining?clubId=1&trainerId=null`} class="btn btn-outline-dark">
+      <a href={`${PG}/#/PersonalTraining?clubId=1&trainerId=null`} class="btn btn-outline-dark" target="_blank" rel="noopener noreferrer">
         Prenota una seduta →
       </a>
     </div>

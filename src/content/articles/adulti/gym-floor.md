@@ -22,7 +22,7 @@ In fase di prenotazione scegli tra:
 <details>
 <summary><strong>Come prenotare</strong></summary>
 
-1. Accedi all'[App Athlon Club](http://onelink.to/athlon) o al [Portale](https://athlon.perfectgym.com/ClientPortal2/#/Login)
+1. Accedi all'<a href="http://onelink.to/athlon" target="_blank" rel="noopener noreferrer">App Athlon Club</a> o al <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" target="_blank" rel="noopener noreferrer">Portale</a>
 2. Clicca su **Corsi/PT → Prenota**
 3. Seleziona **Gym Floor**
 4. Scegli data, orario e modalità (Con Assistenza / Allenamento Libero)
@@ -51,6 +51,6 @@ Hai bisogno di un programma completamente personalizzato?
 </details>
 
 <div class="ci-cta">
-  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary">PRENOTA ORA</a>
-  <a href="http://onelink.to/athlon" class="ci-btn-secondary">SCARICA L'APP</a>
+  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary" target="_blank" rel="noopener noreferrer">PRENOTA ORA</a>
+  <a href="http://onelink.to/athlon" class="ci-btn-secondary" target="_blank" rel="noopener noreferrer">SCARICA L'APP</a>
 </div>

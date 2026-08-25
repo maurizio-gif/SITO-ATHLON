@@ -93,7 +93,7 @@ No: la funzione di disdetta si sblocca quando la posizione è interamente regola
 </details>
 
 <div class="ci-cta">
-  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary">PAGA DA SCADENZE</a>
+  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary" target="_blank" rel="noopener noreferrer">PAGA DA SCADENZE</a>
   <a href="/wikiathlon/adulti/disdetta-contratti-adulti/" class="ci-btn-secondary">COME SI DISDICE</a>
 </div>
 

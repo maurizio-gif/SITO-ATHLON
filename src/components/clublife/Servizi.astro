@@ -57,6 +57,7 @@ const items = (await getCollection('servizi'))
                   href={s.data.href}
                   class="svi__link"
                   {...(s.data.href === '/referral' ? { 'data-cta': 'referral' } : {})}
+                  {...(s.data.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                 >
                   {s.data.hrefLabel ?? 'Scopri di più'} →
                 </a>

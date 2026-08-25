@@ -41,5 +41,5 @@ Le ricevute di tutti gli addebiti effettuati, consultabili e scaricabili in form
 </details>
 
 <div class="ci-cta">
-  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary">ACCEDI AL PORTALE</a>
+  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary" target="_blank" rel="noopener noreferrer">ACCEDI AL PORTALE</a>
 </div>

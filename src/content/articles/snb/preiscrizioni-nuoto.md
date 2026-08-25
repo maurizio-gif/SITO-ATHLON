@@ -28,14 +28,14 @@ draft: false
 
 Ogni link porta al portale, già filtrato sui turni di quella fascia che hanno ancora posto libero: è lì che si vede la disponibilità residua, non nel planning generico del mese, che mostra il palinsesto ma non i posti rimasti.
 
-* Per i nati **2023** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=5\&vacancies=1)
-* Per i nati **2021-22** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=1\&vacancies=1)
-* Per i nati **2019-20** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=12\&vacancies=1)
-* Per i nati **2016-17-18** (e Pallanuoto Acquagol) → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=13\&vacancies=1)
-* Per i nati **2013-14-15** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=14\&vacancies=1)
-* **Pallanuoto Under 14** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=14\&vacancies=1)
-* **Nuoto Propaganda (2014-2018)** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=25\&vacancies=1)
-* **Nuoto Agonistico (2008-2015)** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=22\&vacancies=1)
+* Per i nati **2023** → <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=5&vacancies=1" target="_blank" rel="noopener noreferrer">clicca qui</a>
+* Per i nati **2021-22** → <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=1&vacancies=1" target="_blank" rel="noopener noreferrer">clicca qui</a>
+* Per i nati **2019-20** → <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=12&vacancies=1" target="_blank" rel="noopener noreferrer">clicca qui</a>
+* Per i nati **2016-17-18** (e Pallanuoto Acquagol) → <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=13&vacancies=1" target="_blank" rel="noopener noreferrer">clicca qui</a>
+* Per i nati **2013-14-15** → <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=14&vacancies=1" target="_blank" rel="noopener noreferrer">clicca qui</a>
+* **Pallanuoto Under 14** → <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=14&vacancies=1" target="_blank" rel="noopener noreferrer">clicca qui</a>
+* **Nuoto Propaganda (2014-2018)** → <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=25&vacancies=1" target="_blank" rel="noopener noreferrer">clicca qui</a>
+* **Nuoto Agonistico (2008-2015)** → <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=22&vacancies=1" target="_blank" rel="noopener noreferrer">clicca qui</a>
 
 ***
 
@@ -270,6 +270,6 @@ Stesse modalità del punto 4.11. Disdetta a **[disdetta@athlonroma.it](mailto:di
 </details>
 
 <div class="ci-cta">
-  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?vacancies=1" class="ci-btn-primary">ISCRIVITI ORA</a>
-  <a href="https://athlon.perfectgym.com/ClientPortal2/#/ForgotPassword" class="ci-btn-secondary">RESET PASSWORD</a>
+  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?vacancies=1" class="ci-btn-primary" target="_blank" rel="noopener noreferrer">ISCRIVITI ORA</a>
+  <a href="https://athlon.perfectgym.com/ClientPortal2/#/ForgotPassword" class="ci-btn-secondary" target="_blank" rel="noopener noreferrer">RESET PASSWORD</a>
 </div>

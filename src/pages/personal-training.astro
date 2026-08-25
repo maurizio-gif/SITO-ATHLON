@@ -313,7 +313,7 @@ const trust = [
         ))}
       </div>
 
-      <a href={bookPT(null)} class="btn btn-primary pt-block-cta" data-anim="pop" data-cta="buy">
+      <a href={bookPT(null)} class="btn btn-primary pt-block-cta" data-anim="pop" data-cta="buy" target="_blank" rel="noopener noreferrer">
         Prenota una seduta →
       </a>
     </div>
@@ -361,7 +361,7 @@ const trust = [
                     </ul>
                   </div>
                 ))}
-                <a href={bookPT(t.trainerId)} class="coach__cta" data-cta="buy">
+                <a href={bookPT(t.trainerId)} class="coach__cta" data-cta="buy" target="_blank" rel="noopener noreferrer">
                   {t.trainerId ? 'Verifica la disponibilità →' : 'Prenota una seduta →'}
                 </a>
               </div>
@@ -401,7 +401,7 @@ const trust = [
             </div>
           </div>
 
-          <a href={bookPT(null)} class="modo__cta">Prenota ora →</a>
+          <a href={bookPT(null)} class="modo__cta" target="_blank" rel="noopener noreferrer">Prenota ora →</a>
         </article>
 
         <article class="modo modo--sub" data-anim="scale" data-anim-delay="100">
@@ -425,7 +425,7 @@ const trust = [
           </ul>
 
           <p class="modo__note">Le sedute sono utilizzabili entro il mese solare.</p>
-          <a href={`${PG}/#/Login`} class="modo__cta" data-cta="buy">Aggiungi al tuo abbonamento →</a>
+          <a href={`${PG}/#/Login`} class="modo__cta" data-cta="buy" target="_blank" rel="noopener noreferrer">Aggiungi al tuo abbonamento →</a>
         </article>
       </div>
 

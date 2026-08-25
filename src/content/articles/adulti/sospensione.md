@@ -38,7 +38,7 @@ Vengono confuse spesso, e hanno regole diverse. Trova la tua prima di procedere.
 
 ## Come richiedere la sospensione
 
-1. Accedi al [Portale Athlon](https://athlon.perfectgym.com/ClientPortal2/#/Login)
+1. Accedi al <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" target="_blank" rel="noopener noreferrer">Portale Athlon</a>
 2. Vai su **Abbonamenti**
 3. Seleziona il tuo abbonamento attivo
 4. Clicca su **"Sospensioni"**
@@ -103,5 +103,5 @@ Area riservata → **Abbonamenti** → sezione sospensioni: devi vedere le date 
 </details>
 
 <div class="ci-cta">
-  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary">RICHIEDI SOSPENSIONE</a>
+  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary" target="_blank" rel="noopener noreferrer">RICHIEDI SOSPENSIONE</a>
 </div>

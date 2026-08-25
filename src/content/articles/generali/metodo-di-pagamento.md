@@ -83,5 +83,5 @@ No, al momento non accettiamo voucher sport della Regione Lazio né altri buoni 
 </details>
 
 <div class="ci-cta">
-  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary">GESTISCI IL PAGAMENTO</a>
+  <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary" target="_blank" rel="noopener noreferrer">GESTISCI IL PAGAMENTO</a>
 </div>

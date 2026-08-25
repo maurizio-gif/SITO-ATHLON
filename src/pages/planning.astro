@@ -65,7 +65,7 @@ const faqs = await faqPagina([
         dall'app o dal portale.
       </p>
       <div class="pl-hero__actions">
-        <a href={`${PG}/#/Classes/1/Calendar`} class="btn btn-primary" data-cta="member">
+        <a href={`${PG}/#/Classes/1/Calendar`} class="btn btn-primary" data-cta="member" target="_blank" rel="noopener noreferrer">
           Prenota una lezione →
         </a>
         <a
@@ -73,7 +73,7 @@ const faqs = await faqPagina([
           class="btn btn-outline"
           {...prova.attrs}
         >{prova.label}</a>
-        <a href="https://onelink.to/athlon" class="pl-hero__link" data-cta="member">Scarica l'app</a>
+        <a href="https://onelink.to/athlon" class="pl-hero__link" data-cta="member" target="_blank" rel="noopener noreferrer">Scarica l'app</a>
       </div>
     </div>
   </section>
@@ -132,8 +132,8 @@ const faqs = await faqPagina([
       {/* The old note's booking-window line now lives in the FAQ above, so
           only the monthly-update caveat is left here. */}
       <p class="pl-note">
-        Il planning viene aggiornato ogni mese. Prenoti dall'<a href="https://onelink.to/athlon">app
-        Athlon Club</a> o dal <a href={`${PG}/#/Classes/1/Calendar`}>portale web</a>.
+        Il planning viene aggiornato ogni mese. Prenoti dall'<a href="https://onelink.to/athlon" target="_blank" rel="noopener noreferrer">app
+        Athlon Club</a> o dal <a href={`${PG}/#/Classes/1/Calendar`} target="_blank" rel="noopener noreferrer">portale web</a>.
       </p>
 
       {/* ── Per gli schermi della sede ─────────────────────────────────────
