@@ -26,6 +26,8 @@ draft: false
 
 > Clicca sulla fascia d'età per visualizzare gli orari disponibili.
 
+Ogni link porta al portale, già filtrato sui turni di quella fascia che hanno ancora posto libero: è lì che si vede la disponibilità residua, non nel planning generico del mese, che mostra il palinsesto ma non i posti rimasti.
+
 * Per i nati **2023** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=5\&vacancies=1)
 * Per i nati **2021-22** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=1\&vacancies=1)
 * Per i nati **2019-20** → [clicca qui](https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=12\&vacancies=1)

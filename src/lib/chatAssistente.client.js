@@ -188,6 +188,12 @@ export function initChatAssistente(root, options) {
       /** Lo slug dell'attività scelta, o '' se non ne ha scelta nessuna. */
       attivita: '',
       attivitaJunior: '',
+      /** La data di nascita del bambino, come l'ha scritta nel form dei dati
+          (YYYY-MM-DD). Non serve a PerfectGym da qui — quella l'ha già
+          ricevuta `inviaDati()` — serve a non richiederla una seconda volta
+          in chat: il modello non la vede altrimenti, perché è un campo di un
+          form e non un messaggio scritto in conversazione. */
+      bambinoNascita: '',
       /** Vero da quando l'anagrafica è partita: non si richiede due volte. */
       datiFatti: false,
       pagina: '/',
@@ -1600,6 +1606,7 @@ export function initChatAssistente(root, options) {
           ramo: dati.ramo,
           attivita: dati.attivita ? [dati.attivita] : [],
           attivitaJunior: dati.attivitaJunior,
+          bambinoNascita: dati.bambinoNascita,
           email: dati.email,
           memberId: dati.memberId,
           stato: dati.stato,
@@ -1956,6 +1963,9 @@ export function initChatAssistente(root, options) {
     dati.cognome = valore('cognome');
     dati.telefono = telefonoPronto(valore('cellulare'));
     if (emailValida(valore('email'))) dati.email = valore('email');
+    /* Solo nel ramo junior il campo esiste ed è compilato: altrove resta
+       quello che era, cioè vuoto. */
+    if (valore('bnascita')) dati.bambinoNascita = valore('bnascita');
   }
 
   // ── Eventi ────────────────────────────────────────────────────────────────
