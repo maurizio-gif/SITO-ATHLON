@@ -521,14 +521,21 @@ const faqs = await faqPagina([
   // Il video dei piani di allenamento porta `data-no-autoplay`: lo esclude dal
   // comportamento globale (che lo farebbe partire subito al caricamento) perché
   // nei primi fotogrammi c'è una scritta che deve restare leggibile finché il
-  // visitatore non ci scorre sopra. Parte una sola volta, al primo ingresso in
-  // viewport.
+  // visitatore non ci scorre sopra. Al primo ingresso in viewport tenta il play,
+  // ma **prima toglie l'esclusione**: da quel momento il video è gestito come
+  // ogni altro clip del sito, e se questo primo tentativo viene rifiutato — sul
+  // telefono uno scroll da solo non conta come gesto, quindi capita quasi
+  // sempre — la rete di sicurezza di `video-autoplay.ts` lo riprova al primo
+  // tocco sulla pagina. Senza questo passaggio il rifiuto era definitivo: il
+  // video restava fermo sul fotogramma della scritta per tutta la visita, il
+  // guasto segnalato da telefono.
   const scrollPlayVideo = document.querySelector<HTMLVideoElement>('[data-scroll-play]');
   if (scrollPlayVideo) {
     const playOnArrival = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
+          scrollPlayVideo.removeAttribute('data-no-autoplay');
           void scrollPlayVideo.play().catch(() => {});
           playOnArrival.unobserve(scrollPlayVideo);
         });
