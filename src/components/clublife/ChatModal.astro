@@ -337,7 +337,8 @@ import CampoTelefono from '../CampoTelefono.astro';
 
   if (modal) {
     let ultimoComando: HTMLElement | null = null;
-    let chat: { apri: (pagina: string) => void; reset: () => void } | null = null;
+    let chat: { apri: (pagina: string, attivita?: string) => void; reset: () => void } | null =
+      null;
     let inArrivo: Promise<void> | null = null;
 
     function chiudi() {
@@ -375,7 +376,11 @@ import CampoTelefono from '../CampoTelefono.astro';
       modal!.setAttribute('aria-hidden', 'false');
       document.body.classList.add('amodal-locked');
       await carica();
-      chat?.apri(location.pathname);
+      /* Un comando può dire con quale attività la chat deve partire già scelta
+         (`data-cta-activity`, la stessa convenzione di `ctaAttrs`): il pulsante
+         «Trova il corso giusto per tuo figlio» della scuola nuoto la porta, così
+         la conversazione salta il passo «di quale attività si tratta?». */
+      chat?.apri(location.pathname, comando?.dataset.ctaActivity || undefined);
     }
 
     /* Delegato al documento, come per la prova: un comando che apre

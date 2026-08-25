@@ -52,10 +52,17 @@ const slug = (t: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 
-const CTA_ATTRS = ctaAttrs('resolve', corso.ctaIntent ?? 'junior_info', {
-  activity: corso.slug,
-  source: `/${corso.slug}`,
-});
+/* Gli attributi di una CTA. Di norma aprono il form («resolve»); ma un corso
+   può chiedere che aprano invece la chat con la sua attività già scelta
+   (`ctaChat`, la scuola nuoto bambini): stesso pulsante, stessa etichetta,
+   altra strada. Il ripiego `href={FORM}` resta l'Help Desk in entrambi i casi,
+   che è già la destinazione senza JavaScript di ogni pulsante della chat. */
+const ctaFor = (source: string) =>
+  corso.ctaChat
+    ? { 'data-cta': 'assistente', 'data-cta-activity': corso.ctaChat, 'data-cta-source': source }
+    : ctaAttrs('resolve', corso.ctaIntent ?? 'junior_info', { activity: corso.slug, source });
+
+const CTA_ATTRS = ctaFor(`/${corso.slug}`);
 
 const faqs: FaqEntry[] = await faqPagina(corso.faq);
 
@@ -321,10 +328,7 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
             <a
               href={FORM}
               class="btn btn-primary ju-corso__btn"
-              {...ctaAttrs('resolve', corso.ctaIntent ?? 'junior_info', {
-                activity: corso.slug,
-                source: `/${corso.slug}#${slug(c.nome)}`,
-              })}
+              {...ctaFor(`/${corso.slug}#${slug(c.nome)}`)}
             >
               {CTA} →
             </a>
@@ -374,10 +378,7 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
             <a
               href={FORM}
               class="ju-via__cta"
-              {...ctaAttrs('resolve', corso.ctaIntent ?? 'junior_info', {
-                activity: corso.slug,
-                source: `/${corso.slug}#${a.medium}`,
-              })}
+              {...ctaFor(`/${corso.slug}#${a.medium}`)}
             >
               {CTA} →
             </a>

@@ -84,6 +84,14 @@ export interface CorsoJunior {
    */
   ctaIntent?: 'junior_info' | 'insertion_trial';
   /**
+   * Quando è impostato, i pulsanti della CTA non aprono il form ma **la chat**,
+   * e la fanno partire con questa attività già scelta (lo slug di
+   * `activities.ts`): il passo «di quale attività si tratta?» è una domanda a
+   * cui chi arriva da qui ha già risposto. Stessa etichetta, altra strada. Il
+   * ripiego senza JavaScript resta l'Help Desk, come per ogni pulsante chat.
+   */
+  ctaChat?: string;
+  /**
    * Il Metodo Athlon: i passaggi che il club fa e può dimostrare. Esiste solo
    * per la Scuola Nuoto Bambini, che è l'attività con un metodo documentato —
    * gruppi definiti in vasca, istruttore assegnato, progressione consultabile,
@@ -356,6 +364,7 @@ export const JUNIOR: CorsoJunior[] = [
     claim: 'Prima la passione. Poi i risultati.',
     cta: 'Trova il corso giusto per tuo figlio',
     ctaIntent: 'junior_info',
+    ctaChat: 'scuola-nuoto-bambini',
     hero: `${U}/2024/08/P1120412.jpg`,
     fuoco: '50% 35%',
     medium: 'SNB',
