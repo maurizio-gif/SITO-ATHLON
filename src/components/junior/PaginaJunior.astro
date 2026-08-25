@@ -399,55 +399,55 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
     <div class="container">
       <span class="eyebrow" data-anim="from-left">I nostri spazi</span>
       <h2 class="ju-sec__title" data-anim="reveal">Dove si svolge l’attività</h2>
-      <p class="ju-sec__sub">Puoi vederli prima di venire: apri la voce e scorri il tour senza lasciare la pagina.</p>
+      <p class="ju-sec__sub">Puoi vederli prima di venire: apri il tour senza lasciare la pagina.</p>
 
-      {/* Accordion, uno aperto per volta — stesso pattern dei workout di
-          /gym-floor e delle FAQ, qui applicato a un elenco (non a una griglia
-          di card): chiuso mostra solo il nome dello spazio, aperto rivela il
-          testo e il tour insieme.
-
-          L'iframe è nel markup fin da subito e non lo crea lo script al clic:
-          è la stessa regola di `Struttura.astro`, «l'indirizzo si legge
+      {/* Accordion, uno aperto per volta — come i workout di /gym-floor e le
+          FAQ. L'iframe è nel markup fin da subito e non lo crea lo script al
+          clic: è la stessa regola di `Struttura.astro`, «l'indirizzo si legge
           dall'iframe e non si scrive qui». CookieYes lo blocca finché il
           consenso non arriva leggendo gli iframe già in pagina; uno scritto da
           uno script nostro dopo il caricamento rischierebbe di scavalcarlo. Il
           pannello parte chiuso (altezza zero), quindi il costo è nel
           `loading="lazy"` dell'iframe — la stessa misura già in campo su
           gym-floor e abbonamenti — non in un secondo meccanismo di consenso. */}
-      <div class="ju-spazi">
+      <ul class="ju-spazi">
         {corso.spazi.map((s) => (
-          <div class="ju-spazio" data-ju-spazio-item>
-            <button
-              class="ju-spazio__q"
-              type="button"
-              aria-expanded="false"
-              data-ju-spazio-trigger
-            >
-              <span>{s.nome}</span>
-              <span class="ju-spazio__icon" aria-hidden="true">+</span>
-            </button>
-            <div class="ju-spazio__pannello">
-              <div class="ju-spazio__pannello-inner">
-                <p class="ju-spazio__testo">{s.testo}</p>
-                {s.tour && (
-                  /* Le coordinate di vista sono già nell'indirizzo (`sr`, `ss`)
-                     insieme a `play=1`: si apre già sul punto giusto, senza
-                     bisogno di un tasto play separato dentro il riquadro. */
-                  <div class="ju-spazio__tour">
-                    <iframe
-                      src={s.tour}
-                      title={`Tour virtuale — ${s.nome}, Athlon Club`}
-                      allowfullscreen
-                      loading="lazy"
-                      referrerpolicy="no-referrer-when-downgrade"
-                    ></iframe>
+          <li class="ju-spazio" data-ju-spazio-item>
+            <h3 class="ju-spazio__nome">{s.nome}</h3>
+            <p class="ju-spazio__testo">{s.testo}</p>
+            {s.tour && (
+              <>
+                <button
+                  class="ju-spazio__cta"
+                  type="button"
+                  aria-expanded="false"
+                  data-ju-spazio-trigger
+                >
+                  <span>Apri il tour virtuale</span>
+                  <span class="ju-spazio__cta-icon" aria-hidden="true">+</span>
+                </button>
+                <div class="ju-spazio__pannello">
+                  <div class="ju-spazio__pannello-inner">
+                    {/* Le coordinate di vista sono già nell'indirizzo (`sr`,
+                        `ss`) insieme a `play=1`: si apre già sul punto giusto,
+                        senza bisogno di un tasto play separato dentro il
+                        riquadro. */}
+                    <div class="ju-spazio__tour">
+                      <iframe
+                        src={s.tour}
+                        title={`Tour virtuale — ${s.nome}, Athlon Club`}
+                        allowfullscreen
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                      ></iframe>
+                    </div>
                   </div>
-                )}
-              </div>
-            </div>
-          </div>
+                </div>
+              </>
+            )}
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   </section>
 )}
@@ -1179,59 +1179,75 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
     text-decoration: underline;
   }
 
-  /* ---- Spazi ----
-     Un elenco ad accordion, non una griglia di card: chiuso è solo il nome
-     dello spazio, aperto rivela testo e tour insieme. Stesso schema dei
-     workout di /gym-floor e della Faq condivisa (bordo fra le righe, icona
-     che ruota), nome suo perché questo file non condivide markup con quei
-     due. */
+  /* ---- Spazi ---- */
   .ju-spazi {
+    list-style: none;
     margin: 26px 0 0;
+    padding: 0;
+    display: grid;
+    /* Soglia in rem, non in px: a radice 16 è lo stesso numero di prima, sul
+       totem (radice 27) sale con il testo e la griglia scende da tre colonne a
+       due invece di dare colonne da 280px con dentro venti caratteri per riga.
+       Una `auto-fit` con la soglia in rem si tara da sé a qualunque scala. */
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 18px;
+    /* `start` e non lo `stretch` di default: quando una card apre il suo tour
+       cresce in altezza, e senza questo lo stiramento della griglia avrebbe
+       allungato anche le vicine della stessa riga, lasciandole con un vuoto
+       in fondo che non è loro. */
+    align-items: start;
   }
 
   .ju-spazio {
-    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    border-radius: var(--radius);
+    background: var(--color-white);
+    border: 1px solid var(--border);
   }
 
-  .ju-spazio:last-child {
-    border-bottom: 1px solid var(--border);
+  .ju-spazio__nome {
+    font-size: var(--text-lg);
+    margin: 0 0 8px;
   }
 
-  /* Corpo normale e non il carattere display: `.wk__q` usa `--font-heading`
-     senza `u-display`, e AGENTS.md chiede la classe a chiunque scriva testo in
-     quel carattere fuori da h1–h4 (gli accenti maiuscoli sbordano senza
-     l'headroom che quella classe porta). Qui è più semplice restarne fuori
-     che portarsi dietro il problema. */
-  .ju-spazio__q {
-    width: 100%;
+  .ju-spazio__testo {
+    margin: 0 0 16px;
+    color: var(--text-muted);
+  }
+
+  .ju-spazio__cta {
+    margin-top: auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    padding: 20px 0;
+    gap: 12px;
+    width: 100%;
+    padding: 0;
     background: none;
     border: none;
     cursor: pointer;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
     text-align: left;
-    font-size: var(--text-md);
-    font-weight: 600;
-    color: var(--color-dark);
-    transition: color var(--dur-fast) ease;
   }
 
-  .ju-spazio__q:hover {
-    color: var(--color-primary);
+  .ju-spazio__cta:hover {
+    text-decoration: underline;
   }
 
-  .ju-spazio__icon {
+  .ju-spazio__cta-icon {
     flex: none;
-    font-size: var(--text-xl);
+    font-size: var(--text-md);
     line-height: 1;
-    color: var(--color-primary);
     transition: transform var(--dur-base) var(--ease-out-crit);
   }
 
-  [data-ju-spazio-item].open .ju-spazio__icon {
+  [data-ju-spazio-item].open .ju-spazio__cta-icon {
     transform: rotate(45deg);
   }
 
@@ -1253,12 +1269,7 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
   }
 
   [data-ju-spazio-item].open .ju-spazio__pannello-inner {
-    padding-bottom: 24px;
-  }
-
-  .ju-spazio__testo {
-    margin: 0 0 16px;
-    color: var(--text-muted);
+    padding-top: 16px;
   }
 
   /* Stessa misura del tour della home (`Struttura.astro`): l'altezza è un
