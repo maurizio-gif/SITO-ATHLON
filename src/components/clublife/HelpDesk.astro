@@ -205,35 +205,18 @@ const SUGGESTIONS: Record<string, string[]> = {
     <span class="eyebrow" data-anim="from-left">Help Desk</span>
     <h2 class="hd__title" data-anim="reveal">Quando ti serve una risposta</h2>
     <p class="hd__sub">
-      Scegli l'attività e scrivi la tua domanda: la risposta arriva subito, dalle nostre schede o
+      Scrivi la tua domanda: la risposta arriva subito, dalle nostre schede o
       dal regolamento. Se non ti basta, ti mettiamo in contatto con il nostro team.
     </p>
 
-    {/* La via lunga, accanto a quella corta: il box qui sotto cerca fra le
-        schede, l'assistente parla. Sono due mestieri diversi e stanno bene
-        vicini — chi sa già cosa cerca usa la ricerca, chi non lo sa chiede.
-
-        Era un pulsante arancione della misura di un pulsante, con scritto
-        «Parla con l'assistente». Due cose non funzionavano. La prima è la
-        scala: stava accanto a un box di ricerca alto tre volte tanto, e la
-        via principale sembrava l'accessorio. La seconda sono le parole —
-        «parla con l'assistente» descrive uno strumento, «chatta con noi e
-        trova subito la risposta» descrive cosa ottieni, ed è anche la stessa
-        frase del pulsante nell'header: la stessa azione detta con le stesse
-        parole si riconosce, detta in due modi sembra due cose.
-
-        L'icona è quella dell'header, identica: tre punti in una nuvoletta. */}
-    {/* Le due strade insieme, e in cima: chiedere all'assistente o scrivere al
-        team. Il comando dello staff stava in fondo, dopo l'elenco delle schede,
-        e questo diceva una cosa sbagliata sull'ordine — che scrivere sia
-        l'ultima spiaggia dopo aver cercato. Per chi ha una domanda che nessuna
-        scheda può risolvere — «il mio abbonamento è sbagliato» — cercare fra le
-        schede è tempo perso, e la deve trovare subito.
-
-        L'alternativa resta asimmetrica di proposito: la chat è piena e larga,
-        l'assistenza è contornata. La prima risponde in un secondo e la seconda
-        in qualche ora, quindi non sono pari — ma sono entrambe qui, ed è quello
-        che conta. */}
+    {/* Un comando solo, in cima: il pulsante pieno arancione che apre
+        l'assistente. Prima erano due — la chat e un «Scrivi al team» accanto —
+        ma con la chat che risponde subito e da cui si arriva comunque al team,
+        due comandi affiancati per «farsi rispondere» erano uno di troppo.
+        L'etichetta dice «Richiedi assistenza» e la nota «Chat o contatta il
+        team»: apre la chat, e da lì si scrive al team quando serve. Resta la
+        via scritta in fondo alla sezione, dopo le schede, per chi le ha scorse
+        tutte. L'icona è quella dell'header: tre punti in una nuvoletta. */}
     <div class="hd__vie">
     <button type="button" class="hd__chat" data-cta="assistente" data-cta-source="help-desk" aria-haspopup="dialog">
       <span class="hd__chat__icona" aria-hidden="true">
@@ -246,78 +229,31 @@ const SUGGESTIONS: Record<string, string[]> = {
         </svg>
       </span>
       <span class="hd__chat__testo">
-        <span class="hd__chat__nome u-display">Chatta con noi</span>
-        <span class="hd__chat__nota">e trova subito la risposta</span>
+        <span class="hd__chat__nome u-display">Richiedi assistenza</span>
+        <span class="hd__chat__nota">Chat o contatta il team</span>
       </span>
       <span class="hd__chat__freccia" aria-hidden="true">→</span>
     </button>
-
-      <button type="button" class="hd__vie__staff" data-open-support>
-        <span class="hd__vie__staff__nome">Scrivi al team</span>
-        <span class="hd__vie__staff__nota">Ti rispondiamo in pochi minuti</span>
-      </button>
     </div>
 
-    {/* Ask-a-question box, in two steps: the activity, then the question.
-        Matching runs in the browser against an index built at compile time — no
-        request, no back end, and it works offline once the page is loaded. */}
-    <div class="ask is-locked" data-ask>
-      <div class="ask__step">
-        <span class="ask__num" aria-hidden="true">1</span>
-        <span class="ask__label" id="ask-area-label">Di quale attività si tratta?</span>
-      </div>
+    {/* Ask-a-question box: scrivi direttamente la domanda. La ricerca gira nel
+        browser su un indice costruito al build — nessuna richiesta, nessun back
+        end, e funziona anche offline a pagina caricata.
 
-      <p class="ask__help" id="ask-area-help">
-        Scegli almeno una delle attività — puoi selezionarne anche più di una.
-      </p>
-
-      {/* A dropdown rather than twelve chips in the open: the list is long, and
-          the choice matters more than it needs room. Real checkboxes inside, so
-          multiple selection and keyboard use come for free. */}
-      <div class="ask__picker" data-ask-picker>
-        <button
-          type="button"
-          class="ask__trigger"
-          data-ask-trigger
-          aria-expanded="false"
-          aria-describedby="ask-area-help"
-        >
-          <span class="ask__triggertext" data-ask-triggertext>Scegli le attività</span>
-          <span class="ask__caret" aria-hidden="true">▾</span>
-        </button>
-
-        <div class="ask__panel" data-ask-panel hidden role="group" aria-labelledby="ask-area-label">
-          <div class="ask__families">
-            {ACTIVITY_GROUPS.map((g) => (
-              <div class="ask__family">
-                <span class="ask__familyname">{g.label}</span>
-                {g.tags.map((a) => (
-                  <label class="ask__opt">
-                    <input type="checkbox" value={a.id} data-ask-area />
-                    <span>{a.label}</span>
-                  </label>
-                ))}
-              </div>
-            ))}
-          </div>
-
-          <button type="button" class="ask__done" data-ask-done>Fatto</button>
-        </div>
-      </div>
-
-      <div class="ask__step">
-        <span class="ask__num" aria-hidden="true">2</span>
-        <span class="ask__label">La tua domanda</span>
-      </div>
-
+        Prima c'era un passo in più — «di quale attività si tratta?» — da
+        scegliere prima di poter scrivere. Tolto: con la chat che risponde
+        subito, far scegliere l'attività era un attrito senza una risposta in
+        più. La ricerca gira su tutte le schede; quando una domanda è ambigua
+        fra due percorsi (adulti / scuola nuoto) la risposta lo dice con il suo
+        tag. */}
+    <div class="ask" data-ask>
       <div class="ask__field">
         <span class="ask__icon" aria-hidden="true">?</span>
         <input
           type="search"
           class="ask__input"
           data-ask-input
-          disabled
-          placeholder="Scegli l’attività qui sopra"
+          placeholder="Cosa vuoi sapere? Es. serve il certificato medico?"
           autocomplete="off"
           aria-label="Fai una domanda all'Help Desk"
           aria-describedby="ask-hint"
@@ -325,10 +261,9 @@ const SUGGESTIONS: Record<string, string[]> = {
         <button type="button" class="ask__clear" data-ask-clear hidden aria-label="Cancella">×</button>
       </div>
 
-      <p class="ask__hint" id="ask-hint" data-ask-hint hidden>
+      <p class="ask__hint" id="ask-hint" data-ask-hint>
         Prova con:
-        {/* Filled by the script from the chosen activity; this is the fallback
-            for anyone browsing without JavaScript. */}
+        {/* Rese al build da SUGGESTIONS.all: valgono anche senza JavaScript. */}
         <span data-ask-chips>
           {SUGGESTIONS.all.map((s, i) => (
             <>
@@ -893,7 +828,7 @@ window.__ATHLON_ACTIVITIES__ = ${JSON.stringify(ACTIVITY_TAGS)};`}
   }
 
   function ripristina() {
-    let salvato: { attivita?: unknown; domanda?: unknown } | null = null;
+    let salvato: { domanda?: unknown } | null = null;
     try {
       salvato = JSON.parse(sessionStorage.getItem(MEMORIA) || 'null');
     } catch {
@@ -901,22 +836,14 @@ window.__ATHLON_ACTIVITIES__ = ${JSON.stringify(ACTIVITY_TAGS)};`}
     }
     if (!salvato) return;
 
-    // Solo attività che esistono ancora: la tassonomia può essere cambiata da
-    // quando la scelta è stata salvata.
-    const ids = Array.isArray(salvato.attivita) ? salvato.attivita : [];
-    const validi = ids.filter((id): id is string => typeof id === 'string' && LABEL_OF.has(id));
-    if (validi.length === 0) return;
-
-    validi.forEach((id) => {
-      chosen.add(id);
-      const cb = boxes.find((b) => b.value === id);
-      if (cb) cb.checked = true;
-    });
-    if (input && typeof salvato.domanda === 'string') input.value = salvato.domanda;
-
-    // Riapre il passo 2 e rifà la ricerca. Nessun focus: l'utente sta tornando
-    // su una pagina, non iniziando a scrivere, e il focus la farebbe saltare.
-    syncActivities();
+    // Non c'è più il passo delle attività: si ripristina solo la domanda e la
+    // si riesegue. Chi apre una scheda dalla risposta e torna indietro ritrova
+    // la sua domanda dov'era, senza riscriverla. Nessun focus: sta tornando su
+    // una pagina, non iniziando a scrivere.
+    if (input && typeof salvato.domanda === 'string' && salvato.domanda.trim()) {
+      input.value = salvato.domanda;
+      render(input.value);
+    }
   }
 
   function syncActivities() {
