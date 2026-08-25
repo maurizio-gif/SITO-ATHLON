@@ -355,6 +355,21 @@ export function initChatAssistente(root, options) {
     return '';
   }
 
+  /* Il titolo del passo email, per intento della CTA — la stessa scelta delle
+     APERTURE, un passo prima: chi arriva da «Richiedi assistenza» legge un
+     titolo d'aiuto, chi arriva da «Chatta con noi» un invito generico. Il
+     modulo lo scrive all'apertura di una chat nuova; il markup porta il default
+     che si vede finché il modulo non gira. */
+  var EMAIL_TITOLO = {
+    assistenza: 'Come possiamo aiutarti?',
+    generico: 'Di cosa ti va di parlare?',
+  };
+  function vestiEmail() {
+    if (!emailTitolo) return;
+    emailTitolo.textContent =
+      dati.ctaIntento === 'assistenza' ? EMAIL_TITOLO.assistenza : EMAIL_TITOLO.generico;
+  }
+
   function salva() {
     if (ricostruendo || suTotem()) return;
     /* Niente email e niente conversazione vuol dire che non c'e' ancora niente
@@ -402,6 +417,10 @@ export function initChatAssistente(root, options) {
   var campoEmail = q('[data-ca-email]');
   var btnEmail = q('[data-ca-email-invia]');
   var erroreEmail = q('[data-ca-email-errore]');
+  /* Il titolo del passo email: lo riscrive `vestiEmail()` in base al testo della
+     CTA che ha aperto la chat. L'intro (`data-ca-email-lead`) resta com'è —
+     spiega perché serve l'email, e vale in entrambi i casi. */
+  var emailTitolo = q('[data-ca-email-titolo]');
   var conversazione = q('[data-ca-conversazione]');
   var campoDomanda = q('[data-ca-domanda]');
   var btnDomanda = q('[data-ca-invia]');
@@ -2297,8 +2316,12 @@ export function initChatAssistente(root, options) {
       dati.pagina = pagina || location.pathname;
       /* L'intento del pulsante plasma l'apertura, ma solo per una chat che
          parte ora (passo email): una conversazione già avviata tiene la sua, e
-         chi la riapre non deve vederla cambiare per il pulsante di stavolta. */
-      if (dati.passo === 'email') dati.ctaIntento = intentoDaCta(ctaTesto);
+         chi la riapre non deve vederla cambiare per il pulsante di stavolta. Il
+         titolo del passo email lo rispecchia già qui, prima ancora dell'email. */
+      if (dati.passo === 'email') {
+        dati.ctaIntento = intentoDaCta(ctaTesto);
+        vestiEmail();
+      }
       /* L'attività preselezionata vale solo per una chat che parte ora: se la
          persona ha una conversazione già avviata (o è già oltre l'email), il
          corso lo ha scelto lei e non lo si cambia sotto le mani. Al passo
