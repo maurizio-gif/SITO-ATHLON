@@ -399,17 +399,51 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
     <div class="container">
       <span class="eyebrow" data-anim="from-left">I nostri spazi</span>
       <h2 class="ju-sec__title" data-anim="reveal">Dove si svolge l’attività</h2>
-      <p class="ju-sec__sub">Puoi vederli prima di venire: il tour si apre in una pagina a parte.</p>
+      <p class="ju-sec__sub">Puoi vederli prima di venire: apri il tour senza lasciare la pagina.</p>
 
+      {/* Accordion, uno aperto per volta — come i workout di /gym-floor e le
+          FAQ. L'iframe è nel markup fin da subito e non lo crea lo script al
+          clic: è la stessa regola di `Struttura.astro`, «l'indirizzo si legge
+          dall'iframe e non si scrive qui». CookieYes lo blocca finché il
+          consenso non arriva leggendo gli iframe già in pagina; uno scritto da
+          uno script nostro dopo il caricamento rischierebbe di scavalcarlo. Il
+          pannello parte chiuso (altezza zero), quindi il costo è nel
+          `loading="lazy"` dell'iframe — la stessa misura già in campo su
+          gym-floor e abbonamenti — non in un secondo meccanismo di consenso. */}
       <ul class="ju-spazi">
         {corso.spazi.map((s) => (
-          <li class="ju-spazio">
+          <li class="ju-spazio" data-ju-spazio-item>
             <h3 class="ju-spazio__nome">{s.nome}</h3>
             <p class="ju-spazio__testo">{s.testo}</p>
             {s.tour && (
-              <a class="ju-spazio__cta" href={s.tour} target="_blank" rel="noopener noreferrer">
-                Apri il tour virtuale →
-              </a>
+              <>
+                <button
+                  class="ju-spazio__cta"
+                  type="button"
+                  aria-expanded="false"
+                  data-ju-spazio-trigger
+                >
+                  <span>Apri il tour virtuale</span>
+                  <span class="ju-spazio__cta-icon" aria-hidden="true">+</span>
+                </button>
+                <div class="ju-spazio__pannello">
+                  <div class="ju-spazio__pannello-inner">
+                    {/* Le coordinate di vista sono già nell'indirizzo (`sr`,
+                        `ss`) insieme a `play=1`: si apre già sul punto giusto,
+                        senza bisogno di un tasto play separato dentro il
+                        riquadro. */}
+                    <div class="ju-spazio__tour">
+                      <iframe
+                        src={s.tour}
+                        title={`Tour virtuale — ${s.nome}, Athlon Club`}
+                        allowfullscreen
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                      ></iframe>
+                    </div>
+                  </div>
+                </div>
+              </>
             )}
           </li>
         ))}
@@ -471,6 +505,27 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
     )}
   </div>
 </section>
+
+<script>
+  // Accordion degli spazi — uno aperto per volta, come i workout di
+  // /gym-floor e le FAQ (Faq.astro): stesso pattern, nome suo perché questo
+  // file non condivide markup con quei due.
+  const spazi = Array.from(document.querySelectorAll<HTMLElement>('[data-ju-spazio-item]'));
+  spazi.forEach((item) => {
+    const trigger = item.querySelector<HTMLButtonElement>('[data-ju-spazio-trigger]');
+    trigger?.addEventListener('click', () => {
+      const willOpen = !item.classList.contains('open');
+      spazi.forEach((other) => {
+        other.classList.remove('open');
+        other.querySelector('[data-ju-spazio-trigger]')?.setAttribute('aria-expanded', 'false');
+      });
+      if (willOpen) {
+        item.classList.add('open');
+        trigger.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+</script>
 
 <style>
   /* ---- Hero ---- */
@@ -1136,6 +1191,11 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
        Una `auto-fit` con la soglia in rem si tara da sé a qualunque scala. */
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
     gap: 18px;
+    /* `start` e non lo `stretch` di default: quando una card apre il suo tour
+       cresce in altezza, e senza questo lo stiramento della griglia avrebbe
+       allungato anche le vicine della stessa riga, lasciandole con un vuoto
+       in fondo che non è loro. */
+    align-items: start;
   }
 
   .ju-spazio {
@@ -1159,15 +1219,83 @@ const altri = PAGINE_ADULTI.filter((p) => !corso.simili.some((s) => s.slug === p
 
   .ju-spazio__cta {
     margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
     font-size: var(--text-2xs);
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--color-primary);
+    text-align: left;
   }
 
   .ju-spazio__cta:hover {
     text-decoration: underline;
+  }
+
+  .ju-spazio__cta-icon {
+    flex: none;
+    font-size: var(--text-md);
+    line-height: 1;
+    transition: transform var(--dur-base) var(--ease-out-crit);
+  }
+
+  [data-ju-spazio-item].open .ju-spazio__cta-icon {
+    transform: rotate(45deg);
+  }
+
+  /* Stesso schema di `.wk__a`/`.faq__a`: chiuso è altezza zero, non
+     `display: none` — la transizione ha bisogno di un valore da cui partire. */
+  .ju-spazio__pannello {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--dur-base) var(--ease-out-crit);
+  }
+
+  [data-ju-spazio-item].open .ju-spazio__pannello {
+    grid-template-rows: 1fr;
+  }
+
+  .ju-spazio__pannello-inner {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  [data-ju-spazio-item].open .ju-spazio__pannello-inner {
+    padding-top: 16px;
+  }
+
+  /* Stessa misura del tour della home (`Struttura.astro`): l'altezza è un
+     rapporto — 16/9 in largo, 4/3 sul telefono, dove 16:9 di una colonna
+     stretta lascia troppo poco per orientarsi nel panorama — con un freno in
+     `svh` così un pannello verticale non lo allunga per due schermate. */
+  .ju-spazio__tour {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-strong);
+    aspect-ratio: 16 / 9;
+    max-height: 80svh;
+  }
+
+  .ju-spazio__tour iframe {
+    display: block;
+    border: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  @media (max-width: 700px) {
+    .ju-spazio__tour {
+      aspect-ratio: 4 / 3;
+    }
   }
 
   /* ---- Correlati ---- */

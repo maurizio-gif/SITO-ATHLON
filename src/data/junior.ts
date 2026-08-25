@@ -54,7 +54,8 @@ export interface CorsoStagione {
 export interface SpazioJunior {
   nome: string;
   testo: string;
-  /** Il tour virtuale dell'impianto: si apre a parte, non incorniciato. */
+  /** Il tour virtuale dell'impianto: si apre incorniciato dentro l'accordion
+      dello spazio, non in una scheda a parte. */
   tour?: string;
 }
 
