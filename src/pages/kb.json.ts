@@ -633,7 +633,7 @@ export const GET: APIRoute = async () => {
     testo: blocchi(
       `**Tutte** le attivita' per adulti sono riservate a chi ha almeno ${ETA_MINIMA_ADULTI.anni} anni: Gym Floor, corsi fitness, Group Reformer, aqua fitness, scuola nuoto adulti, corso gestanti, personal training.`,
       `**Il nuoto libero non fa eccezione**: sotto i ${ETA_MINIMA_ADULTI.anni} anni non si accede alla vasca in autonomia, nemmeno accompagnati da un genitore iscritto. Non e' una questione di abbonamento, e' una regola d'accesso: non proporre abbonamenti, prove o accessi singoli per aggirarla.`,
-      `Chi ha meno di ${ETA_MINIMA_ADULTI.anni} anni nuota con ${ETA_MINIMA_ADULTI.alternativa}, che e' un corso con l'istruttore in vasca, e prima dei 30 mesi con il Baby Nuoto.`
+      `Chi ha meno di ${ETA_MINIMA_ADULTI.anni} anni nuota con ${ETA_MINIMA_ADULTI.alternativa}, che e' un corso con l'istruttore in vasca, e i piu' piccoli — i nati nel 2024, 2025 e 2026 — con il Baby Nuoto. Fra scuola nuoto bambini e baby nuoto decide l'anno di nascita, non i mesi: i nati dal 2013 al 2023 fanno la scuola nuoto.`
     ),
   });
 

@@ -422,6 +422,27 @@ import CampoTelefono from '../CampoTelefono.astro';
       apri(null, 'riapri-rimando');
     })();
 
+    /* Un indirizzo che apre la chat da solo, per chi arriva da fuori il sito —
+       una newsletter, un QR, un link mandato da un socio — e non da un
+       `data-cta` in pagina. `?athlon-chat=1` in coda a qualunque indirizzo con
+       questo modal (qui, o su ogni pagina con `chrome`) la apre al
+       caricamento, prima ancora di un click.
+
+       A differenza di `riapriDaRimando()` qui sopra si apre **anche sul
+       telefono**: là il rischio era coprire la pagina appena raggiunta
+       durante una navigazione interna: qui non c'è una pagina "appena
+       raggiunta" da coprire, l'unico motivo per cui si è arrivati è parlare
+       con l'assistente, quindi nasconderla sarebbe il contrario di quello che
+       il link prometteva. */
+    (function apriDaIndirizzo() {
+      var richiesta = false;
+      try {
+        richiesta = new URLSearchParams(location.search).get('athlon-chat') === '1';
+      } catch (err) {}
+      if (!richiesta) return;
+      apri(null, 'link-esterno');
+    })();
+
     /* Il dito o il puntatore che si avvicina al pulsante è il preavviso che
        serve: il modulo parte lì, e al clic è già in memoria. Costa una
        richiesta solo a chi ha davvero avuto l'intenzione. */
@@ -1117,6 +1138,46 @@ import CampoTelefono from '../CampoTelefono.astro';
     outline: none;
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(255, 87, 1, 0.15);
+  }
+
+  /* L'allegato facoltativo: etichetta di spiegazione + campo file. Come i due
+     comandi qui sotto, il markup lo scrive lo script con `innerHTML`, quindi
+     l'aspetto va dichiarato in `:global` e per intero — le regole con lo scoping
+     di Astro non lo raggiungerebbero. */
+  .ca__conversazione :global(.ca__ticket-file-lab) {
+    display: block;
+    margin-top: 0.7rem;
+    color: rgba(39, 36, 35, 0.7);
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .ca__conversazione :global(.ca__ticket-file) {
+    display: block;
+    width: 100%;
+    margin-top: 0.4rem;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--color-dark);
+  }
+
+  .ca__conversazione :global(.ca__ticket-file::file-selector-button) {
+    margin-right: 0.6rem;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid rgba(39, 36, 35, 0.18);
+    border-radius: 0.5rem;
+    background: var(--color-white);
+    color: var(--color-dark);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .ca__conversazione :global(.ca__ticket-file::file-selector-button:hover) {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
   }
 
   /* I due comandi del ticket sono **ridipinti da zero qui**, e non è una

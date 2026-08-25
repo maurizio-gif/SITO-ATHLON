@@ -125,20 +125,17 @@ export function initChatAssistente(root, options) {
       label: 'Attività adulti',
       nota: 'Gym Floor, Corsi Fitness, Group Reformer, Nuoto Libero, Aqua Fitness, Scuola Nuoto Adulti, Corso Gestanti, Personal Training',
     },
-    /* «Dai 30 mesi» e non «dai 3 anni», che è come il resto del sito lo dice.
-       I tre anni sono la cifra tonda della comunicazione, non un requisito: il
-       criterio vero è l'anno di nascita — per il 2026/27 sono i nati dal 2013
-       al 2023, e un nato a fine 2023 a settembre ha trentatré mesi. Il bot
-       legge i dati del sito e risponde «dai 30 mesi», quindi una nota che
-       dicesse tre anni lo smentirebbe due righe più su. E qui la nota non è
-       una didascalia: è quello che fa scegliere fra queste due voci a chi ha
-       un bambino di trenta mesi.
-
-       Per il Baby Nuoto la nota dice anche del genitore, perché fra i 30 e i
-       36 mesi le due fasce si sovrappongono per davvero e l'età non decide
-       niente: quello che cambia è se in acqua si entra insieme. */
-    { id: 'scuola-nuoto-bambini', label: 'Scuola Nuoto Bambini', nota: 'dai 30 mesi' },
-    { id: 'baby-nuoto', label: 'Baby Nuoto', nota: 'da 3 a 36 mesi, con un genitore in acqua' },
+    /* La scelta fra le due si fa per **anno di nascita**, non in mesi, ed è la
+       regola che toglie la sovrapposizione: i nati dal 2013 al 2023 fanno la
+       Scuola Nuoto Bambini, i nati nel 2024, 2025 e 2026 il Baby Nuoto. Prima
+       le note dicevano «dai 30 mesi» e «da 3 a 36 mesi», e fra i 30 e i 36 mesi
+       le due fasce si sovrapponevano davvero — quello che mandava un bambino
+       del 2023 nel corso sbagliato. Ora l'anno decide da solo, come già fa il
+       portale (sotto «nati 2023» c'è la scuola nuoto). Per il Baby Nuoto la
+       nota dice anche del genitore in acqua, che è l'altra differenza. Gli anni
+       vanno aggiornati ogni stagione. */
+    { id: 'scuola-nuoto-bambini', label: 'Scuola Nuoto Bambini', nota: 'nati dal 2013 al 2023' },
+    { id: 'baby-nuoto', label: 'Baby Nuoto', nota: 'nati nel 2024, 2025 e 2026, con un genitore in acqua' },
     { id: 'nuoto-agonistico', label: 'Nuoto Agonistico', nota: '' },
     { id: 'pallanuoto', label: 'Pallanuoto', nota: '' },
   ];
@@ -1494,6 +1491,13 @@ export function initChatAssistente(root, options) {
       '<p class="ca__ticket-lead">Mando al team questa conversazione. Vuoi aggiungere qualcosa?</p>' +
       '<textarea class="ca__ticket-testo" rows="3" data-ca-ticket-testo ' +
       'placeholder="Facoltativo — qualsiasi cosa possa servirci"></textarea>' +
+      /* Un allegato facoltativo: la richiesta tipica al team ne ha uno — il
+         certificato medico, lo screenshot di un errore — e senza un campo qui
+         la persona doveva aprire l'email a parte. Stesso pattern del form
+         dell'Help Desk: immagine o PDF, uno solo, fino a 5 MB, e il file
+         viaggia in base64 nel payload del ticket (vedi inviaTicket). */
+      '<label class="ca__ticket-file-lab" for="ca-ticket-file">Vuoi allegare un file? Il certificato medico, uno screenshot dell’errore o qualsiasi documento utile — immagine o PDF, fino a 5 MB.</label>' +
+      '<input class="ca__ticket-file" id="ca-ticket-file" type="file" accept="image/*,application/pdf" data-ca-ticket-file>' +
       '<div class="ca__ticket-azioni">' +
       '<button type="button" class="ca__btn" data-ca-ticket-invia>Invia al team</button>' +
       '<button type="button" class="ca__link" data-ca-ticket-annulla>Annulla</button>' +
@@ -1508,36 +1512,87 @@ export function initChatAssistente(root, options) {
     if (campo) campo.focus();
   }
 
+  /** Il file in base64, senza il prefisso `data:` che il webhook non usa. */
+  function leggiBase64(f) {
+    return new Promise(function (risolvi, rifiuta) {
+      var r = new FileReader();
+      r.onload = function () {
+        var s = String(r.result || '');
+        var virgola = s.indexOf(',');
+        risolvi(virgola >= 0 ? s.slice(virgola + 1) : s);
+      };
+      r.onerror = function () { rifiuta(r.error); };
+      r.readAsDataURL(f);
+    });
+  }
+
+  function mostraErroreTicket(box, testo) {
+    var errore = box.querySelector('.ca__ticket-errore');
+    if (!errore) {
+      errore = document.createElement('p');
+      errore.className = 'ca__ticket-errore';
+      box.appendChild(errore);
+    }
+    errore.textContent = testo;
+  }
+
   async function inviaTicket(box) {
     var campo = box.querySelector('[data-ca-ticket-testo]');
     var btn = box.querySelector('[data-ca-ticket-invia]');
+    var campoFile = box.querySelector('[data-ca-ticket-file]');
     var messaggio = (campo && campo.value || '').trim();
+
+    /* Il tetto si controlla qui, prima di leggere il file: un rifiuto immediato
+       e' piu' gentile di un caricamento che finisce in errore, e il base64
+       costa un terzo di byte in piu' — su 5 MB sono 6,7 MB di richiesta, dentro
+       il limite. Stesso limite del form dell'Help Desk. */
+    var MAX = 5 * 1024 * 1024;
+    var scelto = (campoFile && campoFile.files && campoFile.files[0]) || null;
+    if (scelto && scelto.size > MAX) {
+      mostraErroreTicket(
+        box,
+        'L’allegato è troppo grande (' + (scelto.size / 1024 / 1024).toFixed(1) + ' MB): il limite è 5 MB.'
+      );
+      return;
+    }
 
     attendi(btn, true);
     try {
+      var payload = {
+        email: dati.email,
+        nome: dati.nome,
+        cognome: dati.cognome,
+        telefono: dati.telefono,
+        memberId: dati.memberId,
+        ramo: dati.ramo,
+        attivita: dati.attivita,
+        attivitaJunior: dati.attivitaJunior,
+        sessione: sessione(),
+        pagina: dati.pagina,
+        messaggio: messaggio,
+        conversazione: trascritto,
+        /* Anche il ticket: chi chiede di parlare con una persona è un contatto
+           come gli altri, e il desk deve poter sapere se sta rispondendo a
+           qualcuno arrivato da una campagna o dal totem in sede. */
+        utm: window.athlonGetUtm ? window.athlonGetUtm() : {},
+        vid: window.athlonGetVid ? window.athlonGetVid() : null,
+        sid: window.athlonGetSid ? window.athlonGetSid() : null,
+      };
+      /* L'allegato viaggia in base64 dentro lo stesso JSON: il webhook riceve un
+         oggetto e da quello compone l'email al desk, quindi passare a multipart
+         per un campo facoltativo vorrebbe dire riscrivere il contratto. Il
+         workflow lo riattacca binario all'email; nella riga di database restano
+         nome, tipo e peso, non il base64. */
+      if (scelto) {
+        payload.allegatoNome = scelto.name;
+        payload.allegatoTipo = scelto.type || 'application/octet-stream';
+        payload.allegatoPeso = scelto.size;
+        payload.allegatoBase64 = await leggiBase64(scelto);
+      }
       var r = await fetch(TICKET, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: dati.email,
-          nome: dati.nome,
-          cognome: dati.cognome,
-          telefono: dati.telefono,
-          memberId: dati.memberId,
-          ramo: dati.ramo,
-          attivita: dati.attivita,
-          attivitaJunior: dati.attivitaJunior,
-          sessione: sessione(),
-          pagina: dati.pagina,
-          messaggio: messaggio,
-          conversazione: trascritto,
-          /* Anche il ticket: chi chiede di parlare con una persona è un contatto
-             come gli altri, e il desk deve poter sapere se sta rispondendo a
-             qualcuno arrivato da una campagna o dal totem in sede. */
-          utm: window.athlonGetUtm ? window.athlonGetUtm() : {},
-          vid: window.athlonGetVid ? window.athlonGetVid() : null,
-          sid: window.athlonGetSid ? window.athlonGetSid() : null,
-        }),
+        body: JSON.stringify(payload),
       });
       if (!r.ok) throw new Error(String(r.status));
       ticketInviato = true;
@@ -1546,13 +1601,7 @@ export function initChatAssistente(root, options) {
       salva();
     } catch (e) {
       attendi(btn, false);
-      var errore = box.querySelector('.ca__ticket-errore');
-      if (!errore) {
-        errore = document.createElement('p');
-        errore.className = 'ca__ticket-errore';
-        box.appendChild(errore);
-      }
-      errore.textContent = 'Non è partita. Riprova fra un momento.';
+      mostraErroreTicket(box, 'Non è partita. Riprova fra un momento.');
     }
   }
 
