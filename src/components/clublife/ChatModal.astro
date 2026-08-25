@@ -422,6 +422,27 @@ import CampoTelefono from '../CampoTelefono.astro';
       apri(null, 'riapri-rimando');
     })();
 
+    /* Un indirizzo che apre la chat da solo, per chi arriva da fuori il sito —
+       una newsletter, un QR, un link mandato da un socio — e non da un
+       `data-cta` in pagina. `?athlon-chat=1` in coda a qualunque indirizzo con
+       questo modal (qui, o su ogni pagina con `chrome`) la apre al
+       caricamento, prima ancora di un click.
+
+       A differenza di `riapriDaRimando()` qui sopra si apre **anche sul
+       telefono**: là il rischio era coprire la pagina appena raggiunta
+       durante una navigazione interna: qui non c'è una pagina "appena
+       raggiunta" da coprire, l'unico motivo per cui si è arrivati è parlare
+       con l'assistente, quindi nasconderla sarebbe il contrario di quello che
+       il link prometteva. */
+    (function apriDaIndirizzo() {
+      var richiesta = false;
+      try {
+        richiesta = new URLSearchParams(location.search).get('athlon-chat') === '1';
+      } catch (err) {}
+      if (!richiesta) return;
+      apri(null, 'link-esterno');
+    })();
+
     /* Il dito o il puntatore che si avvicina al pulsante è il preavviso che
        serve: il modulo parte lì, e al clic è già in memoria. Costa una
        richiesta solo a chi ha davvero avuto l'intenzione. */
