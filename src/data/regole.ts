@@ -42,7 +42,6 @@ export const CERTIFICATO = {
   etaMinima: 6,
   /** Durata del rinnovo temporaneo che il desk inserisce a chi ha la visita già fissata. */
   rinnovoTemporaneoGiorni: 14,
-  scheda: 'generali/certificato-medico',
 } as const;
 
 /**
@@ -70,7 +69,6 @@ export const PRENOTAZIONE = {
   /** Quante prenotazioni si possono tenere aperte insieme. */
   attiveCorsi: 3,
   attiveReformer: 1,
-  scheda: 'generali/prenotazioni',
 } as const;
 
 /* ---- Frasi ricorrenti ---------------------------------------------------

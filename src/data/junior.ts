@@ -315,9 +315,7 @@ export const JUNIOR: CorsoJunior[] = [
       },
       {
         q: 'A quale temperatura è la vasca del Baby Nuoto?',
-        a: 'Durante l’attività di Baby Nuoto la temperatura è tenuta tra 31,5 °C e 31,8 °C.',
-        scheda: 'snb/temperature-piscine',
-        rimando: 'Tutte le temperature',
+        a: 'Durante l’attività di Baby Nuoto la temperatura è tenuta tra 31,5 °C e 31,8 °C, più calda delle altre vasche del club: la piscina grande resta a 28 °C.',
       },
       {
         q: 'Se non possiamo venire, come si disdice la lezione?',
@@ -329,9 +327,7 @@ export const JUNIOR: CorsoJunior[] = [
       },
       {
         q: 'Come si pagano le lezioni e la quota mensile?',
-        a: 'Le lezioni si pagano online con carta di pagamento, di debito o di credito. Per la formula mensile puoi scegliere fra carta di pagamento e addebito su conto corrente.',
-        scheda: 'generali/metodo-di-pagamento',
-        rimando: 'Metodi accettati',
+        a: 'Le lezioni si pagano online con carta di pagamento, di debito o di credito. Per la formula mensile puoi scegliere fra carta di pagamento e addebito su conto corrente: non si accettano contanti, bonifico o voucher regionali.',
       },
     ],
     simili: [
@@ -473,8 +469,6 @@ export const JUNIOR: CorsoJunior[] = [
       {
         q: 'È possibile effettuare una prova?',
         a: 'Sì, e il modo è l’abbonamento stesso: l’adesione è mensile e si rinnova il primo del mese, quindi puoi frequentare un periodo e, se tuo figlio non si trova bene, disdire — non ti leghi alla stagione intera. Per fermarti basta una email a <a href="mailto:disdetta@athlonroma.it">disdetta@athlonroma.it</a> almeno dieci giorni prima del primo del mese. Se più avanti tornate, la quota di attivazione va versata di nuovo.',
-        scheda: 'snb/disdetta',
-        rimando: 'Come e quando si disdice',
       },
       {
         id: 'certificato-junior',
@@ -498,9 +492,7 @@ export const JUNIOR: CorsoJunior[] = [
       },
       {
         q: 'Si possono recuperare le lezioni perse?',
-        a: 'Sì, entro i limiti previsti per la stagione. Le regole precise — quante lezioni, in che periodo e come si prenota il recupero — sono nella scheda dell’Help Desk.',
-        scheda: 'snb/recuperi-lezioni',
-        rimando: 'Come funzionano i recuperi',
+        a: 'Sì: prima disdici la lezione persa dall’app o dal portale, poi prenoti il recupero — nella stessa fascia d’età di tuo figlio — a partire da tre giorni prima. Non sono previsti recuperi nelle prime due settimane di corso né nella settimana dei Brevetti a fine anno, e vanno comunque usati entro la fine della stagione, il 31 maggio: non si trasferiscono all’anno successivo.',
       },
     ],
     simili: [
@@ -602,9 +594,7 @@ export const JUNIOR: CorsoJunior[] = [
       { id: 'convocazioni', q: 'Quali sono i criteri delle convocazioni a gare, partite e manifestazioni?' },
       {
         q: 'Il kit tecnico è obbligatorio?',
-        a: 'Sì: il tesserato ha l’obbligo di indossare il kit istituzionale durante le manifestazioni sportive a cui la società partecipa.',
-        scheda: 'snb/kit-tecnico-agonistico',
-        rimando: 'Cosa comprende e come si ordina',
+        a: 'Sì: il tesserato ha l’obbligo di indossare il kit istituzionale durante le manifestazioni sportive a cui la società partecipa. La consegna avviene tramite l’allenatore, non in reception, e se la taglia non va bene il cambio è possibile: basta parlarne con lui alla consegna, prima di aver usato il capo.',
       },
       {
         q: 'Dove posso acquistare il kit della pallanuoto?',
@@ -704,15 +694,11 @@ export const JUNIOR: CorsoJunior[] = [
       { id: 'convocazioni', q: 'Quali sono i criteri delle convocazioni alle gare e manifestazioni?' },
       {
         q: 'Come funzionano le gare del Circuito ASI?',
-        a: 'Quattro tappe regionali da novembre a maggio e la finale nazionale a giugno. Gli atleti sono divisi per fascia d’età e anno di nascita, e si può scegliere a quante gare iscriversi.',
-        scheda: 'snb/gare-nuoto',
-        rimando: 'Come funzionano le gare',
+        a: 'Quattro tappe regionali da novembre a maggio e la finale nazionale a giugno. Gli atleti sono divisi per fascia d’età e anno di nascita, e si può scegliere a quante gare iscriversi. Per il settore agonistico le gare del circuito sono comprese nella quota, con la sola eccezione degli eventuali meeting.',
       },
       {
         q: 'Il kit tecnico è obbligatorio?',
-        a: 'Sì: il tesserato ha l’obbligo di indossare il kit istituzionale durante le manifestazioni sportive a cui la società partecipa. Il kit tecnico nuoto agonistico costa 49 € e comprende cuffia in silicone, costume, zaino e maglietta.',
-        scheda: 'snb/kit-tecnico-agonistico',
-        rimando: 'Cosa comprende e come si ordina',
+        a: 'Sì: il tesserato ha l’obbligo di indossare il kit istituzionale durante le manifestazioni sportive a cui la società partecipa. Il kit tecnico nuoto agonistico costa 49 € e comprende cuffia in silicone, costume, zaino e maglietta; la consegna avviene tramite l’allenatore, e se la taglia non va bene il cambio è possibile parlandone con lui prima di aver usato il capo.',
       },
     ],
     simili: [
