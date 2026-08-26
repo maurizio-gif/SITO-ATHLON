@@ -65,6 +65,17 @@ const faqs = await faqPagina([
         {lezioniTotali} lezioni ogni settimana, più le ore di nuoto libero e la Gym Floor aperta tutti i giorni. Prenoti tutto
         dall'app o dal portale.
       </p>
+      {/* Stessa finestra e stessa fonte di ORARIO_ECCEZIONALE qui sopra: la
+          vasca grande è stata in ristrutturazione a luglio e agosto 2026, e il
+          planning qui sotto è già quello di settembre — ma vale da quella
+          data, non prima. La nota sparisce da sola dopo il 1° settembre,
+          quando "attivo dal" non è più un'informazione ma un'ovvietà. */}
+      {orarioEccezionaleAttivo() && (
+        <p class="pl-hero__avviso">
+          Il planning qui sotto è già quello di settembre, attivo dal <strong>1° settembre 2026</strong>: a luglio e agosto la
+          vasca grande è in ristrutturazione.
+        </p>
+      )}
       <div class="pl-hero__actions">
         <a href={`${PG}/#/Classes/1/Calendar`} class="btn btn-primary" data-cta="member" target="_blank" rel="noopener noreferrer">
           Prenota una lezione →
@@ -229,9 +240,23 @@ const faqs = await faqPagina([
 
   .pl-hero__lede {
     max-width: 34rem;
-    margin: 20px 0 30px;
+    margin: 20px 0 10px;
     font-size: var(--text-md);
     color: rgba(255, 255, 255, 0.68);
+  }
+
+  /* Corpo minuto e grigio, come le altre note di servizio della pagina
+     (vedi .pl-note più sotto): è un avviso di validità, non il messaggio
+     principale dell'hero. */
+  .pl-hero__avviso {
+    max-width: 34rem;
+    margin: 0 0 24px;
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .pl-hero__avviso strong {
+    color: rgba(255, 255, 255, 0.85);
   }
 
   .pl-hero__actions {
