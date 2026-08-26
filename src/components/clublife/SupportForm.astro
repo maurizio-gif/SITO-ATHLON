@@ -325,6 +325,20 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
       const sidField = form.querySelector<HTMLInputElement>('[data-support-sid]');
       const getSid = (window as unknown as { athlonGetSid?: () => string }).athlonGetSid;
       if (sidField && getSid) sidField.value = getSid();
+
+      /* UserNumber: stesso bug delle UTM, stessa cura. Il campo si riempiva
+         solo da `location.search` della pagina che ha aperto il pannello
+         (sopra, via `data-prefill`), e si perdeva appena il link veniva
+         cliccato da un'altra pagina — perché questo è un sito statico
+         multipagina. `scripts/numeroSocio.ts` lo tiene per tutta la visita
+         (e fra una visita e l'altra, coi funzionali): qui si usa solo come
+         ripiego, se il campo è rimasto vuoto. */
+      const userNumberField = root.querySelector<HTMLInputElement>('[name="userNumber"]');
+      const getUserNumber = (window as unknown as { athlonUserNumberConosciuto?: () => string })
+        .athlonUserNumberConosciuto;
+      if (userNumberField && !userNumberField.value && getUserNumber) {
+        userNumberField.value = getUserNumber();
+      }
     };
 
     /* L'email dall'URL vince su quella ricordata dal browser
