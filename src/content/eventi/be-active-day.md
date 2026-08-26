@@ -16,6 +16,11 @@ program:
       - time: '11:20'
         lesson: Body Sculpt
         trainer: Manuel Di Censi
+  - room: Piscina Piccola
+    slots:
+      - time: '12:10'
+        lesson: Aqua Tonic
+        trainer: Vincenza Bonfante
 ctaHref: ''
 attivita: []
 ---
