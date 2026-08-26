@@ -1,11 +1,19 @@
 ---
-title: "Be Active Day"
-kicker: "Giornata europea dello sport"
-date: 2026-09-27
-image: "/wp-content/uploads/2025/11/ATHLON81-scaled.jpg"
-imageAlt: "La Gym Floor di Athlon Club, l'area funzionale della sala pesi"
-excerpt: "Una masterclass con i nostri migliori istruttori e le nostre lezioni, per la giornata europea dedicata allo sport. Tieniti libera la data: modalità e programma in arrivo."
-ctaHref: ""
+title: Be Active Day
+kicker: Open Day
+date: 2026-09-27T00:00:00.000Z
+time: '10:30 - 13:00'
+image: /wp-content/uploads/2026/08/Matwork-41-Athlon-quadrata-640.jpg
+imageAlt: Pilates Mat 4.1 Il nuovo Matwork targato Athlon
+excerpt: 'Una masterclass con i nostri migliori istruttori e le nostre lezioni, per la giornata europea dedicata allo sport. Tieniti libera la data: modalità e programma in arrivo.'
+price: Gratuito per gli iscritti · 10 € per gli esterni
+program:
+  - room: Sala A
+    slots:
+      - time: '10:30'
+        lesson: Mat 4.1
+        trainer: Manuel Di Censi
+ctaHref: ''
 attivita: []
 ---
 
