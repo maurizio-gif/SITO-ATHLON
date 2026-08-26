@@ -21,6 +21,7 @@
 import { WEBHOOK_VERIFICA, eSocio } from '../data/contatto';
 import { WEBHOOK_REFERRAL, CANALI, AMICI } from '../data/referral';
 import { validaTelefono } from '../data/prefissi';
+import { leggi as userNumberConosciuto } from '../scripts/numeroSocio';
 
 (function () {
   var modal = document.getElementById('referral-modal');
@@ -72,7 +73,7 @@ import { validaTelefono } from '../data/prefissi';
   var esitoTesto = modal.querySelector('[data-rfr-esito]');
 
   /** Chi invita, dopo la verifica: serve al payload e al saluto. */
-  var invitante = { email: '', nome: '', cognome: '', memberId: null };
+  var invitante = { email: '', nome: '', cognome: '', memberId: null, userNumber: '' };
   /** Chi ha aperto il pannello, per rimettergli il fuoco alla chiusura. */
   var chiamante = null;
 
@@ -123,24 +124,27 @@ import { validaTelefono } from '../data/prefissi';
     return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v || '').trim());
   }
 
-  /** La verifica su PerfectGym, con il suo tempo massimo. Null = non lo sappiamo. */
-  async function verifica(email, attesa) {
+  /**
+   * La verifica su PerfectGym, con il suo tempo massimo. Null = non lo
+   * sappiamo. `numero`, quando passato, è un UserNumber già noto: cerca con
+   * quello invece che con l'email, che in quel caso può anche essere vuota.
+   */
+  async function verifica(email, attesa, numero) {
     try {
       var taglia = new AbortController();
       var orologio = setTimeout(function () {
         taglia.abort();
       }, attesa);
+      var corpo = numero ? { userNumber: numero } : { email: email };
+      corpo.pagina = location.pathname;
+      corpo.origine = 'referral';
+      corpo.vid = window.athlonGetVid ? window.athlonGetVid() : null;
+      corpo.sid = window.athlonGetSid ? window.athlonGetSid() : null;
+      corpo.utm = window.athlonGetUtm ? window.athlonGetUtm() : {};
       var r = await fetch(WEBHOOK_VERIFICA, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: email,
-          pagina: location.pathname,
-          origine: 'referral',
-          vid: window.athlonGetVid ? window.athlonGetVid() : null,
-          sid: window.athlonGetSid ? window.athlonGetSid() : null,
-          utm: window.athlonGetUtm ? window.athlonGetUtm() : {},
-        }),
+        body: JSON.stringify(corpo),
         signal: taglia.signal,
       });
       clearTimeout(orologio);
@@ -156,23 +160,47 @@ import { validaTelefono } from '../data/prefissi';
   }
 
   // ── Passo 1: chi invita ───────────────────────────────────────────────────
-  async function controllaInvitante() {
-    if (!campi.email) return;
-    var email = campi.email.value.trim().toLowerCase();
-    if (!emailValida(email)) {
-      return sbaglia('email', 'Controlla l’indirizzo: sembra incompleto.', campi.email);
+  /**
+   * `numero`, quando passato, è un UserNumber già noto (dal link di una
+   * newsletter, o da una verifica precedente riuscita): salta la lettura e
+   * la validazione del campo email, cerca su PerfectGym con quello. Finché
+   * la risposta non porta anche l'email della persona, `invitante.email`
+   * resta vuoto per un invito partito così — non rompe niente a valle, ma è
+   * deliberato e non una svista.
+   */
+  async function controllaInvitante(numero) {
+    var viaNumero = typeof numero === 'string' && numero;
+    var email = '';
+    if (!viaNumero) {
+      if (!campi.email) return;
+      email = campi.email.value.trim().toLowerCase();
+      if (!emailValida(email)) {
+        return sbaglia('email', 'Controlla l’indirizzo: sembra incompleto.', campi.email);
+      }
+      pulisciErrore('email');
+      if (window.athlonRicordaEmail) window.athlonRicordaEmail(email);
+    } else {
+      pulisciErrore('email');
     }
-    pulisciErrore('email');
-    if (window.athlonRicordaEmail) window.athlonRicordaEmail(email);
 
     attendi(btnVerifica, spinnerVerifica, true);
-    var esito = await verifica(email, ATTESA_VERIFICA);
+    var esito = await verifica(email, ATTESA_VERIFICA, viaNumero || undefined);
     attendi(btnVerifica, spinnerVerifica, false);
 
     invitante.email = email;
     invitante.nome = (esito && esito.nome) || '';
     invitante.cognome = (esito && esito.cognome) || '';
     invitante.memberId = (esito && esito.memberId) || null;
+    invitante.userNumber = viaNumero || '';
+
+    /* Il number di PerfectGym, qualunque sia stata la chiave di ricerca:
+       ricordato come l'email, così una verifica partita da un indirizzo
+       digitato riconosce da qui in poi anche i link di newsletter della
+       stessa persona. */
+    if (esito && esito.number) {
+      invitante.userNumber = invitante.userNumber || esito.number;
+      if (window.athlonRicordaUserNumber) window.athlonRicordaUserNumber(esito.number);
+    }
 
     /* Se la verifica ha risposto e dice che non è socio, si ferma. Se non ha
        risposto — `esito` è null — si passa: il workflow rifà il controllo. */
@@ -354,6 +382,7 @@ import { validaTelefono } from '../data/prefissi';
             nome: invitante.nome,
             cognome: invitante.cognome,
             memberId: invitante.memberId,
+            userNumber: invitante.userNumber || null,
           },
           /* Un array, e sempre un array anche con un amico solo: il workflow
              cicla sugli item, e un contratto che cambia forma quando l'elenco
@@ -448,7 +477,7 @@ import { validaTelefono } from '../data/prefissi';
       fuori.hidden = true;
     }
     aggiornaComandi();
-    invitante = { email: '', nome: '', cognome: '', memberId: null };
+    invitante = { email: '', nome: '', cognome: '', memberId: null, userNumber: '' };
     pulisciErrore('email');
     pulisciErrore('amico');
     attendi(btnVerifica, spinnerVerifica, false);
@@ -465,7 +494,14 @@ import { validaTelefono } from '../data/prefissi';
        ancora `hidden` e il `focus()` di `mostra` non attaccherebbe. */
     void modal.offsetWidth;
     mostra('email');
-    if (campi.email && !campi.email.value) campi.email.focus();
+    /* UserNumber prima dell'email: chi arriva da un link di newsletter è già
+       una persona nota, e non deve nemmeno vedere il campo. */
+    var numeroGiaNoto = userNumberConosciuto();
+    if (numeroGiaNoto) {
+      controllaInvitante(numeroGiaNoto);
+    } else if (campi.email && !campi.email.value) {
+      campi.email.focus();
+    }
   }
 
   function chiudi() {

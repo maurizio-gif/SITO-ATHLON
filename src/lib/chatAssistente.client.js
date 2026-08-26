@@ -40,6 +40,7 @@ import { validaTelefono } from '../data/prefissi';
 import { CALENDLY } from '../data/calendly';
 import { suTotem } from '../scripts/totem';
 import { leggi as emailConosciuta } from '../scripts/emailNota';
+import { leggi as userNumberConosciuto } from '../scripts/numeroSocio';
 import { montaCalendario } from './calendario.client.js';
 import { plans, GUEST_PASS } from '../data/abbonamenti';
 import { REGISTRAZIONE, PASSI_ATTIVAZIONE } from '../data/guestPass';
@@ -161,6 +162,9 @@ export function initChatAssistente(root, options) {
     return {
       passo: 'email',
       email: '',
+      /** Il numero socio, quando la verifica è partita da un link invece che
+          da un'email digitata. Vedi `numeroSocio.ts`. */
+      userNumber: '',
       /** L'esito della verifica su PerfectGym. */
       stato: '',
       statoNucleo: '',
@@ -389,7 +393,7 @@ export function initChatAssistente(root, options) {
     /* Niente email e niente conversazione vuol dire che non c'e' ancora niente
        da ritrovare: si evita di scrivere un record vuoto, e soprattutto di
        riscriverne uno subito dopo `pulisciStato()`, che l'aveva appena tolto. */
-    if (!dati.email && !scena.length) return;
+    if (!dati.email && !dati.userNumber && !scena.length) return;
     try {
       if (scena.length > SCENA_MAX) scena = scena.slice(-SCENA_MAX);
       sessionStorage.setItem(
@@ -529,29 +533,42 @@ export function initChatAssistente(root, options) {
     btn.classList.toggle('ca__btn--attesa', acceso);
   }
 
-  async function verifica() {
-    if (erroreEmail) erroreEmail.hidden = true;
-    if (!emailValida(campoEmail.value)) {
-      if (erroreEmail) {
-        erroreEmail.textContent = 'Controlla l’indirizzo email: manca qualcosa.';
-        erroreEmail.hidden = false;
+  /**
+   * `numero`, quando passato, è un UserNumber già noto (dal link di una
+   * newsletter, o da una verifica precedente riuscita): si salta la lettura
+   * e la validazione del campo email, e si cerca su PerfectGym con quello
+   * invece che con l'email. Finché la risposta non porta anche l'email della
+   * persona, `dati.email` resta vuoto per una sessione aperta così — non
+   * rompe niente a valle, ma è deliberato e non una svista.
+   */
+  async function verifica(numero) {
+    var viaNumero = typeof numero === 'string' && numero;
+    if (!viaNumero) {
+      if (erroreEmail) erroreEmail.hidden = true;
+      if (!emailValida(campoEmail.value)) {
+        if (erroreEmail) {
+          erroreEmail.textContent = 'Controlla l’indirizzo email: manca qualcosa.';
+          erroreEmail.hidden = false;
+        }
+        campoEmail.focus();
+        return;
       }
-      campoEmail.focus();
-      return;
-    }
 
-    dati.email = campoEmail.value.trim().toLowerCase();
-    /* L'identità di questa sessione, decisa qui e una volta sola. Se
-       l'indirizzo non è quello con cui la sessione stava parlando, da adesso
-       si parla con qualcun altro: sessione nuova, conversazione nuova. Vedi
-       `rinnovaSessione`. Al primo giro `emailSessione` è vuota e non si
-       rinnova niente — sarebbe buttare via la sessione appena nata. */
-    try {
-      var emailPrima = sessionStorage.getItem('athlon:assistente:email');
-      if (emailPrima && emailPrima !== dati.email) rinnovaSessione();
-      sessionStorage.setItem('athlon:assistente:email', dati.email);
-    } catch (e) {}
-    if (window.athlonRicordaEmail) window.athlonRicordaEmail(dati.email);
+      dati.email = campoEmail.value.trim().toLowerCase();
+      /* L'identità di questa sessione, decisa qui e una volta sola. Se
+         l'indirizzo non è quello con cui la sessione stava parlando, da adesso
+         si parla con qualcun altro: sessione nuova, conversazione nuova. Vedi
+         `rinnovaSessione`. Al primo giro `emailSessione` è vuota e non si
+         rinnova niente — sarebbe buttare via la sessione appena nata. */
+      try {
+        var emailPrima = sessionStorage.getItem('athlon:assistente:email');
+        if (emailPrima && emailPrima !== dati.email) rinnovaSessione();
+        sessionStorage.setItem('athlon:assistente:email', dati.email);
+      } catch (e) {}
+      if (window.athlonRicordaEmail) window.athlonRicordaEmail(dati.email);
+    } else {
+      dati.userNumber = viaNumero;
+    }
     attendi(btnEmail, true);
 
     var esito = null;
@@ -560,22 +577,21 @@ export function initChatAssistente(root, options) {
       var scaduta = window.setTimeout(function () {
         stop.abort();
       }, ATTESA_VERIFICA);
+      /* Con l'attribuzione, come la stessa verifica chiamata dalla prova e dai
+         pulsanti «Iscriviti»: questo endpoint registra **ogni email** del sito
+         su `eventi_email`, quindi è il primo tocco di tutti — ed era l'unico
+         chiamante a non dire da dove arrivava. Sul totem quel primo tocco
+         risultava senza `TOUR`. */
+      var corpo = viaNumero ? { userNumber: viaNumero } : { email: dati.email };
+      corpo.pagina = dati.pagina;
+      corpo.utm = window.athlonGetUtm ? window.athlonGetUtm() : {};
+      corpo.vid = window.athlonGetVid ? window.athlonGetVid() : null;
+      corpo.sid = window.athlonGetSid ? window.athlonGetSid() : null;
       var r = await fetch(VERIFICA, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: stop.signal,
-        /* Con l'attribuzione, come la stessa verifica chiamata dalla prova e dai
-           pulsanti «Iscriviti»: questo endpoint registra **ogni email** del sito
-           su `eventi_email`, quindi è il primo tocco di tutti — ed era l'unico
-           chiamante a non dire da dove arrivava. Sul totem quel primo tocco
-           risultava senza `TOUR`. */
-        body: JSON.stringify({
-          email: dati.email,
-          pagina: dati.pagina,
-          utm: window.athlonGetUtm ? window.athlonGetUtm() : {},
-          vid: window.athlonGetVid ? window.athlonGetVid() : null,
-          sid: window.athlonGetSid ? window.athlonGetSid() : null,
-        }),
+        body: JSON.stringify(corpo),
       });
       window.clearTimeout(scaduta);
       esito = await r.json();
@@ -587,6 +603,14 @@ export function initChatAssistente(root, options) {
     }
 
     attendi(btnEmail, false);
+
+    /* Il number di PerfectGym, qualunque sia stata la chiave di ricerca:
+       ricordato come l'email, così una verifica partita da un indirizzo
+       digitato riconosce da qui in poi anche i link di newsletter della
+       stessa persona — le due identità confluiscono nella stessa memoria. */
+    if (esito && esito.number && window.athlonRicordaUserNumber) {
+      window.athlonRicordaUserNumber(esito.number);
+    }
 
     dati.stato = (esito && esito.stato) || 'errore';
     /* `statoNucleo` è la domanda della chat — «questo nucleo è di casa?» —
@@ -2046,6 +2070,7 @@ export function initChatAssistente(root, options) {
           attivitaJunior: dati.attivitaJunior,
           email: valore('email') || dati.email,
           memberId: dati.memberId,
+          userNumber: dati.userNumber || null,
           statoPgm: dati.stato,
           statoNucleo: dati.statoNucleo,
           sessione: sessione(),
@@ -2318,10 +2343,17 @@ export function initChatAssistente(root, options) {
      rimettere `dati.passo` diverso da 'email' quando c'è una sessione
      salvata). */
   if (dati.passo === 'email' && !dati.email && campoEmail) {
-    var emailGiaNota = emailConosciuta();
-    if (emailGiaNota) {
-      campoEmail.value = emailGiaNota;
-      verifica();
+    /* UserNumber prima dell'email: chi arriva da un link di newsletter è già
+       una persona nota, e non deve nemmeno vedere il campo. */
+    var numeroGiaNoto = userNumberConosciuto();
+    if (numeroGiaNoto) {
+      verifica(numeroGiaNoto);
+    } else {
+      var emailGiaNota = emailConosciuta();
+      if (emailGiaNota) {
+        campoEmail.value = emailGiaNota;
+        verifica();
+      }
     }
   }
 
