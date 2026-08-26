@@ -290,6 +290,12 @@ import CampoTelefono from '../CampoTelefono.astro';
         <div class="ca__campo">
           <label class="ca__label" for="ca-bnascita">Data di nascita</label>
           <input class="ca__input" id="ca-bnascita" type="date" data-ca-f="bnascita" />
+          {/* Il pulsante scelto un passo prima ("Scuola Nuoto Bambini" o "Baby
+              Nuoto") è una stima di chi scrive; questa data è il dato esatto.
+              Se non coincidono lo script corregge da sola l'attività e lo
+              dice qui — non è un errore da correggere, quindi non usa
+              `.ca__errore`. */}
+          <p class="ca__nota" data-ca-bnascita-nota hidden></p>
         </div>
 
         {/* Spunta esplicita e non consenso implicito all'invio: qui i dati sono
@@ -746,6 +752,13 @@ import CampoTelefono from '../CampoTelefono.astro';
   .ca__errore {
     margin: 0.6rem 0 0;
     color: #c0341a;
+    font-size: var(--text-xs);
+  }
+
+  /* Una correzione, non un errore: si vede, ma non allarma. */
+  .ca__nota {
+    margin: 0.5rem 0 0;
+    color: var(--color-primary);
     font-size: var(--text-xs);
   }
 
