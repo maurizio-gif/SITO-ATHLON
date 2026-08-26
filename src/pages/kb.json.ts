@@ -140,10 +140,15 @@ const coppie = (dati?: { l: string; v: string }[]) =>
  */
 function turniScuolaNuoto(md: string): string {
   const righe: string[] = [];
-  const rx = /^\*\s+(.+?)\s+→\s+\[[^\]]+\]\(([^)]+)\)/gm;
+  // Il sorgente porta questi link come ancore HTML (serve `target="_blank"`,
+  // che il markdown puro non esprime), non come `[testo](url)`: un regex
+  // scritto per la sintassi markdown non trovava più niente qui, e gli otto
+  // link sparivano dal contesto senza errore. Vedi il commento sopra la
+  // funzione.
+  const rx = /^\*\s+(.+?)\s+→\s+<a\s+href="([^"]+)"[^>]*>[^<]*<\/a>/gm;
   let m: RegExpExecArray | null;
   while ((m = rx.exec(md))) {
-    righe.push(`${pulito(m[1])}:\nFONTE: ${m[2].replace(/\\&/g, '&')}`);
+    righe.push(`${pulito(m[1])}:\nFONTE: ${m[2].replace(/&amp;/g, '&').replace(/\\&/g, '&')}`);
   }
   return righe.length
     ? blocchi('Link diretti di iscrizione per fascia di nascita', righe.join('\n'))
