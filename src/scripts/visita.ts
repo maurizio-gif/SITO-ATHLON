@@ -111,6 +111,7 @@ interface Finestra {
   athlonGetVid?: () => string;
   athlonGetSid?: () => string;
   athlonVidStabile?: () => boolean;
+  athlonUserNumberConosciuto?: () => string;
   dataLayer?: unknown[];
 }
 
@@ -128,6 +129,11 @@ function contesto() {
     sid: w.athlonGetSid ? w.athlonGetSid() : null,
     pagina: location.pathname + location.search,
     utm: w.athlonGetUtm ? w.athlonGetUtm() : {},
+    /* Il numero socio, quando noto — dal link di una newsletter o da una
+       verifica riuscita in un'altra pagina della stessa visita: è quello che
+       rende questo beacon il tracciamento del percorso, non solo la pagina
+       con il parametro nell'URL. */
+    userNumber: w.athlonUserNumberConosciuto ? w.athlonUserNumberConosciuto() || null : null,
   };
 }
 

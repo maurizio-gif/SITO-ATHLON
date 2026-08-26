@@ -60,6 +60,7 @@ import { SITE } from '../data/sito';
 import { CALENDLY } from '../data/calendly';
 import { validaTelefono } from '../data/prefissi';
 import { leggi as emailConosciuta } from '../scripts/emailNota';
+import { leggi as userNumberConosciuto } from '../scripts/numeroSocio';
 import { montaCalendario } from './calendario.client.js';
 
 export function initContattaciForm(root, options) {
@@ -84,6 +85,9 @@ export function initContattaciForm(root, options) {
   function stato() {
     return {
       email: '',
+      /** Il numero socio, quando la verifica è partita da un link invece che
+          da un'email digitata. Vedi `numeroSocio.ts`. */
+      userNumber: '',
       // Quello che la verifica ha trovato su PerfectGym.
       statoPgm: 'nuovo',
       statoNucleo: 'nuovo',
@@ -319,27 +323,45 @@ export function initContattaciForm(root, options) {
   var campoEmail = q('#' + P + '-email');
   var btnVerifica = q('[data-cf-verifica]');
 
-  async function verifica() {
+  /**
+   * `numero`, quando passato, è un UserNumber già noto (dal link di una
+   * newsletter, o da una verifica precedente riuscita): si salta la lettura
+   * e la validazione del campo email, e si cerca su PerfectGym con quello
+   * invece che con l'email. Finché la risposta non porta anche l'email della
+   * persona, `dati.email` resta vuoto per una sessione aperta così — non
+   * rompe niente a valle, ma è deliberato e non una svista.
+   */
+  async function verifica(numero) {
+    var viaNumero = typeof numero === 'string' && numero;
     pulisciErrore(steps.email);
     togliSegno(campoEmail);
 
-    if (!emailValida(campoEmail.value)) {
-      mostraErrore(steps.email, ERR.email);
-      segnala(campoEmail);
-      return;
+    if (!viaNumero) {
+      if (!emailValida(campoEmail.value)) {
+        mostraErrore(steps.email, ERR.email);
+        segnala(campoEmail);
+        return;
+      }
+      dati.email = campoEmail.value.trim().toLowerCase();
+      if (window.athlonRicordaEmail) window.athlonRicordaEmail(dati.email);
+    } else {
+      dati.userNumber = viaNumero;
     }
-    dati.email = campoEmail.value.trim().toLowerCase();
-    if (window.athlonRicordaEmail) window.athlonRicordaEmail(dati.email);
     attendi(btnVerifica, true);
 
     try {
+      /* Con le UTM oltre al `vid`: la verifica registra ogni email su
+         `eventi_email`, ed è il primo tocco. Senza, un contatto nato da qui
+         risultava senza provenienza fino al secondo invio. */
+      var corpo = viaNumero ? { userNumber: viaNumero } : { email: dati.email };
+      corpo.pagina = dati.pagina;
+      corpo.utm = utm();
+      corpo.vid = vid();
+      corpo.sid = sid();
       var r = await fetch(WEBHOOK_VERIFICA, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        /* Con le UTM oltre al `vid`: la verifica registra ogni email su
-           `eventi_email`, ed è il primo tocco. Senza, un contatto nato da qui
-           risultava senza provenienza fino al secondo invio. */
-        body: JSON.stringify({ email: dati.email, pagina: dati.pagina, utm: utm(), vid: vid(), sid: sid() }),
+        body: JSON.stringify(corpo),
       });
       var body = await r.json();
       if (body && body.stato) {
@@ -348,6 +370,13 @@ export function initContattaciForm(root, options) {
         dati.contrattiVivi = Number(body.contrattiVivi) || 0;
         dati.memberId = body.memberId || null;
         dati.memberType = String(body.memberType || '');
+        /* Il number di PerfectGym, qualunque sia stata la chiave di ricerca:
+           ricordato come l'email, così una verifica partita da un indirizzo
+           digitato riconosce da qui in poi anche i link di newsletter della
+           stessa persona. */
+        if (body.number && window.athlonRicordaUserNumber) {
+          window.athlonRicordaUserNumber(body.number);
+        }
         // L'anagrafica c'è: i suoi dati diventano il precompilato dei campi
         // che verranno. È quello che faceva il form di n8n leggendoli dal
         // record PerfectGym, e risparmia tre campi a chi il club conosce già.
@@ -877,6 +906,7 @@ export function initContattaciForm(root, options) {
       attivita: dati.attivita,
       richiesta: dati.richiesta,
       email: dati.email,
+      userNumber: dati.userNumber || '',
       nome: dati.nome,
       cognome: dati.cognome,
       cellulare: dati.cellulare,
@@ -1172,6 +1202,14 @@ export function initContattaciForm(root, options) {
       numeraPassi();
       mostraContesto();
       mostraStep('email', true);
+
+      /* UserNumber prima dell'email: chi arriva da un link di newsletter è
+         già una persona nota, e non deve nemmeno vedere il campo. */
+      var numeroGiaNoto = userNumberConosciuto();
+      if (numeroGiaNoto) {
+        verifica(numeroGiaNoto);
+        return;
+      }
 
       /* Un'email già nota — dall'URL o ricordata da un altro form — salta il
          passo, non solo lo precompila: chi l'ha già data una volta non deve
