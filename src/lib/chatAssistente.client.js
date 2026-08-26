@@ -1745,6 +1745,31 @@ export function initChatAssistente(root, options) {
     return '';
   }
 
+  /**
+   * Chi scrive così non sta ponendo una domanda: sta chiedendo di uscire
+   * dalla conversazione con il modello. Mandarla comunque al workflow
+   * rischia di tornare con l'invito a «toccare l'icona in alto» — la stessa
+   * icona che da qui si apre già da sola, un giro in più che la persona ha
+   * appena detto di non volere.
+   */
+  var CHIEDE_OPERATORE =
+    /\boperator[ei]\b|\bumano\b|persona (umana|vera|reale|fisica)|essere umano|parlare con (qualcuno|una persona|un umano|il team|lo staff)|contattare (il team|lo staff|una persona|qualcuno)|assistenza umana/i;
+
+  function chiedeOperatore(testo) {
+    return CHIEDE_OPERATORE.test(testo || '');
+  }
+
+  /** Il riordino da fare dopo ogni battuta, sia arrivata dal modello sia
+      saltata per andare dritti al team: vedi `chiedi()`. */
+  function fineRisposta() {
+    inCorso = false;
+    if (btnDomanda) btnDomanda.disabled = (campoDomanda.value || '').trim().length < 3;
+    if (conversazione) conversazione.scrollTop = conversazione.scrollHeight;
+    armaOblio();
+    armaSollecito();
+    armaRichiamoInattivo();
+  }
+
   async function chiedi() {
     var domanda = (campoDomanda && campoDomanda.value || '').trim();
     if (domanda.length < 3 || inCorso) return;
@@ -1759,7 +1784,14 @@ export function initChatAssistente(root, options) {
     fermaRichiamoInattivo();
     campoDomanda.value = '';
     if (btnDomanda) btnDomanda.disabled = true;
-    bolla('utente', escape(domanda), domanda);
+    var msgUtente = bolla('utente', escape(domanda), domanda);
+
+    if (chiedeOperatore(domanda)) {
+      apriTicket(msgUtente);
+      fineRisposta();
+      return;
+    }
+
     var attesa = bolla('assistente', '<span class="ca__pensa"><span></span><span></span><span></span></span>');
 
     try {
@@ -1837,18 +1869,11 @@ export function initChatAssistente(root, options) {
       trascritto.push({ ruolo: 'assistente', testo: scusa });
       registra('assistente', attesa.innerHTML, scusa);
     } finally {
-      inCorso = false;
-      if (btnDomanda) btnDomanda.disabled = (campoDomanda.value || '').trim().length < 3;
-      if (conversazione) conversazione.scrollTop = conversazione.scrollHeight;
       /* La risposta è arrivata: da adesso i tre minuti sono di lettura, e sono
-         i suoi. Riparte il conto da capo — non da quando la domanda è partita,
-         che avrebbe fatto scadere il tempo durante l'attesa. */
-      armaOblio();
-      /* E i trenta secondi dopo i quali l'assistente riprende lui, se non
-         arriva niente. Da qui e non da prima: il silenzio si misura dalla
-         risposta, non dalla domanda. */
-      armaSollecito();
-      armaRichiamoInattivo();
+         i suoi, e i trenta secondi di sollecito ripartono da qui — non da
+         quando la domanda è partita, che avrebbe fatto scadere il tempo
+         durante l'attesa. Vedi `fineRisposta`. */
+      fineRisposta();
     }
   }
 
