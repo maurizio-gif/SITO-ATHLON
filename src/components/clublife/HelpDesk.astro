@@ -9,7 +9,6 @@
 import { getCollection } from 'astro:content';
 import { AREA_LABELS, AREA_ORDER } from '../../data/helpdesk';
 import { ACTIVITY_TAGS } from '../../data/activities';
-import { clausole, urlClausola } from '../../data/termini';
 import { formatEventDate } from '../../data/eventi';
 import { toPlain, clamp } from '../../data/testo';
 import { conNumeri } from '../../data/servizi';
@@ -134,30 +133,11 @@ const serviziIndex = servizi.map((sv) => ({
   tags: [],
 }));
 
-/* Il contratto risponde a molte domande meglio di qualsiasi parafrasi — quanto
-   costa una sospensione, entro quando si disdice, chi deve il certificato — ma
-   risponde da avvocato. Quindi ogni clausola e' cercabile e linkata al suo
-   punto esatto su /regolamento, e in classifica sta un passo dietro alle schede
-   dell'Help Desk, che le stesse cose le spiegano in italiano corrente.
-   Le email vengono via come dal resto della pagina. */
-const terminiIndex = clausole().map((c) => ({
-  kind: 'Regolamento',
-  title: `${c.id} ${c.titolo}`,
-  facts: `Sezione ${c.sezione.numero} · ${c.sezione.titolo}`,
-  answer: clamp(toPlain(c.testo), 320),
-  url: urlClausola(c.id),
-  linkLabel: `Leggi il punto ${c.id}`,
-  area: c.sezione.titolo,
-  scope: 'club',
-  activities: c.sezione.attivita,
-  tags: [c.titolo, c.sezione.titolo],
-  /* Pesa meno di una scheda: e' la fonte, non la spiegazione. Deve restare sotto
-     1 anche dopo il premio per l'attivita' (x1.8), altrimenti "certificato
-     medico scaduto" risponde con la clausola invece che con la procedura. */
-  weight: 0.5,
-}));
-
-const index = [...helpIndex, ...eventiIndex, ...newsIndex, ...serviziIndex, ...terminiIndex];
+/* Questo box cerca solo nel wiki dell'Help Desk e in quello che sta su
+   questa stessa pagina (eventi, news, servizi) — non nel regolamento. Il
+   contratto ha un punto di ricerca suo, /regolamento: mescolarlo qui
+   risponde da avvocato a una domanda scritta in italiano corrente. */
+const index = [...helpIndex, ...eventiIndex, ...newsIndex, ...serviziIndex];
 
 /**
  * First step of the box: the activity, asked before the question rather than
@@ -205,8 +185,8 @@ const SUGGESTIONS: Record<string, string[]> = {
     <span class="eyebrow" data-anim="from-left">Help Desk</span>
     <h2 class="hd__title" data-anim="reveal">Quando ti serve una risposta</h2>
     <p class="hd__sub">
-      Scrivi la tua domanda: la risposta arriva subito, dalle nostre schede o
-      dal regolamento. Se non ti basta, ti mettiamo in contatto con il nostro team.
+      Scrivi la tua domanda: la risposta arriva subito, dalle nostre schede.
+      Se non ti basta, ti mettiamo in contatto con il nostro team.
     </p>
 
     {/* Un comando solo, in cima: il pulsante pieno arancione che apre
