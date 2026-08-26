@@ -13,6 +13,9 @@ program:
       - time: '10:30'
         lesson: Mat 4.1
         trainer: Manuel Di Censi
+      - time: '11:20'
+        lesson: Body Sculpt
+        trainer: Manuel Di Censi
 ctaHref: ''
 attivita: []
 ---
