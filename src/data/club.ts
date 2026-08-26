@@ -77,6 +77,23 @@ export const CLUB = {
   },
 } as const;
 
+/**
+ * Un orario eccezionale che sostituisce quello regolare, se attivo — scade da
+ * solo: superato `finoAl` sparisce sia dalla nota su `/planning` sia
+ * dall'entrata "Orari di apertura" del chatbot (`kb.json`), al prossimo
+ * deploy. Un unico posto: chi lo tocca aggiorna la pagina e il chatbot
+ * insieme, invece di due copie che possono divergere.
+ */
+export const ORARIO_ECCEZIONALE = {
+  testo:
+    "Ad agosto 2026 il club segue l'orario estivo: lunedì-venerdì 8:00-21:00, sabato 9:30-13:00, domenica chiuso.",
+  finoAl: '2026-09-01',
+} as const;
+
+export function orarioEccezionaleAttivo(): boolean {
+  return new Date() < new Date(ORARIO_ECCEZIONALE.finoAl);
+}
+
 /** Giorni della settimana in schema.org, per gli orari del planning. */
 const GIORNI: Record<string, string[]> = {
   'Lunedì – Venerdì': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],

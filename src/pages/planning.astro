@@ -7,6 +7,7 @@ import Faq from '../components/Faq.astro';
 import { bands, gymFloor, countLessons, bandHours, ledeOf, siContaAOre, totalLessons } from '../data/planning';
 import { faqPagina } from '../data/faq';
 import { trialCta } from '../data/cta';
+import { ORARIO_ECCEZIONALE, orarioEccezionaleAttivo } from '../data/club';
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 
@@ -88,6 +89,9 @@ const faqs = await faqPagina([
         fra Con Assistenza e Allenamento Libero — entro gli orari di apertura qui sotto.
         <a href="/gym-floor">Scopri la sala →</a>
       </p>
+      {orarioEccezionaleAttivo() && (
+        <p class="pl-note">{ORARIO_ECCEZIONALE.testo}</p>
+      )}
       <OpeningHours href={`${PG}/#/Classes/1/Calendar?categoryId=6`} />
     </div>
   </section>

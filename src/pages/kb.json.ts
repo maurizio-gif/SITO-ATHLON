@@ -38,7 +38,7 @@ import {
   lessonCardsFor,
   PLANNING_MONTH,
 } from '../data/planning';
-import { CLUB } from '../data/club';
+import { CLUB, ORARIO_ECCEZIONALE, orarioEccezionaleAttivo } from '../data/club';
 import {
   plans,
   GUEST_PASS,
@@ -662,6 +662,7 @@ export const GET: APIRoute = async () => {
     area: 'Il club',
     attivita: [],
     testo: blocchi(
+      orarioEccezionaleAttivo() && pulito(ORARIO_ECCEZIONALE.testo),
       pulito(gymFloor.lede),
       elenco(gymFloor.hours.map((h) => `${h.label}: ${h.hours}`)),
       'Sono gli orari della sala pesi ad accesso libero. Gli orari delle singole attività seguono il planning e cambiano ogni mese.'
