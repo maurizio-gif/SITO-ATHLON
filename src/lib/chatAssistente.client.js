@@ -141,6 +141,20 @@ export function initChatAssistente(root, options) {
     { id: 'pallanuoto', label: 'Pallanuoto', nota: '' },
   ];
 
+  /* Il pulsante scelto qui sopra è una supposizione di chi scrive, fatta
+     prima di aver detto l'anno vero: le due note appena sopra lo dicono, ma
+     nessuno fa il conto con precisione cliccando un bottone. La data di
+     nascita del bambino, che arriva un passo dopo nel form dati, è invece il
+     dato esatto — e se le due cose non coincidono si corregge da quella,
+     vedi `correggiAttivitaJunior()`. Fuori da 2013-2026 non è una di queste
+     due attività (nuoto agonistico, pallanuoto, o nessuna): non correggere,
+     '' lo dice a chi chiama. */
+  function attivitaJuniorDaAnno(anno) {
+    if (anno >= 2024 && anno <= 2026) return 'baby-nuoto';
+    if (anno >= 2013 && anno <= 2023) return 'scuola-nuoto-bambini';
+    return '';
+  }
+
   function etichettaAttivita() {
     var scelta = ATTIVITA.filter(function (a) {
       return a.id === dati.attivita;
@@ -911,6 +925,57 @@ export function initChatAssistente(root, options) {
     } catch (e) {
       return false;
     }
+  }
+
+  /** Un indirizzo perfectgym.com prende un titolo che dice cosa c'è dietro;
+      qualunque altro un titolo neutro — non sappiamo di più, e inventare un
+      titolo specifico per un link che non doveva stare qui sarebbe scrivere
+      un dato che non abbiamo. */
+  function etichettaLinkNudo(url) {
+    try {
+      if (new URL(url).hostname.indexOf('perfectgym.com') !== -1) {
+        return 'Vai al portale e vedi i posti disponibili';
+      }
+    } catch (e) {}
+    return 'Apri il link';
+  }
+
+  /**
+   * Il prompt dice al modello di mettere ogni link fra le fonti, mai scritto
+   * nella prosa — nel testo di una bolla un indirizzo resta scritto e non si
+   * clicca (regola 2bis, regola 3 del prompt) — ma non è garantito che lo
+   * faccia sempre. Questa è la rete sotto: toglie dal testo qualunque
+   * indirizzo rimasto lì, e lo aggiunge alle fonti, dove `rimandi()` lo
+   * disegna come lo stesso pulsante di una fonte vera, invece di lasciarlo
+   * scritto per intero e morto in mezzo a una frase.
+   */
+  function estraiLinkNudi(testo, fonti) {
+    var giaCitati = fonti.map(function (f) { return f.url; });
+    var trovati = [];
+    var ripulito = String(testo).replace(/https?:\/\/[^\s<)]+/g, function (url) {
+      var pulito = url.replace(/[.,;:)\]]+$/, '');
+      if (giaCitati.indexOf(pulito) === -1 && trovati.indexOf(pulito) === -1) {
+        trovati.push(pulito);
+      }
+      return '';
+    });
+    /* Quello che restava intorno al link tolto non deve restare appeso: gli
+       spazi doppi lasciati dal buco, i due punti che non introducono più
+       niente — sia a fine riga («disponibili: ») sia in mezzo alla frase
+       («disponibili:  . Fammi», dove il punto che segue era già lì) — e uno
+       spazio isolato prima della punteggiatura che segue. */
+    ripulito = ripulito
+      .replace(/[ \t]{2,}/g, ' ')
+      .replace(/:\s*([.,;])/g, '$1')
+      .replace(/[ \t]*:[ \t]*(\n|$)/g, '$1')
+      .replace(/[ \t]+([.,;])/g, '$1')
+      .replace(/[ \t]+(\n|$)/g, '$1');
+    return {
+      testo: ripulito,
+      fonti: fonti.concat(trovati.map(function (url) {
+        return { url: url, titolo: etichettaLinkNudo(url) };
+      })),
+    };
   }
 
   function rimandi(fonti) {
@@ -1835,12 +1900,18 @@ export function initChatAssistente(root, options) {
         return f && f.url;
       });
 
+      /* Prima di scrivere il testo, la rete sotto: un link rimasto nella
+         prosa esce da lì e finisce fra le fonti, vedi `estraiLinkNudi`. */
+      var estratto = estraiLinkNudi(risposta.risposta, fonti);
+      var testoRisposta = estratto.testo;
+      fonti = estratto.fonti;
+
       /* Il modello scrive in prosa, con il solo `**grassetto**` che il prompt
          gli concede. Il capoverso resta un capoverso e non una riga incollata
          alla precedente — è la differenza fra una risposta che si legge e un
          muro — e il grassetto si converte **dopo** l'escape, mai prima: vedi
          `conGrassetto`. */
-      var paragrafi = risposta.risposta
+      var paragrafi = testoRisposta
         .split(/\n{1,}/)
         .map(function (r) { return r.trim(); })
         .filter(Boolean)
@@ -1885,9 +1956,11 @@ export function initChatAssistente(root, options) {
   root.querySelectorAll('[data-ca-f]').forEach(function (el) {
     campi[el.dataset.caF] = el;
   });
+  if (campi.bnascita) campi.bnascita.addEventListener('change', correggiAttivitaJunior);
   var bimbo = q('[data-ca-bimbo]');
   var genitoreDati = q('[data-ca-genitore]');
   var nascitaGenitore = q('[data-ca-nascita]');
+  var bnascitaNota = q('[data-ca-bnascita-nota]');
   var erroreDati = q('[data-ca-dati-errore]');
   var btnDati = q('[data-ca-dati-invia]');
   var titoloDati = q('[data-ca-dati-titolo]');
@@ -1937,6 +2010,42 @@ export function initChatAssistente(root, options) {
 
   function valore(nome) {
     return campi[nome] ? String(campi[nome].value || '').trim() : '';
+  }
+
+  /**
+   * Corregge da sola l'attività quando l'anno di nascita appena scritto non è
+   * quello del pulsante scelto un passo prima — succede, perché quel pulsante
+   * è una stima e non un calcolo. Senza questa correzione la conversazione
+   * parte scoperta: `Componi contesto` sul workflow restringe tutta la
+   * conoscenza del modello all'attività scelta, quindi un bambino del 2024
+   * mandato avanti come "Scuola Nuoto Bambini" fa parlare il modello di un
+   * corso — e di eventuali suoi link diretti ai turni — che per lui non è
+   * quello giusto, e di cui in più non ha nessuna fonte vera in mano.
+   */
+  function correggiAttivitaJunior() {
+    if (!bnascitaNota) return;
+    var attuale = dati.attivitaJunior;
+    if (attuale !== 'scuola-nuoto-bambini' && attuale !== 'baby-nuoto') {
+      bnascitaNota.hidden = true;
+      return;
+    }
+    var v = valore('bnascita');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) {
+      bnascitaNota.hidden = true;
+      return;
+    }
+    var anno = Number(v.slice(0, 4));
+    var giusta = attivitaJuniorDaAnno(anno);
+    if (!giusta || giusta === attuale) {
+      bnascitaNota.hidden = true;
+      return;
+    }
+    dati.attivitaJunior = giusta;
+    dati.attivita = giusta;
+    var etichetta = giusta === 'baby-nuoto' ? 'Baby Nuoto' : 'Scuola Nuoto Bambini';
+    bnascitaNota.textContent =
+      'In base all’anno di nascita (' + anno + '), il corso giusto è ' + etichetta + ': ho aggiornato la richiesta.';
+    bnascitaNota.hidden = false;
   }
 
   /**
@@ -2047,6 +2156,7 @@ export function initChatAssistente(root, options) {
     if (privacyDati) privacyDati.hidden = junior;
     if (saltaDati) saltaDati.hidden = true;
     if (erroreDati) erroreDati.hidden = true;
+    if (bnascitaNota) bnascitaNota.hidden = true;
     if (titoloDati) {
       titoloDati.textContent = !junior
         ? 'I tuoi dati'
