@@ -130,7 +130,10 @@ chiamata finisce in `pgm_sync_log` come `scartato-senza-chiave`.
 Quattro regole che il Code node non deve rompere.
 
 **Un campo assente non è un campo svuotato.** Non mandare una chiave lascia la
-colonna com'era. Quindi un webhook parziale non fa danni — ma **per svuotare un
+colonna com'era — `pgm_consensi` compresa: prima l'unione `|| coalesce(v_consensi,
+'{}')` scriveva un oggetto vuoto anche quando non arrivava nessun consenso, che
+su 38.586 righe vuol dire dichiarare «nessun consenso» dove il dato non è mai
+stato chiesto. Ora la colonna si tocca solo se qualcosa arriva. Quindi un webhook parziale non fa danni — ma **per svuotare un
 campo non basta ometterlo**: dal sync non si cancella, ed è deliberato.
 
 **`stato` si può omettere.** Se manca, la funzione lo deriva da `member_type` +

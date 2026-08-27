@@ -288,7 +288,8 @@ begin
       pgm_club_id             = coalesce(v_clubid,   u.pgm_club_id),
       pgm_saldo               = coalesce(v_saldo,    u.pgm_saldo),
       pgm_saldo_negativo_da   = coalesce(v_saldoneg, u.pgm_saldo_negativo_da),
-      pgm_consensi            = coalesce(u.pgm_consensi, '{}'::jsonb) || coalesce(v_consensi, '{}'::jsonb),
+      pgm_consensi            = case when v_consensi is null then u.pgm_consensi
+                                     else coalesce(u.pgm_consensi, '{}'::jsonb) || v_consensi end,
       pgm_genitore_member_id  = coalesce(v_genmem,   u.pgm_genitore_member_id),
       genitore_id             = coalesce(v_gen_id,   u.genitore_id),
       pgm_sincronizzato_il    = now(),
@@ -325,7 +326,8 @@ begin
       pgm_club_id             = coalesce(v_clubid,   u.pgm_club_id),
       pgm_saldo               = coalesce(v_saldo,    u.pgm_saldo),
       pgm_saldo_negativo_da   = coalesce(v_saldoneg, u.pgm_saldo_negativo_da),
-      pgm_consensi            = coalesce(u.pgm_consensi, '{}'::jsonb) || coalesce(v_consensi, '{}'::jsonb),
+      pgm_consensi            = case when v_consensi is null then u.pgm_consensi
+                                     else coalesce(u.pgm_consensi, '{}'::jsonb) || v_consensi end,
       pgm_genitore_member_id  = coalesce(v_genmem,   u.pgm_genitore_member_id),
       genitore_id             = coalesce(v_gen_id,   u.genitore_id),
       pgm_sincronizzato_il    = now(),
