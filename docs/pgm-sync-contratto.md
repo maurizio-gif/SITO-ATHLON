@@ -1,161 +1,167 @@
 # Il sync PerfectGym → Supabase: il contratto
 
-Il workflow n8n **`ATHLON: User Modified > SPOKI - SuperAgent`** riceve il webhook
-`User Modified` di PerfectGym per parlare a Spoki. Da qui in poi scrive anche su
-Supabase, chiamando `pgm_aggiorna_utente(jsonb)` — definita in
-`supabase/migrations/20260827_pgm_sync_utente.sql`, che è dove sta il perché di
-ogni scelta.
+Il workflow n8n **`ATHLON: User Modified > SPOKI - SuperAgent`**
+(`yNCKG3tXTPC8NmSj`) riceve il webhook `User Modified` di PerfectGym per parlare
+a Spoki. Da settembre 2026 scrive anche su Supabase, chiamando
+`pgm_aggiorna_utente(jsonb)` — definita in
+`supabase/migrations/20260827_pgm_sync_utente.sql` e
+`20260827b_pgm_sync_campi_reali.sql`, dove sta il perché di ogni scelta.
 
 Questo file è la sola cosa che tiene insieme i due lati, perché **il workflow non
 sta in questo repository**: se il mapping qui sotto e il Code node divergono, non
 lo dice nessun errore — si vede da una colonna che resta vuota.
 
-## Perché le chiavi sono le nostre e non quelle di PerfectGym
+## Com'è fatto il ramo
 
-I nomi dei campi di PerfectGym cambiano fra l'export CSV, l'OData e il webhook:
-lo stesso tipo utente è `Membro` nell'export e `Member` nell'API. Se la funzione
-Postgres parlasse la loro lingua, ogni cambio del gestionale sarebbe una
-migrazione del database. Così è un Code node da riscrivere.
+```
+Webhook ─ GET MEMBER ─ Solo Scadenza Certificato ─ GET CONTRACTS ─ GET Agreements ─ GET Access ─┬─ CONTATTO A SPOKI
+                                                                                                └─ Prepara Supabase ─ Supabase utenti
+```
 
-**Il ramo Supabase va in parallelo a quello Spoki, non prima.** Vale la regola di
-`athlon-contatto-compilato`: un nodo che scrive non deve poter fermare il resto
-del workflow. La funzione non solleva mai — ogni errore diventa una riga in
-`pgm_sync_log` — ma il parallelo è la seconda rete.
+**In parallelo a Spoki e dopo `GET Access`**, e le due cose sono deliberate.
+Dopo, perché a quel punto tutte e quattro le chiamate OData sono state fatte e i
+dati sono in mano. In parallelo, e **secondo nell'array delle connessioni**,
+perché Spoki deve partire per primo e non deve poter essere fermato: i due nodi
+nuovi portano `onError: continueRegularOutput`, l'HTTP anche `neverError` e
+`retryOnFail` (3 tentativi, 1 s). Vale la regola dei form — perdere una riga è
+brutto, impedire un WhatsApp è peggio.
+
+Il webhook risponde subito («Workflow got started»), quindi il ramo in più non
+costa latenza a nessuno.
+
+## Dove stanno i dati (e non è dove sembra)
+
+**Il webhook è povero.** Payload vero, da un'esecuzione reale:
+
+```json
+{"event":"UserModified","triggeredDate":"2026-08-27T15:40:30Z",
+ "data":{"modificationType":"Updated","userId":39120,
+   "user":{"userId":39120,"userNumber":"101025828",
+           "userFirstName":"…","userLastName":"…","userPhone":"+39…",
+           "userEmail":null,"birthDate":"2023-10-01"},
+   "homeClubId":1,"userType":"Guest"}}
+```
+
+Due cose da sapere: `userType` arriva **in inglese** (`Guest`), come il sito, non
+come l'export CSV che diceva `Ospite`; e `userEmail` **può essere null** — nel
+payload sopra lo è, perché è un bambino del 2023 e i bambini non hanno un
+indirizzo.
+
+**I dati ricchi li prende `GET MEMBER`** dall'OData, con
+`$expand=customAttributes,contracts,memberBalance,familyParents,familyChildren`:
+
+```
+firstName secondName lastName number phoneNumber email personalId sex birthdate
+consultantId referralCode memberType isActive isDeleted isForeigner
+isPaymentInProgress emailVerificationStatus phoneNumberVerificationStatus
+citizenshipId homeClubId createdDate version id
++ customAttributes[] contracts[] memberBalance{} familyParents[] familyChildren[]
+```
+
+Attenzione a due differenze di forma che sono trappole: il webhook scrive
+`birthDate`, l'OData `birthdate` (minuscola); e i nomi sono `userFirstName` da
+una parte, `firstName` dall'altra. Il Code node unisce i due vocabolari, con
+`GET MEMBER` che ha la precedenza perché è la fonte più completa.
+
+**Cosa il webhook non porta, e va saputo:** nessun campo di indirizzo esiste su
+quell'entità. `citta`, `pgm_indirizzo`, `pgm_cap`, `pgm_paese`, `pgm_fonte`,
+`pgm_piva` e `pgm_raccomandato_da` restano popolati solo dall'import CSV del
+24/08/2026 e da questa strada non si aggiornano. Aggiornarli vuole un'altra
+chiamata, che non è in questo lavoro.
 
 ## Le chiavi che la funzione legge
 
-Tutte facoltative, tranne che **almeno una fra `member_id`, `numero_utente` e
-`email` deve esserci**: senza, non c'è niente da agganciare e la chiamata finisce
-in `pgm_sync_log` come `scartato-senza-chiave`.
+Almeno una fra `member_id`, `numero_utente` e `email` deve esserci: senza, la
+chiamata finisce in `pgm_sync_log` come `scartato-senza-chiave`.
 
-| chiave | colonna | note |
+| chiave | da | colonna |
 | --- | --- | --- |
-| `member_id` | `pgm_member_id` | la chiave di aggancio più forte |
-| `numero_utente` | `pgm_numero_utente` | seconda |
-| `email` | `email` | terza. **Sovrascrive**: vedi il paragrafo in fondo |
-| `nome`, `cognome` | `nome`, `cognome` | |
-| `telefono` | `telefono` | E.164 se possibile; `telefono_norm` è calcolata |
-| `member_type` | `pgm_member_type` | normalizzato a `Member` / `Guest` / `Lead` |
-| `stato` | `pgm_stato` | normalizzato a `lead`/`guest`/`member`/`ex-member` |
-| `stato_abbonamento` | `pgm_stato_abbonamento` | come lo scrive PerfectGym |
-| `registrato_il` | `pgm_registrato_il` | |
-| `data_nascita` | `data_nascita` | |
-| `codice_fiscale` | `codice_fiscale` | |
-| `citta`, `indirizzo`, `cap`, `paese` | `citta`, `pgm_indirizzo`, `pgm_cap`, `pgm_paese` | |
-| `ultima_visita` | `pgm_ultima_visita` | il dato per cui il sync esiste |
-| `consulente` | `pgm_consulente` | |
-| `sesso` | `pgm_sesso` | |
-| `figli` | `pgm_figli` | accetta anche `"2,00"` |
-| `nucleo` | `pgm_nucleo` | |
-| `fonte` | `pgm_fonte` | **non** `prima_fonte`/`ultima_fonte` |
-| `consenso_biometrico` | `pgm_consenso_biometrico` | accetta `Sì`/`No` |
-| `raccomandato_da` | `pgm_raccomandato_da` | |
-| `piva` | `pgm_piva` | |
-| `grezzo` | — | il payload originale, va nel log così com'è |
+| `member_id` | `m.id` → `u.userId` | `pgm_member_id` |
+| `numero_utente` | `m.number` → `u.userNumber` | `pgm_numero_utente` |
+| `email` | `m.email` → `u.userEmail` | `email` |
+| `nome`, `cognome` | `m.firstName`/`lastName` → `u.userFirstName`/`userLastName` | `nome`, `cognome` |
+| `secondo_nome` | `m.secondName` | `pgm_secondo_nome` |
+| `telefono` | `m.phoneNumber` → `u.userPhone` | `telefono` |
+| `member_type` | `m.memberType` → `d.userType` | `pgm_member_type` (normalizzato) |
+| `stato_abbonamento` | `contratto.status` | `pgm_stato_abbonamento` |
+| `data_nascita` | `m.birthdate` → `u.birthDate` | `data_nascita` |
+| `registrato_il` | `m.createdDate` | `pgm_registrato_il` |
+| `codice_fiscale` | `m.personalId` | `codice_fiscale` |
+| `sesso` | `m.sex` | `pgm_sesso` |
+| `version` | `m.version` | `pgm_version` |
+| `attivo`, `cancellato`, `straniero` | `m.isActive`, `isDeleted`, `isForeigner` | `pgm_attivo`, `pgm_cancellato`, `pgm_straniero` |
+| `consulente_id` | `m.consultantId` | `pgm_consulente_id` |
+| `codice_referral` | `m.referralCode` | `pgm_codice_referral` |
+| `club_id` | `m.homeClubId` → `d.homeClubId` | `pgm_club_id` |
+| `email_verificata`, `telefono_verificato` | i due `…VerificationStatus` | omonime |
+| `saldo`, `saldo_negativo_da` | `m.memberBalance.*` | `pgm_saldo`, `pgm_saldo_negativo_da` |
+| `figli` | `m.familyChildren.length` | `pgm_figli` |
+| `genitore_member_id` | `m.familyParents[0].id` | `pgm_genitore_member_id` (+ `genitore_id` risolto) |
+| `consensi` | `MemberAgreementAnswers` → `{"1": true}` | `pgm_consensi` |
+| `ultima_visita` | `MemberClubVisits[0]` — **nome del campo da confermare** | `pgm_ultima_visita` |
+| `grezzo` | webhook + scheda + visita | va nel log e in `pgm_payload` |
 
-Tre regole che il Code node non deve rompere.
+Quattro regole che il Code node non deve rompere.
 
-**Un campo assente non è un campo svuotato.** Non mandare una chiave, o mandarla
-vuota, lascia la colonna com'era. Quindi un webhook parziale non fa danni — ma
-significa anche che **per svuotare un campo non basta ometterlo**: oggi non c'è
-modo di cancellare un dato dal sync, ed è deliberato.
+**Un campo assente non è un campo svuotato.** Non mandare una chiave lascia la
+colonna com'era. Quindi un webhook parziale non fa danni — ma **per svuotare un
+campo non basta ometterlo**: dal sync non si cancella, ed è deliberato.
 
-**`stato` si può omettere.** Se manca o non è uno dei quattro valori ammessi, la
-funzione lo deriva da `member_type` più `stato_abbonamento`: Lead → `lead`,
-Guest → `guest`, Member → `member`, e Member con abbonamento terminato →
-`ex-member`. Quella derivazione è un'ipotesi sui valori di PerfectGym e va
-corretta il giorno che si legge il payload vero.
+**`stato` si può omettere.** Se manca, la funzione lo deriva da `member_type` +
+`stato_abbonamento` per rispettare `utenti_pgm_stato_check` (`lead | guest |
+member | ex-member`). Quella derivazione è un'ipotesi: va corretta il giorno che
+si vede un contratto con uno stato fuori dall'elenco.
 
 **`tocchi`, `primo_contatto`, `ultimo_contatto`, `prima_fonte` e `ultima_fonte`
-non si toccano**, e la funzione non le nomina affatto: contano quante volte una
-*persona* ha lasciato un dato al sito, e un'anagrafica modificata dal desk non è
-la persona. Il sync ha `pgm_sincronizzato_il`.
+non si toccano**, e la funzione non le nomina affatto — verificato su
+`pg_get_functiondef`. Contano quante volte una *persona* ha lasciato un dato al
+sito; un'anagrafica modificata dal desk non è la persona.
 
-## Il Code node
+**`version` è la guardia sull'ordine.** Misurato: quattro webhook nello stesso
+secondo. Un aggiornamento con `version` minore di quella già in riga viene
+saltato e registrato come `saltato-versione-vecchia`.
 
-Da mettere fra il webhook e il nodo Supabase. **I nomi a destra sono da
-verificare sul payload vero**: qui ci sono i più probabili con i loro ripieghi,
-non un contratto con PerfectGym.
+## L'unico campo non verificato
 
-```js
-// PerfectGym → le chiavi di pgm_aggiorna_utente(jsonb).
-// Un valore assente resta assente: la funzione non cancella ciò che non riceve.
-const out = [];
+`ultima_visita`. Nelle esecuzioni guardate `MemberClubVisits` tornava **sempre
+vuoto**, perché questo webhook scatta quasi solo su guest appena creati — che non
+hanno ancora visite. Il Code node prova sette nomi plausibili
+(`entranceDate`, `visitDate`, `entryDate`, `date`, `startDate`, `enteredAt`,
+`createdDate`) e mette l'oggetto intero in `grezzo`: al primo passaggio con una
+visita vera, o la colonna si riempie, o il nome si legge dal log e si corregge.
 
-for (const item of $input.all()) {
-  const u = item.json.user ?? item.json.data ?? item.json;
+Per verificarlo quando ci sarà traffico utile:
 
-  const v = (...chiavi) => {
-    for (const k of chiavi) {
-      const x = k.split('.').reduce((o, p) => (o == null ? o : o[p]), u);
-      if (x !== undefined && x !== null && String(x).trim() !== '') return String(x).trim();
-    }
-    return undefined;
-  };
-
-  const dati = {
-    member_id:           v('id', 'userId', 'memberId', 'Id'),
-    numero_utente:       v('number', 'userNumber', 'memberNumber'),
-    email:               v('email', 'emailAddress', 'Email'),
-    nome:                v('firstName', 'name', 'FirstName'),
-    cognome:             v('lastName', 'surname', 'LastName'),
-    telefono:            v('phoneNumber', 'cellPhone', 'mobilePhone', 'phone'),
-    member_type:         v('memberType', 'userType', 'type'),
-    stato:               v('status', 'userStatus'),
-    stato_abbonamento:   v('contractStatus', 'membershipStatus', 'subscriptionStatus'),
-    registrato_il:       v('registrationDate', 'createdAt', 'creationDate'),
-    data_nascita:        v('birthDate', 'dateOfBirth'),
-    codice_fiscale:      v('personalId', 'fiscalCode', 'taxNumber'),
-    citta:               v('homeAddress.city', 'address.city', 'city'),
-    indirizzo:           v('homeAddress.street', 'address.street', 'street'),
-    cap:                 v('homeAddress.zipCode', 'address.zipCode', 'zipCode'),
-    paese:               v('homeAddress.country', 'address.country', 'country'),
-    ultima_visita:       v('lastVisitDate', 'lastEntrance', 'lastVisit'),
-    consulente:          v('consultant', 'salesPerson', 'assignedTo'),
-    sesso:               v('gender', 'sex'),
-    figli:               v('childrenCount', 'children'),
-    nucleo:              v('familyList', 'family'),
-    fonte:               v('source', 'leadSource'),
-    consenso_biometrico: v('biometricConsent', 'biometricsAgreement'),
-    raccomandato_da:     v('recommendedBy', 'referredBy'),
-    piva:                v('vatNumber', 'taxId'),
-    grezzo:              u,
-  };
-
-  // Le chiavi non valorizzate si togliono: mandarle vuote e non mandarle e' la
-  // stessa cosa per la funzione, ma un payload pulito si legge nel log.
-  for (const k of Object.keys(dati)) if (dati[k] === undefined) delete dati[k];
-
-  if (!dati.member_id && !dati.numero_utente && !dati.email) {
-    // Si manda comunque: la funzione lo registra come scartato-senza-chiave, e
-    // uno scarto contato e' l'unico modo di accorgersi che il mapping e' rotto.
-    dati.grezzo = u;
-  }
-
-  out.push({ json: { dati } });
-}
-
-return out;
+```sql
+select payload->'visita' from pgm_sync_log
+ where payload->'visita' is not null and payload->'visita' <> '{}'::jsonb
+ order by ricevuto_il desc limit 5;
 ```
-
-Il nodo Supabase che segue è una **RPC** su `pgm_aggiorna_utente` con
-`{ "p_dati": {{ JSON.stringify($json.dati) }} }`, e va con
-`onError: continueRegularOutput` e `retryOnFail`, come gli altri nodi che
-scrivono.
 
 ## Come si verifica
 
 ```sql
-select * from pgm_sync_esiti;     -- quante chiamate per esito
-select * from pgm_freschezza;     -- quanta anagrafica il sync ha toccato
+select * from pgm_sync_esiti;   -- quante chiamate per esito, con l'ultima
+select * from pgm_freschezza;   -- quanta anagrafica il sync ha toccato
 ```
 
-`pgm_sync_esiti` è il primo posto da guardare. Se `scartato-senza-chiave` cresce,
-il mapping del Code node ha perso una chiave; se cresce `errore`, il
-`motivo_scarto` porta il messaggio di Postgres.
+`pgm_sync_esiti` è il primo posto da guardare. `scartato-senza-chiave` che cresce
+= il mapping ha perso una chiave; `errore` che cresce = il `motivo_scarto` porta
+il messaggio di Postgres.
 
-`pgm_freschezza` risponde alla domanda che resta aperta per costruzione: **«User
-Modified» non arriva per chi nessuno modifica.** Il sync tiene fresco chi si
-muove, non tutti — l'anagrafica di chi non viene toccato resta a quel giorno.
-Coprire anche loro vuole un secondo giro periodico sull'OData, che non è questo
-lavoro.
+E un limite per costruzione: **«User Modified» non arriva per chi nessuno
+modifica.** Il sync tiene fresco chi si muove, non tutti; `pgm_freschezza`
+misura quanti restano fermi all'import. Coprire anche loro vuole un giro
+periodico sull'OData, che non è questo lavoro.
+
+## Sulle bozze n8n
+
+`update_workflow` **non pubblica**: crea una versione e la lascia lì. Le
+esecuzioni manuali girano la bozza, il webhook di produzione la versione attiva —
+quindi si può provare un nodo, vederlo scrivere, ed essere convinti che sia vivo
+mentre non lo è. Dopo ogni modifica va chiamato `publish_workflow`, e il
+controllo è `versionId == activeVersionId` in `get_workflow_details`.
+
+E prima di pubblicare va confrontata `activeVersion.nodes` con `nodes`: le
+versioni sono istantanee, non diff, quindi pubblicare la propria modifica
+pubblica anche le bozze di chi è passato prima.
