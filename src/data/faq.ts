@@ -140,8 +140,16 @@ export const REGISTRO: VoceRegistro[] = [
     q: 'Posso provare prima di iscrivermi?',
     /* Il prezzo e il requisito ci vanno: la formulazione di prima — «puoi
        richiedere un Guest Pass Premium di una settimana» — lasciava credere a
-       una prova gratuita, e chi è già stato iscritto lo scopriva alla fine. */
-    a: `Sì, con il <strong>Guest Pass Premium</strong>: ${GUEST_PASS.giorni} giorni con accesso a tutto il club a <strong>${GUEST_PASS.prezzo} €</strong>. È riservato a chi non ha e non ha mai avuto un abbonamento Athlon dal ${GUEST_PASS.dal} in poi. Se te lo manda un socio che ti invita, hai 30 giorni di tempo per attivarlo da quando ricevi l'invito. In alternativa puoi prenotare e pagare una singola lezione, senza quota di attivazione.`,
+       una prova gratuita, e chi è già stato iscritto lo scopriva alla fine.
+
+       Il perimetro è quello dichiarato esplicitamente, non solo quello che si
+       deduce da `plans`: un assistente che legge «accesso a tutto il club» lo
+       intende alla lettera e propone il Guest Pass anche per un corso per
+       bambini, che non c'è mai stato dentro — il Pass è un Premium di sette
+       giorni e il Premium è il listino degli adulti. Senza questa riga la
+       prova di un corso junior si scopre sbagliata dopo che è stata proposta,
+       non prima. */
+    a: `Sì, con il <strong>Guest Pass Premium</strong>: ${GUEST_PASS.giorni} giorni con accesso a tutto il club a <strong>${GUEST_PASS.prezzo} €</strong>. È riservato a chi non ha e non ha mai avuto un abbonamento Athlon dal ${GUEST_PASS.dal} in poi. Se te lo manda un socio che ti invita, hai 30 giorni di tempo per attivarlo da quando ricevi l'invito. In alternativa puoi prenotare e pagare una singola lezione, senza quota di attivazione. <strong>Vale solo per le attività degli adulti</strong>: non comprende i corsi per bambini né il personal training. Per un corso per bambini che vende anche la lezione singola — come il Baby Nuoto — la prova è prenotare e pagare quella lezione, non il Guest Pass.`,
   },
   {
     id: 'pagamenti',
