@@ -604,7 +604,17 @@ export const GET: APIRoute = async () => {
     url: `${SITE}/attiva`,
     area: 'Abbonamenti',
     attivita: [],
-    testo: `${GUEST_PASS.giorni} giorni di accesso completo al club a ${GUEST_PASS.prezzo} €, con il codice ${GUEST_PASS.codice}. È riservato a chi non ha e non ha mai avuto un abbonamento Athlon dal ${GUEST_PASS.dal} in poi.`,
+    /* Il limite non è deducibile da «accesso completo al club»: un genitore
+       che chiede di provare il Baby Nuoto ha ricevuto in risposta il Guest
+       Pass come se lo comprendesse, perché la voce non diceva il contrario.
+       Il Pass è un Premium di sette giorni e il Premium è il listino degli
+       adulti (vedi `plans` in `data/abbonamenti.ts`): non c'è mai stato
+       dentro un corso junior, né il personal training. Per un corso per
+       bambini che vende anche la lezione singola — come il Baby Nuoto — la
+       prova è quella lezione, non il Guest Pass; per chi non la vende — come
+       la Scuola Nuoto Bambini — non esiste una prova separata dall'adesione
+       mensile, che si disdice di mese in mese. */
+    testo: `${GUEST_PASS.giorni} giorni di accesso completo al club a ${GUEST_PASS.prezzo} €, con il codice ${GUEST_PASS.codice}. È riservato a chi non ha e non ha mai avuto un abbonamento Athlon dal ${GUEST_PASS.dal} in poi. Vale solo per le attività degli adulti (il listino Premium): non comprende i corsi per bambini né il personal training. Per un corso per bambini che vende anche la lezione singola, come il Baby Nuoto, la prova è prenotare e pagare quella lezione — non il Guest Pass.`,
   });
 
   for (const [nome, info] of Object.entries(activityInfo)) {

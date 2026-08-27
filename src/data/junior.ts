@@ -311,6 +311,17 @@ export const JUNIOR: CorsoJunior[] = [
       },
     ],
     faq: [
+      /* La prima domanda di un genitore che sta decidendo, e la risposta che
+         manca crea il buco che il Guest Pass finisce a riempire da solo: senza
+         una voce dedicata, l'assistente recupera quella del Guest Pass — che
+         parla di «accesso completo al club» — e la propone anche qui, dove il
+         Pass non è mai entrato (è un Premium di sette giorni, il listino degli
+         adulti). Il Baby Nuoto vende anche la lezione singola, quindi la prova
+         non è un pass: è prenotare e pagare quella lezione. */
+      {
+        q: 'È possibile effettuare una prova?',
+        a: 'Sì: prenoti e paghi una singola lezione, senza quota di attivazione né abbonamento — è il modo in cui si prova il Baby Nuoto. Il Guest Pass Premium non vale qui: è la prova delle attività per adulti, e non ha mai compreso i corsi per bambini.',
+      },
       {
         q: 'Serve il certificato medico per il Baby Nuoto?',
         a: 'No: per il Baby Nuoto non è richiesto il certificato medico né altre certificazioni.',
