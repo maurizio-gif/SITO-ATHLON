@@ -952,8 +952,18 @@ export function initChatAssistente(root, options) {
   function estraiLinkNudi(testo, fonti) {
     var giaCitati = fonti.map(function (f) { return f.url; });
     var trovati = [];
-    var ripulito = String(testo).replace(/https?:\/\/[^\s<)]+/g, function (url) {
-      var pulito = url.replace(/[.,;:)\]]+$/, '');
+    /* Il carattere escluso non è solo lo spazio: se il modello raddoppia
+       l'incapsulamento — la sua «risposta» finisce per contenere il JSON
+       intero invece del solo testo, `fonti` compresa — un indirizzo qui dentro
+       ha subito, a ridosso, la sintassi di quel JSON: virgolette, parentesi
+       graffe o quadre, il backtick. Nessun link vero del sito le porta senza
+       essere già percentualmente codificato, quindi fermarsi lì invece che a
+       fine riga è la differenza fra un rimando che apre la pagina giusta e uno
+       che si porta dietro `"},{"titolo":"…` fino al prossimo spazio — cioè un
+       indirizzo che il browser non risolve, e la persona legge "pagina non
+       trovata". Trovato leggendo una conversazione vera, non a tavolino. */
+    var ripulito = String(testo).replace(/https?:\/\/[^\s<>"'`(){}\[\]]+/g, function (url) {
+      var pulito = url.replace(/[.,;:)\]"'`}]+$/, '');
       if (giaCitati.indexOf(pulito) === -1 && trovati.indexOf(pulito) === -1) {
         trovati.push(pulito);
       }
