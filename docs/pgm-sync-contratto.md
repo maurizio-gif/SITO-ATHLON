@@ -69,6 +69,32 @@ quell'entità. `citta`, `pgm_indirizzo`, `pgm_cap`, `pgm_paese`, `pgm_fonte`,
 24/08/2026 e da questa strada non si aggiornano. Aggiornarli vuole un'altra
 chiamata, che non è in questo lavoro.
 
+## La chiave è `userId`, e il motivo sta nei bambini
+
+L'aggancio prova tre chiavi, in quest'ordine di forza:
+
+1. **`pgm_member_id`** (= `userId` di PerfectGym) — sempre per prima
+2. `pgm_numero_utente`
+3. `email_norm` — per ultima
+
+**L'email non può essere la chiave, e il dato reale lo dimostra.** Il member
+39122 è un ragazzo del 2012 con `email: null`, legato all'account del genitore
+(39088): se la deduplica passasse dall'indirizzo, quella persona non sarebbe
+agganciabile affatto. Con `userId` viene creata, riconosciuta e aggiornata come
+tutte le altre. È la stessa regola già scritta in `CLAUDE.md` — «lo dice il
+gestionale, non chi compila».
+
+Il nucleo si tiene **sul figlio**, non sul genitore: `familyParents[0].id` va in
+`pgm_genitore_member_id` e l'uuid risolto in `genitore_id`. Una riga, una chiave
+esterna. Il verso opposto non ha bisogno di una colonna — i figli di una persona
+sono `where genitore_id = <lei>`; `pgm_figli` è solo il conteggio che PerfectGym
+dichiara, utile per accorgersi di un nucleo incompleto.
+
+E l'upsert su quella chiave fa il suo lavoro: i **quattro** webhook che PerfectGym
+manda per una modifica sola producono **una** riga in `utenti`. Le quattro righe
+stanno in `pgm_sync_log`, che è un registro di chiamate e non un'anagrafica —
+vedi la sezione sui duplicati.
+
 ## Le chiavi che la funzione legge
 
 Almeno una fra `member_id`, `numero_utente` e `email` deve esserci: senza, la
@@ -121,6 +147,31 @@ sito; un'anagrafica modificata dal desk non è la persona.
 secondo. Un aggiornamento con `version` minore di quella già in riga viene
 saltato e registrato come `saltato-versione-vecchia`.
 
+## I duplicati: quattro webhook per una modifica
+
+Misurato: alle 16:50:36 sono arrivate **quattro chiamate per lo stesso member in
+240 ms, tutte con la stessa `version`**. Non era una modifica ripetuta quattro
+volte — era una modifica notificata quattro volte.
+
+L'anagrafica era giusta (una riga sola), ma il registro pesava quattro volte
+tanto: ogni riga conserva il grezzo, cioè la scheda intera, quindi la stessa
+persona finiva scritta quattro volte per una modifica. A regime sono centinaia di
+copie al giorno di dati personali che non servono a nessuno.
+
+**La `version` uguale è il segnale che non c'è niente di nuovo.** Se il gestionale
+dice «questa scheda è alla versione X» e X è quella che abbiamo già, l'update
+riscriverebbe gli stessi valori. Quindi si salta, e si registra una riga leggera
+con esito `duplicato` e **senza grezzo**: il conteggio resta — sapere che ne
+arrivano quattro è diagnostico, e il giorno che diventassero otto si vede — il
+peso no.
+
+**Con un'eccezione, e non è un dettaglio.** `Members.version` non cambia quando
+qualcuno entra in palestra: l'ultima visita viene da `MemberClubVisits`, un'altra
+entità. Quindi a parità di version quel campo **può essere più fresco**, ed è il
+solo che si aggiorna anche su un duplicato — e solo in avanti. Senza questa
+eccezione la deduplica avrebbe fatto perdere gli accessi al club, cioè
+esattamente il dato per cui il sync esiste.
+
 ## `enterDate`, e come si è trovato
 
 `MemberClubVisits` ha questa forma — letta dal `grezzo` di un'esecuzione vera,
@@ -169,6 +220,8 @@ si promuovono da lì, senza chiedere niente a PerfectGym.
 select * from pgm_sync_esiti;   -- quante chiamate per esito, con l'ultima
 select * from pgm_freschezza;   -- quanta anagrafica il sync ha toccato
 ```
+
+Gli esiti possibili: `creato`, `aggiornato`, `duplicato`, `saltato-versione-vecchia`, `aggiornato-email-in-conflitto`, `scartato-senza-chiave`, `errore`.
 
 `pgm_sync_esiti` è il primo posto da guardare. `scartato-senza-chiave` che cresce
 = il mapping ha perso una chiave; `errore` che cresce = il `motivo_scarto` porta
