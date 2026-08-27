@@ -98,7 +98,7 @@ chiamata finisce in `pgm_sync_log` come `scartato-senza-chiave`.
 | `figli` | `m.familyChildren.length` | `pgm_figli` |
 | `genitore_member_id` | `m.familyParents[0].id` | `pgm_genitore_member_id` (+ `genitore_id` risolto) |
 | `consensi` | `MemberAgreementAnswers` → `{"1": true}` | `pgm_consensi` |
-| `ultima_visita` | `MemberClubVisits[0]` — **nome del campo da confermare** | `pgm_ultima_visita` |
+| `ultima_visita` | `MemberClubVisits[0].enterDate` | `pgm_ultima_visita` |
 | `grezzo` | webhook + scheda + visita | va nel log e in `pgm_payload` |
 
 Quattro regole che il Code node non deve rompere.
@@ -121,22 +121,47 @@ sito; un'anagrafica modificata dal desk non è la persona.
 secondo. Un aggiornamento con `version` minore di quella già in riga viene
 saltato e registrato come `saltato-versione-vecchia`.
 
-## L'unico campo non verificato
+## `enterDate`, e come si è trovato
 
-`ultima_visita`. Nelle esecuzioni guardate `MemberClubVisits` tornava **sempre
-vuoto**, perché questo webhook scatta quasi solo su guest appena creati — che non
-hanno ancora visite. Il Code node prova sette nomi plausibili
-(`entranceDate`, `visitDate`, `entryDate`, `date`, `startDate`, `enteredAt`,
-`createdDate`) e mette l'oggetto intero in `grezzo`: al primo passaggio con una
-visita vera, o la colonna si riempie, o il nome si legge dal log e si corregge.
+`MemberClubVisits` ha questa forma — letta dal `grezzo` di un'esecuzione vera,
+non dalla documentazione:
 
-Per verificarlo quando ci sarà traffico utile:
+```json
+{"id":1008055,"clubId":1,"version":67294516,"memberId":4782,"isDeleted":false,
+ "readerName":"NUOTO","enterDate":"2026-05-27T14:16:19+02:00",
+ "leaveDate":"2026-05-28T02:31:19+02:00"}
+```
+
+Il campo è **`enterDate`**. La prima stesura del Code node provava sette nomi
+plausibili — fra cui `entranceDate`, sbagliato di due lettere — e quindi la
+colonna restava vuota **senza dare errore**, che è il modo peggiore di sbagliare:
+un sync che scrive tutto tranne un campo sembra un sync che funziona.
+
+Il nome vero si è letto da `pgm_sync_log.payload->'visita'`, che sta lì
+esattamente per questo. È il motivo per cui il grezzo si conserva:
 
 ```sql
 select payload->'visita' from pgm_sync_log
- where payload->'visita' is not null and payload->'visita' <> '{}'::jsonb
+ where payload->'visita' <> '{}'::jsonb
  order by ricevuto_il desc limit 5;
 ```
+
+Quando il nome giusto si è saputo, il dato già ricevuto **non si è aspettato dal
+prossimo webhook**: si è recuperato dal log, che è la seconda ragione per cui il
+grezzo esiste.
+
+```sql
+update public.utenti u
+   set pgm_ultima_visita = public.pgm_a_timestamp(l.payload->'visita'->>'enterDate')
+  from public.pgm_sync_log l
+ where l.utente_id = u.id
+   and l.payload->'visita'->>'enterDate' is not null
+   and u.pgm_ultima_visita is null;
+```
+
+`leaveDate` e `readerName` (il tornello: `NUOTO`, …) arrivano nella stessa
+risposta e oggi non hanno una colonna. Restano nel grezzo: il giorno che servono
+si promuovono da lì, senza chiedere niente a PerfectGym.
 
 ## Come si verifica
 
