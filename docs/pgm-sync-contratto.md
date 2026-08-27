@@ -229,8 +229,72 @@ il messaggio di Postgres.
 
 E un limite per costruzione: **«User Modified» non arriva per chi nessuno
 modifica.** Il sync tiene fresco chi si muove, non tutti; `pgm_freschezza`
-misura quanti restano fermi all'import. Coprire anche loro vuole un giro
-periodico sull'OData, che non è questo lavoro.
+misura quanti restano fermi all'import. Chi resta fermo lo prende il
+riallineamento, qui sotto — e lo prende **a comando, non da sé**: fra i due
+manca ancora un giro periodico, che oggi non c'è.
+
+## Il riallineamento: la stessa funzione, 38.586 volte
+
+Il workflow **`ATHLON: Riallineamento PerfectGym > Supabase`**
+(`oroCIjAILImYap7E`, trigger manuale, **non attivo**) legge tutte le schede
+dell'OData e le manda alla stessa `pgm_aggiorna_utente`, passando da
+`pgm_aggiorna_utenti(jsonb)` — un array, una richiesta. Si preme una volta e si
+lascia andare; la migrazione è `20260827d_pgm_sync_riallineamento.sql`, dove sta
+il perché di ogni scelta.
+
+```
+Da qui si parte ─ Cursore iniziale ─ GET Pagina Membri ─ Prepara Righe ─┬─ Supabase riallinea
+                                            ▲                          └─ Respira ─ Ancora una pagina? ─ Finito
+                                            └──────────────────────────────────── (sì)
+```
+
+**Non è un secondo mapping, ed è la riga da non rompere.** `Prepara Righe`
+scrive le stesse chiavi di `Prepara Supabase`: due funzioni che scrivono la
+stessa tabella divergono, e la seconda divergenza non la vede nessuno finché una
+colonna non resta vuota su una sola delle due strade. In particolare
+`stato_abbonamento` si sceglie **con la stessa regola** di `GET CONTRACTS` —
+`isAdditionalContract eq false`, il più recente per `signUpDate` — solo che qui
+la lista arriva dentro la scheda invece che da una chiamata sua.
+
+Quattro numeri sono misurati e non scelti.
+
+- **`$top` si ferma a 100.** Con 500 l'OData risponde `400` e lo dice per
+  esteso: *The limit of '100' for Top query has been exceeded*. Quindi 386
+  pagine, e il `PAGINA = 100` nel Code node **deve restare uguale a quello
+  nell'URL**: è lui che decide se la pagina era piena, cioè se c'è ancora da
+  leggere.
+- **Le finestre sono di id, non di `$skip`.** `id gt <cursore>` con
+  `$orderby=id`, e il cursore è il massimo id della pagina appena letta. Con
+  `$skip` una scheda creata durante la corsa sposta le pagine successive; così
+  no, e ripartire da metà è mettere un numero in `DA`.
+- **`$select` dentro `$expand` dimezza la pagina**: 17,6 kB invece di 40,6 sugli
+  stessi venti membri, perché `familyParents` e `familyChildren` senza `$select`
+  restituiscono la scheda intera di ogni parente. Conta perché l'esecuzione è
+  **una sola** e tiene in memoria tutte le pagine: 34 MB invece di 80.
+- **Le esecuzioni riuscite non salvano i dati** (`saveDataSuccessExecution:
+  none`), o 386 pagine finirebbero nel database di n8n. Quelle in errore sì: se
+  si ferma, si guarda lì.
+
+**Non manda `ultima_visita` né `consensi`**, e non è una dimenticanza: stanno su
+`MemberClubVisits` e `MemberAgreementAnswers`, una chiamata per persona a testa,
+cioè 77 mila richieste. Quelli li tiene in pari il webhook, e la regola
+«un campo che non si manda non cancella quello che c'è» fa il resto.
+
+**E non manda il grezzo.** Su 38.586 schede finirebbe due volte — nel registro e
+in `utenti.pgm_payload` — cioè una copia dell'anagrafica per ogni copia. La
+chiave `origine` dice quale strada ha chiamato, e fuori dal webhook il grezzo
+non si conserva: resta la riga con l'esito, che è il dato diagnostico.
+
+**Si può rieseguire, e la `version` è il freno.** Chi è già in pari esce come
+`duplicato` senza riscrivere niente: la seconda passata costa le chiamate e non
+le scritture. È la proprietà che permette di rifarlo quando l'anagrafica cresce,
+senza pensarci.
+
+Per verificare:
+
+```sql
+select origine, esito, count(*) from pgm_sync_log group by 1, 2 order by 1, 3 desc;
+```
 
 ## Sulle bozze n8n
 
