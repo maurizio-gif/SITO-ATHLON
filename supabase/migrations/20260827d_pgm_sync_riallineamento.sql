@@ -117,6 +117,7 @@ declare
   v_conflitto boolean := false;
   v_ver_riga  bigint;
   v_gen_id    uuid;
+  v_email_altrui boolean := false;
 
   v_member   text := nullif(btrim(coalesce(p_dati->>'member_id', '')), '');
   v_numero   text := nullif(btrim(coalesce(p_dati->>'numero_utente', '')), '');
@@ -173,11 +174,27 @@ begin
   end if;
   if v_id is null and v_numero is not null then
     select id, pgm_version into v_id, v_ver_riga
-      from public.utenti where pgm_numero_utente = v_numero limit 1;
+      from public.utenti where pgm_numero_utente = v_numero
+             and (pgm_member_id is null or v_member is null or pgm_member_id = v_member) limit 1;
   end if;
   if v_id is null and v_email is not null then
     select id, pgm_version into v_id, v_ver_riga
-      from public.utenti where email_norm = lower(v_email) limit 1;
+      from public.utenti where email_norm = lower(v_email)
+             and (pgm_member_id is null or v_member is null or pgm_member_id = v_member) limit 1;
+  end if;
+
+  -- L'indirizzo sta su chi l'ha dato per primo, e chi arriva dopo entra senza.
+  -- Non si perde niente: l'email e' sulla riga del genitore, che e' di chi
+  -- quell'indirizzo e' davvero, e la persona esiste come riga sua con la chiave
+  -- che conta -- il member id. Il contrario sarebbe non farla entrare affatto.
+  if v_id is null and v_email is not null then
+    perform 1 from public.utenti
+     where email_norm = lower(v_email)
+       and pgm_member_id is not null and pgm_member_id <> v_member;
+    if found then
+      v_email_altrui := true;
+      v_email := null;
+    end if;
   end if;
 
   -- Fuori ordine: un webhook piu' vecchio di quello gia' scritto non sovrascrive.
@@ -235,8 +252,12 @@ begin
         now(), p_dati
       ) returning id into v_id;
 
-      insert into public.pgm_sync_log (utente_id, pgm_member_id, esito, payload, origine)
-      values (v_id, v_member, 'creato', v_log, v_orig);
+      insert into public.pgm_sync_log (utente_id, pgm_member_id, esito, motivo_scarto, payload, origine)
+      values (v_id, v_member, 'creato',
+              case when v_email_altrui
+                   then 'Creata senza email: quell''indirizzo e'' gia'' di un''altra scheda PerfectGym.'
+                   else null end,
+              v_log, v_orig);
       return jsonb_build_object('esito', 'creato', 'utente_id', v_id);
     exception when unique_violation then
       v_id := null;
@@ -244,10 +265,12 @@ begin
         select id into v_id from public.utenti where pgm_member_id = v_member limit 1;
       end if;
       if v_id is null and v_numero is not null then
-        select id into v_id from public.utenti where pgm_numero_utente = v_numero limit 1;
+        select id into v_id from public.utenti where pgm_numero_utente = v_numero
+             and (pgm_member_id is null or v_member is null or pgm_member_id = v_member) limit 1;
       end if;
       if v_id is null and v_email is not null then
-        select id into v_id from public.utenti where email_norm = lower(v_email) limit 1;
+        select id into v_id from public.utenti where email_norm = lower(v_email)
+             and (pgm_member_id is null or v_member is null or pgm_member_id = v_member) limit 1;
       end if;
       if v_id is null then
         insert into public.pgm_sync_log (pgm_member_id, esito, motivo_scarto, payload, origine)

@@ -77,6 +77,22 @@ L'aggancio prova tre chiavi, in quest'ordine di forza:
 2. `pgm_numero_utente`
 3. `email_norm` — per ultima
 
+**Una riga di un altro member non si adotta**, e questa riga è costata 761
+persone. Al club i figli si iscrivono con l'email del genitore, quindi due member
+di PerfectGym possono avere lo stesso indirizzo: la ricerca per email trovava la
+riga del genitore e il figlio ci finiva sopra, portandosi via il `pgm_member_id`
+dell'altro. Non è successo per un caso: la guardia sulla `version` ha fermato
+tutti e 761 — confrontando la version del figlio con quella del genitore, cioè
+**sbagliando**, e registrandoli come `saltato-versione-vecchia`, che è il nome di
+un'altra cosa. Il prezzo era che quelle persone non entravano affatto.
+
+Adesso le ricerche per numero utente e per email scartano le righe che portano
+già un `pgm_member_id` diverso: `pgm_member_id` è l'identità, e una riga che ne
+porta un altro non è questa persona. Chi arriva su un indirizzo già preso entra
+**senza email** — il dato non si perde, è sulla riga del genitore, che è di chi
+quell'indirizzo è davvero — e il registro lo scrive nel `motivo_scarto` accanto a
+`creato`. Misurato sulla riesecuzione: `saltato-versione-vecchia` torna a zero.
+
 **L'email non può essere la chiave, e il dato reale lo dimostra.** Il member
 39122 è un ragazzo del 2012 con `email: null`, legato all'account del genitore
 (39088): se la deduplica passasse dall'indirizzo, quella persona non sarebbe
