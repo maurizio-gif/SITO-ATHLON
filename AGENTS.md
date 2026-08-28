@@ -1705,6 +1705,53 @@ Per verificare: `Vaglio Guest Pass` mette in chiaro `passOfferto`,
 è cambiato e il vaglio non aggancia più niente — da fuori si vedrebbe come «il
 Pass si propone sempre», che è il guasto che quel nodo esiste per evitare.
 
+### Chi si lamenta non riceve un'informazione, riceve una persona
+
+Vale in **ogni** ramo e su **qualunque** argomento, ed è la prima delle regole
+fisse del `systemMessage` perché viene prima di tutte le regole di contenuto: se
+il tono è di rabbia o di lamentela — ha pagato e non ha avuto, nessuno gli
+risponde, è la seconda volta che lo segnala, pensa di andarsene — in quel turno
+**non si risponde nel merito**. Niente numeri, niente orari, niente procedure, e
+soprattutto niente motivi: non perché è successo, non cosa comprende il suo
+abbonamento, non com'è fatto il palinsesto, nessuna ipotesi di sospensione o
+rimborso.
+
+**Anche quando la risposta si sa**, ed è questa la parte che non è ovvia. La
+tentazione è rispondere bene: la persona ha detto una cosa sbagliata, il testo ha
+quella giusta, e darla sembra il servizio. È il contrario — rispondere a una
+lamentela con un'informazione la peggiora, perché la persona non ha chiesto un
+dato, ha chiesto che qualcuno se ne occupi. Misurato sulla conversazione del
+28/08: a «ma nel frattempo ho pagato il mese di agosto» l'assistente ha risposto
+che «l'abbonamento di agosto copre quello che c'è disponibile in questo periodo»,
+cioè ha difeso il club, e la chat è andata avanti fino a sedici messaggi senza
+risolvere niente.
+
+Quello che resta sono due righe, in quest'ordine: **il dispiacere** sulla cosa
+precisa che ha detto lei, con le sue parole e senza spiegazioni attaccate; e **la
+strada verso una persona, con le istruzioni** — l'icona del messaggio in alto,
+cosa scriverci (cosa, quando, quale lezione), e che la conversazione arriva al
+team insieme al messaggio. Poi si ferma: nessuna domanda finale, nessuna offerta,
+nessun Guest Pass, nessuna telefonata.
+
+Tre dettagli che sono vincoli e non forma:
+
+- **`"senzaRisposta": true` su quel turno.** È il campo da cui `Salva risposta`
+  ricava `chat_conversazioni.escalata`, quindi è il modo in cui in archivio si
+  vede che quella conversazione è passata a una persona. Non cambia niente per
+  chi legge la chat: è un dato per il club.
+- **Non si promette cosa il team vedrà o farà** (regola 11bis). La prima stesura
+  di questa regola diceva «scrivi al team, che vede la tua situazione»: è
+  esattamente la promessa che la 11bis vieta, ed era già stata scritta una volta.
+  Quello che si sa è che la conversazione gli arriva e che rispondono via email.
+- **Vale sul turno, non sulla conversazione.** Se al messaggio dopo torna a fare
+  una domanda normale, si risponde normalmente — una regola che zittisce
+  l'assistente per il resto della chat trasformerebbe una lamentela in un muro.
+
+Nelle bozze email la stessa cosa c'era già, e con un nome diverso: l'astensione
+allargata di `ATHLON BOZZE EMAIL` passa la mano su un reclamo senza scrivere
+niente. Là la scelta è più radicale perché una bozza sbagliata la si rilegge, ma
+il criterio è lo stesso — un reclamo non lo chiude un testo automatico.
+
 ### «Online limit exceeded»: si aspetta che la lezione passi, non si disdice
 
 Il limite di prenotazioni conta **solo le lezioni ancora da svolgere**, quindi si
