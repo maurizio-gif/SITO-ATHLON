@@ -107,22 +107,96 @@ import { CLUB } from '../data/club';
       </button>
     </section>
 
-    {/* ── 2. Anagrafica e attività ─────────────────────────────────────────
-        Un passo solo e non tre: la persona è in piedi davanti a uno schermo,
-        con qualcuno accanto che aspetta. Ogni schermata in più è un punto in
-        cui si dice «lasciamo stare».
+    {/* ── 2. Le attività ──────────────────────────────────────────────────
+        **L'attività si chiede prima dei dati, e non è un ordine di comodo:**
+        è lei che decide quali dati servono. Un'attività junior vuole il
+        bambino e il genitore, perché da lì nasce il **nucleo familiare** su
+        PerfectGym; una attività adulti vuole solo la persona che ha davanti.
+        Chiedendo i dati per primi si finiva per chiederli sempre uguali, e poi
+        per non avere quelli che servivano davvero.
 
-        Il cellulare è facoltativo. È l'unico campo del sito che lo è, e la
-        ragione è il contesto: l'email l'ha già data, la persona è qui, e un
-        campo obbligatorio in più davanti a chi ha fretta di andarsene è quello
-        su cui il modulo si ferma. Se lo scrive dev'essere un cellulare vero,
-        perché su un fisso il richiamo su WhatsApp non arriva. */}
+        Si spuntano più di una perché al totem il caso normale è proprio
+        quello — un genitore che porta il figlio in piscina e intanto ha
+        guardato la sala pesi. In quel caso vince il ramo junior: il bambino va
+        registrato comunque. */}
+    <section class="tt__step" id="tt-step-attivita" hidden>
+      <h2 class="tt__titolo" tabindex="-1" data-tt-fuoco>Cosa ti interessa?</h2>
+      <p class="tt__lead">Puoi sceglierne più di una.</p>
+
+      <fieldset class="tt__gruppo">
+        <legend class="tt__label tt__label--nascosta">Attività</legend>
+        {GRUPPI_ATTIVITA.map((g) => (
+          <div class="tt__famiglia">
+            <span class="tt__famiglia-titolo">{g.titolo}</span>
+            <div class="tt__chips">
+              {g.voci.map((a) => (
+                <label class="tt__chip">
+                  <input
+                    type="checkbox"
+                    value={a.id}
+                    data-tt-attivita
+                    data-tt-etichetta={a.label}
+                    data-tt-gruppo={g.id}
+                  />
+                  <span>{a.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        ))}
+      </fieldset>
+
+      <p class="tt__errore" data-tt-errore hidden></p>
+
+      <button type="button" class="btn btn-primary tt__btn" data-tt-avanti-attivita>
+        Continua
+      </button>
+    </section>
+
+    {/* ── 3. I dati ────────────────────────────────────────────────────────
+        Un passo solo, che cambia forma. Per le attività adulti chiede la
+        persona che ha davanti; per una junior chiede **il bambino e il
+        genitore**, che sono i dati con cui n8n crea il nucleo familiare su
+        PerfectGym (`PGM Crea Genitore` + `PGM Crea Figlio`).
+
+        Le date di nascita non sono un di più: quella del bambino decide il
+        corso, e quella del genitore la vuole `personalData.birthDate` della
+        chiamata che crea l'anagrafica. Senza, il nucleo non nasce — e non lo
+        nasce **in silenzio**, perché quei nodi hanno `continueRegularOutput`.
+
+        Il cellulare è facoltativo per l'adulto e obbligatorio per il nucleo,
+        e la differenza non è una svista: il lead adulto si crea anche senza,
+        l'anagrafica del nucleo no. */}
     <section class="tt__step" id="tt-step-dati" hidden>
-      <h2 class="tt__titolo" tabindex="-1" data-tt-fuoco>Come ti chiami?</h2>
+      <h2 class="tt__titolo" tabindex="-1" data-tt-fuoco data-tt-titolo-dati>Come ti chiami?</h2>
+
+      {/* Il bambino, solo per il ramo junior. Viene prima del genitore perché
+          è di lui che si è parlato girando il club. */}
+      <div data-tt-bambino hidden>
+        <p class="tt__lead">Prima il bambino: sono i dati con cui lo registriamo e con cui si sceglie il gruppo adatto alla sua età.</p>
+
+        <div class="tt__coppia">
+          <div>
+            <label class="tt__label" for="tt-b-nome">Nome del bambino</label>
+            <input class="tt__input" id="tt-b-nome" type="text" autocomplete="off" placeholder="il suo nome" />
+          </div>
+          <div>
+            <label class="tt__label" for="tt-b-cognome">Cognome</label>
+            <input class="tt__input" id="tt-b-cognome" type="text" autocomplete="off" placeholder="il suo cognome" />
+          </div>
+        </div>
+
+        <label class="tt__label" for="tt-b-nascita">Data di nascita del bambino</label>
+        <input class="tt__input" id="tt-b-nascita" type="date" autocomplete="off" />
+
+        <p class="tt__separatore" aria-hidden="true"></p>
+      </div>
+
+      <p class="tt__lead" data-tt-lead-genitore hidden>E ora i tuoi, come genitore.</p>
 
       <div class="tt__coppia">
         <div>
-          <label class="tt__label" for="tt-nome">Nome</label>
+          <label class="tt__label" for="tt-nome" data-tt-etichetta-nome>Nome</label>
           <input class="tt__input" id="tt-nome" type="text" autocomplete="off" placeholder="Mario" />
         </div>
         <div>
@@ -131,32 +205,17 @@ import { CLUB } from '../data/club';
         </div>
       </div>
 
+      {/* La data di nascita del genitore la chiede PerfectGym, non noi: per il
+          ramo adulti il lead si crea senza, quindi non si mostra. */}
+      <div data-tt-nascita-adulto hidden>
+        <label class="tt__label" for="tt-nascita">La tua data di nascita</label>
+        <input class="tt__input" id="tt-nascita" type="date" autocomplete="off" />
+      </div>
+
       <label class="tt__label" for="tt-cellulare">
-        Cellulare <span class="tt__facoltativo">facoltativo</span>
+        Cellulare <span class="tt__facoltativo" data-tt-cellulare-nota>facoltativo</span>
       </label>
       <CampoTelefono id="tt-cellulare" classe="tt__input" autocomplete="off" />
-
-      {/* Le attività sono la sola informazione che questo modulo raccoglie e
-          che nessuna altra tabella ha: è quella che chi richiama legge prima
-          di comporre il numero. Si spuntano più di una perché al totem il caso
-          normale è proprio quello — un genitore che porta il figlio in piscina
-          e intanto ha guardato la sala pesi. */}
-      <fieldset class="tt__gruppo">
-        <legend class="tt__label">Cosa ti interessa</legend>
-        {GRUPPI_ATTIVITA.map((g) => (
-          <div class="tt__famiglia">
-            <span class="tt__famiglia-titolo">{g.titolo}</span>
-            <div class="tt__chips">
-              {g.voci.map((a) => (
-                <label class="tt__chip">
-                  <input type="checkbox" value={a.id} data-tt-attivita data-tt-etichetta={a.label} />
-                  <span>{a.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        ))}
-      </fieldset>
 
       {/* Il link all'informativa sta **fuori** dall'etichetta, e su questa
           pagina è un vincolo e non una preferenza. Un link dentro un `<label>`
@@ -370,6 +429,26 @@ import { CLUB } from '../data/club';
     border: 0;
     padding: 0;
     margin: 0.5rem 0 1.25rem;
+  }
+
+  /* La legend serve a chi legge con uno screen reader — il titolo del passo
+     dice gia' «Cosa ti interessa?» e ripeterlo a schermo sarebbe rumore. */
+  .tt__label--nascosta {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Il filo fra il blocco del bambino e quello del genitore: due anagrafiche
+     di fila senza stacco si leggono come un modulo solo, e si finisce per
+     scrivere il nome del figlio nel campo del padre. */
+  .tt__separatore {
+    height: 1px;
+    margin: 1.5rem 0;
+    background: var(--border-strong);
   }
 
   .tt__famiglia + .tt__famiglia {

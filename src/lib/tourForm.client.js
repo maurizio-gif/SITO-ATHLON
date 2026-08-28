@@ -4,9 +4,20 @@
 //
 // ── Il percorso ─────────────────────────────────────────────────────────────
 //
-//   email → verifica PGM → anagrafica + attività di interesse → conferma
-//                                                                  ↓
-//                                                          si azzera da sola
+//   email → verifica → attività ─┬─ ADULTI → i tuoi dati ────┬─ conferma
+//                                └─ JUNIOR → bambino          │      ↓
+//                                            + genitore ──────┘  si azzera
+//
+// **L'attività si chiede prima dei dati perché è lei a decidere quali dati
+// servono.** Una attività junior vuole il bambino e il genitore, perché da lì
+// n8n crea il **nucleo familiare** su PerfectGym (`PGM Crea Genitore` +
+// `PGM Crea Figlio`); una attività adulti vuole solo la persona che ha
+// davanti, e il suo lead si crea con nome, cognome, email e telefono.
+//
+// Se sono spuntate tutte e due — il caso normale al totem, il genitore che
+// porta il figlio in piscina e intanto ha guardato la sala pesi — **vince il
+// ramo junior**: il bambino va registrato comunque, e le attività adulti
+// restano nell'email e nelle note del tour.
 //
 // Tre passi e non sei, e la ragione sta scritta in `data/tour.ts`: qui
 // l'operatore è nella stanza, quindi le domande che «Contattaci» fa per capire
@@ -56,6 +67,11 @@ export function initTourForm(root) {
     email: 'Controlla l’indirizzo email: manca qualcosa.',
     nome: 'Serve il nome.',
     cognome: 'Serve il cognome.',
+    bnome: 'Serve il nome del bambino.',
+    bcognome: 'Serve il cognome del bambino.',
+    bnascita: 'Serve la data di nascita del bambino: è quella che decide il corso.',
+    nascita: 'Serve la tua data di nascita: la chiede il portale per creare l’anagrafica.',
+    cellulareNucleo: 'Per registrare il nucleo serve un cellulare.',
     attivita: 'Scegli almeno un’attività.',
     privacy: 'Serve il consenso al trattamento per poterti ricontattare.',
     invio: 'Non riusciamo a registrare il tour. Riprova fra un istante.',
@@ -70,6 +86,7 @@ export function initTourForm(root) {
 
   var steps = {
     email: q('#tt-step-email'),
+    attivita: q('#tt-step-attivita'),
     dati: q('#tt-step-dati'),
     fatto: q('#tt-step-fatto'),
   };
@@ -77,6 +94,10 @@ export function initTourForm(root) {
   var campoEmail = q('#tt-email');
   var campoNome = q('#tt-nome');
   var campoCognome = q('#tt-cognome');
+  var campoNascita = q('#tt-nascita');
+  var campoBNome = q('#tt-b-nome');
+  var campoBCognome = q('#tt-b-cognome');
+  var campoBNascita = q('#tt-b-nascita');
   var campoCellulare = q('#tt-cellulare');
   var campoPrivacy = q('#tt-privacy');
   var campoMarketing = q('#tt-marketing');
@@ -88,8 +109,13 @@ export function initTourForm(root) {
       email: '',
       nome: '',
       cognome: '',
+      nascita: '',
       cellulare: '',
+      bambino: { nome: '', cognome: '', dataNascita: '' },
       attivita: [],
+      /** `adulti` o `junior`: lo decide l'attività, e con lui cambia il passo
+          dei dati e la strada su PerfectGym (`lead` o `nucleo`). */
+      ramo: 'adulti',
       privacy: false,
       marketing: false,
       statoPgm: '',
@@ -159,6 +185,13 @@ export function initTourForm(root) {
     bottone.classList.toggle('tt__btn--attesa', sì);
   }
 
+  /* `2018-04-23` diventa `23/04/2018`. La data finisce in un'email che legge
+     una persona, e la forma ISO la si legge al contrario per un istante. */
+  function giorno(iso) {
+    var p = String(iso || '').split('-');
+    return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : String(iso || '');
+  }
+
   function emailValida(valore) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(valore || '').trim());
   }
@@ -220,7 +253,7 @@ export function initTourForm(root) {
       return;
     }
 
-    mostraStep('dati');
+    mostraStep('attivita');
     /* Qui nasce lo stato: da questo momento c'è qualcosa da dimenticare, e il
        conto parte anche se la persona non tocca più niente. */
     armaOblio();
@@ -248,17 +281,103 @@ export function initTourForm(root) {
     });
   }
 
-  // ── 2. Anagrafica e attività ──────────────────────────────────────────────
+  // ── 2. Le attività, che decidono il ramo ──────────────────────────────────
   function attivitaScelte() {
     return qa('[data-tt-attivita]:checked').map(function (c) {
-      return { id: c.value, label: c.dataset.ttEtichetta || c.value };
+      return {
+        id: c.value,
+        label: c.dataset.ttEtichetta || c.value,
+        gruppo: c.dataset.ttGruppo || 'adulti',
+      };
     });
+  }
+
+  /* Il gruppo lo porta la casella (`data-tt-gruppo`), che il markup riempie da
+     `GRUPPI_ATTIVITA` — cioè da `ACTIVITY_TAGS`. Un elenco di slug scritto qui
+     divergerebbe il giorno che si aggiunge un corso. */
+  function ramoDa(scelte) {
+    var junior = scelte.some(function (a) { return a.gruppo === 'junior'; });
+    return junior ? 'junior' : 'adulti';
+  }
+
+  var btnAvantiAttivita = q('[data-tt-avanti-attivita]');
+
+  function avantiAttivita() {
+    pulisciErrore(steps.attivita);
+    var scelte = attivitaScelte();
+    if (!scelte.length) {
+      mostraErrore(steps.attivita, ERR.attivita);
+      return;
+    }
+    dati.attivita = scelte;
+    dati.ramo = ramoDa(scelte);
+    vestiPassoDati();
+    mostraStep('dati');
+    armaOblio();
+  }
+
+  if (btnAvantiAttivita) btnAvantiAttivita.addEventListener('click', avantiAttivita);
+
+  /* Il passo dei dati cambia forma col ramo. Si tocca solo quello che cambia —
+     titolo, blocchi nascosti, etichette — e non si ricostruisce il markup: i
+     campi che restano devono conservare quello che la persona ci ha già
+     scritto se torna indietro e cambia idea sull'attività. */
+  var bloccoBambino = q('[data-tt-bambino]');
+  var leadGenitore = q('[data-tt-lead-genitore]');
+  var bloccoNascita = q('[data-tt-nascita-adulto]');
+  var titoloDati = q('[data-tt-titolo-dati]');
+  var etichettaNome = q('[data-tt-etichetta-nome]');
+  var notaCellulare = q('[data-tt-cellulare-nota]');
+
+  function vestiPassoDati() {
+    var junior = dati.ramo === 'junior';
+    if (bloccoBambino) bloccoBambino.hidden = !junior;
+    if (leadGenitore) leadGenitore.hidden = !junior;
+    /* La data di nascita dell'adulto la chiede PerfectGym solo per il nucleo:
+       `PGM Crea Lead` non la vuole, quindi nel ramo adulti non si mostra. */
+    if (bloccoNascita) bloccoNascita.hidden = !junior;
+    if (titoloDati) titoloDati.textContent = junior ? 'Chi porti in acqua?' : 'Come ti chiami?';
+    if (etichettaNome) etichettaNome.textContent = junior ? 'Il tuo nome' : 'Nome';
+    /* Il cellulare: facoltativo per l'adulto, necessario per il nucleo. */
+    if (notaCellulare) {
+      notaCellulare.textContent = junior ? 'serve per registrarvi' : 'facoltativo';
+    }
   }
 
   var btnInvia = q('[data-tt-invia]');
 
   async function invia() {
     pulisciErrore(steps.dati);
+
+    var junior = dati.ramo === 'junior';
+
+    /* Il bambino per primo, perché è il primo blocco a schermo: un errore che
+       parla di un campo più in basso di quello che si sta guardando manda a
+       cercarlo. */
+    if (junior) {
+      dati.bambino = {
+        nome: campoBNome.value.trim(),
+        cognome: campoBCognome.value.trim(),
+        dataNascita: campoBNascita.value,
+      };
+      if (!dati.bambino.nome) {
+        mostraErrore(steps.dati, ERR.bnome);
+        segnala(campoBNome);
+        return;
+      }
+      if (!dati.bambino.cognome) {
+        mostraErrore(steps.dati, ERR.bcognome);
+        segnala(campoBCognome);
+        return;
+      }
+      if (!dati.bambino.dataNascita) {
+        mostraErrore(steps.dati, ERR.bnascita);
+        segnala(campoBNascita);
+        return;
+      }
+    } else {
+      dati.bambino = { nome: '', cognome: '', dataNascita: '' };
+    }
 
     dati.nome = campoNome.value.trim();
     dati.cognome = campoCognome.value.trim();
@@ -270,6 +389,16 @@ export function initTourForm(root) {
     if (!dati.cognome) {
       mostraErrore(steps.dati, ERR.cognome);
       segnala(campoCognome);
+      return;
+    }
+
+    /* La data di nascita del genitore la vuole `personalData.birthDate` della
+       chiamata che crea l'anagrafica: senza, il nucleo non nasce — e non nasce
+       in silenzio, perché quel nodo ha `continueRegularOutput`. */
+    dati.nascita = junior ? campoNascita.value : '';
+    if (junior && !dati.nascita) {
+      mostraErrore(steps.dati, ERR.nascita);
+      segnala(campoNascita);
       return;
     }
 
@@ -286,13 +415,23 @@ export function initTourForm(root) {
         return;
       }
       dati.cellulare = tel.e164;
+    } else if (junior) {
+      /* Nel ramo junior smette di essere facoltativo: `phoneNumber` viaggia
+         sia nell'anagrafica del genitore sia in quella del figlio. */
+      mostraErrore(steps.dati, ERR.cellulareNucleo);
+      segnala(campoCellulare);
+      return;
     } else {
       dati.cellulare = '';
     }
 
     var scelte = attivitaScelte();
     if (!scelte.length) {
-      mostraErrore(steps.dati, ERR.attivita);
+      /* Non dovrebbe succedere — si passa di qui solo dopo il passo delle
+         attività — ma se qualcuno torna indietro e le toglie tutte, meglio
+         rimandarlo là che spedire un tour senza. */
+      mostraStep('attivita');
+      mostraErrore(steps.attivita, ERR.attivita);
       return;
     }
     dati.attivita = scelte;
@@ -311,6 +450,8 @@ export function initTourForm(root) {
       nome: dati.nome,
       cognome: dati.cognome,
       telefono: dati.cellulare,
+      dataNascita: dati.nascita,
+      bambino: dati.bambino,
       attivita: scelte.map(function (a) { return a.id; }),
       attivitaEtichette: scelte.map(function (a) { return a.label; }),
       privacy: dati.privacy,
@@ -362,14 +503,24 @@ export function initTourForm(root) {
                fatta, e un secondo workflow sarebbe un secondo posto in cui
                aggiornare le regole di PerfectGym. */
             tipoRichiesta: 'tour',
-            flow: 'adulti',
-            gruppoAttivita: 'adulti',
+            /* **`flow` decide la strada su PerfectGym**, e non è più fisso:
+               `Normalizza e Componi Email` ne ricava `stradaPgm`, che vale
+               `lead` per gli adulti e `nucleo` per i junior — cioè
+               `PGM Crea Genitore` seguito da `PGM Crea Figlio`. Era
+               `'adulti'` scritto a mano, quindi un tour per un bambino creava
+               un lead a nome del genitore e il figlio non esisteva. */
+            flow: dati.ramo,
+            gruppoAttivita: dati.ramo === 'junior' ? 'junior' : 'adulti',
             cellulare: dati.cellulare,
             /* La richiesta non la scrive nessuno al totem: quello che c'è è
                l'elenco delle attività, ed è quello che il desk legge
                nell'email. */
             richiesta: 'Tour in sede. Attività di interesse: ' +
-              scelte.map(function (a) { return a.label; }).join(', ') + '.',
+              scelte.map(function (a) { return a.label; }).join(', ') + '.' +
+              (junior && dati.bambino.nome
+                ? ' Per ' + dati.bambino.nome + ' ' + dati.bambino.cognome +
+                  ' (' + giorno(dati.bambino.dataNascita) + ').'
+                : ''),
             tour: { id: esito && esito.id, data: esito && esito.data, ora: esito && esito.ora },
             isNewUser: dati.statoPgm === 'nuovo',
             /* n8n legge lo stato da `stato`/`statoNucleo`, non da `statoPgm`:
@@ -429,6 +580,9 @@ export function initTourForm(root) {
     fermaConto();
     fermaOblio();
     dati = vuoto();
+    /* Il passo dei dati torna alla forma adulti, o il prossimo visitatore
+       trova a schermo i campi del bambino di quello prima. */
+    vestiPassoDati();
     qa('.tt__input').forEach(function (campo) {
       campo.value = '';
       campo.classList.remove('tt__input--errore');
