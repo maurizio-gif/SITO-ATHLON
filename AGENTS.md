@@ -2240,10 +2240,18 @@ accompagna un amico è tutti e due, e quello che deve ricevere è il promemoria
 della visita. Per questo il ramo si legge da `tipoRichiestaVista` — cioè da
 quello che il browser ha dichiarato — e non da `statoNucleo`.
 
-**Il Guest Pass ha le stesse due condizioni del vaglio della chat**: solo a chi
-ha guardato le attività adulti (il Pass è un Premium, non comprende i corsi
-junior) e **non a chi è già socio**. Un Member che si sente offrire una prova la
-va a chiedere al desk e si sente dire di no.
+**E non si propone niente: si ricapitola.** Nessun Guest Pass, nessun invito a
+provare. La prima stesura aveva una scheda «C'è il Guest Pass», ed era fuori
+posto per una ragione che vale in generale: questa persona **è appena stata in
+sede**, accompagnata da qualcuno. Invitarla a venire a provare è rispondere a una
+domanda che non ha fatto, e la fa sentire un indirizzo in una lista invece che
+qualcuno che il club ha appena conosciuto. Quello che serve è il riepilogo di
+corsi, abbonamenti e attività di cui si è parlato, e dove ritrovarli.
+
+L'unica «prova» che resta nel testo è la **prova di inserimento obbligatoria**
+dell'agonistico e della pallanuoto, che non è un invito ma il modo in cui si
+entra in quei due corsi — sta nel campo `prova` delle loro schede in
+`data/junior.ts`, ed è informazione sull'iscrizione.
 
 I contenuti non sono inventati: le fasce d'età e i claim vengono da
 `data/junior.ts`, il turno fisso della Scuola Nuoto e la prenotazione lezione
