@@ -1,0 +1,148 @@
+---
+/**
+ * Pagina di prova del form «Prenota una chiamata».
+ *
+ * Esiste per provare il calendario su una pagina vera — con il Layout, i
+ * caratteri, i colori e gli script di attribuzione del sito — prima di
+ * decidere dove metterlo davvero: dentro la chat al posto di Calendly, nel
+ * modulo contatti, o in fondo a una pagina di attività.
+ *
+ * `noindex`: non deve finire nei motori di ricerca né essere trovata da un
+ * cliente che cerca «prenota chiamata athlon». Non è una pagina del sito, è un
+ * banco di prova, e resta raggiungibile solo da chi ne conosce l'indirizzo.
+ *
+ * Non c'è niente di suo qui dentro: il modal vive nel Layout ed è già su ogni
+ * pagina. Questa aggiunge solo i pulsanti che lo aprono, con `data-cta="call"`,
+ * che è lo stesso aggancio che useranno le CTA vere.
+ */
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Prova prenotazione chiamata"
+  description="Banco di prova del form di prenotazione telefonica. Pagina interna, non indicizzata."
+  noindex
+>
+  <main class="pp">
+    <section class="pp__intro">
+      <span class="pp__eyebrow">Pagina di prova · non indicizzata</span>
+      <h1 class="pp__titolo">Prenota una chiamata</h1>
+      <p class="pp__lead">
+        Il form prende gli orari liberi dall’agenda del pannello e ci scrive dentro l’appuntamento. Quello che
+        prenoti qui è un appuntamento vero: compare in Agenda e occupa lo slot per tutti gli altri.
+      </p>
+
+      <button type="button" class="btn btn-primary pp__cta" data-cta="call" data-cta-source="prova-prenotazione">
+        Prenota una chiamata
+      </button>
+    </section>
+
+    <section class="pp__note">
+      <h2>Cosa aspettarsi</h2>
+      <ul>
+        <li>
+          <strong>L’email decide il percorso.</strong> Se l’indirizzo risulta già socio o ospite su PerfectGym si
+          salta direttamente agli orari; altrimenti si passa da nome, cellulare e consenso.
+        </li>
+        <li>
+          <strong>Prima il giorno, poi gli orari.</strong> Ogni giorno porta quanti slot liberi ha, così si sceglie
+          senza aprirli tutti.
+        </li>
+        <li>
+          <strong>Gli orari sono veri.</strong> Arrivano dall’agenda in tempo reale: un appuntamento inserito a mano
+          dal desk, o un tour, tolgono lo slot subito.
+        </li>
+        <li>
+          <strong>L’argomento è obbligatorio.</strong> È quello che chi chiama legge prima di comporre il numero.
+        </li>
+      </ul>
+
+      <h2>Le fasce</h2>
+      <table class="pp__tabella">
+        <thead>
+          <tr><th>Giorno</th><th>Mattina</th><th>Pomeriggio</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Lunedì e martedì</td><td>10:30 – 12:30</td><td>15:00 – 17:00</td></tr>
+          <tr><td>Mercoledì e giovedì</td><td>11:30 – 12:30</td><td>15:00 – 17:00</td></tr>
+          <tr><td>Venerdì</td><td>10:30 – 12:30</td><td>—</td></tr>
+          <tr><td>Sabato</td><td>11:30 – 13:00</td><td>—</td></tr>
+          <tr><td>Domenica</td><td colspan="2">chiuso</td></tr>
+        </tbody>
+      </table>
+      <p class="pp__piccolo">
+        Slot da dieci minuti, prenotabili con almeno due ore di anticipo, sui prossimi sette giorni.
+      </p>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .pp {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 4rem 1.25rem 5rem;
+  }
+  .pp__eyebrow {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--color-primary, #ff5701);
+    margin-bottom: 0.75rem;
+  }
+  .pp__titolo {
+    margin: 0 0 0.75rem;
+  }
+  .pp__lead {
+    margin: 0 0 1.75rem;
+    opacity: 0.8;
+    max-width: 38rem;
+  }
+  .pp__cta {
+    min-width: 16rem;
+  }
+  .pp__note {
+    margin-top: 3.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgb(36 26 20 / 0.12);
+  }
+  .pp__note h2 {
+    font-size: 1.1rem;
+    margin: 2rem 0 0.75rem;
+  }
+  .pp__note h2:first-child {
+    margin-top: 0;
+  }
+  .pp__note ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    line-height: 1.65;
+  }
+  .pp__note li + li {
+    margin-top: 0.5rem;
+  }
+  .pp__tabella {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+  .pp__tabella th,
+  .pp__tabella td {
+    text-align: left;
+    padding: 0.55rem 0.6rem;
+    border-bottom: 1px solid rgb(36 26 20 / 0.12);
+  }
+  .pp__tabella th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.6;
+  }
+  .pp__piccolo {
+    font-size: 0.85rem;
+    opacity: 0.7;
+    margin-top: 0.75rem;
+  }
+</style>

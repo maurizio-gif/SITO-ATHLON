@@ -231,28 +231,6 @@ import CampoTelefono from './CampoTelefono.astro';
     font-weight: 700;
     margin: 0 0 0.35rem;
   }
-  .ap__input {
-    width: 100%;
-    border: 1px solid rgb(36 26 20 / 0.18);
-    border-radius: 12px;
-    background: #fff;
-    padding: 0.7rem 0.85rem;
-    font: inherit;
-    font-size: 1rem; /* 16px: sotto questa misura iOS zooma al fuoco */
-    margin-bottom: 0.9rem;
-  }
-  .ap__input:focus {
-    outline: none;
-    border-color: var(--color-primary, #ff5701);
-    box-shadow: 0 0 0 3px rgb(255 87 1 / 0.15);
-  }
-  .ap__textarea {
-    resize: vertical;
-    min-height: 5.5rem;
-  }
-  .ap__input--errore {
-    border-color: #c0392b;
-  }
   .ap__coppia {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -355,6 +333,45 @@ import CampoTelefono from './CampoTelefono.astro';
      Il prefisso `ap__` è già proprio di questo pannello, quindi globale non
      collide con niente: stesso ragionamento di CampoTelefono.astro. -->
 <style is:global>
+
+  /* I campi stanno qui e non nello <style> scoped, e la ragione è
+     CampoTelefono.astro: quel componente si aspetta che padding, bordo e
+     raggio glieli dia la classe del pannello che gli si passa (`ap__input`).
+     Ma è un componente a sé, con il suo `data-astro-cid-…`, e una regola
+     scoped di questo file non lo raggiunge — il prefisso «+39» restava basso,
+     squadrato e disallineato accanto al campo del numero. */
+  .ap__input {
+    width: 100%;
+    border: 1px solid rgb(36 26 20 / 0.18);
+    border-radius: 12px;
+    background: #fff;
+    padding: 0.7rem 0.85rem;
+    font: inherit;
+    font-size: 1rem; /* 16px: sotto questa misura iOS zooma al fuoco */
+    margin-bottom: 0.9rem;
+  }
+  .ap__input:focus {
+    outline: none;
+    border-color: var(--color-primary, #ff5701);
+    box-shadow: 0 0 0 3px rgb(255 87 1 / 0.15);
+  }
+  .ap__textarea {
+    resize: vertical;
+    min-height: 5.5rem;
+  }
+  .ap__input--errore {
+    border-color: #c0392b;
+  }
+
+  /* Il prefisso e il numero devono leggersi come un campo solo: stessa
+     altezza, stessa linea di base, il margine sotto una volta sola. */
+  .ap .tel {
+    align-items: stretch;
+    margin-bottom: 0.9rem;
+  }
+  .ap .tel .ap__input {
+    margin-bottom: 0;
+  }
   /* ── I giorni ──────────────────────────────────────────────────────────
      Una fila che scorre in orizzontale invece di sette righe incolonnate:
      su un telefono le sette righe avrebbero riempito lo schermo prima
