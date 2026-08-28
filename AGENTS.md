@@ -1705,6 +1705,53 @@ Per verificare: `Vaglio Guest Pass` mette in chiaro `passOfferto`,
 è cambiato e il vaglio non aggancia più niente — da fuori si vedrebbe come «il
 Pass si propone sempre», che è il guasto che quel nodo esiste per evitare.
 
+### Le sospensioni sono due regimi, non uno con le varianti
+
+A «devo procedere con la sospensione dell'abbonamento Premium Mensile Flex» —
+un adulto — l'assistente ha dato i 15 € giusti, i 10 giorni di preavviso giusti,
+e poi, quando la persona ha detto di aver avuto un intervento, il ristoro
+sbagliato: *«il recupero avverrà tramite un credito di almeno 2 mensilità,
+utilizzabile entro 6 mesi dalla fine del corso»*. Quello è il punto 4.10 della
+**Scuola Nuoto Bambini**. Per un adulto il contratto si allunga di pari durata e
+di credito non ce n'è.
+
+**Non aveva inventato: aveva letto una voce che conteneva entrambi i regimi.**
+`abbonamento:sospensione` diceva il perimetro per bene — «vale solo per», «per
+quei corsi c'è un'altra strada» — ma teneva in tre righe due cose che non hanno
+in comune nulla oltre ai sessanta giorni. Un contesto che contiene due regimi è
+un contesto da cui si può comporre un terzo regime che non esiste.
+
+Adesso il perimetro è **un dato** e le voci sono **due**:
+
+| | adulti (dal 1/9/2021) e Baby Nuoto | Scuola Nuoto, Agonistico, Pallanuoto |
+| --- | --- | --- |
+| a pagamento | 15 €, un mese solare, preavviso 10 giorni | **non esiste** |
+| per inidoneità | gratuita, ≥ 60 giorni documentati | gratuita, ≥ 60 giorni documentati |
+| la quota del mese | il contratto si allunga | **resta dovuta** |
+| cosa si recupera | il recupero parte da 2 mesi | un **credito** ≥ 2 mensilità, entro 6 mesi dalla fine del corso |
+
+Tre cose da sapere prima di toccarle.
+
+**Ogni voce dichiara il perimetro nel titolo e nella prima riga, e nomina
+l'altra.** Serve tutto e due: il titolo perché è quello che il modello legge
+scegliendo, e il rimando perché il caso «io ho un abbonamento e mio figlio fa la
+scuola nuoto» è comune — e quando il recupero pesca entrambe le voci, ognuna dice
+di non usare i numeri dell'altra.
+
+**`SOSPENSIONE.junior` è la novità nei dati**, accanto a `inabilita`: prima il
+regime dei bambini viveva solo dentro un accordion delle condizioni contrattuali
+di `preiscrizioni-nuoto.md`, cioè in un posto dove nessuno lo cercava e da cui il
+modello lo prendeva per caso. Adesso ha anche una scheda sua,
+`/wikiathlon/snb/sospensione/`, con la tabella del confronto — che è il modo in
+cui due cose che si somigliano smettono di essere confuse.
+
+**Il sito non aveva il difetto, e questo dice dove guardare.** `BannerSospensione`
+sta solo su `/abbonamenti` e `/promo`, e nessuna pagina junior nomina la
+sospensione: il guasto viveva interamente nel `kb.json` e nel wiki. Quando una
+risposta della chat sbaglia su una regola, la prima cosa da controllare non è la
+pagina — è quante voci della knowledge base parlano di quella regola e se
+ciascuna dichiara per chi vale.
+
 ### Dove la scheda tace, il modello applica la regola generale — e il turno della scuola nuoto è fisso
 
 «Posso scegliere un bisettimanale e fare orari diversi nei 2 giorni?» → *«Sì,

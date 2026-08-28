@@ -183,6 +183,8 @@ In caso di malattia o infortunio con inidoneità documentata per almeno **60 gio
 
 La sospensione è **alternativa** al recupero lezioni (punto 4.7): non è possibile cumulare i due meccanismi. Durante la sospensione il pagamento mensile rimane dovuto. Il recupero avverrà tramite un credito pari ad almeno **2 mensilità** pagate, utilizzabile entro **6 mesi** dalla fine del corso. Il credito non è trasferibile.
 
+La procedura passo per passo, con il confronto rispetto agli adulti: [Fermarsi durante la stagione](/wikiathlon/snb/sospensione/).
+
 </details>
 
 <details>
