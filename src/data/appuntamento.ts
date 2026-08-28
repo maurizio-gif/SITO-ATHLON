@@ -13,8 +13,14 @@
  * indirizzo.
  */
 
-/** Il pannello, che è dove vive l'agenda. */
-const CRM = 'https://crm.athlonroma.it';
+/**
+ * Il pannello, che è dove vive l'agenda.
+ *
+ * Esportato perché i posti che ci scrivono sono due — questo form e il tour
+ * del totem (`data/tour.ts`) — e un indirizzo scritto in due file è un
+ * indirizzo che il giorno del trasloco cambia in uno solo.
+ */
+export const CRM = 'https://crm.athlonroma.it';
 
 /** Gli orari ancora liberi nei prossimi sette giorni. */
 export const API_SLOT = `${CRM}/api/prenotazioni/slot`;
