@@ -57,7 +57,20 @@ interface Props {
 /* Il segnaposto senza spazi: è la forma in cui il numero va scritto, e uno
    spazio là dentro invita a scriverlo — `validaTelefono` lo tollera, ma il
    segnaposto è un esempio e un esempio si copia. */
-const { id, classe, placeholder = '3401234567', ...resto } = Astro.props;
+/* `autocomplete` è un parametro con un valore predefinito e non un attributo
+   scritto sotto, e la differenza è visibile: scritto nel markup **prima** di
+   `{...resto}`, un `autocomplete` passato dal chiamante non lo sostituiva —
+   Astro li emetteva tutti e due e il browser onora il primo. Il campo del
+   totem chiedeva `autocomplete="off"` e riceveva `tel-national`, cioè offriva
+   in tendina il numero del visitatore precedente. Un valore predefinito qui
+   non può essere scavalcato per sbaglio. */
+const {
+  id,
+  classe,
+  placeholder = '3401234567',
+  autocomplete = 'tel-national',
+  ...resto
+} = Astro.props;
 
 /* L'Italia in testa, e poi tutti in ordine. Non è un doppione da togliere: la
    prima voce è il preselezionato e nessuno la cerca, la seconda sta alla lettera
@@ -95,7 +108,7 @@ const inTesta = PREFISSI.filter((p) => p.iso === 'IT');
     id={id}
     type="tel"
     inputmode="tel"
-    autocomplete="tel-national"
+    autocomplete={autocomplete}
     placeholder={placeholder}
     {...resto}
   />

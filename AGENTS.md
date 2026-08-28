@@ -2137,16 +2137,48 @@ modulo raccoglie e che nessun'altra tabella ha: finiscono in
 `note_programmazione`, che è quello che il desk legge prima di comporre il
 numero.
 
-**La pagina si dimentica, e questo è il totem.** Alla conferma parte un conto
-alla rovescia visibile (venti secondi) che riporta al primo passo e svuota
-email, anagrafica, spunte e consensi. Stessa regola per cui `emailNota.ts` non
-precompila qui e la chat dimentica dopo tre minuti: chi arriva dopo non deve
-trovare i dati di chi è passato prima. Per la stessa ragione il campo email
-**non porta `data-email-nota`** — non basta che `emailNota.ts` si astenga sul
-totem, l'attributo è l'adesione a un meccanismo che questa pagina non vuole — e
-il pulsante fisso della chat si nasconde con `:global(.cfab) { display: none
+**La pagina si dimentica, e le strade sono due perché i modi di andarsene sono
+due.** Alla conferma parte un conto alla rovescia visibile (venti secondi) che
+riporta al primo passo e svuota tutto: è la strada del modulo che arriva in
+fondo. L'altra copre quello che si ferma a metà, ed è il caso vero da temere —
+qualcuno digita nome, cognome e numero, si distrae, e se ne va senza premere
+«Ho finito». Senza un conto suo quei campi restano a schermo **per sempre**, e
+la persona dopo li legge. Tre minuti di silenzio, a qualunque passo, ed è lo
+stesso numero della chat sul totem dalla stessa misura: troppo presto si
+cancella il lavoro di qualcuno che è ancora lì, troppo tardi si mostrano i dati
+di uno sconosciuto.
+
+**E il conto segue il dato, non il dito** — la lezione l'aveva già pagata la
+chat. Armarlo sui soli eventi di interazione vuol dire che parte perché
+qualcuno ha toccato lo schermo, non perché c'è qualcosa da dimenticare: basta
+un percorso che arriva al passo 2 senza un `pointerdown` — l'`Enter` sul campo
+email — e i dati restano lì per sempre. Quindi si arma anche dove lo stato
+**nasce**, cioè dopo la verifica dell'email. Provato: al passo 2 raggiunto di
+sola tastiera, il modulo si svuota comunque.
+
+**Fuori dalla memoria della funzione non resta niente.** Nessun
+`localStorage`, nessun `sessionStorage`, nessuna chiamata a
+`athlonRicordaEmail` o `athlonRicordaUserNumber` — che sono i due meccanismi
+con cui il resto del sito ricorda chi ha compilato, e che qui non si usano di
+proposito. Quindi non c'è niente da ripulire al caricamento successivo: un `F5`
+riparte vuoto per costruzione, e un ritorno dalla cache di navigazione lo
+azzera `pageshow` con `persisted`. Per la stessa ragione il campo email **non
+porta `data-email-nota`** — non basta che `emailNota.ts` si astenga sul totem,
+l'attributo è l'adesione a un meccanismo che questa pagina non vuole — e il
+pulsante fisso della chat si nasconde con `:global(.cfab) { display: none
 !important }`, come su `/link` ma per un motivo diverso: lì l'assistente era già
 in lista, qui è una via d'uscita da un modulo lasciato a metà.
+
+**E l'autofill del browser è il terzo modo di ricordare, quello che non si
+scrive.** Il campo del cellulare offriva in tendina il numero del visitatore
+precedente, e la causa stava in `CampoTelefono.astro`: `autocomplete` era un
+attributo scritto nel markup **prima** di `{...resto}`, quindi un
+`autocomplete="off"` passato dal chiamante non lo sostituiva — Astro li emetteva
+tutti e due e il browser onora il primo. Ora è un parametro con valore
+predefinito, che non si può scavalcare per sbaglio. Vale in generale: **in un
+componente condiviso, un attributo che il chiamante deve poter cambiare si
+scrive come parametro con un valore predefinito, non come attributo davanti
+allo spread.**
 
 **Il link all'informativa sta fuori dall'etichetta del consenso**, e su una
 pagina che si apre in sede è un vincolo. Un `<a>` dentro un `<label>` fa due
@@ -2173,6 +2205,11 @@ intero con le due chiamate intercettate: dalla verifica devono arrivare i tre
 campi precompilati, l'invio senza attività e senza consenso deve fermarsi, il
 tocco sull'informativa **non** deve spuntare il consenso, e «Registra un altro
 tour» deve lasciare i campi vuoti e nessuna spunta.
+
+E l'oblio, che si prova con l'orologio finto di Playwright (`page.clock`): un
+modulo compilato a metà deve **restare** a 2m30 e **sparire** a 3m15, lo stesso
+deve valere per un passo 2 raggiunto di sola tastiera, e `localStorage` deve
+essere vuoto — non «senza chiavi del modulo»: vuoto.
 
 ## Il form dell'assistenza chiede poco, e il resto lo va a prendere
 

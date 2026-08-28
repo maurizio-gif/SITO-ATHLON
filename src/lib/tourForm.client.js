@@ -14,11 +14,22 @@
 //
 // ── Le tre cose che questo file fa e gli altri form no ──────────────────────
 //
-// **Si dimentica.** Ogni form del sito vive su un dispositivo personale e può
-// permettersi di ricordare; questo no. Alla conferma parte un conto alla
-// rovescia che riporta al primo passo e svuota tutto, ed è la stessa regola per
-// cui `emailNota.ts` non precompila sul totem e la chat dimentica dopo tre
-// minuti — chi arriva dopo non deve trovare il nome di chi è passato prima.
+// **Si dimentica, e per due strade.** Ogni form del sito vive su un dispositivo
+// personale e può permettersi di ricordare; questo no. Alla conferma parte un
+// conto alla rovescia visibile che riporta al primo passo e svuota tutto — è la
+// strada del modulo che arriva in fondo. L'altra copre quello che si ferma a
+// metà, che è il caso vero da temere: qualcuno digita nome, cognome e numero,
+// si distrae, e se ne va senza premere «Ho finito». Dopo tre minuti di silenzio
+// quel modulo si svuota da sé, a qualunque passo sia.
+//
+// **E niente si scrive nel browser.** Nessun `localStorage`, nessun
+// `sessionStorage`, nessuna chiamata a `athlonRicordaEmail` o
+// `athlonRicordaUserNumber` — che sono i due meccanismi con cui il resto del
+// sito ricorda chi ha compilato, e che qui non si usano di proposito. Fuori
+// dalla memoria di questa funzione non resta niente, quindi non c'è niente da
+// ripulire al caricamento successivo: un `F5` riparte vuoto per costruzione.
+// Stessa regola per cui `emailNota.ts` non precompila sul totem e la chat
+// dimentica dopo tre minuti.
 //
 // **La verifica dell'email non cambia il percorso, precompila e basta.** In
 // «Contattaci» `memberType` decide se mandare la persona al portale: qui no,
@@ -31,7 +42,13 @@
 // riconcilia a mano. Se invertiti, l'operatore vedrebbe «fatto» su una visita
 // che in agenda non c'è, e nessuno la richiamerebbe mai.
 
-import { API_TOUR, WEBHOOK_VERIFICA, WEBHOOK_CONTATTO, SECONDI_CONFERMA } from '../data/tour';
+import {
+  API_TOUR,
+  WEBHOOK_VERIFICA,
+  WEBHOOK_CONTATTO,
+  SECONDI_CONFERMA,
+  SECONDI_OBLIO,
+} from '../data/tour';
 import { validaTelefono } from '../data/prefissi';
 
 export function initTourForm(root) {
@@ -204,6 +221,9 @@ export function initTourForm(root) {
     }
 
     mostraStep('dati');
+    /* Qui nasce lo stato: da questo momento c'è qualcosa da dimenticare, e il
+       conto parte anche se la persona non tocca più niente. */
+    armaOblio();
   }
 
   /* Chi il club conosce già non ridigita quello che il club sa. Solo nei campi
@@ -364,6 +384,7 @@ export function initTourForm(root) {
     }
 
     attendi(btnInvia, false);
+    fermaOblio();
     conferma();
   }
 
@@ -406,6 +427,7 @@ export function initTourForm(root) {
      prossima. */
   function azzera() {
     fermaConto();
+    fermaOblio();
     dati = vuoto();
     qa('.tt__input').forEach(function (campo) {
       campo.value = '';
@@ -424,6 +446,53 @@ export function initTourForm(root) {
 
   var btnAncora = q('[data-tt-ancora]');
   if (btnAncora) btnAncora.addEventListener('click', azzera);
+
+  // ── L'oblio di un modulo lasciato a metà ──────────────────────────────────
+  //
+  // Il conto della conferma copre chi arriva in fondo. Questo copre chi non ci
+  // arriva, ed è il caso da temere: i campi del passo 2 — nome, cognome,
+  // numero — restano a schermo finché qualcuno non li tocca, e chi arriva dopo
+  // li legge.
+  //
+  // **Il conto segue il dato, non il dito**, ed è la lezione già pagata dalla
+  // chat: armarlo sui soli eventi di interazione vuol dire che parte perché
+  // qualcuno ha toccato lo schermo, non perché c'è qualcosa da dimenticare. Un
+  // percorso che arriva a destinazione senza un `pointerdown` — un invio da
+  // tastiera, l'`Enter` sul campo email — lascerebbe i dati lì per sempre.
+  // Quindi si arma **anche** dove lo stato nasce: dopo la verifica dell'email,
+  // e a ogni carattere digitato.
+  var orologioOblio = null;
+
+  function armaOblio() {
+    fermaOblio();
+    orologioOblio = setTimeout(function () {
+      orologioOblio = null;
+      /* Non si azzera sopra la conferma: quella ha il suo conto, visibile, e
+         interromperlo vorrebbe dire togliere di mezzo un «Grazie, Giulia» che
+         la persona sta ancora leggendo. */
+      if (steps.fatto && !steps.fatto.hidden) return;
+      azzera();
+    }, SECONDI_OBLIO * 1000);
+  }
+
+  function fermaOblio() {
+    if (orologioOblio) clearTimeout(orologioOblio);
+    orologioOblio = null;
+  }
+
+  root.addEventListener('input', armaOblio);
+  root.addEventListener('change', armaOblio);
+  root.addEventListener('pointerdown', armaOblio);
+  root.addEventListener('keydown', armaOblio);
+
+  /* Il ritorno da un'altra pagina — l'informativa si apre in una scheda nuova,
+     ma un «indietro» resta possibile — non deve rimettere in pagina i campi
+     che il browser aveva conservato nella cache di navigazione. `persisted`
+     dice esattamente questo: la pagina non è stata ricostruita, è tornata
+     com'era. */
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) azzera();
+  });
 
   mostraStep('email');
 }

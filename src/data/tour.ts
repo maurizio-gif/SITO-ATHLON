@@ -89,3 +89,20 @@ export { CONSENSO_PRIVACY, CONSENSO_MARKETING } from './contatto';
  * risentiamo noi» prima che lo schermo si azzeri.
  */
 export const SECONDI_CONFERMA = 20;
+
+/**
+ * Dopo quanto silenzio un modulo lasciato **a metà** si svuota da solo.
+ *
+ * `SECONDI_CONFERMA` copre il percorso che arriva in fondo; questo copre
+ * l'altro, che è il caso vero da temere: qualcuno digita nome, cognome e
+ * numero, si distrae, e se ne va senza premere «Ho finito». Senza questo conto
+ * quei dati restano sullo schermo **per sempre**, e la persona dopo li legge.
+ *
+ * Tre minuti, ed è lo stesso numero della chat sul totem, dalla stessa
+ * misura: troppo presto si cancella il lavoro di qualcuno che è ancora lì e lo
+ * vede — deve ridigitare tutto — troppo tardi si mostrano i dati di uno
+ * sconosciuto. Il primo è un fastidio visibile e recuperabile, il secondo è il
+ * dato di un'altra persona, quindi si sta dalla parte breve; ma non tanto da
+ * colpire chi sta scegliendo le attività con l'operatore che parla.
+ */
+export const SECONDI_OBLIO = 180;
