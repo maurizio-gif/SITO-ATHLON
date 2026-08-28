@@ -1,6 +1,6 @@
 // @ts-nocheck — script di browser, DOM diretto e nessuna annotazione di tipo
 //
-// La logica di `/tour`, la pagina che sta aperta sul totem all'ingresso.
+// La logica di `/totem/tour`, la pagina che sta aperta sul totem all'ingresso.
 //
 // ── Il percorso ─────────────────────────────────────────────────────────────
 //
@@ -174,7 +174,7 @@ export function initTourForm(root) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: dati.email,
-          pagina: '/tour',
+          pagina: '/totem/tour',
           utm: utm(),
           vid: vid(),
           sid: sid(),
@@ -299,7 +299,7 @@ export function initTourForm(root) {
       memberType: dati.memberType,
       statoPgm: dati.statoPgm,
       statoNucleo: dati.statoNucleo,
-      pagina: '/tour',
+      pagina: '/totem/tour',
       origine: 'totem-tour',
       utm: utm(),
       vid: vid(),

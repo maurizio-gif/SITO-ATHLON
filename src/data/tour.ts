@@ -1,7 +1,7 @@
 /**
  * Il tour registrato al totem, in un posto solo.
  *
- * `/tour` è la pagina che sta aperta sul pannello all'ingresso del club: chi
+ * `/totem/tour` è la pagina che sta aperta sul pannello all'ingresso: chi
  * ha appena girato la struttura con un operatore lascia lì i suoi dati, e da
  * quel modulo nasce una voce **tour** nell'agenda del pannello — con la data,
  * l'ora, e uno stato da chiudere.
