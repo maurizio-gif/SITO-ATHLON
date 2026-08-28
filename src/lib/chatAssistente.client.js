@@ -1309,8 +1309,43 @@ export function initChatAssistente(root, options) {
    * ha risposto — non si offre in automatico: e' lo stesso verso in cui si
    * preferisce sbagliare per tutto il resto del sito.
    */
+  /**
+   * Chi puo' avere il Guest Pass, in un posto solo — e sono due **fatti**, non
+   * due deduzioni: quale pulsante ha premuto al passo dell'attivita' e cosa ha
+   * risposto PerfectGym sull'email. Nessuna delle due dipende da come e' andata
+   * la conversazione, ed e' il motivo per cui la regola tiene.
+   *
+   * La stessa condizione vive anche in `Componi contesto` su n8n, dove decide
+   * se la voce del Pass entra nel contesto del modello. I due lati devono dire
+   * la stessa cosa: se divergono, il modello propone una prova che qui non
+   * compare — cioe' il guasto peggiore, un'offerta letta e non attivabile.
+   */
+  var STATI_PROVABILI = ['nuovo', 'esiste'];
+
+  function puoProvare() {
+    /* **`attivita` e non `ambito`.** `ambito` vale 'adulti' anche quando non e'
+       stato scelto niente (vedi `scegliAttivita`): con lui «non lo sappiamo»
+       passerebbe per «ha detto adulti», che e' il modo in cui una regola
+       stringente diventa larga senza che nessuno lo veda. Qui serve il
+       pulsante premuto, e quello e' `attivita === 'adulti'`. */
+    if (dati.attivita !== 'adulti') return false;
+    /* Un Member non prova. Lo dice `memberType` quando c'e'. */
+    if (/member/i.test(dati.memberType || '')) return false;
+    /* **Lista bianca, non esclusione.** `nuovo` (PerfectGym non lo conosce) e
+       `esiste` (Lead o Guest) sono le due risposte che valgono; `iscritto` e'
+       il Member, e il quarto caso — la verifica che non ha risposto, che il
+       client marca `errore` — cade fuori da se' invece di essere un valore da
+       ricordarsi di escludere. E' la stessa scelta di tutto il sito: quando non
+       sappiamo, non si offre. */
+    if (STATI_PROVABILI.indexOf(dati.stato) === -1) return false;
+    return !!dati.email;
+  }
+
   function mostraProva() {
-    if (dati.memberType && /member/i.test(dati.memberType)) {
+    /* Al socio la card spiega perche' no, invece di non comparire. Il gate
+       guarda anche `stato`, perche' un webhook che non mandasse `memberType`
+       lo direbbe comunque con `iscritto`. */
+    if (/member/i.test(dati.memberType || '') || dati.stato === 'iscritto') {
       var negato = document.createElement('div');
       negato.className = 'ca__azione';
       negato.innerHTML =
@@ -1325,7 +1360,14 @@ export function initChatAssistente(root, options) {
       }
       return;
     }
-    if (!dati.memberType || !dati.email) return;
+    /* Tutto il resto passa da `puoProvare()`. Prima qui c'era
+       `if (!dati.memberType || !dati.email) return;`, e quel `!dati.memberType`
+       teneva fuori **le persone nuove** — che per PerfectGym non hanno nessun
+       memberType e sono la ragione per cui il Pass esiste. Il modello diceva
+       «ecco il tuo Guest Pass», la card non compariva e su `richieste_prova`
+       non arrivava niente: nessun errore, nessuna traccia, il codice
+       semplicemente non appariva. */
+    if (!puoProvare()) return;
 
     var box = document.createElement('div');
     box.className = 'ca__azione';
@@ -1885,6 +1927,14 @@ export function initChatAssistente(root, options) {
           pagina: dati.pagina,
           origine: 'assistente',
           ramo: dati.ramo,
+          /* Quante volte ha scritto, questa compresa. Serve a n8n per la
+             condizione «dopo qualche messaggio» del Guest Pass: un conteggio e'
+             un fatto, «e' passato un po' di conversazione» sarebbe un giudizio
+             del modello. Si conta da `trascritto`, dove la domanda in corso e'
+             gia' entrata (`bolla('utente', ...)` viene prima di questa
+             chiamata), e non dalle bolle dell'assistente: l'apertura del
+             saluto e' una di quelle e non e' un turno di nessuno. */
+          scambi: trascritto.filter(function (m) { return m.ruolo === 'utente'; }).length,
           attivita: dati.attivita ? [dati.attivita] : [],
           attivitaJunior: dati.attivitaJunior,
           bambinoNascita: dati.bambinoNascita,

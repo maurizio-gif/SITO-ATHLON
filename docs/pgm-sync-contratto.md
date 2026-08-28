@@ -154,8 +154,12 @@ campo non basta ometterlo**: dal sync non si cancella, ed è deliberato.
 
 **`stato` si può omettere.** Se manca, la funzione lo deriva da `member_type` +
 `stato_abbonamento` per rispettare `utenti_pgm_stato_check` (`lead | guest |
-member | ex-member`). Quella derivazione è un'ipotesi: va corretta il giorno che
-si vede un contratto con uno stato fuori dall'elenco.
+member | ex-member`). Non è più un'ipotesi: il riallineamento l'ha esercitata su
+tutta l'anagrafica, e `Member` + contratto `Ended` → `ex-member` sono **6 942
+righe**. Va corretta il giorno che si vede un contratto con uno stato fuori
+dall'elenco — e due ce ne sono già, `Terminato` su due righe, che è il valore
+italiano dell'import CSV sopravvissuto perché quei due non hanno un contratto
+principale e `coalesce` non cancella.
 
 **`tocchi`, `primo_contatto`, `ultimo_contatto`, `prima_fonte` e `ultima_fonte`
 non si toccano**, e la funzione non le nomina affatto — verificato su
@@ -308,6 +312,40 @@ non si conserva: resta la riga con l'esito, che è il dato diagnostico.
 `duplicato` senza riscrivere niente: la seconda passata costa le chiamate e non
 le scritture. È la proprietà che permette di rifarlo quando l'anagrafica cresce,
 senza pensarci.
+
+### Com'è andata, e cosa dicono i numeri
+
+Due passate: la prima con il difetto dell'identità, la seconda dopo averlo
+chiuso.
+
+| | prima passata | riesecuzione |
+| --- | --- | --- |
+| durata | 12′47″ | 15′37″ |
+| `aggiornato` | 29 552 | — |
+| `creato` | 8 197 | 1 172 |
+| `duplicato` | 131 | 37 414 |
+| `saltato-versione-vecchia` | 761 | **0** |
+| `aggiornato-email-in-conflitto` | 69 | 0 |
+
+I due totali fanno **38 586** membri distinti ciascuno, che è esattamente
+l'`@odata.count` di PerfectGym. E la seconda colonna è il riallineamento che
+fotografa se stesso: chi era già in pari costa una chiamata e nessuna scrittura.
+
+Lo stato finale di `utenti`:
+
+| | |
+| --- | --- |
+| righe | 38 611 |
+| con `pgm_member_id` | 38 586, e **38 586 distinti**: una riga per persona, nessun doppione |
+| con `pgm_version` | 38 586 |
+| senza `pgm_member_id` | 25 — contatti del sito che PerfectGym non ha |
+| legami di nucleo | 8 132, di cui 8 089 risolti in un uuid |
+| con stato abbonamento | 9 261 |
+| con `tocchi` > 0 | 300, e sono le persone che hanno scritto **al sito** |
+
+Quell'ultima riga è la verifica che conta più delle altre: 300 su 38 611. Il
+sync ha riscritto tutta l'anagrafica senza spostare di un'unità il conteggio di
+chi ci ha lasciato un dato — che è la differenza fra un'anagrafica e un imbuto.
 
 Per verificare:
 

@@ -1583,6 +1583,65 @@ ramo parallelo.
   dell'originale: la richiesta è sua, ed è la sua scheda che il desk apre.
   Quella del figlio si porta a parte e compare solo quando c'è.
 
+### Il Guest Pass in chat: due fatti, e la voce che sparisce se mancano
+
+Il Pass si propone **solo** a chi può averlo, e le condizioni sono quattro —
+tutte verificabili, nessuna affidata a come il modello legge la conversazione.
+Stanno in `Vaglio Guest Pass` su n8n e, per la parte che decide l'attivazione,
+in `puoProvare()` dentro `chatAssistente.client.js`.
+
+| condizione | il fatto | dove |
+| --- | --- | --- |
+| attività **adulti** | ha premuto «Attività adulti», uno dei cinque pulsanti del passo prima della chat | `attivita === 'adulti'` |
+| **lead, guest o nuovo** | `stato` di `athlon-verifica-iscritto`: `nuovo` (non lo conosce) o `esiste` (Lead o Guest) | lista bianca |
+| dopo **qualche messaggio** | ha scritto almeno tre volte | `scambi`, contato dal sito |
+| ha chiesto di **abbonamenti** | la stessa regex che accende l'ancora del listino | `CHIEDE_LISTINO` |
+
+Cinque cose da sapere prima di toccarlo.
+
+**Si guarda `attivita`, non `ambito` e non `ramo`.** Entrambi valgono `adulti`
+anche quando non è stato scelto niente, quindi con loro «non lo sappiamo»
+passerebbe per «ha detto adulti» — che è il modo in cui una regola stringente
+diventa larga senza che nessuno se ne accorga. Serve il pulsante premuto.
+
+**Lo stato è una lista bianca, non un'esclusione.** `nuovo` ed `esiste` valgono;
+`iscritto` è il Member; e il quarto caso — la verifica che non ha risposto, che
+il sito marca `errore` — cade fuori da sé invece di essere un valore da
+ricordarsi di escludere. Quando non sappiamo, non si offre.
+
+**La voce esce dal contesto, non ci resta con scritto «non proporla».** Una
+regola che il modello può ignorare non è una regola: è la stessa scelta della
+lezione singola (`SOLO_SE_CHIESTO`) e del Direttore Tecnico (`SOLO_ISCRITTI`).
+Ma togliere la voce non basta da sola, perché **la regola 8 del prompt nomina il
+Pass e il suo url anche senza di lei**: la chiude una regola fissa nel
+`systemMessage` dell'agente, accanto a quelle del nuoto per bambini, che dice
+che senza la voce il Pass per quella persona non esiste.
+
+**Quando lo propone deve elencare tutte le attività, e dire «adulti».**
+L'elenco non sta nel prompt: sta nella voce, e la voce lo legge da
+`ATTIVITA_GUEST_PASS` (`data/abbonamenti.ts`), che è **derivata** dal Premium —
+il Pass è un Premium di sette giorni, quindi il suo perimetro non è una lista
+sua. Un'attività aggiunta al Premium entra da sola in `/prova`, nella voce e
+nella chat. Un elenco a metà si legge come un elenco completo: è così che una
+prova finisce comprata per una cosa che non comprende.
+
+**Il gate del client copre le due condizioni sull'identità, non le altre due**,
+e la divisione è voluta: «adulti» e lo stato dicono *chi può averlo*, i messaggi
+e la domanda sugli abbonamenti dicono *quando proporlo*. Il client decide se la
+card compare e se la richiesta parte davvero (`fetch(PROVA)`), quindi è l'ultima
+parola sull'attivazione — come le guardie del calendario lo sono sul richiamo.
+Il buco che c'era: `if (!dati.memberType || ...) return` teneva fuori **le
+persone nuove**, che per PerfectGym non hanno nessun `memberType` e sono la
+ragione per cui il Pass esiste. Il modello diceva «ecco il tuo Guest Pass», la
+card non compariva e su `richieste_prova` non arrivava niente — nessun errore,
+nessuna traccia.
+
+Per verificare: `Vaglio Guest Pass` mette in chiaro `passOfferto`,
+`passVoceTolta` e `passPerche` (quale condizione ha fermato l'offerta).
+`passVoceTolta` falso mentre `passOfferto` è falso vuol dire che l'id della voce
+è cambiato e il vaglio non aggancia più niente — da fuori si vedrebbe come «il
+Pass si propone sempre», che è il guasto che quel nodo esiste per evitare.
+
 ## Il form dell'assistenza chiede poco, e il resto lo va a prendere
 
 Il form dell'Help Desk — `components/clublife/SupportForm.astro`, dentro
