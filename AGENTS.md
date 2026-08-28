@@ -1705,6 +1705,60 @@ Per verificare: `Vaglio Guest Pass` mette in chiaro `passOfferto`,
 è cambiato e il vaglio non aggancia più niente — da fuori si vedrebbe come «il
 Pass si propone sempre», che è il guasto che quel nodo esiste per evitare.
 
+### La fascia la decide l'anno, e l'anno noto non basta: va confermato
+
+Il 28/08, bambina nata il **2021**-04-23 — l'anno nel contesto, messo lì dal
+form compilato due minuti prima — la mamma scrive «la bimba ha 5 anni compiuti
+ad aprile», e la risposta la mette nel **Baby Nuoto**, «i corsi per i più
+piccoli, dai 3 anni in su». Il Baby Nuoto è per i nati nel 2024, 2025 e 2026,
+dai 3 mesi; «dai 3 anni in su» non sta scritto da nessuna parte. Una bambina del
+2021 fa la Scuola Nuoto Bambini, e il prompt lo diceva già in una regola fissa
+tutta dedicata a questo — con un errore vero citato dentro.
+
+**È la seconda volta che questa regola non tiene, e la lezione è la stessa della
+domanda sull'anno già noto: qui il prompt non basta.** Il modello vede un'età e
+ragiona sull'età; nessuna quantità di maiuscole nel `systemMessage` lo ha fermato.
+Quindi la decisione torna al codice, in `Correggi anno gia' noto`, che di
+controlli fissi ora ne fa tre:
+
+1. **La domanda sull'anno già noto** — quello di prima, invariato: si toglie la
+   frase che la contiene.
+2. **Il corso sbagliato per quell'anno.** Se la risposta nomina il corso che
+   l'anno esclude e non nomina quello giusto, non si rimedia a pezzi: quel testo
+   parla per intero di un altro corso. Si butta, e al suo posto va la conferma
+   dell'anno più il corso che l'anno dice — scritto dal nodo, non dal modello.
+   Nominare quello sbagliato *mentre* si nomina il giusto («non è Baby Nuoto ma
+   Scuola Nuoto») resta legittimo, quindi il controllo scatta solo se il giusto
+   manca.
+3. **Se il genitore ha parlato in età, l'anno si fa confermare.** Anche quando
+   il corso è quello giusto: un'età lascia un margine di un anno intero, e i
+   genitori parlano quasi sempre in età. Una riga in cima, e solo se la risposta
+   non nomina già l'anno.
+
+Tre cose da sapere prima di toccarlo.
+
+**Il terzo controllo è una deroga deliberata al «non chiedere conferma».** La
+regola dice di usare l'anno noto senza richiederlo, e vale ancora: chi si sente
+rifare la stessa domanda pensa che non l'abbiano letto. Ma quando la persona ha
+appena parlato in età, la conferma non è una domanda già fatta — è la sola cosa
+che tiene insieme il dato del form e la frase che ha scritto lei, e le due
+possono divergere davvero (un fratello, un anno digitato male). **La conferma la
+mette il nodo e non il modello**, e questa è la parte che conta: una regola che il
+modello può ignorare non è una regola, e qui l'aveva già ignorata due volte.
+
+**Le due fasce stanno in chiaro nel nodo**, non lette da `junior.ts`: n8n non
+importa il codice del sito. Il giorno che il club sposta la stagione vanno
+aggiornate in tutti e due i posti — è il prezzo di avere la decisione dove il
+modello non può contraddirla.
+
+**E `Salva risposta` archiviava il testo grezzo, non quello corretto.** Leggeva
+`$('Leggi la risposta')`, cioè il nodo *prima* della correzione: la persona
+vedeva il testo corretto e `chat_messaggi` conservava quello sbagliato. Finora
+non si era visto perché la correzione toglieva una frase; con la riscrittura
+intera la divergenza sarebbe stata quella fra il CRM e la realtà — cioè
+esattamente il posto da cui si guarda per capire se una correzione ha funzionato.
+Ora legge il nodo della correzione.
+
 ### Chi si lamenta non riceve un'informazione, riceve una persona
 
 Vale in **ogni** ramo e su **qualunque** argomento, ed è la prima delle regole
