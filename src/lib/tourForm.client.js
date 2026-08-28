@@ -61,7 +61,7 @@ import {
   SECONDI_OBLIO,
 } from '../data/tour';
 import { validaTelefono } from '../data/prefissi';
-import { haGiaAccount } from '../data/contatto';
+import { anagraficaNota, servonoISuoiDati } from '../data/contatto';
 
 export function initTourForm(root) {
   var ERR = {
@@ -132,9 +132,6 @@ export function initTourForm(root) {
           quale strada prende n8n, che con un'anagrafica esistente non crea
           nessun genitore. */
       conosciuto: false,
-      /** Il telefono che PerfectGym ci ha restituito. Vale come i suoi dati:
-          se ce l'abbiamo, il campo non si mostra. */
-      telefonoNoto: '',
     };
   }
 
@@ -246,7 +243,7 @@ export function initTourForm(root) {
         dati.memberId = body.memberId || null;
         dati.memberType = String(body.memberType || '');
         precompila(body);
-        dati.conosciuto = riconosciuto();
+        dati.conosciuto = anagraficaNota({ stato: dati.statoPgm, statoNucleo: dati.statoNucleo });
       }
     } catch (e) {
       // PerfectGym irraggiungibile: si prosegue come persona nuova. Nessuno
@@ -275,7 +272,6 @@ export function initTourForm(root) {
     if (body.nome) dati.nome = String(body.nome);
     if (body.cognome) dati.cognome = String(body.cognome);
     if (body.telefono) dati.cellulare = String(body.telefono);
-    dati.telefonoNoto = normalizzaNoto(dati.cellulare);
     [
       [campoNome, dati.nome],
       [campoCognome, dati.cognome],
@@ -285,49 +281,24 @@ export function initTourForm(root) {
     });
   }
 
-  /* Il numero che arriva da PerfectGym esce in E.164 come tutti gli altri del
-     sito: quando il campo non e' a schermo non c'e' nessuna tendina di prefissi
-     a comporlo, quindi lo si compone qui.
+  /* **La domanda non e' «lo conosciamo», e' «abbiamo i suoi dati».** Sta in
+     `data/contatto.ts` e non qui, perche' e' la stessa della chat: quello e' lo
+     stesso percorso — email, poi i dati solo se mancano — e due copie della
+     condizione risponderebbero in due modi al primo ritocco.
 
-     **Un numero gia' internazionale si prende com'e'**, e ricomporlo su `+39`
-     e' esattamente il bug che `CampoTelefono` ha chiuso: `+44 7911…` diventerebbe
-     un italiano che non esiste, e il WhatsApp partirebbe verso il nulla senza
-     dare errore.
-
-     **E non si giudica se e' plausibile, perche' non e' un dato di adesso.**
-     `validaTelefono` esiste per quello che una persona sta digitando; questo e'
-     il numero che il club ha in archivio, e rifiutarlo qui vorrebbe dire
-     bloccare un tour — nel ramo junior il cellulare e' obbligatorio — su una
-     cifra che chi sta davanti allo schermo non ha scritto e magari non sa
-     nemmeno. Vale la regola dei form: non si fermano mai. Se e' sbagliato lo
-     e' gia' su PerfectGym, e si corregge la' e non da qui.
-
-     Quello che si controlla e' solo che sia componibile: se non lo e' torna
-     vuoto, il campo ricompare e la domanda si fa. */
-  function normalizzaNoto(numero) {
-    var grezzo = String(numero || '').trim();
-    if (!grezzo) return '';
-    if (grezzo.charAt(0) === '+') return grezzo.replace(/[^\d+]/g, '');
-    var esito = validaTelefono('+39', grezzo);
-    return esito.ok ? esito.e164 : '';
-  }
-
-  /* **La domanda e' «abbiamo la sua anagrafica», e la risponde `memberType`.**
-     E' la stessa `haGiaAccount()` che governa i pulsanti d'iscrizione e
-     «contattaci», e sta la' una volta sola di proposito: un Lead e' un contatto
-     e non un'anagrafica da cui appendere un figlio.
-
-     **E serve anche l'id**, che qui non e' un dettaglio: e' la chiave con cui
-     n8n attacca il bambino al genitore. Senza, nascondere i campi vorrebbe dire
-     non chiedere dei dati *e* non avere niente a cui legare il figlio — quindi
-     in quel caso si chiede tutto, e a valle non si crea niente comunque.
-
-     Il verso dell'errore e' controllato: questa condizione e' sempre piu'
-     stretta di `haAnagrafica` su n8n, che aggiunge `statoNucleo === 'iscritto'`.
-     Quindi il sito non puo' mai nascondere un campo che l'automazione poi si
-     aspetta di trovare pieno per creare un'anagrafica. */
-  function riconosciuto() {
-    return haGiaAccount({ memberType: dati.memberType, stato: dati.statoPgm }) && !!dati.memberId;
+     La differenza fra le due domande e' tutta nel Lead: non puo' fare login,
+     quindi `haGiaAccount` dice no, ma i suoi dati ce li abbiamo perche' e' a
+     sistema da una prova. E basta che ne manchi uno — un'anagrafica nata da un
+     form con la sola email, un fisso al posto del cellulare — perche' il blocco
+     torni intero. */
+  function serveGenitore() {
+    return servonoISuoiDati({
+      nota: dati.conosciuto,
+      id: dati.memberId,
+      nome: dati.nome,
+      cognome: dati.cognome,
+      telefono: dati.cellulare,
+    });
   }
 
   if (btnVerifica) btnVerifica.addEventListener('click', verifica);
@@ -391,40 +362,39 @@ export function initTourForm(root) {
 
   function vestiPassoDati() {
     var junior = dati.ramo === 'junior';
-    /* **Il bambino si chiede sempre**, e non dipende da chi e' il genitore:
-       lui in anagrafica non c'e' — o se c'e' non lo sappiamo da qui — ed e'
-       l'unica persona di cui il club non ha ancora niente. */
+    var suoi = serveGenitore();
+
+    /* **Il bambino si chiede sempre**, e non dipende da chi e' il genitore: di
+       lui PerfectGym non ci ha mai detto niente, nemmeno al socio piu' vecchio
+       del club. E' la stessa riga della chat: un corso per bambini vuole due
+       anagrafiche, e la seconda non ce l'ha nessuno. */
     if (bloccoBambino) bloccoBambino.hidden = !junior;
 
-    /* **Del genitore si chiede solo quello che non abbiamo.** Con l'anagrafica
-       gia' su PerfectGym non c'e' nessun `personalData` da comporre, quindi
-       nome, cognome e data di nascita non servono a niente: chiederli e' far
-       ricopiare a una persona in piedi quello che il club ha gia' scritto. */
-    if (bloccoPersona) bloccoPersona.hidden = dati.conosciuto;
-    if (bloccoNoto) bloccoNoto.hidden = !dati.conosciuto;
+    /* **Del genitore si chiede tutto o niente.** Chiedere due campi su tre
+       lascia a indovinare perche' proprio quelli, e un modulo che cambia forma
+       campo per campo si legge come un guasto: o si chiede, o si conferma. */
+    if (bloccoPersona) bloccoPersona.hidden = !suoi;
+    if (bloccoCellulare) bloccoCellulare.hidden = !suoi;
+    if (bloccoNoto) bloccoNoto.hidden = suoi;
     if (nomeNoto) {
       nomeNoto.textContent = (dati.nome + ' ' + dati.cognome).trim() || dati.email;
     }
 
-    if (leadGenitore) leadGenitore.hidden = !junior || dati.conosciuto;
-    /* La data di nascita dell'adulto la chiede PerfectGym solo per il nucleo:
-       `PGM Crea Lead` non la vuole, e per chi ha gia' l'anagrafica non si crea
-       niente — quindi resta al solo genitore nuovo di un bambino. */
-    if (bloccoNascita) bloccoNascita.hidden = !junior || dati.conosciuto;
-
-    /* Il cellulare e' un dato suo come gli altri: se la verifica ce l'ha
-       restituito non si richiede. Se PerfectGym lo conosce ma non ce l'ha —
-       succede — il campo resta, perche' senza numero il richiamo del desk non
-       parte e il bambino nasce senza `phoneNumber`. */
-    var telefonoDaChiedere = !dati.conosciuto || !dati.telefonoNoto;
-    if (bloccoCellulare) bloccoCellulare.hidden = !telefonoDaChiedere;
+    /* La data di nascita del genitore serve a `personalData.birthDate` della
+       chiamata che crea la sua anagrafica, e quella chiamata parte solo se non
+       ce l'ha gia'. Quindi la si chiede esattamente quando si chiedono i suoi
+       dati, e mai da sola. */
+    if (bloccoNascita) bloccoNascita.hidden = !(junior && suoi);
+    if (leadGenitore) leadGenitore.hidden = !(junior && suoi);
 
     if (titoloDati) {
-      titoloDati.textContent = junior
-        ? 'Chi porti in acqua?'
-        : dati.conosciuto
-          ? 'Ci siamo quasi'
-          : 'Come ti chiami?';
+      titoloDati.textContent = !junior
+        ? suoi
+          ? 'Come ti chiami?'
+          : 'Ci siamo quasi'
+        : suoi
+          ? 'Chi porti in acqua?'
+          : 'I dati di tuo figlio';
     }
     if (etichettaNome) etichettaNome.textContent = junior ? 'Il tuo nome' : 'Nome';
     if (notaCellulare) {
@@ -432,12 +402,18 @@ export function initTourForm(root) {
     }
   }
 
+
   var btnInvia = q('[data-tt-invia]');
 
   async function invia() {
     pulisciErrore(steps.dati);
 
     var junior = dati.ramo === 'junior';
+    /* La stessa domanda che ha dato forma al passo: i campi nascosti non si
+       leggono e non si pretendono. Rileggerli darebbe la stringa vuota di un
+       campo che nessuno ha visto, e poi rifiuterebbe l'invio per un campo che
+       non c'e' — un modulo che si blocca su niente. */
+    var suoi = serveGenitore();
 
     /* Il bambino per primo, perché è il primo blocco a schermo: un errore che
        parla di un campo più in basso di quello che si sta guardando manda a
@@ -472,7 +448,7 @@ export function initTourForm(root) {
        verifica: rileggerli dai campi vorrebbe dire prendere la stringa vuota
        di un campo che nessuno ha visto, e poi rifiutare l'invio per un campo
        che non c'è — un modulo che si blocca su niente. */
-    if (!dati.conosciuto) {
+    if (suoi) {
       dati.nome = campoNome.value.trim();
       dati.cognome = campoCognome.value.trim();
       if (!dati.nome) {
@@ -491,8 +467,8 @@ export function initTourForm(root) {
        chiamata che crea l'anagrafica: senza, il nucleo non nasce — e non nasce
        in silenzio, perché quel nodo ha `continueRegularOutput`. Con
        l'anagrafica già lì quella chiamata non parte, quindi non serve. */
-    dati.nascita = junior && !dati.conosciuto ? campoNascita.value : '';
-    if (junior && !dati.conosciuto && !dati.nascita) {
+    dati.nascita = junior && suoi ? campoNascita.value : '';
+    if (junior && suoi && !dati.nascita) {
       mostraErrore(steps.dati, ERR.nascita);
       segnala(campoNascita);
       return;
@@ -503,10 +479,12 @@ export function initTourForm(root) {
        qualcuno che ha fretta di andarsene è il punto in cui il modulo non si
        compila. Ma se è scritto dev'essere un numero vero, o il richiamo parte
        verso il nulla. */
-    if (dati.conosciuto && dati.telefonoNoto) {
-      /* Il campo non è a schermo: il numero è quello che PerfectGym ci ha
-         appena dato, e vale come se fosse stato digitato. */
-      dati.cellulare = dati.telefonoNoto;
+    if (!suoi) {
+      /* Il campo non è a schermo perché il numero ce l'abbiamo già, e
+         `servonoISuoiDati` l'ha appena fatto passare da `validaTelefono`: qui
+         serve solo la forma E.164, che nessuna tendina di prefissi può comporre
+         su un campo che non c'è. */
+      dati.cellulare = validaTelefono('+39', dati.cellulare).e164 || dati.cellulare;
     } else if (campoCellulare.value.trim()) {
       var tel = telefono();
       if (!tel.ok) {

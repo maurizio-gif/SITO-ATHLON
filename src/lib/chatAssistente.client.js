@@ -44,7 +44,13 @@ import { leggi as userNumberConosciuto } from '../scripts/numeroSocio';
 import { montaCalendario } from './calendario.client.js';
 import { plans, GUEST_PASS } from '../data/abbonamenti';
 import { REGISTRAZIONE, PASSI_ATTIVAZIONE } from '../data/guestPass';
-import { WEBHOOK_RESET, PORTALE, haGiaAccount } from '../data/contatto';
+import {
+  WEBHOOK_RESET,
+  PORTALE,
+  haGiaAccount,
+  anagraficaNota,
+  servonoISuoiDati,
+} from '../data/contatto';
 
 export function initChatAssistente(root, options) {
   var onChiudi = (options && options.onChiudi) || function () {};
@@ -648,11 +654,7 @@ export function initChatAssistente(root, options) {
        cognome e telefono, e ce li ha appena detti. Chiederli di nuovo è una
        domanda a cui hanno già risposto. Se la verifica non ha risposto affatto
        (`errore`) non sappiamo niente, quindi il form si chiede. */
-    dati.conosciuto =
-      dati.statoNucleo === 'iscritto' ||
-      dati.statoNucleo === 'esiste' ||
-      dati.stato === 'iscritto' ||
-      dati.stato === 'esiste';
+    dati.conosciuto = anagraficaNota({ stato: dati.stato, statoNucleo: dati.statoNucleo });
 
     /* Chi può fissare una telefonata: **chi non ha un abbonamento vivo nel
        nucleo**, e nessun altro.
@@ -2115,13 +2117,18 @@ export function initChatAssistente(root, options) {
    * Finché la verifica pubblicata non restituisce l'anagrafica, questo è falso
    * per tutti e il form li chiede — che è il comportamento giusto.
    */
+  /* La regola sta in `data/contatto.ts` e non qui, perché la usa anche il
+     modulo del totem: è lo stesso percorso — email, poi i dati solo se mancano
+     — e due copie di quella condizione risponderebbero in due modi al primo
+     ritocco. */
   function serveGenitore() {
-    return !(
-      dati.conosciuto &&
-      dati.nome &&
-      dati.cognome &&
-      validaTelefono('+39', dati.telefono).ok
-    );
+    return servonoISuoiDati({
+      nota: dati.conosciuto,
+      id: dati.memberId,
+      nome: dati.nome,
+      cognome: dati.cognome,
+      telefono: dati.telefono,
+    });
   }
 
   function segnala(nome, messaggio) {

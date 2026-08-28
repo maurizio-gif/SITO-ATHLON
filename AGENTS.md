@@ -2117,37 +2117,50 @@ Il ramo lo decide `data-tt-gruppo` sulla casella, che il markup riempie da
 `GRUPPI_ATTIVITA` — cioè da `ACTIVITY_TAGS`. Un elenco di slug scritto nel
 client divergerebbe il giorno che si aggiunge un corso.
 
-### Del genitore si chiede solo quello che il club non ha già
+### È lo stesso percorso della chat, e le due regole vivono in un posto solo
 
-L'ordine è quello della chat, e non è una somiglianza casuale: **prima l'email,
-poi i dati del genitore solo se PerfectGym non lo conosce, e i dati del bambino
-sempre**. La verifica dell'email non serve a precompilare tre campi, serve a non
-mostrarli: chi il club ha in anagrafica trova al loro posto il proprio nome, e
-del genitore non gli si chiede più niente — non nome e cognome, non la data di
-nascita, e nemmeno il cellulare se PerfectGym ce l'ha dato.
+**Prima l'email, poi i dati del genitore solo se PerfectGym non li ha già, e i
+dati del bambino sempre.** Non è una somiglianza con la chat: è la chat. Le due
+condizioni che lo governano stanno in `data/contatto.ts` — `anagraficaNota()` e
+`servonoISuoiDati()` — e le leggono `chatAssistente.client.js` e
+`tourForm.client.js`. Erano scritte dentro la chat, ed è da lì che sono state
+tolte: due copie di quella condizione rispondono in due modi al primo ritocco, e
+il ritocco lo fa chi tocca uno solo dei due file.
 
-La ragione è che quei campi non erano una domanda, erano una **composizione**:
-esistono per riempire il `personalData` della chiamata che crea l'anagrafica.
-Se l'anagrafica c'è, quella chiamata non parte, e i campi non servono a nessuno
-— restano solo a far ricopiare a una persona in piedi quello che il club ha già
+La ragione per cui i campi spariscono è che non erano una domanda, erano una
+**composizione**: esistono per riempire il `personalData` della chiamata che
+crea l'anagrafica. Se l'anagrafica c'è, quella chiamata non parte, e i campi
+restano solo a far ricopiare a una persona in piedi quello che il club ha già
 scritto.
 
-- **Il bambino si chiede sempre, e non dipende da chi è il genitore.** È l'unica
-  persona di cui non abbiamo niente: il genitore lo conosciamo per email, lui no.
-- **La domanda è `haGiaAccount()`**, la stessa di «contattaci» e dei pulsanti
-  d'iscrizione, con in più l'id PerfectGym — senza quello non ci sarebbe niente a
-  cui attaccare il figlio, quindi si torna a chiedere tutto. **Un Lead non è
-  un'anagrafica**: i suoi dati si chiedono come a uno nuovo, ed è giusto, perché
-  su quella strada il genitore viene creato.
-- **La condizione del sito è sempre più stretta di `haAnagrafica` su n8n**, che
-  aggiunge `statoNucleo === 'iscritto'`. È il verso in cui va sbagliata: il sito
-  non può mai nascondere un campo che l'automazione poi si aspetta di trovare
-  pieno. Al contrario si chiede un dato in più, e non si crea un'anagrafica
-  vuota.
-- **Il numero che arriva da PerfectGym si normalizza in E.164 qui**, perché col
-  campo nascosto non c'è nessuna tendina di prefissi a comporlo. Un numero già
-  internazionale si prende com'è: ricomporlo su `+39` è il bug che
-  `CampoTelefono` ha chiuso. Se non è plausibile il campo si mostra e si chiede.
+- **Il bambino si chiede sempre, e non dipende da chi è il genitore.** Di lui
+  PerfectGym non ci ha mai detto niente, nemmeno per il socio più vecchio del
+  club: un corso per bambini vuole **due** anagrafiche, e la seconda non ce l'ha
+  nessuno.
+- **`anagraficaNota()` non è `haGiaAccount()`, e la differenza è tutta nel
+  Lead.** «Può fare login?» per un Lead è no; «i suoi dati ce li abbiamo?» è
+  **sì** — è a sistema da una prova, e la verifica ci ha appena restituito nome,
+  cognome e telefono. Questa è la seconda domanda, ed è quella giusta qui.
+- **Si chiede tutto o niente, mai due campi su tre.** `servonoISuoiDati()` è
+  vera appena manca uno dei quattro — id, nome, cognome, un cellulare che passa
+  `validaTelefono` — e allora il blocco torna intero, data di nascita compresa.
+  Un modulo che cambia forma campo per campo si legge come un guasto, e lascia a
+  indovinare perché proprio quelli.
+- **L'id fa parte della condizione, e non serve a riempire un campo.** Serve
+  perché è `memberId` a decidere su n8n se l'anagrafica va creata: senza id
+  l'automazione la crea, e per crearla le servono proprio i dati che nascondendo
+  il blocco non avremmo chiesto — nel ramo junior anche la data di nascita,
+  senza la quale la chiamata fallisce in silenzio. Le due decisioni devono
+  guardare la stessa cosa.
+- **Un fisso in archivio vale come un numero assente.** Passa da
+  `validaTelefono`, non da «c'è o non c'è»: su un fisso il richiamo su WhatsApp
+  non arriva, quindi il campo si chiede. Da qui una conseguenza che si vede solo
+  provandola: un numero **straniero** in archivio riporta il blocco a schermo
+  precompilato con quel numero, e l'invio si ferma finché l'operatore non sceglie
+  il prefisso giusto nella tendina — `validaTelefono('+39', '+44…')` non può
+  fare altro. È il comportamento della chat, ed è il verso giusto: la persona
+  vede il numero e lo può correggere, invece di veder partire un WhatsApp verso
+  un italiano che non esiste.
 - **E c'è la via di ritorno**, che qui non è una gentilezza. Al totem l'email la
   digita chi ha l'operatore davanti, e un indirizzo di famiglia riconosce il
   coniuge: chi si vede dire «ti abbiamo trovato: Giulia Bianchi» deve avere
@@ -2155,27 +2168,45 @@ scritto.
   azzera tutto e riparte dall'email — non solo il riconoscimento, perché dopo
   un'email diversa anche nome, cognome e telefono precompilati sono di un altro.
 
+L'unica differenza col passo dati della chat è la fine, e non è una scelta: là
+un adulto già noto salta il modulo e va dritto in conversazione, qui il passo
+resta perché porta i consensi e il comando d'invio — e quello che mostra, per
+lui, è la conferma di chi è.
+
 ### Il figlio di un genitore che c'è già: la quarta strada di `stradaPgm`
 
 Nascondere i campi del genitore ha scoperto un buco che c'era da prima e che
-nessuna esecuzione mostrava, perché erano tutte verdi. `stradaPgm` aveva tre
-valori, e `haAnagrafica` mandava a `nessuna` — cioè *nessuna* delle due persone
-veniva creata. Il genitore giustamente, ma **nemmeno il bambino**, che su
-PerfectGym non c'era. Il nucleo restava a metà.
+nessuna esecuzione mostrava, perché erano tutte verdi. **A decidere era il tipo
+di anagrafica, e la domanda giusta è un'altra: «questa persona su PerfectGym c'è
+già?»** — cioè `memberId`, che è esattamente su cosa decide la chat
+(`Esiste gia su PGM?` in `CHAT ATHLON — DATI`). `haAnagrafica` sbagliava dai due
+lati:
 
-Ed era il caso normale al totem, non un angolo: il genitore che porta il figlio
-è spessissimo un Guest, perché una prova sua l'ha fatta. `nucleo` esisteva solo
-per il genitore nuovo, e `PGM Crea Figlio` legge l'id del genitore dalla
-risposta della creazione — quindi senza quella creazione non aveva a cosa
-attaccarsi.
+- un **Lead** non è Member né Guest, quindi finiva in `lead` o in `nucleo` e la
+  sua anagrafica veniva **creata di nuovo**, con la stessa email. Un doppione
+  silenzioso, e il Lead è metà delle persone che passano da qui;
+- chi era Member o Guest cadeva in `nessuna`, cioè *nessuna* delle due persone
+  veniva creata: non il genitore, giustamente, ma **nemmeno il bambino**, che su
+  PerfectGym non c'era. Il nucleo restava a metà. Ed era il caso normale al
+  totem, non un angolo: il genitore che porta il figlio è spessissimo un Guest,
+  perché una prova sua l'ha fatta.
 
-Adesso la quarta strada è `figlio`, e le sue condizioni sono quello che serve
-per appendere un figlio a qualcuno: un ramo che ha un bambino, i suoi dati per
-intero, e l'id del genitore. Il percorso è `PGM Nucleo Esistente` →
+`nucleo` esisteva solo per il genitore nuovo, e `PGM Crea Figlio` legge l'id del
+genitore dalla risposta della creazione — quindi senza quella creazione non
+aveva a cosa attaccarsi.
+
+Adesso `creaGenitore` è `!memberId`, e la quarta strada è `figlio`: genitore che
+c'è già, bambino che non c'è. Il percorso è `PGM Nucleo Esistente` →
 `Vaglio Figlio` → `Figlio da Creare?` → `PGM Crea Figlio`, che resta **uno
 solo** per tutte e due le strade — un secondo nodo che crea bambini è un nodo
 che un giorno diverge. Ci arriva con `memberId` già nell'item, che è la forma
-che quel nodo si aspetta.
+che quel nodo si aspetta. È lo stesso disegno che la chat ha già
+(`GET FAMIGLIA` → `Confronta figli` → `Figlio duplicato?`), e non è una
+coincidenza: è lo stesso percorso, quindi le stesse strade.
+
+`haAnagrafica` resta calcolato e in uscita, ma non decide più niente qui: lo
+legge `Solo Nuovi Junior` per sapere a chi mandare il WhatsApp, che è un'altra
+domanda.
 
 Tre cose da sapere prima di toccarla.
 
@@ -2206,16 +2237,18 @@ sua, ed è la sua scheda che il desk apre.
 **E questo cambia anche «Contattaci», di proposito.** La strada la sceglie
 `stradaPgm`, che è un'affermazione su *cosa serve a PerfectGym* e non su *da
 quale modulo si arriva*: farla dipendere dal form sarebbe la condizione nascosta
-che poi diverge. Quindi un genitore Guest o Member che compila il ramo junior di
-«contattaci» adesso ha il figlio registrato come lo avrebbe al totem — prima non
-lo aveva, e non lo diceva nessuno. Il ramo assistenza non è toccato: là il
-bambino non si chiede, quindi `haBambino` è falso e la strada resta `nessuna`.
+che poi diverge. Quindi da «contattaci» un genitore già a sistema adesso ha il
+figlio registrato come lo avrebbe al totem — prima non lo aveva, e non lo diceva
+nessuno — e un Lead adulto non si vede più creare una seconda anagrafica. Il
+ramo assistenza non è toccato: là il bambino non si chiede, quindi `haBambino` è
+falso e la strada resta `nessuna`.
 
 Per verificare: `Vaglio Figlio` mette in chiaro `creaFiglio`, `figlioEsistente`,
-`figlioPerche` e `figliVisti`, e `Normalizza e Componi Email` espone `haBambino`
-accanto a `haAnagrafica` e `stradaPgm`. Un `stradaPgm: 'nessuna'` con
-`haBambino: true` vuol dire che manca l'id del genitore, che è la sola altra
-condizione.
+`figlioPerche` e `figliVisti`, e `Normalizza e Componi Email` espone
+`creaGenitore` e `haBambino` accanto a `haAnagrafica` e `stradaPgm`. Un
+`stradaPgm: 'nessuna'` con `haBambino: true` vuol dire ramo adulti; con
+`creaGenitore: true` non ci si arriva mai, perché senza id la strada è sempre
+`lead` o `nucleo`.
 
 **Non è «Contattaci» in una pagina**, e questa è la scelta da cui dipende tutto
 il resto. Le domande sembrano le stesse — email, verifica, attività, anagrafica
