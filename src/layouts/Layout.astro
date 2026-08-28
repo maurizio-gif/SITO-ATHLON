@@ -23,6 +23,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import ProvaModal from '../components/ProvaModal.astro';
 import ContattaciModal from '../components/ContattaciModal.astro';
+import AppuntamentoModal from '../components/AppuntamentoModal.astro';
 import ChatModal from '../components/clublife/ChatModal.astro';
 import ChatFab from '../components/ChatFab.astro';
 import { CLUB, clubSchema, breadcrumbSchema } from '../data/club';
@@ -281,6 +282,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         intestazione — /attiva e /promo — e dentro il `chrome` quelle due CTA
         aprirebbero il nulla. Stessa ragione dell'assistente qui sotto. */}
     <ContattaciModal />
+
+    {/* La prenotazione della chiamata: come gli altri, presente ovunque e
+        aperta da qualunque comando con data-cta="call". */}
+    <AppuntamentoModal />
 
     <ChatModal />
     <ChatFab />
