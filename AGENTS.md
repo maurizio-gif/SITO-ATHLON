@@ -1659,8 +1659,48 @@ detto sì a un piano e a una formula**. Lì siamo al passo (5) della regola 7, e
 mettere sette giorni a 19 € davanti a chi sta entrando a 95 €/mese è l'unico
 modo di sbagliare in eccesso.
 
+### E la lezione singola, quando chiede un abbonamento per una cosa sola
+
+«Abbonamento solo per il Reformer» è la richiesta di **pagare solo quella
+cosa**, quindi la lezione singola è la risposta letterale e non un'aggiunta:
+si nomina. È l'unica eccezione dichiarata alla regola 7ter, che in tutti gli
+altri casi resta come sta — *se non l'ha chiesta, per te non esiste*, perché
+chi chiede quanto costa un corso e si sente rispondere «oppure 22 € a lezione»
+ha appena scoperto che può entrare senza abbonarsi, e non lo aveva chiesto.
+
+Il dato per rispondere c'è: `SINGOLI.voci` ha il prezzo di tutte e sei le
+attività adulti — il Group Reformer sta a 25 € — più il badge di 5 € una
+tantum.
+
+**Il cancello si apre rinominando la voce, e la ragione è dove vive il
+cancello.** `SOLO_SE_CHIESTO[SINGOLO]` sta in `Componi contesto` e guarda
+l'`id`; il vaglio sta un nodo prima, quindi non può togliere quella
+condizione ma può dare alla voce un id che quella condizione non incontra —
+`abbonamento:accessi-singoli-una-attivita`, con il contenuto copiato
+dall'originale così le due cose non possono divergere. **È un aggiramento, ed
+è dichiarato**: il giorno che si tocca `Componi contesto` per altro, questa
+condizione va spostata dentro `SOLO_SE_CHIESTO`, accanto a sua sorella.
+
+Due freni, e il secondo è meno ovvio del primo. **Solo il ramo adulti**: a un
+genitore che chiede «solo il baby nuoto» un listino di prezzi adulti è una
+risposta sbagliata. E **solo se il cancello l'avrebbe chiusa**: se la domanda
+nomina già la lezione singola la voce passa da sé, e rinominarla vorrebbe dire
+averla due volte nel contesto.
+
+**«Solo» da solo non basta**, e sarebbe il falso positivo che apre tutto:
+«vengo solo la sera» non parla di quante attività fa. Serve la restrizione
+**e** una cosa da restringere, vicine — è una regex, non capirà ogni frase, e
+sbaglia nel verso giusto: una richiesta non riconosciuta lascia la 7ter come
+stava.
+
+**L'ordine è piano, Pass, lezione singola**, e se le due offerte non stanno
+nelle cento parole della regola 6 la singola va nel turno dopo. La prima è la
+nostra offerta, la seconda è la sua richiesta presa alla lettera, e nessuna
+delle due si perde. Mai la singola prima del Pass, mai al posto del piano.
+
 Per verificare: `Vaglio Guest Pass` mette in chiaro `passOfferto`,
-`passVoceTolta` e `passPerche` (quale condizione ha fermato l'offerta).
+`passVoceTolta`, `passPerche` (quale condizione ha fermato l'offerta) e
+`singoloAperto`.
 `passVoceTolta` falso mentre `passOfferto` è falso vuol dire che l'id della voce
 è cambiato e il vaglio non aggancia più niente — da fuori si vedrebbe come «il
 Pass si propone sempre», che è il guasto che quel nodo esiste per evitare.
