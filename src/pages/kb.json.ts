@@ -552,7 +552,7 @@ export const GET: APIRoute = async () => {
              settimana in cui non li paga. Si spegne da sé mettendo `draft` sul
              documento della promo, come per la pagina. */
           (promoAttiva
-            ? `\n**Ma con la promozione in corso la quota di attivazione è in omaggio sulle formule annuali** (${promoAttiva.scadenzaLabel.toLowerCase()}): sull'annuale non si paga, sul Mensile Flex sì.`
+            ? `\n**Ma con la promozione in corso la quota di attivazione è in omaggio sulle formule annuali di questo piano** (${promoAttiva.scadenzaLabel.toLowerCase()}): sull'annuale non si paga, sul Mensile Flex sì. Vale **solo** sugli abbonamenti annuali degli adulti, Smart e Premium: sui corsi dei bambini la quota si paga.`
             : '')
       ),
     });
@@ -574,14 +574,14 @@ export const GET: APIRoute = async () => {
     attivita: [],
     testo: blocchi(
       `La quota di attivazione contrattuale — quella che si paga **al momento dell'iscrizione** — è di **${ATTIVAZIONE.quota} € una tantum** e comprende ${ATTIVAZIONE.comprende}.`,
-      `Si paga **una volta per ogni abbonamento attivato** — il secondo abbonamento di una famiglia la paga come il primo — e si somma alla prima quota mensile o annuale, che resta quella del listino. Vale per gli abbonamenti degli adulti e per i corsi dei bambini allo stesso modo.`,
+      `Si paga **una volta per ogni abbonamento attivato** — il secondo abbonamento di una famiglia la paga come il primo — e si somma alla prima quota mensile o annuale, che resta quella del listino. **La quota** vale per gli abbonamenti degli adulti e per i corsi dei bambini allo stesso modo; le eventuali promozioni no, e hanno il perimetro scritto nella loro voce.`,
       `**Non si paga sulla lezione singola**, che è il modo di entrare senza abbonarsi: là c'è il solo badge di accesso, ${SINGOLI.badge} € la prima volta.`,
       `Se si disdice e più avanti si torna, la quota di attivazione va versata di nuovo.`,
       /* Come per le voci dei piani: con la promozione attiva la quota è in
          omaggio sulle annuali, e dirlo qui è il punto — questa è la voce che
          risponde alla domanda diretta. */
       promoAttiva
-        ? `**Con la promozione in corso la quota è in omaggio sulle formule annuali** (${promoAttiva.scadenzaLabel.toLowerCase()}), Smart e Premium: chi attiva un'annuale entro quella data non la paga. Sul Mensile Flex si paga.`
+        ? `**Con la promozione in corso la quota è in omaggio, ma solo sugli abbonamenti annuali degli adulti** — Smart e Premium, ${promoAttiva.scadenzaLabel.toLowerCase()} (${pulito(promoAttiva.validoSu)}). Fuori da quelle due formule si paga: sul Mensile Flex degli adulti **e su tutti i corsi dei bambini**, Scuola Nuoto Bambini e Baby Nuoto compresi. A un genitore che iscrive un figlio la quota non è in omaggio, e dirglielo è un prezzo dichiarato più basso del vero.`
         : ''
     ),
   });

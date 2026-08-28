@@ -1780,6 +1780,53 @@ corso — che è la domanda esatta arrivata in chat.
 chiuderlo: là si prenota turno per turno, come per gli adulti. Le due cose stanno
 nella stessa riga di `prenotazioni.md` per questo.
 
+### La promozione ha un perimetro, e nel ramo dei genitori non deve entrare
+
+`promo.md` lo dichiara — «Valido su tutti gli abbonamenti annuali, Smart e
+Premium», cioè gli adulti — ma la voce `promo:promo` entra nel contesto **per
+punteggio**, e le parole che la fanno vincere (quota, attivazione, costo,
+iscrizione) sono le stesse che usa un genitore. Il 28/08 è finita in due
+conversazioni sulla Scuola Nuoto Bambini, e in entrambe la risposta ha detto al
+genitore che la quota di attivazione «è in omaggio se attivi entro il 31 agosto,
+quindi adesso non la paghi». Falso, e falso nel verso peggiore: **un prezzo
+dichiarato più basso del vero**, che si scopre alla cassa.
+
+Il difetto era mio e di poche ore prima: la riga che ho aggiunto alle voci dei
+piani e alla voce della quota diceva «in omaggio sulle formule annuali» senza
+dire *di chi*. Ora lo dice, e in più c'è il nodo.
+
+**`Vaglio promo` è un nodo a sé, fra `Vaglio Guest Pass` e `Componi contesto`.**
+Quando l'attività scelta è di un figlio, le voci della promo escono dal
+contesto: è la stessa medicina del Guest Pass e del Direttore Tecnico — una voce
+che il modello può fraintendere non deve stargli davanti. Sta in un nodo suo e
+non dentro il vaglio del Pass perché è un'altra decisione, su un'altra voce e
+con un'altra condizione: mescolarle vorrebbe dire che chi legge una spia non sa
+più quale regola l'ha mossa.
+
+**La condizione è in OR su tre vie, e il ramo da solo non basta.** Nel test del
+28/08 la persona aveva scelto la Scuola Nuoto ed era `ramo: iscritto` — il ramo
+lo decide l'abbonamento, non l'attività. Quindi: `attivitaJunior` non vuoto,
+oppure `ramo === 'junior'`, oppure `attivita` che contiene uno dei quattro corsi
+dei bambini.
+
+### Spegnere la promo non deve rompere il build, e prima lo faceva
+
+`promo.astro` chiudeva con un `throw` quando non c'era nessun documento non-bozza:
+l'intenzione era non pubblicare una landing vuota, il risultato era che **la cosa
+da fare alla scadenza era la cosa che rompeva il sito**. Ora la pagina si toglie
+di mezzo da sé, con un `Astro.redirect('/abbonamenti', 301)` che in build statico
+diventa una pagina di `meta refresh`: chi arriva da una campagna, da un'email o
+da un QR trova il listino, che è quello che cercava.
+
+Provato spegnendola per davvero, prima di consegnare: build a 86 pagine, `/promo`
+diventa il reindirizzamento, le sette voci della promo escono dal `kb.json`,
+`/link` perde la sua voce e `/abbonamenti` torna a stampare «+ €50» su tutte le
+formule. Resta un dettaglio noto: `/promo` continua a comparire nella sitemap
+anche quando è un reindirizzamento — e la regola del filtro dice che un
+reindirizzamento non ci va. Non è stato escluso perché quando la promo è viva
+quella pagina è `index, follow` per scelta, e un'esclusione fissa la terrebbe
+fuori anche allora.
+
 ### Un numero che la pagina stampa e i dati non hanno è un numero che l'assistente non può dire
 
 «Quanto è la quota che si paga al momento dell'iscrizione?» → *«L'importo della
