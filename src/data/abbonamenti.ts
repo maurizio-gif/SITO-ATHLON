@@ -191,15 +191,40 @@ export const SOSPENSIONE = {
   /** I corsi che non la hanno, per nome: sono la domanda che arriva. */
   nonValePer: ['Scuola Nuoto Bambini', 'Nuoto Agonistico', 'Pallanuoto'],
   /**
-   * L'altra sospensione, che non è la stessa cosa e viene confusa sempre:
-   * gratuita, per inidoneità documentata di almeno sessanta giorni. Quella
-   * **c'è anche** per i corsi che non hanno quella a pagamento, ed è alternativa
-   * al recupero delle lezioni. Senza questa riga la risposta giusta diventa un
-   * «no» che è falso per metà.
+   * La sospensione per inabilità **degli adulti e del Baby Nuoto**: gratuita,
+   * per inidoneità documentata di almeno sessanta giorni continuativi, e con il
+   * recupero che parte da due mesi (sotto i due mesi non si recupera nulla).
+   * Sta nella stessa scheda di quella a pagamento, perché la scheda le mette a
+   * confronto in una tabella — che è il modo in cui si smette di confonderle.
    */
   inabilita: {
     giorni: 60,
-    scheda: '/wikiathlon/snb/preiscrizioni-nuoto/',
+    recuperoMesiMinimo: 2,
+    scheda: '/wikiathlon/adulti/sospensione/',
+  },
+  /**
+   * E il regime dei corsi in vasca dei bambini, che è **un'altra cosa** e non
+   * una variante: Scuola Nuoto Bambini, Nuoto Agonistico e Pallanuoto non hanno
+   * la sospensione a pagamento, e quella per inidoneità funziona in modo
+   * diverso — durante la sospensione la quota mensile **resta dovuta**, il
+   * ristoro è un credito di almeno due mensilità pagate da usare entro sei mesi
+   * dalla fine del corso, e la sospensione è alternativa al recupero delle
+   * lezioni, non cumulabile con esso (punti 4.7, 4.10 e 6.7).
+   *
+   * Questo blocco nasce da una risposta sbagliata del 28/08: a un Premium
+   * Mensile Flex — un adulto — l'assistente ha dato i quindici euro giusti e poi
+   * il credito di «almeno 2 mensilità utilizzabile entro 6 mesi dalla fine del
+   * corso», che è la regola della scuola nuoto. I due regimi vivevano in due
+   * schede diverse senza che nessuna delle due dichiarasse il proprio perimetro,
+   * e il modello li ha impastati. Ora il perimetro è un dato, e il `kb.json` ne
+   * fa due voci separate che si nominano a vicenda.
+   */
+  junior: {
+    giorni: 60,
+    creditoMensilita: 2,
+    creditoEntroMesi: 6,
+    scheda: '/wikiathlon/snb/sospensione/',
+    valePer: ['Scuola Nuoto Bambini', 'Nuoto Agonistico', 'Pallanuoto'],
   },
 } as const;
 

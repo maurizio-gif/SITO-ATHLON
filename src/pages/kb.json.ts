@@ -586,17 +586,47 @@ export const GET: APIRoute = async () => {
     ),
   });
 
+  /* ---- Le due sospensioni, e sono due voci -------------------------------
+     Erano una sola, e la voce unica le teneva insieme dicendo per bene il
+     perimetro — «vale solo per», «per quei corsi c'e' un'altra strada» — ma
+     mescolando in tre righe due regimi che non hanno niente in comune oltre ai
+     sessanta giorni. Misurato il 28/08: a un Premium Mensile Flex l'assistente
+     ha dato i quindici euro giusti e poi il credito di «almeno 2 mensilita'
+     utilizzabile entro 6 mesi dalla fine del corso», che e' la regola della
+     scuola nuoto. Non aveva inventato: aveva letto una voce che conteneva
+     entrambe.
+
+     Due voci separate, ognuna col perimetro nel titolo e nella prima riga, si
+     citano una per volta — e quando il modello ne prende una, prende un regime
+     intero e coerente. Ognuna nomina l'altra, perche' il caso «ho un abbonamento
+     adulti e un figlio alla scuola nuoto» esiste ed e' comune. */
   voci.push({
     id: 'abbonamento:sospensione',
     tipo: 'abbonamento',
-    titolo: 'Sospendere l’abbonamento',
+    titolo: 'Sospendere l’abbonamento: adulti e Baby Nuoto',
     url: `${SITE}${SOSPENSIONE.scheda}`,
     area: 'Abbonamenti',
     attivita: [],
     testo: blocchi(
-      `La sospensione a pagamento costa ${SOSPENSIONE.prezzo} € e vale un mese solare per volta, senza limite al numero di sospensioni. Va chiesta con ${SOSPENSIONE.preavviso} giorni di preavviso rispetto al primo del mese da sospendere, e non e' retroattiva: non si sospende il mese in corso.`,
-      `**Vale solo per ${SOSPENSIONE.valePer}.** Per ${SOSPENSIONE.nonValePer.join(', ')} la sospensione a pagamento **non esiste**: non proporla e non dire una cifra.`,
-      `Per quei corsi c'e' un'altra strada, che non e' la stessa cosa: la sospensione **gratuita per inidoneita' fisica documentata** di almeno ${SOSPENSIONE.inabilita.giorni} giorni continuativi, alternativa al recupero delle lezioni e non cumulabile con esso. Serve un certificato medico.`
+      `**Vale per ${SOSPENSIONE.valePer}**, e solo per quelli. Per ${SOSPENSIONE.junior.valePer.join(', ')} le regole sono altre: vedi la voce «Fermarsi durante la stagione», e non usare i numeri di questa.`,
+      `**A pagamento:** costa ${SOSPENSIONE.prezzo} € e vale un mese solare per volta, senza limite al numero di sospensioni. Si chiede dall'area riservata (Abbonamenti → Sospensioni) con ${SOSPENSIONE.preavviso} giorni di preavviso rispetto al mese da sospendere, e non e' retroattiva: non si sospende il mese in corso. Il tempo sospeso non si perde — la scadenza del contratto si sposta in avanti di pari durata.`,
+      `**Per inabilita' fisica:** gratuita, per inidoneita' documentata di almeno ${SOSPENSIONE.inabilita.giorni} giorni continuativi. Serve un certificato di struttura sanitaria nazionale che dichiari l'inidoneita' all'attivita' sportiva e il termine del periodo, da mandare al desk; sotto i ${SOSPENSIONE.inabilita.recuperoMesiMinimo} mesi non si recupera niente, e non e' sovrapponibile ad altre sospensioni.`
+    ),
+  });
+
+  voci.push({
+    id: 'abbonamento:sospensione-junior',
+    tipo: 'abbonamento',
+    titolo: 'Fermarsi durante la stagione: Scuola Nuoto, Agonistico, Pallanuoto',
+    url: `${SITE}${SOSPENSIONE.junior.scheda}`,
+    area: 'Abbonamenti',
+    attivita: [],
+    testo: blocchi(
+      `**Vale per ${SOSPENSIONE.junior.valePer.join(', ')}**, e solo per quelli. Per gli abbonamenti degli adulti e per il Baby Nuoto vedi la voce «Sospendere l'abbonamento: adulti e Baby Nuoto» — sono regole diverse, e i numeri non si scambiano.`,
+      `**La sospensione a pagamento qui non esiste**: non proporla e non dire i ${SOSPENSIONE.prezzo} €, che sono degli adulti.`,
+      `Quello che c'e' e' la sospensione **gratuita per inidoneita' documentata di almeno ${SOSPENSIONE.junior.giorni} giorni continuativi**: certificato medico (struttura pubblica o privata) con l'inidoneita' e il termine espliciti, mandato al desk, e la sospensione decorre da quando la documentazione arriva.`,
+      `Due cose che qui sono diverse dagli adulti, e sono quelle che si sbagliano: durante la sospensione **la quota mensile resta dovuta**, e il ristoro e' un **credito pari ad almeno ${SOSPENSIONE.junior.creditoMensilita} mensilita' pagate, da usare entro ${SOSPENSIONE.junior.creditoEntroMesi} mesi dalla fine del corso**, non trasferibile.`,
+      `La sospensione e' **alternativa al recupero delle lezioni** e non cumulabile con esso: per un'assenza di qualche lezione la strada e' quella dei recuperi, non questa.`
     ),
   });
 
