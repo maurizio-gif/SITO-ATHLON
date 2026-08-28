@@ -14,6 +14,7 @@
  * 4279, 4283, 4285); niente è aggiunto per riempire.
  */
 import type { RichiestaFaq } from './faq';
+import { ATTIVAZIONE } from './abbonamenti';
 
 const U = '/wp-content/uploads';
 
@@ -214,7 +215,7 @@ export const JUNIOR: CorsoJunior[] = [
         prezzo: '89',
         periodo: 'mese',
         testo: 'Possibilità di prenotare in tutti i turni disponibili, senza limiti.',
-        nota: 'Quota di attivazione contrattuale una tantum 50 €.',
+        nota: `Quota di attivazione contrattuale una tantum ${ATTIVAZIONE.quota} €.`,
         medium: 'PulsanteMensileBabyNuoto',
       },
     ],
@@ -519,6 +520,17 @@ export const JUNIOR: CorsoJunior[] = [
       {
         q: 'Dove posso attendere mio figlio durante il corso?',
         a: 'Puoi accedere alla balconata sopra le piscine, sostare nella sala d’attesa dedicata in prossimità degli spogliatoi oppure attendere nell’area esterna.',
+      },
+      /* La domanda è arrivata in chat il 28/08 — «posso scegliere un
+         bisettimanale e fare orari diversi nei 2 giorni?» — e l'assistente ha
+         risposto che i turni non sono fissi, prendendo la finestra di
+         prenotazione delle attività degli adulti e applicandola qui. Il dato
+         non era da nessuna parte: nessuna scheda diceva che il turno è fisso,
+         lo diceva solo implicitamente il «turno preferito» della procedura
+         d'iscrizione. */
+      {
+        q: 'Posso scegliere orari diversi ogni settimana?',
+        a: 'No: il turno è fisso. Giorno e ora si scelgono all’iscrizione e restano quelli per tutta la stagione, e con il bisettimanale i turni fissi sono due. Le lezioni non si prenotano una per una: la sola prenotazione che si fa è il <a href="/wikiathlon/snb/recuperi-lezioni">recupero</a>, quando una lezione si perde. Se serve cambiare turno in modo definitivo, c’è la richiesta di <a href="/wikiathlon/snb/cambio-corso">cambio corso</a>.',
       },
       {
         q: 'Si possono recuperare le lezioni perse?',

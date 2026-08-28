@@ -1583,6 +1583,485 @@ ramo parallelo.
   dell'originale: la richiesta è sua, ed è la sua scheda che il desk apre.
   Quella del figlio si porta a parte e compare solo quando c'è.
 
+### Il Guest Pass in chat: due fatti, e la voce che sparisce se mancano
+
+Il Pass si propone **solo** a chi può averlo, e le condizioni sono quattro —
+tutte verificabili, nessuna affidata a come il modello legge la conversazione.
+Stanno in `Vaglio Guest Pass` su n8n e, per la parte che decide l'attivazione,
+in `puoProvare()` dentro `chatAssistente.client.js`.
+
+| condizione | il fatto | dove |
+| --- | --- | --- |
+| attività **adulti** | ha premuto «Attività adulti», uno dei cinque pulsanti del passo prima della chat | `attivita === 'adulti'` |
+| **lead, guest o nuovo** | `stato` di `athlon-verifica-iscritto`: `nuovo` (non lo conosce) o `esiste` (Lead o Guest) | lista bianca |
+| dopo **qualche messaggio** | ha scritto almeno tre volte | `scambi`, contato dal sito |
+| ha chiesto di **abbonamenti** | la stessa regex che accende l'ancora del listino | `CHIEDE_LISTINO` |
+
+Cinque cose da sapere prima di toccarlo.
+
+**Si guarda `attivita`, non `ambito` e non `ramo`.** Entrambi valgono `adulti`
+anche quando non è stato scelto niente, quindi con loro «non lo sappiamo»
+passerebbe per «ha detto adulti» — che è il modo in cui una regola stringente
+diventa larga senza che nessuno se ne accorga. Serve il pulsante premuto.
+
+**Lo stato è una lista bianca, non un'esclusione.** `nuovo` ed `esiste` valgono;
+`iscritto` è il Member; e il quarto caso — la verifica che non ha risposto, che
+il sito marca `errore` — cade fuori da sé invece di essere un valore da
+ricordarsi di escludere. Quando non sappiamo, non si offre.
+
+**La voce esce dal contesto, non ci resta con scritto «non proporla».** Una
+regola che il modello può ignorare non è una regola: è la stessa scelta della
+lezione singola (`SOLO_SE_CHIESTO`) e del Direttore Tecnico (`SOLO_ISCRITTI`).
+Ma togliere la voce non basta da sola, perché **la regola 8 del prompt nomina il
+Pass e il suo url anche senza di lei**: la chiude una regola fissa nel
+`systemMessage` dell'agente, accanto a quelle del nuoto per bambini, che dice
+che senza la voce il Pass per quella persona non esiste.
+
+**Quando lo propone deve elencare tutte le attività, e dire «adulti».**
+L'elenco non sta nel prompt: sta nella voce, e la voce lo legge da
+`ATTIVITA_GUEST_PASS` (`data/abbonamenti.ts`), che è **derivata** dal Premium —
+il Pass è un Premium di sette giorni, quindi il suo perimetro non è una lista
+sua. Un'attività aggiunta al Premium entra da sola in `/prova`, nella voce e
+nella chat. Un elenco a metà si legge come un elenco completo: è così che una
+prova finisce comprata per una cosa che non comprende.
+
+**Il gate del client copre le due condizioni sull'identità, non le altre due**,
+e la divisione è voluta: «adulti» e lo stato dicono *chi può averlo*, i messaggi
+e la domanda sugli abbonamenti dicono *quando proporlo*. Il client decide se la
+card compare e se la richiesta parte davvero (`fetch(PROVA)`), quindi è l'ultima
+parola sull'attivazione — come le guardie del calendario lo sono sul richiamo.
+Il buco che c'era: `if (!dati.memberType || ...) return` teneva fuori **le
+persone nuove**, che per PerfectGym non hanno nessun `memberType` e sono la
+ragione per cui il Pass esiste. Il modello diceva «ecco il tuo Guest Pass», la
+card non compariva e su `richieste_prova` non arrivava niente — nessun errore,
+nessuna traccia.
+
+**Aprire il gate non è proporre, e questo si è visto sul traffico vero.**
+Esecuzione `1443490` del 28/08, `passOfferto: true` e la voce nel contesto:
+`attivita: ["adulti"]`, `stato_pgm: "esiste"`, `scambi: 4`, e la domanda era
+«abbonamento annuale solo per pilates reformer» dopo «vorrei sapere la
+differenza dei costi». Il vaglio aveva fatto tutto giusto — e il modello ha
+risposto che il Group Reformer da solo non si vende, che sta nel Premium, e
+«ti va di partire con l'Annuale a rate, 95 €/mese?». **Del Pass, niente.**
+
+Il motivo sta nella regola 8, che diceva «proponilo quando c'entra»: cioè
+lasciava al modello di decidere il momento, e la regola 7 — porta
+all'attivazione — vinceva sempre. Un no seguito da un prezzo più alto è il
+punto esatto in cui una persona chiude la chat.
+
+Adesso la presenza della voce **è** il momento: se c'è, il sito ha già
+verificato le quattro condizioni, quindi proporlo non è facoltativo e va fatto
+in quel turno, una volta. Con i due casi in cui è la risposta giusta e non
+un'aggiunta — *quando la risposta è un no* (quella cosa non si vende da sola,
+sta solo in un piano più grande) e *quando sta pesando il prezzo o l'ampiezza
+del piano* — e con l'unico caso in cui non si propone: **quando ha appena
+detto sì a un piano e a una formula**. Lì siamo al passo (5) della regola 7, e
+mettere sette giorni a 19 € davanti a chi sta entrando a 95 €/mese è l'unico
+modo di sbagliare in eccesso.
+
+### E la lezione singola, quando chiede un abbonamento per una cosa sola
+
+«Abbonamento solo per il Reformer» è la richiesta di **pagare solo quella
+cosa**, quindi la lezione singola è la risposta letterale e non un'aggiunta:
+si nomina. È l'unica eccezione dichiarata alla regola 7ter, che in tutti gli
+altri casi resta come sta — *se non l'ha chiesta, per te non esiste*, perché
+chi chiede quanto costa un corso e si sente rispondere «oppure 22 € a lezione»
+ha appena scoperto che può entrare senza abbonarsi, e non lo aveva chiesto.
+
+Il dato per rispondere c'è: `SINGOLI.voci` ha il prezzo di tutte e sei le
+attività adulti — il Group Reformer sta a 25 € — più il badge di 5 € una
+tantum.
+
+**Il cancello si apre rinominando la voce, e la ragione è dove vive il
+cancello.** `SOLO_SE_CHIESTO[SINGOLO]` sta in `Componi contesto` e guarda
+l'`id`; il vaglio sta un nodo prima, quindi non può togliere quella
+condizione ma può dare alla voce un id che quella condizione non incontra —
+`abbonamento:accessi-singoli-una-attivita`, con il contenuto copiato
+dall'originale così le due cose non possono divergere. **È un aggiramento, ed
+è dichiarato**: il giorno che si tocca `Componi contesto` per altro, questa
+condizione va spostata dentro `SOLO_SE_CHIESTO`, accanto a sua sorella.
+
+Due freni, e il secondo è meno ovvio del primo. **Solo il ramo adulti**: a un
+genitore che chiede «solo il baby nuoto» un listino di prezzi adulti è una
+risposta sbagliata. E **solo se il cancello l'avrebbe chiusa**: se la domanda
+nomina già la lezione singola la voce passa da sé, e rinominarla vorrebbe dire
+averla due volte nel contesto.
+
+**«Solo» da solo non basta**, e sarebbe il falso positivo che apre tutto:
+«vengo solo la sera» non parla di quante attività fa. Serve la restrizione
+**e** una cosa da restringere, vicine — è una regex, non capirà ogni frase, e
+sbaglia nel verso giusto: una richiesta non riconosciuta lascia la 7ter come
+stava.
+
+**L'ordine è piano, Pass, lezione singola**, e se le due offerte non stanno
+nelle cento parole della regola 6 la singola va nel turno dopo. La prima è la
+nostra offerta, la seconda è la sua richiesta presa alla lettera, e nessuna
+delle due si perde. Mai la singola prima del Pass, mai al posto del piano.
+
+Per verificare: `Vaglio Guest Pass` mette in chiaro `passOfferto`,
+`passVoceTolta`, `passPerche` (quale condizione ha fermato l'offerta) e
+`singoloAperto`.
+`passVoceTolta` falso mentre `passOfferto` è falso vuol dire che l'id della voce
+è cambiato e il vaglio non aggancia più niente — da fuori si vedrebbe come «il
+Pass si propone sempre», che è il guasto che quel nodo esiste per evitare.
+
+### Le sospensioni sono due regimi, non uno con le varianti
+
+A «devo procedere con la sospensione dell'abbonamento Premium Mensile Flex» —
+un adulto — l'assistente ha dato i 15 € giusti, i 10 giorni di preavviso giusti,
+e poi, quando la persona ha detto di aver avuto un intervento, il ristoro
+sbagliato: *«il recupero avverrà tramite un credito di almeno 2 mensilità,
+utilizzabile entro 6 mesi dalla fine del corso»*. Quello è il punto 4.10 della
+**Scuola Nuoto Bambini**. Per un adulto il contratto si allunga di pari durata e
+di credito non ce n'è.
+
+**Non aveva inventato: aveva letto una voce che conteneva entrambi i regimi.**
+`abbonamento:sospensione` diceva il perimetro per bene — «vale solo per», «per
+quei corsi c'è un'altra strada» — ma teneva in tre righe due cose che non hanno
+in comune nulla oltre ai sessanta giorni. Un contesto che contiene due regimi è
+un contesto da cui si può comporre un terzo regime che non esiste.
+
+Adesso il perimetro è **un dato** e le voci sono **due**:
+
+| | adulti (dal 1/9/2021) e Baby Nuoto | Scuola Nuoto, Agonistico, Pallanuoto |
+| --- | --- | --- |
+| a pagamento | 15 €, un mese solare, preavviso 10 giorni | **non esiste** |
+| per inidoneità | gratuita, ≥ 60 giorni documentati | gratuita, ≥ 60 giorni documentati |
+| la quota del mese | il contratto si allunga | **resta dovuta** |
+| cosa si recupera | il recupero parte da 2 mesi | un **credito** ≥ 2 mensilità, entro 6 mesi dalla fine del corso |
+
+Tre cose da sapere prima di toccarle.
+
+**Ogni voce dichiara il perimetro nel titolo e nella prima riga, e nomina
+l'altra.** Serve tutto e due: il titolo perché è quello che il modello legge
+scegliendo, e il rimando perché il caso «io ho un abbonamento e mio figlio fa la
+scuola nuoto» è comune — e quando il recupero pesca entrambe le voci, ognuna dice
+di non usare i numeri dell'altra.
+
+**`SOSPENSIONE.junior` è la novità nei dati**, accanto a `inabilita`: prima il
+regime dei bambini viveva solo dentro un accordion delle condizioni contrattuali
+di `preiscrizioni-nuoto.md`, cioè in un posto dove nessuno lo cercava e da cui il
+modello lo prendeva per caso. Adesso ha anche una scheda sua,
+`/wikiathlon/snb/sospensione/`, con la tabella del confronto — che è il modo in
+cui due cose che si somigliano smettono di essere confuse.
+
+**Il sito non aveva il difetto, e questo dice dove guardare.** `BannerSospensione`
+sta solo su `/abbonamenti` e `/promo`, e nessuna pagina junior nomina la
+sospensione: il guasto viveva interamente nel `kb.json` e nel wiki. Quando una
+risposta della chat sbaglia su una regola, la prima cosa da controllare non è la
+pagina — è quante voci della knowledge base parlano di quella regola e se
+ciascuna dichiara per chi vale.
+
+### Dove la scheda tace, il modello applica la regola generale — e il turno della scuola nuoto è fisso
+
+«Posso scegliere un bisettimanale e fare orari diversi nei 2 giorni?» → *«Sì,
+non c'è un giorno fisso da rispettare per tutta la stagione. Ogni volta che
+prenoti scegli il turno che ti conviene, a partire da tre giorni prima.»* È
+falso: alla Scuola Nuoto Bambini il turno si scegle all'iscrizione e resta
+quello, e col bisettimanale i turni fissi sono due. Chi perde una lezione la
+**recupera**, con la procedura della scheda dei recuperi.
+
+**Il modello non ha inventato, ha generalizzato.** La finestra dei 3 giorni
+esiste ed è scritta: è quella delle attività degli adulti e del Baby Nuoto — e
+dei *recuperi* della scuola nuoto, che infatti compaiono nell'elenco delle
+attività a prenotazione. Nessuna scheda diceva che il turno settimanale è fisso:
+lo diceva solo, di sfuggita, il «turno preferito» della procedura d'iscrizione.
+Un dato assente non è un buco silenzioso — è una regola generale che si allarga
+al posto suo.
+
+Ora sta scritto in quattro posti, ognuno per un percorso diverso di chi legge:
+la scheda dell'iscrizione (dove si scelgono i turni), la scheda dei recuperi
+(come premessa: il recupero è la sola lezione che si prenota), l'elenco delle
+attività a prenotazione in `prenotazioni.md` (dove «Recuperi Scuola Nuoto
+Bambini» ora spiega perché è scritto *recuperi*), e una f.a.q. della pagina del
+corso — che è la domanda esatta arrivata in chat.
+
+**Il Baby Nuoto è l'opposto e va detto insieme**, o si sposta l'errore invece di
+chiuderlo: là si prenota turno per turno, come per gli adulti. Le due cose stanno
+nella stessa riga di `prenotazioni.md` per questo.
+
+### La promozione ha un perimetro, e nel ramo dei genitori non deve entrare
+
+`promo.md` lo dichiara — «Valido su tutti gli abbonamenti annuali, Smart e
+Premium», cioè gli adulti — ma la voce `promo:promo` entra nel contesto **per
+punteggio**, e le parole che la fanno vincere (quota, attivazione, costo,
+iscrizione) sono le stesse che usa un genitore. Il 28/08 è finita in due
+conversazioni sulla Scuola Nuoto Bambini, e in entrambe la risposta ha detto al
+genitore che la quota di attivazione «è in omaggio se attivi entro il 31 agosto,
+quindi adesso non la paghi». Falso, e falso nel verso peggiore: **un prezzo
+dichiarato più basso del vero**, che si scopre alla cassa.
+
+Il difetto era mio e di poche ore prima: la riga che ho aggiunto alle voci dei
+piani e alla voce della quota diceva «in omaggio sulle formule annuali» senza
+dire *di chi*. Ora lo dice, e in più c'è il nodo.
+
+**`Vaglio promo` è un nodo a sé, fra `Vaglio Guest Pass` e `Componi contesto`.**
+Quando l'attività scelta è di un figlio, le voci della promo escono dal
+contesto: è la stessa medicina del Guest Pass e del Direttore Tecnico — una voce
+che il modello può fraintendere non deve stargli davanti. Sta in un nodo suo e
+non dentro il vaglio del Pass perché è un'altra decisione, su un'altra voce e
+con un'altra condizione: mescolarle vorrebbe dire che chi legge una spia non sa
+più quale regola l'ha mossa.
+
+**La condizione è in OR su tre vie, e il ramo da solo non basta.** Nel test del
+28/08 la persona aveva scelto la Scuola Nuoto ed era `ramo: iscritto` — il ramo
+lo decide l'abbonamento, non l'attività. Quindi: `attivitaJunior` non vuoto,
+oppure `ramo === 'junior'`, oppure `attivita` che contiene uno dei quattro corsi
+dei bambini.
+
+### Spegnere la promo non deve rompere il build, e prima lo faceva
+
+`promo.astro` chiudeva con un `throw` quando non c'era nessun documento non-bozza:
+l'intenzione era non pubblicare una landing vuota, il risultato era che **la cosa
+da fare alla scadenza era la cosa che rompeva il sito**. Ora la pagina si toglie
+di mezzo da sé, con un `Astro.redirect('/abbonamenti', 301)` che in build statico
+diventa una pagina di `meta refresh`: chi arriva da una campagna, da un'email o
+da un QR trova il listino, che è quello che cercava.
+
+Provato spegnendola per davvero, prima di consegnare: build a 86 pagine, `/promo`
+diventa il reindirizzamento, le sette voci della promo escono dal `kb.json`,
+`/link` perde la sua voce e `/abbonamenti` torna a stampare «+ €50» su tutte le
+formule. Resta un dettaglio noto: `/promo` continua a comparire nella sitemap
+anche quando è un reindirizzamento — e la regola del filtro dice che un
+reindirizzamento non ci va. Non è stato escluso perché quando la promo è viva
+quella pagina è `index, follow` per scelta, e un'esclusione fissa la terrebbe
+fuori anche allora.
+
+### Un numero che la pagina stampa e i dati non hanno è un numero che l'assistente non può dire
+
+«Quanto è la quota che si paga al momento dell'iscrizione?» → *«L'importo della
+quota di attivazione non è scritto nella documentazione che ho a disposizione.»*
+La risposta era **corretta** — è la regola 2, le cifre si citano e non si
+inventano — e il difetto stava a monte: i 50 € vivevano scritti a mano in
+`abbonamenti.astro` e nel markdown della scuola nuoto, cioè in due posti che il
+`kb.json` non legge. La pagina lo diceva, l'assistente no.
+
+Ora la quota sta in `ATTIVAZIONE` (`data/abbonamenti.ts`) e da lì la leggono la
+pagina, la nota del Baby Nuoto e tre voci del `kb.json`: quella di ogni piano —
+perché **un mensile citato da solo è un preventivo incompleto**, ed è il motivo
+per cui la pagina la stampa sotto ogni formula — più una voce sua,
+`abbonamento:quota-attivazione`, per la domanda che arriva senza nominare nessun
+piano. Che è esattamente come è arrivata.
+
+Tre cose da sapere prima di toccarla.
+
+**Si paga per ogni abbonamento attivato**, non per nucleo: il secondo
+abbonamento di una famiglia la paga come il primo. Detta in modo ambiguo, quella
+riga fa arrivare al desk un genitore con due figli convinto di dover pagare 50 €
+in tutto.
+
+**Con la promozione attiva la quota è in omaggio sulle annuali, e le voci lo
+dicono.** Il gate è lo stesso `promoDoc` che governa la pagina — la collezione
+filtrata su `!draft` — quindi si spegne da sé mettendo `draft: true` sul
+documento della promo. Senza quella riga la voce avrebbe detto «50 €» a chi
+stava attivando un'annuale nella settimana esatta in cui non li paga: il verso
+sbagliato in cui sbagliare, perché è un prezzo dichiarato più alto del vero.
+
+**Il numero vive in tre posti, e due non sono evitabili.** `ATTIVAZIONE.quota` è
+la fonte; `quotaBarrata` in `promo.md` e la riga nella tabella di
+`preiscrizioni-nuoto.md` sono contenuti di Tina, che non possono importare
+TypeScript. Il giorno che la quota cambia vanno aggiornati tutti e tre — e la
+verifica è una spazzata sul `dist`: le occorrenze di «quota di attivazione» con
+una cifra devono dire tutte la stessa cifra.
+
+### La fascia la decide l'anno, e l'anno noto non basta: va confermato
+
+Il 28/08, bambina nata il **2021**-04-23 — l'anno nel contesto, messo lì dal
+form compilato due minuti prima — la mamma scrive «la bimba ha 5 anni compiuti
+ad aprile», e la risposta la mette nel **Baby Nuoto**, «i corsi per i più
+piccoli, dai 3 anni in su». Il Baby Nuoto è per i nati nel 2024, 2025 e 2026,
+dai 3 mesi; «dai 3 anni in su» non sta scritto da nessuna parte. Una bambina del
+2021 fa la Scuola Nuoto Bambini, e il prompt lo diceva già in una regola fissa
+tutta dedicata a questo — con un errore vero citato dentro.
+
+**È la seconda volta che questa regola non tiene, e la lezione è la stessa della
+domanda sull'anno già noto: qui il prompt non basta.** Il modello vede un'età e
+ragiona sull'età; nessuna quantità di maiuscole nel `systemMessage` lo ha fermato.
+Quindi la decisione torna al codice, in `Correggi anno gia' noto`, che di
+controlli fissi ora ne fa tre:
+
+1. **La domanda sull'anno già noto** — quello di prima, invariato: si toglie la
+   frase che la contiene.
+2. **Il corso sbagliato per quell'anno.** Se la risposta nomina il corso che
+   l'anno esclude e non nomina quello giusto, non si rimedia a pezzi: quel testo
+   parla per intero di un altro corso. Si butta, e al suo posto va la conferma
+   dell'anno più il corso che l'anno dice — scritto dal nodo, non dal modello.
+   Nominare quello sbagliato *mentre* si nomina il giusto («non è Baby Nuoto ma
+   Scuola Nuoto») resta legittimo, quindi il controllo scatta solo se il giusto
+   manca.
+3. **Se il genitore ha parlato in età, l'anno si fa confermare.** Anche quando
+   il corso è quello giusto: un'età lascia un margine di un anno intero, e i
+   genitori parlano quasi sempre in età. Una riga in cima, e solo se la risposta
+   non nomina già l'anno.
+
+Tre cose da sapere prima di toccarlo.
+
+**Il terzo controllo è una deroga deliberata al «non chiedere conferma».** La
+regola dice di usare l'anno noto senza richiederlo, e vale ancora: chi si sente
+rifare la stessa domanda pensa che non l'abbiano letto. Ma quando la persona ha
+appena parlato in età, la conferma non è una domanda già fatta — è la sola cosa
+che tiene insieme il dato del form e la frase che ha scritto lei, e le due
+possono divergere davvero (un fratello, un anno digitato male). **La conferma la
+mette il nodo e non il modello**, e questa è la parte che conta: una regola che il
+modello può ignorare non è una regola, e qui l'aveva già ignorata due volte.
+
+**Le due fasce stanno in chiaro nel nodo**, non lette da `junior.ts`: n8n non
+importa il codice del sito. Il giorno che il club sposta la stagione vanno
+aggiornate in tutti e due i posti — è il prezzo di avere la decisione dove il
+modello non può contraddirla.
+
+**E `Salva risposta` archiviava il testo grezzo, non quello corretto.** Leggeva
+`$('Leggi la risposta')`, cioè il nodo *prima* della correzione: la persona
+vedeva il testo corretto e `chat_messaggi` conservava quello sbagliato. Finora
+non si era visto perché la correzione toglieva una frase; con la riscrittura
+intera la divergenza sarebbe stata quella fra il CRM e la realtà — cioè
+esattamente il posto da cui si guarda per capire se una correzione ha funzionato.
+Ora legge il nodo della correzione.
+
+### Chi si lamenta non riceve un'informazione, riceve una persona
+
+Vale in **ogni** ramo e su **qualunque** argomento, ed è la prima delle regole
+fisse del `systemMessage` perché viene prima di tutte le regole di contenuto: se
+il tono è di rabbia o di lamentela — ha pagato e non ha avuto, nessuno gli
+risponde, è la seconda volta che lo segnala, pensa di andarsene — in quel turno
+**non si risponde nel merito**. Niente numeri, niente orari, niente procedure, e
+soprattutto niente motivi: non perché è successo, non cosa comprende il suo
+abbonamento, non com'è fatto il palinsesto, nessuna ipotesi di sospensione o
+rimborso.
+
+**Anche quando la risposta si sa**, ed è questa la parte che non è ovvia. La
+tentazione è rispondere bene: la persona ha detto una cosa sbagliata, il testo ha
+quella giusta, e darla sembra il servizio. È il contrario — rispondere a una
+lamentela con un'informazione la peggiora, perché la persona non ha chiesto un
+dato, ha chiesto che qualcuno se ne occupi. Misurato sulla conversazione del
+28/08: a «ma nel frattempo ho pagato il mese di agosto» l'assistente ha risposto
+che «l'abbonamento di agosto copre quello che c'è disponibile in questo periodo»,
+cioè ha difeso il club, e la chat è andata avanti fino a sedici messaggi senza
+risolvere niente.
+
+Quello che resta sono due righe, in quest'ordine: **il dispiacere** sulla cosa
+precisa che ha detto lei, con le sue parole e senza spiegazioni attaccate; e **la
+strada verso una persona, con le istruzioni** — l'icona del messaggio in alto,
+cosa scriverci (cosa, quando, quale lezione), e che la conversazione arriva al
+team insieme al messaggio. Poi si ferma: nessuna domanda finale, nessuna offerta,
+nessun Guest Pass, nessuna telefonata.
+
+Tre dettagli che sono vincoli e non forma:
+
+- **`"senzaRisposta": true` su quel turno.** È il campo da cui `Salva risposta`
+  ricava `chat_conversazioni.escalata`, quindi è il modo in cui in archivio si
+  vede che quella conversazione è passata a una persona. Non cambia niente per
+  chi legge la chat: è un dato per il club.
+- **Non si promette cosa il team vedrà o farà** (regola 11bis). La prima stesura
+  di questa regola diceva «scrivi al team, che vede la tua situazione»: è
+  esattamente la promessa che la 11bis vieta, ed era già stata scritta una volta.
+  Quello che si sa è che la conversazione gli arriva e che rispondono via email.
+- **Vale sul turno, non sulla conversazione.** Se al messaggio dopo torna a fare
+  una domanda normale, si risponde normalmente — una regola che zittisce
+  l'assistente per il resto della chat trasformerebbe una lamentela in un muro.
+
+Nelle bozze email la stessa cosa c'era già, e con un nome diverso: l'astensione
+allargata di `ATHLON BOZZE EMAIL` passa la mano su un reclamo senza scrivere
+niente. Là la scelta è più radicale perché una bozza sbagliata la si rilegge, ma
+il criterio è lo stesso — un reclamo non lo chiude un testo automatico.
+
+### «Online limit exceeded»: si aspetta che la lezione passi, non si disdice
+
+Il limite di prenotazioni conta **solo le lezioni ancora da svolgere**, quindi si
+libera da sé: quando quella in programma è finita, si prenota la successiva senza
+disdire niente. Col Group Reformer, che ne ammette una per volta, è il caso
+normale — la lezione di domani si prenota quando quella di oggi è passata, e la
+finestra resta aperta fino all'inizio, quindi non si arriva tardi.
+
+L'assistente diceva l'opposto, e per tre volte nella stessa conversazione: «per
+prenotare quella di domani devi prima disdire quella di oggi». A una persona che
+aveva **una sola** prenotazione di Reformer, cioè il caso in cui la risposta
+giusta è «aspetta due ore». Il consiglio le faceva perdere il posto di oggi per
+prendere quello di domani, che è un cambio, non una soluzione.
+
+**Il difetto era nella scheda, non nel modello.** `prenotazioni-problemi.md`
+chiudeva la causa 5 con «Disdici o completa una delle prenotazioni attive»: le
+due strade in fila, con la peggiore per prima e senza dire che «completa»
+significa *non fare niente e aspettare*. Un modello che riassume in cento parole
+tiene la prima. Adesso la scheda apre con l'attesa, dice che «attiva» vuol dire
+**in programma**, e nomina la disdetta solo per chi a quella lezione non ci va.
+La stessa riga sta in `prenotazioni.md` e nella f.a.q. `prenotazioni-attive`,
+perché il limite si legge in tre posti.
+
+E nel `systemMessage` c'è la regola fissa che chiude il caso anche se la scheda
+dovesse tornare ambigua: **mai dire di disdire una lezione a cui vuole andare per
+liberare il limite.**
+
+### Le date non si calcolano, e una lezione di domani è dentro la finestra
+
+Nella stessa conversazione, primo messaggio: «non riesco a prenotare una lezione
+per domani» → «le prenotazioni si aprono 3 giorni prima, quindi da mercoledì 3
+settembre in poi». Domani era sabato 29 agosto: la finestra era **aperta da tre
+giorni**, e la risposta ha mandato la persona a settembre per una lezione
+dell'indomani.
+
+La regola 2ter lo vietava già, in mezzo a un paragrafo che dice anche altre
+quattro cose. Ora è una regola fissa a sé, e in una forma che non richiede
+nessun conto: **oggi, domani e dopodomani sono sempre dentro la finestra**, e
+l'unico caso in cui non è aperta è una lezione a più di 3 giorni. Un conto sulle
+date è un errore che il modello non si accorge di fare — vale la stessa scelta
+della fascia d'età del nuoto bambini, dove il calcolo è vietato invece che
+corretto.
+
+### Una chat di assistenza si chiude, e chi la allunga è l'assistente
+
+Sedici messaggi per una domanda che aveva una risposta di due righe. Dopo il
+consiglio sbagliato, l'assistente ha raccontato l'orario estivo, quante lezioni
+ci saranno a settembre, e — a «ma nel frattempo ho pagato il mese di agosto» —
+che «l'abbonamento di agosto copre quello che c'è disponibile in questo periodo».
+Cioè ha difeso il club su una lamentela, che è esattamente ciò che la regola 11
+vieta.
+
+La regola fissa aggiunta dice quando smettere: **detta la causa e cosa fare, non
+si aggiunge altro** — non il palinsesto del mese, non cosa comprende
+l'abbonamento, non ipotesi di sospensioni o rimborsi. Se insiste, se il problema
+resta, o se la situazione è personale, si chiude con una riga: *se ti serve altro
+aiuto scrivi al team dall'icona in alto, che vede la tua situazione*. È la regola
+11 applicata **prima** che la cosa diventi un reclamo, e la ragione è che una
+spiegazione in più non risolve il caso di quella persona: lo allunga.
+
+### L'upgrade non si preventiva in chat, si chiede dal modulo
+
+«Quanto costa se aggiungo i corsi al mio abbonamento?» → tre domande
+(quale piano hai, mensile o annuale, da quando) e poi *«la nuova quota è
+119 €/mese»*. Quella cifra l'assistente non la può sapere: un cambio
+abbonamento si conteggia sul contratto vero, col credito residuo di quello in
+corso, e lo fa il desk. Il numero detto in chat diventa un'aspettativa che alla
+cassa non torna — è lo stesso difetto della quota di attivazione «in omaggio»,
+nel verso opposto: **un prezzo dichiarato per una cosa che nessuno ha ancora
+calcolato**.
+
+La scheda `adulti/cambio-abbonamento` diceva già tutto quello che serve, e in una
+riga: si richiede **sempre** dal modulo che sta dentro la scheda, e le istruzioni
+per proseguire arrivano via email dopo la compilazione. Quindi la risposta giusta
+è corta e non è un preventivo: *come si chiede*, con la scheda fra le fonti.
+
+Tre cose, e la seconda è quella che è costata il turno:
+
+- **Niente numeri e niente procedura.** Non la nuova quota, non la differenza,
+  non il credito residuo nominato come se lo sapessimo, non i passaggi e non i
+  tempi. Il prezzo di **listino** di un piano invece si dice — è un dato del
+  sito, con la sua fonte (regola 7bis) — aggiungendo che l'importo del *suo*
+  cambio dipende dal credito residuo e gli arriva via email.
+- **E non si fa l'interrogatorio per fare il conto.** Chiedere quale abbonamento
+  ha, se paga mensilmente, da quando: quei dati al desk arrivano dal modulo, e
+  tre domande prima di una risposta che comunque non si può dare sono tre turni
+  buttati. Una richiesta di dati è una promessa implicita di rispondere con un
+  numero.
+- **Il modulo si nomina come si nominano i rimandi**: «compila il modulo che
+  trovi nel pulsante qui sotto». La chat non disegna link dentro il testo, li
+  disegna `rimandi()` in fondo alla bolla — quindi una frase che dice «al link
+  qui sotto» senza dire *pulsante* fa cercare un link che non c'è.
+
+Vale per ogni forma di upgrade, compreso «voglio il Reformer sul mio
+abbonamento»: aggiungere un'attività *è* un cambio abbonamento, e passa dallo
+stesso modulo.
+
 ## Il form dell'assistenza chiede poco, e il resto lo va a prendere
 
 Il form dell'Help Desk — `components/clublife/SupportForm.astro`, dentro

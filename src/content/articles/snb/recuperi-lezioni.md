@@ -13,6 +13,8 @@ attivita:
   🔄 Devi prima disdire la lezione, poi prenotare il recupero · Da 3 giorni prima
 </div>
 
+Il turno della Scuola Nuoto Bambini è **fisso** — giorno e ora scelti all'iscrizione, per tutta la stagione — quindi il recupero è la sola lezione che si prenota: serve quando quella del proprio turno si perde.
+
 > ⚠️ Durante le **prime due settimane** di corso non sono previsti recuperi. L'assenza deve essere dichiarata in anticipo — senza disdetta non è possibile prenotare il recupero.
 
 ## Procedura

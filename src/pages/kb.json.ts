@@ -45,8 +45,10 @@ import {
   SOSPENSIONE,
   activityInfo,
   SINGOLI,
+  ATTIVAZIONE,
   PERSONAL,
   ETA_MINIMA_ADULTI,
+  ATTIVITA_GUEST_PASS,
 } from '../data/abbonamenti';
 import { ACTIVITY_TAGS, ACTIVITY_IDS } from '../data/activities';
 import { AREA_LABELS } from '../data/helpdesk';
@@ -466,6 +468,10 @@ export const GET: APIRoute = async () => {
     });
   }
 
+  /* Lo stesso documento che governa /promo e /abbonamenti: la collezione è
+     già filtrata su `!draft` qui sopra. */
+  const promoAttiva = promo[0]?.data;
+
   for (const voce of promo) {
     const d = voce.data;
     voci.push({
@@ -534,22 +540,93 @@ export const GET: APIRoute = async () => {
               // alla frase del risparmio: «…fine del mese Risparmio €138».
               `${pulito(o.note).replace(/[.\s]*$/, '')}.${o.savings ? ` ${pulito(o.savings)}.` : ''}`
           )
-          .join('\n')
+          .join('\n'),
+        /* La quota di attivazione sta accanto ai prezzi e non in una voce a
+           parte, perché chi chiede quanto costa un abbonamento sta chiedendo
+           anche questo: un mensile citato da solo è un preventivo incompleto,
+           ed è il motivo per cui la pagina la stampa sotto ogni formula. */
+        `**Oltre alla quota mensile o annuale si paga la quota di attivazione contrattuale: ${ATTIVAZIONE.quota} € una tantum**, per ogni abbonamento attivato, e comprende ${ATTIVAZIONE.comprende}. Non si paga sulla lezione singola.` +
+          /* Con una promozione attiva la quota è in omaggio sulle annuali, ed è
+             lo stesso `promoDoc` che governa la pagina: senza questa riga la
+             voce direbbe «50 €» a chi sta attivando un'annuale proprio nella
+             settimana in cui non li paga. Si spegne da sé mettendo `draft` sul
+             documento della promo, come per la pagina. */
+          (promoAttiva
+            ? `\n**Ma con la promozione in corso la quota di attivazione è in omaggio sulle formule annuali di questo piano** (${promoAttiva.scadenzaLabel.toLowerCase()}): sull'annuale non si paga, sul Mensile Flex sì. Vale **solo** sugli abbonamenti annuali degli adulti, Smart e Premium: sui corsi dei bambini la quota si paga.`
+            : '')
       ),
     });
   }
 
+  /* ---- La quota di attivazione, come voce a sé ---------------------------
+     Sta accanto a ogni piano (sopra) e anche da sola, perché «quanto è la
+     quota che si paga al momento dell'iscrizione?» è una domanda che arriva
+     senza nominare nessun piano — è arrivata così, e la risposta è stata che
+     il dato non c'era: il numero viveva scritto a mano nella pagina e nel
+     markdown della scuola nuoto, cioè in due posti che il `kb.json` non
+     legge. */
+  voci.push({
+    id: 'abbonamento:quota-attivazione',
+    tipo: 'abbonamento',
+    titolo: 'La quota di attivazione',
+    url: `${SITE}/abbonamenti`,
+    area: 'Abbonamenti',
+    attivita: [],
+    testo: blocchi(
+      `La quota di attivazione contrattuale — quella che si paga **al momento dell'iscrizione** — è di **${ATTIVAZIONE.quota} € una tantum** e comprende ${ATTIVAZIONE.comprende}.`,
+      `Si paga **una volta per ogni abbonamento attivato** — il secondo abbonamento di una famiglia la paga come il primo — e si somma alla prima quota mensile o annuale, che resta quella del listino. **La quota** vale per gli abbonamenti degli adulti e per i corsi dei bambini allo stesso modo; le eventuali promozioni no, e hanno il perimetro scritto nella loro voce.`,
+      `**Non si paga sulla lezione singola**, che è il modo di entrare senza abbonarsi: là c'è il solo badge di accesso, ${SINGOLI.badge} € la prima volta.`,
+      `Se si disdice e più avanti si torna, la quota di attivazione va versata di nuovo.`,
+      /* Come per le voci dei piani: con la promozione attiva la quota è in
+         omaggio sulle annuali, e dirlo qui è il punto — questa è la voce che
+         risponde alla domanda diretta. */
+      promoAttiva
+        ? `**Con la promozione in corso la quota è in omaggio, ma solo sugli abbonamenti annuali degli adulti** — Smart e Premium, ${promoAttiva.scadenzaLabel.toLowerCase()} (${pulito(promoAttiva.validoSu)}). Fuori da quelle due formule si paga: sul Mensile Flex degli adulti **e su tutti i corsi dei bambini**, Scuola Nuoto Bambini e Baby Nuoto compresi. A un genitore che iscrive un figlio la quota non è in omaggio, e dirglielo è un prezzo dichiarato più basso del vero.`
+        : ''
+    ),
+  });
+
+  /* ---- Le due sospensioni, e sono due voci -------------------------------
+     Erano una sola, e la voce unica le teneva insieme dicendo per bene il
+     perimetro — «vale solo per», «per quei corsi c'e' un'altra strada» — ma
+     mescolando in tre righe due regimi che non hanno niente in comune oltre ai
+     sessanta giorni. Misurato il 28/08: a un Premium Mensile Flex l'assistente
+     ha dato i quindici euro giusti e poi il credito di «almeno 2 mensilita'
+     utilizzabile entro 6 mesi dalla fine del corso», che e' la regola della
+     scuola nuoto. Non aveva inventato: aveva letto una voce che conteneva
+     entrambe.
+
+     Due voci separate, ognuna col perimetro nel titolo e nella prima riga, si
+     citano una per volta — e quando il modello ne prende una, prende un regime
+     intero e coerente. Ognuna nomina l'altra, perche' il caso «ho un abbonamento
+     adulti e un figlio alla scuola nuoto» esiste ed e' comune. */
   voci.push({
     id: 'abbonamento:sospensione',
     tipo: 'abbonamento',
-    titolo: 'Sospendere l’abbonamento',
+    titolo: 'Sospendere l’abbonamento: adulti e Baby Nuoto',
     url: `${SITE}${SOSPENSIONE.scheda}`,
     area: 'Abbonamenti',
     attivita: [],
     testo: blocchi(
-      `La sospensione a pagamento costa ${SOSPENSIONE.prezzo} € e vale un mese solare per volta, senza limite al numero di sospensioni. Va chiesta con ${SOSPENSIONE.preavviso} giorni di preavviso rispetto al primo del mese da sospendere, e non e' retroattiva: non si sospende il mese in corso.`,
-      `**Vale solo per ${SOSPENSIONE.valePer}.** Per ${SOSPENSIONE.nonValePer.join(', ')} la sospensione a pagamento **non esiste**: non proporla e non dire una cifra.`,
-      `Per quei corsi c'e' un'altra strada, che non e' la stessa cosa: la sospensione **gratuita per inidoneita' fisica documentata** di almeno ${SOSPENSIONE.inabilita.giorni} giorni continuativi, alternativa al recupero delle lezioni e non cumulabile con esso. Serve un certificato medico.`
+      `**Vale per ${SOSPENSIONE.valePer}**, e solo per quelli. Per ${SOSPENSIONE.junior.valePer.join(', ')} le regole sono altre: vedi la voce «Fermarsi durante la stagione», e non usare i numeri di questa.`,
+      `**A pagamento:** costa ${SOSPENSIONE.prezzo} € e vale un mese solare per volta, senza limite al numero di sospensioni. Si chiede dall'area riservata (Abbonamenti → Sospensioni) con ${SOSPENSIONE.preavviso} giorni di preavviso rispetto al mese da sospendere, e non e' retroattiva: non si sospende il mese in corso. Il tempo sospeso non si perde — la scadenza del contratto si sposta in avanti di pari durata.`,
+      `**Per inabilita' fisica:** gratuita, per inidoneita' documentata di almeno ${SOSPENSIONE.inabilita.giorni} giorni continuativi. Serve un certificato di struttura sanitaria nazionale che dichiari l'inidoneita' all'attivita' sportiva e il termine del periodo, da mandare al desk; sotto i ${SOSPENSIONE.inabilita.recuperoMesiMinimo} mesi non si recupera niente, e non e' sovrapponibile ad altre sospensioni.`
+    ),
+  });
+
+  voci.push({
+    id: 'abbonamento:sospensione-junior',
+    tipo: 'abbonamento',
+    titolo: 'Fermarsi durante la stagione: Scuola Nuoto, Agonistico, Pallanuoto',
+    url: `${SITE}${SOSPENSIONE.junior.scheda}`,
+    area: 'Abbonamenti',
+    attivita: [],
+    testo: blocchi(
+      `**Vale per ${SOSPENSIONE.junior.valePer.join(', ')}**, e solo per quelli. Per gli abbonamenti degli adulti e per il Baby Nuoto vedi la voce «Sospendere l'abbonamento: adulti e Baby Nuoto» — sono regole diverse, e i numeri non si scambiano.`,
+      `**La sospensione a pagamento qui non esiste**: non proporla e non dire i ${SOSPENSIONE.prezzo} €, che sono degli adulti.`,
+      `Quello che c'e' e' la sospensione **gratuita per inidoneita' documentata di almeno ${SOSPENSIONE.junior.giorni} giorni continuativi**: certificato medico (struttura pubblica o privata) con l'inidoneita' e il termine espliciti, mandato al desk, e la sospensione decorre da quando la documentazione arriva.`,
+      `Due cose che qui sono diverse dagli adulti, e sono quelle che si sbagliano: durante la sospensione **la quota mensile resta dovuta**, e il ristoro e' un **credito pari ad almeno ${SOSPENSIONE.junior.creditoMensilita} mensilita' pagate, da usare entro ${SOSPENSIONE.junior.creditoEntroMesi} mesi dalla fine del corso**, non trasferibile.`,
+      `La sospensione e' **alternativa al recupero delle lezioni** e non cumulabile con esso: per un'assenza di qualche lezione la strada e' quella dei recuperi, non questa.`
     ),
   });
 
@@ -614,7 +691,9 @@ export const GET: APIRoute = async () => {
        prova è quella lezione, non il Guest Pass; per chi non la vende — come
        la Scuola Nuoto Bambini — non esiste una prova separata dall'adesione
        mensile, che si disdice di mese in mese. */
-    testo: `${GUEST_PASS.giorni} giorni di accesso completo al club a ${GUEST_PASS.prezzo} €, con il codice ${GUEST_PASS.codice}. È riservato a chi non ha e non ha mai avuto un abbonamento Athlon dal ${GUEST_PASS.dal} in poi. Vale solo per le attività degli adulti (il listino Premium): non comprende i corsi per bambini né il personal training. Per un corso per bambini che vende anche la lezione singola, come il Baby Nuoto, la prova è prenotare e pagare quella lezione — non il Guest Pass.`,
+    testo: `${GUEST_PASS.giorni} giorni di accesso completo al club a ${GUEST_PASS.prezzo} €, con il codice ${GUEST_PASS.codice}. È riservato a chi non ha e non ha mai avuto un abbonamento Athlon dal ${GUEST_PASS.dal} in poi. Vale solo per le attività degli adulti (il listino Premium): non comprende i corsi per bambini né il personal training. Per un corso per bambini che vende anche la lezione singola, come il Baby Nuoto, la prova è prenotare e pagare quella lezione — non il Guest Pass.
+Le attività comprese sono queste, e sono tutte: ${ATTIVITA_GUEST_PASS.join(', ')}.
+Quando proponi il Pass, dì che è la settimana Premium delle attività degli adulti ed **elenca tutte** le attività qui sopra, con questi nomi: chi legge deve sapere cosa sta comprando senza aprire un'altra pagina, e un elenco a metà si legge come un elenco completo.`,
   });
 
   for (const [nome, info] of Object.entries(activityInfo)) {

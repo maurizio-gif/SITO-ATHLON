@@ -1,0 +1,366 @@
+# Il sync PerfectGym → Supabase: il contratto
+
+Il workflow n8n **`ATHLON: User Modified > SPOKI - SuperAgent`**
+(`yNCKG3tXTPC8NmSj`) riceve il webhook `User Modified` di PerfectGym per parlare
+a Spoki. Da settembre 2026 scrive anche su Supabase, chiamando
+`pgm_aggiorna_utente(jsonb)` — definita in
+`supabase/migrations/20260827_pgm_sync_utente.sql` e
+`20260827b_pgm_sync_campi_reali.sql`, dove sta il perché di ogni scelta.
+
+Questo file è la sola cosa che tiene insieme i due lati, perché **il workflow non
+sta in questo repository**: se il mapping qui sotto e il Code node divergono, non
+lo dice nessun errore — si vede da una colonna che resta vuota.
+
+## Com'è fatto il ramo
+
+```
+Webhook ─ GET MEMBER ─ Solo Scadenza Certificato ─ GET CONTRACTS ─ GET Agreements ─ GET Access ─┬─ CONTATTO A SPOKI
+                                                                                                └─ Prepara Supabase ─ Supabase utenti
+```
+
+**In parallelo a Spoki e dopo `GET Access`**, e le due cose sono deliberate.
+Dopo, perché a quel punto tutte e quattro le chiamate OData sono state fatte e i
+dati sono in mano. In parallelo, e **secondo nell'array delle connessioni**,
+perché Spoki deve partire per primo e non deve poter essere fermato: i due nodi
+nuovi portano `onError: continueRegularOutput`, l'HTTP anche `neverError` e
+`retryOnFail` (3 tentativi, 1 s). Vale la regola dei form — perdere una riga è
+brutto, impedire un WhatsApp è peggio.
+
+Il webhook risponde subito («Workflow got started»), quindi il ramo in più non
+costa latenza a nessuno.
+
+## Dove stanno i dati (e non è dove sembra)
+
+**Il webhook è povero.** Payload vero, da un'esecuzione reale:
+
+```json
+{"event":"UserModified","triggeredDate":"2026-08-27T15:40:30Z",
+ "data":{"modificationType":"Updated","userId":39120,
+   "user":{"userId":39120,"userNumber":"101025828",
+           "userFirstName":"…","userLastName":"…","userPhone":"+39…",
+           "userEmail":null,"birthDate":"2023-10-01"},
+   "homeClubId":1,"userType":"Guest"}}
+```
+
+Due cose da sapere: `userType` arriva **in inglese** (`Guest`), come il sito, non
+come l'export CSV che diceva `Ospite`; e `userEmail` **può essere null** — nel
+payload sopra lo è, perché è un bambino del 2023 e i bambini non hanno un
+indirizzo.
+
+**I dati ricchi li prende `GET MEMBER`** dall'OData, con
+`$expand=customAttributes,contracts,memberBalance,familyParents,familyChildren`:
+
+```
+firstName secondName lastName number phoneNumber email personalId sex birthdate
+consultantId referralCode memberType isActive isDeleted isForeigner
+isPaymentInProgress emailVerificationStatus phoneNumberVerificationStatus
+citizenshipId homeClubId createdDate version id
++ customAttributes[] contracts[] memberBalance{} familyParents[] familyChildren[]
+```
+
+Attenzione a due differenze di forma che sono trappole: il webhook scrive
+`birthDate`, l'OData `birthdate` (minuscola); e i nomi sono `userFirstName` da
+una parte, `firstName` dall'altra. Il Code node unisce i due vocabolari, con
+`GET MEMBER` che ha la precedenza perché è la fonte più completa.
+
+**Cosa il webhook non porta, e va saputo:** nessun campo di indirizzo esiste su
+quell'entità. `citta`, `pgm_indirizzo`, `pgm_cap`, `pgm_paese`, `pgm_fonte`,
+`pgm_piva` e `pgm_raccomandato_da` restano popolati solo dall'import CSV del
+24/08/2026 e da questa strada non si aggiornano. Aggiornarli vuole un'altra
+chiamata, che non è in questo lavoro.
+
+## La chiave è `userId`, e il motivo sta nei bambini
+
+L'aggancio prova tre chiavi, in quest'ordine di forza:
+
+1. **`pgm_member_id`** (= `userId` di PerfectGym) — sempre per prima
+2. `pgm_numero_utente`
+3. `email_norm` — per ultima
+
+**Una riga di un altro member non si adotta**, e questa riga è costata 761
+persone. Al club i figli si iscrivono con l'email del genitore, quindi due member
+di PerfectGym possono avere lo stesso indirizzo: la ricerca per email trovava la
+riga del genitore e il figlio ci finiva sopra, portandosi via il `pgm_member_id`
+dell'altro. Non è successo per un caso: la guardia sulla `version` ha fermato
+tutti e 761 — confrontando la version del figlio con quella del genitore, cioè
+**sbagliando**, e registrandoli come `saltato-versione-vecchia`, che è il nome di
+un'altra cosa. Il prezzo era che quelle persone non entravano affatto.
+
+Adesso le ricerche per numero utente e per email scartano le righe che portano
+già un `pgm_member_id` diverso: `pgm_member_id` è l'identità, e una riga che ne
+porta un altro non è questa persona. Chi arriva su un indirizzo già preso entra
+**senza email** — il dato non si perde, è sulla riga del genitore, che è di chi
+quell'indirizzo è davvero — e il registro lo scrive nel `motivo_scarto` accanto a
+`creato`. Misurato sulla riesecuzione: `saltato-versione-vecchia` torna a zero.
+
+**L'email non può essere la chiave, e il dato reale lo dimostra.** Il member
+39122 è un ragazzo del 2012 con `email: null`, legato all'account del genitore
+(39088): se la deduplica passasse dall'indirizzo, quella persona non sarebbe
+agganciabile affatto. Con `userId` viene creata, riconosciuta e aggiornata come
+tutte le altre. È la stessa regola già scritta in `CLAUDE.md` — «lo dice il
+gestionale, non chi compila».
+
+Il nucleo si tiene **sul figlio**, non sul genitore: `familyParents[0].id` va in
+`pgm_genitore_member_id` e l'uuid risolto in `genitore_id`. Una riga, una chiave
+esterna. Il verso opposto non ha bisogno di una colonna — i figli di una persona
+sono `where genitore_id = <lei>`; `pgm_figli` è solo il conteggio che PerfectGym
+dichiara, utile per accorgersi di un nucleo incompleto.
+
+E l'upsert su quella chiave fa il suo lavoro: i **quattro** webhook che PerfectGym
+manda per una modifica sola producono **una** riga in `utenti`. Le quattro righe
+stanno in `pgm_sync_log`, che è un registro di chiamate e non un'anagrafica —
+vedi la sezione sui duplicati.
+
+## Le chiavi che la funzione legge
+
+Almeno una fra `member_id`, `numero_utente` e `email` deve esserci: senza, la
+chiamata finisce in `pgm_sync_log` come `scartato-senza-chiave`.
+
+| chiave | da | colonna |
+| --- | --- | --- |
+| `member_id` | `m.id` → `u.userId` | `pgm_member_id` |
+| `numero_utente` | `m.number` → `u.userNumber` | `pgm_numero_utente` |
+| `email` | `m.email` → `u.userEmail` | `email` |
+| `nome`, `cognome` | `m.firstName`/`lastName` → `u.userFirstName`/`userLastName` | `nome`, `cognome` |
+| `secondo_nome` | `m.secondName` | `pgm_secondo_nome` |
+| `telefono` | `m.phoneNumber` → `u.userPhone` | `telefono` |
+| `member_type` | `m.memberType` → `d.userType` | `pgm_member_type` (normalizzato) |
+| `stato_abbonamento` | `contratto.status` | `pgm_stato_abbonamento` |
+| `data_nascita` | `m.birthdate` → `u.birthDate` | `data_nascita` |
+| `registrato_il` | `m.createdDate` | `pgm_registrato_il` |
+| `codice_fiscale` | `m.personalId` | `codice_fiscale` |
+| `sesso` | `m.sex` | `pgm_sesso` |
+| `version` | `m.version` | `pgm_version` |
+| `attivo`, `cancellato`, `straniero` | `m.isActive`, `isDeleted`, `isForeigner` | `pgm_attivo`, `pgm_cancellato`, `pgm_straniero` |
+| `consulente_id` | `m.consultantId` | `pgm_consulente_id` |
+| `codice_referral` | `m.referralCode` | `pgm_codice_referral` |
+| `club_id` | `m.homeClubId` → `d.homeClubId` | `pgm_club_id` |
+| `email_verificata`, `telefono_verificato` | i due `…VerificationStatus` | omonime |
+| `saldo`, `saldo_negativo_da` | `m.memberBalance.*` | `pgm_saldo`, `pgm_saldo_negativo_da` |
+| `figli` | `m.familyChildren.length` | `pgm_figli` |
+| `genitore_member_id` | `m.familyParents[0].id` | `pgm_genitore_member_id` (+ `genitore_id` risolto) |
+| `consensi` | `MemberAgreementAnswers` → `{"1": true}` | `pgm_consensi` |
+| `ultima_visita` | `MemberClubVisits[0].enterDate` | `pgm_ultima_visita` |
+| `grezzo` | webhook + scheda + visita | va nel log e in `pgm_payload` |
+
+Quattro regole che il Code node non deve rompere.
+
+**Un campo assente non è un campo svuotato.** Non mandare una chiave lascia la
+colonna com'era — `pgm_consensi` compresa: prima l'unione `|| coalesce(v_consensi,
+'{}')` scriveva un oggetto vuoto anche quando non arrivava nessun consenso, che
+su 38.586 righe vuol dire dichiarare «nessun consenso» dove il dato non è mai
+stato chiesto. Ora la colonna si tocca solo se qualcosa arriva. Quindi un webhook parziale non fa danni — ma **per svuotare un
+campo non basta ometterlo**: dal sync non si cancella, ed è deliberato.
+
+**`stato` si può omettere.** Se manca, la funzione lo deriva da `member_type` +
+`stato_abbonamento` per rispettare `utenti_pgm_stato_check` (`lead | guest |
+member | ex-member`). Non è più un'ipotesi: il riallineamento l'ha esercitata su
+tutta l'anagrafica, e `Member` + contratto `Ended` → `ex-member` sono **6 942
+righe**. Va corretta il giorno che si vede un contratto con uno stato fuori
+dall'elenco — e due ce ne sono già, `Terminato` su due righe, che è il valore
+italiano dell'import CSV sopravvissuto perché quei due non hanno un contratto
+principale e `coalesce` non cancella.
+
+**`tocchi`, `primo_contatto`, `ultimo_contatto`, `prima_fonte` e `ultima_fonte`
+non si toccano**, e la funzione non le nomina affatto — verificato su
+`pg_get_functiondef`. Contano quante volte una *persona* ha lasciato un dato al
+sito; un'anagrafica modificata dal desk non è la persona.
+
+**`version` è la guardia sull'ordine.** Misurato: quattro webhook nello stesso
+secondo. Un aggiornamento con `version` minore di quella già in riga viene
+saltato e registrato come `saltato-versione-vecchia`.
+
+## I duplicati: quattro webhook per una modifica
+
+Misurato: alle 16:50:36 sono arrivate **quattro chiamate per lo stesso member in
+240 ms, tutte con la stessa `version`**. Non era una modifica ripetuta quattro
+volte — era una modifica notificata quattro volte.
+
+L'anagrafica era giusta (una riga sola), ma il registro pesava quattro volte
+tanto: ogni riga conserva il grezzo, cioè la scheda intera, quindi la stessa
+persona finiva scritta quattro volte per una modifica. A regime sono centinaia di
+copie al giorno di dati personali che non servono a nessuno.
+
+**La `version` uguale è il segnale che non c'è niente di nuovo.** Se il gestionale
+dice «questa scheda è alla versione X» e X è quella che abbiamo già, l'update
+riscriverebbe gli stessi valori. Quindi si salta, e si registra una riga leggera
+con esito `duplicato` e **senza grezzo**: il conteggio resta — sapere che ne
+arrivano quattro è diagnostico, e il giorno che diventassero otto si vede — il
+peso no.
+
+**Con un'eccezione, e non è un dettaglio.** `Members.version` non cambia quando
+qualcuno entra in palestra: l'ultima visita viene da `MemberClubVisits`, un'altra
+entità. Quindi a parità di version quel campo **può essere più fresco**, ed è il
+solo che si aggiorna anche su un duplicato — e solo in avanti. Senza questa
+eccezione la deduplica avrebbe fatto perdere gli accessi al club, cioè
+esattamente il dato per cui il sync esiste.
+
+## `enterDate`, e come si è trovato
+
+`MemberClubVisits` ha questa forma — letta dal `grezzo` di un'esecuzione vera,
+non dalla documentazione:
+
+```json
+{"id":1008055,"clubId":1,"version":67294516,"memberId":4782,"isDeleted":false,
+ "readerName":"NUOTO","enterDate":"2026-05-27T14:16:19+02:00",
+ "leaveDate":"2026-05-28T02:31:19+02:00"}
+```
+
+Il campo è **`enterDate`**. La prima stesura del Code node provava sette nomi
+plausibili — fra cui `entranceDate`, sbagliato di due lettere — e quindi la
+colonna restava vuota **senza dare errore**, che è il modo peggiore di sbagliare:
+un sync che scrive tutto tranne un campo sembra un sync che funziona.
+
+Il nome vero si è letto da `pgm_sync_log.payload->'visita'`, che sta lì
+esattamente per questo. È il motivo per cui il grezzo si conserva:
+
+```sql
+select payload->'visita' from pgm_sync_log
+ where payload->'visita' <> '{}'::jsonb
+ order by ricevuto_il desc limit 5;
+```
+
+Quando il nome giusto si è saputo, il dato già ricevuto **non si è aspettato dal
+prossimo webhook**: si è recuperato dal log, che è la seconda ragione per cui il
+grezzo esiste.
+
+```sql
+update public.utenti u
+   set pgm_ultima_visita = public.pgm_a_timestamp(l.payload->'visita'->>'enterDate')
+  from public.pgm_sync_log l
+ where l.utente_id = u.id
+   and l.payload->'visita'->>'enterDate' is not null
+   and u.pgm_ultima_visita is null;
+```
+
+`leaveDate` e `readerName` (il tornello: `NUOTO`, …) arrivano nella stessa
+risposta e oggi non hanno una colonna. Restano nel grezzo: il giorno che servono
+si promuovono da lì, senza chiedere niente a PerfectGym.
+
+## Come si verifica
+
+```sql
+select * from pgm_sync_esiti;   -- quante chiamate per esito, con l'ultima
+select * from pgm_freschezza;   -- quanta anagrafica il sync ha toccato
+```
+
+Gli esiti possibili: `creato`, `aggiornato`, `duplicato`, `saltato-versione-vecchia`, `aggiornato-email-in-conflitto`, `scartato-senza-chiave`, `errore`.
+
+`pgm_sync_esiti` è il primo posto da guardare. `scartato-senza-chiave` che cresce
+= il mapping ha perso una chiave; `errore` che cresce = il `motivo_scarto` porta
+il messaggio di Postgres.
+
+E un limite per costruzione: **«User Modified» non arriva per chi nessuno
+modifica.** Il sync tiene fresco chi si muove, non tutti; `pgm_freschezza`
+misura quanti restano fermi all'import. Chi resta fermo lo prende il
+riallineamento, qui sotto — e lo prende **a comando, non da sé**: fra i due
+manca ancora un giro periodico, che oggi non c'è.
+
+## Il riallineamento: la stessa funzione, 38.586 volte
+
+Il workflow **`ATHLON: Riallineamento PerfectGym > Supabase`**
+(`oroCIjAILImYap7E`, trigger manuale, **non attivo**) legge tutte le schede
+dell'OData e le manda alla stessa `pgm_aggiorna_utente`, passando da
+`pgm_aggiorna_utenti(jsonb)` — un array, una richiesta. Si preme una volta e si
+lascia andare; la migrazione è `20260827d_pgm_sync_riallineamento.sql`, dove sta
+il perché di ogni scelta.
+
+```
+Da qui si parte ─ Cursore iniziale ─ GET Pagina Membri ─ Prepara Righe ─┬─ Supabase riallinea
+                                            ▲                          └─ Respira ─ Ancora una pagina? ─ Finito
+                                            └──────────────────────────────────── (sì)
+```
+
+**Non è un secondo mapping, ed è la riga da non rompere.** `Prepara Righe`
+scrive le stesse chiavi di `Prepara Supabase`: due funzioni che scrivono la
+stessa tabella divergono, e la seconda divergenza non la vede nessuno finché una
+colonna non resta vuota su una sola delle due strade. In particolare
+`stato_abbonamento` si sceglie **con la stessa regola** di `GET CONTRACTS` —
+`isAdditionalContract eq false`, il più recente per `signUpDate` — solo che qui
+la lista arriva dentro la scheda invece che da una chiamata sua.
+
+Quattro numeri sono misurati e non scelti.
+
+- **`$top` si ferma a 100.** Con 500 l'OData risponde `400` e lo dice per
+  esteso: *The limit of '100' for Top query has been exceeded*. Quindi 386
+  pagine, e il `PAGINA = 100` nel Code node **deve restare uguale a quello
+  nell'URL**: è lui che decide se la pagina era piena, cioè se c'è ancora da
+  leggere.
+- **Le finestre sono di id, non di `$skip`.** `id gt <cursore>` con
+  `$orderby=id`, e il cursore è il massimo id della pagina appena letta. Con
+  `$skip` una scheda creata durante la corsa sposta le pagine successive; così
+  no, e ripartire da metà è mettere un numero in `DA`.
+- **`$select` dentro `$expand` dimezza la pagina**: 17,6 kB invece di 40,6 sugli
+  stessi venti membri, perché `familyParents` e `familyChildren` senza `$select`
+  restituiscono la scheda intera di ogni parente. Conta perché l'esecuzione è
+  **una sola** e tiene in memoria tutte le pagine: 34 MB invece di 80.
+- **Le esecuzioni riuscite non salvano i dati** (`saveDataSuccessExecution:
+  none`), o 386 pagine finirebbero nel database di n8n. Quelle in errore sì: se
+  si ferma, si guarda lì.
+
+**Non manda `ultima_visita` né `consensi`**, e non è una dimenticanza: stanno su
+`MemberClubVisits` e `MemberAgreementAnswers`, una chiamata per persona a testa,
+cioè 77 mila richieste. Quelli li tiene in pari il webhook, e la regola
+«un campo che non si manda non cancella quello che c'è» fa il resto.
+
+**E non manda il grezzo.** Su 38.586 schede finirebbe due volte — nel registro e
+in `utenti.pgm_payload` — cioè una copia dell'anagrafica per ogni copia. La
+chiave `origine` dice quale strada ha chiamato, e fuori dal webhook il grezzo
+non si conserva: resta la riga con l'esito, che è il dato diagnostico.
+
+**Si può rieseguire, e la `version` è il freno.** Chi è già in pari esce come
+`duplicato` senza riscrivere niente: la seconda passata costa le chiamate e non
+le scritture. È la proprietà che permette di rifarlo quando l'anagrafica cresce,
+senza pensarci.
+
+### Com'è andata, e cosa dicono i numeri
+
+Due passate: la prima con il difetto dell'identità, la seconda dopo averlo
+chiuso.
+
+| | prima passata | riesecuzione |
+| --- | --- | --- |
+| durata | 12′47″ | 15′37″ |
+| `aggiornato` | 29 552 | — |
+| `creato` | 8 197 | 1 172 |
+| `duplicato` | 131 | 37 414 |
+| `saltato-versione-vecchia` | 761 | **0** |
+| `aggiornato-email-in-conflitto` | 69 | 0 |
+
+I due totali fanno **38 586** membri distinti ciascuno, che è esattamente
+l'`@odata.count` di PerfectGym. E la seconda colonna è il riallineamento che
+fotografa se stesso: chi era già in pari costa una chiamata e nessuna scrittura.
+
+Lo stato finale di `utenti`:
+
+| | |
+| --- | --- |
+| righe | 38 611 |
+| con `pgm_member_id` | 38 586, e **38 586 distinti**: una riga per persona, nessun doppione |
+| con `pgm_version` | 38 586 |
+| senza `pgm_member_id` | 25 — contatti del sito che PerfectGym non ha |
+| legami di nucleo | 8 132, di cui 8 089 risolti in un uuid |
+| con stato abbonamento | 9 261 |
+| con `tocchi` > 0 | 300, e sono le persone che hanno scritto **al sito** |
+
+Quell'ultima riga è la verifica che conta più delle altre: 300 su 38 611. Il
+sync ha riscritto tutta l'anagrafica senza spostare di un'unità il conteggio di
+chi ci ha lasciato un dato — che è la differenza fra un'anagrafica e un imbuto.
+
+Per verificare:
+
+```sql
+select origine, esito, count(*) from pgm_sync_log group by 1, 2 order by 1, 3 desc;
+```
+
+## Sulle bozze n8n
+
+`update_workflow` **non pubblica**: crea una versione e la lascia lì. Le
+esecuzioni manuali girano la bozza, il webhook di produzione la versione attiva —
+quindi si può provare un nodo, vederlo scrivere, ed essere convinti che sia vivo
+mentre non lo è. Dopo ogni modifica va chiamato `publish_workflow`, e il
+controllo è `versionId == activeVersionId` in `get_workflow_details`.
+
+E prima di pubblicare va confrontata `activeVersion.nodes` con `nodes`: le
+versioni sono istantanee, non diff, quindi pubblicare la propria modifica
+pubblica anche le bozze di chi è passato prima.

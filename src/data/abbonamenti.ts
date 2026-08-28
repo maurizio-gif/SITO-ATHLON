@@ -191,15 +191,40 @@ export const SOSPENSIONE = {
   /** I corsi che non la hanno, per nome: sono la domanda che arriva. */
   nonValePer: ['Scuola Nuoto Bambini', 'Nuoto Agonistico', 'Pallanuoto'],
   /**
-   * L'altra sospensione, che non è la stessa cosa e viene confusa sempre:
-   * gratuita, per inidoneità documentata di almeno sessanta giorni. Quella
-   * **c'è anche** per i corsi che non hanno quella a pagamento, ed è alternativa
-   * al recupero delle lezioni. Senza questa riga la risposta giusta diventa un
-   * «no» che è falso per metà.
+   * La sospensione per inabilità **degli adulti e del Baby Nuoto**: gratuita,
+   * per inidoneità documentata di almeno sessanta giorni continuativi, e con il
+   * recupero che parte da due mesi (sotto i due mesi non si recupera nulla).
+   * Sta nella stessa scheda di quella a pagamento, perché la scheda le mette a
+   * confronto in una tabella — che è il modo in cui si smette di confonderle.
    */
   inabilita: {
     giorni: 60,
-    scheda: '/wikiathlon/snb/preiscrizioni-nuoto/',
+    recuperoMesiMinimo: 2,
+    scheda: '/wikiathlon/adulti/sospensione/',
+  },
+  /**
+   * E il regime dei corsi in vasca dei bambini, che è **un'altra cosa** e non
+   * una variante: Scuola Nuoto Bambini, Nuoto Agonistico e Pallanuoto non hanno
+   * la sospensione a pagamento, e quella per inidoneità funziona in modo
+   * diverso — durante la sospensione la quota mensile **resta dovuta**, il
+   * ristoro è un credito di almeno due mensilità pagate da usare entro sei mesi
+   * dalla fine del corso, e la sospensione è alternativa al recupero delle
+   * lezioni, non cumulabile con esso (punti 4.7, 4.10 e 6.7).
+   *
+   * Questo blocco nasce da una risposta sbagliata del 28/08: a un Premium
+   * Mensile Flex — un adulto — l'assistente ha dato i quindici euro giusti e poi
+   * il credito di «almeno 2 mensilità utilizzabile entro 6 mesi dalla fine del
+   * corso», che è la regola della scuola nuoto. I due regimi vivevano in due
+   * schede diverse senza che nessuna delle due dichiarasse il proprio perimetro,
+   * e il modello li ha impastati. Ora il perimetro è un dato, e il `kb.json` ne
+   * fa due voci separate che si nominano a vicenda.
+   */
+  junior: {
+    giorni: 60,
+    creditoMensilita: 2,
+    creditoEntroMesi: 6,
+    scheda: '/wikiathlon/snb/sospensione/',
+    valePer: ['Scuola Nuoto Bambini', 'Nuoto Agonistico', 'Pallanuoto'],
   },
 } as const;
 
@@ -217,6 +242,22 @@ export const GUEST_PASS = {
 } as const;
 
 /**
+ * Cosa si prova con il Guest Pass, e perché è una lista **derivata**.
+ *
+ * Il Pass è un Premium di sette giorni: il suo perimetro non è una lista sua, è
+ * quella del Premium. Riscriverla qui vorrebbe dire poterla cambiare in un
+ * posto solo dei due, e scoprirlo dal giorno in cui l'assistente promette
+ * un'attività che il Pass non apre — che è esattamente l'errore già capitato
+ * col Baby Nuoto, in piccolo e in una sola conversazione.
+ *
+ * La legge chi lo propone: `/prova`, la voce «Guest Pass» della knowledge base
+ * e, da lì, l'assistente in chat, che ha l'obbligo di elencarle tutte quando lo
+ * propone. Un'attività aggiunta al Premium entra in tutti e tre da sola.
+ */
+export const ATTIVITA_GUEST_PASS: readonly string[] =
+  plans.find((p) => p.id === 'premium')?.activities ?? [];
+
+/**
  * Gli accessi singoli, e il perché stanno qui e non nella pagina.
  *
  * Erano scritti a mano dentro `abbonamenti.astro`, e per questo la KB
@@ -229,6 +270,28 @@ export const GUEST_PASS = {
  * prepagati. Si prenota e si paga una lezione alla volta — che è la cosa che
  * serve sapere, e che va detta al posto di un «no».
  */
+/**
+ * La quota di attivazione contrattuale (clausola 3.1): una tantum, e si paga
+ * per **ogni** abbonamento attivato — il secondo abbonamento di una famiglia
+ * la paga come il primo. Comprende il badge di accesso e l'attivazione
+ * dell'account, e si versa di nuovo se si disdice e più avanti si torna.
+ *
+ * Viveva scritta a mano in `abbonamenti.astro` e in `preiscrizioni-nuoto.md`,
+ * quindi la pagina la diceva e il `kb.json` no: a «quanto è la quota che si
+ * paga al momento dell'iscrizione?» l'assistente ha risposto — correttamente,
+ * per la regola 2 — che il dato non era nella sua documentazione. Un numero
+ * che una pagina stampa e i dati non hanno è un numero che l'assistente non
+ * può dire.
+ *
+ * Non si applica alla lezione singola, che è il modo di entrare senza
+ * abbonarsi: là c'è il solo badge di `SINGOLI.badge`.
+ */
+export const ATTIVAZIONE = {
+  /** Euro, una tantum, per ogni abbonamento attivato. */
+  quota: '50',
+  comprende: "il badge di accesso e l'attivazione dell'account",
+} as const;
+
 export const SINGOLI = {
   /** Il badge, una tantum: si paga la prima volta e poi mai più. */
   badge: '5',

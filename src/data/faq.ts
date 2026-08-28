@@ -121,7 +121,7 @@ export const REGISTRO: VoceRegistro[] = [
   {
     id: 'prenotazioni-attive',
     q: 'Quante prenotazioni attive posso avere insieme?',
-    a: `Massimo <strong>${PRENOTAZIONE.attiveCorsi}</strong> per Corsi Fitness, Aqua Fitness e Scuola Nuoto Adulti; <strong>${PRENOTAZIONE.attiveReformer}</strong> per il Group Reformer, che si prenota una lezione per volta.`,
+    a: `Massimo <strong>${PRENOTAZIONE.attiveCorsi}</strong> per Corsi Fitness, Aqua Fitness e Scuola Nuoto Adulti; <strong>${PRENOTAZIONE.attiveReformer}</strong> per il Group Reformer, che si prenota una lezione per volta. Contano solo le prenotazioni ancora da svolgere: quando la lezione è passata lo slot si libera e prenoti la successiva, senza disdire niente.`,
   },
   {
     id: 'sospensione',

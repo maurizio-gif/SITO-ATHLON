@@ -33,9 +33,18 @@ import { urlPiccola } from '../data/foto';
 
 const voci = await getCollection('promo', ({ data }) => !data.draft);
 const promo = voci[0]?.data;
-// Rumoroso di proposito: senza il documento la pagina non ha niente da dire, e
-// una landing vuota in produzione è peggio di un errore in fase di build.
-if (!promo) throw new Error('Nessun documento in src/content/promo: la pagina /promo non ha contenuti.');
+
+/* Quando la promozione finisce si mette `draft: true` sul suo documento, e da
+   quel momento questa pagina non ha niente da dire. Prima qui c'era un
+   `throw`, con la buona intenzione di non pubblicare una landing vuota: il
+   guaio è che spegnere la promo faceva **fallire il build**, cioè la cosa che
+   si fa alla scadenza era la cosa che rompeva il sito.
+   Quindi la pagina si toglie di mezzo da sé: chi arriva su un indirizzo che è
+   girato in una campagna, in una email o in un QR non trova un errore né una
+   pagina vuota, trova il listino — che è la cosa che stava cercando. In build
+   statico Astro emette una pagina di reindirizzamento, come per le tre regole
+   di `redirects` in `astro.config.mjs`. */
+if (!promo) return Astro.redirect('/abbonamenti', 301);
 
 /* I due piani con le sole formule annuali: la promo vale su quelle, e mostrare
    anche la mensile qui vorrebbe dire mettere in vetrina l'unica che lo sconto

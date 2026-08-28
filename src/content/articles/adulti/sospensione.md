@@ -27,6 +27,8 @@ attivita:
 
 Valido per abbonamenti **Adulti** acquistati dal 1 Settembre 2021 e abbonamenti **Baby Nuoto**.
 
+> ⚠️ **Non vale per i corsi in vasca dei bambini.** Scuola Nuoto Bambini, Nuoto Agonistico e Pallanuoto non hanno la sospensione a pagamento, e per loro anche quella per inidoneità funziona in modo diverso — la quota del mese resta dovuta e il ristoro è un credito: sta in [Fermarsi durante la stagione](/wikiathlon/snb/sospensione/). Il Baby Nuoto invece segue questa scheda, come gli adulti.
+
 ## Le due sospensioni non sono la stessa cosa
 
 Vengono confuse spesso, e hanno regole diverse. Trova la tua prima di procedere.
