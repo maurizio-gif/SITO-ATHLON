@@ -2253,6 +2253,17 @@ dell'agonistico e della pallanuoto, che non è un invito ma il modo in cui si
 entra in quei due corsi — sta nel campo `prova` delle loro schede in
 `data/junior.ts`, ed è informazione sull'iscrizione.
 
+**L'ultimo comando apre la chat, e la apre davvero.** Porta a
+`/club-life/?athlon-chat=1`: quel parametro esiste in `ChatModal.astro` proprio
+per i link che arrivano da fuori, e apre l'assistente al caricamento, telefono
+compreso. Un pulsante che dice «Chatta con noi» e atterra su una sezione da cui
+la chat va ancora cercata è un pulsante che mente. La pagina sotto è l'Help
+Desk, quindi con JavaScript spento si atterra comunque dove stanno le risposte
+scritte — il verso giusto in cui sbagliare.
+
+E non promette che risponda una persona: dice cosa fa l'assistente. Le altre tre
+varianti tengono il loro comando verso l'Help Desk e non cambiano.
+
 I contenuti non sono inventati: le fasce d'età e i claim vengono da
 `data/junior.ts`, il turno fisso della Scuola Nuoto e la prenotazione lezione
 per lezione del Baby Nuoto dalle regole scritte più su, la prova di inserimento
