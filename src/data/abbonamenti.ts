@@ -217,6 +217,22 @@ export const GUEST_PASS = {
 } as const;
 
 /**
+ * Cosa si prova con il Guest Pass, e perché è una lista **derivata**.
+ *
+ * Il Pass è un Premium di sette giorni: il suo perimetro non è una lista sua, è
+ * quella del Premium. Riscriverla qui vorrebbe dire poterla cambiare in un
+ * posto solo dei due, e scoprirlo dal giorno in cui l'assistente promette
+ * un'attività che il Pass non apre — che è esattamente l'errore già capitato
+ * col Baby Nuoto, in piccolo e in una sola conversazione.
+ *
+ * La legge chi lo propone: `/prova`, la voce «Guest Pass» della knowledge base
+ * e, da lì, l'assistente in chat, che ha l'obbligo di elencarle tutte quando lo
+ * propone. Un'attività aggiunta al Premium entra in tutti e tre da sola.
+ */
+export const ATTIVITA_GUEST_PASS: readonly string[] =
+  plans.find((p) => p.id === 'premium')?.activities ?? [];
+
+/**
  * Gli accessi singoli, e il perché stanno qui e non nella pagina.
  *
  * Erano scritti a mano dentro `abbonamenti.astro`, e per questo la KB

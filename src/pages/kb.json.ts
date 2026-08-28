@@ -47,6 +47,7 @@ import {
   SINGOLI,
   PERSONAL,
   ETA_MINIMA_ADULTI,
+  ATTIVITA_GUEST_PASS,
 } from '../data/abbonamenti';
 import { ACTIVITY_TAGS, ACTIVITY_IDS } from '../data/activities';
 import { AREA_LABELS } from '../data/helpdesk';
@@ -614,7 +615,9 @@ export const GET: APIRoute = async () => {
        prova è quella lezione, non il Guest Pass; per chi non la vende — come
        la Scuola Nuoto Bambini — non esiste una prova separata dall'adesione
        mensile, che si disdice di mese in mese. */
-    testo: `${GUEST_PASS.giorni} giorni di accesso completo al club a ${GUEST_PASS.prezzo} €, con il codice ${GUEST_PASS.codice}. È riservato a chi non ha e non ha mai avuto un abbonamento Athlon dal ${GUEST_PASS.dal} in poi. Vale solo per le attività degli adulti (il listino Premium): non comprende i corsi per bambini né il personal training. Per un corso per bambini che vende anche la lezione singola, come il Baby Nuoto, la prova è prenotare e pagare quella lezione — non il Guest Pass.`,
+    testo: `${GUEST_PASS.giorni} giorni di accesso completo al club a ${GUEST_PASS.prezzo} €, con il codice ${GUEST_PASS.codice}. È riservato a chi non ha e non ha mai avuto un abbonamento Athlon dal ${GUEST_PASS.dal} in poi. Vale solo per le attività degli adulti (il listino Premium): non comprende i corsi per bambini né il personal training. Per un corso per bambini che vende anche la lezione singola, come il Baby Nuoto, la prova è prenotare e pagare quella lezione — non il Guest Pass.
+Le attività comprese sono queste, e sono tutte: ${ATTIVITA_GUEST_PASS.join(', ')}.
+Quando proponi il Pass, dì che è la settimana Premium delle attività degli adulti ed **elenca tutte** le attività qui sopra, con questi nomi: chi legge deve sapere cosa sta comprando senza aprire un'altra pagina, e un elenco a metà si legge come un elenco completo.`,
   });
 
   for (const [nome, info] of Object.entries(activityInfo)) {
