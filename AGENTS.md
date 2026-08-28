@@ -2089,6 +2089,34 @@ Il filtro della sitemap la esclude con `endsWith('/tour/')` e non con
 slug finisce per quella parola, e una pagina che sparisce dalla sitemap senza
 che nessuno l'abbia chiesto è il tipo di guasto che non si nota.
 
+**L'attività si chiede prima dei dati, ed è lei a decidere quali dati servono.**
+Un'attività junior vuole il bambino *e* il genitore, perché da lì n8n crea il
+**nucleo familiare** su PerfectGym: `flow: 'junior'` porta `stradaPgm` a
+`nucleo`, cioè `PGM Crea Genitore` seguito da `PGM Crea Figlio`. Un'attività
+adulti vuole solo la persona che ha davanti, e il suo lead si crea con nome,
+cognome, email e telefono. Chiedendo i dati per primi si finiva per chiederli
+sempre uguali e poi per non avere quelli che servivano: prima di questa riga il
+form mandava `flow: 'adulti'` scritto a mano, quindi il tour di un bambino
+creava un lead a nome del genitore e il figlio non esisteva.
+
+Tre cose che questo ramo porta con sé:
+
+- **le date di nascita non sono un di più.** Quella del bambino decide il
+  corso, quella del genitore la vuole `personalData.birthDate` della chiamata
+  che crea l'anagrafica. Senza, il nucleo non nasce — e non nasce **in
+  silenzio**, perché quei nodi hanno `continueRegularOutput`;
+- **il cellulare smette di essere facoltativo.** Resta tale per l'adulto,
+  perché `PGM Crea Lead` si accontenta; per il nucleo no, e `phoneNumber`
+  viaggia sia nell'anagrafica del genitore sia in quella del figlio;
+- **se sono spuntate tutte e due, vince junior.** È il caso normale al totem —
+  il genitore che porta il figlio in piscina e intanto ha guardato la sala pesi
+  — e il bambino va registrato comunque; le attività adulti restano nell'email
+  e nelle note del tour.
+
+Il ramo lo decide `data-tt-gruppo` sulla casella, che il markup riempie da
+`GRUPPI_ATTIVITA` — cioè da `ACTIVITY_TAGS`. Un elenco di slug scritto nel
+client divergerebbe il giorno che si aggiunge un corso.
+
 **Non è «Contattaci» in una pagina**, e questa è la scelta da cui dipende tutto
 il resto. Le domande sembrano le stesse — email, verifica, attività, anagrafica
 — e non lo sono, perché cambia chi è nella stanza. `ContattaciModal` esiste per
@@ -2209,6 +2237,23 @@ un workflow nuovo — un tour è una richiesta di contatto con una visita già
 fatta, e duplicare quel flusso vorrebbe dire due posti in cui aggiornare le
 regole di PerfectGym.
 
+**E l'email parte solo a chi ha fatto il tour: il desk non riceve niente.**
+Scelta del club, e ha una ragione che si tiene: quella visita non è una
+richiesta da lavorare, è già avvenuta, e la cosa da fare — chiuderla con le
+note e fissare il richiamo — vive in **Agenda**, dove la voce nasce `da_fare` e
+si vede da sola. Un'email che annuncia una cosa già visibile è rumore in una
+casella che ne ha. Il gate sta in `Componi Email Desk` con un `return []`,
+accanto al testo che governa, come in `Componi Email Utente`. Restano la riga
+su `richieste_contatto` e quella su Airtable: sono dati, non notifiche.
+
+**E il WhatsApp ai genitori non parte**, che è la trappola nascosta di tutto
+questo. `Solo Nuovi Junior` si accendeva su `ramo !== 'adulti'`: passando il
+tour di un bambino a `flow: 'junior'` — necessario per il nucleo — quel
+messaggio sarebbe partito a chi era appena stato in sede, e nessuno lo aveva
+chiesto. Il filtro ha una quarta condizione, `tour` falso. **Vale in generale:
+cambiare `flow` accende e spegne cose lontane dal punto in cui lo si cambia** —
+`stradaPgm`, il WhatsApp, la variante dell'email — e vanno guardate tutte.
+
 **Non spiega come iscriversi, ricapitola.** È la differenza con le altre tre
 varianti, e viene dal fatto che chi la riceve ha appena girato il club con un
 operatore: le domande gliele hanno già fatte a voce. Quindi una scheda per ogni
@@ -2283,8 +2328,8 @@ pubblicare, `versionId == activeVersionId`: `update_workflow` non pubblica, e un
 nodo in bozza non scrive niente.
 
 Per verificare: la spazzata del totem (1080×1920) e della televisione
-(1920×1080) su **tutti e tre i passi**, non solo il primo — i due nascosti hanno
-la gran parte dei comandi e delle etichette, e sono quelli in cui si trovano i
+(1920×1080) su **tutti e quattro i passi più la forma junior del passo dati**,
+non solo il primo — i nascosti hanno la gran parte dei comandi e delle etichette, e sono quelli in cui si trovano i
 guai. L'ultima passata: nessun overflow, niente sotto i 19px, nessun comando
 sotto i 48px, nessun paragrafo sotto i 30 caratteri per riga. Poi il percorso
 intero con le due chiamate intercettate: dalla verifica devono arrivare i tre
