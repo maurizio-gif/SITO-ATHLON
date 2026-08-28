@@ -2025,6 +2025,43 @@ aiuto scrivi al team dall'icona in alto, che vede la tua situazione*. È la rego
 11 applicata **prima** che la cosa diventi un reclamo, e la ragione è che una
 spiegazione in più non risolve il caso di quella persona: lo allunga.
 
+### L'upgrade non si preventiva in chat, si chiede dal modulo
+
+«Quanto costa se aggiungo i corsi al mio abbonamento?» → tre domande
+(quale piano hai, mensile o annuale, da quando) e poi *«la nuova quota è
+119 €/mese»*. Quella cifra l'assistente non la può sapere: un cambio
+abbonamento si conteggia sul contratto vero, col credito residuo di quello in
+corso, e lo fa il desk. Il numero detto in chat diventa un'aspettativa che alla
+cassa non torna — è lo stesso difetto della quota di attivazione «in omaggio»,
+nel verso opposto: **un prezzo dichiarato per una cosa che nessuno ha ancora
+calcolato**.
+
+La scheda `adulti/cambio-abbonamento` diceva già tutto quello che serve, e in una
+riga: si richiede **sempre** dal modulo che sta dentro la scheda, e le istruzioni
+per proseguire arrivano via email dopo la compilazione. Quindi la risposta giusta
+è corta e non è un preventivo: *come si chiede*, con la scheda fra le fonti.
+
+Tre cose, e la seconda è quella che è costata il turno:
+
+- **Niente numeri e niente procedura.** Non la nuova quota, non la differenza,
+  non il credito residuo nominato come se lo sapessimo, non i passaggi e non i
+  tempi. Il prezzo di **listino** di un piano invece si dice — è un dato del
+  sito, con la sua fonte (regola 7bis) — aggiungendo che l'importo del *suo*
+  cambio dipende dal credito residuo e gli arriva via email.
+- **E non si fa l'interrogatorio per fare il conto.** Chiedere quale abbonamento
+  ha, se paga mensilmente, da quando: quei dati al desk arrivano dal modulo, e
+  tre domande prima di una risposta che comunque non si può dare sono tre turni
+  buttati. Una richiesta di dati è una promessa implicita di rispondere con un
+  numero.
+- **Il modulo si nomina come si nominano i rimandi**: «compila il modulo che
+  trovi nel pulsante qui sotto». La chat non disegna link dentro il testo, li
+  disegna `rimandi()` in fondo alla bolla — quindi una frase che dice «al link
+  qui sotto» senza dire *pulsante* fa cercare un link che non c'è.
+
+Vale per ogni forma di upgrade, compreso «voglio il Reformer sul mio
+abbonamento»: aggiungere un'attività *è* un cambio abbonamento, e passa dallo
+stesso modulo.
+
 ## Il form dell'assistenza chiede poco, e il resto lo va a prendere
 
 Il form dell'Help Desk — `components/clublife/SupportForm.astro`, dentro
