@@ -1636,6 +1636,29 @@ ragione per cui il Pass esiste. Il modello diceva «ecco il tuo Guest Pass», la
 card non compariva e su `richieste_prova` non arrivava niente — nessun errore,
 nessuna traccia.
 
+**Aprire il gate non è proporre, e questo si è visto sul traffico vero.**
+Esecuzione `1443490` del 28/08, `passOfferto: true` e la voce nel contesto:
+`attivita: ["adulti"]`, `stato_pgm: "esiste"`, `scambi: 4`, e la domanda era
+«abbonamento annuale solo per pilates reformer» dopo «vorrei sapere la
+differenza dei costi». Il vaglio aveva fatto tutto giusto — e il modello ha
+risposto che il Group Reformer da solo non si vende, che sta nel Premium, e
+«ti va di partire con l'Annuale a rate, 95 €/mese?». **Del Pass, niente.**
+
+Il motivo sta nella regola 8, che diceva «proponilo quando c'entra»: cioè
+lasciava al modello di decidere il momento, e la regola 7 — porta
+all'attivazione — vinceva sempre. Un no seguito da un prezzo più alto è il
+punto esatto in cui una persona chiude la chat.
+
+Adesso la presenza della voce **è** il momento: se c'è, il sito ha già
+verificato le quattro condizioni, quindi proporlo non è facoltativo e va fatto
+in quel turno, una volta. Con i due casi in cui è la risposta giusta e non
+un'aggiunta — *quando la risposta è un no* (quella cosa non si vende da sola,
+sta solo in un piano più grande) e *quando sta pesando il prezzo o l'ampiezza
+del piano* — e con l'unico caso in cui non si propone: **quando ha appena
+detto sì a un piano e a una formula**. Lì siamo al passo (5) della regola 7, e
+mettere sette giorni a 19 € davanti a chi sta entrando a 95 €/mese è l'unico
+modo di sbagliare in eccesso.
+
 Per verificare: `Vaglio Guest Pass` mette in chiaro `passOfferto`,
 `passVoceTolta` e `passPerche` (quale condizione ha fermato l'offerta).
 `passVoceTolta` falso mentre `passOfferto` è falso vuol dire che l'id della voce
