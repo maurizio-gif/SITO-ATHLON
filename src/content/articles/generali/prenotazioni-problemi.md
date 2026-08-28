@@ -101,18 +101,22 @@ Oppure non riesci a prenotare anche se vedi posti liberi.
 
 ### Perché appare
 
-Hai superato il limite di prenotazioni attive. Ogni attività ha un limite di prenotazioni contemporanee:
+Hai raggiunto il numero massimo di prenotazioni **ancora da svolgere**. Ogni attività ha il suo:
 
 | Attività | Prenotazioni attive |
 |:---|:---:|
 | Corsi Fitness, Aqua Fitness, Scuola Nuoto Adulti | max **3** |
 | Group Reformer | max **1** |
 
-Ricorda che una lista d'attesa conta come una prenotazione (causa 4).
+**«Attiva» vuol dire in programma**: una lezione che si è già svolta non occupa più niente. Una lista d'attesa invece sì, conta come una prenotazione (causa 4).
 
 ### Come si risolve
 
-Disdici o completa una delle prenotazioni attive, poi prenota la nuova.
+**Aspetta che la lezione che hai in programma si svolga: appena è finita lo slot si libera e prenoti la successiva.** Col Group Reformer, che ne ammette una per volta, funziona così: la lezione di domani si prenota quando quella di oggi è passata — la finestra resta aperta fino all'inizio, quindi non rischi di arrivare tardi.
+
+**Non disdire una lezione a cui vuoi andare** solo per liberare il limite: perderesti quel posto, e non serve. Disdici — entro 1 ora dall'inizio, così subentra chi è in lista d'attesa — soltanto se a quella lezione hai deciso di non andare.
+
+Se il conto non torna, cioè il messaggio compare e non hai né prenotazioni in programma né liste d'attesa, [scrivi al team](/club-life#help-desk) con uno screenshot: cosa il sistema abbia in memoria da fuori non si vede.
 
 ---
 

@@ -1705,6 +1705,66 @@ Per verificare: `Vaglio Guest Pass` mette in chiaro `passOfferto`,
 è cambiato e il vaglio non aggancia più niente — da fuori si vedrebbe come «il
 Pass si propone sempre», che è il guasto che quel nodo esiste per evitare.
 
+### «Online limit exceeded»: si aspetta che la lezione passi, non si disdice
+
+Il limite di prenotazioni conta **solo le lezioni ancora da svolgere**, quindi si
+libera da sé: quando quella in programma è finita, si prenota la successiva senza
+disdire niente. Col Group Reformer, che ne ammette una per volta, è il caso
+normale — la lezione di domani si prenota quando quella di oggi è passata, e la
+finestra resta aperta fino all'inizio, quindi non si arriva tardi.
+
+L'assistente diceva l'opposto, e per tre volte nella stessa conversazione: «per
+prenotare quella di domani devi prima disdire quella di oggi». A una persona che
+aveva **una sola** prenotazione di Reformer, cioè il caso in cui la risposta
+giusta è «aspetta due ore». Il consiglio le faceva perdere il posto di oggi per
+prendere quello di domani, che è un cambio, non una soluzione.
+
+**Il difetto era nella scheda, non nel modello.** `prenotazioni-problemi.md`
+chiudeva la causa 5 con «Disdici o completa una delle prenotazioni attive»: le
+due strade in fila, con la peggiore per prima e senza dire che «completa»
+significa *non fare niente e aspettare*. Un modello che riassume in cento parole
+tiene la prima. Adesso la scheda apre con l'attesa, dice che «attiva» vuol dire
+**in programma**, e nomina la disdetta solo per chi a quella lezione non ci va.
+La stessa riga sta in `prenotazioni.md` e nella f.a.q. `prenotazioni-attive`,
+perché il limite si legge in tre posti.
+
+E nel `systemMessage` c'è la regola fissa che chiude il caso anche se la scheda
+dovesse tornare ambigua: **mai dire di disdire una lezione a cui vuole andare per
+liberare il limite.**
+
+### Le date non si calcolano, e una lezione di domani è dentro la finestra
+
+Nella stessa conversazione, primo messaggio: «non riesco a prenotare una lezione
+per domani» → «le prenotazioni si aprono 3 giorni prima, quindi da mercoledì 3
+settembre in poi». Domani era sabato 29 agosto: la finestra era **aperta da tre
+giorni**, e la risposta ha mandato la persona a settembre per una lezione
+dell'indomani.
+
+La regola 2ter lo vietava già, in mezzo a un paragrafo che dice anche altre
+quattro cose. Ora è una regola fissa a sé, e in una forma che non richiede
+nessun conto: **oggi, domani e dopodomani sono sempre dentro la finestra**, e
+l'unico caso in cui non è aperta è una lezione a più di 3 giorni. Un conto sulle
+date è un errore che il modello non si accorge di fare — vale la stessa scelta
+della fascia d'età del nuoto bambini, dove il calcolo è vietato invece che
+corretto.
+
+### Una chat di assistenza si chiude, e chi la allunga è l'assistente
+
+Sedici messaggi per una domanda che aveva una risposta di due righe. Dopo il
+consiglio sbagliato, l'assistente ha raccontato l'orario estivo, quante lezioni
+ci saranno a settembre, e — a «ma nel frattempo ho pagato il mese di agosto» —
+che «l'abbonamento di agosto copre quello che c'è disponibile in questo periodo».
+Cioè ha difeso il club su una lamentela, che è esattamente ciò che la regola 11
+vieta.
+
+La regola fissa aggiunta dice quando smettere: **detta la causa e cosa fare, non
+si aggiunge altro** — non il palinsesto del mese, non cosa comprende
+l'abbonamento, non ipotesi di sospensioni o rimborsi. Se insiste, se il problema
+resta, o se la situazione è personale, si chiude con una riga: *se ti serve altro
+aiuto scrivi al team dall'icona in alto, che vede la tua situazione*. È la regola
+11 applicata **prima** che la cosa diventi un reclamo, e la ragione è che una
+spiegazione in più non risolve il caso di quella persona: lo allunga.
+
 ## Il form dell'assistenza chiede poco, e il resto lo va a prendere
 
 Il form dell'Help Desk — `components/clublife/SupportForm.astro`, dentro

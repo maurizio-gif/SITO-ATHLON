@@ -32,6 +32,8 @@ Gym Floor · Corsi Fitness · Aqua Fitness · Scuola Nuoto Adulti · Nuoto Liber
 - **Corsi Fitness, Aqua Fitness, Scuola Nuoto Adulti**: max **3 prenotazioni attive** contemporanee
 - **Group Reformer**: max **1 prenotazione attiva** per volta
 
+> ✅ **«Attiva» vuol dire in programma.** Una lezione già svolta non conta più: quando quella che hai prenotato è finita, lo slot si libera e prenoti la successiva — **senza disdire niente**. Se il limite ti ferma, aspetta che la lezione passi invece di cancellarla.
+
 > ⚠️ **La lista d'attesa occupa uno slot come una prenotazione confermata.** Se sei in lista d'attesa, quello slot è impegnato e non puoi prenotare altro nella stessa fascia: è il motivo più frequente del messaggio "hai troppe prenotazioni".
 
 > 🔒 **Non riesci a prenotare?** Le cause sono un insieme chiuso di sette casi, ognuno col suo messaggio a schermo: [Non riesco a prenotare una lezione](/wikiathlon/generali/prenotazioni-problemi/).
