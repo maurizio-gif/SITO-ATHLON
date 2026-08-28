@@ -1705,6 +1705,43 @@ Per verificare: `Vaglio Guest Pass` mette in chiaro `passOfferto`,
 è cambiato e il vaglio non aggancia più niente — da fuori si vedrebbe come «il
 Pass si propone sempre», che è il guasto che quel nodo esiste per evitare.
 
+### Un numero che la pagina stampa e i dati non hanno è un numero che l'assistente non può dire
+
+«Quanto è la quota che si paga al momento dell'iscrizione?» → *«L'importo della
+quota di attivazione non è scritto nella documentazione che ho a disposizione.»*
+La risposta era **corretta** — è la regola 2, le cifre si citano e non si
+inventano — e il difetto stava a monte: i 50 € vivevano scritti a mano in
+`abbonamenti.astro` e nel markdown della scuola nuoto, cioè in due posti che il
+`kb.json` non legge. La pagina lo diceva, l'assistente no.
+
+Ora la quota sta in `ATTIVAZIONE` (`data/abbonamenti.ts`) e da lì la leggono la
+pagina, la nota del Baby Nuoto e tre voci del `kb.json`: quella di ogni piano —
+perché **un mensile citato da solo è un preventivo incompleto**, ed è il motivo
+per cui la pagina la stampa sotto ogni formula — più una voce sua,
+`abbonamento:quota-attivazione`, per la domanda che arriva senza nominare nessun
+piano. Che è esattamente come è arrivata.
+
+Tre cose da sapere prima di toccarla.
+
+**Si paga per ogni abbonamento attivato**, non per nucleo: il secondo
+abbonamento di una famiglia la paga come il primo. Detta in modo ambiguo, quella
+riga fa arrivare al desk un genitore con due figli convinto di dover pagare 50 €
+in tutto.
+
+**Con la promozione attiva la quota è in omaggio sulle annuali, e le voci lo
+dicono.** Il gate è lo stesso `promoDoc` che governa la pagina — la collezione
+filtrata su `!draft` — quindi si spegne da sé mettendo `draft: true` sul
+documento della promo. Senza quella riga la voce avrebbe detto «50 €» a chi
+stava attivando un'annuale nella settimana esatta in cui non li paga: il verso
+sbagliato in cui sbagliare, perché è un prezzo dichiarato più alto del vero.
+
+**Il numero vive in tre posti, e due non sono evitabili.** `ATTIVAZIONE.quota` è
+la fonte; `quotaBarrata` in `promo.md` e la riga nella tabella di
+`preiscrizioni-nuoto.md` sono contenuti di Tina, che non possono importare
+TypeScript. Il giorno che la quota cambia vanno aggiornati tutti e tre — e la
+verifica è una spazzata sul `dist`: le occorrenze di «quota di attivazione» con
+una cifra devono dire tutte la stessa cifra.
+
 ### La fascia la decide l'anno, e l'anno noto non basta: va confermato
 
 Il 28/08, bambina nata il **2021**-04-23 — l'anno nel contesto, messo lì dal

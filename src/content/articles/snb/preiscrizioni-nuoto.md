@@ -52,6 +52,8 @@ Ogni link porta al portale, già filtrato sui turni di quella fascia che hanno a
 
 > 💡 L'abbonamento è mensile, con rinnovo automatico il giorno 1 di ogni mese (punto 4.11).
 
+**Quota di attivazione contrattuale: €50 una tantum**, per ogni abbonamento attivato — il secondo figlio la paga come il primo. Si somma alla prima quota mensile e comprende il badge di accesso e l'attivazione dell'account. Se si disdice e più avanti si torna, va versata di nuovo (punto 3.1).
+
 **Pro-rata mesi di apertura e chiusura:** per i mesi di Settembre (inizio 14/09) e Giugno (fine 20/06) viene addebitato l'importo proporzionale ai giorni effettivi di frequenza.
 
 |                       | Monosettimanale | Bisettimanale | Agonistico/Pallanuoto |

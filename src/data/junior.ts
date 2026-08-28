@@ -14,6 +14,7 @@
  * 4279, 4283, 4285); niente è aggiunto per riempire.
  */
 import type { RichiestaFaq } from './faq';
+import { ATTIVAZIONE } from './abbonamenti';
 
 const U = '/wp-content/uploads';
 
@@ -214,7 +215,7 @@ export const JUNIOR: CorsoJunior[] = [
         prezzo: '89',
         periodo: 'mese',
         testo: 'Possibilità di prenotare in tutti i turni disponibili, senza limiti.',
-        nota: 'Quota di attivazione contrattuale una tantum 50 €.',
+        nota: `Quota di attivazione contrattuale una tantum ${ATTIVAZIONE.quota} €.`,
         medium: 'PulsanteMensileBabyNuoto',
       },
     ],
