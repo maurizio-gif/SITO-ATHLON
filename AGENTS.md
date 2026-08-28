@@ -2062,7 +2062,7 @@ Vale per ogni forma di upgrade, compreso «voglio il Reformer sul mio
 abbonamento»: aggiungere un'attività *è* un cambio abbonamento, e passa dallo
 stesso modulo.
 
-## `/totem/tour` è il totem all'ingresso, e registra una visita già avvenuta
+## `/tour` è il totem all'ingresso, e registra una visita già avvenuta
 
 Il pannello all'ingresso del club sta aperto su questa pagina. Chi ha appena
 girato la struttura con un operatore lascia lì i suoi dati, e da quel modulo
@@ -2071,18 +2071,23 @@ Chi lo ha accompagnato la ritrova in agenda, ci scrive com'è andata, e da lì
 fissa il richiamo. `noindex` e fuori dalla sitemap come `/attiva` e `/referral`:
 non è una pagina del club, è uno strumento del desk.
 
-**Sta sotto `/totem/` e non è `/tour`**, e la prima ragione è che su questo
-sito «tour» significa già un'altra cosa: il virtual tour di my.mpskin nella
-home, quello con scritto sopra «Clicca play per il virtual tour completo». Chi
-digitasse `athlonroma.it/tour` si aspetterebbe quello. La seconda è che questa
-pagina non la digita nessuno — la apre un dispositivo solo, una volta, e resta
-aperta — quindi non deve essere corta né bella: deve dire di chi è. Il filtro
-della sitemap esclude **la cartella** e non la pagina, così la seconda pagina
-del totem non va ricordata.
+**L'indirizzo è `/tour`, ed è una scelta del club.** Per un po' è stato
+`/totem/tour`, e la ragione era una collisione vera: su questo sito «tour»
+significa anche il virtual tour di my.mpskin nella home, quello col cartello
+«Clicca play per il virtual tour completo». Chi digita `athlonroma.it/tour`
+potrebbe aspettarsi quello e trovare un modulo che presuppone di avere appena
+girato il club con qualcuno.
 
-E vale la regola generale: una pagina che sta su un dispositivo e non in un
-link non prende un indirizzo che qualcuno potrebbe digitare per sbaglio,
-soprattutto se quella parola il sito la usa già in vetrina.
+Il club ha deciso `/tour` lo stesso. **La collisione resta, e va saputa**: se un
+giorno il virtual tour volesse un indirizzo suo, non può essere questo — e chi
+la scoprisse partendo dalla home non deve «correggere» questa pagina credendo a
+uno sbaglio. Non c'è nessun rimando da `/totem/tour`: quell'indirizzo è stato
+vivo meno di un'ora e non esiste più.
+
+Il filtro della sitemap la esclude con `endsWith('/tour/')` e non con
+`includes('/tour')`: la seconda forma prenderebbe anche una pagina futura il cui
+slug finisce per quella parola, e una pagina che sparisce dalla sitemap senza
+che nessuno l'abbia chiesto è il tipo di guasto che non si nota.
 
 **Non è «Contattaci» in una pagina**, e questa è la scelta da cui dipende tutto
 il resto. Le domande sembrano le stesse — email, verifica, attività, anagrafica
@@ -2100,9 +2105,9 @@ stare». Quindi tre passi: email, anagrafica con le attività, conferma.
 e la mette il pannello. È la differenza con `/api/prenotazioni`, che invece
 prende uno slot futuro e controlla che sia libero: passare da lì avrebbe voluto
 dire chiedere all'agenda il permesso di scrivere un fatto. Per questo la rotta è
-`POST /api/tour` (in `APP-ATHLON`), gemella ma non la stessa. La rotta si
-chiama `/api/tour` e non `/api/totem/tour`: là dentro «tour» non è ambiguo — è
-un tipo di `agenda_voci`, accanto a `task` e `appuntamento_telefonico`.
+`POST /api/tour` (in `APP-ATHLON`), gemella ma non la stessa. Nel pannello
+«tour» non è ambiguo: è un tipo di `agenda_voci`, accanto a `task` e
+`appuntamento_telefonico`.
 
 **E nasce `da_fare`, non `eseguito`.** Sembra un controsenso — la cosa è
 avvenuta — ed è il punto: quello che resta da fare non è il tour, è **chiuderlo**.
@@ -2195,6 +2200,87 @@ la persona è qui, l'email l'ha già data, e un campo obbligatorio in più davan
 a chi ha fretta di andarsene è quello su cui il modulo si ferma. Se lo scrive
 passa comunque da `validaTelefono`, perché su un fisso il richiamo su WhatsApp
 non arriva.
+
+### E chi compila riceve il promemoria della visita
+
+L'email la scrive `Componi Email Utente` di `athlon-contatto-compilato`, che da
+tre varianti passa a quattro: `assistenza`, `junior`, `baby` e **`tour`**. Non è
+un workflow nuovo — un tour è una richiesta di contatto con una visita già
+fatta, e duplicare quel flusso vorrebbe dire due posti in cui aggiornare le
+regole di PerfectGym.
+
+**Non spiega come iscriversi, ricapitola.** È la differenza con le altre tre
+varianti, e viene dal fatto che chi la riceve ha appena girato il club con un
+operatore: le domande gliele hanno già fatte a voce. Quindi una scheda per ogni
+**area spuntata al totem**, con le pagine dove ritrovare le cose con calma.
+
+**Le schede sono più d'una quando le aree sono più d'una**, e non si sceglie la
+principale: al totem il caso normale è il genitore che porta il figlio in
+piscina e intanto ha guardato la sala pesi. Sceglierne una vorrebbe dire buttare
+metà di quello che ha chiesto.
+
+**Nessun prezzo, mai, e non è prudenza: è manutenzione.** Una cifra dentro un
+template è una cifra che il giorno del ritocco al listino resta indietro in un
+posto che nessuno rilegge — e un prezzo sbagliato in un'email è un prezzo che la
+persona ha in mano quando arriva alla cassa. I costi vivono in
+`data/abbonamenti.ts` e li stampa il sito: l'email manda alla pagina che li
+porta. Vale anche per i giorni del Guest Pass, che infatti non sono scritti.
+
+Quattro cose da sapere prima di toccarla.
+
+**L'area si riconosce dallo slug, non dall'etichetta.** `Normalizza e Componi
+Email` ora emette anche `attivitaSlug` — gli id grezzi di `activities.ts` —
+accanto alle etichette in italiano che il desk legge. Confrontare stringhe in
+italiano vorrebbe dire rompere l'email rinominando una voce, senza che nessuno
+se ne accorga.
+
+**E la mappa slug → pagina non è l'identità.** `group-reformer` sta a
+`/reformer`: quella pagina è anteriore ad `ACTIVITY_TAGS` e ha tenuto il suo
+indirizzo. Comporre l'url dallo slug darebbe un link morto — e un'email con un
+link morto non fallisce, arriva.
+
+**Il tour vince sulle altre due domande.** `assistenza` e `ramo` dicono *che
+tipo di richiesta* è, il tour dice *da quale modulo arriva*: un socio che
+accompagna un amico è tutti e due, e quello che deve ricevere è il promemoria
+della visita. Per questo il ramo si legge da `tipoRichiestaVista` — cioè da
+quello che il browser ha dichiarato — e non da `statoNucleo`.
+
+**E non si propone niente: si ricapitola.** Nessun Guest Pass, nessun invito a
+provare. La prima stesura aveva una scheda «C'è il Guest Pass», ed era fuori
+posto per una ragione che vale in generale: questa persona **è appena stata in
+sede**, accompagnata da qualcuno. Invitarla a venire a provare è rispondere a una
+domanda che non ha fatto, e la fa sentire un indirizzo in una lista invece che
+qualcuno che il club ha appena conosciuto. Quello che serve è il riepilogo di
+corsi, abbonamenti e attività di cui si è parlato, e dove ritrovarli.
+
+L'unica «prova» che resta nel testo è la **prova di inserimento obbligatoria**
+dell'agonistico e della pallanuoto, che non è un invito ma il modo in cui si
+entra in quei due corsi — sta nel campo `prova` delle loro schede in
+`data/junior.ts`, ed è informazione sull'iscrizione.
+
+**L'ultimo comando apre la chat, e la apre davvero.** Porta a
+`/club-life/?athlon-chat=1`: quel parametro esiste in `ChatModal.astro` proprio
+per i link che arrivano da fuori, e apre l'assistente al caricamento, telefono
+compreso. Un pulsante che dice «Chatta con noi» e atterra su una sezione da cui
+la chat va ancora cercata è un pulsante che mente. La pagina sotto è l'Help
+Desk, quindi con JavaScript spento si atterra comunque dove stanno le risposte
+scritte — il verso giusto in cui sbagliare.
+
+E non promette che risponda una persona: dice cosa fa l'assistente. Le altre tre
+varianti tengono il loro comando verso l'Help Desk e non cambiano.
+
+I contenuti non sono inventati: le fasce d'età e i claim vengono da
+`data/junior.ts`, il turno fisso della Scuola Nuoto e la prenotazione lezione
+per lezione del Baby Nuoto dalle regole scritte più su, la prova di inserimento
+obbligatoria dell'agonistico e della pallanuoto dal campo `prova` delle loro
+schede. Un dato inventato in un'email è peggio di un dato assente, perché la
+persona lo porta al desk.
+
+Per verificare: i due nodi Code si eseguono fuori da n8n con un payload finto —
+è così che sono stati provati, su sette casi — e ogni link va confrontato con il
+`dist`, perché una pagina rinominata qui non fa fallire niente. E prima di
+pubblicare, `versionId == activeVersionId`: `update_workflow` non pubblica, e un
+nodo in bozza non scrive niente.
 
 Per verificare: la spazzata del totem (1080×1920) e della televisione
 (1920×1080) su **tutti e tre i passi**, non solo il primo — i due nascosti hanno
