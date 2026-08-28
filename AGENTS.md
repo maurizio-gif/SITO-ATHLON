@@ -2196,6 +2196,68 @@ a chi ha fretta di andarsene è quello su cui il modulo si ferma. Se lo scrive
 passa comunque da `validaTelefono`, perché su un fisso il richiamo su WhatsApp
 non arriva.
 
+### E chi compila riceve il promemoria della visita
+
+L'email la scrive `Componi Email Utente` di `athlon-contatto-compilato`, che da
+tre varianti passa a quattro: `assistenza`, `junior`, `baby` e **`tour`**. Non è
+un workflow nuovo — un tour è una richiesta di contatto con una visita già
+fatta, e duplicare quel flusso vorrebbe dire due posti in cui aggiornare le
+regole di PerfectGym.
+
+**Non spiega come iscriversi, ricapitola.** È la differenza con le altre tre
+varianti, e viene dal fatto che chi la riceve ha appena girato il club con un
+operatore: le domande gliele hanno già fatte a voce. Quindi una scheda per ogni
+**area spuntata al totem**, con le pagine dove ritrovare le cose con calma.
+
+**Le schede sono più d'una quando le aree sono più d'una**, e non si sceglie la
+principale: al totem il caso normale è il genitore che porta il figlio in
+piscina e intanto ha guardato la sala pesi. Sceglierne una vorrebbe dire buttare
+metà di quello che ha chiesto.
+
+**Nessun prezzo, mai, e non è prudenza: è manutenzione.** Una cifra dentro un
+template è una cifra che il giorno del ritocco al listino resta indietro in un
+posto che nessuno rilegge — e un prezzo sbagliato in un'email è un prezzo che la
+persona ha in mano quando arriva alla cassa. I costi vivono in
+`data/abbonamenti.ts` e li stampa il sito: l'email manda alla pagina che li
+porta. Vale anche per i giorni del Guest Pass, che infatti non sono scritti.
+
+Quattro cose da sapere prima di toccarla.
+
+**L'area si riconosce dallo slug, non dall'etichetta.** `Normalizza e Componi
+Email` ora emette anche `attivitaSlug` — gli id grezzi di `activities.ts` —
+accanto alle etichette in italiano che il desk legge. Confrontare stringhe in
+italiano vorrebbe dire rompere l'email rinominando una voce, senza che nessuno
+se ne accorga.
+
+**E la mappa slug → pagina non è l'identità.** `group-reformer` sta a
+`/reformer`: quella pagina è anteriore ad `ACTIVITY_TAGS` e ha tenuto il suo
+indirizzo. Comporre l'url dallo slug darebbe un link morto — e un'email con un
+link morto non fallisce, arriva.
+
+**Il tour vince sulle altre due domande.** `assistenza` e `ramo` dicono *che
+tipo di richiesta* è, il tour dice *da quale modulo arriva*: un socio che
+accompagna un amico è tutti e due, e quello che deve ricevere è il promemoria
+della visita. Per questo il ramo si legge da `tipoRichiestaVista` — cioè da
+quello che il browser ha dichiarato — e non da `statoNucleo`.
+
+**Il Guest Pass ha le stesse due condizioni del vaglio della chat**: solo a chi
+ha guardato le attività adulti (il Pass è un Premium, non comprende i corsi
+junior) e **non a chi è già socio**. Un Member che si sente offrire una prova la
+va a chiedere al desk e si sente dire di no.
+
+I contenuti non sono inventati: le fasce d'età e i claim vengono da
+`data/junior.ts`, il turno fisso della Scuola Nuoto e la prenotazione lezione
+per lezione del Baby Nuoto dalle regole scritte più su, la prova di inserimento
+obbligatoria dell'agonistico e della pallanuoto dal campo `prova` delle loro
+schede. Un dato inventato in un'email è peggio di un dato assente, perché la
+persona lo porta al desk.
+
+Per verificare: i due nodi Code si eseguono fuori da n8n con un payload finto —
+è così che sono stati provati, su sette casi — e ogni link va confrontato con il
+`dist`, perché una pagina rinominata qui non fa fallire niente. E prima di
+pubblicare, `versionId == activeVersionId`: `update_workflow` non pubblica, e un
+nodo in bozza non scrive niente.
+
 Per verificare: la spazzata del totem (1080×1920) e della televisione
 (1920×1080) su **tutti e tre i passi**, non solo il primo — i due nascosti hanno
 la gran parte dei comandi e delle etichette, e sono quelli in cui si trovano i
