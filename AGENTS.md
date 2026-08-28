@@ -2062,7 +2062,7 @@ Vale per ogni forma di upgrade, compreso «voglio il Reformer sul mio
 abbonamento»: aggiungere un'attività *è* un cambio abbonamento, e passa dallo
 stesso modulo.
 
-## `/totem/tour` è il totem all'ingresso, e registra una visita già avvenuta
+## `/tour` è il totem all'ingresso, e registra una visita già avvenuta
 
 Il pannello all'ingresso del club sta aperto su questa pagina. Chi ha appena
 girato la struttura con un operatore lascia lì i suoi dati, e da quel modulo
@@ -2071,18 +2071,23 @@ Chi lo ha accompagnato la ritrova in agenda, ci scrive com'è andata, e da lì
 fissa il richiamo. `noindex` e fuori dalla sitemap come `/attiva` e `/referral`:
 non è una pagina del club, è uno strumento del desk.
 
-**Sta sotto `/totem/` e non è `/tour`**, e la prima ragione è che su questo
-sito «tour» significa già un'altra cosa: il virtual tour di my.mpskin nella
-home, quello con scritto sopra «Clicca play per il virtual tour completo». Chi
-digitasse `athlonroma.it/tour` si aspetterebbe quello. La seconda è che questa
-pagina non la digita nessuno — la apre un dispositivo solo, una volta, e resta
-aperta — quindi non deve essere corta né bella: deve dire di chi è. Il filtro
-della sitemap esclude **la cartella** e non la pagina, così la seconda pagina
-del totem non va ricordata.
+**L'indirizzo è `/tour`, ed è una scelta del club.** Per un po' è stato
+`/totem/tour`, e la ragione era una collisione vera: su questo sito «tour»
+significa anche il virtual tour di my.mpskin nella home, quello col cartello
+«Clicca play per il virtual tour completo». Chi digita `athlonroma.it/tour`
+potrebbe aspettarsi quello e trovare un modulo che presuppone di avere appena
+girato il club con qualcuno.
 
-E vale la regola generale: una pagina che sta su un dispositivo e non in un
-link non prende un indirizzo che qualcuno potrebbe digitare per sbaglio,
-soprattutto se quella parola il sito la usa già in vetrina.
+Il club ha deciso `/tour` lo stesso. **La collisione resta, e va saputa**: se un
+giorno il virtual tour volesse un indirizzo suo, non può essere questo — e chi
+la scoprisse partendo dalla home non deve «correggere» questa pagina credendo a
+uno sbaglio. Non c'è nessun rimando da `/totem/tour`: quell'indirizzo è stato
+vivo meno di un'ora e non esiste più.
+
+Il filtro della sitemap la esclude con `endsWith('/tour/')` e non con
+`includes('/tour')`: la seconda forma prenderebbe anche una pagina futura il cui
+slug finisce per quella parola, e una pagina che sparisce dalla sitemap senza
+che nessuno l'abbia chiesto è il tipo di guasto che non si nota.
 
 **Non è «Contattaci» in una pagina**, e questa è la scelta da cui dipende tutto
 il resto. Le domande sembrano le stesse — email, verifica, attività, anagrafica
@@ -2100,9 +2105,9 @@ stare». Quindi tre passi: email, anagrafica con le attività, conferma.
 e la mette il pannello. È la differenza con `/api/prenotazioni`, che invece
 prende uno slot futuro e controlla che sia libero: passare da lì avrebbe voluto
 dire chiedere all'agenda il permesso di scrivere un fatto. Per questo la rotta è
-`POST /api/tour` (in `APP-ATHLON`), gemella ma non la stessa. La rotta si
-chiama `/api/tour` e non `/api/totem/tour`: là dentro «tour» non è ambiguo — è
-un tipo di `agenda_voci`, accanto a `task` e `appuntamento_telefonico`.
+`POST /api/tour` (in `APP-ATHLON`), gemella ma non la stessa. Nel pannello
+«tour» non è ambiguo: è un tipo di `agenda_voci`, accanto a `task` e
+`appuntamento_telefonico`.
 
 **E nasce `da_fare`, non `eseguito`.** Sembra un controsenso — la cosa è
 avvenuta — ed è il punto: quello che resta da fare non è il tour, è **chiuderlo**.

@@ -1,18 +1,20 @@
 ---
 /**
- * `/totem/tour` — il modulo che sta aperto sul totem all'ingresso del club.
+ * `/tour` — il modulo che sta aperto sul totem all'ingresso del club.
  *
- * **Il nome sta sotto `/totem/` e non è `/tour`**, e sono due ragioni diverse.
- * La prima è che su questo sito «tour» significa già un'altra cosa: il virtual
- * tour di my.mpskin nella home, quello con scritto sopra «Clicca play per il
- * virtual tour completo». Chi digitasse `athlonroma.it/tour` si aspetterebbe
- * quello, e troverebbe un modulo che gli chiede l'email presupponendo che abbia
- * appena girato il club con qualcuno.
+ * **L'indirizzo è `/tour`, ed è una scelta del club.** Per un po' è stato
+ * `/totem/tour`, e la ragione era una collisione vera: su questo sito «tour»
+ * significa anche il virtual tour di my.mpskin nella home, quello col cartello
+ * «Clicca play per il virtual tour completo». Chi digita `athlonroma.it/tour`
+ * potrebbe aspettarsi quello e trovare invece un modulo che gli chiede l'email
+ * presupponendo che abbia appena girato il club con qualcuno.
  *
- * La seconda è che questa pagina non la digita nessuno. La apre un dispositivo
- * solo, una volta, e resta aperta: non deve essere corta né bella, deve dire di
- * chi è. `/totem/` lo dice, e lascia il posto alla seconda pagina del totem
- * senza doverne rinominare una.
+ * Il club ha deciso `/tour` lo stesso, ed è l'indirizzo che il totem apre. La
+ * collisione resta e vale la pena saperla: **se un giorno il virtual tour
+ * volesse un indirizzo suo, non può essere questo** — e chi lo scoprisse
+ * partendo dalla home non deve «correggere» questa pagina credendo a uno
+ * sbaglio. Non c'è nessun rimando da `/totem/tour`: quell'indirizzo non esiste
+ * più.
  *
  * Chi ha appena girato la struttura con un operatore lascia qui i suoi dati, e
  * da questa pagina nasce una voce **tour** nell'agenda del pannello: data, ora,
@@ -46,10 +48,10 @@
  * al primo passo e svuota i campi. Stessa regola di `emailNota.ts`, che sul
  * totem non precompila l'email, e della chat, che dimentica dopo tre minuti.
  */
-import Layout from '../../layouts/Layout.astro';
-import CampoTelefono from '../../components/CampoTelefono.astro';
-import { GRUPPI_ATTIVITA, CONSENSO_PRIVACY, CONSENSO_MARKETING, SECONDI_CONFERMA } from '../../data/tour';
-import { CLUB } from '../../data/club';
+import Layout from '../layouts/Layout.astro';
+import CampoTelefono from '../components/CampoTelefono.astro';
+import { GRUPPI_ATTIVITA, CONSENSO_PRIVACY, CONSENSO_MARKETING, SECONDI_CONFERMA } from '../data/tour';
+import { CLUB } from '../data/club';
 ---
 
 <Layout
@@ -219,7 +221,7 @@ import { CLUB } from '../../data/club';
 </Layout>
 
 <script>
-  import { initTourForm } from '../../lib/tourForm.client.js';
+  import { initTourForm } from '../lib/tourForm.client.js';
 
   const radice = document.getElementById('tour-totem');
   if (radice) initTourForm(radice);
