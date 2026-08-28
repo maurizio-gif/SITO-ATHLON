@@ -25,6 +25,8 @@ attivita: []
 
 Gym Floor · Corsi Fitness · Aqua Fitness · Scuola Nuoto Adulti · Nuoto Libero Assistito · Corsi Fitness Virtual · Baby Nuoto (nati nel 2024, 2025 e 2026) · Recuperi Scuola Nuoto Bambini · Group Reformer
 
+> 📌 **Della Scuola Nuoto Bambini si prenotano i recuperi, non le lezioni.** Là il turno è fisso: giorno e ora si scelgono all'iscrizione e restano quelli per la stagione, e con il bisettimanale i turni fissi sono due — non si scelgono orari diversi di settimana in settimana. Il Baby Nuoto invece si prenota turno per turno, come le attività degli adulti.
+
 ## Regole principali
 
 - Le prenotazioni si aprono **3 giorni prima** (72 ore) e da quel momento restano aperte **fino all'inizio della lezione**: puoi prenotare in qualsiasi momento della finestra, anche all'ultimo secondo — non c'è un termine anticipato entro cui prenotare.

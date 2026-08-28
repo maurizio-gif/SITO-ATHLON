@@ -37,6 +37,8 @@ Ogni link porta al portale, già filtrato sui turni di quella fascia che hanno a
 * **Nuoto Propaganda (2014-2018)** → <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=25&vacancies=1" target="_blank" rel="noopener noreferrer">clicca qui</a>
 * **Nuoto Agonistico (2008-2015)** → <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=22&vacancies=1" target="_blank" rel="noopener noreferrer">clicca qui</a>
 
+> 📌 **Il turno è fisso.** Giorno e ora si scelgono all'iscrizione e restano quelli per tutta la stagione; con il **bisettimanale** i turni fissi sono due, uno per ciascuna delle due lezioni della settimana. Le lezioni **non si prenotano una per una** e non si cambia orario di settimana in settimana: la sola prenotazione che si fa è il [recupero](/wikiathlon/snb/recuperi-lezioni/), quando una lezione si perde. Per cambiare turno in modo definitivo c'è la richiesta di [cambio corso](/wikiathlon/snb/cambio-corso/).
+
 ***
 
 ## Prezzi e dettagli economici

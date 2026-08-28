@@ -521,6 +521,17 @@ export const JUNIOR: CorsoJunior[] = [
         q: 'Dove posso attendere mio figlio durante il corso?',
         a: 'Puoi accedere alla balconata sopra le piscine, sostare nella sala d’attesa dedicata in prossimità degli spogliatoi oppure attendere nell’area esterna.',
       },
+      /* La domanda è arrivata in chat il 28/08 — «posso scegliere un
+         bisettimanale e fare orari diversi nei 2 giorni?» — e l'assistente ha
+         risposto che i turni non sono fissi, prendendo la finestra di
+         prenotazione delle attività degli adulti e applicandola qui. Il dato
+         non era da nessuna parte: nessuna scheda diceva che il turno è fisso,
+         lo diceva solo implicitamente il «turno preferito» della procedura
+         d'iscrizione. */
+      {
+        q: 'Posso scegliere orari diversi ogni settimana?',
+        a: 'No: il turno è fisso. Giorno e ora si scelgono all’iscrizione e restano quelli per tutta la stagione, e con il bisettimanale i turni fissi sono due. Le lezioni non si prenotano una per una: la sola prenotazione che si fa è il <a href="/wikiathlon/snb/recuperi-lezioni">recupero</a>, quando una lezione si perde. Se serve cambiare turno in modo definitivo, c’è la richiesta di <a href="/wikiathlon/snb/cambio-corso">cambio corso</a>.',
+      },
       {
         q: 'Si possono recuperare le lezioni perse?',
         a: 'Sì: prima disdici la lezione persa dall’app o dal portale, poi prenoti il recupero — nella stessa fascia d’età di tuo figlio — a partire da tre giorni prima. Non sono previsti recuperi nelle prime due settimane di corso né nella settimana dei Brevetti a fine anno, e vanno comunque usati entro la fine della stagione, il 31 maggio: non si trasferiscono all’anno successivo.',

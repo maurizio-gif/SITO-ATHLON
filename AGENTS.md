@@ -1705,6 +1705,34 @@ Per verificare: `Vaglio Guest Pass` mette in chiaro `passOfferto`,
 è cambiato e il vaglio non aggancia più niente — da fuori si vedrebbe come «il
 Pass si propone sempre», che è il guasto che quel nodo esiste per evitare.
 
+### Dove la scheda tace, il modello applica la regola generale — e il turno della scuola nuoto è fisso
+
+«Posso scegliere un bisettimanale e fare orari diversi nei 2 giorni?» → *«Sì,
+non c'è un giorno fisso da rispettare per tutta la stagione. Ogni volta che
+prenoti scegli il turno che ti conviene, a partire da tre giorni prima.»* È
+falso: alla Scuola Nuoto Bambini il turno si scegle all'iscrizione e resta
+quello, e col bisettimanale i turni fissi sono due. Chi perde una lezione la
+**recupera**, con la procedura della scheda dei recuperi.
+
+**Il modello non ha inventato, ha generalizzato.** La finestra dei 3 giorni
+esiste ed è scritta: è quella delle attività degli adulti e del Baby Nuoto — e
+dei *recuperi* della scuola nuoto, che infatti compaiono nell'elenco delle
+attività a prenotazione. Nessuna scheda diceva che il turno settimanale è fisso:
+lo diceva solo, di sfuggita, il «turno preferito» della procedura d'iscrizione.
+Un dato assente non è un buco silenzioso — è una regola generale che si allarga
+al posto suo.
+
+Ora sta scritto in quattro posti, ognuno per un percorso diverso di chi legge:
+la scheda dell'iscrizione (dove si scelgono i turni), la scheda dei recuperi
+(come premessa: il recupero è la sola lezione che si prenota), l'elenco delle
+attività a prenotazione in `prenotazioni.md` (dove «Recuperi Scuola Nuoto
+Bambini» ora spiega perché è scritto *recuperi*), e una f.a.q. della pagina del
+corso — che è la domanda esatta arrivata in chat.
+
+**Il Baby Nuoto è l'opposto e va detto insieme**, o si sposta l'errore invece di
+chiuderlo: là si prenota turno per turno, come per gli adulti. Le due cose stanno
+nella stessa riga di `prenotazioni.md` per questo.
+
 ### Un numero che la pagina stampa e i dati non hanno è un numero che l'assistente non può dire
 
 «Quanto è la quota che si paga al momento dell'iscrizione?» → *«L'importo della
