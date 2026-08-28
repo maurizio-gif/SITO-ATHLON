@@ -1705,6 +1705,113 @@ Per verificare: `Vaglio Guest Pass` mette in chiaro `passOfferto`,
 è cambiato e il vaglio non aggancia più niente — da fuori si vedrebbe come «il
 Pass si propone sempre», che è il guasto che quel nodo esiste per evitare.
 
+### Chi si lamenta non riceve un'informazione, riceve una persona
+
+Vale in **ogni** ramo e su **qualunque** argomento, ed è la prima delle regole
+fisse del `systemMessage` perché viene prima di tutte le regole di contenuto: se
+il tono è di rabbia o di lamentela — ha pagato e non ha avuto, nessuno gli
+risponde, è la seconda volta che lo segnala, pensa di andarsene — in quel turno
+**non si risponde nel merito**. Niente numeri, niente orari, niente procedure, e
+soprattutto niente motivi: non perché è successo, non cosa comprende il suo
+abbonamento, non com'è fatto il palinsesto, nessuna ipotesi di sospensione o
+rimborso.
+
+**Anche quando la risposta si sa**, ed è questa la parte che non è ovvia. La
+tentazione è rispondere bene: la persona ha detto una cosa sbagliata, il testo ha
+quella giusta, e darla sembra il servizio. È il contrario — rispondere a una
+lamentela con un'informazione la peggiora, perché la persona non ha chiesto un
+dato, ha chiesto che qualcuno se ne occupi. Misurato sulla conversazione del
+28/08: a «ma nel frattempo ho pagato il mese di agosto» l'assistente ha risposto
+che «l'abbonamento di agosto copre quello che c'è disponibile in questo periodo»,
+cioè ha difeso il club, e la chat è andata avanti fino a sedici messaggi senza
+risolvere niente.
+
+Quello che resta sono due righe, in quest'ordine: **il dispiacere** sulla cosa
+precisa che ha detto lei, con le sue parole e senza spiegazioni attaccate; e **la
+strada verso una persona, con le istruzioni** — l'icona del messaggio in alto,
+cosa scriverci (cosa, quando, quale lezione), e che la conversazione arriva al
+team insieme al messaggio. Poi si ferma: nessuna domanda finale, nessuna offerta,
+nessun Guest Pass, nessuna telefonata.
+
+Tre dettagli che sono vincoli e non forma:
+
+- **`"senzaRisposta": true` su quel turno.** È il campo da cui `Salva risposta`
+  ricava `chat_conversazioni.escalata`, quindi è il modo in cui in archivio si
+  vede che quella conversazione è passata a una persona. Non cambia niente per
+  chi legge la chat: è un dato per il club.
+- **Non si promette cosa il team vedrà o farà** (regola 11bis). La prima stesura
+  di questa regola diceva «scrivi al team, che vede la tua situazione»: è
+  esattamente la promessa che la 11bis vieta, ed era già stata scritta una volta.
+  Quello che si sa è che la conversazione gli arriva e che rispondono via email.
+- **Vale sul turno, non sulla conversazione.** Se al messaggio dopo torna a fare
+  una domanda normale, si risponde normalmente — una regola che zittisce
+  l'assistente per il resto della chat trasformerebbe una lamentela in un muro.
+
+Nelle bozze email la stessa cosa c'era già, e con un nome diverso: l'astensione
+allargata di `ATHLON BOZZE EMAIL` passa la mano su un reclamo senza scrivere
+niente. Là la scelta è più radicale perché una bozza sbagliata la si rilegge, ma
+il criterio è lo stesso — un reclamo non lo chiude un testo automatico.
+
+### «Online limit exceeded»: si aspetta che la lezione passi, non si disdice
+
+Il limite di prenotazioni conta **solo le lezioni ancora da svolgere**, quindi si
+libera da sé: quando quella in programma è finita, si prenota la successiva senza
+disdire niente. Col Group Reformer, che ne ammette una per volta, è il caso
+normale — la lezione di domani si prenota quando quella di oggi è passata, e la
+finestra resta aperta fino all'inizio, quindi non si arriva tardi.
+
+L'assistente diceva l'opposto, e per tre volte nella stessa conversazione: «per
+prenotare quella di domani devi prima disdire quella di oggi». A una persona che
+aveva **una sola** prenotazione di Reformer, cioè il caso in cui la risposta
+giusta è «aspetta due ore». Il consiglio le faceva perdere il posto di oggi per
+prendere quello di domani, che è un cambio, non una soluzione.
+
+**Il difetto era nella scheda, non nel modello.** `prenotazioni-problemi.md`
+chiudeva la causa 5 con «Disdici o completa una delle prenotazioni attive»: le
+due strade in fila, con la peggiore per prima e senza dire che «completa»
+significa *non fare niente e aspettare*. Un modello che riassume in cento parole
+tiene la prima. Adesso la scheda apre con l'attesa, dice che «attiva» vuol dire
+**in programma**, e nomina la disdetta solo per chi a quella lezione non ci va.
+La stessa riga sta in `prenotazioni.md` e nella f.a.q. `prenotazioni-attive`,
+perché il limite si legge in tre posti.
+
+E nel `systemMessage` c'è la regola fissa che chiude il caso anche se la scheda
+dovesse tornare ambigua: **mai dire di disdire una lezione a cui vuole andare per
+liberare il limite.**
+
+### Le date non si calcolano, e una lezione di domani è dentro la finestra
+
+Nella stessa conversazione, primo messaggio: «non riesco a prenotare una lezione
+per domani» → «le prenotazioni si aprono 3 giorni prima, quindi da mercoledì 3
+settembre in poi». Domani era sabato 29 agosto: la finestra era **aperta da tre
+giorni**, e la risposta ha mandato la persona a settembre per una lezione
+dell'indomani.
+
+La regola 2ter lo vietava già, in mezzo a un paragrafo che dice anche altre
+quattro cose. Ora è una regola fissa a sé, e in una forma che non richiede
+nessun conto: **oggi, domani e dopodomani sono sempre dentro la finestra**, e
+l'unico caso in cui non è aperta è una lezione a più di 3 giorni. Un conto sulle
+date è un errore che il modello non si accorge di fare — vale la stessa scelta
+della fascia d'età del nuoto bambini, dove il calcolo è vietato invece che
+corretto.
+
+### Una chat di assistenza si chiude, e chi la allunga è l'assistente
+
+Sedici messaggi per una domanda che aveva una risposta di due righe. Dopo il
+consiglio sbagliato, l'assistente ha raccontato l'orario estivo, quante lezioni
+ci saranno a settembre, e — a «ma nel frattempo ho pagato il mese di agosto» —
+che «l'abbonamento di agosto copre quello che c'è disponibile in questo periodo».
+Cioè ha difeso il club su una lamentela, che è esattamente ciò che la regola 11
+vieta.
+
+La regola fissa aggiunta dice quando smettere: **detta la causa e cosa fare, non
+si aggiunge altro** — non il palinsesto del mese, non cosa comprende
+l'abbonamento, non ipotesi di sospensioni o rimborsi. Se insiste, se il problema
+resta, o se la situazione è personale, si chiude con una riga: *se ti serve altro
+aiuto scrivi al team dall'icona in alto, che vede la tua situazione*. È la regola
+11 applicata **prima** che la cosa diventi un reclamo, e la ragione è che una
+spiegazione in più non risolve il caso di quella persona: lo allunga.
+
 ## Il form dell'assistenza chiede poco, e il resto lo va a prendere
 
 Il form dell'Help Desk — `components/clublife/SupportForm.astro`, dentro
