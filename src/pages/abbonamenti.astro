@@ -9,7 +9,7 @@ import { faqPagina } from '../data/faq';
 
 import { trialCta } from '../data/cta';
 import { offerSchema } from '../data/club';
-import { plans, GUEST_PASS, SOSPENSIONE, activityInfo, SINGOLI, PERSONAL } from '../data/abbonamenti';
+import { plans, GUEST_PASS, SOSPENSIONE, activityInfo, SINGOLI, PERSONAL, ATTIVAZIONE } from '../data/abbonamenti';
 /* Il dominio di produzione, per gli @id assoluti degli schemi. */
 const SITE = 'https://www.athlonroma.it';
 
@@ -257,7 +257,7 @@ const trust = [
                           attivazione — <strong class="pcard__omaggio">in omaggio</strong>, {promoDoc.scadenzaLabel.toLowerCase()}
                         </Fragment>
                       ) : (
-                        <Fragment><strong>+ €50</strong> quota di attivazione una tantum</Fragment>
+                        <Fragment><strong>+ €{ATTIVAZIONE.quota}</strong> quota di attivazione una tantum</Fragment>
                       )}
                     </li>
                     <li>{o.note}</li>

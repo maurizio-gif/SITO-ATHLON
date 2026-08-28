@@ -45,6 +45,7 @@ import {
   SOSPENSIONE,
   activityInfo,
   SINGOLI,
+  ATTIVAZIONE,
   PERSONAL,
   ETA_MINIMA_ADULTI,
   ATTIVITA_GUEST_PASS,
@@ -467,6 +468,10 @@ export const GET: APIRoute = async () => {
     });
   }
 
+  /* Lo stesso documento che governa /promo e /abbonamenti: la collezione è
+     già filtrata su `!draft` qui sopra. */
+  const promoAttiva = promo[0]?.data;
+
   for (const voce of promo) {
     const d = voce.data;
     voci.push({
@@ -535,10 +540,51 @@ export const GET: APIRoute = async () => {
               // alla frase del risparmio: «…fine del mese Risparmio €138».
               `${pulito(o.note).replace(/[.\s]*$/, '')}.${o.savings ? ` ${pulito(o.savings)}.` : ''}`
           )
-          .join('\n')
+          .join('\n'),
+        /* La quota di attivazione sta accanto ai prezzi e non in una voce a
+           parte, perché chi chiede quanto costa un abbonamento sta chiedendo
+           anche questo: un mensile citato da solo è un preventivo incompleto,
+           ed è il motivo per cui la pagina la stampa sotto ogni formula. */
+        `**Oltre alla quota mensile o annuale si paga la quota di attivazione contrattuale: ${ATTIVAZIONE.quota} € una tantum**, per ogni abbonamento attivato, e comprende ${ATTIVAZIONE.comprende}. Non si paga sulla lezione singola.` +
+          /* Con una promozione attiva la quota è in omaggio sulle annuali, ed è
+             lo stesso `promoDoc` che governa la pagina: senza questa riga la
+             voce direbbe «50 €» a chi sta attivando un'annuale proprio nella
+             settimana in cui non li paga. Si spegne da sé mettendo `draft` sul
+             documento della promo, come per la pagina. */
+          (promoAttiva
+            ? `\n**Ma con la promozione in corso la quota di attivazione è in omaggio sulle formule annuali** (${promoAttiva.scadenzaLabel.toLowerCase()}): sull'annuale non si paga, sul Mensile Flex sì.`
+            : '')
       ),
     });
   }
+
+  /* ---- La quota di attivazione, come voce a sé ---------------------------
+     Sta accanto a ogni piano (sopra) e anche da sola, perché «quanto è la
+     quota che si paga al momento dell'iscrizione?» è una domanda che arriva
+     senza nominare nessun piano — è arrivata così, e la risposta è stata che
+     il dato non c'era: il numero viveva scritto a mano nella pagina e nel
+     markdown della scuola nuoto, cioè in due posti che il `kb.json` non
+     legge. */
+  voci.push({
+    id: 'abbonamento:quota-attivazione',
+    tipo: 'abbonamento',
+    titolo: 'La quota di attivazione',
+    url: `${SITE}/abbonamenti`,
+    area: 'Abbonamenti',
+    attivita: [],
+    testo: blocchi(
+      `La quota di attivazione contrattuale — quella che si paga **al momento dell'iscrizione** — è di **${ATTIVAZIONE.quota} € una tantum** e comprende ${ATTIVAZIONE.comprende}.`,
+      `Si paga **una volta per ogni abbonamento attivato** — il secondo abbonamento di una famiglia la paga come il primo — e si somma alla prima quota mensile o annuale, che resta quella del listino. Vale per gli abbonamenti degli adulti e per i corsi dei bambini allo stesso modo.`,
+      `**Non si paga sulla lezione singola**, che è il modo di entrare senza abbonarsi: là c'è il solo badge di accesso, ${SINGOLI.badge} € la prima volta.`,
+      `Se si disdice e più avanti si torna, la quota di attivazione va versata di nuovo.`,
+      /* Come per le voci dei piani: con la promozione attiva la quota è in
+         omaggio sulle annuali, e dirlo qui è il punto — questa è la voce che
+         risponde alla domanda diretta. */
+      promoAttiva
+        ? `**Con la promozione in corso la quota è in omaggio sulle formule annuali** (${promoAttiva.scadenzaLabel.toLowerCase()}), Smart e Premium: chi attiva un'annuale entro quella data non la paga. Sul Mensile Flex si paga.`
+        : ''
+    ),
+  });
 
   voci.push({
     id: 'abbonamento:sospensione',

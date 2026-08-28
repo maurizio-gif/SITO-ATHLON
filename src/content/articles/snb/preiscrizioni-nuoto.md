@@ -37,6 +37,8 @@ Ogni link porta al portale, già filtrato sui turni di quella fascia che hanno a
 * **Nuoto Propaganda (2014-2018)** → <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=25&vacancies=1" target="_blank" rel="noopener noreferrer">clicca qui</a>
 * **Nuoto Agonistico (2008-2015)** → <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=22&vacancies=1" target="_blank" rel="noopener noreferrer">clicca qui</a>
 
+> 📌 **Il turno è fisso.** Giorno e ora si scelgono all'iscrizione e restano quelli per tutta la stagione; con il **bisettimanale** i turni fissi sono due, uno per ciascuna delle due lezioni della settimana. Le lezioni **non si prenotano una per una** e non si cambia orario di settimana in settimana: la sola prenotazione che si fa è il [recupero](/wikiathlon/snb/recuperi-lezioni/), quando una lezione si perde. Per cambiare turno in modo definitivo c'è la richiesta di [cambio corso](/wikiathlon/snb/cambio-corso/).
+
 ***
 
 ## Prezzi e dettagli economici
@@ -51,6 +53,8 @@ Ogni link porta al portale, già filtrato sui turni di quella fascia che hanno a
 | Agonistico / Pallanuoto | **€119/mese** |
 
 > 💡 L'abbonamento è mensile, con rinnovo automatico il giorno 1 di ogni mese (punto 4.11).
+
+**Quota di attivazione contrattuale: €50 una tantum**, per ogni abbonamento attivato — il secondo figlio la paga come il primo. Si somma alla prima quota mensile e comprende il badge di accesso e l'attivazione dell'account. Se si disdice e più avanti si torna, va versata di nuovo (punto 3.1).
 
 **Pro-rata mesi di apertura e chiusura:** per i mesi di Settembre (inizio 14/09) e Giugno (fine 20/06) viene addebitato l'importo proporzionale ai giorni effettivi di frequenza.
 

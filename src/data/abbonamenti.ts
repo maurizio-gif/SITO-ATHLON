@@ -245,6 +245,28 @@ export const ATTIVITA_GUEST_PASS: readonly string[] =
  * prepagati. Si prenota e si paga una lezione alla volta — che è la cosa che
  * serve sapere, e che va detta al posto di un «no».
  */
+/**
+ * La quota di attivazione contrattuale (clausola 3.1): una tantum, e si paga
+ * per **ogni** abbonamento attivato — il secondo abbonamento di una famiglia
+ * la paga come il primo. Comprende il badge di accesso e l'attivazione
+ * dell'account, e si versa di nuovo se si disdice e più avanti si torna.
+ *
+ * Viveva scritta a mano in `abbonamenti.astro` e in `preiscrizioni-nuoto.md`,
+ * quindi la pagina la diceva e il `kb.json` no: a «quanto è la quota che si
+ * paga al momento dell'iscrizione?» l'assistente ha risposto — correttamente,
+ * per la regola 2 — che il dato non era nella sua documentazione. Un numero
+ * che una pagina stampa e i dati non hanno è un numero che l'assistente non
+ * può dire.
+ *
+ * Non si applica alla lezione singola, che è il modo di entrare senza
+ * abbonarsi: là c'è il solo badge di `SINGOLI.badge`.
+ */
+export const ATTIVAZIONE = {
+  /** Euro, una tantum, per ogni abbonamento attivato. */
+  quota: '50',
+  comprende: "il badge di accesso e l'attivazione dell'account",
+} as const;
+
 export const SINGOLI = {
   /** Il badge, una tantum: si paga la prima volta e poi mai più. */
   badge: '5',
