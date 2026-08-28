@@ -17,6 +17,7 @@
  * gli interessa è la domanda che fa chiudere la pagina.
  */
 import { ACTIVITY_TAGS } from './activities';
+import { PREFISSO_PREDEFINITO, validaTelefono } from './prefissi';
 
 /** L'endpoint che verifica l'email su PerfectGym: lo stesso del form di prova. */
 export const WEBHOOK_VERIFICA = 'https://automazione.n8ndevelop.it/webhook/athlon-verifica-iscritto';
@@ -97,6 +98,75 @@ export const PORTALE = {
 export function haGiaAccount(esito: { memberType?: string; stato?: string }): boolean {
   if (esito.memberType) return /member|guest/i.test(esito.memberType);
   return esito.stato === 'iscritto';
+}
+
+/**
+ * Se PerfectGym **ha già un'anagrafica** per questa email.
+ *
+ * È una terza domanda, diversa dalle altre due di questo file, e la differenza
+ * è tutta nel Lead. `haGiaAccount` chiede «può fare login?» e un Lead no;
+ * `eSocio` chiede «paga un abbonamento?» e un Lead no. Questa chiede «i suoi
+ * dati ce li abbiamo?», e di un Lead **sì**: è a sistema perché ha fatto una
+ * prova o ha lasciato un contatto, e la verifica ci ha appena restituito nome,
+ * cognome e telefono. Richiederglieli è fare una domanda a cui ha già risposto.
+ *
+ * La usano la chat e il modulo del totem, e devono rispondere allo stesso modo
+ * perché sono lo stesso percorso: email, poi i dati solo se mancano.
+ *
+ * `errore` non è «no», è «non lo sappiamo»: se la verifica non ha risposto i
+ * dati si chiedono, che è il verso giusto in cui sbagliare — una domanda in più
+ * costa un campo, una in meno costa un'anagrafica senza nome.
+ */
+export function anagraficaNota(esito: { stato?: string; statoNucleo?: string }): boolean {
+  const nucleo = esito.statoNucleo || esito.stato;
+  return (
+    nucleo === 'iscritto' ||
+    nucleo === 'esiste' ||
+    esito.stato === 'iscritto' ||
+    esito.stato === 'esiste'
+  );
+}
+
+/**
+ * Se i dati della persona vanno **chiesti**, o se li abbiamo già tutti.
+ *
+ * Non è la negazione di `anagraficaNota`, ed è il punto: sapere che una persona
+ * è a sistema non vuol dire avere i suoi dati. Un'anagrafica può essere nata da
+ * un form che chiedeva solo l'email, o portare un numero che non è un
+ * cellulare. Quindi la domanda non è «lo conosciamo» ma «abbiamo tutto e tre»,
+ * e basta che ne manchi uno perché il blocco torni intero.
+ *
+ * **Intero e non a pezzi**, e questa è una scelta: mostrare due campi su tre
+ * lascia la persona a indovinare perché proprio quelli, e un modulo che cambia
+ * forma campo per campo si legge come un guasto. O si chiede, o si conferma.
+ *
+ * Il telefono passa da `validaTelefono` e non da «c'è o non c'è»: un numero
+ * fisso in archivio è un numero su cui il richiamo non arriva, quindi vale come
+ * assente e il campo si chiede.
+ *
+ * **E serve l'id**, che è la condizione meno ovvia delle quattro. Non serve a
+ * riempire un campo: serve perché è `memberId` a decidere, su n8n, se
+ * l'anagrafica va creata — è così nella chat (`Esiste gia su PGM?`) e nel
+ * modulo del totem. Senza id l'automazione crea la persona, e per crearla le
+ * servono proprio i dati che nascondendo il blocco non avremmo chiesto: nel
+ * ramo junior anche la data di nascita, senza la quale la chiamata fallisce
+ * **in silenzio**. Le due decisioni devono guardare la stessa cosa, o il modulo
+ * smette di chiedere quello che l'automazione si aspetta di ricevere.
+ */
+export function servonoISuoiDati(persona: {
+  nota: boolean;
+  id?: string | number | null;
+  nome?: string;
+  cognome?: string;
+  telefono?: string;
+}): boolean {
+  return !(
+    persona.nota &&
+    persona.id &&
+    persona.nome &&
+    persona.cognome &&
+    validaTelefono(PREFISSO_PREDEFINITO, persona.telefono || '').ok
+  );
 }
 
 /**

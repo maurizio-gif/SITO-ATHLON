@@ -61,6 +61,7 @@ import {
   SECONDI_OBLIO,
 } from '../data/tour';
 import { validaTelefono } from '../data/prefissi';
+import { anagraficaNota, servonoISuoiDati } from '../data/contatto';
 
 export function initTourForm(root) {
   var ERR = {
@@ -126,6 +127,11 @@ export function initTourForm(root) {
       statoNucleo: '',
       memberId: null,
       memberType: '',
+      /** Se PerfectGym ha gia' l'anagrafica di chi sta compilando. Decide due
+          cose insieme: quali campi si mostrano — i suoi non si chiedono — e
+          quale strada prende n8n, che con un'anagrafica esistente non crea
+          nessun genitore. */
+      conosciuto: false,
     };
   }
 
@@ -237,6 +243,7 @@ export function initTourForm(root) {
         dati.memberId = body.memberId || null;
         dati.memberType = String(body.memberType || '');
         precompila(body);
+        dati.conosciuto = anagraficaNota({ stato: dati.statoPgm, statoNucleo: dati.statoNucleo });
       }
     } catch (e) {
       // PerfectGym irraggiungibile: si prosegue come persona nuova. Nessuno
@@ -271,6 +278,26 @@ export function initTourForm(root) {
       [campoCellulare, dati.cellulare],
     ].forEach(function (coppia) {
       if (coppia[0] && !coppia[0].value && coppia[1]) coppia[0].value = coppia[1];
+    });
+  }
+
+  /* **La domanda non e' «lo conosciamo», e' «abbiamo i suoi dati».** Sta in
+     `data/contatto.ts` e non qui, perche' e' la stessa della chat: quello e' lo
+     stesso percorso — email, poi i dati solo se mancano — e due copie della
+     condizione risponderebbero in due modi al primo ritocco.
+
+     La differenza fra le due domande e' tutta nel Lead: non puo' fare login,
+     quindi `haGiaAccount` dice no, ma i suoi dati ce li abbiamo perche' e' a
+     sistema da una prova. E basta che ne manchi uno — un'anagrafica nata da un
+     form con la sola email, un fisso al posto del cellulare — perche' il blocco
+     torni intero. */
+  function serveGenitore() {
+    return servonoISuoiDati({
+      nota: dati.conosciuto,
+      id: dati.memberId,
+      nome: dati.nome,
+      cognome: dati.cognome,
+      telefono: dati.cellulare,
     });
   }
 
@@ -328,21 +355,53 @@ export function initTourForm(root) {
   var titoloDati = q('[data-tt-titolo-dati]');
   var etichettaNome = q('[data-tt-etichetta-nome]');
   var notaCellulare = q('[data-tt-cellulare-nota]');
+  var bloccoPersona = q('[data-tt-persona]');
+  var bloccoCellulare = q('[data-tt-cellulare-blocco]');
+  var bloccoNoto = q('[data-tt-noto]');
+  var nomeNoto = q('[data-tt-noto-nome]');
 
   function vestiPassoDati() {
     var junior = dati.ramo === 'junior';
+    var suoi = serveGenitore();
+
+    /* **Il bambino si chiede sempre**, e non dipende da chi e' il genitore: di
+       lui PerfectGym non ci ha mai detto niente, nemmeno al socio piu' vecchio
+       del club. E' la stessa riga della chat: un corso per bambini vuole due
+       anagrafiche, e la seconda non ce l'ha nessuno. */
     if (bloccoBambino) bloccoBambino.hidden = !junior;
-    if (leadGenitore) leadGenitore.hidden = !junior;
-    /* La data di nascita dell'adulto la chiede PerfectGym solo per il nucleo:
-       `PGM Crea Lead` non la vuole, quindi nel ramo adulti non si mostra. */
-    if (bloccoNascita) bloccoNascita.hidden = !junior;
-    if (titoloDati) titoloDati.textContent = junior ? 'Chi porti in acqua?' : 'Come ti chiami?';
+
+    /* **Del genitore si chiede tutto o niente.** Chiedere due campi su tre
+       lascia a indovinare perche' proprio quelli, e un modulo che cambia forma
+       campo per campo si legge come un guasto: o si chiede, o si conferma. */
+    if (bloccoPersona) bloccoPersona.hidden = !suoi;
+    if (bloccoCellulare) bloccoCellulare.hidden = !suoi;
+    if (bloccoNoto) bloccoNoto.hidden = suoi;
+    if (nomeNoto) {
+      nomeNoto.textContent = (dati.nome + ' ' + dati.cognome).trim() || dati.email;
+    }
+
+    /* La data di nascita del genitore serve a `personalData.birthDate` della
+       chiamata che crea la sua anagrafica, e quella chiamata parte solo se non
+       ce l'ha gia'. Quindi la si chiede esattamente quando si chiedono i suoi
+       dati, e mai da sola. */
+    if (bloccoNascita) bloccoNascita.hidden = !(junior && suoi);
+    if (leadGenitore) leadGenitore.hidden = !(junior && suoi);
+
+    if (titoloDati) {
+      titoloDati.textContent = !junior
+        ? suoi
+          ? 'Come ti chiami?'
+          : 'Ci siamo quasi'
+        : suoi
+          ? 'Chi porti in acqua?'
+          : 'I dati di tuo figlio';
+    }
     if (etichettaNome) etichettaNome.textContent = junior ? 'Il tuo nome' : 'Nome';
-    /* Il cellulare: facoltativo per l'adulto, necessario per il nucleo. */
     if (notaCellulare) {
       notaCellulare.textContent = junior ? 'serve per registrarvi' : 'facoltativo';
     }
   }
+
 
   var btnInvia = q('[data-tt-invia]');
 
@@ -350,6 +409,11 @@ export function initTourForm(root) {
     pulisciErrore(steps.dati);
 
     var junior = dati.ramo === 'junior';
+    /* La stessa domanda che ha dato forma al passo: i campi nascosti non si
+       leggono e non si pretendono. Rileggerli darebbe la stringa vuota di un
+       campo che nessuno ha visto, e poi rifiuterebbe l'invio per un campo che
+       non c'e' — un modulo che si blocca su niente. */
+    var suoi = serveGenitore();
 
     /* Il bambino per primo, perché è il primo blocco a schermo: un errore che
        parla di un campo più in basso di quello che si sta guardando manda a
@@ -379,24 +443,32 @@ export function initTourForm(root) {
       dati.bambino = { nome: '', cognome: '', dataNascita: '' };
     }
 
-    dati.nome = campoNome.value.trim();
-    dati.cognome = campoCognome.value.trim();
-    if (!dati.nome) {
-      mostraErrore(steps.dati, ERR.nome);
-      segnala(campoNome);
-      return;
-    }
-    if (!dati.cognome) {
-      mostraErrore(steps.dati, ERR.cognome);
-      segnala(campoCognome);
-      return;
+    /* **I campi nascosti non si leggono e non si pretendono.** Quando
+       l'anagrafica c'è già, `dati.nome` e `dati.cognome` li ha messi la
+       verifica: rileggerli dai campi vorrebbe dire prendere la stringa vuota
+       di un campo che nessuno ha visto, e poi rifiutare l'invio per un campo
+       che non c'è — un modulo che si blocca su niente. */
+    if (suoi) {
+      dati.nome = campoNome.value.trim();
+      dati.cognome = campoCognome.value.trim();
+      if (!dati.nome) {
+        mostraErrore(steps.dati, ERR.nome);
+        segnala(campoNome);
+        return;
+      }
+      if (!dati.cognome) {
+        mostraErrore(steps.dati, ERR.cognome);
+        segnala(campoCognome);
+        return;
+      }
     }
 
     /* La data di nascita del genitore la vuole `personalData.birthDate` della
        chiamata che crea l'anagrafica: senza, il nucleo non nasce — e non nasce
-       in silenzio, perché quel nodo ha `continueRegularOutput`. */
-    dati.nascita = junior ? campoNascita.value : '';
-    if (junior && !dati.nascita) {
+       in silenzio, perché quel nodo ha `continueRegularOutput`. Con
+       l'anagrafica già lì quella chiamata non parte, quindi non serve. */
+    dati.nascita = junior && suoi ? campoNascita.value : '';
+    if (junior && suoi && !dati.nascita) {
       mostraErrore(steps.dati, ERR.nascita);
       segnala(campoNascita);
       return;
@@ -407,7 +479,13 @@ export function initTourForm(root) {
        qualcuno che ha fretta di andarsene è il punto in cui il modulo non si
        compila. Ma se è scritto dev'essere un numero vero, o il richiamo parte
        verso il nulla. */
-    if (campoCellulare.value.trim()) {
+    if (!suoi) {
+      /* Il campo non è a schermo perché il numero ce l'abbiamo già, e
+         `servonoISuoiDati` l'ha appena fatto passare da `validaTelefono`: qui
+         serve solo la forma E.164, che nessuna tendina di prefissi può comporre
+         su un campo che non c'è. */
+      dati.cellulare = validaTelefono('+39', dati.cellulare).e164 || dati.cellulare;
+    } else if (campoCellulare.value.trim()) {
       var tel = telefono();
       if (!tel.ok) {
         mostraErrore(steps.dati, tel.motivo);
@@ -600,6 +678,16 @@ export function initTourForm(root) {
 
   var btnAncora = q('[data-tt-ancora]');
   if (btnAncora) btnAncora.addEventListener('click', azzera);
+
+  /* «Non sei tu?»: si riparte dall'email, che e' l'unica cosa da cui il
+     riconoscimento dipende. Non e' un ripensamento raro — al totem l'email la
+     digita chi ha davanti l'operatore, e un indirizzo di famiglia riconosce il
+     coniuge — e senza questo comando quella persona registrerebbe il tour a
+     nome di un altro senza niente da toccare. Si azzera tutto e non solo il
+     riconoscimento: dopo un'email diversa nome, cognome e telefono precompilati
+     sono quelli sbagliati. */
+  var btnNonSeiTu = q('[data-tt-non-sei-tu]');
+  if (btnNonSeiTu) btnNonSeiTu.addEventListener('click', azzera);
 
   // ── L'oblio di un modulo lasciato a metà ──────────────────────────────────
   //
