@@ -192,30 +192,58 @@ import { CLUB } from '../data/club';
         <p class="tt__separatore" aria-hidden="true"></p>
       </div>
 
+      {/* **Chi il club ha gia' in anagrafica non ridigita niente di suo.** La
+          verifica dell'email ha appena risposto con nome, cognome e telefono:
+          rimetterli davanti a una persona in piedi e' chiedere di ricopiare
+          quello che sappiamo. Al posto dei campi c'e' il nome riconosciuto,
+          perche' un dato che sparisce senza dire dov'e' andato sembra un dato
+          perduto — e perche' il riconoscimento va mostrato per poter essere
+          smentito. */}
+      <div class="tt__noto" data-tt-noto hidden>
+        <p class="tt__noto-testo">
+          Ti abbiamo trovato: <strong data-tt-noto-nome></strong>.
+          I tuoi dati li abbiamo gia', non serve riscriverli.
+        </p>
+        {/* La via di ritorno, che qui e' un vincolo: l'email l'ha digitata la
+            persona davanti all'operatore, e chi sbaglia indirizzo — o scrive
+            quello del coniuge — si vedrebbe registrare il tour a nome di un
+            altro senza niente da toccare. Stessa scelta del comando davanti a
+            «hai gia' un account» su `/abbonamenti`. */}
+        <button type="button" class="tt__noto-cambia" data-tt-non-sei-tu>
+          Non sei tu? Ricomincia
+        </button>
+      </div>
+
       <p class="tt__lead" data-tt-lead-genitore hidden>E ora i tuoi, come genitore.</p>
 
-      <div class="tt__coppia">
-        <div>
-          <label class="tt__label" for="tt-nome" data-tt-etichetta-nome>Nome</label>
-          <input class="tt__input" id="tt-nome" type="text" autocomplete="off" placeholder="Mario" />
+      <div data-tt-persona>
+        <div class="tt__coppia">
+          <div>
+            <label class="tt__label" for="tt-nome" data-tt-etichetta-nome>Nome</label>
+            <input class="tt__input" id="tt-nome" type="text" autocomplete="off" placeholder="Mario" />
+          </div>
+          <div>
+            <label class="tt__label" for="tt-cognome">Cognome</label>
+            <input class="tt__input" id="tt-cognome" type="text" autocomplete="off" placeholder="Rossi" />
+          </div>
         </div>
-        <div>
-          <label class="tt__label" for="tt-cognome">Cognome</label>
-          <input class="tt__input" id="tt-cognome" type="text" autocomplete="off" placeholder="Rossi" />
+
+        {/* La data di nascita del genitore la chiede PerfectGym, non noi: serve
+            a `personalData.birthDate` della chiamata che crea l'anagrafica.
+            Quindi per il ramo adulti non si mostra — il lead si crea senza — e
+            per chi l'anagrafica ce l'ha gia' nemmeno: non si crea niente. */}
+        <div data-tt-nascita-adulto hidden>
+          <label class="tt__label" for="tt-nascita">La tua data di nascita</label>
+          <input class="tt__input" id="tt-nascita" type="date" autocomplete="off" />
         </div>
       </div>
 
-      {/* La data di nascita del genitore la chiede PerfectGym, non noi: per il
-          ramo adulti il lead si crea senza, quindi non si mostra. */}
-      <div data-tt-nascita-adulto hidden>
-        <label class="tt__label" for="tt-nascita">La tua data di nascita</label>
-        <input class="tt__input" id="tt-nascita" type="date" autocomplete="off" />
+      <div data-tt-cellulare-blocco>
+        <label class="tt__label" for="tt-cellulare">
+          Cellulare <span class="tt__facoltativo" data-tt-cellulare-nota>facoltativo</span>
+        </label>
+        <CampoTelefono id="tt-cellulare" classe="tt__input" autocomplete="off" />
       </div>
-
-      <label class="tt__label" for="tt-cellulare">
-        Cellulare <span class="tt__facoltativo" data-tt-cellulare-nota>facoltativo</span>
-      </label>
-      <CampoTelefono id="tt-cellulare" classe="tt__input" autocomplete="off" />
 
       {/* Il link all'informativa sta **fuori** dall'etichetta, e su questa
           pagina è un vincolo e non una preferenza. Un link dentro un `<label>`
@@ -449,6 +477,40 @@ import { CLUB } from '../data/club';
     height: 1px;
     margin: 1.5rem 0;
     background: var(--border-strong);
+  }
+
+  /* Il riquadro di chi e' gia' in anagrafica. Non e' un avviso e non e' un
+     errore: e' il posto dove stavano i campi, quindi occupa lo stesso spazio e
+     porta lo stesso peso visivo di una riga di modulo. */
+  .tt__noto {
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.125rem;
+    border-left: 3px solid var(--accent);
+    background: var(--surface-2, rgba(0, 0, 0, 0.03));
+  }
+
+  .tt__noto-testo {
+    margin: 0;
+    line-height: 1.6;
+    max-width: 44ch;
+  }
+
+  /* `min-height: 3rem` come `.tt__informativa`: e' un comando, e sul totem
+     nessun bersaglio sta sotto i 48px. In rem e non in px, o sul pannello
+     resterebbe della misura di un telefono. */
+  .tt__noto-cambia {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    margin-top: 0.25rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--accent-text);
+    font: inherit;
+    font-size: var(--text-xs);
+    text-decoration: underline;
+    cursor: pointer;
   }
 
   .tt__famiglia + .tt__famiglia {

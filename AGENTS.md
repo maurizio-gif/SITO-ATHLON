@@ -2117,6 +2117,106 @@ Il ramo lo decide `data-tt-gruppo` sulla casella, che il markup riempie da
 `GRUPPI_ATTIVITA` — cioè da `ACTIVITY_TAGS`. Un elenco di slug scritto nel
 client divergerebbe il giorno che si aggiunge un corso.
 
+### Del genitore si chiede solo quello che il club non ha già
+
+L'ordine è quello della chat, e non è una somiglianza casuale: **prima l'email,
+poi i dati del genitore solo se PerfectGym non lo conosce, e i dati del bambino
+sempre**. La verifica dell'email non serve a precompilare tre campi, serve a non
+mostrarli: chi il club ha in anagrafica trova al loro posto il proprio nome, e
+del genitore non gli si chiede più niente — non nome e cognome, non la data di
+nascita, e nemmeno il cellulare se PerfectGym ce l'ha dato.
+
+La ragione è che quei campi non erano una domanda, erano una **composizione**:
+esistono per riempire il `personalData` della chiamata che crea l'anagrafica.
+Se l'anagrafica c'è, quella chiamata non parte, e i campi non servono a nessuno
+— restano solo a far ricopiare a una persona in piedi quello che il club ha già
+scritto.
+
+- **Il bambino si chiede sempre, e non dipende da chi è il genitore.** È l'unica
+  persona di cui non abbiamo niente: il genitore lo conosciamo per email, lui no.
+- **La domanda è `haGiaAccount()`**, la stessa di «contattaci» e dei pulsanti
+  d'iscrizione, con in più l'id PerfectGym — senza quello non ci sarebbe niente a
+  cui attaccare il figlio, quindi si torna a chiedere tutto. **Un Lead non è
+  un'anagrafica**: i suoi dati si chiedono come a uno nuovo, ed è giusto, perché
+  su quella strada il genitore viene creato.
+- **La condizione del sito è sempre più stretta di `haAnagrafica` su n8n**, che
+  aggiunge `statoNucleo === 'iscritto'`. È il verso in cui va sbagliata: il sito
+  non può mai nascondere un campo che l'automazione poi si aspetta di trovare
+  pieno. Al contrario si chiede un dato in più, e non si crea un'anagrafica
+  vuota.
+- **Il numero che arriva da PerfectGym si normalizza in E.164 qui**, perché col
+  campo nascosto non c'è nessuna tendina di prefissi a comporlo. Un numero già
+  internazionale si prende com'è: ricomporlo su `+39` è il bug che
+  `CampoTelefono` ha chiuso. Se non è plausibile il campo si mostra e si chiede.
+- **E c'è la via di ritorno**, che qui non è una gentilezza. Al totem l'email la
+  digita chi ha l'operatore davanti, e un indirizzo di famiglia riconosce il
+  coniuge: chi si vede dire «ti abbiamo trovato: Giulia Bianchi» deve avere
+  qualcosa da premere, o registra il tour a nome di un altro. «Non sei tu?»
+  azzera tutto e riparte dall'email — non solo il riconoscimento, perché dopo
+  un'email diversa anche nome, cognome e telefono precompilati sono di un altro.
+
+### Il figlio di un genitore che c'è già: la quarta strada di `stradaPgm`
+
+Nascondere i campi del genitore ha scoperto un buco che c'era da prima e che
+nessuna esecuzione mostrava, perché erano tutte verdi. `stradaPgm` aveva tre
+valori, e `haAnagrafica` mandava a `nessuna` — cioè *nessuna* delle due persone
+veniva creata. Il genitore giustamente, ma **nemmeno il bambino**, che su
+PerfectGym non c'era. Il nucleo restava a metà.
+
+Ed era il caso normale al totem, non un angolo: il genitore che porta il figlio
+è spessissimo un Guest, perché una prova sua l'ha fatta. `nucleo` esisteva solo
+per il genitore nuovo, e `PGM Crea Figlio` legge l'id del genitore dalla
+risposta della creazione — quindi senza quella creazione non aveva a cosa
+attaccarsi.
+
+Adesso la quarta strada è `figlio`, e le sue condizioni sono quello che serve
+per appendere un figlio a qualcuno: un ramo che ha un bambino, i suoi dati per
+intero, e l'id del genitore. Il percorso è `PGM Nucleo Esistente` →
+`Vaglio Figlio` → `Figlio da Creare?` → `PGM Crea Figlio`, che resta **uno
+solo** per tutte e due le strade — un secondo nodo che crea bambini è un nodo
+che un giorno diverge. Ci arriva con `memberId` già nell'item, che è la forma
+che quel nodo si aspetta.
+
+Tre cose da sapere prima di toccarla.
+
+**Il doppione qui è probabile, non teorico**, ed è il motivo per cui c'è un
+vaglio e non una creazione diretta. Un nucleo che esiste ha buone probabilità di
+contenere proprio quel bambino — quello che già fa la scuola nuoto e che oggi
+viene a provare un altro corso. Creato una seconda volta diventa due schede con
+lo stesso nome, e il giorno che ci si attacca un contratto nessuno sa quale sia
+quella buona. La chiave del confronto è **nome, cognome e data di nascita
+insieme**: i fratelli condividono il cognome ma non le altre due. Senza accenti
+e senza maiuscole, perché «Niccolò» e «NICCOLO» sono la stessa persona.
+
+**Nel dubbio non si crea, ed è il verso opposto a quello del form.** Sul modulo
+un invio in più costa meno di una visita persa; qui i due errori non si
+somigliano. Un bambino non creato è **visibile** — la sua riga sta nella voce
+del tour in agenda, che l'operatore apre comunque per scrivere le note e fissare
+il richiamo — mentre un bambino creato due volte non lo vede nessuno finché non
+fa danno. Quindi se la lettura del nucleo non risponde, o il genitore non si
+trova, si passa oltre e `figlioPerche` dice quale delle quattro ragioni è stata.
+
+**`Aggiorna Member Id` va guardato ogni volta che si aggiunge una strada.**
+Leggeva `$('PGM Crea Genitore').item.json.memberId` con una sola guardia
+`isExecuted`, sul nodo del lead: su questa strada nessuno dei due gira e
+quell'espressione sollevava. Ora ha la terza alternativa, l'id che il form ha
+mandato — che è **quello del genitore**, come vuole la regola: la richiesta è
+sua, ed è la sua scheda che il desk apre.
+
+**E questo cambia anche «Contattaci», di proposito.** La strada la sceglie
+`stradaPgm`, che è un'affermazione su *cosa serve a PerfectGym* e non su *da
+quale modulo si arriva*: farla dipendere dal form sarebbe la condizione nascosta
+che poi diverge. Quindi un genitore Guest o Member che compila il ramo junior di
+«contattaci» adesso ha il figlio registrato come lo avrebbe al totem — prima non
+lo aveva, e non lo diceva nessuno. Il ramo assistenza non è toccato: là il
+bambino non si chiede, quindi `haBambino` è falso e la strada resta `nessuna`.
+
+Per verificare: `Vaglio Figlio` mette in chiaro `creaFiglio`, `figlioEsistente`,
+`figlioPerche` e `figliVisti`, e `Normalizza e Componi Email` espone `haBambino`
+accanto a `haAnagrafica` e `stradaPgm`. Un `stradaPgm: 'nessuna'` con
+`haBambino: true` vuol dire che manca l'id del genitore, che è la sola altra
+condizione.
+
 **Non è «Contattaci» in una pagina**, e questa è la scelta da cui dipende tutto
 il resto. Le domande sembrano le stesse — email, verifica, attività, anagrafica
 — e non lo sono, perché cambia chi è nella stanza. `ContattaciModal` esiste per
@@ -2328,19 +2428,33 @@ pubblicare, `versionId == activeVersionId`: `update_workflow` non pubblica, e un
 nodo in bozza non scrive niente.
 
 Per verificare: la spazzata del totem (1080×1920) e della televisione
-(1920×1080) su **tutti e quattro i passi più la forma junior del passo dati**,
-non solo il primo — i nascosti hanno la gran parte dei comandi e delle etichette, e sono quelli in cui si trovano i
-guai. L'ultima passata: nessun overflow, niente sotto i 19px, nessun comando
-sotto i 48px, nessun paragrafo sotto i 30 caratteri per riga. Poi il percorso
-intero con le due chiamate intercettate: dalla verifica devono arrivare i tre
-campi precompilati, l'invio senza attività e senza consenso deve fermarsi, il
-tocco sull'informativa **non** deve spuntare il consenso, e «Registra un altro
-tour» deve lasciare i campi vuoti e nessuna spunta.
+(1920×1080) su **tutti e quattro i passi, e sul passo dati in tutte e quattro le
+sue forme** — adulti e junior, per uno sconosciuto e per uno riconosciuto — non
+solo il primo: i nascosti hanno la gran parte dei comandi e delle etichette, e
+sono quelli in cui si trovano i guai. L'ultima passata: nessun overflow, niente
+sotto i 19px, nessun comando sotto i 48px, nessun paragrafo sotto i 30 caratteri
+per riga. Poi il percorso intero con le due chiamate intercettate: l'invio senza
+attività e senza consenso deve fermarsi, il tocco sull'informativa **non** deve
+spuntare il consenso, e «Registra un altro tour» deve lasciare i campi vuoti e
+nessuna spunta.
+
+E la verifica dell'email va provata su **tutti gli esiti che può dare**, perché
+è lei a decidere quali campi esistono: sconosciuto e Lead chiedono tutto, Guest
+e Member non chiedono niente del genitore, e un Member di cui PerfectGym non ha
+il numero rimette il solo campo del cellulare. Il bambino compare in tutti e
+quattro.
+
+**Una casella dentro la sua etichetta non è un bersaglio da misurare**: il tocco
+lo prende l'etichetta. Misurando l'`input` i due consensi risultano 34×34 e la
+spazzata segnala due guai che non esistono — l'etichetta è 891×62.
 
 E l'oblio, che si prova con l'orologio finto di Playwright (`page.clock`): un
 modulo compilato a metà deve **restare** a 2m30 e **sparire** a 3m15, lo stesso
-deve valere per un passo 2 raggiunto di sola tastiera, e `localStorage` deve
-essere vuoto — non «senza chiavi del modulo»: vuoto.
+deve valere per un passo 2 raggiunto di sola tastiera e per un genitore
+riconosciuto — di cui deve sparire anche il nome. `localStorage` deve essere
+vuoto, e `sessionStorage` avere le sole due chiavi dell'attribuzione
+(`athlon_utm`, `athlon_sid`): non è un dato di una persona, ed è la ragione per
+cui la regola «niente nella sessione» è rispettata pur con due chiavi in mezzo.
 
 ## Il form dell'assistenza chiede poco, e il resto lo va a prendere
 
