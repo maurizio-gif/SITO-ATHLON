@@ -2062,6 +2062,103 @@ Vale per ogni forma di upgrade, compreso «voglio il Reformer sul mio
 abbonamento»: aggiungere un'attività *è* un cambio abbonamento, e passa dallo
 stesso modulo.
 
+## `/tour` è il totem all'ingresso, e registra una visita già avvenuta
+
+Il pannello all'ingresso del club sta aperto su questa pagina. Chi ha appena
+girato la struttura con un operatore lascia lì i suoi dati, e da quel modulo
+nasce una voce **tour** in `agenda_voci` — data, ora, e uno stato da chiudere.
+Chi lo ha accompagnato la ritrova in agenda, ci scrive com'è andata, e da lì
+fissa il richiamo. `noindex` e fuori dalla sitemap come `/attiva` e `/referral`:
+non è una pagina del club, è uno strumento del desk.
+
+**Non è «Contattaci» in una pagina**, e questa è la scelta da cui dipende tutto
+il resto. Le domande sembrano le stesse — email, verifica, attività, anagrafica
+— e non lo sono, perché cambia chi è nella stanza. `ContattaciModal` esiste per
+far arrivare una richiesta a qualcuno che non c'è: chiede di cosa si vuole
+parlare in testo libero, si ramifica sui cinque percorsi di iscrizione, e per un
+genitore raccoglie il bambino con la data di nascita e le tre domande sul
+livello in acqua. Al totem l'operatore è lì: il contesto lo ha raccolto
+camminando e lo scriverà nelle note del tour. Chiedere qui la richiesta in testo
+libero vuol dire far digitare a una persona in piedi una cosa che ha appena
+detto a voce, e ogni schermata in più è un punto in cui si dice «lasciamo
+stare». Quindi tre passi: email, anagrafica con le attività, conferma.
+
+**Il tour è già successo, quindi non si sceglie nessun orario.** L'ora è adesso
+e la mette il pannello. È la differenza con `/api/prenotazioni`, che invece
+prende uno slot futuro e controlla che sia libero: passare da lì avrebbe voluto
+dire chiedere all'agenda il permesso di scrivere un fatto. Per questo la rotta è
+`POST /api/tour` (in `APP-ATHLON`), gemella ma non la stessa.
+
+**E nasce `da_fare`, non `eseguito`.** Sembra un controsenso — la cosa è
+avvenuta — ed è il punto: quello che resta da fare non è il tour, è **chiuderlo**.
+Nascere già eseguito vorrebbe dire nascere senza note e senza seguito, cioè
+sparire dall'agenda nel momento stesso in cui ci entra. Il conto lo chiude
+l'operatore, con «Eseguito e richiama», che segna l'esito e crea il **task**
+collegato — `voce_precedente_id`, lo stesso legame della riprogrammazione. Un
+task e non un altro tour: riprogrammare vuol dire «non è avvenuto, lo
+rifacciamo», qui è avvenuto e quello che resta è una telefonata fra una
+settimana, che non ha un'ora.
+
+Quattro cose da sapere prima di toccarlo.
+
+**Le due chiamate, e perché in quest'ordine.** Prima `API_TOUR` sul pannello,
+che scrive la voce in agenda; poi `WEBHOOK_CONTATTO` su n8n, che crea il lead su
+PerfectGym e la riga su `richieste_contatto`. La prima ferma l'invio se
+fallisce, la seconda no. È la stessa scelta dell'appuntamento telefonico e per
+la stessa ragione: dire «fatto» per un tour che in agenda non c'è vuol dire
+perderlo senza che nessuno se ne accorga, mentre un lead da riconciliare a mano
+costa meno di una visita persa. Il webhook è quello dei contatti e non uno nuovo
+— un tour è una richiesta di contatto con una visita già fatta — e si riconosce
+da `tipoRichiesta: 'tour'`, come l'appuntamento si riconosce da
+`tipoRichiesta: 'appuntamento'`.
+
+**Le attività sono le dodici di `ACTIVITY_TAGS`, non le cinque macro di
+`contatto.ts`.** Là le cinque scelte sono cinque *percorsi di iscrizione*,
+perché quel form si deve ramificare; qui non si ramifica niente, la risposta può
+essere più di una — un genitore che porta il figlio in piscina e intanto ha
+guardato la sala pesi è il caso normale al totem — e chi la legge è una persona
+che quella visita se la ricorda. Sono anche l'unica informazione che questo
+modulo raccoglie e che nessun'altra tabella ha: finiscono in
+`note_programmazione`, che è quello che il desk legge prima di comporre il
+numero.
+
+**La pagina si dimentica, e questo è il totem.** Alla conferma parte un conto
+alla rovescia visibile (venti secondi) che riporta al primo passo e svuota
+email, anagrafica, spunte e consensi. Stessa regola per cui `emailNota.ts` non
+precompila qui e la chat dimentica dopo tre minuti: chi arriva dopo non deve
+trovare i dati di chi è passato prima. Per la stessa ragione il campo email
+**non porta `data-email-nota`** — non basta che `emailNota.ts` si astenga sul
+totem, l'attributo è l'adesione a un meccanismo che questa pagina non vuole — e
+il pulsante fisso della chat si nasconde con `:global(.cfab) { display: none
+!important }`, come su `/link` ma per un motivo diverso: lì l'assistente era già
+in lista, qui è una via d'uscita da un modulo lasciato a metà.
+
+**Il link all'informativa sta fuori dall'etichetta del consenso**, e su una
+pagina che si apre in sede è un vincolo. Un `<a>` dentro un `<label>` fa due
+cose con un tocco solo: apre la pagina *e* spunta la casella — cioè registra un
+consenso che nessuno ha dato, e lo registra proprio mentre la persona stava
+andando a leggere cosa stava accettando. Altrove il danno si vede meno perché la
+navigazione porta via dalla pagina; qui la scheda si aprirebbe accanto e il
+modulo resterebbe lì, spuntato. `ContattaciModal` ha ancora il link dentro
+l'etichetta, in due punti: va sistemato allo stesso modo, ed è la cosa da fare
+la prossima volta che quel form si tocca.
+
+Il cellulare invece è **facoltativo**, ed è l'unico campo del sito che lo sia:
+la persona è qui, l'email l'ha già data, e un campo obbligatorio in più davanti
+a chi ha fretta di andarsene è quello su cui il modulo si ferma. Se lo scrive
+passa comunque da `validaTelefono`, perché su un fisso il richiamo su WhatsApp
+non arriva.
+
+Per verificare: la spazzata del totem (1080×1920) e della televisione
+(1920×1080) su **tutti e tre i passi**, non solo il primo — i due nascosti hanno
+la gran parte dei comandi e delle etichette, e sono quelli in cui si trovano i
+guai. L'ultima passata: nessun overflow, niente sotto i 19px, nessun comando
+sotto i 48px, nessun paragrafo sotto i 30 caratteri per riga. Poi il percorso
+intero con le due chiamate intercettate: dalla verifica devono arrivare i tre
+campi precompilati, l'invio senza attività e senza consenso deve fermarsi, il
+tocco sull'informativa **non** deve spuntare il consenso, e «Registra un altro
+tour» deve lasciare i campi vuoti e nessuna spunta.
+
 ## Il form dell'assistenza chiede poco, e il resto lo va a prendere
 
 Il form dell'Help Desk — `components/clublife/SupportForm.astro`, dentro

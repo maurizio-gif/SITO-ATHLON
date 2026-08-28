@@ -70,6 +70,11 @@ export default defineConfig({
            pagine che sono già in sitemap per conto loro. Indicizzarla vorrebbe
            dire mettere in concorrenza un indice con i contenuti che indicizza. */
         !page.includes('/link') &&
+        /* `/tour` è il modulo che sta aperto sul totem all'ingresso: registra
+           una visita **già avvenuta**, quindi presuppone di avere appena girato
+           il club con qualcuno. Chi cerca «visita athlon» deve trovare `/prova`,
+           non un modulo che a lui non risponde. */
+        !page.includes('/tour') &&
         !page.includes('/wikiathlon/'),
 
       /* Priorità e frequenza sono suggerimenti, e Google li ignora — restano

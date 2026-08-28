@@ -1,0 +1,516 @@
+---
+/**
+ * `/tour` — il modulo che sta aperto sul totem all'ingresso del club.
+ *
+ * Chi ha appena girato la struttura con un operatore lascia qui i suoi dati, e
+ * da questa pagina nasce una voce **tour** nell'agenda del pannello: data, ora,
+ * e uno stato da chiudere. Chi lo ha accompagnato la ritrova in agenda, ci
+ * scrive com'è andata, e da lì fissa il task di richiamo.
+ *
+ * ## Le quattro scelte di questa pagina
+ *
+ * **`noindex`, e fuori dalla sitemap.** Non è una pagina del club: è uno
+ * strumento del desk, come `/attiva` e `/diagnostica-schermo`. Chi cerca
+ * «visita athlon» deve trovare `/prova`, non un modulo che presuppone di avere
+ * appena fatto il giro con qualcuno.
+ *
+ * **`chrome={false}`.** Niente intestazione e niente footer, e non è per
+ * estetica: il menu del sito su un totem è un invito a navigare via dal modulo
+ * — e da lì nessuno torna indietro. Quello che resta a schermo è una cosa sola
+ * da fare.
+ *
+ * **Il tour è già avvenuto, quindi non si sceglie nessun orario.** L'ora è
+ * adesso, e la mette il pannello: chiedere «quando vuoi fare il tour» a chi lo
+ * ha appena fatto è la domanda che rivela un modulo copiato da un altro.
+ *
+ * **Non è `ContattaciModal` in una pagina.** Le domande sembrano le stesse e
+ * non lo sono: il perché sta scritto in testa a `data/tour.ts`, e in una riga è
+ * che qui l'operatore è nella stanza.
+ *
+ * ## Il ritorno allo stato vuoto
+ *
+ * È un dispositivo condiviso, quindi tutto quello che questa pagina raccoglie
+ * deve sparire da solo: alla conferma parte un conto alla rovescia che riporta
+ * al primo passo e svuota i campi. Stessa regola di `emailNota.ts`, che sul
+ * totem non precompila l'email, e della chat, che dimentica dopo tre minuti.
+ */
+import Layout from '../layouts/Layout.astro';
+import CampoTelefono from '../components/CampoTelefono.astro';
+import { GRUPPI_ATTIVITA, CONSENSO_PRIVACY, CONSENSO_MARKETING, SECONDI_CONFERMA } from '../data/tour';
+import { CLUB } from '../data/club';
+---
+
+<Layout
+  title="Registra il tuo tour"
+  description="Modulo interno del totem all'ingresso: registra la visita in sede. Pagina non indicizzata."
+  chrome={false}
+  noindex
+>
+  <main class="tt" id="tour-totem">
+    <header class="tt__testa">
+      <span class="tt__eyebrow">{CLUB.name}</span>
+      <p class="tt__insegna">Hai appena visitato il club</p>
+    </header>
+
+    {/* ── 1. L'email ───────────────────────────────────────────────────────
+        Primo passo come in ogni form del sito, e per la stessa ragione: è la
+        chiave con cui il club riconosce chi è già passato di qui, e quella con
+        cui il pannello evita di creare un doppione della stessa persona.
+
+        Ma qui non decide niente altro. In «Contattaci» avere già un account
+        cambia percorso — si va al portale invece di raccogliere i dati — e in
+        un tour no: un tour è un tour anche per un socio che si è portato
+        dietro un amico. Quello che la verifica fa è precompilare i tre campi
+        del passo dopo. */}
+    <section class="tt__step" id="tt-step-email">
+      <h1 class="tt__titolo" tabindex="-1" data-tt-fuoco>Lasciaci un contatto.</h1>
+      <p class="tt__lead">
+        Bastano trenta secondi. Ti mandiamo quello di cui abbiamo parlato e restiamo a disposizione
+        per le tue domande.
+      </p>
+
+      {/* Niente `data-email-nota`, ed è deliberato: quell'attributo fa
+          precompilare al campo l'email che il browser ricorda, e su un
+          dispositivo condiviso vorrebbe dire mostrare l'indirizzo del
+          visitatore precedente. `emailNota.ts` non riempie sul totem, ma
+          l'attributo qui non ci va comunque — è l'adesione a un meccanismo che
+          questa pagina non vuole. */}
+      <label class="tt__label" for="tt-email">La tua email</label>
+      <input
+        class="tt__input"
+        id="tt-email"
+        type="email"
+        inputmode="email"
+        autocomplete="off"
+        placeholder="mario.rossi@email.it"
+      />
+
+      <p class="tt__errore" data-tt-errore hidden></p>
+
+      <button type="button" class="btn btn-primary tt__btn" data-tt-verifica>
+        <span class="tt__btn-testo">Continua</span>
+        <span class="tt__spinner" aria-hidden="true"></span>
+      </button>
+    </section>
+
+    {/* ── 2. Anagrafica e attività ─────────────────────────────────────────
+        Un passo solo e non tre: la persona è in piedi davanti a uno schermo,
+        con qualcuno accanto che aspetta. Ogni schermata in più è un punto in
+        cui si dice «lasciamo stare».
+
+        Il cellulare è facoltativo. È l'unico campo del sito che lo è, e la
+        ragione è il contesto: l'email l'ha già data, la persona è qui, e un
+        campo obbligatorio in più davanti a chi ha fretta di andarsene è quello
+        su cui il modulo si ferma. Se lo scrive dev'essere un cellulare vero,
+        perché su un fisso il richiamo su WhatsApp non arriva. */}
+    <section class="tt__step" id="tt-step-dati" hidden>
+      <h2 class="tt__titolo" tabindex="-1" data-tt-fuoco>Come ti chiami?</h2>
+
+      <div class="tt__coppia">
+        <div>
+          <label class="tt__label" for="tt-nome">Nome</label>
+          <input class="tt__input" id="tt-nome" type="text" autocomplete="off" placeholder="Mario" />
+        </div>
+        <div>
+          <label class="tt__label" for="tt-cognome">Cognome</label>
+          <input class="tt__input" id="tt-cognome" type="text" autocomplete="off" placeholder="Rossi" />
+        </div>
+      </div>
+
+      <label class="tt__label" for="tt-cellulare">
+        Cellulare <span class="tt__facoltativo">facoltativo</span>
+      </label>
+      <CampoTelefono id="tt-cellulare" classe="tt__input" autocomplete="off" />
+
+      {/* Le attività sono la sola informazione che questo modulo raccoglie e
+          che nessuna altra tabella ha: è quella che chi richiama legge prima
+          di comporre il numero. Si spuntano più di una perché al totem il caso
+          normale è proprio quello — un genitore che porta il figlio in piscina
+          e intanto ha guardato la sala pesi. */}
+      <fieldset class="tt__gruppo">
+        <legend class="tt__label">Cosa ti interessa</legend>
+        {GRUPPI_ATTIVITA.map((g) => (
+          <div class="tt__famiglia">
+            <span class="tt__famiglia-titolo">{g.titolo}</span>
+            <div class="tt__chips">
+              {g.voci.map((a) => (
+                <label class="tt__chip">
+                  <input type="checkbox" value={a.id} data-tt-attivita data-tt-etichetta={a.label} />
+                  <span>{a.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        ))}
+      </fieldset>
+
+      {/* Il link all'informativa sta **fuori** dall'etichetta, e su questa
+          pagina è un vincolo e non una preferenza. Un link dentro un `<label>`
+          fa due cose con un tocco solo: apre la pagina *e* spunta la casella —
+          cioè registra un consenso che nessuno ha dato, e lo registra proprio
+          mentre la persona stava andando a leggere cosa stava accettando.
+          Altrove il danno si vede meno perché la navigazione porta via dalla
+          pagina; qui la scheda si apre accanto e il modulo resta lì, spuntato.
+
+          Il resto del sito ha ancora il link dentro l'etichetta
+          (`ContattaciModal`): va sistemato allo stesso modo, ma non in questo
+          commit — è un form vivo e merita la sua prova. */}
+      <label class="tt__consenso">
+        <input type="checkbox" id="tt-privacy" />
+        <span>{CONSENSO_PRIVACY}</span>
+      </label>
+
+      <label class="tt__consenso">
+        <input type="checkbox" id="tt-marketing" />
+        <span>{CONSENSO_MARKETING}</span>
+      </label>
+
+      {/* `inline-flex` e non in linea: su un elemento in linea il `padding`
+          verticale non riserva spazio, quindi il bersaglio sborderebbe sui
+          consensi qui sopra e ne ruberebbe i tocchi. È la stessa trappola del
+          reset password davanti a «Iscriviti». */}
+      <a class="tt__informativa" href="/privacy" target="_blank" rel="noopener">
+        Leggi l’informativa privacy ↗
+      </a>
+
+      <p class="tt__errore" data-tt-errore hidden></p>
+
+      <button type="button" class="btn btn-primary tt__btn" data-tt-invia>
+        <span class="tt__btn-testo">Ho finito</span>
+        <span class="tt__spinner" aria-hidden="true"></span>
+      </button>
+    </section>
+
+    {/* ── 3. La conferma, che si spegne da sola ────────────────────────────
+        Il conto alla rovescia è visibile e non nascosto: chi legge deve capire
+        che lo schermo sta per tornare com'era, invece di vederlo cambiare da
+        solo mentre ci sta davanti. E il comando per ricominciare subito esiste
+        perché al desk capita: due persone in fila. */}
+    <section class="tt__step tt__step--fatto" id="tt-step-fatto" hidden>
+      <h2 class="tt__titolo" tabindex="-1" data-tt-fuoco>
+        Grazie, <span data-tt-nome-conferma></span>.
+      </h2>
+      <p class="tt__lead">
+        È tutto registrato. Ti ricontattiamo noi con quello di cui abbiamo parlato — e se nel
+        frattempo ti viene un dubbio, scrivici quando vuoi.
+      </p>
+
+      <p class="tt__conto">
+        Lo schermo torna al modulo fra <strong data-tt-conto>{SECONDI_CONFERMA}</strong> secondi.
+      </p>
+
+      <button type="button" class="btn btn-outline-dark tt__btn" data-tt-ancora>
+        Registra un altro tour
+      </button>
+    </section>
+  </main>
+</Layout>
+
+<script>
+  import { initTourForm } from '../lib/tourForm.client.js';
+
+  const radice = document.getElementById('tour-totem');
+  if (radice) initTourForm(radice);
+</script>
+
+<style>
+  /* Il pulsante fisso della chat non ci sta, ed è la stessa scelta di `/link`
+     con una ragione diversa. Là l'assistente era già uno dei sei comandi; qui
+     l'assistente è una **via d'uscita**: chi si è fermato a metà del modulo e
+     si mette a chattare non lo finisce, e la persona che gli sta accanto ha già
+     risposto a voce a tutto quello che la chat direbbe. Sul totem, poi, la chat
+     ricorderebbe l'email di chi ha appena compilato — se ne va con lo stesso
+     conto alla rovescia di questa pagina, ma tenerla a portata di dito sarebbe
+     un secondo posto in cui quel dato può comparire.
+
+     `!important` è necessario: `ChatFab` dichiara `.cfab { display: inline-flex }`
+     nel proprio `<style>`, che Astro compila in `.cfab[data-astro-cid-…]` — due
+     classi contro una, quindi senza vince lui. `display: none` e non
+     `visibility`, così esce anche dal giro del tab. */
+  :global(.cfab) {
+    display: none !important;
+  }
+
+  /* La pagina occupa lo schermo e non scorre più del necessario: su un totem
+     in verticale il modulo intero ci sta, e su uno schermo da scrivania — dove
+     questa pagina si apre solo per provarla — la colonna resta stretta. */
+  .tt {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: var(--space-section-sm) 1.25rem var(--space-section-md);
+    background: var(--color-cream);
+  }
+
+  .tt__testa {
+    text-align: center;
+  }
+
+  .tt__eyebrow {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .tt__insegna {
+    margin: 0.35rem 0 0;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .tt__step {
+    width: 100%;
+    max-width: 34rem;
+    background: var(--color-white);
+    border-radius: 1.25rem;
+    padding: 2rem 1.75rem;
+    box-shadow: 0 18px 44px rgba(39, 36, 35, 0.09);
+  }
+
+  /* Il titolo prende il fuoco a ogni cambio di schermata: senza `outline: none`
+     il browser gli disegna intorno l'anello del fuoco, che su un titolo grande
+     sembra un errore di stile. Il fuoco resta utile — chi legge con uno screen
+     reader sente dove è arrivato — e i comandi il loro anello ce l'hanno. */
+  .tt__titolo {
+    font-size: var(--text-xl);
+    --lh: 1;
+    margin: 0 0 0.75rem;
+  }
+
+  .tt__titolo:focus {
+    outline: none;
+  }
+
+  .tt__lead {
+    margin: 0 0 1.5rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 44ch;
+  }
+
+  .tt__label {
+    display: block;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-dark);
+    margin-bottom: 0.5rem;
+  }
+
+  .tt__facoltativo {
+    margin-left: 0.5rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: var(--text-muted);
+  }
+
+  /* `:global`, e non è pigrizia: il campo telefono lo disegna
+     `CampoTelefono.astro`, quindi il suo `select` e il suo `input` portano
+     l'ambito di *quel* file. Una regola con ambito scritta qui diventa
+     `.tt__input[data-astro-cid-…]` e non li raggiunge mai — passare la classe
+     al componente non basta, perché a non attraversare il confine è la regola,
+     non la classe. La classe è già propria di questa pagina, quindi globale
+     non collide con niente. */
+  :global(.tt__input) {
+    width: 100%;
+    min-height: 3.5rem;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(39, 36, 35, 0.18);
+    border-radius: 0.75rem;
+    background: var(--color-white);
+    color: var(--color-dark);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+  }
+
+  :global(.tt__input)::placeholder {
+    color: rgba(39, 36, 35, 0.38);
+  }
+
+  :global(.tt__input):focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(255, 87, 1, 0.15);
+  }
+
+  :global(.tt__input--errore) {
+    border-color: #d92d20;
+  }
+
+  .tt__coppia {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 0 1rem;
+  }
+
+  .tt__gruppo {
+    border: 0;
+    padding: 0;
+    margin: 0.5rem 0 1.25rem;
+  }
+
+  .tt__famiglia + .tt__famiglia {
+    margin-top: 1rem;
+  }
+
+  .tt__famiglia-titolo {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  .tt__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  /* 3rem di altezza e non 2,75: al totem si preme con un dito, in piedi, e
+     senza appoggiare la mano. La misura minima della spazzata è 48px, e a
+     radice 16 questa fa 48 esatti — sul pannello cresce con la radice perché è
+     in rem. */
+  .tt__chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    padding: 0 1.05rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    background: var(--color-white);
+    font-size: var(--text-sm);
+    color: var(--color-dark);
+    cursor: pointer;
+    transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease,
+      color var(--dur-fast) ease;
+  }
+
+  /* La casella resta nel DOM e prende il fuoco da tastiera — è lei che porta lo
+     stato — ma non si disegna: la pastiglia è la sua etichetta. `appearance:
+     none` e non `display: none`, perché una casella con `display: none` esce
+     dall'ordine di tabulazione. */
+  .tt__chip input {
+    appearance: none;
+    -webkit-appearance: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    margin: 0;
+  }
+
+  .tt__chip:has(input:checked) {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .tt__chip:has(input:focus-visible) {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+  }
+
+  .tt__consenso {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    margin: 0 0 0.9rem;
+    color: var(--text-muted);
+    font-size: var(--text-2xs);
+    line-height: 1.6;
+    cursor: pointer;
+  }
+
+  .tt__consenso input {
+    flex: 0 0 auto;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0.1rem;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+  }
+
+  .tt__informativa {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    margin-bottom: 0.75rem;
+    color: var(--accent-text);
+    font-size: var(--text-xs);
+    text-decoration: underline;
+  }
+
+  .tt__errore {
+    margin: -0.25rem 0 0.875rem;
+    color: #d92d20;
+    font-size: var(--text-sm);
+  }
+
+  .tt__btn {
+    width: 100%;
+    justify-content: center;
+    position: relative;
+    min-height: 3.5rem;
+  }
+
+  .tt__btn--attesa {
+    opacity: 0.75;
+    pointer-events: none;
+  }
+
+  .tt__btn--attesa .tt__btn-testo {
+    visibility: hidden;
+  }
+
+  .tt__spinner {
+    display: none;
+    position: absolute;
+    width: 1.125rem;
+    height: 1.125rem;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: var(--color-white);
+    border-radius: 50%;
+    animation: tt-gira 0.7s linear infinite;
+  }
+
+  .tt__btn--attesa .tt__spinner {
+    display: block;
+  }
+
+  @keyframes tt-gira {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .tt__conto {
+    margin: 0 0 1.25rem;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  /* + totem */
+  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
+    /* La colonna cresce con la radice perché è in rem, ma non abbastanza: sul
+       pannello il modulo va letto da mezzo metro e premuto in piedi, quindi la
+       scheda prende più larghezza e più aria. Resta sotto i 75 caratteri per
+       riga, che è il limite che conta. */
+    .tt__step {
+      max-width: 40rem;
+      padding: 2.5rem 2.25rem;
+    }
+
+    .tt__titolo {
+      font-size: var(--text-2xl);
+    }
+  }
+</style>
