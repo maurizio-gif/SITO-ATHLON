@@ -1358,7 +1358,7 @@ Due dettagli che sono trappole vere:
   scuola nuoto mandava a `/richiamami`, che è l'evento degli adulti; qui si
   segue `data/calendly.ts`.
 
-### Un orario eccezionale sostituisce quello ordinario, e va detto nel dato
+### Una lezione che non si può prenotare è una lezione che non c'è
 
 Sabato 29 agosto, dentro la finestra dell'orario estivo, a «sto provando a
 prenotare per oggi alle 17 gym floor» l'assistente ha risposto *«la Gym Floor
@@ -1384,6 +1384,19 @@ la conseguenza che nessun dato può contenere: **una chiusura non è un guasto
 del portale e non è la finestra dei tre giorni** — se in quella fascia il club è
 chiuso, la risposta è la chiusura, non «riprova» e non «controlla il
 certificato».
+
+**E la regola generale è più larga della chiusura**, perché è la chiusura a
+esserne un caso: *una lezione che non si può prenotare è quasi sempre una
+lezione che non c'è*. Il portale mostra il palinsesto vero, quindi un giorno
+vuoto o «non sono presenti lezioni nel giorno che hai selezionato» vogliono dire
+che quel giorno quella lezione non è in programma — o perché il club è chiuso in
+quella fascia, o perché quell'attività quel giorno non c'è, e il palinsesto
+cambia ogni mese. Le **sette cause** di `prenotazioni-problemi.md` sono blocchi
+su una lezione **che esiste**: elencarle a chi ha davanti un giorno vuoto è
+rispondere a un'altra domanda. La scheda ora se lo dice da sola, in un blocco
+che viene prima delle sette e non è numerato — non è un blocco, è l'assenza
+della lezione — e il prompt manda al planning invece che a «riprova» e allo
+screenshot.
 
 Due cose da sapere prima di toccarlo:
 
