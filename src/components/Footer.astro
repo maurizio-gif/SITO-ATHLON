@@ -102,23 +102,31 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
         <div class="find-us__item">
           <p class="find-us__label">Contatti</p>
           <div class="footer-contact-actions">
-            {/* Le stesse due strade dell'header — chiedere e chattare —
-                al posto dell'email: `contatta` è lo stesso `talkCta` che apre
-                il modal, e `data-cta="assistente"` è lo stesso comando che il
-                pulsante della barra usa per aprire l'assistente. */}
-            <a href={contatta.href} class="footer-contact-btn" {...contatta.attrs}>
-              <svg class="footer-contact-btn__icona" viewBox="0 0 24 24" width="16" height="16" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                aria-hidden="true">
-                <rect x="3" y="5" width="18" height="14" rx="2.5" />
-                <path d="m4 6.5 8 6.5 8-6.5" />
-              </svg>
-              <span>{contatta.label}</span>
-            </a>
-            <button type="button" class="footer-contact-btn" data-cta="assistente" data-cta-source="footer" aria-haspopup="dialog">
-              {/* La stessa icona e la stessa animazione della pastiglia della
-                  chat, sfalsata sui tre punti: dice che dall'altra parte c'è
-                  qualcuno, e vuole essere la stessa in ogni punto del sito. */}
+            {/* Un comando solo, e apre la chat.
+                Prima erano due — «Contattaci» sul modulo e «Chatta con noi»
+                sull'assistente — e chiedevano di scegliere il canale a chi ha
+                solo una domanda. Chi arriva in fondo alla pagina senza aver
+                trovato quello che cercava vuole una risposta, non un bivio: la
+                chat risponde subito, e quando non basta ha «Contatta il team»
+                dentro la conversazione, che porta esattamente dove portava
+                l'altro pulsante. È la stessa scelta già fatta sulla barra del
+                telefono, dove di comandi per farsi rispondere ce n'è uno solo.
+
+                Resta un `<a>` e non un `<button>`: `data-cta="assistente"`
+                apre l'assistente quando il JavaScript c'è, e senza si atterra
+                comunque sull'Help Desk — dove le risposte scritte ci sono
+                tutte. Il parametro le apre la chat da solo, come per i link
+                che arrivano dalle email. */}
+            <a
+              href="/club-life/?athlon-chat=1"
+              class="footer-contact-btn"
+              data-cta="assistente"
+              data-cta-source="footer"
+              aria-haspopup="dialog"
+            >
+              {/* L'icona è quella della chat e non la busta, perché è dove
+                  porta: un'icona che promette un'email davanti a un pulsante
+                  che apre una conversazione è una bugia piccola e gratuita. */}
               <svg class="footer-contact-btn__icona footer-contact-btn__icona--chat" viewBox="0 0 24 24"
                 width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -127,8 +135,8 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
                 <circle cx="12.5" cy="11.5" r="1.1" fill="currentColor" stroke="none" />
                 <circle cx="16" cy="11.5" r="1.1" fill="currentColor" stroke="none" />
               </svg>
-              <span>Chatta con noi</span>
-            </button>
+              <span>{contatta.label}</span>
+            </a>
           </div>
         </div>
         <div class="find-us__item">
