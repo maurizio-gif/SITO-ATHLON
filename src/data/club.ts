@@ -78,15 +78,33 @@ export const CLUB = {
 } as const;
 
 /**
- * Un orario eccezionale che sostituisce quello regolare, se attivo — scade da
- * solo: superato `finoAl` sparisce sia dalla nota su `/planning` sia
+ * Un orario eccezionale che **sostituisce** quello regolare, se attivo — scade
+ * da solo: superato `finoAl` sparisce sia dalla nota su `/planning` sia
  * dall'entrata "Orari di apertura" del chatbot (`kb.json`), al prossimo
  * deploy. Un unico posto: chi lo tocca aggiorna la pagina e il chatbot
  * insieme, invece di due copie che possono divergere.
+ *
+ * **`sostituisce` non è una glossa, è la metà che mancava.** L'entrata del
+ * chatbot metteva questo testo sopra le fasce ordinarie della sala pesi e le
+ * lasciava lì sotto, senza dire quale delle due vincesse: il 29 agosto — un
+ * sabato dentro la finestra estiva — a chi chiedeva di prenotare per le 17
+ * l'assistente ha risposto «la Gym Floor chiude alle 20:00, alle 17 riesci
+ * tranquillamente», leggendo la riga ordinaria del sabato. Il club era chiuso
+ * da quattro ore, e alla persona è stato detto pure che il portale sbagliava a
+ * non mostrare le sessioni. Due contesti compresenti che non dichiarano chi
+ * prevale sono un contesto da cui si compone un terzo orario che non esiste —
+ * è lo stesso difetto delle due sospensioni.
  */
 export const ORARIO_ECCEZIONALE = {
   testo:
     "Ad agosto 2026 il club segue l'orario estivo: lunedì-venerdì 8:00-21:00, sabato 9:30-13:00, domenica chiuso.",
+  /**
+   * Cosa fa a quello ordinario, detto per esteso perché è la riga che decide.
+   * Vale per **tutto**, sala pesi compresa: fuori da queste fasce non ci sono
+   * né lezioni né accesso libero, quindi non c'è niente da prenotare.
+   */
+  sostituisce:
+    "Finché vale, questo orario sostituisce quello ordinario qui sotto — sala pesi ad accesso libero compresa. Fuori da queste fasce il club è chiuso: non ci sono lezioni né accesso libero, e sul portale non compare niente da prenotare. Il sabato pomeriggio e la domenica il club è chiuso.",
   finoAl: '2026-09-01',
 } as const;
 

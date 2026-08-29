@@ -25,6 +25,13 @@ attivita: []
 
 Entro **14 giorni dall'inizio** dell'attività è obbligatorio inviare copia del Certificato di Idoneità all'Attività Sportiva **NON AGONISTICA** a [desk@athlonroma.it](mailto:desk@athlonroma.it). Non accettiamo più il formato cartaceo.
 
+## Due modi per mandarcelo, e il più rapido è da qui
+
+- **Dalla chat dell'assistente**, allegandolo al messaggio per il team: apri il modulo con l'icona del messaggio in alto, scegli il file — immagine o PDF, fino a 5 MB — e invia. È la via più corta: non devi aprire la posta e la richiesta arriva al desk con il tuo nome già attaccato.
+- **Via email**, se preferisci mandarlo dal tuo indirizzo di posta: la casella del desk è quella in cima a questa scheda.
+
+Non c'è invece un caricamento dall'app o dall'area riservata: da lì si vede la **data di scadenza**, non si carica il documento.
+
 ## L'originale resta tuo, la copia digitale la conserviamo noi
 
 Acquisiamo i certificati **esclusivamente in forma digitale**: quello che ci mandi è una copia, e **l'originale resta sempre in mano a te**. Non ritiriamo mai il cartaceo.
