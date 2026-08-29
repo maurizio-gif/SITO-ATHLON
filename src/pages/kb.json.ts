@@ -742,7 +742,7 @@ Quando proponi il Pass, dì che è la settimana Premium delle attività degli ad
     testo: blocchi(
       `Club sportivo dal ${CLUB.founded}, in ${CLUB.street}, ${CLUB.postalCode} ${CLUB.city}, zona ${CLUB.area}.`,
       `Oltre ${CLUB.sqm} m² fra sala pesi, tre sale corsi e due piscine.`,
-      `${totalLessons()} lezioni a settimana per ${totalHours()} ore di palinsesto, e ${openHours()} ore a settimana di sala pesi ad accesso libero.`,
+      `${totalLessons()} lezioni a settimana per ${totalHours()} ore di palinsesto, e ${openHours()} ore a settimana di apertura della sala pesi.`,
       elenco(bands.map((b) => `${b.title}: ${countLessons(b)} lezioni a settimana`)),
       'Non c’è un numero di telefono pubblicato: le richieste passano dal modulo di assistenza dell’Help Desk o dai moduli delle pagine.'
     ),
@@ -766,7 +766,7 @@ Quando proponi il Pass, dì che è la settimana Premium delle attività degli ad
       orarioEccezionaleAttivo() && 'ORARIO ORDINARIO, che non vale adesso:',
       pulito(gymFloor.lede),
       elenco(gymFloor.hours.map((h) => `${h.label}: ${h.hours}`)),
-      'Sono gli orari della sala pesi ad accesso libero. Gli orari delle singole attività seguono il planning e cambiano ogni mese.'
+      'Sono gli orari di apertura della sala pesi. Anche la sessione in sala si prenota, come ogni altra attività del club: prenotandola si sceglie la fascia — Con Assistenza, con un trainer in sala per tutta la sessione, oppure Allenamento Libero. Gli orari delle singole attività seguono il planning e cambiano ogni mese.'
     ),
   });
 

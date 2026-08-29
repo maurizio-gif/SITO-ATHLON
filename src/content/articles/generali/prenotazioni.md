@@ -25,6 +25,10 @@ attivita: []
 
 Gym Floor · Corsi Fitness · Aqua Fitness · Scuola Nuoto Adulti · Nuoto Libero Assistito · Corsi Fitness Virtual · Baby Nuoto (nati nel 2024, 2025 e 2026) · Recuperi Scuola Nuoto Bambini · Group Reformer
 
+### Perché si prenota
+
+La prenotazione non è un adempimento: è quello che ti garantisce di trovare il posto quando arrivi, invece di scoprire in sala o a bordo vasca che è pieno. E per la **Gym Floor** fa una cosa in più — ti dice **quando in sala c'è un trainer**: prenotando scegli fra la fascia **Con Assistenza**, dove il trainer è in sala per tutta la sessione e ti segue negli esercizi e nella scelta del piano sull'app, e **Allenamento Libero**, dove ti alleni con il piano che hai già. In sala l'assistenza c'è: dall'app vedi in quali orari.
+
 > 📌 **Della Scuola Nuoto Bambini si prenotano i recuperi, non le lezioni.** Là il turno è fisso: giorno e ora si scelgono all'iscrizione e restano quelli per la stagione, e con il bisettimanale i turni fissi sono due — non si scelgono orari diversi di settimana in settimana. Il Baby Nuoto invece si prenota turno per turno, come le attività degli adulti.
 
 ## Regole principali

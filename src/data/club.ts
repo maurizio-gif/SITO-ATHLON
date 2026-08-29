@@ -101,10 +101,10 @@ export const ORARIO_ECCEZIONALE = {
   /**
    * Cosa fa a quello ordinario, detto per esteso perché è la riga che decide.
    * Vale per **tutto**, sala pesi compresa: fuori da queste fasce non ci sono
-   * né lezioni né accesso libero, quindi non c'è niente da prenotare.
+   * né lezioni né sessioni in sala, quindi non c'è niente da prenotare.
    */
   sostituisce:
-    "Finché vale, questo orario sostituisce quello ordinario qui sotto — sala pesi ad accesso libero compresa. Fuori da queste fasce il club è chiuso: non ci sono lezioni né accesso libero, e sul portale non compare niente da prenotare. Il sabato pomeriggio e la domenica il club è chiuso.",
+    "Finché vale, questo orario sostituisce quello ordinario qui sotto — sala pesi compresa. Fuori da queste fasce il club è chiuso: non ci sono lezioni né sessioni in sala, e sul portale non compare niente da prenotare. Il sabato pomeriggio e la domenica il club è chiuso.",
   finoAl: '2026-09-01',
 } as const;
 
