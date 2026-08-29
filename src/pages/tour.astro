@@ -50,6 +50,7 @@
  */
 import Layout from '../layouts/Layout.astro';
 import CampoTelefono from '../components/CampoTelefono.astro';
+import SupportForm from '../components/clublife/SupportForm.astro';
 import { GRUPPI_ATTIVITA, CONSENSO_PRIVACY, CONSENSO_MARKETING, SECONDI_CONFERMA } from '../data/tour';
 import { CLUB } from '../data/club';
 ---
@@ -304,6 +305,36 @@ import { CLUB } from '../data/club';
         Registra un altro tour
       </button>
     </section>
+
+    {/* ── La via d'uscita, in fondo e in corpo piccolo ──────────────────────
+        È lo stesso comando in fondo a `/club-life` — stesso `SupportForm`,
+        stessa etichetta — e serve al caso che il modulo non copre: chi al
+        totem non sta registrando una visita ma ha un problema da segnalare,
+        un socio che passa dall'ingresso e trova questo schermo.
+
+        **Piccolo, e in fondo.** In cima o in pieno contenderebbe con «Ho
+        finito», che è la cosa per cui questa pagina esiste: chi ha appena
+        fatto il giro deve finire il modulo, non aprirne un altro. È lo stesso
+        peso che «Lavora con noi» ha su `/link` e nel menu del telefono, e per
+        la stessa ragione — chi cerca assistenza la cerca sapendo già di
+        volerla, e non va messo in concorrenza con la conversione.
+
+        Il pannello si apre da `window.__athlonOpenSupport`, la stessa maniglia
+        che usa la chat: qui l'ascoltatore di `HelpDesk.astro` non c'è — vive
+        sulla sezione `.hd`, che è di quella pagina — quindi il comando chiama
+        la funzione invece di portare `data-open-support`, che qui non
+        aggancerebbe niente. */}
+    <div class="tt__aiuto">
+      <button type="button" class="tt__aiuto-btn" data-tt-assistenza>
+        Richiedi assistenza →
+      </button>
+    </div>
+
+    {/* Dentro `<main>` di proposito, e non dopo: l'oblio dei tre minuti si arma
+        sugli eventi che arrivano alla radice `#tour-totem`. Montandolo fuori,
+        scrivere nel pannello dell'assistenza non conterebbe come presenza e il
+        modulo del tour si svuoterebbe sotto il naso di chi sta scrivendo. */}
+    <SupportForm />
   </main>
 </Layout>
 
@@ -473,6 +504,37 @@ import { CLUB } from '../data/club';
   /* Il filo fra il blocco del bambino e quello del genitore: due anagrafiche
      di fila senza stacco si leggono come un modulo solo, e si finisce per
      scrivere il nome del figlio nel campo del padre. */
+  /* Contornato e non pieno, come in fondo a `/club-life`: il pieno di questa
+     pagina è «Ho finito». `min-height: 3rem` in rem e non in px, o sul totem
+     resterebbe un bersaglio della misura di un telefono. */
+  .tt__aiuto {
+    margin-top: 2rem;
+    text-align: center;
+  }
+
+  .tt__aiuto-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--color-primary);
+    border-radius: 100px;
+    background: transparent;
+    color: var(--color-primary);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
+  }
+
+  .tt__aiuto-btn:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
   .tt__separatore {
     height: 1px;
     margin: 1.5rem 0;

@@ -2173,6 +2173,40 @@ un adulto già noto salta il modulo e va dritto in conversazione, qui il passo
 resta perché porta i consensi e il comando d'invio — e quello che mostra, per
 lui, è la conferma di chi è.
 
+### E in fondo c'è «Richiedi assistenza», che è quello di `/club-life`
+
+Stesso `SupportForm`, stessa etichetta, stessa maniglia: il comando chiama
+`window.__athlonOpenSupport`, e **non porta `data-open-support`** — quello lo
+ascolta uno script di `HelpDesk.astro` legato alla sezione `.hd`, che su questa
+pagina non esiste, quindi l'attributo qui non aggancerebbe niente.
+
+Serve al caso che il modulo non copre: chi al totem non sta registrando una
+visita ma ha un problema da segnalare. **Piccolo e in fondo**, con lo stesso
+peso che «Lavora con noi» ha su `/link` — in cima o in pieno contenderebbe con
+«Ho finito», che è la cosa per cui questa pagina esiste.
+
+Tre cose, e le prime due sono la ragione per cui non è bastato incollare il
+pulsante.
+
+- **Il pannello si monta dentro `<main>`, non dopo.** L'oblio dei tre minuti si
+  arma sugli eventi che arrivano a `#tour-totem`: montandolo fuori, scrivere
+  nell'assistenza non conterebbe come presenza e il modulo del tour si
+  svuoterebbe sotto il naso di chi sta scrivendo. Provato: una riga scritta al
+  secondo minuto tiene il pannello vivo, e sparisce tre minuti dopo *l'ultima*
+  battuta.
+- **Chiudere il pannello non svuota i suoi campi**: `form.reset()` sta solo dopo
+  un invio riuscito. Su un dispositivo condiviso l'email e il testo di chi ha
+  rinunciato a metà resterebbero per il prossimo, ed è esattamente ciò che
+  questa pagina esiste per evitare. `azzera()` chiama
+  `window.__athlonChiudiSupport`, che svuota e chiude — la pulizia sta in
+  `SupportForm` e non qui, o due posti azzererebbero lo stesso modulo e
+  divergerebbero al primo campo aggiunto.
+- **Il tasto di chiusura del pannello era 38px**, sotto i 48 di un dito, e sul
+  totem è l'**unico** modo di chiuderlo: non c'è una tastiera per l'Escape. Non
+  si vedeva perché la spazzata misura quello che è a schermo, e un pannello
+  chiuso non lo è. Ora cresce a `3rem` sotto le condizioni del totem e della
+  televisione; su telefono e scrivania resta 38px.
+
 ### Il figlio di un genitore che c'è già: la quarta strada di `stradaPgm`
 
 Nascondere i campi del genitore ha scoperto un buco che c'era da prima e che
@@ -2480,6 +2514,10 @@ quattro.
 **Una casella dentro la sua etichetta non è un bersaglio da misurare**: il tocco
 lo prende l'etichetta. Misurando l'`input` i due consensi risultano 34×34 e la
 spazzata segnala due guai che non esistono — l'etichetta è 891×62.
+
+E la spazzata va fatta **anche col pannello dell'assistenza aperto**: è la parte
+di questa pagina che il totem non aveva mai visto, ed è dove si è trovato il
+solo guaio vero di questo giro.
 
 E l'oblio, che si prova con l'orologio finto di Playwright (`page.clock`): un
 modulo compilato a metà deve **restare** a 2m30 e **sparire** a 3m15, lo stesso
