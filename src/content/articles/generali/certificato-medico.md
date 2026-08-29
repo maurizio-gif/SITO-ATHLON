@@ -12,6 +12,10 @@ tags:
   - scadenza
   - rinnovo temporaneo
   - obbligatorio
+  - non trovo il certificato
+  - conservazione
+  - originale
+  - copia digitale
 attivita: []
 ---
 
@@ -20,6 +24,21 @@ attivita: []
 </div>
 
 Entro **14 giorni dall'inizio** dell'attività è obbligatorio inviare copia del Certificato di Idoneità all'Attività Sportiva **NON AGONISTICA** a [desk@athlonroma.it](mailto:desk@athlonroma.it). Non accettiamo più il formato cartaceo.
+
+## L'originale resta tuo, la copia digitale la conserviamo noi
+
+Acquisiamo i certificati **esclusivamente in forma digitale**: quello che ci mandi è una copia, e **l'originale resta sempre in mano a te**. Non ritiriamo mai il cartaceo.
+
+La copia che riceviamo **la conserviamo**, ed è un obbligo di legge — non una scelta del club. Non viene eliminata dopo il controllo.
+
+> ⚠️ In area riservata, alla voce **Documenti**, ci sono i contratti e le ricevute di pagamento: **i certificati medici non sono lì**, e non c'è una copia da scaricare. Quello che l'area riservata mostra è la **data di scadenza**, sotto **Abbonamenti**.
+
+## «Non trovo il mio certificato»
+
+Sono due domande diverse, e hanno due risposte diverse. Prima di rispondere bisogna capire quale delle due è:
+
+- **Non trovi la data di scadenza** — cioè vuoi sapere fino a quando sei coperto, o se quello che hai mandato è arrivato. La trovi **in area riservata, alla voce Abbonamenti**. Se lì non c'è o non si vede, vuol dire che un certificato valido non risulta: o non ci è mai arrivato, o è scaduto.
+- **Non trovi il documento** — cioè il foglio. Quello ce l'hai tu: noi ne abbiamo solo la copia digitale, e non l'abbiamo mai ritirato. Se ti serve una copia per un'altra struttura o per il medico, la richiedi a chi te l'ha rilasciato — il medico di base, il pediatra o lo specialista in medicina dello sport hanno l'originale nei loro archivi.
 
 ## Chi può rilasciarlo
 
