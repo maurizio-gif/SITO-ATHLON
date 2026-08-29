@@ -393,6 +393,21 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
     // two components through the DOM.
     (window as any).__athlonOpenSupport = openModal;
 
+    /* E la controparte, che serve al totem. Chiudere il pannello non svuota i
+       campi — `form.reset()` sta solo dopo un invio riuscito — quindi su un
+       dispositivo condiviso l'email e il testo di chi ha rinunciato a metà
+       resterebbero lì per il prossimo che passa. `/tour` chiama questa quando
+       si dimentica, e da qui la pulizia è una sola: due posti che azzerano lo
+       stesso modulo divergerebbero al primo campo aggiunto. */
+    (window as any).__athlonChiudiSupport = () => {
+      form.reset();
+      if (status) {
+        status.textContent = '';
+        delete status.dataset.kind;
+      }
+      closeModal();
+    };
+
 
     root.querySelectorAll('[data-support-close]').forEach((el) =>
       el.addEventListener('click', closeModal)
@@ -551,6 +566,25 @@ const UTM_FIELDS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
 
   .sup__close:hover {
     background: var(--color-primary);
+  }
+
+  /* Sul totem e sulla televisione il tasto di chiusura cresce, e non e' un
+     ritocco estetico: 38px e' sotto i 48 che un dito vuole, e su quello schermo
+     questo e' **l'unico modo di chiudere il pannello** — non c'e' una tastiera
+     per l'Escape e non c'e' un fuori-pannello da toccare. Finche' questo modulo
+     stava solo su `/club-life` la cosa non si vedeva, perche' la spazzata
+     misura quello che e' a schermo e un pannello chiuso non lo e'.
+
+     Le tre condizioni sono quelle di `global.css`, e vanno tenute identiche.
+     In `rem` e non in px: sul pannello la radice cresce, e un bersaglio in px
+     resterebbe della misura di un telefono. */
+  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10),
+    (min-width: 1700px) and (min-height: 1020px) and (max-aspect-ratio: 37/20) {
+    .sup__close {
+      width: 3rem;
+      height: 3rem;
+      font-size: 1.5rem;
+    }
   }
 
   .sup__eyebrow {

@@ -657,6 +657,12 @@ export function initTourForm(root) {
   function azzera() {
     fermaConto();
     fermaOblio();
+    /* **Anche il pannello dell'assistenza si svuota**, e non è un di più:
+       chiuderlo non azzera i suoi campi — lo fa solo un invio riuscito —
+       quindi l'email e il testo di chi ci ha ripensato resterebbero a schermo
+       per il visitatore dopo. È lo stesso motivo per cui questa pagina non
+       scrive niente nello storage. */
+    if (window.__athlonChiudiSupport) window.__athlonChiudiSupport();
     dati = vuoto();
     /* Il passo dei dati torna alla forma adulti, o il prossimo visitatore
        trova a schermo i campi del bambino di quello prima. */
@@ -688,6 +694,17 @@ export function initTourForm(root) {
      sono quelli sbagliati. */
   var btnNonSeiTu = q('[data-tt-non-sei-tu]');
   if (btnNonSeiTu) btnNonSeiTu.addEventListener('click', azzera);
+
+  /* Il comando in fondo apre il pannello dell'assistenza, quello di
+     `/club-life`. Si chiama la maniglia globale e non si porta
+     `data-open-support`: quell'attributo lo ascolta uno script di
+     `HelpDesk.astro`, legato alla sezione `.hd` che qui non esiste. */
+  var btnAssistenza = q('[data-tt-assistenza]');
+  if (btnAssistenza) {
+    btnAssistenza.addEventListener('click', function () {
+      if (window.__athlonOpenSupport) window.__athlonOpenSupport();
+    });
+  }
 
   // ── L'oblio di un modulo lasciato a metà ──────────────────────────────────
   //
