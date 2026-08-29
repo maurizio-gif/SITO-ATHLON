@@ -1149,7 +1149,7 @@ export function initChatAssistente(root, options) {
   /** Il montaggio in corso, per poterlo smontare alla chiusura. */
   var montaggioRichiamo = null;
 
-  // ── L'azione: iscrizione, prova o richiamo ────────────────────────────────
+  // ── L'azione: iscrizione, prova, richiamo o team ──────────────────────────
   /**
    * Il segnale che il modello manda quando la persona ha appena confermato di
    * voler procedere (regole 7, 8, 8bis e 12 del prompt di `CHAT ATHLON`): non è
@@ -1163,12 +1163,24 @@ export function initChatAssistente(root, options) {
    * conversazione. Il calendario torna così ad apparire **solo su richiesta**,
    * come dopo la rimozione dell'offerta automatica: la differenza è che qui la
    * richiesta è arrivata a parole invece che da un pulsante.
+   *
+   * `team` è il gemello scritto di `richiamo`, e serve a una cosa sola che
+   * finora la chat non sapeva fare: **ricevere un file**. Il box del team ha
+   * un campo allegato — immagine o PDF, fino a 5 MB — quindi il certificato
+   * medico si manda da qui, senza aprire la posta. Prima l'assistente
+   * rispondeva «lo mandi via email» e l'indirizzo non poteva nemmeno dirlo,
+   * perché `data/testo.ts` toglie gli indirizzi da tutto quello che entra
+   * nella knowledge base: la persona restava con una procedura senza il dato
+   * che la fa partire. Apre lo stesso modulo dell'icona in alto, quindi ne
+   * valgono le guardie — uno per volta, e a ticket già inviato si torna alla
+   * conferma invece di aprirne un secondo.
    */
   function eseguiAzione(azione) {
     if (!azione || !conversazione) return;
     if (azione.tipo === 'iscrizione') mostraIscrizione(azione);
     else if (azione.tipo === 'prova') mostraProva();
     else if (azione.tipo === 'richiamo') mostraRichiamo();
+    else if (azione.tipo === 'team') apriTicket();
   }
 
   /** Annuale/mensile, Annuale/unico, Mensile Flex: l'ordine fisso delle tre

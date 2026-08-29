@@ -1358,6 +1358,90 @@ Due dettagli che sono trappole vere:
   scuola nuoto mandava a `/richiamami`, che è l'evento degli adulti; qui si
   segue `data/calendly.ts`.
 
+### Una lezione che non si può prenotare è una lezione che non c'è
+
+Sabato 29 agosto, dentro la finestra dell'orario estivo, a «sto provando a
+prenotare per oggi alle 17 gym floor» l'assistente ha risposto *«la Gym Floor
+chiude alle 20:00 — quindi alle 17 riesci tranquillamente»*, e al messaggio del
+portale — «non sono presenti lezioni nel giorno che hai selezionato» — che la
+finestra di prenotazione non era ancora aperta, invitando a riprovare e a
+mandare uno screenshot. Il club chiudeva alle **13:00**: non c'era niente da
+prenotare, e la persona è stata mandata a caccia di un guasto che non esisteva.
+
+**Il modello non ha inventato: ha letto la riga sbagliata di due che c'erano
+entrambe.** `club:orari` metteva `ORARIO_ECCEZIONALE.testo` sopra le fasce
+ordinarie della sala pesi e le lasciava lì sotto, senza dire quale delle due
+vincesse — ed è lo stesso difetto delle due sospensioni: *un contesto che
+contiene due regimi è un contesto da cui si può comporre un terzo regime che
+non esiste*.
+
+Ora la gerarchia è **un dato**, non una deduzione: `ORARIO_ECCEZIONALE` porta
+`sostituisce`, che dice per esteso che vale per tutto — sala pesi ad accesso
+libero compresa — e che fuori da quelle fasce non c'è né lezione né accesso
+libero; e la voce del `kb.json` marca l'elenco ordinario come *«ORARIO
+ORDINARIO, che non vale adesso»*. Nel `systemMessage` la regola fissa aggiunge
+la conseguenza che nessun dato può contenere: **una chiusura non è un guasto
+del portale e non è la finestra dei tre giorni** — se in quella fascia il club è
+chiuso, la risposta è la chiusura, non «riprova» e non «controlla il
+certificato».
+
+**E la regola generale è più larga della chiusura**, perché è la chiusura a
+esserne un caso: *una lezione che non si può prenotare è quasi sempre una
+lezione che non c'è*. Il portale mostra il palinsesto vero, quindi un giorno
+vuoto o «non sono presenti lezioni nel giorno che hai selezionato» vogliono dire
+che quel giorno quella lezione non è in programma — o perché il club è chiuso in
+quella fascia, o perché quell'attività quel giorno non c'è, e il palinsesto
+cambia ogni mese. Le **sette cause** di `prenotazioni-problemi.md` sono blocchi
+su una lezione **che esiste**: elencarle a chi ha davanti un giorno vuoto è
+rispondere a un'altra domanda. La scheda ora se lo dice da sola, in un blocco
+che viene prima delle sette e non è numerato — non è un blocco, è l'assenza
+della lezione — e il prompt manda al planning invece che a «riprova» e allo
+screenshot.
+
+Due cose da sapere prima di toccarlo:
+
+- **Sabato e domenica sono i giorni in cui i due orari divergono di più**, ed è
+  lì che l'errore si vede: l'ordinario dà il sabato 8:00–20:00, l'estivo
+  9:30–13:00. Un controllo che guarda solo i feriali non trova niente.
+- **Scade da sé**, e va bene così: passato `finoAl`, la riga eccezionale sparisce
+  e l'elenco ordinario torna a essere l'unico — quindi anche l'etichetta «che
+  non vale adesso» se ne va con lei, perché è condizionata alla stessa
+  funzione.
+
+### Il certificato medico si manda dalla chat, e l'azione `team` apre il modulo
+
+«A che indirizzo posso mandarlo?» non aveva una risposta che l'assistente
+potesse dare: `data/testo.ts` toglie **le caselle email da tutta la knowledge
+base**, quindi il modello sapeva che il certificato si manda per email e non
+sapeva dove — e ha risposto rimandando alla scheda. Alla domanda dopo, «o posso
+caricarlo tramite app», ha detto no e ha rimandato di nuovo alla scheda: due
+turni per non dare un dato che non ha.
+
+Il dato però non serviva, perché **la via più corta era già in pagina e nessuno
+gliel'aveva detta**: il box «Contatta il team» della chat ha un campo allegato —
+immagine o PDF, fino a 5 MB — che nomina il certificato medico nella sua stessa
+etichetta. Mancava il modo di arrivarci a parole.
+
+Quindi l'azione del modello diventa la quarta: `{"tipo": "team"}`, che apre quel
+modulo sotto la risposta, come le altre tre aprono l'iscrizione, la prova e il
+calendario. Tre pezzi, e nessuno dei tre si può saltare — `eseguiAzione` in
+`chatAssistente.client.js`, l'enum di `Leggi la risposta` su n8n (un'azione
+fuori forma si scarta in silenzio, quindi il modello direbbe «te lo apro qui
+sotto» senza che si apra niente), e la regola fissa nel `systemMessage`.
+
+- **È l'eccezione dichiarata al «solo dopo una conferma»** che governa le altre
+  tre azioni: aprire un modulo non impegna a niente e non manda niente — il
+  messaggio lo scrive e lo invia la persona — quindi si apre già nel turno in
+  cui dice che ha un documento da farci avere. Le altre tre partono solo dopo un
+  sì, perché quelle *fanno* qualcosa.
+- **Le guardie restano al sito**: `apriTicket()` è lo stesso dell'icona in alto,
+  quindi uno per volta, e a ticket già inviato si torna alla conferma invece di
+  aprirne un secondo.
+- **E la scheda del certificato ora dichiara le due strade**, la chat prima
+  della posta. Il markdown tiene l'indirizzo per chi legge il sito; nel `kb.json`
+  quella riga arriva senza casella, ed è giusto — l'assistente la casella non la
+  deve dire, deve aprire il modulo.
+
 ### Gli orari in chat hanno tre posti, e la domanda decide quali
 
 Non è un bivio, è una scala, e ogni gradino esiste perché il precedente non

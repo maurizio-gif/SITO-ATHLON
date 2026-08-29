@@ -18,10 +18,35 @@ attivita: []
 ---
 
 <div class="ci-hero">
-  🔒 Le cause sono sette, e sei di queste si risolvono da sola o dall'area riservata
+  🔒 Prima controlla che quella lezione ci sia · Poi le sette cause di blocco
 </div>
 
-Se il sistema non ti lascia prenotare, quasi sempre è una di queste sette cause. Trova il messaggio che vedi a schermo: sotto c'è il motivo e cosa fare. Se nessuna corrisponde, [scrivi all'assistenza](/club-life#help-desk) allegando uno **screenshot dell'errore** — è la prima cosa che ti chiediamo, e mandarla subito dimezza i tempi.
+Se il sistema non ti lascia prenotare, la prima domanda non è quale blocco sia scattato: è se quella lezione, in quel giorno e a quell'ora, esiste. Se esiste, quasi sempre è una delle sette cause qui sotto. Trova il messaggio che vedi a schermo: sotto c'è il motivo e cosa fare. Se nessuna corrisponde, [scrivi all'assistenza](/club-life#help-desk) allegando uno **screenshot dell'errore** — è la prima cosa che ti chiediamo, e mandarla subito dimezza i tempi.
+
+---
+
+## Prima di tutto: quella lezione, quel giorno, c'è?
+
+### Messaggio che vedi
+
+> Non sono presenti lezioni nel giorno che hai selezionato
+
+Oppure il giorno si apre vuoto, o l'orario che cerchi non compare in elenco.
+
+### Perché appare
+
+**Una lezione che non si può prenotare è quasi sempre una lezione che non c'è.** Il portale mostra il palinsesto vero: se quel giorno non ha quella lezione, non c'è niente da prenotare — e non è un guasto, non è il tuo account e non è la finestra dei 3 giorni.
+
+I motivi sono due, e si controllano in un minuto:
+
+- **il club è chiuso** in quella fascia — succede il sabato pomeriggio e la domenica quando è in vigore un orario ridotto, come quello estivo;
+- **quell'attività non è in palinsesto** quel giorno: gli orari cambiano ogni mese, e un corso che il martedì c'è il giovedì può non esserci.
+
+### Come si risolve
+
+Guarda il [planning del mese](/planning/): dice quali lezioni ci sono, in che giorno e a che ora. Scegli un giorno in cui quella lezione è in programma e la prenotazione si apre normalmente.
+
+> 💡 Le sette cause qui sotto sono blocchi su una lezione **che esiste**: se il giorno è vuoto, nessuna delle sette c'entra.
 
 ---
 

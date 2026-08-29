@@ -755,8 +755,15 @@ Quando proponi il Pass, dì che è la settimana Premium delle attività degli ad
     url: `${SITE}/planning`,
     area: 'Il club',
     attivita: [],
+    /* L'orario eccezionale non sta sopra a quello ordinario: lo **sostituisce**,
+       e la voce lo deve dire. Senza quella riga il contesto conteneva due
+       orari senza gerarchia, e il 29 agosto la risposta è stata quella
+       ordinaria del sabato — «la Gym Floor chiude alle 20:00» a club chiuso
+       dalle 13. Vedi la nota su `ORARIO_ECCEZIONALE` in `data/club.ts`. */
     testo: blocchi(
-      orarioEccezionaleAttivo() && pulito(ORARIO_ECCEZIONALE.testo),
+      orarioEccezionaleAttivo() &&
+        capoversi([ORARIO_ECCEZIONALE.testo, ORARIO_ECCEZIONALE.sostituisce]),
+      orarioEccezionaleAttivo() && 'ORARIO ORDINARIO, che non vale adesso:',
       pulito(gymFloor.lede),
       elenco(gymFloor.hours.map((h) => `${h.label}: ${h.hours}`)),
       'Sono gli orari della sala pesi ad accesso libero. Gli orari delle singole attività seguono il planning e cambiano ogni mese.'
