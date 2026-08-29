@@ -1358,6 +1358,49 @@ Due dettagli che sono trappole vere:
   scuola nuoto mandava a `/richiamami`, che è l'evento degli adulti; qui si
   segue `data/calendly.ts`.
 
+### Tutto si prenota, e in sala l'assistenza c'è
+
+A «quali attività si devono prenotare?» l'assistente ha risposto con due
+elenchi — *si prenota* / *non si prenota* — mettendo la **Gym Floor** nel
+secondo: *«entri quando vuoi, senza prenotazione»*, e poi *«se scegli lo Smart,
+la sala pesi è libera quando vuoi»*. Sono due cose false in una frase: la
+sessione in sala si prenota come una lezione, e prenotandola si sceglie la
+fascia — **Con Assistenza**, con un trainer in sala per tutta la sessione, o
+**Allenamento Libero**.
+
+**La pagina `/gym-floor` lo diceva già giusto; a sbagliare erano i dati che
+finiscono nel `kb.json`**, ed è lì che è stato corretto:
+
+- `activityInfo['Gym Floor']` diceva solo com'è fatta la sala. Ora dice anche
+  che la sessione si prenota e cosa si sceglie prenotandola.
+- Il piano **Smart** portava `badge: 'Autonomia'` e `claim: 'Allenati in
+  autonomia'` — la riga da cui la chat ha dedotto che in sala si sta da soli.
+  Quello che lo Smart lascia fuori è il **palinsesto dei corsi**, non
+  l'assistenza: badge e claim ora dicono quello.
+- «Sala pesi **ad accesso libero**» spariva in tre punti (`club:anagrafica`,
+  `club:orari`, `llms.txt`): quel nome descriveva le ore di apertura e si
+  leggeva come «si entra senza prenotare».
+
+**La prenotazione si racconta per quello che dà**, non come un adempimento: ti
+garantisce il posto, e in sala ti dice **quando il trainer c'è**. È il motivo
+per cui esiste, ed è la risposta alla domanda che le persone fanno davvero.
+
+**E l'obiezione si risvolta, non si difende.** «Da voi si deve prenotare tutto»
+non si chiude con «è obbligatoria»: la prenotazione fa tre cose, e sono tutte di
+chi prenota — il posto è suo e vede **quante persone ci sono** in quell'orario;
+**se qualcosa cambia lo sa prima** (un trainer o un istruttore sostituito, una
+lezione che cambia orario o tipo: prenotando sappiamo chi avvisare); e in sala
+sceglie se allenarsi col trainer o per conto suo. È lo scopo vero della
+prenotazione — tenere aggiornati il club e chi si allena, da tutte e due le
+parti — e sta scritto in tre posti: la f.a.q. di `/gym-floor`, la scheda
+`adulti/gym-floor` e la sezione «Perché si prenota» di `generali/prenotazioni`.
+
+**E a «c'è assistenza in sala?» la risposta è sempre sì.** Non «puoi allenarti
+in autonomia»: il trainer c'è, segue l'esecuzione degli esercizi e aiuta a
+scegliere il piano sull'app; quello che si sceglie prenotando è l'orario in cui
+c'è. La regola fissa nel `systemMessage` lo dice, insieme al divieto di
+costruire l'elenco «cosa non si prenota», che non ha nessuna voce.
+
 ### Una lezione che non si può prenotare è una lezione che non c'è
 
 Sabato 29 agosto, dentro la finestra dell'orario estivo, a «sto provando a

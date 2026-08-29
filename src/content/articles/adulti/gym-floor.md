@@ -16,8 +16,18 @@ attivita:
 
 In fase di prenotazione scegli tra:
 
-- **Con Assistenza** — sarà presente un Trainer per supportarti
-- **Allenamento Libero** — accesso autonomo, nessun trainer
+- **Con Assistenza** — un nostro Trainer è in sala per tutta la sessione: ti segue nell'**esecuzione degli esercizi**, ti controlla mentre lavori e ti aiuta a **scegliere il piano di allenamento** più adatto fra quelli dell'app
+- **Allenamento Libero** — ti alleni con il piano che hai già, senza trainer in sala
+
+**L'assistenza in sala c'è**: prenotando vedi in quali orari.
+
+### Perché si prenota
+
+Non è un adempimento, è quello che tiene il filo fra te e il club:
+
+- **il posto è tuo**, e vedi quante persone ci sono in quell'orario;
+- **se qualcosa cambia lo sai prima** — un trainer sostituito, una variazione di orario o di tipo di sessione — invece di scoprirlo arrivando;
+- **scegli come allenarti**, con il trainer in sala o per conto tuo.
 
 <details>
 <summary><strong>Come prenotare</strong></summary>

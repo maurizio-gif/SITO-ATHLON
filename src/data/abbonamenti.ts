@@ -35,8 +35,14 @@ export const ETA_MINIMA_ADULTI = {
 export const activityInfo: Record<string, { title: string; body: string; href?: string }> = {
   'Gym Floor': {
     title: 'Gym Floor',
+    /* **«Accesso libero» non è mai stato il nome giusto, e in chat è diventato
+       un errore**: l'assistente ha risposto che la sala «si entra quando vuoi,
+       senza prenotazione» e che con lo Smart ci si allena da soli. La sessione
+       si prenota come una lezione, e prenotandola si sceglie la fascia — con
+       il trainer in sala, o allenamento libero. È il motivo per cui si
+       prenota: dall'app si vede quando il trainer c'è. */
     body:
-      '400 mq di sala accessibile dalle 6:00 alle 22:00: area cardio Matrix 4.0 con macchinari connessi all\'app, area isotonica, area funzionale Ziva con rig da 8 metri, manubri fino a 50 kg e area cavi e carico libero.',
+      '400 mq di sala aperta dalle 6:00 alle 22:00: area cardio Matrix 4.0 con macchinari connessi all\'app, area isotonica, area funzionale Ziva con rig da 8 metri, manubri fino a 50 kg e area cavi e carico libero. La sessione si prenota da app o portale, scegliendo la fascia Con Assistenza — un trainer in sala per tutta la sessione, che ti segue negli esercizi e ti aiuta a scegliere il piano sull\'app — oppure Allenamento Libero.',
     href: '/gym-floor',
   },
   'Nuoto Libero Assistito': {
@@ -86,10 +92,14 @@ export const activityInfo: Record<string, { title: string; body: string; href?: 
 export const plans = [
   {
     id: 'smart',
-    badge: 'Autonomia',
+    /* Il badge diceva «Autonomia» e il claim «Allenati in autonomia», ed è la
+       riga da cui la chat ha dedotto che in sala si sta da soli. In sala il
+       trainer c'è: quello che lo Smart lascia fuori è il palinsesto dei corsi,
+       non l'assistenza. */
+    badge: 'Sala e vasca',
     name: 'Smart',
-    claim: 'Allenati in autonomia.',
-    desc: 'Gym Floor e Nuoto Libero Assistito tutti i giorni, più Athlon TV: costruisci la tua routine fra sala e vasca, senza dipendere dal palinsesto dei corsi.',
+    claim: 'Sala e vasca, quando vuoi.',
+    desc: 'Gym Floor e Nuoto Libero Assistito tutti i giorni, più Athlon TV: prenoti la sessione, scegli se allenarti con il trainer in sala o per conto tuo, e costruisci la tua routine fra sala e vasca senza dipendere dal palinsesto dei corsi.',
     activities: ['Gym Floor', 'Nuoto Libero Assistito', 'Athlon TV'],
     options: [
       {

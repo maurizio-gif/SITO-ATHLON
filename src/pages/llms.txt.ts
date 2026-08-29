@@ -59,7 +59,7 @@ ${SITE}/planning
 ## Cosa si fa, in numeri
 
 - ${totalLessons()} lezioni a settimana, per ${totalHours()} ore di palinsesto
-- ${openHours()} ore a settimana di sala pesi ad accesso libero
+- ${openHours()} ore a settimana di apertura della sala pesi
 - ${fitness.length} corsi fitness, ${acqua.length} attività in acqua, 4 corsi per bambini
 
 ${fasce().join('\n')}
