@@ -164,9 +164,42 @@ export const SPONTANEA = {
 /** Il tetto del curriculum, in byte. Lo stesso dell'allegato dell'Help Desk. */
 export const CV_MAX_BYTE = 5 * 1024 * 1024;
 
-/** Cosa accetta il campo del curriculum. PDF in testa, che è quello giusto. */
-export const CV_TIPI = '.pdf,.doc,.docx,application/pdf,application/msword,' +
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+/**
+ * Cosa accetta il campo del curriculum. PDF in testa, che è quello giusto.
+ *
+ * **L'elenco è largo di proposito, e la ragione è che questo attributo è
+ * l'unico filtro che esiste.** All'invio si controlla solo il peso: n8n prende
+ * il tipo dal body così com'è, con ripiego `application/octet-stream`, e
+ * SendGrid allega qualunque cosa arrivi. Quindi ciò che non è scritto qui non
+ * è «sconsigliato»: è impossibile da allegare.
+ *
+ * E dove morde non è la scrivania — lì si può sempre passare a «tutti i file»
+ * dal selettore — ma il **telefono**, che è da dove si candida quasi tutti.
+ * Su iOS e Android il picker mostra solo ciò che `accept` ammette: senza
+ * `image/*` la libreria foto non si apre nemmeno, e chi ha il curriculum
+ * fotografato o scansionato con lo scanner del telefono non ha nessuna
+ * strada. Un curriculum in una foto storta si legge lo stesso; una
+ * candidatura che non parte no.
+ *
+ * `image/*` invece dei singoli tipi perché l'HEIC di iPhone si dichiara in
+ * modi diversi a seconda della versione, e un elenco che ne dimentica uno
+ * richiude la porta che questa riga apre. `.heic`/`.heif` restano scritte
+ * perché qualche browser confronta l'estensione e non il tipo.
+ */
+export const CV_TIPI = [
+  // I documenti veri, in ordine di quanto sono comodi da leggere.
+  '.pdf', '.doc', '.docx', '.odt', '.rtf', '.txt', '.pages',
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.oasis.opendocument.text',
+  'application/rtf',
+  'text/rtf',
+  'text/plain',
+  'application/x-iwork-pages-sffpages',
+  // La foto o la scansione, che dal telefono è il caso normale.
+  '.heic', '.heif', 'image/*',
+].join(',');
 
 /** Il webhook n8n che salva su Supabase e manda il curriculum al club. */
 export const ENDPOINT_CANDIDATURA =
