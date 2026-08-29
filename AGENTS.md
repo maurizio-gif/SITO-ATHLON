@@ -2457,18 +2457,46 @@ accompagna un amico è tutti e due, e quello che deve ricevere è il promemoria
 della visita. Per questo il ramo si legge da `tipoRichiestaVista` — cioè da
 quello che il browser ha dichiarato — e non da `statoNucleo`.
 
-**E non si propone niente: si ricapitola.** Nessun Guest Pass, nessun invito a
-provare. La prima stesura aveva una scheda «C'è il Guest Pass», ed era fuori
-posto per una ragione che vale in generale: questa persona **è appena stata in
-sede**, accompagnata da qualcuno. Invitarla a venire a provare è rispondere a una
-domanda che non ha fatto, e la fa sentire un indirizzo in una lista invece che
-qualcuno che il club ha appena conosciuto. Quello che serve è il riepilogo di
-corsi, abbonamenti e attività di cui si è parlato, e dove ritrovarli.
+**Si ricapitola, e si propone una cosa sola: il Guest Pass, nel solo ramo
+adulti.** Tutto il resto dell'email è un promemoria — corsi, abbonamenti,
+attività di cui si è parlato, e dove ritrovarli — perché questa persona **è
+appena stata in sede**, accompagnata da qualcuno: proporle di venire a provare è
+rispondere a una domanda che non ha fatto. Il Pass è l'eccezione, ed è una
+scelta del club: chi ha girato la sala pesi e i corsi ha già in mano il motivo
+per provarli, e il passo dopo la visita è entrare una volta senza abbonarsi.
 
-L'unica «prova» che resta nel testo è la **prova di inserimento obbligatoria**
+Il riquadro sta **dentro il ramo adulti e subito dopo le sue schede**, non in
+fondo: segue le attività che l'hanno motivato. Tre condizioni, e le ultime due
+non sono prudenza.
+
+- **Almeno un'attività adulti fra quelle spuntate al totem** — è la stessa
+  `adulti` che compone le schede, quindi un tour misto lo riceve: il genitore
+  che ha guardato la sala pesi mentre iscriveva il figlio è il caso normale.
+- **Solo a chi il Pass può averlo.** È riservato a chi non ha avuto un
+  abbonamento Athlon dal 2021 (`GUEST_PASS.dal`), quindi a un socio si starebbe
+  offrendo una cosa che non può comprare. La condizione è la lista bianca della
+  chat — `stato` a `nuovo` o `esiste` — e la verifica che non ha risposto cade
+  fuori da sé: quando non sappiamo, non si offre.
+- **Niente cifre, niente giorni e nessun elenco delle attività comprese.** Le
+  prime due per la regola di tutta questa email; il terzo perché un elenco a
+  metà si legge come un elenco completo, ed è così che una prova finisce
+  comprata per una cosa che non comprende — il Pass è un Premium, quindi non
+  apre il personal training. Durata, prezzo e perimetro li stampa `/prova`, che
+  li legge da `GUEST_PASS` e `ATTIVITA_GUEST_PASS`.
+
+**Il link è `/prova/` con lo slash**, come ogni indirizzo interno del sito: senza
+si prende un 308 in più, dentro un'email che qualcuno aprirà fra un mese.
+
+L'altra «prova» che compare nel testo è la **prova di inserimento obbligatoria**
 dell'agonistico e della pallanuoto, che non è un invito ma il modo in cui si
 entra in quei due corsi — sta nel campo `prova` delle loro schede in
 `data/junior.ts`, ed è informazione sull'iscrizione.
+
+Per verificare, senza n8n: si esegue il nodo fuori con un payload finto e si
+confronta l'HTML con quello del nodo prima della modifica. Su dodici casi ne
+deve cambiare **uno solo** — il tour adulti di chi può provare — e in quello
+l'unico link nuovo dev'essere `/prova/`, senza `19`, senza `7 giorni` e senza
+`GOLD7`.
 
 **L'ultimo comando apre la chat, e la apre davvero.** Porta a
 `/club-life/?athlon-chat=1`: quel parametro esiste in `ChatModal.astro` proprio
