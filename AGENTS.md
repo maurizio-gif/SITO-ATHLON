@@ -2113,6 +2113,76 @@ Tre cose che questo ramo porta con sé:
   — e il bambino va registrato comunque; le attività adulti restano nell'email
   e nelle note del tour.
 
+### Il codice fiscale sta in un accordion chiuso, e vale per tutte e due
+
+`personalId` è il campo con cui PerfectGym tiene il codice fiscale — lo dice già
+la tabella del sync, `m.personalId` → `codice_fiscale` — e senza di lui la scheda
+che n8n crea nasce incompleta: la si finisce a mano, e nessuno sa che c'è da
+farlo. Quindi il totem lo chiede, **all'adulto che si sta registrando e al
+bambino**, cioè alle due anagrafiche che da qui nascono davvero.
+
+**Chiuso, e non è timidezza.** Sedici caratteri si copiano da una tessera, e al
+totem la tessera in tasca quasi nessuno ce l'ha: un campo aperto in mezzo al
+modulo è una domanda a cui la risposta normale è «non ce l'ho dietro», e ogni
+domanda del genere è un punto in cui una persona in piedi dice «lasciamo stare».
+Un `<details>` chiuso è invece un'**offerta**: chi ce l'ha lo apre, chi non ce
+l'ha non lo vede nemmeno. È lo stesso `<details>` di `Servizi.astro`, e per la
+stessa ragione — nessuno script, e il trova-nella-pagina lo apre lo stesso.
+
+Quattro cose da sapere prima di toccarlo.
+
+**Si chiede a chi si sta registrando, non a chi passa.** Il campo dell'adulto sta
+**dentro** `data-tt-persona`, quindi compare esattamente quando compaiono nome e
+cognome — cioè quando `servonoISuoiDati()` è vera e l'anagrafica la crea n8n. A
+chi il club ha già in archivio il codice fiscale lo ha dato PerfectGym: è la
+stessa ricopiatura che il riquadro «ti abbiamo trovato» esiste per togliere.
+Quello del bambino sta dentro `data-tt-bambino`, che segue il ramo junior, e per
+lui non c'è il caso «ce l'abbiamo già» — di lui PerfectGym non ci ha mai detto
+niente.
+
+**Facoltativo vuol dire «puoi non darmelo», non «puoi darmelo sbagliato».** È la
+regola del cellulare: se è scritto dev'essere vero, o il dato che parte è peggio
+del dato che manca — un `personalId` troncato si siede nella scheda, e lo
+corregge solo chi va a guardarlo. Il controllo è **sedici alfanumerici**, e non
+lo schema canonico: quello lo rompe l'**omocodia**, cioè i codici in cui
+l'Agenzia sostituisce una cifra con una lettera per separare due persone che si
+scontrano. Sono codici veri, in tasca a qualcuno, e un controllo elegante che li
+rifiuta blocca un dato buono per fare bella figura.
+
+**Un campo dentro un accordion chiuso non si può segnalare.** `segnala()` chiama
+`focus()`, e su un elemento non renderizzato non fa niente: il modulo si
+fermerebbe mostrando un errore che parla di un campo che non è a schermo — «un
+modulo che si blocca su niente», che è la trappola già scritta due volte in
+questo file. Quindi `apriExtra()` apre il riquadro **prima** di puntare il campo.
+Vale per ogni campo che un giorno finisse dentro un `<details>`.
+
+**E alla fine gli accordion si richiudono**, dentro `azzera()`. Il valore lo
+svuota già il giro su `.tt__input`; è il riquadro *aperto* a essere il residuo —
+direbbe al visitatore dopo che il codice fiscale è una cosa che gli stiamo
+chiedendo. Sul totem ogni cosa lasciata a schermo è una cosa di un'altra persona.
+
+Sul filo, i due nomi:
+
+- verso il pannello viaggia `codiceFiscale`, e dentro `bambino.codiceFiscale`. In
+  italiano come tutto il resto del payload — `dataNascita` non si chiama
+  `birthDate` — e il pannello lo tiene in `payload`, dove sta già tutto il resto
+  del modulo;
+- verso n8n viaggiano **anche** `personalId` e `personalIdFiglio`, col nome che
+  PerfectGym gli dà, come `cellulare` ripete `telefono` con il nome che quel
+  workflow si aspetta. Vanno in `personalData.personalId`: il primo nella
+  chiamata che crea l'adulto — `PGM Crea Lead` per gli adulti, `PGM Crea
+  Genitore` per il nucleo — il secondo in `PGM Crea Figlio`;
+- **vuoto vuol dire assente.** `|| undefined` toglie la chiave da
+  `JSON.stringify`, così una stringa vuota non arriva a PerfectGym come la
+  proposta di azzerare un `personalId` che l'anagrafica magari ha già. È la
+  stessa regola del sync, «un campo assente non è un campo svuotato».
+
+**La mappatura sui nodi la fa n8n, e finché non c'è il campo non arriva.** Il
+sito manda il dato con il nome giusto; leggerlo in `personalData` è una riga in
+`PGM Crea Lead`, `PGM Crea Genitore` e `PGM Crea Figlio`. Senza quella riga il
+codice fiscale resta nel payload del tour — visibile in agenda, quindi non
+perso — e la scheda su PerfectGym nasce come prima.
+
 Il ramo lo decide `data-tt-gruppo` sulla casella, che il markup riempie da
 `GRUPPI_ATTIVITA` — cioè da `ACTIVITY_TAGS`. Un elenco di slug scritto nel
 client divergerebbe il giorno che si aggiunge un corso.

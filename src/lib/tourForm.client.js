@@ -73,6 +73,8 @@ export function initTourForm(root) {
     bnascita: 'Serve la data di nascita del bambino: è quella che decide il corso.',
     nascita: 'Serve la tua data di nascita: la chiede il portale per creare l’anagrafica.',
     cellulareNucleo: 'Per registrare il nucleo serve un cellulare.',
+    cf: 'Il codice fiscale è di sedici caratteri: controlla, o lascialo vuoto.',
+    bcf: 'Il codice fiscale del bambino è di sedici caratteri: controlla, o lascialo vuoto.',
     attivita: 'Scegli almeno un’attività.',
     privacy: 'Serve il consenso al trattamento per poterti ricontattare.',
     invio: 'Non riusciamo a registrare il tour. Riprova fra un istante.',
@@ -99,6 +101,8 @@ export function initTourForm(root) {
   var campoBNome = q('#tt-b-nome');
   var campoBCognome = q('#tt-b-cognome');
   var campoBNascita = q('#tt-b-nascita');
+  var campoCf = q('#tt-cf');
+  var campoBCf = q('#tt-b-cf');
   var campoCellulare = q('#tt-cellulare');
   var campoPrivacy = q('#tt-privacy');
   var campoMarketing = q('#tt-marketing');
@@ -111,8 +115,13 @@ export function initTourForm(root) {
       nome: '',
       cognome: '',
       nascita: '',
+      /** Il codice fiscale, che PerfectGym chiama `personalId`. Facoltativo di
+          qui fino a n8n: se manca, la scheda si crea senza e il campo resta da
+          completare a mano — che è esattamente com'era prima che questo campo
+          esistesse. */
+      codiceFiscale: '',
       cellulare: '',
-      bambino: { nome: '', cognome: '', dataNascita: '' },
+      bambino: { nome: '', cognome: '', dataNascita: '', codiceFiscale: '' },
       attivita: [],
       /** `adulti` o `junior`: lo decide l'attività, e con lui cambia il passo
           dei dati e la strada su PerfectGym (`lead` o `nucleo`). */
@@ -200,6 +209,37 @@ export function initTourForm(root) {
 
   function emailValida(valore) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(valore || '').trim());
+  }
+
+  /* Il codice fiscale come lo vuole PerfectGym: stampatello, senza spazi.
+     Chi lo copia da una tessera ci mette dentro un separatore o lo scrive
+     minuscolo, e rifiutarglielo per quello vorrebbe dire far ridigitare
+     sedici caratteri a una persona in piedi. */
+  function normalizzaCf(valore) {
+    return String(valore || '').replace(/\s+/g, '').toUpperCase();
+  }
+
+  /* **Sedici alfanumerici, e non lo schema completo.** La forma canonica —
+     sei lettere, due cifre, una lettera del mese… — la rompe l'**omocodia**:
+     quando due persone si scontrano sullo stesso codice, l'Agenzia sostituisce
+     una cifra con una lettera, e quei codici sono veri e in tasca a qualcuno.
+     Un controllo che li rifiuta blocca un dato buono; questo prende quello che
+     serve davvero, cioè il codice troncato o incollato a metà.
+
+     Non c'è il carattere di controllo, e nemmeno quello è una svista: chi si
+     sbaglia di una lettera qui davanti ha comunque l'operatore accanto, e il
+     dato lo si vede nella scheda. */
+  function cfValido(valore) {
+    return /^[A-Z0-9]{16}$/.test(valore);
+  }
+
+  /* Un campo dentro un accordion chiuso non si può segnalare: `focus()` su un
+     elemento non renderizzato non fa niente, e il modulo si fermerebbe
+     mostrando un errore che parla di un campo che non è a schermo. Quindi
+     prima si apre il riquadro, poi si punta il campo. */
+  function apriExtra(campo) {
+    var box = campo && campo.closest ? campo.closest('[data-tt-extra]') : null;
+    if (box) box.open = true;
   }
 
   /* Il numero in forma internazionale: la tendina del prefisso è quella accanto
@@ -423,6 +463,7 @@ export function initTourForm(root) {
         nome: campoBNome.value.trim(),
         cognome: campoBCognome.value.trim(),
         dataNascita: campoBNascita.value,
+        codiceFiscale: normalizzaCf(campoBCf && campoBCf.value),
       };
       if (!dati.bambino.nome) {
         mostraErrore(steps.dati, ERR.bnome);
@@ -439,8 +480,19 @@ export function initTourForm(root) {
         segnala(campoBNascita);
         return;
       }
+      /* Facoltativo vuol dire «puoi non darmelo», non «puoi darmelo
+         sbagliato»: è la stessa regola del cellulare, che si può lasciare
+         vuoto ma non si può lasciare a metà. Un `personalId` troncato non
+         fallisce la creazione della scheda — ci si siede dentro, e da lì lo
+         corregge solo chi va a guardarlo. */
+      if (dati.bambino.codiceFiscale && !cfValido(dati.bambino.codiceFiscale)) {
+        mostraErrore(steps.dati, ERR.bcf);
+        apriExtra(campoBCf);
+        segnala(campoBCf);
+        return;
+      }
     } else {
-      dati.bambino = { nome: '', cognome: '', dataNascita: '' };
+      dati.bambino = { nome: '', cognome: '', dataNascita: '', codiceFiscale: '' };
     }
 
     /* **I campi nascosti non si leggono e non si pretendono.** Quando
@@ -471,6 +523,21 @@ export function initTourForm(root) {
     if (junior && suoi && !dati.nascita) {
       mostraErrore(steps.dati, ERR.nascita);
       segnala(campoNascita);
+      return;
+    }
+
+    /* **Il codice fiscale si chiede a chi si sta registrando, e a nessun
+       altro.** Il campo sta dentro `data-tt-persona`, quindi è a schermo
+       esattamente quando lo sono nome e cognome — cioè quando l'anagrafica la
+       crea n8n e `personalId` ha un posto dove andare. Con l'anagrafica già su
+       PerfectGym quella chiamata non parte: leggere il campo darebbe la
+       stringa vuota di un riquadro che nessuno ha visto, e mandarla vorrebbe
+       dire proporsi di svuotare un dato che il gestionale ha già. */
+    dati.codiceFiscale = suoi ? normalizzaCf(campoCf && campoCf.value) : '';
+    if (dati.codiceFiscale && !cfValido(dati.codiceFiscale)) {
+      mostraErrore(steps.dati, ERR.cf);
+      apriExtra(campoCf);
+      segnala(campoCf);
       return;
     }
 
@@ -529,6 +596,10 @@ export function initTourForm(root) {
       cognome: dati.cognome,
       telefono: dati.cellulare,
       dataNascita: dati.nascita,
+      /* In italiano come tutto il resto del payload — `dataNascita` non si
+         chiama `birthDate` — e la traduzione la fa n8n, che è il posto dove
+         PerfectGym si parla. Il bambino se lo porta dentro `bambino`. */
+      codiceFiscale: dati.codiceFiscale,
       bambino: dati.bambino,
       attivita: scelte.map(function (a) { return a.id; }),
       attivitaEtichette: scelte.map(function (a) { return a.label; }),
@@ -590,6 +661,22 @@ export function initTourForm(root) {
             flow: dati.ramo,
             gruppoAttivita: dati.ramo === 'junior' ? 'junior' : 'adulti',
             cellulare: dati.cellulare,
+            /* **I due codici fiscali col nome che PerfectGym gli dà**, come
+               `cellulare` qui sopra ripete `telefono` con il nome che quel
+               workflow si aspetta. Vanno in `personalData.personalId`: il primo
+               nella chiamata che crea l'adulto — `PGM Crea Lead` per il ramo
+               adulti, `PGM Crea Genitore` per il nucleo — il secondo in
+               `PGM Crea Figlio`.
+
+               **Una stringa vuota non è un campo da scrivere.** Il codice
+               fiscale è facoltativo, quindi il caso normale è che non ci sia:
+               mandare `''` a PerfectGym vuol dire proporsi di azzerare un
+               `personalId` che magari l'anagrafica ha già. `undefined` sparisce
+               da `JSON.stringify`, quindi la chiave non parte proprio — è la
+               stessa regola del sync, «un campo assente non è un campo
+               svuotato». */
+            personalId: dati.codiceFiscale || undefined,
+            personalIdFiglio: dati.bambino.codiceFiscale || undefined,
             /* La richiesta non la scrive nessuno al totem: quello che c'è è
                l'elenco delle attività, ed è quello che il desk legge
                nell'email. */
@@ -673,6 +760,14 @@ export function initTourForm(root) {
     });
     qa('[data-tt-attivita]').forEach(function (c) {
       c.checked = false;
+    });
+    /* Gli accordion tornano chiusi. Il campo dentro lo svuota il giro qui
+       sopra — porta `.tt__input` — ma un riquadro rimasto aperto direbbe al
+       visitatore dopo che il codice fiscale è una cosa che gli stiamo
+       chiedendo, e questa pagina esiste anche per non lasciargli addosso le
+       scelte di quello prima. */
+    qa('[data-tt-extra]').forEach(function (d) {
+      d.open = false;
     });
     if (campoPrivacy) campoPrivacy.checked = false;
     if (campoMarketing) campoMarketing.checked = false;

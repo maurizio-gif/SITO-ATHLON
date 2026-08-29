@@ -190,6 +190,32 @@ import { CLUB } from '../data/club';
         <label class="tt__label" for="tt-b-nascita">Data di nascita del bambino</label>
         <input class="tt__input" id="tt-b-nascita" type="date" autocomplete="off" />
 
+        {/* Il codice fiscale, chiuso. Il perché sta in testa a `tourForm.client.js`:
+            PerfectGym lo vuole in `personalData.personalId` e senza di lui la
+            scheda del bambino va completata a mano, ma è sedici caratteri da
+            copiare da una tessera che al totem quasi nessuno ha in tasca. Un
+            campo aperto è una domanda; un accordion chiuso è un'offerta — chi ce
+            l'ha lo apre e lo scrive, chi non ce l'ha non lo vede nemmeno. */}
+        <details class="tt__extra" data-tt-extra>
+          <summary class="tt__extra-testa">
+            Codice fiscale del bambino <span class="tt__facoltativo">facoltativo</span>
+          </summary>
+          <div class="tt__extra-corpo">
+            <p class="tt__extra-nota">Se ce l'hai a portata di mano, la sua scheda nasce già completa.</p>
+            <label class="tt__label tt__label--nascosta" for="tt-b-cf">Codice fiscale del bambino</label>
+            <input
+              class="tt__input"
+              id="tt-b-cf"
+              type="text"
+              autocomplete="off"
+              autocapitalize="characters"
+              spellcheck="false"
+              maxlength="16"
+              placeholder="RSSMRA18D23H501K"
+            />
+          </div>
+        </details>
+
         <p class="tt__separatore" aria-hidden="true"></p>
       </div>
 
@@ -237,6 +263,32 @@ import { CLUB } from '../data/club';
           <label class="tt__label" for="tt-nascita">La tua data di nascita</label>
           <input class="tt__input" id="tt-nascita" type="date" autocomplete="off" />
         </div>
+
+        {/* Sta **dentro** `data-tt-persona`, e non accanto: si chiede a chi
+            l'anagrafica non ce l'ha, cioè esattamente quando quell'anagrafica
+            la creiamo noi. A chi il club ha già in archivio il codice fiscale
+            lo ha dato PerfectGym — richiederglielo in piedi al totem è la
+            ricopiatura che il riquadro «ti abbiamo trovato» esiste per
+            togliere. */}
+        <details class="tt__extra" data-tt-extra>
+          <summary class="tt__extra-testa">
+            Codice fiscale <span class="tt__facoltativo">facoltativo</span>
+          </summary>
+          <div class="tt__extra-corpo">
+            <p class="tt__extra-nota">Se ce l'hai a portata di mano, la tua scheda nasce già completa.</p>
+            <label class="tt__label tt__label--nascosta" for="tt-cf">Il tuo codice fiscale</label>
+            <input
+              class="tt__input"
+              id="tt-cf"
+              type="text"
+              autocomplete="off"
+              autocapitalize="characters"
+              spellcheck="false"
+              maxlength="16"
+              placeholder="RSSMRA80A01H501U"
+            />
+          </div>
+        </details>
       </div>
 
       <div data-tt-cellulare-blocco>
@@ -539,6 +591,76 @@ import { CLUB } from '../data/club';
     height: 1px;
     margin: 1.5rem 0;
     background: var(--border-strong);
+  }
+
+  /* Il campo facoltativo che sta chiuso. `<details>` e non un accordion con
+     dello script, per la stessa ragione di `Servizi.astro`: non serve
+     JavaScript, e chi cerca «codice fiscale» col trova-nella-pagina lo apre
+     comunque. Il fatto che sia chiuso non è estetica — al totem ogni campo a
+     schermo è una domanda in più a una persona in piedi, e questa è una
+     domanda a cui quasi tutti rispondono «non ce l'ho dietro». */
+  .tt__extra {
+    margin: 0 0 1rem;
+    border: 1px solid rgba(39, 36, 35, 0.14);
+    border-radius: 0.75rem;
+    background: var(--color-white);
+  }
+
+  /* 3rem come le pastiglie delle attività e come «Non sei tu?»: al totem si
+     preme con un dito, in piedi, e sotto i 48px il bersaglio si manca. Il
+     marcatore predefinito se ne va da tutte e due le parti — `list-style` per
+     i browser moderni, la pseudo-classe per WebKit — o resterebbe una
+     freccetta accanto al `+`, che è il comando vero. */
+  .tt__extra-testa {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 3rem;
+    padding: 0.75rem 1.125rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-dark);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .tt__extra-testa::-webkit-details-marker {
+    display: none;
+  }
+
+  .tt__extra-testa::after {
+    content: '+';
+    font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--accent-text);
+  }
+
+  .tt__extra[open] .tt__extra-testa::after {
+    content: '−';
+  }
+
+  .tt__extra-corpo {
+    padding: 0 1.125rem 0.25rem;
+  }
+
+  /* Lo stampatello è quello in cui il codice fiscale si legge e si controlla —
+     ed è anche la forma in cui parte, perché `invia()` lo normalizza comunque:
+     senza, chi scrive in minuscolo vedrebbe a schermo una cosa e ne
+     manderebbe un'altra. Qui non serve `:global`: questo campo lo disegna
+     questa pagina, non `CampoTelefono`. */
+  .tt__extra-corpo .tt__input {
+    text-transform: uppercase;
+  }
+
+  .tt__extra-nota {
+    margin: 0 0 0.75rem;
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    color: var(--text-muted);
   }
 
   /* Il riquadro di chi e' gia' in anagrafica. Non e' un avviso e non e' un
