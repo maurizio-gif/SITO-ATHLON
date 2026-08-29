@@ -27,7 +27,11 @@ Gym Floor · Corsi Fitness · Aqua Fitness · Scuola Nuoto Adulti · Nuoto Liber
 
 ### Perché si prenota
 
-La prenotazione non è un adempimento: è quello che ti garantisce di trovare il posto quando arrivi, invece di scoprire in sala o a bordo vasca che è pieno. E per la **Gym Floor** fa una cosa in più — ti dice **quando in sala c'è un trainer**: prenotando scegli fra la fascia **Con Assistenza**, dove il trainer è in sala per tutta la sessione e ti segue negli esercizi e nella scelta del piano sull'app, e **Allenamento Libero**, dove ti alleni con il piano che hai già. In sala l'assistenza c'è: dall'app vedi in quali orari.
+La prenotazione non è un adempimento: è il filo che tiene aggiornati te e noi. Fa tre cose, e sono tutte per chi prenota.
+
+- **Il posto è tuo.** Arrivi sapendo che c'è spazio, invece di scoprirlo in sala o a bordo vasca. E vedi **quante persone ci sono** in quell'orario, così scegli la fascia che ti conviene.
+- **Se qualcosa cambia, lo sai prima.** Un trainer o un istruttore sostituito, una lezione che cambia tipo o orario: sappiamo chi c'era e possiamo avvisarti, invece di fartelo scoprire arrivando.
+- **In sala, ti dice quando c'è il trainer.** Prenotando la Gym Floor scegli fra la fascia **Con Assistenza** — un nostro trainer in sala per tutta la sessione, che ti segue nell'esecuzione degli esercizi, ti controlla mentre lavori e ti aiuta a scegliere il piano di allenamento sull'app — e **Allenamento Libero**, dove ti alleni con il piano che hai già. L'assistenza in sala c'è: dall'app vedi in quali orari.
 
 > 📌 **Della Scuola Nuoto Bambini si prenotano i recuperi, non le lezioni.** Là il turno è fisso: giorno e ora si scelgono all'iscrizione e restano quelli per la stagione, e con il bisettimanale i turni fissi sono due — non si scelgono orari diversi di settimana in settimana. Il Baby Nuoto invece si prenota turno per turno, come le attività degli adulti.
 
