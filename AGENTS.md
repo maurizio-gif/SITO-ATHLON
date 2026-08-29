@@ -1644,6 +1644,54 @@ credenziali e non lo è. Si passa dal browser. E attenzione all'errore che ho
 fatto io: se nella pagina hai sostituito `window.fetch` per finire le risposte,
 il `200 {ok:true}` che leggi è il tuo stesso stub e a n8n non arriva niente.
 
+### Il voto alla chat si chiede una volta, e non a chi è appena stato passato al team
+
+Dopo la **terza risposta** l'assistente chiede «Come è andata?» con cinque
+stelle. Il numero non è arbitrario: alla prima domanda non si è ancora capito
+se è servito, quindi un voto chiesto lì misura la cortesia dell'apertura e non
+l'aiuto.
+
+**Non si chiede in due casi**, e sono i due in cui il voto direbbe un'altra
+cosa: quando la risposta di quel turno è `senzaRisposta` — cioè la persona è
+appena stata mandata al team — e quando il ticket è già partito. Lì sta
+aspettando una risposta vera, e chiederle un voto in quel momento è il modo
+più rapido per prenderne uno da una stella per un motivo che non è nostro.
+
+**La domanda è una sola per conversazione, e la conversazione sopravvive al
+cambio di pagina**: `votoChiesto` e `votoDato` viaggiano nella scena in
+`sessionStorage` accanto a `ticketInviato` e `richiamoProposto`, o al secondo
+caricamento le stelle ricomparirebbero. Sul totem `pulisciStato()` le azzera
+come tutto il resto: la persona dopo non ha valutato niente.
+
+**La nota si chiede solo sotto le quattro stelle.** Chi dà cinque stelle ha già
+detto quello che pensa, e un campo di testo dopo un voto alto è un compito in
+più che abbassa la percentuale di chi vota. Sotto, la domanda è quella utile:
+«cosa potevamo fare meglio».
+
+Il voto viaggia da solo verso `chat-athlon-valutazione` (n8n, `CHAT ATHLON —
+VALUTAZIONE`) e finisce su `chat_conversazioni` — `valutazione`,
+`valutazione_il`, `valutazione_nota` — trovata dalla **sessione**, l'unica
+chiave di quella riga che il browser conosce. Tre dettagli che non sono
+decorazione:
+
+- **`keepalive` sulla `fetch`**: il voto è spesso l'ultima cosa che si tocca
+  prima di chiudere la scheda, e senza quello la richiesta muore con la pagina.
+- **Il voto si valida anche su n8n**, non solo nel browser: il vincolo `check
+  (valutazione between 1 and 5)` farebbe fallire l'update in silenzio, perché
+  quel nodo ha `continueRegularOutput` — e un voto perso non si vede da nessuna
+  parte.
+- **Le stelle sono cinque pulsanti da 2,75 rem**, non un `input range`: si
+  toccano col dito, si leggono con la tastiera, e ognuna dichiara quante stelle
+  sta dando. Una stella disegnata alla dimensione del carattere è un bersaglio
+  da 16 px, cioè un voto dato per sbaglio a quella accanto.
+
+**Dove si legge**: nel pannello, in cima alla riga chiusa della conversazione,
+con il colore che dice il verso — verde da 4, ambra a 3, rosso a 1 e 2. Sta
+sulla conversazione e non su `utenti` perché una persona ha più chat, e un voto
+senza la conversazione che l'ha generato non si può spiegare; l'anagrafica ce
+l'ha comunque, perché la riga porta già `utente_id` e la scheda della persona
+mostra le sue conversazioni.
+
 ### Sul totem la chat dimentica dopo tre minuti, altrove no
 
 La chat riprende dove stava di proposito: chiudere il pannello per sbaglio non

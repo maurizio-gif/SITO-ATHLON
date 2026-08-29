@@ -1461,6 +1461,70 @@ import CampoTelefono from '../CampoTelefono.astro';
     font-size: var(--text-xs);
   }
 
+  /* ── Il voto alla chat ───────────────────────────────────────────────────
+     Stesso riquadro del ticket — è la stessa cosa, una domanda dentro la
+     conversazione — con le cinque stelle al posto dei campi. Anche questo
+     markup lo scrive lo script, quindi vale la regola di sopra: aspetto
+     dichiarato in `:global` e per intero. */
+  .ca__conversazione :global(.ca__stelle) {
+    display: flex;
+    gap: 0.15rem;
+    margin-top: 0.35rem;
+  }
+
+  /* 2.75rem di lato: è la misura del dito, la stessa dei comandi del ticket.
+     Una stella disegnata "alla dimensione del carattere" sarebbe un bersaglio
+     da 16px, cioè un voto dato per sbaglio a quella accanto. */
+  .ca__conversazione :global(.ca__stella) {
+    width: 2.75rem;
+    height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: rgba(39, 36, 35, 0.25);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.15s ease;
+  }
+
+  /* Si accende la stella toccata **e tutte quelle prima**, che è come si legge
+     un voto a stelle: `:hover ~ *` colorerebbe quelle dopo, cioè il contrario.
+     Con `:has()` si guarda in avanti — «questo gruppo ha una stella in hover
+     più a destra?» — e si colora all'indietro. */
+  .ca__conversazione :global(.ca__stelle:hover .ca__stella),
+  .ca__conversazione :global(.ca__stella:focus-visible) {
+    color: var(--color-primary);
+  }
+
+  .ca__conversazione :global(.ca__stella:hover ~ .ca__stella) {
+    color: rgba(39, 36, 35, 0.25);
+  }
+
+  .ca__conversazione :global(.ca__stella:active) {
+    transform: scale(0.92);
+  }
+
+  .ca__conversazione :global(.ca__voto-grazie) {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--color-dark);
+  }
+
+  .ca__conversazione :global(.ca__voto-lab) {
+    display: block;
+    margin-top: 0.7rem;
+    color: rgba(39, 36, 35, 0.7);
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
   /* ---- L'azione: iscrizione o prova ----
      Stessa forma della card del richiamo (`.ca__richiamo*`), che riusa il
      titolo, il testo e il pulsante pieno: sono la stessa idea, «una cosa da

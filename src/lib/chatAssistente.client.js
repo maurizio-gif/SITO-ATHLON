@@ -64,6 +64,9 @@ export function initChatAssistente(root, options) {
      stessa email e lo stesso WhatsApp — non un codice mostrato senza che da
      nessuna parte risulti che qualcuno l'ha chiesto. Vedi `provaForm.client.js`. */
   var PROVA = 'https://automazione.n8ndevelop.it/webhook/athlon-prova-compilata';
+  /* Il voto alla chat: una riga sola su `chat_conversazioni`, trovata dalla
+     sessione. Vedi `CHAT ATHLON — VALUTAZIONE` su n8n. */
+  var VALUTAZIONE = 'https://automazione.n8ndevelop.it/webhook/chat-athlon-valutazione';
 
   /** Dove finisce il percorso junior, comunque vada. */
   var LANDING_JUNIOR = '/wikiathlon/snb/preiscrizioni-nuoto/';
@@ -426,6 +429,12 @@ export function initChatAssistente(root, options) {
           ticketInviato: ticketInviato,
           sollecitato: sollecitato,
           richiamoProposto: richiamoProposto,
+          /* La domanda sul voto si fa **una volta per conversazione**, e la
+             conversazione sopravvive al cambio di pagina: senza questi due
+             flag nella scena, chi cambia pagina se la vedrebbe rifare. */
+          votoChiesto: votoChiesto,
+          votoDato: votoDato,
+          risposteFatte: risposteFatte,
         })
       );
     } catch (e) {
@@ -1494,6 +1503,11 @@ export function initChatAssistente(root, options) {
     sollecitato = false;
     fermaRichiamoInattivo();
     richiamoProposto = false;
+    /* Sul totem la persona dopo non ha valutato niente: il voto e la domanda
+       ripartono da zero come tutto il resto. */
+    votoChiesto = false;
+    votoDato = false;
+    risposteFatte = 0;
     /* Una preselezione non consumata non deve sopravvivere a un reset: la
        persona dopo, sul totem, non sta cercando quel corso. */
     preselezioneAttivita = '';
@@ -1701,6 +1715,120 @@ export function initChatAssistente(root, options) {
     root.addEventListener(evento, armaOblio, true);
   });
   if (conversazione) conversazione.addEventListener('scroll', armaOblio, { passive: true });
+
+  // ── La valutazione della chat ─────────────────────────────────────────────
+  /**
+   * «Come è andata?», una volta sola, verso la fine.
+   *
+   * **Dopo la terza risposta e non alla prima**, perché a una domanda sola non
+   * si è ancora capito se l'assistente è servito: un voto chiesto troppo
+   * presto misura la cortesia dell'apertura, non l'aiuto. E **non si chiede
+   * mai** a chi è appena stato passato al team (`senzaRisposta`) o ha già
+   * aperto il ticket: lì la persona sta aspettando una risposta vera, e
+   * chiederle un voto in quel momento è il modo più rapido per prenderne uno
+   * da una stella per un motivo che non è il nostro.
+   *
+   * Il voto viaggia da solo verso `chat-athlon-valutazione`, che lo scrive
+   * sulla riga della conversazione: la chiave è la sessione, l'unica cosa che
+   * il browser conosce di quella riga.
+   */
+  var votoChiesto = false;
+  var votoDato = false;
+  var risposteFatte = 0;
+  var RISPOSTE_PRIMA_DEL_VOTO = 3;
+
+  function mandaVoto(voto, nota) {
+    try {
+      fetch(VALUTAZIONE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        /* `keepalive`: il voto è spesso l'ultima cosa che si tocca prima di
+           chiudere la scheda, e senza questo la richiesta muore con la pagina. */
+        keepalive: true,
+        body: JSON.stringify({
+          sessione: sessione(),
+          valutazione: voto,
+          nota: nota || '',
+          email: dati.email || '',
+          pagina: dati.pagina || '',
+        }),
+      }).catch(function () {});
+    } catch (e) {
+      /* Un voto perso non è un guasto per chi sta scrivendo: la chat continua
+         come se niente fosse, ed è il verso giusto in cui sbagliare. */
+    }
+  }
+
+  /** Il grazie, con la domanda in più solo quando il voto è basso. */
+  function grazieDelVoto(box, voto) {
+    box.innerHTML =
+      '<p class="ca__voto-grazie">Grazie, ci aiuta a migliorare.</p>' +
+      (voto <= 3
+        ? '<label class="ca__voto-lab" for="ca-voto-nota">Cosa potevamo fare meglio?</label>' +
+          '<textarea class="ca__ticket-testo" id="ca-voto-nota" rows="2" data-ca-voto-nota ' +
+          'placeholder="Facoltativo — una riga ci basta"></textarea>' +
+          '<div class="ca__ticket-azioni">' +
+          '<button type="button" class="ca__btn" data-ca-voto-invia>Invia</button>' +
+          '</div>'
+        : '');
+    var campo = box.querySelector('[data-ca-voto-nota]');
+    var invia = box.querySelector('[data-ca-voto-invia]');
+    if (!campo || !invia) return;
+    invia.addEventListener('click', function () {
+      var nota = (campo.value || '').trim();
+      if (nota) mandaVoto(voto, nota);
+      box.innerHTML = '<p class="ca__voto-grazie">Grazie: lo giriamo al team.</p>';
+    });
+  }
+
+  function chiediVoto() {
+    if (!conversazione || votoChiesto || votoDato) return;
+    votoChiesto = true;
+
+    var box = document.createElement('div');
+    box.className = 'ca__ticket ca__voto';
+    box.setAttribute('data-ca-voto', '');
+    /* Le stelle sono cinque pulsanti veri e non un `input range`: si toccano
+       col dito, si leggono con la tastiera, e ognuna dice ad alta voce quante
+       stelle sta dando — un range da 1 a 5 in una chat non lo capisce nessuno. */
+    var stelle = '';
+    for (var i = 1; i <= 5; i++) {
+      stelle +=
+        '<button type="button" class="ca__stella" data-ca-stella="' + i + '" ' +
+        'aria-label="' + i + (i === 1 ? ' stella su 5' : ' stelle su 5') + '">★</button>';
+    }
+    box.innerHTML =
+      '<p class="ca__ticket-lead">Come è andata? Dai un voto a questa chat.</p>' +
+      '<div class="ca__stelle" role="group" aria-label="Da 1 a 5 stelle">' + stelle + '</div>';
+
+    conversazione.appendChild(box);
+    conversazione.scrollTop = conversazione.scrollHeight;
+
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('[data-ca-stella]') : null;
+      if (!b) return;
+      var voto = Number(b.getAttribute('data-ca-stella'));
+      if (!(voto >= 1 && voto <= 5)) return;
+      votoDato = true;
+      mandaVoto(voto, '');
+      grazieDelVoto(box, voto);
+      salva();
+    });
+    salva();
+  }
+
+  /**
+   * Chiamata alla fine di ogni risposta. Le condizioni stanno qui e non dentro
+   * `chiediVoto` perché sono su *questo* turno: quante risposte sono arrivate,
+   * e se l'ultima era una che passa la mano al team.
+   */
+  function forseChiediVoto(senzaRisposta) {
+    risposteFatte += 1;
+    if (votoChiesto || votoDato) return;
+    if (senzaRisposta || ticketInviato) return;
+    if (risposteFatte < RISPOSTE_PRIMA_DEL_VOTO) return;
+    chiediVoto();
+  }
 
   var ticketInviato = false;
 
@@ -2000,6 +2128,10 @@ export function initChatAssistente(root, options) {
          in cui la persona ha confermato (regole 7, 8, 12 del prompt), non
          un'anticipazione. */
       eseguiAzione(risposta.azione);
+      /* E, verso la fine, la domanda sul voto: dopo che la risposta e' a
+         schermo, mai prima. Il flag di questo turno serve a non chiederlo a
+         chi e' appena stato passato a una persona. */
+      forseChiediVoto(!!risposta.senzaRisposta);
     } catch (e) {
       /* Nel modal non c'è la ricerca locale a cui ricadere — quella è rimasta
          nel box della pagina. Qui si dice come stanno le cose e si indica la
@@ -2517,6 +2649,9 @@ export function initChatAssistente(root, options) {
       ticketInviato = !!salvato.ticketInviato;
       sollecitato = !!salvato.sollecitato;
       richiamoProposto = !!salvato.richiamoProposto;
+      votoChiesto = !!salvato.votoChiesto;
+      votoDato = !!salvato.votoDato;
+      risposteFatte = Number(salvato.risposteFatte) || 0;
 
       scena.forEach(function (v) {
         if (v.k === 'm') bolla(v.c, v.h, v.t);
