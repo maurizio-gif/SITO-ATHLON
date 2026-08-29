@@ -3410,6 +3410,27 @@ Consult these guides before working on related tasks:
 - [Adding styles or using Tailwind](https://docs.astro.build/en/guides/styling/)
 - [Supporting multiple languages](https://docs.astro.build/en/guides/internationalization/)
 
+### Una f.a.q. scritta in una pagina non arriva all'assistente
+
+`kb.json` raccoglie le f.a.q. **dei corsi** — quelle dichiarate in `corsi.ts` e
+`junior.ts` — e il testo delle schede del wiki. Le f.a.q. scritte a mano
+nell'array di una pagina `.astro` no: vivono in quella pagina e basta.
+
+Non è un difetto, è il taglio del file: le voci sono i contenuti, non il
+markup delle pagine. Ma è una trappola quando si corregge un errore della
+chat, perché il posto dove viene naturale scrivere la risposta è la pagina, e
+lì l'assistente non la legge. È successo con la Gym Floor: la f.a.q. di
+`/gym-floor` diceva già che l'accesso si prenota e che c'è la fascia Con
+Assistenza, e la chat continuava a rispondere «entri quando vuoi, senza
+prenotazione» — perché quello che leggeva erano `activityInfo` e la scheda
+`adulti/gym-floor`.
+
+Quindi: **un dato che deve arrivare all'assistente va messo dove il `kb.json`
+lo prende** — i dati (`abbonamenti.ts`, `planning`, `club.ts`), una scheda del
+wiki, o la f.a.q. di un corso. La f.a.q. della pagina è per chi legge la
+pagina, e le due cose si scrivono insieme. Per controllare dove è finita una
+frase: `grep` sul `dist/kb.json`, che è l'unica verifica che conta.
+
 ## I contenuti si scrivono da Tina, e il build lo sa
 
 News, eventi, schede dell'Help Desk, servizi e la landing della promo sono
