@@ -17,7 +17,7 @@ attivita:
 In fase di prenotazione scegli tra:
 
 - **Con Assistenza** — in sala c'è un **assistente** che supervisiona tutte le attività: puoi chiedergli suggerimenti e farti aiutare a **scegliere uno dei 30 piani di allenamento** già presenti in app
-- **Allenamento Libero** — ti alleni con il piano che hai già, senza assistente in sala
+- **Allenamento Libero** — l’assistente di sala non è presente: ti alleni con il piano che hai già
 
 **L'assistenza in sala c'è**: prenotando vedi in quali orari.
 

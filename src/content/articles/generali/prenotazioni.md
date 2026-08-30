@@ -31,7 +31,7 @@ La prenotazione non è un adempimento: è il filo che tiene aggiornati te e noi.
 
 - **Il posto è tuo.** Arrivi sapendo che c'è spazio, invece di scoprirlo in sala o a bordo vasca. E vedi **quante persone ci sono** in quell'orario, così scegli la fascia che ti conviene.
 - **Se qualcosa cambia, lo sai prima.** Un trainer o un istruttore sostituito, una lezione che cambia tipo o orario: sappiamo chi c'era e possiamo avvisarti, invece di fartelo scoprire arrivando.
-- **In sala, ti dice quando c'è l'assistente.** Prenotando la Gym Floor scegli fra la fascia **Con Assistenza** — un assistente di sala che supervisiona l'attività, dà suggerimenti e aiuta a scegliere fra i trenta piani dell'app — e **Allenamento Libero**, dove ti alleni con il piano che hai già. L'assistenza in sala c'è: dall'app vedi in quali orari. Per essere seguito individualmente ci sono le sedute di [personal training](/personal-training/), a parte.
+- **In sala, ti dice quando c'è l'assistente.** Prenotando la Gym Floor scegli fra la fascia **Con Assistenza** — un assistente di sala che supervisiona l'attività, dà suggerimenti e aiuta a scegliere fra i trenta piani dell'app — e **Allenamento Libero**, dove l’assistente non c’è e ti alleni con il piano che hai già. L'assistenza in sala c'è: dall'app vedi in quali orari. Per essere seguito individualmente ci sono le sedute di [personal training](/personal-training/), a parte.
 
 > 📌 **Della Scuola Nuoto Bambini si prenotano i recuperi, non le lezioni.** Là il turno è fisso: giorno e ora si scelgono all'iscrizione e restano quelli per la stagione, e con il bisettimanale i turni fissi sono due — non si scelgono orari diversi di settimana in settimana. Il Baby Nuoto invece si prenota turno per turno, come le attività degli adulti.
 

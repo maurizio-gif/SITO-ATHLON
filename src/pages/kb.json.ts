@@ -766,7 +766,7 @@ Quando proponi il Pass, dì che è la settimana Premium delle attività degli ad
       orarioEccezionaleAttivo() && 'ORARIO ORDINARIO, che non vale adesso:',
       pulito(gymFloor.lede),
       elenco(gymFloor.hours.map((h) => `${h.label}: ${h.hours}`)),
-      'Sono gli orari di apertura della sala pesi. Anche la sessione in sala si prenota, come ogni altra attività del club: prenotandola si sceglie la fascia — Con Assistenza, con un trainer in sala per tutta la sessione, oppure Allenamento Libero. Gli orari delle singole attività seguono il planning e cambiano ogni mese.'
+      'Sono gli orari di apertura della sala pesi. Anche la sessione in sala si prenota, come ogni altra attività del club: prenotandola si sceglie la fascia — Con Assistenza, con un assistente di sala presente che supervisiona l\u2019attività, oppure Allenamento Libero, dove l\u2019assistente non c\u2019è. Gli orari delle singole attività seguono il planning e cambiano ogni mese.'
     ),
   });
 

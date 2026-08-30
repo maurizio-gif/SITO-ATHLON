@@ -47,7 +47,7 @@ export const activityInfo: Record<string, { title: string; body: string; href?: 
        promettere l'una e dare l'altra è il modo di far arrivare una persona
        delusa alla prima sessione. */
     body:
-      '400 mq di sala aperta dalle 6:00 alle 22:00: area cardio Matrix 4.0 con macchinari connessi all\'app, area isotonica, area funzionale Ziva con rig da 8 metri, manubri fino a 50 kg e area cavi e carico libero. La sessione si prenota da app o portale, scegliendo la fascia Con Assistenza — in sala c\'e\' un assistente che supervisiona l\'attivita\', da\' suggerimenti e aiuta a scegliere fra i trenta piani di allenamento gia\' presenti in app — oppure Allenamento Libero. Per essere seguiti individualmente ci sono le sedute di personal training, che si prenotano e si acquistano a parte.',
+      '400 mq di sala aperta dalle 6:00 alle 22:00: area cardio Matrix 4.0 con macchinari connessi all\'app, area isotonica, area funzionale Ziva con rig da 8 metri, manubri fino a 50 kg e area cavi e carico libero. La sessione si prenota da app o portale, scegliendo la fascia Con Assistenza — in sala c\'e\' un assistente che supervisiona l\'attivita\', da\' suggerimenti e aiuta a scegliere fra i trenta piani di allenamento gia\' presenti in app — oppure Allenamento Libero, dove l\'assistente non e\' presente. Per essere seguiti individualmente ci sono le sedute di personal training, che si prenotano e si acquistano a parte.',
     href: '/gym-floor',
   },
   'Nuoto Libero Assistito': {
