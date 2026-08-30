@@ -1416,6 +1416,24 @@ qualcuno accanto a sé, e quel qualcuno sta seguendo l'intera sala.
 - **L'assistenza individuale e personalizzata è il personal training**, una o
   più sedute che si prenotano e si acquistano.
 
+**E la seconda fascia si dice per quello che non ha, non per quello che fai.**
+La prima stesura della regola fissa chiudeva con «l'assistente c'è, e quello che
+si sceglie prenotando è l'orario in cui c'è» — vera come sintesi, e letale come
+istruzione: il modello ne ha dedotto *«l'assistente c'è in entrambi i casi —
+cambia solo l'orario in cui lo scegli prenotando»*, che è l'opposto. Fra le due
+fasce cambia **la presenza dell'assistente**, non l'orario, e la regola adesso
+vieta per nome «in entrambi i casi», «c'è comunque» e «cambia solo l'orario».
+Vale in generale: *una regola che riassume due casi in una frase sola è una
+frase da cui si ricompone il caso che non esiste* — è lo stesso difetto delle
+due sospensioni e dei due orari.
+
+**E le due fasce si spiegano solo se le chiedono.** A «quanto costa un ingresso
+singolo in pesi?» la chat ha risposto col prezzo giusto e poi con due capoversi
+su Con Assistenza e Allenamento Libero, che nessuno aveva chiesto. Una domanda
+di prezzo vuole l'importo, la durata e il badge: è la regola 7ter — se non
+l'ha chiesto, per lui non esiste — e il fatto che il dato sia appena stato
+corretto non è una ragione per metterlo in vetrina.
+
 Quindi le tre formule vietate, in chat e sul sito: «ti segue», «ti controlla
 mentre lavori», «per tutta la sessione». Descrivono un servizio a pagamento con
 le parole di uno incluso, che è il verso sbagliato in cui sbagliare — l'altro
