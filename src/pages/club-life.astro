@@ -4,6 +4,7 @@ import EventiPreview from '../components/eventi/EventiPreview.astro';
 import NewsPreview from '../components/clublife/NewsPreview.astro';
 import HelpDesk from '../components/clublife/HelpDesk.astro';
 import Servizi from '../components/clublife/Servizi.astro';
+import Opinione from '../components/clublife/Opinione.astro';
 import { upcomingEvents } from '../data/eventi';
 import { getCollection } from 'astro:content';
 import { fotoHero } from '../data/foto';
@@ -183,7 +184,14 @@ const altre = sections.filter((s) => s.id !== 'help-desk');
       c'è più: l'invito è diventato una voce della sezione Servizi — dove sono
       le altre cose che si hanno perché si è soci — e il comando resta la
       pastiglia che galleggia in cima. Tre posti per la stessa offerta erano
-      due di troppo. */}
+      due di troppo.
+
+      Il posto lo prende l'invito a dare un'opinione, che è la stessa forma —
+      una cosa che chiediamo noi, fra due sezioni che raccontano cosa diamo — e
+      sta **prima** dell'Help Desk di proposito: dopo, la pagina la chiude il
+      modulo dell'assistenza, e un questionario dopo «richiedi assistenza» si
+      legge come un passaggio del reclamo che si è appena aperto. */}
+  <Opinione id="opinione" />
 
   {/* Last on the page: it is the deepest of the four, and it closes with its own
       way out — the chat's "scrivi al team" button. */}

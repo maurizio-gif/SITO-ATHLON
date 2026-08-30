@@ -1,0 +1,115 @@
+---
+/**
+ * «Raccontaci come sta andando»: la fascia che porta alle survey.
+ *
+ * Sta fra i Servizi e l'Help Desk, cioè nel posto che era della fascia «Porta
+ * un amico»: è la stessa forma — un invito a fare una cosa per il club, in
+ * mezzo a due sezioni che invece raccontano cosa il club fa per te — e quel
+ * taglio nella pagina esisteva già per questo.
+ *
+ * **Non è un modulo, è una porta.** Le domande stanno su `/surveys/`, e mettere
+ * qui la prima domanda sarebbe l'errore che il menu delle survey esiste per
+ * evitare: chi arriva su Club Life sta cercando una news o una risposta, e un
+ * questionario che comincia da solo in mezzo alla pagina è rumore. Il pulsante
+ * porta al menu, dove si sceglie l'argomento — che è la prima decisione vera.
+ *
+ * **Il numero delle survey è contato, non scritto**: aggiungendo un tema in
+ * `data/surveys.ts` questa riga si aggiorna da sola. Una cifra ricopiata è una
+ * cifra che il giorno del nono tema resta a otto.
+ */
+import { SURVEYS } from '../../data/surveys';
+
+interface Props {
+  id?: string;
+}
+
+const { id = 'opinione' } = Astro.props;
+const quanti = SURVEYS.length;
+---
+
+<section class="op" id={id}>
+  <div class="container op__inner">
+    <span class="eyebrow" data-anim="from-left">La tua opinione</span>
+    <h2 class="op__title" data-anim="reveal">
+      Raccontaci<br /><em class="accent">come sta andando</em>
+    </h2>
+
+    {/* Le stesse tre cose della dedica in cima a `/surveys/`, in tre righe:
+        perché chiediamo, cosa ne facciamo, e quanto costa rispondere. Senza la
+        terza il pulsante sembra l'inizio di un impegno. */}
+    <p class="op__lede">
+      Ascoltare chi frequenta il club è il modo in cui capiamo cosa funziona e cosa no: è da lì
+      che decidiamo dove intervenire. Se qualcosa non va vogliamo saperlo, e se qualcosa
+      funziona vogliamo sapere anche quello.
+    </p>
+    {/* «Un minuto l'una» e non «tre minuti in tutto»: gli argomenti sono otto
+        ma se ne compila uno — il tempo che conta è quello di quella cosa lì, e
+        un totale fa sembrare la pagina un questionario da fare tutto. */}
+    <p class="op__nota">
+      {quanti} argomenti, <strong>un minuto l’uno</strong>: scegli quello di cui vuoi parlarci.
+      Niente registrazione, e l’email è facoltativa.
+    </p>
+
+    <a class="btn btn-primary op__cta" href="/surveys/" data-cta="survey" data-cta-source="club-life">
+      Dicci la tua →
+    </a>
+  </div>
+</section>
+
+<style>
+  /* Fondo scuro, come l'Help Desk che le sta sotto: è una fascia e non una
+     sezione di contenuto, e il cambio di colore è quello che la fa leggere
+     come una pausa fra due cose da consultare. */
+  .op {
+    background: var(--color-dark);
+    color: var(--color-cream);
+    padding: var(--space-section-md) 0;
+  }
+
+  .op__inner {
+    max-width: 46rem;
+  }
+
+  .op__title {
+    font-size: var(--text-2xl);
+    --lh: 0.95;
+    margin: 0.4rem 0 0;
+  }
+
+  /* Sotto i 700px il titolo va a capo comunque, e a 0.95 le due righe si
+     toccano: stessa cura del titolo delle survey, e si passa da `--lh` o la
+     spaziatura sopra le accentate resta quella di prima. */
+  @media (max-width: 700px) {
+    .op__title {
+      --lh: 1.05;
+    }
+  }
+
+  .op__lede {
+    /* In `ch`: la colonna resta fra i 45 e i 75 caratteri per riga sul telefono
+       come sul totem, dove la radice è il doppio. */
+    max-width: 58ch;
+    font-size: var(--text-md);
+    margin: 1.1rem 0 0;
+  }
+
+  .op__nota {
+    max-width: 58ch;
+    margin: 0.8rem 0 0;
+    font-size: var(--text-sm);
+    color: rgba(238, 234, 227, 0.7);
+  }
+
+  .op__cta {
+    display: inline-flex;
+    align-items: center;
+    /* In rem e non in px: sul totem e sulla televisione il comando cresce con
+       la radice invece di restare della misura di un telefono. */
+    min-height: 3rem;
+    margin-top: 1.8rem;
+  }
+
+  .op .eyebrow {
+    color: var(--accent-on-dark);
+  }
+</style>
