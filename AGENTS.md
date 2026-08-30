@@ -2294,6 +2294,44 @@ aiuto scrivi al team dall'icona in alto, che vede la tua situazione*. È la rego
 11 applicata **prima** che la cosa diventi un reclamo, e la ragione è che una
 spiegazione in più non risolve il caso di quella persona: lo allunga.
 
+### Non si dice mai a nessuno di aspettare a iscriversi
+
+A «se mi iscrivo oggi risparmio?» l'assistente ha risposto *«no, non risparmi
+niente… attivando oggi spendi 8 € in più per 2 giorni di agosto che magari non
+usi nemmeno… conviene aspettare domani, se puoi»*. È il peggior consiglio che
+questa chat abbia dato: ha allontanato un'iscrizione già decisa, per otto euro
+che per giunta si era calcolato da solo — e calcolare una cifra è vietato dalla
+regola 2.
+
+**Non l'aveva inventato.** La scheda `adulti/pro-rata-durata-minima` chiudeva
+con «se puoi scegliere, far partire l'abbonamento il **1° del mese** rende tutto
+più semplice», e la stessa frase stava nella f.a.q. della promo. Detta senza
+dire **come** si sceglie la data, quella riga si legge in un modo solo: aspetta.
+
+**Il come era il dato che mancava**, ed è in `DATA_INIZIO`
+(`data/abbonamenti.ts`): iscrivendosi si imposta quando parte l'abbonamento — lo
+stesso giorno oppure una data futura, **fino a 14 giorni dopo**. Quindi non c'è
+niente da rimandare: ci si iscrive oggi e si sceglie la data. Da lì la voce
+`abbonamento:data-inizio` del `kb.json`, e le due frasi riscritte.
+
+Tre cose da sapere prima di toccarlo.
+
+**La regola fissa vieta le forme, non la parola.** «Conviene aspettare», «meglio
+domani», «aspetta il primo del mese», «risparmi se aspetti», «se puoi scegliere
+fai partire il mese prossimo»: sono tutte la stessa frase, e un divieto scritto
+su una sola di esse lascia passare le altre quattro. È la lezione dell'assistente
+di sala applicata al commerciale.
+
+**La risposta giusta è che è indifferente**, e finisce lì: si paga da quando
+l'abbonamento comincia, non da quando si firma. La scelta della data è di chi si
+iscrive e non va consigliata — nemmeno nel verso opposto, perché «iscriviti oggi
+che conviene» è la stessa invadenza al contrario.
+
+**E il numero vive in tre posti**, come la quota di attivazione e per la stessa
+ragione: `DATA_INIZIO.giorniMax` è la fonte, le due copie stanno in
+`pro-rata-durata-minima.md` e in `promo.md`, che sono contenuti di Tina e non
+possono importare TypeScript.
+
 ### L'upgrade non si preventiva in chat, si chiede dal modulo
 
 «Quanto costa se aggiungo i corsi al mio abbonamento?» → tre domande

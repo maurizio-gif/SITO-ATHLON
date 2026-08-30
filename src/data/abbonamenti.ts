@@ -301,6 +301,36 @@ export const ATTIVITA_GUEST_PASS: readonly string[] =
  * Non si applica alla lezione singola, che è il modo di entrare senza
  * abbonarsi: là c'è il solo badge di `SINGOLI.badge`.
  */
+/**
+ * La data di inizio la sceglie chi si iscrive, fino a **14 giorni avanti**.
+ *
+ * È il fatto che mancava, e la sua assenza ha prodotto il peggior consiglio che
+ * questa chat abbia dato: il 30 agosto, a una persona che chiedeva «se mi
+ * iscrivo oggi risparmio?», l'assistente ha risposto «conviene aspettare
+ * domani» — cioè ha allontanato un'iscrizione già decisa, per otto euro di
+ * pro-rata che si era anche calcolato da solo.
+ *
+ * Non l'aveva inventato: la scheda `adulti/pro-rata-durata-minima` chiudeva con
+ * «se puoi scegliere, far partire l'abbonamento il 1° del mese semplifica
+ * tutto», e la stessa frase stava nella f.a.q. della promo. Detta senza dire
+ * **come** si sceglie, quella riga si legge in un modo solo: aspetta.
+ *
+ * Il come è questo: ci si iscrive oggi e si imposta la data di inizio nel
+ * contratto. Quindi non c'è niente da rimandare, e non c'è nessun risparmio da
+ * inseguire — si paga da quando si comincia, e basta.
+ *
+ * Il numero vive in tre posti e due non sono evitabili: qui è la fonte, e le
+ * due copie stanno in `pro-rata-durata-minima.md` e in `promo.md`, che sono
+ * contenuti di Tina e non possono importare TypeScript. Vale la regola di
+ * `ATTIVAZIONE.quota`: il giorno che cambia vanno aggiornati tutti e tre.
+ */
+export const DATA_INIZIO = {
+  /** Giorni di anticipo massimo fra iscrizione e inizio dell'abbonamento. */
+  giorniMax: '14',
+  testo:
+    "Iscrivendoti scegli tu la data di inizio dell'abbonamento: può essere lo stesso giorno oppure una data futura, fino a 14 giorni dopo l'iscrizione. Quindi non c'è un momento più conveniente di un altro per iscriversi — paghi da quando parte l'abbonamento, non da quando firmi. Se fai partire l'abbonamento a mese iniziato la prima quota copre solo i giorni che restano; se lo fai partire il 1° del mese non c'è pro-rata. In tutti e due i casi ti iscrivi quando vuoi e imposti la data che preferisci in fase di iscrizione.",
+} as const;
+
 export const ATTIVAZIONE = {
   /** Euro, una tantum, per ogni abbonamento attivato. */
   quota: '50',
