@@ -2294,14 +2294,44 @@ aiuto scrivi al team dall'icona in alto, che vede la tua situazione*. È la rego
 11 applicata **prima** che la cosa diventi un reclamo, e la ragione è che una
 spiegazione in più non risolve il caso di quella persona: lo allunga.
 
+### Quando si scende nel dettaglio, la chat dice di essere un assistente virtuale
+
+Gli errori sono pochi, ma arrivano quasi tutti nello stesso punto: nel botta e
+risposta lungo, quando la conversazione stringe su un caso specifico e il
+modello comincia a comporre invece che a citare. Quasi tutte le sezioni qui
+sopra nascono da lì. Quindi, oltre a chiudere i casi uno per uno, la chat mette
+le mani avanti: quando la conversazione scende nello specifico, apre quella
+risposta dicendo che è l'**assistente virtuale** del club, che su domande molto
+specifiche può scapparle un errore, e che lo staff è **l'icona del messaggio in
+alto a destra** — quella accanto alla chiusura, verificata nel markup di
+`ChatModal.astro`, dove l'intestazione porta avatar, nome, telefono, messaggio,
+chiusura. L'intestazione dice già «Assistente Virtuale» sotto «Athlon Club»:
+quella riga conferma ciò che si vede, non annuncia una cosa nuova.
+
+**Continua a rispondere, e questo è il vincolo.** La risposta si dà comunque e
+per intero: la premessa non è un rifiuto, e «meglio che chiedi allo staff» al
+posto della risposta è esattamente l'uso sbagliato. Lo staff è un'alternativa
+offerta, non il posto dove si manda la gente.
+
+**Su una domanda semplice non ci va**, ed è il freno che rende la regola utile.
+Orari, prezzi di listino, dove si parcheggia: lì la risposta è scritta e la sa,
+e premettere che potrebbe sbagliare la fa sembrare inaffidabile proprio dove è
+affidabile. Vale dove il rischio c'è: dal terzo scambio sullo stesso dettaglio,
+sul caso personale (il suo contratto, il suo addebito, la sua prenotazione), o
+su un caso di confine.
+
+**Una volta per conversazione.** Un assistente che a ogni risposta ricorda di
+essere un assistente è un assistente che nessuno legge più. E se chi scrive si
+sta lamentando comanda la regola del reclamo, che passa la mano al team davvero.
+
 ### Non si dice mai a nessuno di aspettare a iscriversi
 
 A «se mi iscrivo oggi risparmio?» l'assistente ha risposto *«no, non risparmi
 niente… attivando oggi spendi 8 € in più per 2 giorni di agosto che magari non
 usi nemmeno… conviene aspettare domani, se puoi»*. È il peggior consiglio che
-questa chat abbia dato: ha allontanato un'iscrizione già decisa, per otto euro
-che per giunta si era calcolato da solo — e calcolare una cifra è vietato dalla
-regola 2.
+questa chat abbia dato: ha allontanato un'iscrizione già decisa, per otto euro.
+**A essere sbagliato era il consiglio, non il conto** — il pro-rata si può
+calcolare, e come si fa sta qui sotto.
 
 **Non l'aveva inventato.** La scheda `adulti/pro-rata-durata-minima` chiudeva
 con «se puoi scegliere, far partire l'abbonamento il **1° del mese** rende tutto
@@ -2331,6 +2361,33 @@ che conviene» è la stessa invadenza al contrario.
 ragione: `DATA_INIZIO.giorniMax` è la fonte, le due copie stanno in
 `pro-rata-durata-minima.md` e in `promo.md`, che sono contenuti di Tina e non
 possono importare TypeScript.
+
+#### Il pro-rata si calcola, ed è l'eccezione dichiarata alla regola 2
+
+La prima stesura della regola vietava il conto, e vietava troppo: il pro-rata si
+ricava dal canone di listino e dai giorni, quindi è un calcolo che si può
+mostrare — a chi sta decidendo quanto spenderà, sapere l'ordine di grandezza
+serve. Le due condizioni non sono formalità.
+
+**Si calcola sulla data di inizio del contratto, non su quella di iscrizione**,
+e sono due cose diverse proprio per la riga qui sopra: ci si iscrive oggi e si
+sceglie di partire fra dieci giorni. Contano i giorni dall'inizio
+dell'abbonamento alla fine di quel mese, quindi se non sa da quando vuole
+partire lo deve chiedere prima di fare il conto — è l'unico dato che serve, ed è
+la persona a sceglierlo.
+
+**Sempre al condizionale, e sempre dicendo dove si vede il valore vero.**
+«Sarebbe circa», «verrebbe intorno a», mai «paghi X» come se fosse definitivo; e
+nella stessa frase che **l'importo esatto compare in fase di iscrizione, prima
+di confermare**. L'arrotondamento e il conteggio dei giorni li fa il gestionale:
+una cifra data come certa è un'aspettativa che alla cassa può non tornare, ed è
+lo stesso difetto dell'upgrade preventivato in chat.
+
+**Ma il conto non si usa per il confronto che spinge ad aspettare**, ed è il
+punto in cui la regola qui sopra resta intera: mettere in fila due scenari —
+oggi contro il primo del mese — per far vedere che uno costa meno è la cosa
+vietata, qualunque cifra ne esca. Si calcola sulla data che ha in mente la
+persona, non per proporgliene un'altra.
 
 ### L'upgrade non si preventiva in chat, si chiede dal modulo
 
