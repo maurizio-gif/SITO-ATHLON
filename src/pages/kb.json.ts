@@ -50,6 +50,8 @@ import {
   PERSONAL,
   ETA_MINIMA_ADULTI,
   ATTIVITA_GUEST_PASS,
+  JUNIOR_MENSILE,
+  PREISCRIZIONE,
 } from '../data/abbonamenti';
 import { ACTIVITY_TAGS, ACTIVITY_IDS } from '../data/activities';
 import { AREA_LABELS } from '../data/helpdesk';
@@ -597,6 +599,36 @@ export const GET: APIRoute = async () => {
       promoAttiva
         ? `**Con la promozione in corso la quota è in omaggio, ma solo sugli abbonamenti annuali degli adulti** — Smart e Premium, ${promoAttiva.scadenzaLabel.toLowerCase()} (${pulito(promoAttiva.validoSu)}). Fuori da quelle due formule si paga: sul Mensile Flex degli adulti **e su tutti i corsi dei bambini**, Scuola Nuoto Bambini e Baby Nuoto compresi. A un genitore che iscrive un figlio la quota non è in omaggio, e dirglielo è un prezzo dichiarato più basso del vero.`
         : ''
+    ),
+  });
+
+  /* ---- I corsi junior a stagione: una modalita' sola, e gli sconti hanno una
+     finestra ------------------------------------------------------------------
+     Il 30/08 a «ci sono sconti per la scuola nuoto bambini?» la chat ha detto
+     bene che la promo e' degli adulti e che la quota di attivazione si paga, e
+     non ha detto le due cose che quella domanda chiedeva davvero: che l'unica
+     formula in vendita adesso e' la mensile — con i suoi prezzi, che nel
+     `kb.json` non c'erano affatto, perche' vivevano solo nella tabella di Tina
+     — e che le scontistiche esistono, ma dentro la preiscrizione.
+
+     Una voce sola e non due: «quanto costa» e «ci sono sconti» sono la stessa
+     domanda fatta in due modi, e separarle rifarebbe il difetto delle due
+     sospensioni al contrario — chi pesca la voce del prezzo non troverebbe la
+     finestra, e direbbe un prezzo pieno a chi e' dentro la preiscrizione. */
+  voci.push({
+    id: 'abbonamento:junior-mensile',
+    tipo: 'abbonamento',
+    titolo: 'Corsi per bambini: quanto costano e gli sconti della preiscrizione',
+    url: `${SITE}${JUNIOR_MENSILE.scheda}`,
+    area: 'Junior',
+    attivita: [],
+    testo: blocchi(
+      `**Vale per ${JUNIOR_MENSILE.valePer.join(', ')}.** Per il Baby Nuoto le formule sono altre — c'e' anche la lezione singola — e stanno nella sua pagina.`,
+      `**A stagione iniziata l'unica formula in vendita e' l'abbonamento mensile**: si paga un mese per volta, il rinnovo e' ${JUNIOR_MENSILE.rinnovo}, e non ci si lega alla stagione intera — per fermarsi basta la disdetta con dieci giorni di preavviso sul primo del mese.`,
+      JUNIOR_MENSILE.voci.map((v) => `- ${v.nome}: **${v.prezzo} €/mese**`).join('\n'),
+      `A questi si somma la **quota di attivazione di ${ATTIVAZIONE.quota} € una tantum**, per ogni abbonamento attivato: il secondo figlio la paga come il primo. E ${JUNIOR_MENSILE.proRata}.`,
+      `**Gli sconti ci sono, e sono quelli della preiscrizione**, la finestra ${PREISCRIZIONE.finestra} in cui si sceglie il turno per la stagione successiva: li' si compra ${PREISCRIZIONE.su}, scontato del **${PREISCRIZIONE.sconto}%**. Fuori da quella finestra ${PREISCRIZIONE.su} non e' in vendita e **non c'e' nessuno sconto sui prezzi qui sopra**: non e' una promozione che va e viene, e' legata alla preiscrizione.`,
+      `E **le promozioni degli adulti non valgono qui**: hanno il perimetro scritto nella loro voce, che sono gli abbonamenti annuali Smart e Premium.`
     ),
   });
 

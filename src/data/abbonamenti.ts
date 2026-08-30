@@ -337,6 +337,50 @@ export const ATTIVAZIONE = {
   comprende: "il badge di accesso e l'attivazione dell'account",
 } as const;
 
+/**
+ * I corsi junior a stagione — Scuola Nuoto Bambini, Pallanuoto, Nuoto
+ * Agonistico — si vendono in una sola forma: l'abbonamento **mensile**.
+ *
+ * Il numero vive qui e non solo nella tabella di `snb/preiscrizioni-nuoto.md`,
+ * che e' contenuto di Tina e quindi non arriva alla chat: prima di questa
+ * costante l'assistente sapeva che i corsi sono mensili e non sapeva quanto
+ * costano, che e' il modo in cui una domanda di prezzo finisce senza risposta.
+ * Il Baby Nuoto non e' qui: la sua adesione sta in `junior.ts`, con la lezione
+ * singola, perche' e' l'unico corso per bambini che si compra anche a lezione.
+ */
+export const JUNIOR_MENSILE = {
+  valePer: ['Scuola Nuoto Bambini', 'Pallanuoto', 'Nuoto Agonistico'],
+  voci: [
+    { nome: 'Monosettimanale', prezzo: '89' },
+    { nome: 'Bisettimanale', prezzo: '109' },
+    { nome: 'Agonistico / Pallanuoto', prezzo: '119' },
+  ],
+  /** Il rinnovo, punto 4.11 delle condizioni contrattuali. */
+  rinnovo: 'automatico il giorno 1 di ogni mese',
+  proRata:
+    'nei mesi di apertura e chiusura della stagione (inizio 14/09, fine 20/06) si paga la quota proporzionale ai giorni effettivi',
+  scheda: '/wikiathlon/snb/preiscrizioni-nuoto/',
+} as const;
+
+/**
+ * La preiscrizione, e questa costante esiste per una domanda sola: «ci sono
+ * sconti?».
+ *
+ * Le scontistiche dei corsi junior non sono una promozione che va e viene: sono
+ * legate alla finestra in cui si sceglie il turno per la stagione successiva, e
+ * fuori da quella finestra **non esistono**. Detto senza la finestra, «c'e' uno
+ * sconto del 15%» e' un prezzo dichiarato piu' basso del vero — il verso
+ * sbagliato in cui sbagliare, perche' si scopre alla cassa.
+ */
+export const PREISCRIZIONE = {
+  /** Ogni anno, e sono le stesse date per tutti e tre i corsi. */
+  finestra: 'dal 1 maggio al 31 luglio di ogni anno',
+  sconto: '15',
+  /** Cosa si sconta: la formula stagionale, che si compra solo li'. */
+  su: "l'abbonamento stagionale",
+  valePer: ['Scuola Nuoto Bambini', 'Pallanuoto', 'Nuoto Agonistico'],
+} as const;
+
 export const SINGOLI = {
   /** Il badge, una tantum: si paga la prima volta e poi mai più. */
   badge: '5',
