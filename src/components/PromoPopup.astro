@@ -1,0 +1,334 @@
+---
+/**
+ * Il richiamo alla promozione del mese, sulle pagine delle attività per adulti.
+ *
+ * Chi legge la pagina di un corso sta valutando *quella cosa*, non il listino:
+ * il popup esiste per dire che questo mese attivare costa meno, e per portarlo
+ * su `/promo`, che è la pagina che quella promessa la spiega per intero.
+ *
+ * Tre scelte, e nessuna è arbitraria.
+ *
+ * - **Non esiste se la promo non esiste.** I testi e la scadenza vengono dalla
+ *   collezione `promo` — la stessa che alimenta `/promo` e la voce di `/link` —
+ *   e la condizione è la stessa dei due: documento non in bozza **e** scadenza
+ *   non passata. Spegnere la promo da Tina spegne anche questo, senza toccare
+ *   il codice. Si valuta al build, e va bene: cambiare la promo *è* un commit.
+ *   Resta scoperta solo la promo che scade senza che nessuno tocchi niente, e
+ *   la chiude il conto alla rovescia, che a zero si toglie di mezzo da solo.
+ * - **Non blocca la pagina.** Niente `amodal-locked` e niente fondo scuro: è
+ *   una scheda in un angolo, non un modal. Un pannello che copre la pagina
+ *   appena si entra è quello che si chiude senza leggere — e soprattutto il
+ *   `body` bloccato è condiviso con i quattro modal veri del sito, quindi un
+ *   popup che lo tocca all'apertura lo toglierebbe a uno di loro chiudendosi.
+ * - **Compare una volta sola per sessione, sulla prima pagina adulti che si
+ *   apre.** Il segno si scrive quando la scheda *compare*, non quando la si
+ *   chiude: chi la legge e prosegue senza toccarla ha già ricevuto l'avviso, e
+ *   ripresentarglielo a ogni corso che guarda è la cosa che si chiude senza
+ *   leggere. Il tasto di chiusura resta, ma toglie una scheda che comunque non
+ *   sarebbe tornata. `sessionStorage` e non `localStorage`: la promo dura un
+ *   mese, e chi l'ha vista oggi non deve trovarsela ancora fra tre settimane —
+ *   ma nemmeno mai più.
+ *
+ * **Sul totem non si ricorda niente**, come per `emailNota.ts` e per la chat:
+ * il pannello all'ingresso è di tutti, e la chiusura di chi è passato prima
+ * non deve nascondere la promo a chi arriva dopo. Le tre condizioni le decide
+ * `suTotem()`, che non si ricopia.
+ *
+ * Le cifre non sono scritte qui: il countdown le conta, il testo lo scrive chi
+ * gestisce la promo. Un prezzo ricopiato in un popup è un prezzo che diverge.
+ */
+import { getCollection } from 'astro:content';
+
+/**
+ * Il popup si spegne alla mezzanotte fra il 31 agosto e il 1 settembre, scelta
+ * del club: l'ora di Roma e non UTC, o si spegnerebbe con due ore di anticipo.
+ *
+ * È un tetto **suo**, non la scadenza della promozione: quella la dice il
+ * documento di Tina e governa `/promo`, che resta viva finché lo dice lei.
+ * Il conto alla rovescia punta alla prima delle due che arriva, così la scheda
+ * non promette mai tempo che non c'è — e il giorno che le due date divergono
+ * per davvero, è questa costante da guardare, non il countdown.
+ */
+const FINE_POPUP = new Date('2026-09-01T00:00:00+02:00');
+
+const voci = await getCollection('promo', ({ data }) => !data.draft);
+const promo = voci[0]?.data;
+/* La prima delle due scadenze: il popup non sopravvive né alla promo né al suo
+   tetto. */
+const limite = promo ? new Date(Math.min(promo.scadenza.getTime(), FINE_POPUP.getTime())) : null;
+const viva = limite !== null && limite.getTime() > Date.now();
+---
+
+{
+  viva && (
+    <aside class="pp" id="promo-popup" role="dialog" aria-labelledby="pp-titolo" aria-describedby="pp-testo" hidden>
+      <button class="pp__x" type="button" data-pp-chiudi aria-label="Chiudi l'avviso della promozione">
+        <span aria-hidden="true">×</span>
+      </button>
+
+      <p class="pp__occhiello">{promo.occhiello}</p>
+      <h2 class="pp__titolo" id="pp-titolo">{promo.claim}</h2>
+      <p class="pp__testo" id="pp-testo">{promo.sommario}</p>
+
+      {/* Il conto alla rovescia: i numeri li scrive lo script, il markup porta
+          gli zeri perché senza JavaScript la scheda non compare affatto — ma se
+          comparisse non deve mostrare quattro caselle vuote. */}
+      <div class="pp__conto" data-pp-conto data-scadenza={limite!.toISOString()} aria-live="off">
+        <div class="pp__unita"><span class="pp__n u-display" data-pp="g">00</span><span class="pp__u">giorni</span></div>
+        <div class="pp__unita"><span class="pp__n u-display" data-pp="h">00</span><span class="pp__u">ore</span></div>
+        <div class="pp__unita"><span class="pp__n u-display" data-pp="m">00</span><span class="pp__u">min</span></div>
+        <div class="pp__unita"><span class="pp__n u-display" data-pp="s">00</span><span class="pp__u">sec</span></div>
+      </div>
+      <p class="pp__scadenza">{promo.scadenzaLabel}</p>
+
+      <a class="pp__cta" href="/promo/" data-link="promo-popup">Scopri la promo</a>
+    </aside>
+  )
+}
+
+<style>
+  .pp {
+    position: fixed;
+    z-index: 90;
+    right: 1rem;
+    bottom: 1rem;
+    width: min(23rem, calc(100vw - 2rem));
+    padding: 1.5rem 1.25rem 1.25rem;
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius);
+    background: var(--color-dark);
+    color: var(--color-white);
+    box-shadow: 0 1.5rem 3rem rgba(39, 36, 35, 0.35);
+    /* Entra scorrendo dal basso: la scheda arriva dopo il primo sguardo alla
+       pagina, e comparire di colpo si legge come un errore di rendering. */
+    animation: pp-entra 0.45s var(--ease-out-crit) both;
+  }
+
+  @keyframes pp-entra {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pp {
+      animation: none;
+    }
+  }
+
+  /* Il tasto di chiusura è l'unico comando oltre alla CTA, e sul totem è il
+     solo modo di togliere la scheda: non c'è una tastiera per l'Escape.
+     3rem e non 38px, come il tasto del pannello dell'assistenza. */
+  .pp__x {
+    position: absolute;
+    top: 0.35rem;
+    right: 0.35rem;
+    width: 3rem;
+    height: 3rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--color-white);
+    font-size: var(--text-xl);
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .pp__x:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .pp__occhiello {
+    margin: 0 3rem 0.35rem 0;
+    color: var(--accent-on-dark);
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Il corpo del titolo passa da `--lh` e mai da `line-height`: la spaziatura
+     sopra le maiuscole accentate si calcola da lì. */
+  .pp__titolo {
+    margin: 0 0 0.5rem;
+    font-size: var(--text-lg);
+    --lh: 1;
+  }
+
+  .pp__testo {
+    margin: 0 0 1rem;
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .pp__conto {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .pp__unita {
+    padding: 0.5rem 0.25rem;
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.07);
+    text-align: center;
+  }
+
+  .pp__n {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    --lh: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pp__u {
+    display: block;
+    font-size: var(--text-2xs);
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  .pp__scadenza {
+    margin: 0 0 1rem;
+    font-size: var(--text-2xs);
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  .pp__cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--color-white);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .pp__cta:hover {
+    background: var(--accent-hover);
+  }
+
+  /* Sul telefono diventa una fascia in basso: una scheda da 23rem in un angolo
+     di 375px non è un angolo, è la pagina. */
+  @media (max-width: 700px) {
+    .pp {
+      right: 0.75rem;
+      left: 0.75rem;
+      bottom: 0.75rem;
+      width: auto;
+    }
+  }
+
+  /* + totem */
+  /* + tv */
+  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10),
+    (min-width: 1700px) and (min-height: 1020px) and (max-aspect-ratio: 37/20) {
+    .pp {
+      width: min(30rem, calc(100vw - 4rem));
+      right: 2rem;
+      bottom: 2rem;
+    }
+  }
+</style>
+
+<script>
+  import { suTotem } from '../scripts/totem';
+
+  const VISTO = 'athlon_promo_popup_visto';
+
+  function pad(n: number): string {
+    return String(Math.max(0, n)).padStart(2, '0');
+  }
+
+  function avvia(): void {
+    const pop = document.getElementById('promo-popup');
+    if (!pop) return;
+
+    /* Sul totem la chiusura vale per chi ha premuto, non per chi arriva dopo:
+       lì non si legge e non si scrive niente. */
+    const totem = suTotem();
+    if (!totem) {
+      try {
+        if (sessionStorage.getItem(VISTO) === '1') return;
+      } catch {
+        /* Sessione non disponibile (finestra privata, storage bloccato): la
+           scheda compare comunque. Un avviso in più costa meno di un avviso
+           che non si vede mai. */
+      }
+    }
+
+    const conto = pop.querySelector<HTMLElement>('[data-pp-conto]');
+    const scadenza = conto ? Date.parse(conto.dataset.scadenza ?? '') : NaN;
+    if (!Number.isFinite(scadenza)) return;
+
+    const campi = {
+      g: pop.querySelector<HTMLElement>('[data-pp="g"]'),
+      h: pop.querySelector<HTMLElement>('[data-pp="h"]'),
+      m: pop.querySelector<HTMLElement>('[data-pp="m"]'),
+      s: pop.querySelector<HTMLElement>('[data-pp="s"]'),
+    };
+
+    let tic: number | undefined;
+
+    function chiudi(): void {
+      pop!.hidden = true;
+      if (tic) window.clearInterval(tic);
+    }
+
+    /* Il segno si scrive alla comparsa, non alla chiusura: l'avviso è stato
+       dato, e chi prosegue senza toccarlo l'ha comunque letto. Sul totem non si
+       scrive niente — quel pannello è di tutti, e la sessione del browser non
+       finisce quando la persona se ne va. */
+    function segnaVisto(): void {
+      if (totem) return;
+      try {
+        sessionStorage.setItem(VISTO, '1');
+      } catch {
+        /* niente da fare: la scheda tornerà alla pagina dopo */
+      }
+    }
+
+    /* Il conto è la scadenza vera, quindi a zero la promo è finita: la scheda
+       sparisce da sé anche su una pagina rimasta aperta, e su un build più
+       vecchio della scadenza non compare affatto. */
+    function aggiorna(): void {
+      const resta = scadenza - Date.now();
+      if (resta <= 0) {
+        chiudi();
+        return;
+      }
+      const s = Math.floor(resta / 1000);
+      campi.g!.textContent = pad(Math.floor(s / 86400));
+      campi.h!.textContent = pad(Math.floor(s / 3600) % 24);
+      campi.m!.textContent = pad(Math.floor(s / 60) % 60);
+      campi.s!.textContent = pad(s % 60);
+    }
+
+    aggiorna();
+    if (scadenza - Date.now() <= 0) return;
+    tic = window.setInterval(aggiorna, 1000);
+
+    pop.querySelector('[data-pp-chiudi]')?.addEventListener('click', chiudi);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !pop.hidden) chiudi();
+    });
+
+    /* Appena entri, ma non nel primo istante: un secondo lascia disegnare la
+       pagina, così la scheda arriva su qualcosa e non su uno schermo bianco. */
+    window.setTimeout(() => {
+      pop.hidden = false;
+      segnaVisto();
+    }, 1000);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', avvia);
+  else avvia();
+</script>

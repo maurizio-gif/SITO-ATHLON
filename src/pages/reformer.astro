@@ -19,6 +19,7 @@ import { getCorso } from '../data/corsi';
 import { trialCta } from '../data/cta';
 import { serviceSchema } from '../data/club';
 import { urlPiccola, fotoHero } from '../data/foto';
+import PromoPopup from '../components/PromoPopup.astro';
 /* Il dominio di produzione, per gli @id assoluti degli schemi. */
 const SITE = 'https://www.athlonroma.it';
 
@@ -360,6 +361,7 @@ const faqs = await faqPagina([
 
   {/* Il pannello della lezione, aperto dalle celle del planning. */}
   <LessonModal bands={['group-reformer']} />
+  <PromoPopup />
 </Layout>
 
 <style>

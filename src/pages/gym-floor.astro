@@ -7,6 +7,7 @@ import SpacesGallery from '../components/home/SpacesGallery.astro';
 import { getCorso } from '../data/corsi';
 import { trialCta } from '../data/cta';
 import { serviceSchema } from '../data/club';
+import PromoPopup from '../components/PromoPopup.astro';
 /* Il dominio di produzione, per gli @id assoluti degli schemi. */
 const SITE = 'https://www.athlonroma.it';
 
@@ -540,6 +541,7 @@ const faqs = await faqPagina([
       </p>
     </div>
   </section>
+  <PromoPopup />
 </Layout>
 
 <script>
