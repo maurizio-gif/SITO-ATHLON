@@ -7,7 +7,7 @@ import Faq from '../components/Faq.astro';
 import { bands, gymFloor, countLessons, bandHours, ledeOf, siContaAOre, totalLessons } from '../data/planning';
 import { faqPagina } from '../data/faq';
 import { trialCta } from '../data/cta';
-import { ORARIO_ECCEZIONALE, orarioEccezionaleAttivo } from '../data/club';
+import { DOMENICA, ORARIO_ECCEZIONALE, orarioEccezionaleAttivo } from '../data/club';
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 
@@ -105,6 +105,14 @@ const faqs = await faqPagina([
         <p class="pl-note">{ORARIO_ECCEZIONALE.testo}</p>
       )}
       <OpeningHours href={`${PG}/#/Classes/1/Calendar?categoryId=6`} />
+      {/* Sotto la tabella e non sopra: la domenica in tabella e' una riga di
+          orari come le altre, e senza questa nota si legge come un giorno di
+          palinsesto ridotto invece che come il giorno degli eventi. Il testo
+          viene da DOMENICA (data/club.ts), lo stesso che finisce nel kb.json:
+          scritto a mano qui, pagina e chat divergerebbero al primo ritocco. */}
+      <p class="pl-note">
+        {DOMENICA.nota} <a href={DOMENICA.url}>Vai al calendario →</a>
+      </p>
     </div>
   </section>
 
