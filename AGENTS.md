@@ -2096,6 +2096,47 @@ reindirizzamento non ci va. Non è stato escluso perché quando la promo è viva
 quella pagina è `index, follow` per scelta, e un'esclusione fissa la terrebbe
 fuori anche allora.
 
+### «Ci sono sconti?» sui corsi dei bambini: la modalità è una, e lo sconto ha una finestra
+
+Il 30 agosto, a un genitore che chiedeva «ci sono sconti per la scuola nuoto
+bambini?», la chat ha risposto bene su due cose — la promozione in corso è degli
+adulti, la quota di attivazione si paga — e non ha detto le due che quella
+domanda chiedeva davvero: che **a stagione iniziata l'unica formula in vendita è
+il mensile**, con i suoi prezzi, e che **gli sconti esistono, ma dentro la
+preiscrizione**, dal 1 maggio al 31 luglio di ogni anno.
+
+**E i prezzi non li poteva dire**, che è il difetto sotto il difetto: 89, 109 e
+119 € vivevano soltanto nella tabella di `snb/preiscrizioni-nuoto.md`, cioè in un
+contenuto di Tina, e il `kb.json` non legge il markdown delle schede per i
+numeri. È lo stesso guasto della quota di attivazione, e la cura è la stessa —
+`JUNIOR_MENSILE` in `data/abbonamenti.ts`, da cui esce la voce
+`abbonamento:junior-mensile`.
+
+**Una voce sola per le due domande, e non due.** «Quanto costa» e «ci sono
+sconti» sono la stessa domanda fatta in due modi: separarle rifarebbe al
+contrario il difetto delle due sospensioni — chi pesca la voce del prezzo non
+troverebbe la finestra, e citerebbe il prezzo pieno a chi è dentro la
+preiscrizione.
+
+Tre cose da sapere prima di toccarla.
+
+**Lo sconto non è una promozione che va e viene, ed è per questo che ha una
+costante sua.** `PREISCRIZIONE` dice la finestra, la percentuale e su cosa si
+applica — l'abbonamento **stagionale**, che fuori da quella finestra non è in
+vendita. Detto senza la finestra, «c'è il 15%» è un prezzo dichiarato più basso
+del vero, che è il verso sbagliato in cui sbagliare: si scopre alla cassa.
+
+**E il verso opposto è sbagliato quasi quanto.** «Non ci sono sconti» da solo è
+falso e chiude la conversazione: lo sconto c'è, ed è a maggio. La regola fissa lo
+vieta per nome, insieme alle tre forme che dicono troppo — «chiedi al desk se c'è
+una promozione», «la promo vale anche per i bambini», «lo sconto si applica al
+mensile».
+
+**Il Baby Nuoto non è qui.** Le sue formule stanno in `junior.ts`, dentro
+`adesione`, e comprendono la lezione singola: è l'unico corso per bambini che si
+compra anche a lezione, quindi un perimetro che lo includesse offrirebbe una
+formula che per gli altri tre non esiste.
+
 ### Un numero che la pagina stampa e i dati non hanno è un numero che l'assistente non può dire
 
 «Quanto è la quota che si paga al momento dell'iscrizione?» → *«L'importo della
