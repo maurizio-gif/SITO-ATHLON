@@ -38,7 +38,7 @@ import {
   lessonCardsFor,
   PLANNING_MONTH,
 } from '../data/planning';
-import { CLUB, ORARIO_ECCEZIONALE, orarioEccezionaleAttivo } from '../data/club';
+import { CLUB, DOMENICA, ORARIO_ECCEZIONALE, orarioEccezionaleAttivo } from '../data/club';
 import {
   plans,
   GUEST_PASS,
@@ -766,7 +766,27 @@ Quando proponi il Pass, dì che è la settimana Premium delle attività degli ad
       orarioEccezionaleAttivo() && 'ORARIO ORDINARIO, che non vale adesso:',
       pulito(gymFloor.lede),
       elenco(gymFloor.hours.map((h) => `${h.label}: ${h.hours}`)),
+      `${DOMENICA.nota} Il calendario è su ${SITE}${DOMENICA.url}`,
       'Sono gli orari di apertura della sala pesi. Anche la sessione in sala si prenota, come ogni altra attività del club: prenotandola si sceglie la fascia — Con Assistenza, con un assistente di sala presente che supervisiona l\u2019attività, oppure Allenamento Libero, dove l\u2019assistente non c\u2019è. Gli orari delle singole attività seguono il planning e cambiano ogni mese.'
+    ),
+  });
+
+  /* Il calendario eventi non aveva una voce sua: c'erano i singoli eventi
+     (`evento:<slug>`), quindi l'assistente poteva citare una masterclass ma non
+     il calendario. Alla domanda sulla domenica — che è il giorno degli eventi —
+     serve proprio l'indice, perché quale sia l'evento dipende dalla settimana.
+     È una voce e non un url scritto in prosa perché in chat i link cliccabili
+     sono solo le `fonti`. */
+  voci.push({
+    id: 'club:eventi',
+    tipo: 'club',
+    titolo: 'Calendario eventi e masterclass',
+    url: `${SITE}${DOMENICA.url}`,
+    area: 'Il club',
+    attivita: [],
+    testo: blocchi(
+      DOMENICA.nota,
+      'Masterclass e seminari, gare, corsi speciali e formazione. Alcune giornate sono aperte anche a chi non è iscritto. Il calendario cambia di settimana in settimana: per sapere cosa c\u2019è in una domenica precisa si guarda qui.'
     ),
   });
 

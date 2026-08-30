@@ -108,6 +108,25 @@ export const ORARIO_ECCEZIONALE = {
   finoAl: '2026-09-01',
 } as const;
 
+/**
+ * La domenica, nell'orario ordinario, non è un giorno come gli altri: la
+ * mattina è dedicata a **eventi e masterclass**, non al palinsesto
+ * settimanale. Un'assistente che legge solo le fasce risponde «la domenica
+ * apriamo 9:30-13:00» e si ferma lì, o peggio — sotto l'orario estivo, che la
+ * domenica chiude — risponde «la domenica il club è chiuso» come se fosse la
+ * regola dell'anno. È successo il 30 agosto.
+ *
+ * Sta qui e non nel testo di una pagina perché il `kb.json` legge questo file,
+ * e sta **dentro il blocco dell'orario ordinario** della voce `club:orari`:
+ * così quando c'è un `ORARIO_ECCEZIONALE` che la domenica chiude, si porta
+ * dietro da sola l'etichetta «che non vale adesso» invece di contraddirlo.
+ */
+export const DOMENICA = {
+  nota:
+    "La domenica è il giorno degli eventi e delle masterclass: in genere non c'è il palinsesto dei corsi, ma iniziative dedicate — masterclass, gare, giornate aperte anche a chi non è iscritto. Quali siano e a che ora dipende dalla domenica, quindi si guarda il calendario eventi.",
+  url: '/eventi/',
+} as const;
+
 export function orarioEccezionaleAttivo(): boolean {
   return new Date() < new Date(ORARIO_ECCEZIONALE.finoAl);
 }
