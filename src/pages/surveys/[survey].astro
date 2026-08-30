@@ -92,17 +92,22 @@ const { s } = Astro.props;
           </fieldset>
 
           {/*
-            La nota compare quando il giudizio scende sotto la soglia, e sparisce
-            se la persona si corregge verso l'alto. `hidden` e non una classe:
-            `global.css` dichiara `[hidden] { display: none !important }` una
-            volta per tutto il sito, ed è la sola cosa che regge contro un
-            `display` scritto qui.
+            Il campo aperto c'è sempre, ed è la sola domanda che può dirci una
+            cosa che non avevamo pensato di chiedere: le stelle misurano quello
+            che sappiamo già di dover misurare. Quello che cambia col giudizio è
+            **l'etichetta**, che la scrive `surveyForm.client.js`: sotto soglia
+            la domanda utile è «cosa potevamo fare meglio», sopra è «cosa ti
+            piacerebbe trovare». Chiedere «cosa non va» a chi ha dato cinque
+            stelle è una domanda a cui quella persona non ha risposta.
           */}
-          <div class="sq__blocco" data-sq-nota hidden>
-            <label class="sq__domanda" for="sq-nota">Cosa potevamo fare meglio?</label>
-            <p class="sq__aiuto">
-              Facoltativo, ma è la parte che ci serve davvero: più è preciso — quando, quale lezione,
-              chi c’era — più possiamo farci qualcosa.
+          <div class="sq__blocco">
+            <label class="sq__domanda" for="sq-nota" data-sq-nota-titolo>
+              Vuoi aggiungere qualcosa?
+            </label>
+            <p class="sq__aiuto" data-sq-nota-aiuto>
+              Facoltativo, ed è la parte che ci serve di più: un suggerimento, una cosa che
+              cambieresti, una che ti è piaciuta. Più è preciso — quando, quale lezione, chi c’era —
+              più possiamo farci qualcosa.
             </p>
             <textarea id="sq-nota" class="sq__testo" rows="4"></textarea>
           </div>
@@ -198,6 +203,13 @@ const { s } = Astro.props;
     --lh: 0.95;
     margin: 0.4rem 0 0;
     outline: none;
+  }
+
+  /* Come sul menu: a 0.95 le due righe del titolo si toccano sul telefono. */
+  @media (max-width: 700px) {
+    .sq__title {
+      --lh: 1.05;
+    }
   }
 
   .sq__lede {

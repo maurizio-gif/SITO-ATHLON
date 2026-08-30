@@ -3498,6 +3498,19 @@ pannello via JavaScript è un link che non funziona quando lo script non arriva.
 questionario indicizzato raccoglie giudizi di chi non frequenta. Il filtro in
 `astro.config.mjs` esclude `/surveys` per intero.
 
+**La dedica in cima al menu non è un preambolo di cortesia**, ed è la parte che
+decide quante risposte arrivano: dice perché chiediamo (è da lì che decidiamo
+dove intervenire), cosa ci impegniamo a fare — migliorare la qualità dei
+servizi, rispondere con puntualità, dire con chiarezza cosa comprende l'offerta
+e per quanto tempo vale — e cosa costa rispondere. «La tua opinione è importante
+per noi» non dice nessuna delle tre.
+
+**E il titolo cambia interlinea sotto i 700px.** A `--lh: 0.92` le due righe si
+toccano appena il titolo va a capo, e sul telefono va a capo sempre: il corpo
+scende col `clamp`, l'interlinea è un rapporto e resta stretta uguale. Si passa
+da `--lh` e mai da `line-height`, o la spaziatura sopra le maiuscole accentate
+resta quella di prima e le tronca.
+
 **L'NPS c'è in tutte, e non è ripetizione.** Le stelle misurano il servizio,
 l'NPS misura la disposizione a parlarne — che è esattamente quello che una
 recensione è — e ripeterlo rende i temi confrontabili («sugli spogliatoi
@@ -3519,15 +3532,21 @@ questa è l'unica duplicazione dichiarata. Media e `positivo` **si ricalcolano**
 su n8n invece di prendere quelli del payload: sono dati derivati e decisioni, e
 un webhook pubblico non accetta decisioni da fuori.
 
-**La nota si chiede solo sotto soglia, e compare mentre si risponde.** È la
-regola del voto alla chat: chi dà il massimo ha già detto quello che pensa, e un
-campo di testo dopo un voto alto è un compito in più che abbassa la percentuale
-di chi risponde. Chiederla *dopo* l'invio vorrebbe dire una schermata in più su
-un modulo che dura venti secondi; farla comparire nel momento in cui il giudizio
-scende la mette davanti a chi sta pensando proprio a quella cosa. Se poi la
-persona alza i voti il campo si richiude ma **quello che ha scritto parte lo
-stesso**: un testo scritto e poi buttato dal codice è il modo peggiore di
-trattare l'unica risposta libera che questo modulo raccoglie.
+**Il campo aperto c'è sempre, e a cambiare col giudizio è l'etichetta.** È
+l'unica domanda che può dirci una cosa che non avevamo pensato di chiedere — le
+stelle misurano quello che sappiamo già di dover misurare — quindi nasconderlo a
+chi è contento vorrebbe dire raccogliere suggerimenti solo dagli scontenti. Ma
+la domanda non può essere la stessa per tutti: «cosa potevamo fare meglio» a chi
+ha dato cinque stelle è una domanda a cui quella persona non ha risposta, e la
+lascia in bianco. Quindi tre forme, e le sceglie `aggiornaNota()` mentre si
+risponde: neutra finché non c'è un giudizio (ed è quella che il markup porta
+scritta, cioè quella che vede chi ha JavaScript spento), «cosa potevamo fare
+meglio» sotto soglia, «c'è qualcosa che ti piacerebbe trovare» sopra.
+
+**La prima versione lo nascondeva sopra soglia**, sul modello del voto alla
+chat, e la differenza fra i due casi è che lì la nota è un'appendice a un voto e
+qui è metà del dato: un questionario a stelle senza campo libero raccoglie solo
+risposte alle domande che qualcuno ha già pensato di scrivere.
 
 **L'email è facoltativa e quasi sempre non si digita.** Tre strade in ordine: il
 parametro `email` o `UserNumber` nel link (una newsletter sa a chi scrive),

@@ -34,9 +34,24 @@ import { SURVEYS } from '../../data/surveys';
     <div class="container sv__inner">
       <span class="eyebrow">Athlon Club</span>
       <h1 class="sv__title">Dicci come<br /><em class="accent">stiamo andando</em></h1>
+      {/* La dedica, e non è un preambolo di cortesia: è la ragione per cui la
+          pagina esiste, e chi la legge decide lì se rispondere. Dice tre cose e
+          nessuna è generica — che ascoltiamo, che cosa ce ne facciamo, e cosa
+          costa rispondere. Un «la tua opinione è importante per noi» non dice
+          niente di tutto questo. */}
       <p class="sv__lede">
-        Scegli l’argomento di cui vuoi parlarci: sono <strong>tre domande</strong> e ti prendono
-        meno di un minuto. Non serve registrarsi, e l’email è facoltativa.
+        Ascoltare chi frequenta il club è il modo in cui capiamo cosa funziona e cosa no: non è una
+        formalità, è da lì che decidiamo dove intervenire.
+      </p>
+      <p class="sv__lede">
+        Ogni anno il nostro impegno è lo stesso — <strong>migliorare la qualità dei servizi</strong>,
+        rispondere con puntualità a chi ci scrive, e dire con chiarezza cosa comprende la nostra
+        offerta e per quanto tempo vale, con coerenza e trasparenza. Le tue risposte sono quello che
+        ci dice se ci stiamo riuscendo.
+      </p>
+      <p class="sv__lede">
+        Scegli l’argomento di cui vuoi parlarci: <strong>tre domande</strong>, meno di un minuto.
+        Non serve registrarsi e l’email è facoltativa.
       </p>
 
       <nav class="sv__menu" aria-label="Le survey">
@@ -76,6 +91,17 @@ import { SURVEYS } from '../../data/surveys';
     font-size: var(--text-3xl);
     --lh: 0.92;
     margin: 0.4rem 0 0;
+  }
+
+  /* Sul telefono il titolo va a capo per forza, e a 0.92 le due righe si
+     toccano: il corpo scende con `clamp` ma l'interlinea è un rapporto, quindi
+     resta stretta uguale. Si allarga solo dove il titolo è su due righe — e si
+     passa da `--lh`, mai da `line-height`: la spaziatura sopra le maiuscole
+     accentate è calcolata da lì (vedi «Display-face headroom» in global.css). */
+  @media (max-width: 700px) {
+    .sv__title {
+      --lh: 1.02;
+    }
   }
 
   .sv__lede {
