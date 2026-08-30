@@ -1,0 +1,156 @@
+---
+/**
+ * Il menu delle survey: otto pulsanti, uno per tema.
+ *
+ * **Non è una survey lunga divisa in schermate**, ed è la scelta da cui dipende
+ * il resto: da qui non si «comincia» un percorso, si sceglie *di cosa* si vuole
+ * parlare e si finisce lì. Chi arriva dal QR degli spogliatoi salta questa
+ * pagina del tutto — `/surveys/pulizia/` è già la domanda — e questa resta per
+ * chi arriva dal link generico, dal footer di un'email, o da chi è passato di
+ * qui per un tema e ha voglia di dirne un altro.
+ *
+ * **`noindex` e fuori dalla sitemap**, come `/referral` e `/attiva`: si
+ * raggiunge da un link che il club manda, non da una ricerca. Una pagina di
+ * questionari indicizzata raccoglie soprattutto risposte di chi non frequenta,
+ * che è il campione che non serve a niente.
+ *
+ * **Senza intestazione** (`chrome={false}`): la pagina fa una cosa sola, e un
+ * menu di navigazione accanto a un menu di survey sono due menu che si
+ * contendono lo stesso sguardo. In fondo c'è il ritorno alla home, che è
+ * l'unica navigazione che serve.
+ */
+import Layout from '../../layouts/Layout.astro';
+import { SURVEYS } from '../../data/surveys';
+---
+
+<Layout
+  title="Dicci come stiamo andando | Athlon Club Roma"
+  description="Un minuto del tuo tempo: scegli di cosa vuoi parlarci e dacci un giudizio. Tre domande, nessuna registrazione."
+  breadcrumb={[{ name: 'Survey', path: '/surveys' }]}
+  chrome={false}
+  noindex
+>
+  <main class="sv">
+    <div class="container sv__inner">
+      <span class="eyebrow">Athlon Club</span>
+      <h1 class="sv__title">Dicci come<br /><em class="accent">stiamo andando</em></h1>
+      <p class="sv__lede">
+        Scegli l’argomento di cui vuoi parlarci: sono <strong>tre domande</strong> e ti prendono
+        meno di un minuto. Non serve registrarsi, e l’email è facoltativa.
+      </p>
+
+      <nav class="sv__menu" aria-label="Le survey">
+        {
+          SURVEYS.map((s) => (
+            <a class="sv__card" href={`/surveys/${s.slug}/`} data-survey={s.slug}>
+              <span class="sv__card-eyebrow">{s.eyebrow}</span>
+              <span class="sv__card-titolo u-display">{s.titolo}</span>
+              <span class="sv__card-nota">{s.intro}</span>
+              <span class="sv__card-freccia" aria-hidden="true">→</span>
+            </a>
+          ))
+        }
+      </nav>
+
+      <p class="sv__coda">
+        Hai un problema da segnalare e non un giudizio da dare? <a href="/club-life/">Scrivi al team</a>,
+        ti risponde una persona.
+      </p>
+      <p class="sv__coda"><a href="/">Torna al sito</a></p>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .sv {
+    background: var(--color-cream);
+    min-height: 100svh;
+    padding: var(--space-section-md) 0;
+  }
+
+  .sv__inner {
+    max-width: 60rem;
+  }
+
+  .sv__title {
+    font-size: var(--text-3xl);
+    --lh: 0.92;
+    margin: 0.4rem 0 0;
+  }
+
+  .sv__lede {
+    /* In `ch` e non in px: la colonna deve restare fra i 45 e i 75 caratteri
+       per riga sul telefono come sul totem, dove la radice è il doppio. */
+    max-width: 56ch;
+    font-size: var(--text-md);
+    margin: 1rem 0 2.5rem;
+  }
+
+  .sv__menu {
+    display: grid;
+    gap: 0.9rem;
+    /* Si sistema da sé: il minimo è in rem, quindi cresce con la radice e la
+       griglia perde una colonna sul totem senza nessuna media query. */
+    grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+  }
+
+  .sv__card {
+    position: relative;
+    display: block;
+    padding: 1.35rem 3rem 1.35rem 1.35rem;
+    background: var(--color-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: inherit;
+    transition: transform var(--dur-fast) var(--ease-out-crit),
+      border-color var(--dur-fast) ease;
+  }
+
+  .sv__card:hover,
+  .sv__card:focus-visible {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+  }
+
+  .sv__card-eyebrow {
+    display: block;
+    font-size: var(--text-2xs);
+    letter-spacing: 0.104em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .sv__card-titolo {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    --lh: 1.02;
+    margin: 0.35rem 0 0.4rem;
+  }
+
+  .sv__card-nota {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .sv__card-freccia {
+    position: absolute;
+    right: 1.35rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: var(--text-md);
+    color: var(--accent-text);
+  }
+
+  .sv__coda {
+    margin-top: 2rem;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .sv__coda a {
+    color: var(--accent-text);
+  }
+</style>

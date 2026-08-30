@@ -2930,6 +2930,7 @@ Dove finisce cosa:
 | `chat-athlon-dati` | `chat_lead` |
 | `chat-athlon-ticket` | `chat_ticket` |
 | `athlon-referral` | `richieste_referral` |
+| `athlon-sondaggio` | `sondaggi_risposte` |
 | `athlon-verifica-iscritto`, `athlon-reset-password` | `eventi_email` |
 
 E le automazioni della posta non partono da un webhook: `INBOX EMAIL DESK -
@@ -3469,6 +3470,98 @@ il webhook con quel `vid` — deve rispondere con l'attività. Con `created_at`
 2 ore fa, o con una pagina non nell'elenco, deve rispondere `{ "attivita": [] }`.
 Con un `vid` che risolve a un `utente_id` (via `visitatori`), deve scartare
 come `scartato-contatto-noto` anche se le pagine ci sono.
+
+## `/surveys` è un menu di mini survey, e la recensione si chiede solo ai promotori
+
+Otto questionari da tre giudizi e un NPS — `/surveys/<tema>/` — più il menu su
+`/surveys/`. I temi stanno in `src/data/surveys.ts`, la pagina è
+`pages/surveys/[survey].astro`, la meccanica `lib/surveyForm.client.js`, e le
+risposte finiscono su `sondaggi_risposte` (Supabase `app-athlon`) passando dal
+webhook `athlon-sondaggio`.
+
+**Otto survey brevi e non una lunga**, ed è la scelta da cui dipende tutto il
+resto. La media di dodici domande è un numero solo e non dice dove intervenire;
+tre domande su un tema dicono *quale* cosa non va e si compilano in venti
+secondi, che è il tempo che ha in mano una persona ferma alla reception. Da qui
+il tetto: **tre domande a testa**, e alla quarta la survey diventa un
+questionario — che compila solo chi ha già deciso di lamentarsi, cioè il
+campione peggiore che si possa raccogliere.
+
+**L'indirizzo per tema è il punto, il menu è il ripiego.** Una survey si manda
+in una newsletter, si stampa in un QR accanto agli spogliatoi, si incolla in una
+risposta del desk: `/surveys/pulizia/` *è* già la domanda. Il menu esiste per
+chi arriva dal link generico, e chi arriva da lì non deve poterlo saltare per
+sbaglio. Niente ancore su una pagina sola: un link diretto che deve aprire un
+pannello via JavaScript è un link che non funziona quando lo script non arriva.
+
+**`noindex` e fuori dalla sitemap**, come `/referral` e `/attiva`: un
+questionario indicizzato raccoglie giudizi di chi non frequenta. Il filtro in
+`astro.config.mjs` esclude `/surveys` per intero.
+
+**L'NPS c'è in tutte, e non è ripetizione.** Le stelle misurano il servizio,
+l'NPS misura la disposizione a parlarne — che è esattamente quello che una
+recensione è — e ripeterlo rende i temi confrontabili («sugli spogliatoi
+promotori 20%, sulle lezioni 70%»), che è la ragione per cui le pagine sono otto
+e non una.
+
+**La soglia della recensione è NPS ≥ 9 *oppure* media ≥ 4,5**, in OR e non in
+AND: chiedere entrambe vorrebbe dire non chiederla a chi ha dato 5, 5, 4 e un 9,
+cioè a un promotore vero, per un decimale. E il verso in cui si sbaglia è
+deliberato — non chiedere una recensione a chi l'avrebbe scritta costa una
+recensione, chiederla a chi ha appena detto che gli spogliatoi sono sporchi la
+scrive. Quando non sappiamo (nessun voto, nessun NPS) non si chiede: è la lista
+bianca del Guest Pass applicata qui.
+
+**La regola vive in `giudizioPositivo()` e in un solo altro posto.** Il browser
+la usa per scegliere la schermata finale, n8n la riapplica prima di scrivere:
+n8n non importa il codice del sito, quindi le due copie vanno tenute in pari, e
+questa è l'unica duplicazione dichiarata. Media e `positivo` **si ricalcolano**
+su n8n invece di prendere quelli del payload: sono dati derivati e decisioni, e
+un webhook pubblico non accetta decisioni da fuori.
+
+**La nota si chiede solo sotto soglia, e compare mentre si risponde.** È la
+regola del voto alla chat: chi dà il massimo ha già detto quello che pensa, e un
+campo di testo dopo un voto alto è un compito in più che abbassa la percentuale
+di chi risponde. Chiederla *dopo* l'invio vorrebbe dire una schermata in più su
+un modulo che dura venti secondi; farla comparire nel momento in cui il giudizio
+scende la mette davanti a chi sta pensando proprio a quella cosa. Se poi la
+persona alza i voti il campo si richiude ma **quello che ha scritto parte lo
+stesso**: un testo scritto e poi buttato dal codice è il modo peggiore di
+trattare l'unica risposta libera che questo modulo raccoglie.
+
+**L'email è facoltativa e quasi sempre non si digita.** Tre strade in ordine: il
+parametro `email` o `UserNumber` nel link (una newsletter sa a chi scrive),
+l'email che il browser ricorda (`emailNota.ts`), il campo. Un'email nel link
+**vince sul ricordo e toglie `data-email-nota` dal campo**, o `emailNota.ts` lo
+riempirebbe di nuovo al primo fuoco — la trappola già vista sul modulo del tour.
+Se resta vuoto la risposta parte comunque: un giudizio anonimo vale, il `vid` lo
+aggancia alla visita, e un campo obbligatorio davanti a una survey volontaria è
+il punto in cui si chiude la pagina.
+
+**L'invio può fallire e lo si dice**, ed è l'eccezione alla regola dei form del
+sito. Là in fondo c'è una richiesta che costa più se si perde che se si duplica;
+qui c'è un giudizio — mandarlo due volte sporca la media, e dire «grazie» per
+una risposta che non è arrivata è una bugia che nessuno può scoprire. Quindi
+errore in chiaro e il pulsante torna premibile. La `fetch` porta `keepalive`,
+come il voto alla chat: una survey è spesso l'ultima cosa che si tocca prima di
+chiudere la scheda.
+
+**Le stelle e l'NPS sono `input[type=radio]`, non pulsanti governati da uno
+script.** Selezione, tab e screen reader funzionano prima che il client arrivi,
+e l'accensione delle stelle fino a quella scelta la fa `:has` in CSS. Il
+bersaglio è l'etichetta (3rem), non l'`input`, che è fuori schermo: misurando
+l'`input` una spazzata segnala 26 bersagli da 1×1 che non esistono — è la stessa
+falsa positività delle caselle di consenso al totem.
+
+Per verificare: la spazzata del totem (1080×1920) e della televisione
+(1920×1080) su tutte e tre le schermate — le domande **con la nota aperta**, il
+grazie del promotore, il grazie degli altri — deve dare nessun overflow, niente
+sotto i 19px, nessun comando sotto i 48px e nessun paragrafo sotto i 30
+caratteri per riga (ultima passata: min 40, mediana 72). Poi il percorso intero
+con la chiamata intercettata: un giudizio basso deve far comparire la nota e
+finire sulla schermata del team, uno alto deve saltarla e mostrare il pulsante
+di Google, e l'invio senza nemmeno un voto deve fermarsi. E su n8n,
+`versionId == activeVersionId`: `update_workflow` non pubblica.
 
 ## Le pagine senza intestazione azzerano `--header-h`
 

@@ -1,0 +1,422 @@
+---
+/**
+ * Una survey: tre stelle, un NPS, e — solo se serve — una nota.
+ *
+ * Il markup è **statico e completo**: le stelle sono `input[type=radio]` dentro
+ * una `fieldset`, non pulsanti governati da uno script. Così la selezione, il
+ * giro col tab e la lettura da parte di uno screen reader funzionano prima che
+ * `surveyForm.client.js` sia arrivato, e quello che lo script aggiunge è solo
+ * ciò che il markup non può fare da solo: la nota che compare sotto la soglia,
+ * l'invio, e la schermata finale.
+ *
+ * **Una pagina per tema, generata da `SURVEYS`.** Aggiungere un tema è una voce
+ * in `data/surveys.ts`: compare nel menu, ha il suo indirizzo, e n8n non va
+ * toccato — lo slug viaggia nel payload e finisce in una colonna.
+ *
+ * `noindex`, fuori dalla sitemap e senza intestazione, per le stesse ragioni
+ * del menu — che sono scritte in `surveys/index.astro`.
+ */
+import Layout from '../../layouts/Layout.astro';
+import { SURVEYS, NPS, STELLE } from '../../data/surveys';
+
+export function getStaticPaths() {
+  return SURVEYS.map((s) => ({ params: { survey: s.slug }, props: { s } }));
+}
+
+const { s } = Astro.props;
+---
+
+<Layout
+  title={`${s.titolo} | Dicci come stiamo andando | Athlon Club Roma`}
+  description={s.intro}
+  breadcrumb={[
+    { name: 'Survey', path: '/surveys' },
+    { name: s.titolo, path: `/surveys/${s.slug}` },
+  ]}
+  chrome={false}
+  noindex
+>
+  <main class="sq" data-survey={s.slug}>
+    <div class="container sq__inner">
+      <!-- ── Le domande ────────────────────────────────────────────────── -->
+      <section id="sq-form" data-sq-passo="form">
+        <span class="eyebrow">{s.eyebrow}</span>
+        <h1 class="sq__title" tabindex="-1" data-sq-fuoco>{s.titolo}</h1>
+        <p class="sq__lede">{s.intro}</p>
+
+        <form class="sq__form" novalidate data-sq-form>
+          {
+            s.domande.map((d) => (
+              <fieldset class="sq__blocco" data-sq-domanda={d.id}>
+                <legend class="sq__domanda">{d.testo}</legend>
+                <div class="sq__stelle">
+                  {STELLE.map((etichetta, i) => (
+                    <label class="sq__stella" title={`${i + 1} — ${etichetta}`}>
+                      <input
+                        type="radio"
+                        name={`stelle-${d.id}`}
+                        value={i + 1}
+                        aria-label={`${i + 1} stelle su 5 — ${etichetta}`}
+                        data-sq-stella
+                      />
+                      <span class="sq__stella-segno" aria-hidden="true">★</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ))
+          }
+
+          <fieldset class="sq__blocco sq__blocco--nps">
+            <legend class="sq__domanda">{NPS.testo}</legend>
+            <div class="sq__nps">
+              {
+                Array.from({ length: 11 }, (_, n) => (
+                  <label class="sq__voto">
+                    <input
+                      type="radio"
+                      name="nps"
+                      value={n}
+                      aria-label={`${n} su 10`}
+                      data-sq-nps
+                    />
+                    <span aria-hidden="true">{n}</span>
+                  </label>
+                ))
+              }
+            </div>
+            <p class="sq__scala">
+              <span>0 — {NPS.minimo}</span>
+              <span>10 — {NPS.massimo}</span>
+            </p>
+          </fieldset>
+
+          {/*
+            La nota compare quando il giudizio scende sotto la soglia, e sparisce
+            se la persona si corregge verso l'alto. `hidden` e non una classe:
+            `global.css` dichiara `[hidden] { display: none !important }` una
+            volta per tutto il sito, ed è la sola cosa che regge contro un
+            `display` scritto qui.
+          */}
+          <div class="sq__blocco" data-sq-nota hidden>
+            <label class="sq__domanda" for="sq-nota">Cosa potevamo fare meglio?</label>
+            <p class="sq__aiuto">
+              Facoltativo, ma è la parte che ci serve davvero: più è preciso — quando, quale lezione,
+              chi c’era — più possiamo farci qualcosa.
+            </p>
+            <textarea id="sq-nota" class="sq__testo" rows="4"></textarea>
+          </div>
+
+          <div class="sq__blocco">
+            <label class="sq__domanda" for="sq-email">La tua email</label>
+            <p class="sq__aiuto">
+              Facoltativa. Serve solo se vuoi che ti si possa rispondere: senza, la risposta resta
+              anonima e va bene lo stesso.
+            </p>
+            <input
+              id="sq-email"
+              class="sq__input"
+              type="email"
+              autocomplete="email"
+              inputmode="email"
+              placeholder="nome@esempio.it"
+              data-email-nota
+            />
+            <p class="sq__aiuto sq__aiuto--nota" data-sq-riconosciuto hidden></p>
+          </div>
+
+          <p class="sq__errore" data-sq-errore hidden></p>
+
+          <button type="submit" class="btn btn-primary sq__invia" data-sq-invia>
+            <span data-sq-etichetta>Invia</span>
+            <span class="sq__spinner" data-sq-spinner hidden aria-hidden="true"></span>
+          </button>
+
+          <p class="sq__legale">
+            I dati che lasci qui li trattiamo come descritto nella
+            <a href="/privacy/">privacy policy</a>.
+          </p>
+        </form>
+      </section>
+
+      <!-- ── Grazie, versione promotore ────────────────────────────────── -->
+      <section id="sq-grazie-positivo" data-sq-passo="positivo" hidden>
+        <span class="eyebrow">Grazie</span>
+        <h2 class="sq__title" tabindex="-1" data-sq-fuoco>Ci fa piacere<br /><em class="accent">davvero</em></h2>
+        <p class="sq__lede">
+          Grazie per il tempo che ci hai dedicato: quello che hai scritto arriva a chi se ne occupa.
+        </p>
+        <p class="sq__lede">
+          Se ti va di darci una mano a farci conoscere, la cosa che vale di più è una
+          <strong>recensione su Google</strong>: la leggono le persone che stanno decidendo se
+          venire a provare, e ci mette due minuti.
+        </p>
+        <a class="btn btn-primary sq__cta" data-sq-google target="_blank" rel="noopener">
+          Scrivi una recensione su Google →
+        </a>
+        <p class="sq__coda"><a href="/surveys/">Rispondi a un altro argomento</a></p>
+        <p class="sq__coda"><a href="/">Torna al sito</a></p>
+      </section>
+
+      <!-- ── Grazie, tutti gli altri ───────────────────────────────────── -->
+      <section id="sq-grazie" data-sq-passo="grazie" hidden>
+        <span class="eyebrow">Grazie</span>
+        <h2 class="sq__title" tabindex="-1" data-sq-fuoco>Grazie,<br /><em class="accent">l’abbiamo letta</em></h2>
+        <p class="sq__lede">
+          La tua risposta è arrivata. Le leggiamo tutte, e quelle che dicono cosa non va sono quelle
+          da cui cambiamo qualcosa.
+        </p>
+        <p class="sq__lede">
+          Se c’è una cosa che va sistemata adesso — un abbonamento, una prenotazione, qualcosa che è
+          successo — scrivi al team: ti risponde una persona, non un questionario.
+        </p>
+        <a class="btn btn-primary sq__cta" href="/club-life/">Scrivi al team →</a>
+        <p class="sq__coda"><a href="/surveys/">Rispondi a un altro argomento</a></p>
+        <p class="sq__coda"><a href="/">Torna al sito</a></p>
+      </section>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import '../../lib/surveyForm.client.js';
+</script>
+
+<style>
+  .sq {
+    background: var(--color-cream);
+    min-height: 100svh;
+    padding: var(--space-section-md) 0;
+  }
+
+  .sq__inner {
+    max-width: 46rem;
+  }
+
+  .sq__title {
+    font-size: var(--text-2xl);
+    --lh: 0.95;
+    margin: 0.4rem 0 0;
+    outline: none;
+  }
+
+  .sq__lede {
+    max-width: 58ch;
+    font-size: var(--text-md);
+    margin: 1rem 0 0;
+  }
+
+  .sq__form {
+    margin-top: 2.2rem;
+  }
+
+  .sq__blocco {
+    border: 0;
+    padding: 0;
+    margin: 0 0 1.8rem;
+  }
+
+  .sq__blocco--nps {
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--border-strong);
+  }
+
+  .sq__domanda {
+    display: block;
+    padding: 0;
+    font-weight: 600;
+    font-size: var(--text-base);
+    max-width: 54ch;
+  }
+
+  .sq__aiuto {
+    max-width: 58ch;
+    margin: 0.35rem 0 0.6rem;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .sq__aiuto--nota {
+    color: var(--accent-text);
+  }
+
+  /* ── Le stelle ───────────────────────────────────────────────────────────
+     Il bersaglio è l'etichetta e non l'`input`, che è fuori schermo: 2.75rem
+     per lato, cioè 44px a radice 16 e più del doppio sul totem. Sono le stesse
+     stelle del voto alla chat, e per la stessa ragione — una stella disegnata
+     alla dimensione del carattere è un voto dato per sbaglio a quella accanto. */
+  .sq__stelle {
+    display: flex;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+  }
+
+  .sq__stella {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    cursor: pointer;
+    border-radius: 12px;
+  }
+
+  .sq__stella-segno {
+    font-size: 1.9rem;
+    line-height: 1;
+    color: rgba(39, 36, 35, 0.22);
+    transition: color var(--dur-instant) ease, transform var(--dur-press) ease;
+  }
+
+  /* Accese fino a quella scelta: `:has` guarda il gruppo, e il verso della
+     selezione fa il resto — la stella scelta e tutte quelle prima. Senza `:has`
+     lo script accenderebbe le stesse classi; con, la cosa funziona anche a
+     JavaScript spento. */
+  .sq__stelle:has(input:checked) .sq__stella:has(~ .sq__stella input:checked) .sq__stella-segno,
+  .sq__stella:has(input:checked) .sq__stella-segno {
+    color: var(--accent-fill);
+  }
+
+  .sq__stella:hover .sq__stella-segno {
+    transform: scale(1.08);
+  }
+
+  .sq__stella input:focus-visible + .sq__stella-segno {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* ── L'NPS ───────────────────────────────────────────────────────────── */
+  .sq__nps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.7rem;
+  }
+
+  .sq__voto {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 3rem;
+    height: 3rem;
+    padding: 0 0.2rem;
+    cursor: pointer;
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    background: var(--color-white);
+    font-variant-numeric: tabular-nums;
+    transition: background var(--dur-instant) ease, color var(--dur-instant) ease;
+  }
+
+  .sq__voto:has(input:checked) {
+    background: var(--accent-fill);
+    border-color: var(--accent-fill);
+    color: var(--color-white);
+  }
+
+  .sq__voto:has(input:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .sq__scala {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0.6rem 0 0;
+    font-size: var(--text-2xs);
+    color: var(--text-muted);
+  }
+
+  .sq__stella input,
+  .sq__voto input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* ── Testo, email, invio ─────────────────────────────────────────────── */
+  .sq__testo,
+  .sq__input {
+    width: 100%;
+    /* 3rem di altezza minima e non solo il padding: a radice 16 il campo
+       misurava 47px, cioè un pixel sotto la misura di un dito. In rem cresce
+       da sé sul totem e sulla televisione. */
+    min-height: 3rem;
+    padding: 0.8rem 0.9rem;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--color-dark);
+    background: var(--color-white);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+  }
+
+  .sq__testo:focus,
+  .sq__input:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .sq__input.segnalato {
+    border-color: var(--accent-fill);
+  }
+
+  .sq__errore {
+    margin: 0 0 1rem;
+    font-size: var(--text-sm);
+    color: var(--accent-text);
+  }
+
+  .sq__invia {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 3rem;
+  }
+
+  .sq__spinner {
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: var(--color-white);
+    border-radius: 50%;
+    animation: sq-gira 0.7s linear infinite;
+  }
+
+  @keyframes sq-gira {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sq__spinner {
+      animation-duration: 2s;
+    }
+  }
+
+  .sq__cta {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    margin-top: 1.6rem;
+  }
+
+  .sq__legale,
+  .sq__coda {
+    margin-top: 1.2rem;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .sq__legale a,
+  .sq__coda a {
+    color: var(--accent-text);
+  }
+</style>

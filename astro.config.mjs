@@ -75,6 +75,11 @@ export default defineConfig({
            il club con qualcuno. Chi cerca «visita athlon» deve trovare `/prova`,
            non un modulo che a lui non risponde. */
         !page.endsWith('/tour/') &&
+        /* `/surveys/` e le sue otto pagine sono `noindex`: si raggiungono da un
+           link che manda il club — una newsletter, un QR in sede, la risposta
+           del desk. Un questionario indicizzato raccoglie soprattutto giudizi
+           di chi non frequenta, che è il campione che non serve a niente. */
+        !page.includes('/surveys') &&
         !page.includes('/wikiathlon/'),
 
       /* Priorità e frequenza sono suggerimenti, e Google li ignora — restano
