@@ -152,21 +152,30 @@ export type Survey = {
 export const SURVEYS: Survey[] = [
   {
     slug: 'assistenza',
-    titolo: 'Assistenza e reception',
-    eyebrow: 'Il desk',
-    intro: 'Com’è andata l’ultima volta che hai chiesto qualcosa al desk o ci hai scritto.',
-    /* Le promesse controllate: «ti risponde una persona» (il rimando che
-       chiude ogni pannello del sito e ogni bozza email), la casella del desk
-       come canale vero, e il fatto che una richiesta si chiude — che è quello
-       che il club dichiara facendo esistere l'Help Desk. */
+    titolo: 'Informazioni e assistenza',
+    eyebrow: 'Trovare risposte',
+    intro:
+      'Le tre strade per avere una risposta: le pagine del sito, l’assistente virtuale e le persone del club.',
+    /* **Il perimetro è il servizio intero e non il solo desk**, ed è la
+       correzione che questa survey ha ricevuto per prima: chi cerca un orario
+       lo cerca sul sito, chi ha una domanda di sera la fa alla chat, chi ha un
+       problema scrive allo staff — e sono tre esperienze diverse che il club
+       offre come una sola. Chiedere solo dell'ultima misura un canale e ne
+       lascia due fuori, compresi i due che rispondono ventiquattr'ore su
+       ventiquattro.
+
+       L'ultima domanda è quella che le tiene insieme: tre canali che dicono
+       tre cose diverse sono il difetto peggiore di un servizio informativo, e
+       nessuna delle prime tre lo farebbe emergere. */
     domande: [
-      { id: 'cortesia', testo: 'La persona che ti ha risposto è stata cortese e disponibile' },
-      { id: 'tempi', testo: 'Hai avuto una risposta in tempi ragionevoli' },
+      { id: 'sito', testo: 'Sul sito trovi le informazioni che cerchi, senza doverle chiedere' },
+      { id: 'assistente', testo: 'L’assistente virtuale in chat ti ha dato una risposta utile' },
+      { id: 'cortesia', testo: 'Le persone del club sono state cortesi e disponibili' },
+      { id: 'tempi', testo: 'Quando hai scritto o chiesto allo staff, la risposta è arrivata in tempi ragionevoli' },
       { id: 'risolto', testo: 'La tua richiesta è stata risolta, non solo presa in carico' },
-      { id: 'chiarezza', testo: 'La risposta era chiara: hai capito cosa dovevi fare' },
-      { id: 'coerenza', testo: 'Quello che ti hanno detto coincideva con quello che hai trovato' },
+      { id: 'coerenza', testo: 'Sito, chat e persone del club ti dicono la stessa cosa' },
     ],
-    fonte: { testo: 'Come si contatta il club', href: '/club-life/' },
+    fonte: { testo: 'Le domande frequenti e il modulo per il team', href: '/club-life/' },
   },
   {
     slug: 'lezioni',
@@ -184,8 +193,8 @@ export const SURVEYS: Survey[] = [
       { id: 'palinsesto', testo: 'Negli orari che ti servono trovi le lezioni che cerchi' },
       { id: 'puntualita', testo: 'Le lezioni cominciano e finiscono all’orario dichiarato' },
       { id: 'gruppo', testo: 'Il numero di persone in sala ti permette di allenarti bene' },
-      { id: 'sostituzioni', testo: 'Quando cambia l’istruttore o l’orario, vieni avvisato prima' },
-      { id: 'sala', testo: 'La sala e l’attrezzatura della lezione sono pronte quando arrivi' },
+      { id: 'app-aggiornata', testo: 'Quando una lezione cambia, sull’app lo trovi già aggiornato' },
+      { id: 'attrezzature', testo: 'Le attrezzature della lezione sono idonee a quello che si fa' },
     ],
     fonte: { testo: 'Il palinsesto della settimana', href: '/planning/' },
   },
@@ -264,8 +273,8 @@ export const SURVEYS: Survey[] = [
       { id: 'finestra', testo: 'La finestra dei tre giorni ti basta per organizzarti' },
       { id: 'posti', testo: 'Trovi posto nelle lezioni che vuoi fare' },
       { id: 'disdetta', testo: 'Disdire una prenotazione è altrettanto semplice' },
-      { id: 'informazioni', testo: 'Orari e informazioni sull’app sono chiari e aggiornati' },
-      { id: 'avvisi', testo: 'Quando una lezione cambia o salta, l’avviso ti arriva' },
+      { id: 'informazioni', testo: 'Nel portale trovi chiare le informazioni sul tuo abbonamento e sulle scadenze' },
+      { id: 'app-aggiornata', testo: 'Quando una lezione cambia o salta, sull’app lo trovi già aggiornato' },
       { id: 'affidabilita', testo: 'L’app funziona senza doverci tornare due volte' },
     ],
     fonte: { testo: 'Come funzionano le prenotazioni', href: '/wikiathlon/generali/prenotazioni/' },
@@ -288,7 +297,7 @@ export const SURVEYS: Survey[] = [
       { id: 'gruppo', testo: 'Tuo figlio è nel gruppo giusto per il suo livello' },
       { id: 'organizzazione', testo: 'Turni, cambi e comunicazioni sono chiari' },
       { id: 'recuperi', testo: 'Recuperare una lezione persa è semplice' },
-      { id: 'accoglienza', testo: 'A bordo vasca ti senti accolto e sai a chi rivolgerti' },
+      { id: 'direttore-tecnico', testo: 'Se hai parlato con il Direttore Tecnico, ti ha saputo aiutare' },
     ],
     fonte: { testo: 'Il Metodo Athlon', href: '/scuola-nuoto-bambini/' },
   },
