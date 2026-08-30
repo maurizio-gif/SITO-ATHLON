@@ -1,0 +1,271 @@
+---
+/**
+ * Pagina di prova dell'embed del Client Portal PerfectGym — solo il calendario.
+ *
+ * Esiste per rispondere a una domanda sola, che da qui non si può verificare:
+ * **`athlon.perfectgym.com` accetta di stare dentro un iframe del nostro
+ * dominio?** Lo decidono due intestazioni HTTP che manda PerfectGym,
+ * `X-Frame-Options` e `Content-Security-Policy: frame-ancestors`, e il browser
+ * le applica in silenzio — un iframe rifiutato resta bianco, senza errore in
+ * pagina. Per questo il riquadro di diagnostica qui sotto non è un ornamento:
+ * è il solo modo di distinguere «non è ancora arrivato» da «è stato rifiutato».
+ *
+ * Non è una pagina del club: `noindex`, fuori dalla sitemap, e va cancellata o
+ * promossa a pagina vera quando la prova ha dato il suo esito. Il nome dice
+ * cos'è, così nessuno la scambia per un'area riservata a metà.
+ *
+ * Tre cose che questa pagina fa diversamente dal resto del sito, e ognuna ha
+ * una ragione:
+ *
+ *  - **due domini di terzi in più** (jsDelivr per le due librerie). La regola
+ *    del progetto è che l'unico terzo dominio è GTM: qui l'eccezione è
+ *    confinata a questa route — gli script stanno nella pagina, mai nel Layout
+ *    — e non blocca il rendering, perché sta in fondo al contenuto e non nel
+ *    `<head>`. Il CSS del portale è l'unica cosa che deve arrivare presto, ed è
+ *    un `<link>` nel corpo: 2 kB, e riguarda solo il riquadro.
+ *  - **le versioni sono fissate** (`@1.13.3`, `@5.5.7`) e non `@latest`, che è
+ *    quello che consiglia il README di PerfectGym. `latest` vuol dire che una
+ *    loro pubblicazione cambia il nostro sito senza un nostro commit.
+ *  - **niente `client:` di Astro e niente modulo**: `is:inline` passa gli
+ *    script al browser come sono. Senza, Astro li tratterebbe come moduli suoi
+ *    e li servirebbe differiti, quindi `window.PerfectGym` non esisterebbe
+ *    ancora quando l'inizializzazione lo cerca.
+ *
+ * E una che va saputa prima di provarla: **se CookieYes ha il blocco
+ * automatico degli script di terzi attivo**, questi due `<script>` possono
+ * essere bloccati finché non si dà il consenso — e il sintomo è identico a un
+ * iframe rifiutato. La diagnostica distingue anche questo, perché guarda prima
+ * se `window.PerfectGym` è arrivato.
+ */
+import Layout from '../layouts/Layout.astro';
+import { PG } from '../data/cta';
+
+/* L'url del portale vuole lo slash finale: la libreria ci attacca il frammento
+   (`#/...`) e senza lo slash comporrebbe `ClientPortal2#/Classes`. */
+const URL_PORTALE = `${PG}/`;
+
+/* Versioni fissate. Alzarle è un commit, ed è il punto. */
+const IFRAME_RESIZER = 'https://cdn.jsdelivr.net/npm/@iframe-resizer/parent@5.5.7/index.umd.min.js';
+const CLIENT_PORTAL = 'https://cdn.jsdelivr.net/npm/@perfectgym/client-portal@1.13.3/dist/ClientPortal.min.js';
+const CLIENT_PORTAL_CSS = 'https://cdn.jsdelivr.net/npm/@perfectgym/client-portal@1.13.3/dist/ClientPortal.css';
+---
+
+<Layout
+  title="Prova embed portale — Athlon"
+  description="Pagina di prova dell'incorporamento del calendario PerfectGym."
+  noindex
+>
+  <link rel="stylesheet" href={CLIENT_PORTAL_CSS} />
+
+  <main class="tp">
+    <div class="tp__intro">
+      <p class="tp__eyebrow">Pagina di prova</p>
+      <h1 class="tp__titolo">Calendario PerfectGym incorporato</h1>
+      <p class="tp__testo">
+        Il riquadro qui sotto è il calendario delle lezioni del portale, dentro questa
+        pagina. Serve a vedere se PerfectGym permette di essere incorporato dal nostro
+        dominio: se il riquadro resta vuoto, la diagnostica dice quale delle cause è.
+      </p>
+    </div>
+
+    {/* La diagnostica sta **prima** del riquadro di proposito: quando la prova
+        fallisce, il riquadro è vuoto e chi guarda deve trovare la spiegazione
+        senza scorrere sotto un vuoto alto mille pixel. */}
+    <div class="tp__diag" id="tp-diag" data-stato="attesa">
+      <p class="tp__diag-riga"><span class="tp__spia" data-spia="script">…</span> Librerie da jsDelivr</p>
+      <p class="tp__diag-riga"><span class="tp__spia" data-spia="init">…</span> Inizializzazione</p>
+      <p class="tp__diag-riga"><span class="tp__spia" data-spia="connect">…</span> Risposta del portale</p>
+      <p class="tp__diag-esito" id="tp-esito">In attesa…</p>
+    </div>
+
+    <div class="tp__riquadro">
+      <div id="pg-client-portal-calendar"></div>
+    </div>
+
+    <p class="tp__nota">
+      Se qui non compare niente, il calendario resta raggiungibile fuori dal sito:
+      <a class="tp__link" href={`${URL_PORTALE}#/Classes`} target="_blank" rel="noopener">
+        apri il portale PerfectGym
+      </a>
+    </p>
+  </main>
+</Layout>
+
+{/* Gli script stanno qui, dopo il contenuto, e in quest'ordine: iframe-resizer
+    è una dipendenza dichiarata di ClientPortal, che al caricamento la cerca. */}
+<script is:inline src={IFRAME_RESIZER} data-tp="resizer"></script>
+<script is:inline src={CLIENT_PORTAL} data-tp="portale"></script>
+
+<script is:inline define:vars={{ URL_PORTALE }}>
+  (function () {
+    var diag = document.getElementById('tp-diag');
+    var esito = document.getElementById('tp-esito');
+    var spie = {};
+    document.querySelectorAll('[data-spia]').forEach(function (e) {
+      spie[e.dataset.spia] = e;
+    });
+
+    function segna(nome, ok) {
+      if (spie[nome]) {
+        spie[nome].textContent = ok ? '✓' : '✕';
+        spie[nome].className = 'tp__spia ' + (ok ? 'tp__spia--si' : 'tp__spia--no');
+      }
+    }
+
+    function chiudi(ok, testo) {
+      if (diag) diag.dataset.stato = ok ? 'ok' : 'ko';
+      if (esito) esito.textContent = testo;
+    }
+
+    /* Primo bivio: le librerie sono arrivate? Se no, la causa non è PerfectGym
+       — è la rete, un blocco pubblicitario, o CookieYes che tiene fermi gli
+       script di terzi finché non c'è il consenso. Sono guasti diversi con lo
+       stesso sintomo, e distinguerli è metà del lavoro di questa pagina. */
+    if (!window.PerfectGym || !window.PerfectGym.ClientPortal) {
+      segna('script', false);
+      chiudi(
+        false,
+        'Le librerie non sono state caricate. Cause tipiche: blocco degli script di terzi ' +
+          '(CookieYes o un ad blocker), oppure jsDelivr irraggiungibile. Non è ancora una ' +
+          'risposta su PerfectGym.',
+      );
+      return;
+    }
+    segna('script', true);
+
+    var elemento = document.getElementById('pg-client-portal-calendar');
+    var connesso = false;
+
+    try {
+      new window.PerfectGym.ClientPortal(elemento, {
+        url: URL_PORTALE,
+        /* Solo il calendario: niente barra di navigazione del portale, e
+           nessun «Prenota» a chi non ha fatto login — chi non è entrato non
+           deve trovare un pulsante che lo porta a una pagina di errore. */
+        navigation: { hide: true },
+        calendarPage: { hideBookingIfNotLogged: true },
+        defaultState: window.PerfectGym.ClientPortal.State.Classes,
+        language: 'it',
+        minHeight: 900,
+        onConnect: function () {
+          connesso = true;
+          segna('connect', true);
+          chiudi(true, 'Il portale risponde: l’incorporamento è permesso da questo dominio.');
+        },
+      });
+      segna('init', true);
+    } catch (e) {
+      segna('init', false);
+      chiudi(false, 'La libreria ha sollevato un errore in inizializzazione: ' + e.message);
+      return;
+    }
+
+    /* Il caso che conta, e il solo che il browser non segnala: un iframe
+       rifiutato da `X-Frame-Options` o da `frame-ancestors` resta bianco e
+       muto. Dieci secondi sono larghi per un portale che carica su rete
+       normale, e stretti abbastanza da non far dubitare chi guarda. */
+    setTimeout(function () {
+      if (connesso) return;
+      segna('connect', false);
+      chiudi(
+        false,
+        'Il portale non ha risposto entro dieci secondi. Se il riquadro è bianco, ' +
+          'guarda la console del browser: «Refused to display … in a frame» vuol dire che ' +
+          'PerfectGym deve autorizzare questo dominio (X-Frame-Options o frame-ancestors).',
+      );
+    }, 10000);
+  })();
+</script>
+
+<style>
+  .tp {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: var(--space-section-md) 1.25rem var(--space-section-lg);
+  }
+
+  .tp__eyebrow {
+    font-size: var(--text-2xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+    margin: 0 0 0.5rem;
+  }
+
+  .tp__titolo {
+    font-size: var(--text-2xl);
+    --lh: 0.95;
+    margin: 0 0 1rem;
+  }
+
+  .tp__testo {
+    max-width: 58ch;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .tp__diag {
+    margin: 2rem 0 1.5rem;
+    padding: 1.25rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--color-white);
+  }
+
+  .tp__diag[data-stato='ok'] {
+    border-color: rgba(31, 122, 60, 0.35);
+  }
+
+  .tp__diag[data-stato='ko'] {
+    border-color: rgba(176, 60, 0, 0.35);
+  }
+
+  .tp__diag-riga {
+    margin: 0 0 0.4rem;
+    font-size: var(--text-sm);
+  }
+
+  .tp__spia {
+    display: inline-block;
+    width: 1.5rem;
+    font-weight: 700;
+  }
+
+  .tp__spia--si { color: #1f7a3c; }
+  .tp__spia--no { color: var(--accent-fill-hover); }
+
+  .tp__diag-esito {
+    margin: 0.9rem 0 0;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--border);
+    font-size: var(--text-sm);
+    max-width: 70ch;
+  }
+
+  /* Il riquadro non ha un'altezza scritta: la detta iframe-resizer, che misura
+     il contenuto e la aggiorna. `min-height` è solo il posto che il calendario
+     occupa mentre arriva, così la pagina non salta quando compare. */
+  .tp__riquadro {
+    min-height: 40rem;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--color-cream);
+  }
+
+  .tp__nota {
+    margin: 1.5rem 0 0;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  /* La lista dei comandi a forma di link di `global.css`: senza, questo link
+     resta alto quanto il testo e sul totem è sotto i 48px. */
+  .tp__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    padding: 0.25rem 0;
+    color: var(--accent-text);
+    font-weight: 600;
+  }
+</style>
