@@ -3526,6 +3526,17 @@ corrispondere a quello che promettiamo, no.
 `risposte` su Supabase e nel pannello: cambiarne uno spezza in due la serie
 storica di quella domanda, senza che niente dia errore.
 
+**Su `/club-life` c'è la porta, non la prima domanda.** La fascia «Raccontaci
+come sta andando» sta fra i Servizi e l'Help Desk — il posto che era della
+fascia «Porta un amico», e per la stessa ragione: è una cosa che chiediamo noi,
+in mezzo a due sezioni che raccontano cosa diamo. **Prima** dell'Help Desk di
+proposito: dopo, la pagina la chiude il modulo dell'assistenza, e un
+questionario dopo «richiedi assistenza» si legge come un passaggio del reclamo
+appena aperto. E porta al menu invece di cominciare una survey lì: chi apre
+Club Life sta cercando una news o una risposta, e la prima decisione vera è di
+quale cosa parlare. Il numero degli argomenti lo conta `SURVEYS.length`, non è
+scritto: una cifra ricopiata resta a otto il giorno del nono tema.
+
 **L'indirizzo per tema è il punto, il menu è il ripiego.** Una survey si manda
 in una newsletter, si stampa in un QR accanto agli spogliatoi, si incolla in una
 risposta del desk: `/surveys/pulizia/` *è* già la domanda. Il menu esiste per
