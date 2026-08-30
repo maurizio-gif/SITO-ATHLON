@@ -2096,6 +2096,47 @@ reindirizzamento non ci va. Non è stato escluso perché quando la promo è viva
 quella pagina è `index, follow` per scelta, e un'esclusione fissa la terrebbe
 fuori anche allora.
 
+### Due righe che si leggono allo stesso modo sono due righe che si scambiano
+
+Il 30 agosto, a chi voleva cominciare la Scuola Nuoto Adulti e chiedeva
+«qualcosa di più flessibile», la chat ha risposto **Mensile Flex 95 €/mese**, e
+al messaggio dopo **annuale 75 €/mese oppure 950 €/anno**. Il Premium Flex è
+**119**, l'annuale a rate è **95**, e i **75** sono dello **Smart**: tre importi,
+tre righe sbagliate. E il risultato non era solo falso, era falso nel verso che
+il cliente scopre alla cassa — e in mezzo diceva pure che il senza vincoli costa
+meno dell'annuale, cioè il contrario di come è costruito il listino.
+
+**I dati erano giusti e la voce li stampava tutti e sei.** A essere sbagliata era
+la forma: le due voci — Smart e Premium — hanno la **stessa identica sagoma**,
+tre righe con le stesse etichette, e l'unica cosa che le distingueva era il
+titolo in cima. Una riga letta senza il titolo è un importo senza piano. In più,
+dentro ogni voce, due righe su tre si leggono come «mensile»: *Annuale —
+pagamento mensile* e *Mensile Flex*. È esattamente il difetto delle due
+sospensioni, in versione numerica: **un contesto da cui si può comporre una
+formula che non esiste** — un senza vincoli a 95 €.
+
+La cura sta nella voce e non solo nel prompt, e sono tre righe di `kb.json.ts`:
+
+- **ogni riga porta il nome del piano** — `**Premium Mensile Flex, senza
+  vincoli: 119 €/mese**` — così una riga estratta dal contesto resta attribuita;
+- **una riga disambigua le due formule mensili**, e il confronto è **calcolato
+  dai numeri** (`flex.amount` contro `rate.amount`), non scritto a mano: il
+  giorno che il listino cambia non resta indietro;
+- **una riga dice che quegli importi non sono dell'altro piano**, con il nome
+  dell'altro piano dentro.
+
+Nel `systemMessage` la regola fissa aggiunge quello che nessun dato può dire: un
+importo si copia **con il suo piano e la sua formula**, nella frase che arriva
+alla persona il numero non va mai da solo, e c'è un'**invariante controllabile**
+— il Flex è sempre il più caro dei tre importi del suo piano. Se la risposta sta
+per dire che il senza vincoli costa meno dell'annuale, la riga è quella
+sbagliata, e questo il modello lo può verificare da sé prima di scrivere.
+
+**La lezione generale:** quando due voci della knowledge base hanno la stessa
+struttura e differiscono solo per un titolo, il titolo non basta — ogni riga che
+porta un numero deve portarsi dietro di chi è. Vale per i piani, e varrà per la
+prossima coppia di listini che si somigliano.
+
 ### «Ci sono sconti?» sui corsi dei bambini: la modalità è una, e lo sconto ha una finestra
 
 Il 30 agosto, a un genitore che chiedeva «ci sono sconti per la scuola nuoto
