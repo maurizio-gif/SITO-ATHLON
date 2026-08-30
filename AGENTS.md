@@ -3481,11 +3481,40 @@ webhook `athlon-sondaggio`.
 
 **Otto survey brevi e non una lunga**, ed è la scelta da cui dipende tutto il
 resto. La media di dodici domande è un numero solo e non dice dove intervenire;
-tre domande su un tema dicono *quale* cosa non va e si compilano in venti
-secondi, che è il tempo che ha in mano una persona ferma alla reception. Da qui
-il tetto: **tre domande a testa**, e alla quarta la survey diventa un
-questionario — che compila solo chi ha già deciso di lamentarsi, cioè il
-campione peggiore che si possa raccogliere.
+cinque domande su un tema dicono *quale* cosa non va e si compilano in un
+minuto, che è il tempo che ha in mano una persona ferma alla reception. Il
+tetto è **sette**, e vale la stessa ragione al contrario: oltre, la survey
+diventa un questionario, che compila solo chi ha già deciso di lamentarsi —
+cioè il campione peggiore che si possa raccogliere.
+
+**Ogni domanda controlla una promessa scritta sul sito**, ed è la regola da cui
+si scrive la prossima. Il sito dichiara un perimetro preciso — «assistenza
+bagnino sempre presente», «prenoti a partire da 3 giorni prima», «se qualcosa
+cambia lo sai prima», «gruppi da 10 persone con istruttore dedicato», «brevetti
+aggiornati circa ogni due mesi» — e una survey che non chiede proprio di quelle
+cose misura la simpatia, non il servizio: «com'è la piscina» dà una media che
+non si può usare per decidere niente, «l'acqua era alla temperatura giusta»
+dice se abbiamo mantenuto un numero che abbiamo scritto noi. Da qui anche
+quante sono: la piscina ne ha sette perché dichiariamo temperatura, corsie,
+bagnino e turni; la reception cinque.
+
+**E il raccordo va nei due versi.** Se scrivendo una domanda ci si accorge che
+una cosa che facciamo non è scritta da nessuna parte, si scrive prima sulla
+pagina e poi la si chiede — è successo con «a chi si segnala un attrezzo
+guasto», che la survey della manutenzione dava per noto e il sito non diceva:
+ora sta nella f.a.q. di `/gym-floor` **e** nella scheda `adulti/gym-floor`, che
+è dove il `kb.json` la prende. Nell'altro verso, una risposta che dice che una
+promessa non regge è un cambiamento della pagina prima che della domanda.
+
+Il campo `fonte` di ogni survey tiene agganciati i due lati: in fondo alla
+pagina rimanda a dove quella promessa sta scritta, così chi risponde può
+vederla e chi tocca quella pagina trova qui le domande che la controllano. Un
+rimando morto in fondo a un questionario si nota; una domanda che ha smesso di
+corrispondere a quello che promettiamo, no.
+
+**Gli `id` delle domande non si rinominano.** Sono il nome della colonna dentro
+`risposte` su Supabase e nel pannello: cambiarne uno spezza in due la serie
+storica di quella domanda, senza che niente dia errore.
 
 **L'indirizzo per tema è il punto, il menu è il ripiego.** Una survey si manda
 in una newsletter, si stampa in un QR accanto agli spogliatoi, si incolla in una

@@ -95,22 +95,59 @@ export type Survey = {
   eyebrow: string;
   /** Una riga: cosa stiamo chiedendo, e perché. Sta in una riga su un telefono da 390px. */
   intro: string;
-  /** Tre giudizi a stelle. Tre e non cinque: è una mini survey. */
+  /**
+   * I giudizi a stelle, da cinque a sette. Ognuno controlla **una promessa
+   * scritta sul sito**, e l'`id` è il nome con cui quella risposta finisce su
+   * Supabase e nel pannello: non si rinomina, o le risposte vecchie e le nuove
+   * smettono di essere la stessa colonna.
+   */
   domande: { id: string; testo: string }[];
+  /**
+   * La pagina dove quella promessa sta scritta, mostrata in fondo alla survey.
+   *
+   * È il raccordo nel verso che di solito manca: chi risponde vede cosa
+   * avevamo dichiarato, e chi tocca quella pagina trova qui le domande che la
+   * controllano. Se un giorno il link non esistesse più, la survey lo direbbe
+   * — un rimando morto in fondo a un questionario è visibile, a differenza di
+   * una domanda che ha smesso di corrispondere a quello che promettiamo.
+   */
+  fonte?: { testo: string; href: string };
 };
 
 /**
  * Gli otto temi.
  *
- * **Tre domande a testa è un tetto, non una media.** Alla quarta la survey
- * smette di essere quella cosa che si compila in coda alla reception e diventa
- * un questionario, e un questionario lo compila chi ha già deciso di
- * lamentarsi — cioè il campione peggiore che si possa raccogliere.
+ * ## Ogni domanda controlla una promessa che abbiamo fatto
  *
- * Le domande sono scritte **su fatti osservabili** e non su impressioni: «gli
- * spogliatoi li hai trovati puliti» ha una risposta, «come giudichi l'igiene
- * del club» ha un'opinione. Il secondo tipo di domanda produce medie che non si
- * possono usare per decidere niente.
+ * Questa è la regola che governa l'elenco, e da cui si scrive la prossima
+ * domanda. Il sito dichiara un perimetro preciso — «assistenza bagnino sempre
+ * presente», «prenoti dall'app a partire da 3 giorni prima», «se qualcosa
+ * cambia lo sai prima», «gruppi da 10 persone con istruttore dedicato», «i
+ * brevetti aggiornati circa ogni due mesi» — e una survey che non chiede
+ * proprio di quelle cose misura la simpatia, non il servizio. Una domanda
+ * generica («com'è la piscina») produce una media che non si può usare per
+ * decidere niente; «l'acqua era alla temperatura giusta» dice se abbiamo
+ * mantenuto un numero che abbiamo scritto noi.
+ *
+ * **E il raccordo va nei due versi.** Se scrivendo una domanda ci si accorge
+ * che una cosa che facciamo non è scritta da nessuna parte, si scrive prima
+ * sulla pagina e poi la si chiede; se una risposta dice che una promessa non
+ * regge, la pagina va cambiata prima della domanda. Il campo `fonte` tiene i
+ * due lati agganciati: chi risponde vede dove l'avevamo dichiarata, e chi
+ * tocca quella pagina trova qui la domanda che la controlla.
+ *
+ * ## Da cinque a sette, e il numero lo decide l'attività
+ *
+ * Tre erano poche: bastavano a dire che un tema non andava, non a dire *cosa*.
+ * Sette è il tetto, e vale la ragione di prima al contrario — oltre, la survey
+ * smette di essere quella cosa che si compila in coda alla reception e diventa
+ * un questionario, che compila solo chi ha già deciso di lamentarsi. Quanti
+ * dipende da quante promesse quel tema porta: la piscina ne ha sette perché
+ * dichiariamo temperatura, corsie, bagnino e turni; la reception cinque.
+ *
+ * Le domande restano scritte **su fatti osservabili**: «gli spogliatoi li hai
+ * trovati puliti» ha una risposta, «come giudichi l'igiene del club» ha
+ * un'opinione.
  */
 export const SURVEYS: Survey[] = [
   {
@@ -118,88 +155,161 @@ export const SURVEYS: Survey[] = [
     titolo: 'Assistenza e reception',
     eyebrow: 'Il desk',
     intro: 'Com’è andata l’ultima volta che hai chiesto qualcosa al desk o ci hai scritto.',
+    /* Le promesse controllate: «ti risponde una persona» (il rimando che
+       chiude ogni pannello del sito e ogni bozza email), la casella del desk
+       come canale vero, e il fatto che una richiesta si chiude — che è quello
+       che il club dichiara facendo esistere l'Help Desk. */
     domande: [
       { id: 'cortesia', testo: 'La persona che ti ha risposto è stata cortese e disponibile' },
       { id: 'tempi', testo: 'Hai avuto una risposta in tempi ragionevoli' },
-      { id: 'risolto', testo: 'La tua richiesta è stata risolta' },
+      { id: 'risolto', testo: 'La tua richiesta è stata risolta, non solo presa in carico' },
+      { id: 'chiarezza', testo: 'La risposta era chiara: hai capito cosa dovevi fare' },
+      { id: 'coerenza', testo: 'Quello che ti hanno detto coincideva con quello che hai trovato' },
     ],
+    fonte: { testo: 'Come si contatta il club', href: '/club-life/' },
   },
   {
     slug: 'lezioni',
     titolo: 'Lezioni e istruttori',
     eyebrow: 'In sala e in acqua',
     intro: 'Le lezioni che segui: chi le tiene, come sono fatte, se sono al tuo livello.',
+    /* «Oltre 80 corsi a settimana in tre sale», «piccoli gruppi da 10 persone
+       con istruttore dedicato» (Group Reformer), «istruttori federali», e la
+       promessa di `prenotazioni.md`: se un istruttore cambia, lo sai prima. La
+       domanda sull'orario dichiarato controlla il planning, che è un dato
+       nostro pubblicato. */
     domande: [
-      { id: 'istruttori', testo: 'Gli istruttori sono preparati e ti seguono' },
+      { id: 'istruttori', testo: 'Gli istruttori sono preparati e ti seguono durante la lezione' },
       { id: 'livello', testo: 'Le lezioni sono adatte al tuo livello' },
       { id: 'palinsesto', testo: 'Negli orari che ti servono trovi le lezioni che cerchi' },
+      { id: 'puntualita', testo: 'Le lezioni cominciano e finiscono all’orario dichiarato' },
+      { id: 'gruppo', testo: 'Il numero di persone in sala ti permette di allenarti bene' },
+      { id: 'sostituzioni', testo: 'Quando cambia l’istruttore o l’orario, vieni avvisato prima' },
+      { id: 'sala', testo: 'La sala e l’attrezzatura della lezione sono pronte quando arrivi' },
     ],
+    fonte: { testo: 'Il palinsesto della settimana', href: '/planning/' },
   },
   {
     slug: 'pulizia',
     titolo: 'Pulizia e spogliatoi',
     eyebrow: 'Gli ambienti',
     intro: 'Spogliatoi, docce, sale: come li hai trovati l’ultima volta che sei venuto.',
+    /* La scheda dei servizi dichiara spogliatoi rinnovati, separati per
+       fitness, nuoto adulti e baby, con docce e postazioni phon incluse e 64
+       armadietti per parte: sono quattro cose verificabili una per una, ed è
+       il motivo per cui questo tema ha sette domande invece di tre. */
     domande: [
       { id: 'spogliatoi', testo: 'Spogliatoi e docce li hai trovati puliti' },
+      { id: 'acqua', testo: 'Nelle docce c’era acqua calda e la pressione era buona' },
+      { id: 'armadietti', testo: 'Hai trovato un armadietto libero quando ti serviva' },
+      { id: 'phon', testo: 'Le postazioni phon erano funzionanti e sufficienti' },
       { id: 'sale', testo: 'Le sale e gli attrezzi erano in ordine' },
       { id: 'ricambi', testo: 'Aria, temperatura e ricambi erano confortevoli' },
+      { id: 'bagni', testo: 'Bagni e materiali di consumo erano riforniti' },
     ],
+    fonte: { testo: 'Cosa dichiariamo sugli spogliatoi', href: '/wikiathlon/generali/spogliatoi/' },
   },
   {
     slug: 'manutenzione',
     titolo: 'Attrezzature e manutenzione',
     eyebrow: 'Le macchine',
     intro: 'Gli attrezzi della sala e tutto quello che si usa allenandosi.',
+    /* Quello che la pagina della Gym Floor dichiara: 400 mq, area cardio
+       Matrix 4.0 connessa all'app, isotonica, funzionale Ziva con rig da 8
+       metri, manubri fino a 50 kg. «Connessi all'app» è una promessa precisa —
+       riprendi da dove avevi lasciato — e o funziona o no. */
     domande: [
       { id: 'funzionanti', testo: 'Gli attrezzi che ti servivano erano funzionanti' },
       { id: 'riparazioni', testo: 'Quando qualcosa si rompe viene riparato in fretta' },
       { id: 'quantita', testo: 'Ce n’è abbastanza anche negli orari di punta' },
+      { id: 'app', testo: 'I macchinari collegati all’app registrano davvero i tuoi allenamenti' },
+      { id: 'ordine', testo: 'Manubri e dischi si trovano al loro posto' },
+      { id: 'segnalazioni', testo: 'Quando segnali un attrezzo guasto, qualcuno se ne occupa' },
     ],
+    fonte: { testo: 'Cosa c’è nella Gym Floor', href: '/gym-floor/' },
   },
   {
     slug: 'piscina',
     titolo: 'Piscina e acqua',
     eyebrow: 'Le vasche',
     intro: 'L’acqua, le corsie, e come si sta in vasca negli orari in cui vieni.',
+    /* Qui il sito dichiara numeri: vasca da 25 metri a 5 corsie, temperatura
+       costante fra 28 e 28,5 °C (30–30,5 nella vasca piccola), corsie divise
+       per ritmo, assistenza bagnino **sempre** presente, e capienza di ogni
+       corsia definita in anticipo — «il turno che prenoti è il tuo». Sette
+       domande perché sono sette promesse, e ognuna è un fatto. */
     domande: [
-      { id: 'acqua', testo: 'L’acqua e la temperatura erano come devono essere' },
+      { id: 'temperatura', testo: 'L’acqua era alla temperatura giusta' },
+      { id: 'pulizia-acqua', testo: 'L’acqua era limpida e l’ambiente in ordine' },
       { id: 'corsie', testo: 'Le corsie erano abbastanza libere per allenarti' },
-      { id: 'bordo', testo: 'Bordo vasca e spogliatoi della piscina erano in ordine' },
+      { id: 'ritmo', testo: 'La divisione delle corsie per ritmo funziona' },
+      { id: 'bagnino', testo: 'L’assistente bagnino era presente e attento' },
+      { id: 'turno', testo: 'Il turno che avevi prenotato era disponibile come previsto' },
+      { id: 'bordo', testo: 'Bordo vasca e spogliatoio della piscina erano in ordine' },
     ],
+    fonte: { testo: 'Vasca, corsie e orari', href: '/nuoto-libero/' },
   },
   {
     slug: 'prenotazioni',
     titolo: 'Prenotazioni e app',
     eyebrow: 'Il portale',
     intro: 'Prenotare una lezione, guardare gli orari, gestire il tuo abbonamento.',
+    /* `prenotazioni.md` è la scheda con più promesse esplicite del sito, e
+       questa survey le ricalca una per una: la finestra dei 3 giorni aperta
+       fino all'inizio della lezione, «il posto è tuo e vedi quante persone ci
+       sono», «se qualcosa cambia lo sai prima», e i trenta piani nell'app con
+       i macchinari che riprendono da dove avevi lasciato. */
     domande: [
       { id: 'facilita', testo: 'Prenotare una lezione è semplice' },
+      { id: 'finestra', testo: 'La finestra dei tre giorni ti basta per organizzarti' },
       { id: 'posti', testo: 'Trovi posto nelle lezioni che vuoi fare' },
-      { id: 'informazioni', testo: 'Orari e informazioni sono chiari e aggiornati' },
+      { id: 'disdetta', testo: 'Disdire una prenotazione è altrettanto semplice' },
+      { id: 'informazioni', testo: 'Orari e informazioni sull’app sono chiari e aggiornati' },
+      { id: 'avvisi', testo: 'Quando una lezione cambia o salta, l’avviso ti arriva' },
+      { id: 'affidabilita', testo: 'L’app funziona senza doverci tornare due volte' },
     ],
+    fonte: { testo: 'Come funzionano le prenotazioni', href: '/wikiathlon/generali/prenotazioni/' },
   },
   {
     slug: 'junior',
     titolo: 'Corsi bambini',
     eyebrow: 'Per i genitori',
     intro: 'Scuola Nuoto, Baby Nuoto, agonistico: com’è per tuo figlio e per te.',
+    /* Il Metodo Athlon è la promessa più dettagliata del sito, e ognuno dei
+       suoi quattro pilastri qui è una domanda: il gruppo deciso in vasca e
+       l'istruttore assegnato dopo due settimane, il cambio di gruppo senza
+       cambiare orario, i brevetti aggiornati **circa ogni due mesi** nel
+       proprio account, la sessione di fine maggio. Più il turno fisso e i
+       recuperi, che sono le due cose su cui il desk riceve più domande. */
     domande: [
       { id: 'istruttori', testo: 'Gli istruttori seguono i bambini con attenzione' },
-      { id: 'progressi', testo: 'Vedi progressi e ti viene raccontato come va' },
-      { id: 'organizzazione', testo: 'Turni, recuperi e comunicazioni sono chiari' },
+      { id: 'progressi', testo: 'Vedi progressi in tuo figlio, lezione dopo lezione' },
+      { id: 'brevetti', testo: 'I brevetti nel tuo account sono aggiornati e li capisci' },
+      { id: 'gruppo', testo: 'Tuo figlio è nel gruppo giusto per il suo livello' },
+      { id: 'organizzazione', testo: 'Turni, cambi e comunicazioni sono chiari' },
+      { id: 'recuperi', testo: 'Recuperare una lezione persa è semplice' },
+      { id: 'accoglienza', testo: 'A bordo vasca ti senti accolto e sai a chi rivolgerti' },
     ],
+    fonte: { testo: 'Il Metodo Athlon', href: '/scuola-nuoto-bambini/' },
   },
   {
     slug: 'generale',
     titolo: 'La tua esperienza in generale',
     eyebrow: 'Tutto il club',
     intro: 'Una domanda su tutto: quanto ti trovi bene ad Athlon.',
+    /* Le due promesse di listino — cosa comprende il tuo abbonamento e per
+       quanto vale — e la trasparenza dichiarata nella dedica del menu: qui si
+       controlla se il perimetro che il sito descrive è quello che la persona
+       ha trovato, che è la domanda da cui nascono le disdette. */
     domande: [
       { id: 'aspettative', testo: 'Athlon è all’altezza di quello che ti aspettavi' },
       { id: 'accoglienza', testo: 'Ti senti accolto e a tuo agio nel club' },
+      { id: 'perimetro', testo: 'Il tuo abbonamento comprende quello che pensavi comprendesse' },
+      { id: 'trasparenza', testo: 'Costi, scadenze e condizioni ti sono stati detti con chiarezza' },
+      { id: 'orari', testo: 'Gli orari di apertura ti permettono di allenarti quando puoi' },
       { id: 'valore', testo: 'Quello che ricevi vale quello che paghi' },
     ],
+    fonte: { testo: 'Cosa comprende ogni abbonamento', href: '/abbonamenti/' },
   },
 ];
 

@@ -137,6 +137,20 @@ const { s } = Astro.props;
             <span class="sq__spinner" data-sq-spinner hidden aria-hidden="true"></span>
           </button>
 
+          {/* Il raccordo col sito, in fondo e non in cima: chi arriva qui deve
+              rispondere, non studiare. Ma chi ha dato due stelle a una domanda
+              e vuole vedere cosa avevamo dichiarato deve poterlo fare senza
+              cercarlo — ed è anche il promemoria, per chi tocca quella pagina,
+              che qui ci sono le domande che la controllano. */}
+          {
+            s.fonte && (
+              <p class="sq__legale">
+                Le domande qui sopra riprendono quello che dichiariamo sul sito:
+                <a href={s.fonte.href}>{s.fonte.testo}</a>.
+              </p>
+            )
+          }
+
           <p class="sq__legale">
             I dati che lasci qui li trattiamo come descritto nella
             <a href="/privacy/">privacy policy</a>.
