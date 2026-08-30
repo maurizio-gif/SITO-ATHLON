@@ -3481,11 +3481,40 @@ webhook `athlon-sondaggio`.
 
 **Otto survey brevi e non una lunga**, ed è la scelta da cui dipende tutto il
 resto. La media di dodici domande è un numero solo e non dice dove intervenire;
-tre domande su un tema dicono *quale* cosa non va e si compilano in venti
-secondi, che è il tempo che ha in mano una persona ferma alla reception. Da qui
-il tetto: **tre domande a testa**, e alla quarta la survey diventa un
-questionario — che compila solo chi ha già deciso di lamentarsi, cioè il
-campione peggiore che si possa raccogliere.
+cinque domande su un tema dicono *quale* cosa non va e si compilano in un
+minuto, che è il tempo che ha in mano una persona ferma alla reception. Il
+tetto è **sette**, e vale la stessa ragione al contrario: oltre, la survey
+diventa un questionario, che compila solo chi ha già deciso di lamentarsi —
+cioè il campione peggiore che si possa raccogliere.
+
+**Ogni domanda controlla una promessa scritta sul sito**, ed è la regola da cui
+si scrive la prossima. Il sito dichiara un perimetro preciso — «assistenza
+bagnino sempre presente», «prenoti a partire da 3 giorni prima», «se qualcosa
+cambia lo sai prima», «gruppi da 10 persone con istruttore dedicato», «brevetti
+aggiornati circa ogni due mesi» — e una survey che non chiede proprio di quelle
+cose misura la simpatia, non il servizio: «com'è la piscina» dà una media che
+non si può usare per decidere niente, «l'acqua era alla temperatura giusta»
+dice se abbiamo mantenuto un numero che abbiamo scritto noi. Da qui anche
+quante sono: la piscina ne ha sette perché dichiariamo temperatura, corsie,
+bagnino e turni; la reception cinque.
+
+**E il raccordo va nei due versi.** Se scrivendo una domanda ci si accorge che
+una cosa che facciamo non è scritta da nessuna parte, si scrive prima sulla
+pagina e poi la si chiede — è successo con «a chi si segnala un attrezzo
+guasto», che la survey della manutenzione dava per noto e il sito non diceva:
+ora sta nella f.a.q. di `/gym-floor` **e** nella scheda `adulti/gym-floor`, che
+è dove il `kb.json` la prende. Nell'altro verso, una risposta che dice che una
+promessa non regge è un cambiamento della pagina prima che della domanda.
+
+Il campo `fonte` di ogni survey tiene agganciati i due lati: in fondo alla
+pagina rimanda a dove quella promessa sta scritta, così chi risponde può
+vederla e chi tocca quella pagina trova qui le domande che la controllano. Un
+rimando morto in fondo a un questionario si nota; una domanda che ha smesso di
+corrispondere a quello che promettiamo, no.
+
+**Gli `id` delle domande non si rinominano.** Sono il nome della colonna dentro
+`risposte` su Supabase e nel pannello: cambiarne uno spezza in due la serie
+storica di quella domanda, senza che niente dia errore.
 
 **L'indirizzo per tema è il punto, il menu è il ripiego.** Una survey si manda
 in una newsletter, si stampa in un QR accanto agli spogliatoi, si incolla in una
@@ -3497,6 +3526,19 @@ pannello via JavaScript è un link che non funziona quando lo script non arriva.
 **`noindex` e fuori dalla sitemap**, come `/referral` e `/attiva`: un
 questionario indicizzato raccoglie giudizi di chi non frequenta. Il filtro in
 `astro.config.mjs` esclude `/surveys` per intero.
+
+**La dedica in cima al menu non è un preambolo di cortesia**, ed è la parte che
+decide quante risposte arrivano: dice perché chiediamo (è da lì che decidiamo
+dove intervenire), cosa ci impegniamo a fare — migliorare la qualità dei
+servizi, rispondere con puntualità, dire con chiarezza cosa comprende l'offerta
+e per quanto tempo vale — e cosa costa rispondere. «La tua opinione è importante
+per noi» non dice nessuna delle tre.
+
+**E il titolo cambia interlinea sotto i 700px.** A `--lh: 0.92` le due righe si
+toccano appena il titolo va a capo, e sul telefono va a capo sempre: il corpo
+scende col `clamp`, l'interlinea è un rapporto e resta stretta uguale. Si passa
+da `--lh` e mai da `line-height`, o la spaziatura sopra le maiuscole accentate
+resta quella di prima e le tronca.
 
 **L'NPS c'è in tutte, e non è ripetizione.** Le stelle misurano il servizio,
 l'NPS misura la disposizione a parlarne — che è esattamente quello che una
@@ -3519,15 +3561,21 @@ questa è l'unica duplicazione dichiarata. Media e `positivo` **si ricalcolano**
 su n8n invece di prendere quelli del payload: sono dati derivati e decisioni, e
 un webhook pubblico non accetta decisioni da fuori.
 
-**La nota si chiede solo sotto soglia, e compare mentre si risponde.** È la
-regola del voto alla chat: chi dà il massimo ha già detto quello che pensa, e un
-campo di testo dopo un voto alto è un compito in più che abbassa la percentuale
-di chi risponde. Chiederla *dopo* l'invio vorrebbe dire una schermata in più su
-un modulo che dura venti secondi; farla comparire nel momento in cui il giudizio
-scende la mette davanti a chi sta pensando proprio a quella cosa. Se poi la
-persona alza i voti il campo si richiude ma **quello che ha scritto parte lo
-stesso**: un testo scritto e poi buttato dal codice è il modo peggiore di
-trattare l'unica risposta libera che questo modulo raccoglie.
+**Il campo aperto c'è sempre, e a cambiare col giudizio è l'etichetta.** È
+l'unica domanda che può dirci una cosa che non avevamo pensato di chiedere — le
+stelle misurano quello che sappiamo già di dover misurare — quindi nasconderlo a
+chi è contento vorrebbe dire raccogliere suggerimenti solo dagli scontenti. Ma
+la domanda non può essere la stessa per tutti: «cosa potevamo fare meglio» a chi
+ha dato cinque stelle è una domanda a cui quella persona non ha risposta, e la
+lascia in bianco. Quindi tre forme, e le sceglie `aggiornaNota()` mentre si
+risponde: neutra finché non c'è un giudizio (ed è quella che il markup porta
+scritta, cioè quella che vede chi ha JavaScript spento), «cosa potevamo fare
+meglio» sotto soglia, «c'è qualcosa che ti piacerebbe trovare» sopra.
+
+**La prima versione lo nascondeva sopra soglia**, sul modello del voto alla
+chat, e la differenza fra i due casi è che lì la nota è un'appendice a un voto e
+qui è metà del dato: un questionario a stelle senza campo libero raccoglie solo
+risposte alle domande che qualcuno ha già pensato di scrivere.
 
 **L'email è facoltativa e quasi sempre non si digita.** Tre strade in ordine: il
 parametro `email` o `UserNumber` nel link (una newsletter sa a chi scrive),

@@ -7,15 +7,15 @@
 // riapplica n8n prima di scrivere `positivo` su Supabase: una soglia scritta in
 // tre posti risponde in tre modi al primo ritocco. Da qui si importa.
 //
-// **La nota compare e sparisce mentre la persona risponde**, non dopo l'invio.
-// Chiederla dopo vorrebbe dire una schermata in più su un modulo che dura venti
-// secondi, e la risposta la scriverebbe solo chi ha già deciso di scrivere;
-// mostrarla nel momento in cui il giudizio scende sotto la soglia la mette
-// davanti a chi sta pensando proprio a quella cosa. Se poi la persona alza i
-// voti il campo si richiude — ma **quello che ha scritto resta nel campo**, e
-// se il giudizio finale è positivo la nota parte comunque: un testo scritto e
-// poi buttato dal codice è il modo peggiore di trattare l'unica risposta libera
-// che questo modulo raccoglie.
+// **Il campo aperto c'è sempre, e a cambiare col giudizio è l'etichetta.** È
+// l'unica domanda che può dirci una cosa che non avevamo pensato di chiedere —
+// le stelle misurano quello che sappiamo già di dover misurare — quindi
+// nasconderlo a chi è contento vorrebbe dire raccogliere suggerimenti solo dai
+// scontenti. Ma la domanda non può essere la stessa: «cosa potevamo fare
+// meglio» a chi ha dato cinque stelle è una domanda a cui quella persona non ha
+// risposta, e la lascia in bianco. Quindi sotto soglia si chiede cosa non ha
+// funzionato, sopra cosa gli piacerebbe trovare, e senza ancora un giudizio la
+// forma neutra che il markup porta già scritta.
 //
 // **L'invio può fallire e lo si dice.** È l'eccezione alla regola dei form del
 // sito, dove qualunque errore lascia passare: là in fondo c'è una richiesta che
@@ -40,7 +40,8 @@ import { leggi as userNumberConosciuto } from '../scripts/numeroSocio';
     grazie: pagina.querySelector('[data-sq-passo="grazie"]'),
   };
   var blocchi = Array.prototype.slice.call(pagina.querySelectorAll('[data-sq-domanda]'));
-  var nota = pagina.querySelector('[data-sq-nota]');
+  var notaTitolo = pagina.querySelector('[data-sq-nota-titolo]');
+  var notaAiuto = pagina.querySelector('[data-sq-nota-aiuto]');
   var campoNota = pagina.querySelector('#sq-nota');
   var campoEmail = pagina.querySelector('#sq-email');
   var riconosciuto = pagina.querySelector('[data-sq-riconosciuto]');
@@ -139,19 +140,43 @@ import { leggi as userNumberConosciuto } from '../scripts/numeroSocio';
   }
 
   /**
-   * La nota si mostra quando c'è già un giudizio **e** non è positivo.
+   * Le tre forme della domanda aperta.
    *
-   * Le due condizioni insieme, o al caricamento la pagina si aprirebbe con
-   * «cosa potevamo fare meglio» prima che la persona abbia detto che qualcosa
-   * non va — che è il modo di far cominciare male una survey.
+   * Sta qui e non nel markup perché dipende dai voti, che sono di questo file;
+   * il markup porta la forma neutra, che è quella giusta finché non si sa
+   * niente — ed è anche quella che vede chi ha JavaScript spento.
    */
+  var DOMANDA = {
+    neutra: {
+      titolo: 'Vuoi aggiungere qualcosa?',
+      aiuto:
+        'Facoltativo, ed è la parte che ci serve di più: un suggerimento, una cosa che cambieresti, una che ti è piaciuta. Più è preciso — quando, quale lezione, chi c’era — più possiamo farci qualcosa.',
+    },
+    sotto: {
+      titolo: 'Cosa potevamo fare meglio?',
+      aiuto:
+        'Facoltativo, ed è la parte che ci serve davvero: più è preciso — quando, quale lezione, chi c’era — più possiamo farci qualcosa.',
+    },
+    sopra: {
+      titolo: 'C’è qualcosa che ti piacerebbe trovare?',
+      aiuto:
+        'Facoltativo: un suggerimento, un corso o un orario che ti manca, una cosa che secondo te possiamo fare meglio anche così.',
+    },
+  };
+
   function aggiornaNota() {
-    if (!nota) return;
+    if (!notaTitolo && !notaAiuto) return;
     var lista = voti();
     var m = media(lista);
     var n = nps();
     var risposto = m !== null || n !== null;
-    nota.hidden = !(risposto && !giudizioPositivo(m, n));
+    var forma = !risposto
+      ? DOMANDA.neutra
+      : giudizioPositivo(m, n)
+        ? DOMANDA.sopra
+        : DOMANDA.sotto;
+    if (notaTitolo) notaTitolo.textContent = forma.titolo;
+    if (notaAiuto) notaAiuto.textContent = forma.aiuto;
   }
 
   pagina.addEventListener('change', function (e) {
@@ -234,9 +259,6 @@ import { leggi as userNumberConosciuto } from '../scripts/numeroSocio';
           media: m,
           nps: n,
           positivo: positivo,
-          /* La nota parte anche se il campo è tornato nascosto: chi l'ha scritta
-             ce l'ha detta, e il fatto che poi abbia alzato un voto non la
-             cancella. */
           nota: campoNota ? campoNota.value.trim() : '',
           email: email || null,
           userNumber: identita.userNumber || null,

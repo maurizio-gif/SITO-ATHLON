@@ -62,6 +62,18 @@ Hai bisogno di un programma completamente personalizzato?
 
 </details>
 
+## Un attrezzo non funziona
+
+Segnalalo subito all'**assistente di sala**, se è una fascia Con Assistenza:
+è la persona che supervisiona la sala e sa cosa è già stato segnalato. Fuori da
+quelle fasce, o se preferisci lasciarne traccia scritta, lo dici alla
+**reception** o scrivi al team dal sito: nella segnalazione servono quale
+attrezzo è e cosa fa, perché una macchina che si spegne e una con un cavo
+consumato non si riparano nello stesso modo.
+
+Una segnalazione scritta è anche il modo in cui te ne torna una risposta: a
+voce si risolve prima, ma non resta.
+
 <div class="ci-cta">
   <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary" target="_blank" rel="noopener noreferrer">PRENOTA ORA</a>
   <a href="http://onelink.to/athlon" class="ci-btn-secondary" target="_blank" rel="noopener noreferrer">SCARICA L'APP</a>
