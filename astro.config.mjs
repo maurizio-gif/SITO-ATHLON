@@ -80,6 +80,10 @@ export default defineConfig({
            del desk. Un questionario indicizzato raccoglie soprattutto giudizi
            di chi non frequenta, che è il campione che non serve a niente. */
         !page.includes('/surveys') &&
+        /* `/test-portale` è la prova dell'embed del portale PerfectGym: uno
+           strumento come `/diagnostica-schermo`, non una pagina del club. Va via
+           insieme alla pagina, il giorno che la prova ha dato il suo esito. */
+        !page.includes('/test-portale') &&
         !page.includes('/wikiathlon/'),
 
       /* Priorità e frequenza sono suggerimenti, e Google li ignora — restano
