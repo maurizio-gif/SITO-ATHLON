@@ -1915,6 +1915,58 @@ nelle cento parole della regola 6 la singola va nel turno dopo. La prima è la
 nostra offerta, la seconda è la sua richiesta presa alla lettera, e nessuna
 delle due si perde. Mai la singola prima del Pass, mai al posto del piano.
 
+#### Un cancello che ne chiude una e ne lascia un'altra non è un cancello
+
+Il 30 agosto, a un genitore che scriveva dalla pagina della Scuola Nuoto
+Bambini e diceva «mia figlia non ha mai fatto nuoto, mi servirebbe solo il
+lunedì pomeriggio», la risposta è stata: *«con la settimana di prova a 19 €
+accedi a tutto il club per sette giorni»*. Il Pass è un Premium **adulti** di
+sette giorni: quella bambina non può usarlo, e non comprende la scuola nuoto.
+
+**E il vaglio aveva funzionato.** L'esecuzione dice `passOfferto: false`,
+`passVoceTolta: true`, `passPerche: attivita-non-adulti` — la voce del Pass
+era uscita dal contesto, esattamente come deve. A restare dentro erano **altre tre voci**
+che raccontano la stessa offerta, e le ha trovate tutte una spazzata sulle 252
+voci di quel contesto:
+
+- `servizio:invita-i-tuoi-amici` — «ognuno prova tutto il club per 7 giorni
+  pagando solo il badge di accesso, €5 invece di €19». Da qui i sette giorni e
+  i 19 €. **Non nomina mai «Guest Pass»**, ed è il motivo per cui una regola
+  sul solo contenuto non basta e serve anche un elenco di id.
+- `scheda:generali/referral-guest-pass` — «Invita un amico: Guest Pass e
+  voucher», che spiega per esteso come si genera la settimana di prova.
+- `scheda:adulti/cessione-abbonamento` — «esiste il Guest Pass: una settimana
+  di prova gratuita», una frase sola in mezzo a tutt'altro argomento.
+
+**E la prima correzione ne tolse una sola**, cioè ricadde nell'errore che
+questa sezione descrive: la spazzata è venuta dopo, e ha trovato le altre due.
+
+La lezione è più larga del Pass, ed è la sorella di quella sui due regimi
+compresenti: *chiudere una voce e lasciarne un'altra che descrive la stessa
+offerta non protegge da niente*. Quando si mette un prodotto dietro un
+cancello, la domanda da farsi non è «ho tolto la sua voce?» ma **«quante voci
+del contesto raccontano questa offerta?»** — e la verifica è un grep sul
+contesto vero di un'esecuzione, non sulla lista degli id.
+
+Ora nel ramo junior esce **qualunque voce che offra la prova**, per id o per
+contenuto, e la spia `vociProvaTolte` le elenca: una voce nuova che la racconta
+e non compare lì è la prossima falla.
+
+**L'eccezione va tenuta, ed è la risposta giusta.** `faq:junior:baby-nuoto`
+dice «il Guest Pass Premium non vale qui: è la prova delle attività per adulti,
+e non ha mai compreso i corsi per bambini» — nomina il Pass proprio per negarlo,
+e toglierla lascerebbe il genitore senza la frase che chiude la questione. Da
+qui il `LA_NEGA` accanto al `NOMINA_PROVA`.
+**La condizione è `adulti` e non `passOfferto`**, e la differenza conta:
+`passOfferto` porta dentro anche il *quando* proporlo (tre messaggi, ha chiesto
+di prezzi), mentre qui la domanda è *di chi è questo prodotto*. Il referral lo
+fa un socio adulto — e a un Member, per cui `statoOk` è falso e quindi
+`passOfferto` sarebbe falso, va benissimo restare: è proprio lui che invita.
+
+E la risposta giusta c'era già nel contesto, ignorata: per la Scuola Nuoto la
+prova **è l'abbonamento stesso**, mensile e disdicibile con dieci giorni di
+preavviso, come dice la f.a.q. «È possibile effettuare una prova?».
+
 Per verificare: `Vaglio Guest Pass` mette in chiaro `passOfferto`,
 `passVoceTolta`, `passPerche` (quale condizione ha fermato l'offerta) e
 `singoloAperto`.
