@@ -535,15 +535,46 @@ export const GET: APIRoute = async () => {
         pulito(piano.claim),
         pulito(piano.desc),
         `Attività comprese: ${piano.activities.join(', ')}.`,
+        /* Ogni riga porta il nome del piano, e non e' ridondanza: le due voci
+           hanno la stessa forma — tre righe, le stesse etichette — e l'unica
+           cosa che le distingue e' il titolo in cima. Una riga letta senza il
+           titolo e' un importo senza piano, ed e' cosi' che il 30/08 a chi
+           chiedeva il Premium sono stati dati i 75 € dello Smart. */
         piano.options
           .map(
             (o) =>
-              `${o.title}${o.sub ? ` — ${o.sub}` : ''}: ${o.amount} ${o.period}. ` +
+              // Il Flex si chiama «Mensile Flex» ovunque — sul sito, al desk e
+              // in bocca a chi lo compra — e comporlo da `title` + `sub` dava
+              // «Mensile, flex, senza vincoli», che non e' il nome di niente.
+              `**${piano.name} ${
+                o.title === 'Mensile' ? 'Mensile Flex, senza vincoli' : `${o.title}, ${(o.sub ?? '').toLowerCase()}`
+              }: ${o.amount} ${o.period}**. ` +
               // La nota non finisce con un punto nei dati, e senza si attacca
               // alla frase del risparmio: «…fine del mese Risparmio €138».
               `${pulito(o.note).replace(/[.\s]*$/, '')}.${o.savings ? ` ${pulito(o.savings)}.` : ''}`
           )
           .join('\n'),
+        /* E la riga che disambigua le due formule che si pagano ogni mese.
+           «Annuale — pagamento mensile» e «Mensile Flex» si leggono tutte e due
+           come «mensile», e nella stessa conversazione la chat ha dato il
+           prezzo dell'annuale come se fosse quello del Flex: un contesto da cui
+           si puo' comporre una formula che non esiste — un senza vincoli a 95 €
+           — e' lo stesso difetto delle due sospensioni. Il confronto e' un dato
+           calcolato dai numeri, non una frase scritta a mano. */
+        (() => {
+          const flex = piano.options.find((o) => o.title === 'Mensile');
+          const rate = piano.options.find((o) => o.title === 'Annuale' && o.period === '€/mese');
+          if (!flex || !rate) return '';
+          return (
+            `**Le formule che si pagano ogni mese sono due e non vanno scambiate.** ` +
+            `Quella **senza vincoli** e' una sola: **${piano.name} Mensile Flex, ${flex.amount} ${flex.period}**; ` +
+            `i **${rate.amount} ${rate.period}** sono l'**Annuale pagato a rate**, cioe' un impegno di dodici mesi, ` +
+            `e infatti costano **meno**. Se qualcuno chiede la formula flessibile di questo piano, l'importo e' ${flex.amount} €.`
+          );
+        })(),
+        /* E l'altro verso dello stesso errore: gli importi di un piano non sono
+           quelli dell'altro. */
+        `**Questi importi sono ${piano.id === 'smart' ? 'dello Smart' : 'del Premium'} e di nessun altro piano**: ${piano.id === 'smart' ? 'il Premium' : 'lo Smart'} ha i suoi, scritti nella sua voce. Non usare una cifra letta qui per rispondere sull'altro piano.`,
         /* La quota di attivazione sta accanto ai prezzi e non in una voce a
            parte, perché chi chiede quanto costa un abbonamento sta chiedendo
            anche questo: un mensile citato da solo è un preventivo incompleto,
