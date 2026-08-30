@@ -71,6 +71,11 @@ quelle fasce, o se preferisci lasciarne traccia scritta, lo dici alla
 attrezzo è e cosa fa, perché una macchina che si spegne e una con un cavo
 consumato non si riparano nello stesso modo.
 
+**Ogni segnalazione viene presa in carico e gestita fino alla risoluzione.** I
+tempi dipendono da cosa serve — una regolazione si fa in giornata, un pezzo di
+ricambio ha i tempi del fornitore — ma la segnalazione non resta ferma, e se
+l'attrezzo è fuori uso lo trovi segnalato in sala.
+
 Una segnalazione scritta è anche il modo in cui te ne torna una risposta: a
 voce si risolve prima, ma non resta.
 

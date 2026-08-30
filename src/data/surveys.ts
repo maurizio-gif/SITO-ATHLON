@@ -156,7 +156,13 @@ export const SURVEYS: Survey[] = [
     eyebrow: 'Trovare risposte',
     intro:
       'Le tre strade per avere una risposta: le pagine del sito, l’assistente virtuale e le persone del club.',
-    /* **Il perimetro è il servizio intero e non il solo desk**, ed è la
+    /* **La promessa sui tempi ora è scritta**, quindi la domanda smette di
+       chiedere un'impressione: la scheda «In quanto tempo rispondiamo» dichiara
+       poche ore, in genere un'ora negli orari di apertura, e la domanda chiede
+       esattamente quello. Prima diceva «in tempi ragionevoli», che è una cosa
+       su cui ognuno ha un metro suo.
+
+       **Il perimetro è il servizio intero e non il solo desk**, ed è la
        correzione che questa survey ha ricevuto per prima: chi cerca un orario
        lo cerca sul sito, chi ha una domanda di sera la fa alla chat, chi ha un
        problema scrive allo staff — e sono tre esperienze diverse che il club
@@ -171,11 +177,11 @@ export const SURVEYS: Survey[] = [
       { id: 'sito', testo: 'Sul sito trovi le informazioni che cerchi, senza doverle chiedere' },
       { id: 'assistente', testo: 'L’assistente virtuale in chat ti ha dato una risposta utile' },
       { id: 'cortesia', testo: 'Le persone del club sono state cortesi e disponibili' },
-      { id: 'tempi', testo: 'Quando hai scritto o chiesto allo staff, la risposta è arrivata in tempi ragionevoli' },
+      { id: 'tempi', testo: 'Quando hai scritto al club, la risposta è arrivata entro poche ore' },
       { id: 'risolto', testo: 'La tua richiesta è stata risolta, non solo presa in carico' },
       { id: 'coerenza', testo: 'Sito, chat e persone del club ti dicono la stessa cosa' },
     ],
-    fonte: { testo: 'Le domande frequenti e il modulo per il team', href: '/club-life/' },
+    fonte: { testo: 'In quanto tempo rispondiamo', href: '/wikiathlon/generali/tempi-di-risposta/' },
   },
   {
     slug: 'lezioni',
@@ -226,14 +232,22 @@ export const SURVEYS: Survey[] = [
     /* Quello che la pagina della Gym Floor dichiara: 400 mq, area cardio
        Matrix 4.0 connessa all'app, isotonica, funzionale Ziva con rig da 8
        metri, manubri fino a 50 kg. «Connessi all'app» è una promessa precisa —
-       riprendi da dove avevi lasciato — e o funziona o no. */
+       riprendi da dove avevi lasciato — e o funziona o no.
+
+       **Sulle riparazioni la domanda è una sola, e chiede il ciclo intero.**
+       Prima ce n'erano due — «viene riparato in fretta» e «quando segnali,
+       qualcuno se ne occupa» — che raccoglievano lo stesso giudizio due volte,
+       e la prima chiedeva di una velocità che il club non dichiara: su un
+       pezzo di ricambio i tempi sono del fornitore. Quello che il club
+       promette, ed è scritto nella scheda, è che la segnalazione viene presa
+       in carico e gestita fino alla risoluzione: quella è la cosa da
+       verificare. */
     domande: [
       { id: 'funzionanti', testo: 'Gli attrezzi che ti servivano erano funzionanti' },
-      { id: 'riparazioni', testo: 'Quando qualcosa si rompe viene riparato in fretta' },
+      { id: 'riparazioni', testo: 'La tua segnalazione è stata presa in carico e risolta' },
       { id: 'quantita', testo: 'Ce n’è abbastanza anche negli orari di punta' },
       { id: 'app', testo: 'I macchinari collegati all’app registrano davvero i tuoi allenamenti' },
       { id: 'ordine', testo: 'Manubri e dischi si trovano al loro posto' },
-      { id: 'segnalazioni', testo: 'Quando segnali un attrezzo guasto, qualcuno se ne occupa' },
     ],
     fonte: { testo: 'Cosa c’è nella Gym Floor', href: '/gym-floor/' },
   },
