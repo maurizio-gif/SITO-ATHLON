@@ -3506,6 +3506,16 @@ ora sta nella f.a.q. di `/gym-floor` **e** nella scheda `adulti/gym-floor`, che
 è dove il `kb.json` la prende. Nell'altro verso, una risposta che dice che una
 promessa non regge è un cambiamento della pagina prima che della domanda.
 
+**E il verso opposto ha già prodotto due schede.** Chiedere «la risposta è
+arrivata in tempi ragionevoli» misurava il metro di chi risponde, non il
+servizio: la promessa non era scritta da nessuna parte. Ora c'è —
+`generali/tempi-di-risposta`, poche ore e in genere un'ora negli orari di
+apertura — e la domanda chiede quella. Stessa cosa per la manutenzione: «viene
+riparato in fretta» chiedeva una velocità che il club non può promettere su un
+pezzo di ricambio, quindi la scheda della Gym Floor dichiara il ciclo — presa in
+carico e gestita fino alla risoluzione — e la domanda verifica quello. Le due
+domande che si somigliavano sono diventate una.
+
 Il campo `fonte` di ogni survey tiene agganciati i due lati: in fondo alla
 pagina rimanda a dove quella promessa sta scritta, così chi risponde può
 vederla e chi tocca quella pagina trova qui le domande che la controllano. Un
