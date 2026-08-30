@@ -36,8 +36,9 @@ faq:
       pro-rata. Da lì in poi paghi le mensilità piene. Una cosa da sapere: la
       durata minima si conta dal primo mese intero, quindi con un'attivazione a
       mese iniziato la scadenza cade un mese più in là di quanto verrebbe da
-      pensare. Se puoi scegliere, far partire l'abbonamento il 1° del mese evita
-      il pro-rata e semplifica tutto.
+      pensare. La data di inizio però la scegli tu in fase di iscrizione, anche
+      futura fino a 14 giorni: se preferisci partire il 1° del mese lo imposti
+      subito, senza rimandare l'iscrizione.
   - q: Come si paga?
     a: >-
       Con carta di credito o debito, oppure con addebito diretto sul conto

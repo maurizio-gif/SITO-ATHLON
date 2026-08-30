@@ -46,6 +46,7 @@ import {
   activityInfo,
   SINGOLI,
   ATTIVAZIONE,
+  DATA_INIZIO,
   PERSONAL,
   ETA_MINIMA_ADULTI,
   ATTIVITA_GUEST_PASS,
@@ -565,6 +566,19 @@ export const GET: APIRoute = async () => {
      il dato non c'era: il numero viveva scritto a mano nella pagina e nel
      markdown della scuola nuoto, cioè in due posti che il `kb.json` non
      legge. */
+  voci.push({
+    id: 'abbonamento:data-inizio',
+    tipo: 'abbonamento',
+    titolo: 'Quando comincia l\u2019abbonamento, e perché iscriversi oggi non costa di più',
+    url: `${SITE}/abbonamenti`,
+    area: 'Abbonamenti',
+    attivita: [],
+    /* La voce che mancava, e la sua assenza ha prodotto «conviene aspettare
+       domani» a una persona già decisa. Vedi la nota su DATA_INIZIO in
+       `data/abbonamenti.ts`. */
+    testo: blocchi(DATA_INIZIO.testo),
+  });
+
   voci.push({
     id: 'abbonamento:quota-attivazione',
     tipo: 'abbonamento',
