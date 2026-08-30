@@ -1365,7 +1365,7 @@ elenchi — *si prenota* / *non si prenota* — mettendo la **Gym Floor** nel
 secondo: *«entri quando vuoi, senza prenotazione»*, e poi *«se scegli lo Smart,
 la sala pesi è libera quando vuoi»*. Sono due cose false in una frase: la
 sessione in sala si prenota come una lezione, e prenotandola si sceglie la
-fascia — **Con Assistenza**, con un trainer in sala per tutta la sessione, o
+fascia — **Con Assistenza**, con un assistente di sala presente, o
 **Allenamento Libero**.
 
 **La pagina `/gym-floor` lo diceva già giusto; a sbagliare erano i dati che
@@ -1396,10 +1396,34 @@ parti — e sta scritto in tre posti: la f.a.q. di `/gym-floor`, la scheda
 `adulti/gym-floor` e la sezione «Perché si prenota» di `generali/prenotazioni`.
 
 **E a «c'è assistenza in sala?» la risposta è sempre sì.** Non «puoi allenarti
-in autonomia»: il trainer c'è, segue l'esecuzione degli esercizi e aiuta a
-scegliere il piano sull'app; quello che si sceglie prenotando è l'orario in cui
-c'è. La regola fissa nel `systemMessage` lo dice, insieme al divieto di
+in autonomia»: l'assistente c'è, e quello che si sceglie prenotando è l'orario
+in cui c'è. La regola fissa nel `systemMessage` lo dice, insieme al divieto di
 costruire l'elenco «cosa non si prenota», che non ha nessuna voce.
+
+#### L'assistente di sala supervisiona, il personal trainer segue una persona
+
+Questa distinzione è costata una riscrittura, perché la prima stesura prometteva
+la seconda cosa col nome della prima: «un trainer che ti segue negli esercizi e
+ti controlla mentre lavori» è il personal training, che si prenota e **si paga a
+parte**. Chi legge quella frase in chat o sul sito arriva in sala aspettandosi
+qualcuno accanto a sé, e quel qualcuno sta seguendo l'intera sala.
+
+- **Con Assistenza** vuol dire che in sala c'è un **assistente di sala**, il cui
+  ruolo è **supervisionare tutte le attività di sala**: gli si chiede un
+  suggerimento, un dubbio su un esercizio, e aiuta a scegliere fra i **trenta
+  piani di allenamento già presenti in app**. È incluso nell'abbonamento.
+- **Allenamento Libero** è la stessa sala senza l'assistente.
+- **L'assistenza individuale e personalizzata è il personal training**, una o
+  più sedute che si prenotano e si acquistano.
+
+Quindi le tre formule vietate, in chat e sul sito: «ti segue», «ti controlla
+mentre lavori», «per tutta la sessione». Descrivono un servizio a pagamento con
+le parole di uno incluso, che è il verso sbagliato in cui sbagliare — l'altro
+verso costa una domanda, questo costa una promessa non mantenuta al primo
+allenamento. Sta in quattro posti che vanno tenuti in pari: la scheda
+«L'assistenza» e le due f.a.q. di `/gym-floor`, `activityInfo['Gym Floor']` in
+`data/abbonamenti.ts` (che è quello che finisce nel `kb.json`), la scheda
+`adulti/gym-floor` e `generali/prenotazioni`.
 
 ### Una lezione che non si può prenotare è una lezione che non c'è
 

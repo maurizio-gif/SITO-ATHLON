@@ -16,10 +16,12 @@ attivita:
 
 In fase di prenotazione scegli tra:
 
-- **Con Assistenza** — un nostro Trainer è in sala per tutta la sessione: ti segue nell'**esecuzione degli esercizi**, ti controlla mentre lavori e ti aiuta a **scegliere il piano di allenamento** più adatto fra quelli dell'app
-- **Allenamento Libero** — ti alleni con il piano che hai già, senza trainer in sala
+- **Con Assistenza** — in sala c'è un **assistente** che supervisiona tutte le attività: puoi chiedergli suggerimenti e farti aiutare a **scegliere uno dei 30 piani di allenamento** già presenti in app
+- **Allenamento Libero** — ti alleni con il piano che hai già, senza assistente in sala
 
 **L'assistenza in sala c'è**: prenotando vedi in quali orari.
+
+> 💡 **Se ti serve un'assistenza individuale e personalizzata**, quella è un'altra cosa: si prenotano e si acquistano una o più **sedute di Personal Training**, con un trainer che costruisce il programma su di te e ti segue mentre lo esegui. L'assistente di sala c'è per tutti e non allena una persona sola.
 
 ### Perché si prenota
 

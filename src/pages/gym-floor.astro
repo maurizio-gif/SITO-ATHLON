@@ -59,9 +59,14 @@ const sistema = [
   },
   {
     nome: 'L’assistenza',
-    titolo: 'In sala c’è qualcuno a cui chiedere.',
+    titolo: 'In sala c’è sempre qualcuno a cui chiedere.',
+    /* «Supervisiona», non «ti segue»: l'assistente di sala tiene d'occhio
+       tutta la sala e risponde a chi chiede, non allena una persona per
+       un'ora. Chi vuole essere seguito passo per passo prende una seduta di
+       personal training — e dirlo qui è il modo di non far arrivare nessuno
+       aspettandosi l'una e trovando l'altra. */
     testo:
-      'Nelle fasce Con Assistenza un nostro trainer è in sala per tutta la sessione: gli chiedi un esercizio, un carico, una correzione. Nelle altre ti alleni con il piano che hai già sull’app, senza doverti inventare niente.',
+      'Nelle fasce Con Assistenza c’è un assistente di sala che supervisiona l’attività: gli chiedi un suggerimento, un dubbio su un esercizio, e ti aiuta a scegliere fra i trenta piani dell’app. Se vuoi un allenamento costruito su di te, quello è il personal training.',
   },
   {
     nome: 'I progressi',
@@ -227,8 +232,12 @@ const faqs = await faqPagina([
     a: "Sì. Nell'app trovi due percorsi <strong>Start Up</strong> pensati esattamente per chi parte da zero o riprende dopo una lunga pausa, e in sala c'è sempre qualcuno a cui chiedere. Se preferisci essere seguito passo a passo, c'è il <a href=\"/personal-training\">personal training</a>.",
   },
   {
-    q: 'In sala c\'è qualcuno che mi segue?',
-    a: "Sì. Nelle fasce <strong>Con Assistenza</strong> un nostro trainer è in sala per tutta la sessione: ti segue nell'<strong>esecuzione degli esercizi</strong>, ti controlla mentre lavori e ti aiuta a <strong>scegliere il piano di allenamento</strong> più adatto fra quelli dell'app. Quando prenoti vedi in quali orari c'è: le altre fasce sono segnate <strong>Allenamento Libero</strong>, e lì ti alleni con il piano che hai già.",
+    q: 'In sala c\'è qualcuno a cui chiedere?',
+    a: "Sì. Nelle fasce <strong>Con Assistenza</strong> in sala c'è un <strong>assistente</strong> che supervisiona tutte le attività: puoi chiedergli un suggerimento e farti aiutare a scegliere fra i <strong>trenta piani di allenamento</strong> già presenti in app. Quando prenoti vedi in quali orari c'è; le altre fasce sono segnate <strong>Allenamento Libero</strong>, e lì ti alleni con il piano che hai già.",
+  },
+  {
+    q: 'E se voglio qualcuno che segua solo me?',
+    a: "Allora è <a href=\"/personal-training\">personal training</a>: una o più sedute con un trainer tutto per te, che costruisce il programma sul tuo obiettivo e ti segue mentre lo esegui. Si prenota e si acquista a parte — l'assistente di sala è un'altra cosa, c'è per tutti e non allena una persona sola.",
   },
   {
     q: 'Devo prenotare per allenarmi?',
@@ -319,10 +328,10 @@ const faqs = await faqPagina([
         Quattrocento metri quadri con la vista sulle piscine, e un posto per volta: la fascia si
         prenota da app o portale, quindi quando arrivi il tuo spazio c’è e le macchine non si fanno
         la fila. Sull’app trovi <strong>trenta piani di allenamento</strong> scritti dai nostri
-        trainer, e sono loro ad aiutarti a scegliere quello giusto — la prima volta e ogni volta che
+        trainer, e c’è chi ti aiuta a scegliere quello giusto — la prima volta e ogni volta che
         cambia l’obiettivo. Le due fasce, <strong>Con Assistenza</strong> e <strong>Allenamento
-        Libero</strong>, cambiano solo questo: se il trainer è in sala con te o se segui il piano
-        che hai già in tasca.
+        Libero</strong>, cambiano solo questo: se in sala c’è un assistente a cui chiedere o se
+        segui il piano che hai già in tasca.
       </p>
 
       <ul class="gf-sistema">
