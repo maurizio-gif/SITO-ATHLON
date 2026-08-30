@@ -20,9 +20,14 @@
  *   appena si entra è quello che si chiude senza leggere — e soprattutto il
  *   `body` bloccato è condiviso con i quattro modal veri del sito, quindi un
  *   popup che lo tocca all'apertura lo toglierebbe a uno di loro chiudendosi.
- * - **Si richiude, e resta chiuso per la visita.** `sessionStorage`, non
- *   `localStorage`: la promo dura un mese, e chi l'ha chiusa oggi non deve
- *   trovarsela ancora fra tre settimane — ma nemmeno mai più.
+ * - **Compare una volta sola per sessione, sulla prima pagina adulti che si
+ *   apre.** Il segno si scrive quando la scheda *compare*, non quando la si
+ *   chiude: chi la legge e prosegue senza toccarla ha già ricevuto l'avviso, e
+ *   ripresentarglielo a ogni corso che guarda è la cosa che si chiude senza
+ *   leggere. Il tasto di chiusura resta, ma toglie una scheda che comunque non
+ *   sarebbe tornata. `sessionStorage` e non `localStorage`: la promo dura un
+ *   mese, e chi l'ha vista oggi non deve trovarsela ancora fra tre settimane —
+ *   ma nemmeno mai più.
  *
  * **Sul totem non si ricorda niente**, come per `emailNota.ts` e per la chat:
  * il pannello all'ingresso è di tutti, e la chiusura di chi è passato prima
@@ -34,9 +39,24 @@
  */
 import { getCollection } from 'astro:content';
 
+/**
+ * Il popup si spegne alla mezzanotte fra il 31 agosto e il 1 settembre, scelta
+ * del club: l'ora di Roma e non UTC, o si spegnerebbe con due ore di anticipo.
+ *
+ * È un tetto **suo**, non la scadenza della promozione: quella la dice il
+ * documento di Tina e governa `/promo`, che resta viva finché lo dice lei.
+ * Il conto alla rovescia punta alla prima delle due che arriva, così la scheda
+ * non promette mai tempo che non c'è — e il giorno che le due date divergono
+ * per davvero, è questa costante da guardare, non il countdown.
+ */
+const FINE_POPUP = new Date('2026-09-01T00:00:00+02:00');
+
 const voci = await getCollection('promo', ({ data }) => !data.draft);
 const promo = voci[0]?.data;
-const viva = promo && promo.scadenza.getTime() > Date.now();
+/* La prima delle due scadenze: il popup non sopravvive né alla promo né al suo
+   tetto. */
+const limite = promo ? new Date(Math.min(promo.scadenza.getTime(), FINE_POPUP.getTime())) : null;
+const viva = limite !== null && limite.getTime() > Date.now();
 ---
 
 {
@@ -53,7 +73,7 @@ const viva = promo && promo.scadenza.getTime() > Date.now();
       {/* Il conto alla rovescia: i numeri li scrive lo script, il markup porta
           gli zeri perché senza JavaScript la scheda non compare affatto — ma se
           comparisse non deve mostrare quattro caselle vuote. */}
-      <div class="pp__conto" data-pp-conto data-scadenza={promo.scadenza.toISOString()} aria-live="off">
+      <div class="pp__conto" data-pp-conto data-scadenza={limite!.toISOString()} aria-live="off">
         <div class="pp__unita"><span class="pp__n u-display" data-pp="g">00</span><span class="pp__u">giorni</span></div>
         <div class="pp__unita"><span class="pp__n u-display" data-pp="h">00</span><span class="pp__u">ore</span></div>
         <div class="pp__unita"><span class="pp__n u-display" data-pp="m">00</span><span class="pp__u">min</span></div>
@@ -222,7 +242,7 @@ const viva = promo && promo.scadenza.getTime() > Date.now();
 <script>
   import { suTotem } from '../scripts/totem';
 
-  const CHIUSO = 'athlon_promo_popup_chiuso';
+  const VISTO = 'athlon_promo_popup_visto';
 
   function pad(n: number): string {
     return String(Math.max(0, n)).padStart(2, '0');
@@ -237,7 +257,7 @@ const viva = promo && promo.scadenza.getTime() > Date.now();
     const totem = suTotem();
     if (!totem) {
       try {
-        if (sessionStorage.getItem(CHIUSO) === '1') return;
+        if (sessionStorage.getItem(VISTO) === '1') return;
       } catch {
         /* Sessione non disponibile (finestra privata, storage bloccato): la
            scheda compare comunque. Un avviso in più costa meno di un avviso
@@ -258,12 +278,19 @@ const viva = promo && promo.scadenza.getTime() > Date.now();
 
     let tic: number | undefined;
 
-    function chiudi(ricorda: boolean): void {
+    function chiudi(): void {
       pop!.hidden = true;
       if (tic) window.clearInterval(tic);
-      if (!ricorda || totem) return;
+    }
+
+    /* Il segno si scrive alla comparsa, non alla chiusura: l'avviso è stato
+       dato, e chi prosegue senza toccarlo l'ha comunque letto. Sul totem non si
+       scrive niente — quel pannello è di tutti, e la sessione del browser non
+       finisce quando la persona se ne va. */
+    function segnaVisto(): void {
+      if (totem) return;
       try {
-        sessionStorage.setItem(CHIUSO, '1');
+        sessionStorage.setItem(VISTO, '1');
       } catch {
         /* niente da fare: la scheda tornerà alla pagina dopo */
       }
@@ -275,7 +302,7 @@ const viva = promo && promo.scadenza.getTime() > Date.now();
     function aggiorna(): void {
       const resta = scadenza - Date.now();
       if (resta <= 0) {
-        chiudi(false);
+        chiudi();
         return;
       }
       const s = Math.floor(resta / 1000);
@@ -289,15 +316,16 @@ const viva = promo && promo.scadenza.getTime() > Date.now();
     if (scadenza - Date.now() <= 0) return;
     tic = window.setInterval(aggiorna, 1000);
 
-    pop.querySelector('[data-pp-chiudi]')?.addEventListener('click', () => chiudi(true));
+    pop.querySelector('[data-pp-chiudi]')?.addEventListener('click', chiudi);
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !pop.hidden) chiudi(true);
+      if (e.key === 'Escape' && !pop.hidden) chiudi();
     });
 
     /* Appena entri, ma non nel primo istante: un secondo lascia disegnare la
        pagina, così la scheda arriva su qualcosa e non su uno schermo bianco. */
     window.setTimeout(() => {
       pop.hidden = false;
+      segnaVisto();
     }, 1000);
   }
 
