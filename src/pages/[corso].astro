@@ -22,6 +22,7 @@ import { getBand, bands, bandHours, siContaAOre } from '../data/planning';
 import { trialCta } from '../data/cta';
 import { serviceSchema } from '../data/club';
 import { fotoHero, fotoPiccola } from '../data/foto';
+import PromoPopup from '../components/PromoPopup.astro';
 
 /* Il dominio di produzione, per gli @id assoluti degli schemi. */
 const SITE = 'https://www.athlonroma.it';
@@ -479,6 +480,7 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
     </div>
   </section>
 
+  <PromoPopup />
 </Layout>
 
 <style>
