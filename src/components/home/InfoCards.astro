@@ -1,5 +1,7 @@
 ---
 import { urlPiccola } from '../../data/foto';
+import { GUEST_PASS } from '../../data/abbonamenti';
+
 const cards = [
   {
     variant: 'dark',
@@ -18,12 +20,24 @@ const cards = [
     /* La card e' una duotone arancione: la foto viene moltiplicata per il
        colore del marchio, quindi vince chi ha luce e movimento, non chi ha
        atmosfera. La sala vuota diventava una macchia scura — questa e' piena
-       di gente che si allena, che e' anche quello che la promo vende. */
+       di gente che si allena, che e' anche quello che questa card vende.
+
+       **Qui c'era la promo del mese, e al suo posto c'è la prova.** Una card
+       legata a una promozione va sostituita il giorno che la promozione
+       finisce, e finché nessuno la sostituisce racconta un'offerta scaduta
+       nella home; il Guest Pass invece è l'offerta permanente del club — sette
+       giorni per conoscerlo — quindi questa card non scade più. Quando ci sarà
+       una promo nuova prenderà il posto di un'altra, o questa tornerà a essere
+       la promo: la decisione è del club, non una scadenza da ricordare.
+
+       I giorni e il prezzo li legge `GUEST_PASS`, come `/prova` e come la voce
+       della knowledge base: un numero ricopiato in una home è il numero che
+       resta indietro. */
     image: '/wp-content/uploads/2024/08/ACK2226Giacomo-lattanzio_-1-1024x683.jpg',
-    title: 'Promo Agosto',
-    html: 'Scopri la nostra promozione riservata agli <strong>Abbonamenti Annuali</strong>. Entro il <strong>31/08/2026</strong>',
-    link: '/promo',
-    cta: 'Vedi la promo',
+    title: `Prova ${GUEST_PASS.giorni} giorni`,
+    html: `Conosci il club con il <strong>Guest Pass</strong>: ${GUEST_PASS.giorni} giorni di Premium a <strong>€${GUEST_PASS.prezzo}</strong>, senza abbonarti.`,
+    link: '/prova',
+    cta: 'Scopri la prova',
   },
   {
     variant: 'light',

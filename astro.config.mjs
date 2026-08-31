@@ -1,7 +1,35 @@
 // @ts-check
+import { readdirSync, readFileSync } from 'node:fs';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import linkCanonici from './scripts/link-canonici.mjs';
+
+/**
+ * C'è una promozione viva? Cioè: esiste un documento della collezione `promo`
+ * che non sia una bozza.
+ *
+ * Serve alla sitemap, e la domanda si fa **qui a mano** perché questo file non
+ * può importare la collezione — gira prima che Astro esista. Si legge il
+ * frontmatter col minimo che basta: un `draft: true` in cima al documento.
+ *
+ * Quando la promo è viva `/promo` è una pagina vera, `index, follow` per
+ * scelta, e nella sitemap ci va. Quando è spenta, `promo.astro` emette un
+ * reindirizzamento verso `/abbonamenti` — una pagina con `noindex` e il
+ * canonical del bersaglio — e dichiararla nella sitemap sarebbe la stessa
+ * contraddizione che le righe qui sotto evitano per `/attiva` e per il wiki:
+ * un indirizzo consegnato a Google con dentro scritto di non indicizzarlo.
+ * Un'esclusione fissa invece la terrebbe fuori anche il mese che la promo c'è.
+ */
+function promoViva() {
+  try {
+    return readdirSync('src/content/promo')
+      .filter((n) => n.endsWith('.md'))
+      .some((n) => !/^draft:\s*true\s*$/m.test(readFileSync(`src/content/promo/${n}`, 'utf8')));
+  } catch {
+    /* Cartella assente: nessuna promo, e la sitemap non la dichiara. */
+    return false;
+  }
+}
 
 // https://astro.build/config
 export default defineConfig({
@@ -84,6 +112,9 @@ export default defineConfig({
            strumento come `/diagnostica-schermo`, non una pagina del club. Va via
            insieme alla pagina, il giorno che la prova ha dato il suo esito. */
         !page.includes('/test-portale') &&
+        /* `/promo` solo mentre la promozione esiste: spenta, quell'indirizzo è
+           un reindirizzamento verso il listino. Vedi `promoViva()` qui sopra. */
+        (promoViva() || !page.endsWith('/promo/')) &&
         !page.includes('/wikiathlon/'),
 
       /* Priorità e frequenza sono suggerimenti, e Google li ignora — restano
