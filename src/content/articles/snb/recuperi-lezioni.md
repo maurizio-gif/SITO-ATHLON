@@ -49,6 +49,9 @@ Puoi prenotare da **3 giorni prima** e disdire entro 1 ora dall'inizio.
 <details>
 <summary><strong>Lista d'attesa</strong></summary>
 
+> Vale per il **recupero**, che è una lezione da prenotare. Per l'**iscrizione**
+> a un turno della Scuola Nuoto non c'è nessuna lista d'attesa.
+
 Se il corso di recupero è al completo puoi iscriverti in lista d'attesa. La lista scorre in ordine cronologico e il subentrante viene avvisato via email. Il subentro è possibile fino a **1 ora dall'inizio**.
 
 </details>

@@ -2090,6 +2090,39 @@ corso — che è la domanda esatta arrivata in chat.
 chiuderlo: là si prenota turno per turno, come per gli adulti. Le due cose stanno
 nella stessa riga di `prenotazioni.md` per questo.
 
+### La lista d'attesa è delle prenotazioni, e il Direttore Tecnico è degli iscritti
+
+Il 31 agosto, a una mamma che voleva iscrivere la figlia del 2023 a un turno
+dove non c'erano più posti, la chat ha risposto due cose false in un colpo:
+che poteva **iscriversi in lista d'attesa**, che «scorre in ordine cronologico
+e se si libera un posto ricevi una notifica via email», e che poteva
+**parlare col Direttore Tecnico** per capire l'organizzazione dei gruppi.
+
+**Non aveva inventato niente: aveva applicato all'iscrizione due cose che
+valgono per gli iscritti.** La lista d'attesa esiste — sta in
+`generali/prenotazioni` e in `snb/recuperi-lezioni` — ma è quella della
+**singola lezione che si prenota**, recuperi compresi; per l'iscrizione a un
+turno della Scuola Nuoto non esiste, e chi la promette manda una famiglia ad
+aspettare una email che non arriverà mai. Il Direttore Tecnico riceve su
+appuntamento, ma per **le famiglie degli allievi** — la sua scheda lo diceva
+solo nel badge della hero, cioè in un posto che il `kb.json` porta come una
+riga qualsiasi: chi deve ancora iscriversi non ha un percorso di cui parlare.
+
+È lo stesso difetto della finestra dei tre giorni allargata alla Scuola Nuoto
+e del Guest Pass finito nel ramo junior: **una regola che non dichiara il
+proprio perimetro è una regola che si allarga al caso vicino**. Quindi il
+perimetro sta adesso dentro le tre schede che il modello legge — la f.a.q.
+della lista d'attesa, la scheda dei recuperi, la scheda della Direzione
+Tecnica — e `preiscrizioni-nuoto` dice cosa fare davvero quando il turno è al
+completo: si sceglie fra quelli che hanno posto, e se nessuno va bene si
+scrive al team.
+
+**E la cosa da non fare è inventare il rimedio.** La tentazione, davanti a un
+turno pieno, è descrivere un meccanismo che consoli: una coda, una notifica,
+un «ti avvisiamo noi». Un dato inventato è peggio di un dato assente, e qui
+peggio ancora: è una promessa che il club non può mantenere e che nessuno
+scoprirà finché la stagione non è cominciata senza quel bambino.
+
 ### La promozione ha un perimetro, e nel ramo dei genitori non deve entrare
 
 `promo.md` lo dichiara — «Valido su tutti gli abbonamenti annuali, Smart e
