@@ -31,7 +31,19 @@ const ilClub = [
   { label: 'Abbonamenti', href: '/abbonamenti' },
   { label: 'Orari Corsi', href: '/planning' },
   { label: 'Eventi', href: '/eventi' },
-  { label: contatta.label, href: contatta.href, attrs: contatta.attrs },
+  /* «Contattaci» apre **la chat**, come il pulsante qui sopra e come nel menu
+     del telefono: l'etichetta dice l'intenzione — parlare con qualcuno — e la
+     porta è quella che risponde adesso, con «Contatta il team» dentro la
+     conversazione per chi ha bisogno di una persona. Era l'ultimo comando di
+     contatto del footer a portare al modulo, e due voci con lo stesso nome che
+     aprivano due cose diverse erano la cosa da chiudere.
+     `href` e `data-cta` sono gli stessi del pulsante: il parametro apre la chat
+     anche senza JavaScript. */
+  {
+    label: contatta.label,
+    href: '/club-life/?athlon-chat=1',
+    attrs: { 'data-cta': 'assistente', 'data-cta-source': 'footer-menu' },
+  },
 ];
 
 const risorse = [
@@ -227,8 +239,8 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
         {ilClub.map((l) => (
           <li>
             {/* `attrs` porta i `data-cta` della voce Contattaci, che è quello
-                che il modal intercetta: senza lo spread questa voce del menu
-                sarebbe l'unica CTA di contatto del sito a non aprirlo. */}
+                che il pannello intercetta: senza lo spread questa voce del menu
+                sarebbe l'unica CTA di contatto del sito a non aprire niente. */}
             <a
               href={l.href}
               target={l.external ? '_blank' : undefined}
