@@ -7,7 +7,7 @@ import Faq from '../components/Faq.astro';
 import { bands, gymFloor, countLessons, bandHours, ledeOf, siContaAOre, totalLessons } from '../data/planning';
 import { faqPagina } from '../data/faq';
 import { trialCta } from '../data/cta';
-import { DOMENICA, ORARIO_ECCEZIONALE, orarioEccezionaleAttivo } from '../data/club';
+import { DOMENICA, ORARIO_ECCEZIONALE, orarioEccezionaleAttivo, finestraEstiva } from '../data/club';
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 
@@ -101,8 +101,11 @@ const faqs = await faqPagina([
         entro gli orari di apertura qui sotto.
         <a href="/gym-floor">Scopri la sala →</a>
       </p>
+      {/* La finestra accanto all'orario, qui come nel `kb.json`: un orario
+          eccezionale senza la sua data di fine è un orario che chi legge dà per
+          valido anche domani. */}
       {orarioEccezionaleAttivo() && (
-        <p class="pl-note">{ORARIO_ECCEZIONALE.testo}</p>
+        <p class="pl-note">{ORARIO_ECCEZIONALE.testo} {finestraEstiva().frase}</p>
       )}
       <OpeningHours href={`${PG}/#/Classes/1/Calendar?categoryId=6`} />
       {/* Sotto la tabella e non sopra: la domenica in tabella e' una riga di

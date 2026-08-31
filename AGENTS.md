@@ -1486,6 +1486,31 @@ del portale e non è la finestra dei tre giorni** — se in quella fascia il clu
 chiuso, la risposta è la chiusura, non «riprova» e non «controlla il
 certificato».
 
+**E un regime senza la sua data di fine è un regime che si prolunga.** Il 31
+agosto, a «da domani, 1 settembre, apre la piscina?», la risposta è stata che
+«da domani il club segue ancora l'orario estivo ridotto». Il dato era giusto —
+`finoAl` scadeva quella notte — ma la voce diceva solo *che* c'è un orario
+estivo e che sostituisce l'ordinario, non **fino a quando**: «Ad agosto 2026»
+scritto in prosa non è una scadenza che un modello applica a una domanda su
+domani. È la sorella della lezione qui sopra: due regimi senza gerarchia
+lasciano comporre un terzo orario, un regime senza scadenza lascia prolungare
+quello che c'è.
+
+Ora `finestraEstiva()` (`data/club.ts`) stampa la finestra per esteso — ultimo
+giorno compreso, e da quando torna l'ordinario — dentro il blocco dell'orario
+estivo del `kb.json` e nella nota di `/planning`. Le due date **si derivano da
+`finoAl`**, che è il primo giorno in cui l'orario *non* vale più: scritte a mano
+sarebbero due date che al cambio di stagione divergono di uno. E `finoAl` porta
+il fuso di Roma (`T00:00:00+02:00`) perché `new Date('2026-09-01')` è mezzanotte
+UTC, cioè le due del mattino qui: senza, fra l'una e le due del 1 settembre
+l'orario estivo risultava ancora attivo.
+
+Serve anche per una ragione che il dato da solo non copre: **il `kb.json` si
+costruisce al build**, quindi il giorno della scadenza, se nessuno tocca il
+sito, quella voce resta scritta com'era. Con la finestra dentro il testo, un
+modello che legge la data se ne accorge da sé invece di fidarsi del fatto che la
+voce esista.
+
 **E la regola generale è più larga della chiusura**, perché è la chiusura a
 esserne un caso: *una lezione che non si può prenotare è quasi sempre una
 lezione che non c'è*. Il portale mostra il palinsesto vero, quindi un giorno
@@ -2064,6 +2089,66 @@ corso — che è la domanda esatta arrivata in chat.
 **Il Baby Nuoto è l'opposto e va detto insieme**, o si sposta l'errore invece di
 chiuderlo: là si prenota turno per turno, come per gli adulti. Le due cose stanno
 nella stessa riga di `prenotazioni.md` per questo.
+
+### Il cambio corso dei bambini non è il cambio abbonamento degli adulti
+
+Stessa giornata, stesso difetto, terzo caso: a un genitore che chiedeva di
+passare da una a due volte a settimana **per il nuoto dei bambini**, la chat ha
+risposto con la procedura degli adulti — «compila il modulo, ti arriva via
+email il conteggio del credito residuo con le istruzioni» — e poi l'ha
+confermata («sì, vale anche per il nuoto»). Per la Scuola Nuoto il cambio di
+frequenza non passa da nessun modulo: richiede **disdetta e nuova iscrizione**,
+con una nuova quota di attivazione. Cioè la risposta ha nascosto un costo e
+promesso un'email che non sarebbe mai arrivata.
+
+La persona stava scrivendo **dalla scheda giusta** — `da /wikiathlon/snb/cambio-corso`
+è scritto nell'intestazione della conversazione — e il modello ha preferito la
+voce degli adulti: `adulti/cambio-abbonamento` non dichiarava di essere degli
+adulti, e «cambio abbonamento» somiglia a «cambio frequenza» più di quanto due
+procedure diverse possano permettersi. Ora le due schede si nominano a
+vicenda e dichiarano il proprio perimetro nella **prima riga**, che è quella
+che il `kb.json` porta per prima.
+
+**Le tre voci di questa giornata dicono la stessa cosa**, e vale la pena
+scriverla una volta sola: quando due procedure hanno nomi simili e persone
+diverse — la lista d'attesa delle prenotazioni e l'iscrizione, il Direttore
+Tecnico e chi deve ancora iscriversi, il cambio abbonamento e il cambio corso —
+**il perimetro va nel dato, non nel prompt**. Una regola che il modello può
+ignorare non è una regola, e una voce che non dice per chi vale è una voce che
+verrà applicata a chi le somiglia.
+
+### La lista d'attesa è delle prenotazioni, e il Direttore Tecnico è degli iscritti
+
+Il 31 agosto, a una mamma che voleva iscrivere la figlia del 2023 a un turno
+dove non c'erano più posti, la chat ha risposto due cose false in un colpo:
+che poteva **iscriversi in lista d'attesa**, che «scorre in ordine cronologico
+e se si libera un posto ricevi una notifica via email», e che poteva
+**parlare col Direttore Tecnico** per capire l'organizzazione dei gruppi.
+
+**Non aveva inventato niente: aveva applicato all'iscrizione due cose che
+valgono per gli iscritti.** La lista d'attesa esiste — sta in
+`generali/prenotazioni` e in `snb/recuperi-lezioni` — ma è quella della
+**singola lezione che si prenota**, recuperi compresi; per l'iscrizione a un
+turno della Scuola Nuoto non esiste, e chi la promette manda una famiglia ad
+aspettare una email che non arriverà mai. Il Direttore Tecnico riceve su
+appuntamento, ma per **le famiglie degli allievi** — la sua scheda lo diceva
+solo nel badge della hero, cioè in un posto che il `kb.json` porta come una
+riga qualsiasi: chi deve ancora iscriversi non ha un percorso di cui parlare.
+
+È lo stesso difetto della finestra dei tre giorni allargata alla Scuola Nuoto
+e del Guest Pass finito nel ramo junior: **una regola che non dichiara il
+proprio perimetro è una regola che si allarga al caso vicino**. Quindi il
+perimetro sta adesso dentro le tre schede che il modello legge — la f.a.q.
+della lista d'attesa, la scheda dei recuperi, la scheda della Direzione
+Tecnica — e `preiscrizioni-nuoto` dice cosa fare davvero quando il turno è al
+completo: si sceglie fra quelli che hanno posto, e se nessuno va bene si
+scrive al team.
+
+**E la cosa da non fare è inventare il rimedio.** La tentazione, davanti a un
+turno pieno, è descrivere un meccanismo che consoli: una coda, una notifica,
+un «ti avvisiamo noi». Un dato inventato è peggio di un dato assente, e qui
+peggio ancora: è una promessa che il club non può mantenere e che nessuno
+scoprirà finché la stagione non è cominciata senza quel bambino.
 
 ### La promozione ha un perimetro, e nel ramo dei genitori non deve entrare
 

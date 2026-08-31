@@ -13,6 +13,14 @@ attivita:
   📞 Riservato agli iscritti · Appuntamento telefonico con il Direttore Tecnico · Noi ti ricontattiamo
 </div>
 
+> **Per chi è.** Per le famiglie degli allievi **già iscritti**: l'appuntamento
+> serve a parlare del percorso di un bambino che frequenta — progressione,
+> gruppo, passaggi di livello. **Non è la strada per iscriversi**, per scegliere
+> un turno o per chiedere un posto in un turno al completo: chi deve ancora
+> iscriversi passa dall'[iscrizione ai corsi](/wikiathlon/snb/preiscrizioni-nuoto/),
+> e per una domanda prima dell'iscrizione scrive al team dall'icona del
+> messaggio in alto.
+
 ## Il tuo punto di riferimento diretto
 
 La Scuola Nuoto Athlon non è solo lezioni in vasca — è un percorso di crescita che costruiamo insieme alle famiglie. Il servizio di appuntamento con il Direttore Tecnico nasce proprio da questa convinzione: **ogni bambino merita attenzione individuale**, e ogni famiglia merita di essere tenuta informata e coinvolta.

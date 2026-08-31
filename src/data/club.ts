@@ -105,8 +105,51 @@ export const ORARIO_ECCEZIONALE = {
    */
   sostituisce:
     "Finché vale, questo orario sostituisce quello ordinario qui sotto — sala pesi compresa. Fuori da queste fasce il club è chiuso: non ci sono lezioni né sessioni in sala, e sul portale non compare niente da prenotare. Il sabato pomeriggio e la domenica il club è chiuso.",
-  finoAl: '2026-09-01',
+  /**
+   * Il **primo giorno in cui non vale più**, non l'ultimo in cui vale: è la
+   * soglia del confronto, e la data leggibile la deriva `finestraEstiva()`
+   * togliendo un giorno. Due date scritte a mano — «fino al 31» e «dal 1» —
+   * sono due date che al prossimo cambio divergono di uno.
+   *
+   * Con il fuso di Roma dentro, e non è pignoleria: `new Date('2026-09-01')`
+   * è mezzanotte **UTC**, cioè le 02:00 qui, quindi fra l'una e le due del
+   * mattino del 1 settembre l'orario estivo sarebbe risultato ancora attivo.
+   */
+  finoAl: '2026-09-01T00:00:00+02:00',
 } as const;
+
+/**
+ * Quando comincia e quando finisce, detto per esteso — ed è la riga che
+ * mancava.
+ *
+ * Il 31 agosto, a «da domani, 1 settembre, apre la piscina?», l'assistente ha
+ * risposto che «da domani il club segue ancora l'orario estivo ridotto». Il
+ * dato era giusto — `finoAl` scadeva quella notte — ma la voce del `kb.json`
+ * diceva solo *che* c'è un orario estivo e che sostituisce l'ordinario, non
+ * **fino a quando**: «Ad agosto 2026» in prosa non è una scadenza che un
+ * modello applica a una domanda su domani. Un regime senza la sua data di fine
+ * è un regime che si estende da sé, ed è la sorella della lezione già scritta
+ * qui sopra: due contesti senza gerarchia lasciano comporre un terzo orario,
+ * un contesto senza scadenza lascia prolungare quello che c'è.
+ *
+ * Serve anche perché il `kb.json` si costruisce **al build**: se nessuno tocca
+ * il sito, il 1 settembre quella voce resta scritta com'era. Con la finestra
+ * dentro il testo, un modello che legge la data se ne accorge da sé invece di
+ * fidarsi del fatto che la voce esista.
+ */
+export function finestraEstiva(): { ultimoGiorno: string; primoGiornoDopo: string; frase: string } {
+  const fine = new Date(ORARIO_ECCEZIONALE.finoAl);
+  const ultimo = new Date(fine.getTime() - 24 * 60 * 60 * 1000);
+  const data = (d: Date) =>
+    d.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Rome' });
+  const ultimoGiorno = data(ultimo);
+  const primoGiornoDopo = data(fine);
+  return {
+    ultimoGiorno,
+    primoGiornoDopo,
+    frase: `Vale fino al ${ultimoGiorno} compreso: è l'ultimo giorno dell'orario estivo. Dal ${primoGiornoDopo} torna l'orario ordinario, quello scritto qui sotto.`,
+  };
+}
 
 /**
  * La domenica, nell'orario ordinario, non è un giorno come gli altri: la

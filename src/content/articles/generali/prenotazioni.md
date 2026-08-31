@@ -63,6 +63,14 @@ La prenotazione non è un adempimento: è il filo che tiene aggiornati te e noi.
 <details>
 <summary><strong>Come funziona la lista d'attesa?</strong></summary>
 
+> **La lista d'attesa è delle prenotazioni, non delle iscrizioni.** Vale per la
+> singola lezione che si prenota — corsi fitness, acqua, sala pesi, recuperi
+> della Scuola Nuoto. **Per iscriversi a un turno della Scuola Nuoto Bambini o
+> del Baby Nuoto non esiste nessuna lista d'attesa**: se il turno che vuoi è al
+> completo si sceglie fra quelli che hanno ancora posto, e se nessuno va bene
+> scrivi al team — nessuno viene messo in coda e nessuno riceve una notifica
+> automatica per un posto che si libera.
+
 Se il corso è al completo puoi iscriverti in lista d'attesa. In caso di disdetta di un prenotato, la lista scorre in ordine cronologico e il subentrante viene avvisato via email. Il subentro è possibile fino a **1 ora dall'inizio**.
 
 Nel caso di acquisto della singola lezione, la stessa verrà riaccreditata se non si subentra.
