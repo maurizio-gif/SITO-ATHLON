@@ -190,7 +190,10 @@ import CampoTelefono from './CampoTelefono.astro';
     <section class="pn__step" id="pn-step-dati" hidden>
       <span class="pn__eyebrow">Ultimo passo</span>
       <h3 class="pn__title" tabindex="-1" data-pn-fuoco>Chi viene in vasca?</h3>
-      <p class="pn__lead">Il nome di chi fa la prova, e il tuo per la conferma.</p>
+      <p class="pn__lead">
+        Il nome di chi fa la prova, e il tuo per la conferma. Serve tutto: da qui nasce la scheda in
+        piscina.
+      </p>
 
       <div class="pn__coppia">
         <div>
@@ -244,9 +247,15 @@ import CampoTelefono from './CampoTelefono.astro';
         <input type="checkbox" id="pn-privacy" />
         <span>{CONSENSO_PRIVACY} <a href="/privacy">Informativa privacy</a>.</span>
       </label>
+      {/* L'unica riga facoltativa del modulo, e lo dice.
+          Marcare i campi obbligatori uno per uno avrebbe messo un asterisco
+          quasi su tutto: qui la regola e' che serve tutto — nome e cognome di
+          chi nuota, la sua data di nascita, i tuoi dati, il consenso al
+          trattamento — e l'eccezione e' una. Segnalare l'eccezione dice la
+          regola senza ripeterla otto volte. */}
       <label class="pn__consenso">
         <input type="checkbox" id="pn-marketing" />
-        <span>{CONSENSO_MARKETING}</span>
+        <span>{CONSENSO_MARKETING} <em class="pn__facoltativo">Facoltativo.</em></span>
       </label>
 
       <p class="pn__errore" data-pn-errore hidden></p>
@@ -392,6 +401,12 @@ import CampoTelefono from './CampoTelefono.astro';
     width: 1.05rem;
     height: 1.05rem;
     accent-color: var(--color-primary, #ff5701);
+  }
+
+  .pn__facoltativo {
+    font-style: normal;
+    font-weight: 700;
+    opacity: 0.75;
   }
 
   .pn__errore {
