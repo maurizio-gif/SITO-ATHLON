@@ -501,11 +501,24 @@ export function initContattaciForm(root, options) {
       mostraStep('adulti');
       return;
     }
-    // Junior e baby: chi ha già l'anagrafica non ne crea una seconda.
-    if (vaAlPortale()) {
-      inviaEPortale();
-      return;
-    }
+    /* Junior e baby: **il bambino si chiede sempre**, anche a un genitore che
+       il portale conosce già.
+
+       Prima non era così, e costava la cosa per cui questo percorso esiste. Chi
+       aveva un account saltava questo passo e finiva dritto sulla schermata del
+       portale: il payload partiva senza `bambino`, quindi su n8n `haBambino`
+       era falso e `stradaPgm` diventava `nessuna` — nessuna anagrafica del
+       figlio, nessun legame col nucleo. Il genitore leggeva «accedi e prenota»
+       e nel portale non trovava nessun bambino da prenotare.
+
+       La ragione è la stessa del totem: di un genitore PerfectGym ci ha già
+       detto tutto, **del bambino non ci ha mai detto niente** — nemmeno per il
+       socio più vecchio del club. Un corso per bambini vuole due anagrafiche
+       legate, e la seconda non ce l'ha nessuno.
+
+       Quello che resta saltato è il passo del *genitore*, che è giusto: nome,
+       cognome e cellulare li abbiamo, e la strada `figlio` di n8n aggancia il
+       bambino al nucleo leggendo `memberId`. */
     mostraStep('bambino');
   }
 
@@ -666,7 +679,7 @@ export function initContattaciForm(root, options) {
     return scelta.value === 'si';
   }
 
-  function avantiBambino() {
+  async function avantiBambino() {
     pulisciErrore(steps.bambino);
     [bNome, bCognome, bNascita].forEach(togliSegno);
 
@@ -712,6 +725,13 @@ export function initContattaciForm(root, options) {
       saNuotare: livello.saNuotare,
       stileLibero: livello.stileLibero,
     };
+    /* Chi ha già l'account non ridigita i propri dati: si spedisce di qui — con
+       il bambino nel payload — e si mostra la schermata del portale. */
+    if (vaAlPortale()) {
+      await inviaEPortale(q('[data-cf-avanti-bambino]'));
+      return;
+    }
+
     mostraMotivoGenitore();
     mostraStep('genitore');
   }
@@ -766,8 +786,8 @@ export function initContattaciForm(root, options) {
  *  portale. Il blocco sbagliato non si nasconde e basta — con `hidden`
  *  scompare dal giro del tab, che è la regola del sito per gli overlay
  *  chiusi. */
-  async function inviaEPortale() {
-    await spedisci(null);
+  async function inviaEPortale(bottone) {
+    await spedisci(bottone || null);
     var per = q('[data-cf-portale-ramo]');
     if (per) per.textContent = dati.ramo === 'baby' ? 'il baby nuoto' : 'i corsi junior';
     qa('[data-cf-portale-blocco]').forEach(function (blocco) {
