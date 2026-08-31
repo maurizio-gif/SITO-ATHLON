@@ -431,7 +431,7 @@
           "full": "Sabato",
           "classes": [
             {
-              "time": "09:30–10:20",
+              "time": "09:00–09:50",
               "name": "HBX Fusion",
               "sala": "Sala B"
             },
@@ -574,7 +574,7 @@
               "sala": "Sala C"
             },
             {
-              "time": "18:30–19:20",
+              "time": "18:20–19:10",
               "name": "Group Reformer",
               "sala": "Sala C"
             },
