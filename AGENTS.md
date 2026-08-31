@@ -1290,6 +1290,22 @@ vedrebbe la schermata «ecco come iscriverti», che a chi è già dentro non ser
 e riceverebbe l'email con le modalità di iscrizione — una lettera al cliente
 sbagliato.
 
+**I dati del bambino si chiedono sempre, anche a un genitore che il portale
+conosce già.** Prima no: chi aveva un account (Member o Guest) saltava il passo
+del bambino e finiva dritto sulla schermata «accedi e prenota». Il payload
+partiva senza `bambino`, quindi su n8n `haBambino` era falso e `stradaPgm`
+cadeva su `nessuna` — cioè la strada `figlio`, che esiste apposta per questo
+caso, non si attivava **mai** da questo form. Il genitore leggeva di andare a
+prenotare e nel portale non trovava nessun bambino: il nucleo era rimasto a
+metà, e non lo segnalava niente.
+
+La ragione è quella già scritta per il totem: di un genitore PerfectGym ci ha
+detto tutto, **del bambino non ci ha mai detto niente**, nemmeno per il socio
+più vecchio del club. Un corso per bambini vuole due anagrafiche legate e la
+seconda non ce l'ha nessuno. Quello che resta saltato è il passo del
+*genitore* — nome, cognome e cellulare li abbiamo — e il legame lo fa
+`Vaglio Figlio` leggendo `memberId`, con il suo controllo sul doppione.
+
 **Il calendario si toglie con `hidden`, non si nasconde.** L'appuntamento
 telefonico è lo strumento di chi deve ancora decidere se iscriversi: offrirlo a
 un socio che segnala un badge sospeso vuol dire rispondergli «ti richiamiamo fra
