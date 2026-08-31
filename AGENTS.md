@@ -2090,6 +2090,33 @@ corso — che è la domanda esatta arrivata in chat.
 chiuderlo: là si prenota turno per turno, come per gli adulti. Le due cose stanno
 nella stessa riga di `prenotazioni.md` per questo.
 
+### Il cambio corso dei bambini non è il cambio abbonamento degli adulti
+
+Stessa giornata, stesso difetto, terzo caso: a un genitore che chiedeva di
+passare da una a due volte a settimana **per il nuoto dei bambini**, la chat ha
+risposto con la procedura degli adulti — «compila il modulo, ti arriva via
+email il conteggio del credito residuo con le istruzioni» — e poi l'ha
+confermata («sì, vale anche per il nuoto»). Per la Scuola Nuoto il cambio di
+frequenza non passa da nessun modulo: richiede **disdetta e nuova iscrizione**,
+con una nuova quota di attivazione. Cioè la risposta ha nascosto un costo e
+promesso un'email che non sarebbe mai arrivata.
+
+La persona stava scrivendo **dalla scheda giusta** — `da /wikiathlon/snb/cambio-corso`
+è scritto nell'intestazione della conversazione — e il modello ha preferito la
+voce degli adulti: `adulti/cambio-abbonamento` non dichiarava di essere degli
+adulti, e «cambio abbonamento» somiglia a «cambio frequenza» più di quanto due
+procedure diverse possano permettersi. Ora le due schede si nominano a
+vicenda e dichiarano il proprio perimetro nella **prima riga**, che è quella
+che il `kb.json` porta per prima.
+
+**Le tre voci di questa giornata dicono la stessa cosa**, e vale la pena
+scriverla una volta sola: quando due procedure hanno nomi simili e persone
+diverse — la lista d'attesa delle prenotazioni e l'iscrizione, il Direttore
+Tecnico e chi deve ancora iscriversi, il cambio abbonamento e il cambio corso —
+**il perimetro va nel dato, non nel prompt**. Una regola che il modello può
+ignorare non è una regola, e una voce che non dice per chi vale è una voce che
+verrà applicata a chi le somiglia.
+
 ### La lista d'attesa è delle prenotazioni, e il Direttore Tecnico è degli iscritti
 
 Il 31 agosto, a una mamma che voleva iscrivere la figlia del 2023 a un turno

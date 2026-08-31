@@ -13,6 +13,14 @@ attivita:
   🔄 Cambio turno possibile nello stesso contratto · Contattaci via "Richiedi Assistenza"
 </div>
 
+> 📌 **Questa è la strada per i corsi dei bambini**, Scuola Nuoto e Baby Nuoto:
+> non si passa dal modulo di [cambio abbonamento](/wikiathlon/adulti/cambio-abbonamento/),
+> che è degli adulti, e non c'è nessun conteggio del credito residuo da
+> aspettare via email. Il cambio di **turno** lo fa la Segreteria dentro lo
+> stesso contratto; il cambio di **frequenza** — da una a due volte a settimana
+> o viceversa — richiede disdetta e nuova iscrizione, quindi anche una nuova
+> quota di attivazione.
+
 ## Cambio turno (stessa frequenza)
 
 Possibile all'interno dello stesso contratto (bisettimanale↔bisettimanale, monosettimanale↔monosettimanale).

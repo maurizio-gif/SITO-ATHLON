@@ -23,6 +23,15 @@ attivita:
   🔁 Cambio possibile solo verso abbonamenti di valore superiore · Il credito residuo viene scalato automaticamente
 </div>
 
+> 👤 **Vale per gli abbonamenti degli adulti**, quelli elencati qui sopra. Per i
+> corsi dei bambini la strada è un'altra e i costi sono diversi: cambio di turno
+> e passaggio da mono a bisettimanale si fanno come dice
+> [Cambio Orario](/wikiathlon/snb/cambio-corso/) — **non da questo modulo**, e
+> il cambio di frequenza passa da disdetta e nuova iscrizione, con una nuova
+> quota di attivazione. Applicare qui la procedura degli adulti vuol dire
+> promettere a un genitore un conteggio del credito residuo che nessuno gli
+> manderà.
+
 Il cambio abbonamento avviene chiudendo il contratto attuale, calcolando il **credito residuo** e applicandolo al nuovo abbonamento. **Si richiede sempre dal modulo qui sotto**: le istruzioni per proseguire arrivano via email dopo la compilazione.
 
 > ℹ️ **Aggiungere un'attività** — per esempio il Group Reformer — non è un acquisto a parte: è un upgrade del profilo abbonamento, e si richiede con questo stesso modulo.
