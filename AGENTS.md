@@ -1486,6 +1486,31 @@ del portale e non è la finestra dei tre giorni** — se in quella fascia il clu
 chiuso, la risposta è la chiusura, non «riprova» e non «controlla il
 certificato».
 
+**E un regime senza la sua data di fine è un regime che si prolunga.** Il 31
+agosto, a «da domani, 1 settembre, apre la piscina?», la risposta è stata che
+«da domani il club segue ancora l'orario estivo ridotto». Il dato era giusto —
+`finoAl` scadeva quella notte — ma la voce diceva solo *che* c'è un orario
+estivo e che sostituisce l'ordinario, non **fino a quando**: «Ad agosto 2026»
+scritto in prosa non è una scadenza che un modello applica a una domanda su
+domani. È la sorella della lezione qui sopra: due regimi senza gerarchia
+lasciano comporre un terzo orario, un regime senza scadenza lascia prolungare
+quello che c'è.
+
+Ora `finestraEstiva()` (`data/club.ts`) stampa la finestra per esteso — ultimo
+giorno compreso, e da quando torna l'ordinario — dentro il blocco dell'orario
+estivo del `kb.json` e nella nota di `/planning`. Le due date **si derivano da
+`finoAl`**, che è il primo giorno in cui l'orario *non* vale più: scritte a mano
+sarebbero due date che al cambio di stagione divergono di uno. E `finoAl` porta
+il fuso di Roma (`T00:00:00+02:00`) perché `new Date('2026-09-01')` è mezzanotte
+UTC, cioè le due del mattino qui: senza, fra l'una e le due del 1 settembre
+l'orario estivo risultava ancora attivo.
+
+Serve anche per una ragione che il dato da solo non copre: **il `kb.json` si
+costruisce al build**, quindi il giorno della scadenza, se nessuno tocca il
+sito, quella voce resta scritta com'era. Con la finestra dentro il testo, un
+modello che legge la data se ne accorge da sé invece di fidarsi del fatto che la
+voce esista.
+
 **E la regola generale è più larga della chiusura**, perché è la chiusura a
 esserne un caso: *una lezione che non si può prenotare è quasi sempre una
 lezione che non c'è*. Il portale mostra il palinsesto vero, quindi un giorno

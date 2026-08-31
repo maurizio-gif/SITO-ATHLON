@@ -38,7 +38,7 @@ import {
   lessonCardsFor,
   PLANNING_MONTH,
 } from '../data/planning';
-import { CLUB, DOMENICA, ORARIO_ECCEZIONALE, orarioEccezionaleAttivo } from '../data/club';
+import { CLUB, DOMENICA, ORARIO_ECCEZIONALE, orarioEccezionaleAttivo, finestraEstiva } from '../data/club';
 import {
   plans,
   GUEST_PASS,
@@ -838,8 +838,12 @@ Quando proponi il Pass, dì che è la settimana Premium delle attività degli ad
        ordinaria del sabato — «la Gym Floor chiude alle 20:00» a club chiuso
        dalle 13. Vedi la nota su `ORARIO_ECCEZIONALE` in `data/club.ts`. */
     testo: blocchi(
+      /* La finestra sta **dentro** il blocco dell'orario estivo, fra il testo e
+         la riga che dice che sostituisce l'ordinario: un regime che non dichiara
+         quando finisce è un regime che il modello prolunga — è successo il 31
+         agosto, a una domanda su «domani, 1 settembre». */
       orarioEccezionaleAttivo() &&
-        capoversi([ORARIO_ECCEZIONALE.testo, ORARIO_ECCEZIONALE.sostituisce]),
+        capoversi([ORARIO_ECCEZIONALE.testo, finestraEstiva().frase, ORARIO_ECCEZIONALE.sostituisce]),
       orarioEccezionaleAttivo() && 'ORARIO ORDINARIO, che non vale adesso:',
       pulito(gymFloor.lede),
       elenco(gymFloor.hours.map((h) => `${h.label}: ${h.hours}`)),
