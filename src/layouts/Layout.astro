@@ -24,6 +24,7 @@ import Footer from '../components/Footer.astro';
 import ProvaModal from '../components/ProvaModal.astro';
 import ContattaciModal from '../components/ContattaciModal.astro';
 import AppuntamentoModal from '../components/AppuntamentoModal.astro';
+import ProvaNuotoModal from '../components/ProvaNuotoModal.astro';
 import ChatModal from '../components/clublife/ChatModal.astro';
 import ChatFab from '../components/ChatFab.astro';
 import { CLUB, clubSchema, breadcrumbSchema } from '../data/club';
@@ -286,6 +287,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     {/* La prenotazione della chiamata: come gli altri, presente ovunque e
         aperta da qualunque comando con data-cta="call". */}
     <AppuntamentoModal />
+
+    {/* La prova di inserimento di pallanuoto e nuoto agonistico. Fuori dal
+        `chrome` come il form dei contatti, e per la stessa ragione: la CTA
+        compare anche dentro le risposte delle FAQ e negli articoli del wiki,
+        che sono pagine senza intestazione. */}
+    <ProvaNuotoModal />
 
     <ChatModal />
     <ChatFab />

@@ -636,6 +636,12 @@ import CampoTelefono from './CampoTelefono.astro';
       const target = e.target as HTMLElement | null;
       const cta = target?.closest<HTMLElement>('[data-cta="talk"], [data-cta="resolve"]');
       if (!cta) return;
+      /* Tranne la prova di inserimento. E' `resolve` come le altre CTA junior —
+         chiede qualcosa di preciso e vuole una risposta — ma la risposta non e'
+         una richiesta al desk: e' un questionario tecnico e un calendario, e
+         li tiene `ProvaNuotoModal.astro`. Senza questa riga i due pannelli si
+         aprirebbero entrambi sullo stesso clic. */
+      if (cta.dataset.ctaIntent === 'insertion_trial') return;
       e.preventDefault();
       apri(cta);
     });

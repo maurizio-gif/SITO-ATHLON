@@ -1,0 +1,749 @@
+---
+/**
+ * «Richiedi la prova di inserimento»: il modulo di pallanuoto e nuoto
+ * agonistico.
+ *
+ * Sta nel Layout, quindi è presente su ogni pagina, e lo apre qualunque
+ * comando con `data-cta="resolve"` e `data-cta-intent="insertion_trial"` —
+ * cioè i pulsanti che `PaginaJunior` già scriveva per quei due corsi. Prima
+ * quegli stessi pulsanti aprivano `ContattaciModal`, che è un modulo di
+ * richiesta informazioni: la prova ne uscivano come una domanda a cui il desk
+ * rispondeva al telefono, e il livello tecnico non lo chiedeva nessuno.
+ *
+ * Cinque schermate, e l'ordine è la cosa che conta:
+ *
+ *   categoria → requisiti ─┬ tutti sì → date → dati → prenotato
+ *                          └ un no    → scuola nuoto (e finisce qui)
+ *
+ * **Il questionario viene prima del calendario**, e non è un dettaglio di
+ * navigazione: chi non è al livello non deve arrivare a scegliere un giorno.
+ * Vedere le date e poi sentirsi dire «non sei idoneo» è la sequenza che fa
+ * arrabbiare; sentirselo dire prima, con l'indicazione del corso giusto, è
+ * un'informazione utile.
+ *
+ * Il sito non parla mai con PerfectGym né con Supabase: manda una POST al
+ * pannello per occupare il posto e una a n8n per le email e il lead. Nessuna
+ * chiave nel browser, nessuna route server, il sito resta statico.
+ */
+import { CONSENSO_PRIVACY, CONSENSO_MARKETING } from '../data/contatto';
+import { COSA_PORTARE, SCUOLA_NUOTO } from '../data/proveNuoto';
+import CampoTelefono from './CampoTelefono.astro';
+---
+
+<div class="pn" id="prova-nuoto-modal" aria-hidden="true">
+  <div class="pn__backdrop" data-pn-close></div>
+  <div class="pn__panel" role="dialog" aria-modal="true" aria-labelledby="pn-titolo-corrente">
+    <button type="button" class="pn__close" data-pn-close aria-label="Chiudi">×</button>
+
+    {/* ── 1. La categoria ─────────────────────────────────────────────────
+
+        Le schede portano annate e orario, che sono le due cose con cui un
+        genitore riconosce il corso di suo figlio. Il nome da solo non basta:
+        «Propaganda» e «Nuoto Agonistico» non dicono un'età. */}
+    <section class="pn__step" id="pn-step-categoria">
+      <span class="pn__eyebrow">Prova di inserimento</span>
+      <h3 class="pn__title" id="pn-titolo-corrente" tabindex="-1" data-pn-fuoco>
+        Per quale corso?
+      </h3>
+      <p class="pn__lead">
+        La prova è una valutazione in acqua, dentro un allenamento vero. Scegli il gruppo: gli anni di nascita
+        aiutano a riconoscerlo.
+      </p>
+
+      <div class="pn__scelte" data-pn-categorie role="group" aria-label="Scegli il corso"></div>
+
+      <p class="pn__errore" data-pn-errore hidden></p>
+    </section>
+
+    {/* ── 2. I requisiti, una domanda per schermata ────────────────────────
+
+        Una alla volta e non un elenco di caselle. Un elenco si spunta tutto
+        per arrivare in fondo — è quello che succede a ogni «dichiaro di
+        aver letto» — mentre una domanda sola, con due pulsanti larghi, si
+        legge davvero. Ed è l'unica cosa che rende utile questo modulo. */}
+    <section class="pn__step" id="pn-step-requisiti" hidden>
+      <span class="pn__eyebrow" data-pn-passo></span>
+      <h3 class="pn__title" tabindex="-1" data-pn-fuoco data-pn-domanda></h3>
+      <p class="pn__lead" data-pn-aiuto hidden></p>
+
+      <div class="pn__azioni pn__azioni--sino">
+        <button type="button" class="btn btn-primary pn__btn" data-pn-risposta="si">Sì</button>
+        <button type="button" class="btn btn-outline-dark pn__btn" data-pn-risposta="no">No / non lo so</button>
+      </div>
+
+      <p class="pn__nota">
+        Rispondi con sincerità: la prova si fa insieme al gruppo, e un livello diverso da quello del gruppo non
+        si vede in acqua per venti minuti — si vede subito.
+      </p>
+
+      <button type="button" class="pn__link pn__indietro" data-pn-indietro-requisito>← Domanda precedente</button>
+    </section>
+
+    {/* ── 3. Non è il momento della prova ──────────────────────────────────
+
+        La schermata che giustifica tutto il modulo. Non dice «no»: dice
+        qual è il percorso e come si accede, perché chi arriva qui ha appena
+        scoperto di cercare un corso di nuoto. */}
+    <section class="pn__step" id="pn-step-stop" hidden>
+      <span class="pn__eyebrow">Prima la scuola nuoto</span>
+      <h3 class="pn__title" tabindex="-1" data-pn-fuoco>Meglio partire dal corso.</h3>
+      <p class="pn__lead" data-pn-stop-perche></p>
+      <p class="pn__lead">
+        Per entrare in questo gruppo servono tutte le prove tecniche del livello richiesto: è il livello a cui il
+        gruppo si allena già, e chi parte più indietro passa la stagione a rincorrere invece di divertirsi.
+      </p>
+      <p class="pn__lead">
+        La Scuola Nuoto Bambini è esattamente il posto dove si arriva a quel livello — gruppi per età, istruttore
+        assegnato e progressione consultabile — e da lì il passaggio all’agonistica è la cosa che facciamo ogni
+        anno.
+      </p>
+
+      <div class="pn__uscite">
+        <a class="btn btn-primary pn__btn" href={SCUOLA_NUOTO.iscrizione}>Come iscriversi ai corsi</a>
+        <a class="btn btn-outline-dark pn__btn" href={SCUOLA_NUOTO.pagina}>Guarda la Scuola Nuoto</a>
+      </div>
+
+      <p class="pn__nota">
+        Ci siamo sbagliati? Se le prove tecniche le sa fare tutte,
+        <button type="button" class="pn__link" data-pn-riprova>torna alle domande</button>.
+      </p>
+    </section>
+
+    {/* ── 4. Il giorno ─────────────────────────────────────────────────────
+
+        Un giorno porta un orario solo — la prova si fa dentro l'allenamento
+        del gruppo — quindi qui non c'è la griglia degli orari degli
+        appuntamenti telefonici: si scelgono le pillole dei giorni, con
+        quanti posti restano scritti sopra. */}
+    <section class="pn__step" id="pn-step-quando" hidden>
+      <span class="pn__eyebrow">Quando</span>
+      <h3 class="pn__title" tabindex="-1" data-pn-fuoco>Scegli il giorno.</h3>
+      <p class="pn__lead" data-pn-quando-lead></p>
+
+      <div class="pn__giorni" data-pn-giorni role="group" aria-label="Scegli il giorno"></div>
+
+      {/* Il certificato medico si nomina **qui**, dove si sta scegliendo la
+          data, e non solo nella conferma: chi crede di aver bisogno del
+          certificato rimanda la prenotazione al giorno in cui l'avrà — cioè di
+          settimane, su una finestra che dura tre settimane e mezzo. La frase la
+          scrive il client, perché il tipo di certificato dipende dal corso. */}
+      <p class="pn__nota" data-pn-certificato></p>
+
+      <p class="pn__scelta" data-pn-scelta hidden></p>
+      <p class="pn__errore" data-pn-errore hidden></p>
+
+      <div class="pn__azioni">
+        <button type="button" class="btn btn-outline-dark pn__btn-secondario" data-pn-indietro="categoria">
+          Indietro
+        </button>
+        <button type="button" class="btn btn-primary pn__btn" data-pn-avanti-quando disabled>
+          <span class="pn__btn-testo">Continua</span>
+        </button>
+      </div>
+    </section>
+
+    {/* ── 5. L'email, e cosa PerfectGym sa già ─────────────────────────────
+
+        Lo stesso passo della chat e del totem, con lo stesso scopo: se
+        l'indirizzo è già a sistema, nome, cognome e cellulare li abbiamo e
+        richiederli è una domanda a cui la persona ha già risposto. Sta **dopo**
+        il giorno e non prima, al contrario dell'appuntamento telefonico, perché
+        qui la cosa contesa è il posto in vasca: prima si mette al sicuro
+        quello. */}
+    <section class="pn__step" id="pn-step-email" hidden>
+      <span class="pn__eyebrow">Ci siamo</span>
+      <h3 class="pn__title" tabindex="-1" data-pn-fuoco>La tua email.</h3>
+      <p class="pn__lead">
+        Se ci hai già scritto, o se sei già socio, saltiamo i convenevoli: i tuoi dati li abbiamo.
+      </p>
+
+      <label class="pn__label" for="pn-email">La tua email</label>
+      <input
+        class="pn__input"
+        id="pn-email"
+        data-email-nota
+        type="email"
+        inputmode="email"
+        autocomplete="email"
+        placeholder="mario.rossi@email.it"
+      />
+
+      <p class="pn__errore" data-pn-errore hidden></p>
+
+      <div class="pn__azioni">
+        <button type="button" class="btn btn-outline-dark pn__btn-secondario" data-pn-indietro="quando">
+          Indietro
+        </button>
+        <button type="button" class="btn btn-primary pn__btn" data-pn-verifica>
+          <span class="pn__btn-testo">Continua</span>
+          <span class="pn__spinner" aria-hidden="true"></span>
+        </button>
+      </div>
+    </section>
+
+    {/* ── 6. I dati ────────────────────────────────────────────────────────
+
+        Due blocchi separati e non un modulo unico: chi fa la prova è il
+        ragazzo, chi lascia l'email è il genitore, e mescolarli è il modo più
+        rapido per ritrovarsi in elenco un undicenne con il cellulare della
+        madre come nome. */}
+    <section class="pn__step" id="pn-step-dati" hidden>
+      <span class="pn__eyebrow">Ultimo passo</span>
+      <h3 class="pn__title" tabindex="-1" data-pn-fuoco>Chi viene in vasca?</h3>
+      <p class="pn__lead">Il nome di chi fa la prova, e il tuo per la conferma.</p>
+
+      <div class="pn__coppia">
+        <div>
+          <label class="pn__label" for="pn-atleta-nome">Nome di chi fa la prova</label>
+          <input class="pn__input" id="pn-atleta-nome" type="text" autocomplete="off" />
+        </div>
+        <div>
+          <label class="pn__label" for="pn-atleta-cognome">Cognome</label>
+          <input class="pn__input" id="pn-atleta-cognome" type="text" autocomplete="off" />
+        </div>
+      </div>
+
+      {/* Obbligatoria, e non per completezza: e' con la data di nascita che
+          l'anagrafica del minore nasce su PerfectGym (`AddGuestMember` vuole
+          `birthDate`), e senza di lei il nucleo familiare non si puo' comporre. */}
+      <label class="pn__label" for="pn-atleta-nascita">Data di nascita</label>
+      <input class="pn__input" id="pn-atleta-nascita" type="date" />
+
+      <hr class="pn__riga" />
+
+      {/* Il blocco del genitore. Quando la verifica dell'email lo ha
+          riconosciuto, i campi arrivano compilati e restano modificabili: un
+          dato che viene da un gestionale va potuto guardare prima di
+          confermarlo. */}
+      <p class="pn__nota pn__nota--alta" data-pn-riconosciuto hidden></p>
+
+      <div class="pn__coppia">
+        <div>
+          <label class="pn__label" for="pn-nome">Il tuo nome</label>
+          <input class="pn__input" id="pn-nome" type="text" autocomplete="given-name" />
+        </div>
+        <div>
+          <label class="pn__label" for="pn-cognome">Il tuo cognome</label>
+          <input class="pn__input" id="pn-cognome" type="text" autocomplete="family-name" />
+        </div>
+      </div>
+
+      <label class="pn__label" for="pn-cellulare">Il tuo cellulare</label>
+      <CampoTelefono id="pn-cellulare" classe="pn__input" />
+
+      {/* La tua data di nascita: la chiediamo **solo** se la tua scheda va
+          creata adesso. Chi e' gia' a sistema porta il suo `memberId`, e in quel
+          caso si crea soltanto il figlio sotto di lui — quella data non la
+          legge nessuno, e chiederla sarebbe un campo in piu' per niente. */}
+      <div data-pn-genitore-nascita hidden>
+        <label class="pn__label" for="pn-genitore-nascita">La tua data di nascita</label>
+        <input class="pn__input" id="pn-genitore-nascita" type="date" />
+      </div>
+
+      <label class="pn__consenso">
+        <input type="checkbox" id="pn-privacy" />
+        <span>{CONSENSO_PRIVACY} <a href="/privacy">Informativa privacy</a>.</span>
+      </label>
+      <label class="pn__consenso">
+        <input type="checkbox" id="pn-marketing" />
+        <span>{CONSENSO_MARKETING}</span>
+      </label>
+
+      <p class="pn__errore" data-pn-errore hidden></p>
+
+      <div class="pn__azioni">
+        <button type="button" class="btn btn-outline-dark pn__btn-secondario" data-pn-indietro="quando">Indietro</button>
+        <button type="button" class="btn btn-primary pn__btn" data-pn-invia>
+          <span class="pn__btn-testo">Prenota la prova</span>
+          <span class="pn__spinner" aria-hidden="true"></span>
+        </button>
+      </div>
+    </section>
+
+    {/* ── 7. Prenotata ─────────────────────────────────────────────────────*/}
+    <section class="pn__step" id="pn-step-esito" hidden>
+      <span class="pn__eyebrow">Prenotata</span>
+      <h3 class="pn__title" tabindex="-1" data-pn-fuoco>Ci vediamo in vasca.</h3>
+      <p class="pn__scelta pn__scelta--grande" data-pn-riepilogo></p>
+      <p class="pn__lead">Ti abbiamo mandato la conferma per email, con tutto quello che serve.</p>
+
+      <ul class="pn__portare">
+        {COSA_PORTARE.map((riga) => <li>{riga}</li>)}
+      </ul>
+
+      <p class="pn__nota pn__nota--alta" data-pn-certificato></p>
+
+      <button type="button" class="btn btn-primary pn__btn" data-pn-close>Chiudi</button>
+    </section>
+  </div>
+</div>
+
+<style>
+  /* Il guscio: stesse misure e stessi tempi degli altri modal del sito. */
+  .pn {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+  }
+  .pn.open {
+    display: block;
+  }
+  .pn__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgb(20 14 10 / 0.55);
+    backdrop-filter: blur(2px);
+  }
+  .pn__panel {
+    position: relative;
+    margin: auto;
+    inset: 0;
+    max-width: 34rem;
+    width: calc(100% - 2rem);
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+    background: var(--color-cream, #fdf8f3);
+    border-radius: var(--radius, 20px);
+    padding: 2rem 1.75rem 1.75rem;
+    box-shadow: 0 24px 60px rgb(20 14 10 / 0.28);
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .pn__close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.9rem;
+    border: none;
+    background: none;
+    font-size: 1.75rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--color-dark, #241a14);
+    opacity: 0.5;
+  }
+  .pn__close:hover {
+    opacity: 1;
+  }
+
+  .pn__eyebrow {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--color-primary, #ff5701);
+    margin-bottom: 0.6rem;
+    min-height: 1em;
+  }
+  .pn__title {
+    margin: 0 0 0.4rem;
+    font-size: clamp(1.4rem, 4vw, 1.8rem);
+    line-height: 1.15;
+  }
+  .pn__title:focus {
+    outline: none;
+  }
+  .pn__lead {
+    margin: 0 0 1.1rem;
+    opacity: 0.75;
+    font-size: 0.95rem;
+  }
+  /* La riga che smorza: sta sotto i due pulsanti Sì/No e non sopra, perché
+     prima si legge la domanda e poi il perché conviene rispondere sul serio. */
+  .pn__nota {
+    margin: 1.1rem 0 0;
+    font-size: 0.82rem;
+    opacity: 0.6;
+    line-height: 1.45;
+  }
+  .pn__label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin: 0 0 0.35rem;
+  }
+  .pn__coppia {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 0.75rem;
+  }
+  /* Il taglio fra il ragazzo e il genitore: due blocchi nello stesso passo si
+     confondono, e un nome scritto nel riquadro sbagliato è una riga d'elenco
+     con l'atleta chiamato come la madre. */
+  .pn__riga {
+    border: none;
+    border-top: 1px solid rgb(36 26 20 / 0.12);
+    margin: 0.4rem 0 1.1rem;
+  }
+
+  .pn__consenso {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    margin-bottom: 0.7rem;
+    opacity: 0.85;
+  }
+  .pn__consenso input {
+    margin-top: 0.15rem;
+    flex: none;
+    width: 1.05rem;
+    height: 1.05rem;
+    accent-color: var(--color-primary, #ff5701);
+  }
+
+  .pn__errore {
+    color: #c0392b;
+    font-size: 0.85rem;
+    margin: 0 0 0.9rem;
+  }
+
+  .pn__btn {
+    width: 100%;
+    position: relative;
+  }
+  .pn__azioni {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+  }
+  .pn__azioni .pn__btn {
+    flex: 1 1 auto;
+  }
+  /* `btn-outline-dark` e non `btn-outline`, su ogni pulsante secondario di
+     questo pannello. `.btn-outline` è bianco su trasparente: è la variante
+     delle hero, dove il fondo è una foto scura. Qui il fondo è il crema del
+     pannello, e bianco su crema è un pulsante che non si legge — «Indietro» e
+     «Guarda la Scuola Nuoto» erano fantasmi. `btn-outline-dark` è la stessa
+     forma con il bordo e il testo scuri, ed è quella che l'Header usa già sui
+     suoi fondi chiari. */
+
+  /* Sì e No larghi uguali: uno dei due più grande dell'altro è un consiglio su
+     cosa rispondere, e qui la risposta comoda non deve essere anche la più
+     facile da premere. */
+  .pn__azioni--sino {
+    margin-top: 1.4rem;
+  }
+  .pn__azioni--sino .pn__btn {
+    flex: 1 1 0;
+  }
+  .pn__btn-secondario {
+    flex: 0 0 auto;
+  }
+  .pn__uscite {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-top: 1.4rem;
+  }
+  /* I due comandi scritti dentro una frase — «torna alle domande», «domanda
+     precedente». Sono pulsanti veri perché fanno qualcosa, non navigano, ma
+     disegnati come un link: un terzo pulsante pieno accanto alle due uscite
+     della scuola nuoto avrebbe pesato come loro, e questo è un ripensamento,
+     non un'alternativa. */
+  .pn__link {
+    border: none;
+    background: none;
+    padding: 0;
+    font: inherit;
+    color: var(--color-primary, #ff5701);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+    cursor: pointer;
+  }
+  .pn__link:hover {
+    text-decoration-thickness: 2px;
+  }
+  .pn__indietro {
+    display: inline-block;
+    margin-top: 1.2rem;
+    font-size: 0.85rem;
+    opacity: 0.7;
+  }
+  /* La riga «ti abbiamo riconosciuto» sta sopra i campi che ha compilato, non
+     sotto: spiega perche' sono gia' pieni, e una spiegazione che arriva dopo
+     e' una spiegazione letta troppo tardi. */
+  .pn__nota--alta {
+    margin: 0 0 0.9rem;
+  }
+  .pn__portare {
+    margin: 0 0 1.4rem;
+    padding-left: 1.2rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  .pn__portare li + li {
+    margin-top: 0.4rem;
+  }
+  .pn__spinner {
+    display: none;
+  }
+  .pn__btn.is-attesa .pn__btn-testo {
+    opacity: 0.35;
+  }
+  .pn__btn.is-attesa .pn__spinner {
+    display: block;
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 1.05rem;
+    height: 1.05rem;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: pn-gira 0.7s linear infinite;
+  }
+  @keyframes pn-gira {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (max-width: 30rem) {
+    .pn__panel {
+      padding: 1.6rem 1.1rem 1.25rem;
+      top: 0;
+      transform: none;
+      margin-top: 1rem;
+      max-height: calc(100dvh - 2rem);
+    }
+    .pn__coppia {
+      grid-template-columns: 1fr;
+    }
+    .pn__azioni {
+      flex-direction: column-reverse;
+    }
+    .pn__azioni--sino {
+      flex-direction: row;
+    }
+    .pn__azioni .btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<!-- Gli stili di ciò che nasce da JavaScript: le schede delle categorie e le
+     pillole dei giorni. Devono essere globali per la stessa ragione spiegata
+     in AppuntamentoModal.astro — Astro restringe le regole scoped agli
+     elementi del template, che portano un `data-astro-cid-…`, e questi non ce
+     l'hanno perché il browser li crea dopo. Il prefisso `pn__` è proprio di
+     questo pannello, quindi globale non collide con niente. -->
+<style is:global>
+  .pn__input {
+    width: 100%;
+    border: 1px solid rgb(36 26 20 / 0.18);
+    border-radius: 12px;
+    background: #fff;
+    padding: 0.7rem 0.85rem;
+    font: inherit;
+    font-size: 1rem; /* 16px: sotto questa misura iOS zooma al fuoco */
+    margin-bottom: 0.9rem;
+  }
+  .pn__input:focus {
+    outline: none;
+    border-color: var(--color-primary, #ff5701);
+    box-shadow: 0 0 0 3px rgb(255 87 1 / 0.15);
+  }
+  .pn__input--errore {
+    border-color: #c0392b;
+  }
+  .pn .tel {
+    align-items: stretch;
+    margin-bottom: 0.9rem;
+  }
+  .pn .tel .pn__input {
+    margin-bottom: 0;
+  }
+
+  /* ── Le schede delle categorie ─────────────────────────────────────────
+     In colonna e non a griglia: ogni scheda porta tre righe di testo — nome,
+     annate, orario — e due colonne le stringerebbero fino a mandare a capo
+     l'orario, che è la riga con cui il genitore riconosce il corso. */
+  .pn__scelte {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+  .pn__scelta-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgb(36 26 20 / 0.16);
+    border-radius: 14px;
+    background: #fff;
+    font: inherit;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .pn__scelta-btn:hover {
+    border-color: var(--color-primary, #ff5701);
+    box-shadow: 0 0 0 3px rgb(255 87 1 / 0.1);
+  }
+  .pn__scelta-nome {
+    display: block;
+    font-weight: 700;
+  }
+  .pn__scelta-annate {
+    display: block;
+    font-size: 0.85rem;
+    opacity: 0.7;
+    margin-top: 0.1rem;
+  }
+  .pn__scelta-quando {
+    display: block;
+    font-size: 0.8rem;
+    opacity: 0.6;
+    margin-top: 0.25rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── I giorni ──────────────────────────────────────────────────────────
+     Una fila che scorre in orizzontale, come per l'appuntamento telefonico.
+     Qui la pastiglia in basso non conta gli orari — ce n'è uno solo — ma i
+     posti che restano, che è il dato per cui si sceglie un giorno invece di
+     rimandare. */
+  .pn__giorni {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+  .pn__giorni::-webkit-scrollbar {
+    height: 4px;
+  }
+  .pn__giorni::-webkit-scrollbar-thumb {
+    background: rgb(36 26 20 / 0.2);
+    border-radius: 999px;
+  }
+  .pn__giorno {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+    min-width: 4.8rem;
+    padding: 0.6rem 0.7rem;
+    border: 1px solid rgb(36 26 20 / 0.16);
+    border-radius: 14px;
+    background: #fff;
+    cursor: pointer;
+    font: inherit;
+    line-height: 1.2;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .pn__giorno:hover {
+    border-color: var(--color-primary, #ff5701);
+  }
+  .pn__giorno.is-scelto {
+    background: var(--color-primary, #ff5701);
+    border-color: var(--color-primary, #ff5701);
+    color: #fff;
+  }
+  .pn__giorno-nome {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
+  }
+  .pn__giorno-num {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+  .pn__giorno-mese {
+    font-size: 0.64rem;
+    opacity: 0.6;
+    text-transform: lowercase;
+  }
+  .pn__giorno-posti {
+    margin-top: 0.15rem;
+    font-size: 0.62rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0.15rem 0.4rem;
+    border-radius: 999px;
+    background: rgb(36 26 20 / 0.08);
+    white-space: nowrap;
+  }
+  .pn__giorno.is-scelto .pn__giorno-posti {
+    background: rgb(255 255 255 / 0.25);
+  }
+
+  .pn__attesa,
+  .pn__invito {
+    margin: 0;
+    padding: 1.1rem 0;
+    opacity: 0.6;
+    font-size: 0.9rem;
+  }
+  .pn__scelta {
+    margin: 0.6rem 0 0.9rem;
+    font-weight: 700;
+  }
+  .pn__scelta--grande {
+    font-size: 1.15rem;
+    color: var(--color-primary, #ff5701);
+    margin-top: 0.2rem;
+  }
+</style>
+
+<script>
+  import { initProvaNuotoForm } from '../lib/provaNuotoForm.client.js';
+
+  const modal = document.getElementById('prova-nuoto-modal');
+  if (modal) {
+    const form = initProvaNuotoForm(modal, { prefix: 'pn' });
+    let ultimoComando: HTMLElement | null = null;
+
+    function apri(comando: HTMLElement) {
+      ultimoComando = comando;
+      modal!.classList.add('open');
+      modal!.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('amodal-locked');
+      form.apri({
+        pagina: location.pathname,
+        // L'attività di provenienza decide quali categorie offrire: dalla
+        // pagina della pallanuoto non si prenota una prova di nuoto
+        // agonistico, ed è una domanda a cui chi arriva da lì ha già risposto.
+        attivita: comando.dataset.ctaActivity || '',
+        origine: comando.dataset.ctaSource || '',
+        cta: (comando.textContent || '').trim().slice(0, 80),
+      });
+    }
+
+    function chiudi() {
+      modal!.classList.remove('open');
+      modal!.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('amodal-locked');
+      // Si svuota anche in chiusura: il sito gira sul totem all'ingresso, e i
+      // dati di un visitatore non devono restare visibili al successivo.
+      form.chiudi();
+      if (ultimoComando) ultimoComando.focus();
+    }
+
+    // Delega sul documento, come per gli altri modal. Il selettore è più
+    // stretto di quello di ContattaciModal — `resolve` **con** l'intento della
+    // prova di inserimento — e quello di là lo esclude: sono gli stessi
+    // pulsanti, e senza la distinzione si aprirebbero due pannelli.
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement | null;
+      const cta = target?.closest<HTMLElement>('[data-cta-intent="insertion_trial"]');
+      if (!cta) return;
+      e.preventDefault();
+      apri(cta);
+    });
+
+    modal.querySelectorAll('[data-pn-close]').forEach((el) => el.addEventListener('click', chiudi));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('open')) chiudi();
+    });
+  }
+</script>

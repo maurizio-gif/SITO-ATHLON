@@ -3962,6 +3962,114 @@ finire sulla schermata del team, uno alto deve saltarla e mostrare il pulsante
 di Google, e l'invio senza nemmeno un voto deve fermarsi. E su n8n,
 `versionId == activeVersionId`: `update_workflow` non pubblica.
 
+## La prova di inserimento chiede prima e prenota dopo
+
+`ProvaNuotoModal.astro` + `lib/provaNuotoForm.client.js` + `data/proveNuoto.ts`.
+Lo aprono i pulsanti «Richiedi la prova di inserimento» di `/pallanuoto` e
+`/nuoto-agonistico`, che `PaginaJunior` già marcava con
+`data-cta-intent="insertion_trial"`.
+
+Sei schermate, e **l'ordine è la cosa che conta**:
+
+```
+categoria → requisiti ─┬ tutti sì → giorno → email → dati → prenotata
+                       └ un no    → scuola nuoto, e finisce qui
+```
+
+Prima quegli stessi pulsanti aprivano `ContattaciModal`, cioè un modulo di
+richiesta informazioni: la prova ne usciva come una domanda a cui il desk
+rispondeva al telefono, e **il livello tecnico non lo chiedeva nessuno**. Il
+caso che costava era chi si presentava a una prova agonistica senza saper
+nuotare: non è colpa di nessuno, è una domanda che nessuno aveva fatto.
+
+Adesso la fa il modulo, e la fa **una alla volta**. Non un elenco di caselle da
+spuntare: un elenco si spunta tutto per arrivare in fondo — è quello che
+succede a ogni «dichiaro di aver letto» — mentre una domanda sola, con due
+pulsanti larghi e uguali, si legge davvero. Sì e No hanno la stessa dimensione
+di proposito: uno più grande dell'altro è un consiglio su cosa rispondere.
+
+**Le domande non stanno scritte nel modulo: si leggono dal livello del corso.**
+`categoriaDa()` prende `livello.voci` da `data/junior.ts` — le stesse voci che
+la scheda stampa come «Livello minimo richiesto B2 · Dorso, Stile libero, Gambe
+rana» — e `FRASI` dice soltanto *come si chiede* ogni voce, perché a una sigla un
+genitore non può rispondere.
+
+È così per un errore, e vale ricordarlo: la prima versione ricopiava l'elenco a
+mano, e nel ricopiarlo aveva aggiunto tre prove che il club non chiede da
+nessuna parte — le virate, i venticinque metri di fila, l'acqua alta. **Un
+questionario che filtra le persone non può contenere un requisito che la pagina
+non dichiara**: chi si vede rifiutare la prova non lo troverebbe scritto in
+nessun posto, e chi la ottiene avrebbe dichiarato cose che nessuno gli chiederà.
+Adesso una voce nuova senza frase **non compila**, che è il modo giusto di
+accorgersene.
+
+Un caso merita la sua riga: `Stile libero bilaterale` (B3) nomina la
+respirazione bilaterale **nella domanda** e non solo nell'aiuto. È l'unica cosa
+che lo distingue dallo `Stile libero` del B2, e «sa nuotare a stile libero?»
+avrebbe raccolto un sì anche da chi respira sempre dallo stesso lato.
+
+Gli **id** devono combaciare con quelli in `lib/proveNuoto.ts` del pannello:
+sono la chiave con cui la rotta verifica che la prenotazione arrivi con tutti i
+requisiti dichiarati. Li genera `idDa()` dalla voce, quindi cambiano solo se
+cambia la voce sulla scheda — e in quel caso vanno cambiati anche di là,
+altrimenti ogni invio torna un 422.
+
+**Un solo «no» chiude il ramo**, e la schermata che si apre non dice «no»: dice
+qual è il percorso — la Scuola Nuoto Bambini — e nomina *la prova che manca*,
+non «non hai i requisiti». Un genitore che legge «riesce a nuotare 25 metri di
+fila?» sa cosa deve accadere prima di riprovare; da un giudizio generico non sa
+niente. Le due uscite sono l'articolo del Wiki sull'iscrizione (come si fa) e la
+pagina del corso (cos'è), più «torna alle domande» per il caso vero di chi ha
+capito male una parola da piscina.
+
+**Il questionario sta prima del calendario.** Vedere le date e poi sentirsi
+dire «non sei idoneo» è la sequenza che fa arrabbiare; sentirselo dire prima,
+con l'indicazione del corso giusto, è un'informazione utile.
+
+Il giorno porta **un orario solo** — la prova si fa dentro l'allenamento del
+gruppo — quindi non c'è la griglia degli orari di `AppuntamentoModal`: solo le
+pillole dei giorni, con quanti posti restano scritti sopra. «Ultimo posto» è
+l'informazione che fa scegliere quel giorno invece di rimandare.
+
+`ContattaciModal` esclude questo intento a mano (`if (cta.dataset.ctaIntent ===
+'insertion_trial') return`): sono gli stessi pulsanti `data-cta="resolve"`, e
+senza quella riga si aprirebbero due pannelli sullo stesso clic.
+
+**L'email si verifica, e il nucleo familiare lo compone la chat.** Il passo
+`email` è quello della chat e del totem: `WEBHOOK_VERIFICA` dice se PerfectGym
+ha già quell'indirizzo, `anagraficaNota` e `servonoISuoiDati` — le stesse
+funzioni, non una copia — decidono se i campi del genitore vanno chiesti o
+soltanto riempiti. Riempiti restano visibili e modificabili: un dato che arriva
+da un gestionale va potuto guardare prima di confermarlo.
+
+Sta **dopo** il giorno e non prima, al contrario dell'appuntamento telefonico,
+perché qui la cosa contesa è il posto in vasca: prima si mette al sicuro quello.
+
+Due date di nascita, con due regole diverse, e le impone il workflow a valle.
+Quella del **minore** sempre: `Members/AddGuestMember` vuole `birthDate`, e
+senza non si può creare la sua scheda. Quella del **genitore** solo quando la
+verifica non ha restituito un `memberId`, cioè solo quando la sua scheda va
+creata adesso — con un `memberId` si crea unicamente il figlio, sotto di lui, e
+quel campo non lo legge nessuno. Il modulo lo mostra di conseguenza.
+
+Poi l'invio, in tre chiamate e in quest'ordine:
+
+1. `POST crm.athlonroma.it/api/prove-nuoto` — occupa il posto, che è la cosa
+   contesa e che sono in due a potersi prendere;
+2. `POST webhook/chat-athlon-dati` — **lo stesso webhook della chat**, con
+   `ambito: 'junior'`. Dentro c'è già tutto: crea il genitore se non c'è, poi
+   `GET FAMIGLIA` legge i `familyChildren` del suo `memberId`, `Confronta figli`
+   cerca il minore per nome e cognome — senza maiuscole né accenti, il criterio
+   con cui un genitore direbbe «è lui» — e lo aggiunge al nucleo con
+   `parentMemberId` solo se non lo trova. Riscriverlo qui avrebbe voluto dire una
+   seconda implementazione della stessa regola contro lo stesso gestionale;
+3. `POST webhook/athlon-prova-nuoto` — le tre email.
+
+Se la 2 o la 3 falliscono si prosegue: il posto è occupato e la riga nel
+pannello porta nome, cognome e telefono, quindi la prova si fa e il resto lo
+sistema il desk. All'inverso — la scheda creata e nessun posto — resterebbe una
+famiglia nuova su PerfectGym senza nessuna prova a cui presentarsi.
+
 ## Le pagine senza intestazione azzerano `--header-h`
 
 `global.css` tiene le ancore sotto l'header appiccicoso con
