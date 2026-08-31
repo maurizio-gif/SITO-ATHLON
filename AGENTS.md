@@ -1956,6 +1956,63 @@ nelle cento parole della regola 6 la singola va nel turno dopo. La prima è la
 nostra offerta, la seconda è la sua richiesta presa alla lettera, e nessuna
 delle due si perde. Mai la singola prima del Pass, mai al posto del piano.
 
+#### Chi esita non va mandato a cercare altrove: l'esitazione apre il cancello della prova
+
+Il 31 agosto, a una persona interessata all'Hydrobike che si allenerebbe la
+mattina presto e abita sulla Cassia, la chat ha chiesto *«Ti va di provare, o
+preferisci qualcosa più vicino a casa?»* — e quando lei ha risposto «faccio una
+ricerca più vicino a me», l'ha salutata con **«Buona ricerca!»**. L'alternativa
+fuori dal club l'ha offerta l'assistente, e poi le ha tenuto la porta.
+
+**Ma il modello non aveva molte scelte**, e questa è la parte che conta: in
+quella conversazione la persona non aveva mai nominato un prezzo, quindi la
+quarta condizione di `Vaglio Guest Pass` — `CHIEDE_LISTINO` — era falsa, la voce
+del Pass era **uscita dal contesto**, e proporre una prova gli era vietato dalla
+regola fissa che governa quel cancello. Una regola nel prompt che dicesse
+«quando esita proponi la prova» sarebbe entrata in contraddizione con quella:
+gli avrebbe chiesto di offrire una cosa che non ha davanti.
+
+Quindi la correzione sta nei due posti insieme, e l'ordine è quello:
+
+- **Il cancello.** La quarta condizione diventa «ha chiesto di prezzi
+  **oppure** sta esitando», con `ESITA` — una regex in quattro famiglie: rimanda
+  la decisione, saluta o cerca altrove, la logistica non torna, dubita di
+  riuscirci. E la soglia degli scambi scende da tre a **due** quando esita:
+  chi dice «faccio una ricerca» al secondo messaggio se ne va adesso, e
+  aspettare il terzo vuol dire che il terzo non arriva.
+- **La regola fissa**, che dice cosa farne: mai suggerire di cercare altrove
+  («buona ricerca», «preferisci qualcosa più vicino a casa» e le altre forme
+  sono vietate per nome), l'obiezione si riconosce in mezza riga **senza
+  allargarla**, e poi si propone la prova. Con la via di ripiego per quando la
+  voce non c'è — la lezione singola, la visita, il team — perché il divieto di
+  inventare il Pass resta intero.
+
+Tre cose da sapere prima di toccarla.
+
+**L'idoneità la decide la presenza della voce, non il modello**, ed è la
+richiesta del club presa alla lettera: «proponi sempre la prova, verificando che
+sia idoneo». Il verificare non è un giudizio in chat — sono le condizioni (1) e
+(2) del vaglio, l'attività adulti e lo stato PerfectGym. Un socio che esita e un
+genitore che esita **non** vedono comparire la voce, e per loro la prova non
+esiste: provato sui nove casi, il ramo junior perde anche le altre voci che
+raccontano la prova.
+
+**Il verso in cui sbaglia `ESITA` è dichiarato.** Un falso positivo lascia la
+voce nel contesto e a proporla o no ci pensa il prompt; un falso negativo è una
+persona che se ne va senza che le sia stato offerto niente. Da qui anche cosa
+**non** va aggiunto alla regex: le sole indicazioni di luogo. «Sono a Roma nord»
+dice dove sta, non che stia titubando — ed è uno dei casi di prova.
+
+**Le condizioni del vaglio sono divise in due, e allargare la seconda metà non
+tocca il sito.** (1) e (2) dicono *chi può avere il Pass* e vivono anche in
+`puoProvare()`; (3) e (4) dicono *quando proporlo* e stanno solo su n8n. Se un
+giorno si toccano le prime due, vanno cambiate in tutti e due i posti — o il
+modello offre una prova che nel browser non si attiva.
+
+Per verificare: `passPerEsitazione` nelle spie del vaglio dice quale metà della
+quarta condizione ha aperto il cancello. Se su traffico vero non si accende mai,
+la regex non riconosce l'italiano che scrivono le persone.
+
 #### Un cancello che ne chiude una e ne lascia un'altra non è un cancello
 
 Il 30 agosto, a un genitore che scriveva dalla pagina della Scuola Nuoto
