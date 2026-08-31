@@ -412,18 +412,31 @@ const accountBlocks = [
         {iscriviti.label}
       </a>
 
-      {/* Contattaci torna qui, e questa è la sua unica casa sul telefono: dalla
-          barra è uscito — là due comandi per «farsi rispondere» obbligavano uno
-          dei due a essere un'icona muta — e nel menu non c'era mai stato. Senza
-          questa riga, sul telefono si arrivava a chiedere qualcosa a una
-          persona solo scorrendo fino al footer.
+      {/* «Contattaci», e apre **l'assistente**: scelta del club.
 
-          Stesso peso di Iscriviti e non meno: sono due intenzioni diverse allo
-          stesso livello — chi ha deciso e chi vuole parlarne — e la scala la
-          fa il pieno di Prova Athlon sopra. */}
-      <a class="btn btn-outline-dark mobile-cta" href={contatta.href} {...contatta.attrs}>
-        {contatta.label}
-      </a>
+          L'etichetta resta quella — è l'intenzione che la persona ha, «voglio
+          parlare con qualcuno» — mentre la porta è la chat, che risponde
+          adesso invece di aprire un modulo che verrà letto più tardi. Chi ha
+          davvero bisogno di una persona la trova dentro la conversazione, con
+          «Contatta il team», che porta al desk anche il trascritto: il desk
+          legge la domanda già fatta, non un campo vuoto.
+
+          **Quindi `data-cta="assistente"` e non `"talk"`**, e i due non si
+          possono scambiare: `ContattaciModal` e `ChatModal` intercettano
+          ciascuno il proprio, e un comando con l'attributo dell'altro apre
+          l'altro pannello. Il modulo contatti resta raggiungibile dal footer di
+          ogni pagina e dai comandi `data-cta="talk"` sparsi nelle pagine.
+
+          Il ripiego dell'`href` cambia con lui: `?athlon-chat=1` è il parametro
+          che `ChatModal` legge al caricamento per aprirsi da sé, quindi anche
+          senza JavaScript, o con un click che apre una scheda nuova, si
+          atterra sulla chat e non su una sezione da cui cercarla. */}
+      <a
+        class="btn btn-outline-dark mobile-cta"
+        href="/club-life/?athlon-chat=1"
+        data-cta="assistente"
+        data-cta-source="menu-mobile"
+      >{contatta.label}</a>
 
       {/* In fondo e in corpo piccolo, come su `/link`: chi cerca lavoro lo cerca
           sapendo già di volerlo, e un pulsante pieno lo metterebbe in
