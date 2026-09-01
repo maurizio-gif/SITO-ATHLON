@@ -2550,6 +2550,56 @@ E nel `systemMessage` c'è la regola fissa che chiude il caso anche se la scheda
 dovesse tornare ambigua: **mai dire di disdire una lezione a cui vuole andare per
 liberare il limite.**
 
+### Un messaggio d'errore che la scheda non nomina è una diagnosi che il modello inventa
+
+«Mi sono iscritta ieri e mi esce una scritta in rosso, *your member is on
+financial debit*: che significa?» → *«quel messaggio non dovrebbe comparire se ti
+sei iscritta ieri. Potrebbe essere un errore di sincronizzazione fra l'app e il
+portale, oppure il metodo di pagamento non è stato elaborato correttamente.
+Scrivi al team.»*
+
+Tre cose sbagliate in una risposta. L'«errore di sincronizzazione fra l'app e il
+portale» **non esiste**: è stato inventato lì. «Non dovrebbe comparire se ti sei
+iscritta ieri» è **falso**, ed è anzi il caso più frequente — il primo pagamento
+non è andato a buon fine, cosa che con la carta capita quando manca
+l'autenticazione della banca. E soprattutto: quel messaggio ha una **soluzione
+che la persona può fare da sola in trenta secondi**, e invece è stata mandata a
+scrivere al desk e ad aspettare una risposta via email.
+
+**Il pezzo che mancava era una riga, e la scheda aveva già tutto il resto.**
+`generali/prenotazioni-problemi` elenca sette cause di blocco, la terza è
+«Pagamento insoluto» e portava già `Area riservata → Scadenze → Paga`. Ma era
+**l'unica delle sette senza la sezione «Messaggio che vedi»** — e la scheda apre
+dicendo *«trova il messaggio che vedi a schermo: sotto c'è il motivo e cosa
+fare»*. Cioè prometteva un indice per messaggio e su quella causa aveva un buco,
+per giunta sull'unico messaggio che il portale scrive **in inglese**.
+
+Da qui la regola, che è la sorella di quella sul turno fisso della scuola nuoto:
+là un dato assente diventava una regola generale che si allargava al posto suo,
+qui un messaggio non indicizzato diventa una diagnosi inventata. **Un errore che
+la persona cita è una chiave di ricerca prima che un sintomo**: se la knowledge
+base non lo contiene con le parole esatte con cui appare a schermo — maiuscole e
+lingua originale comprese — il modello non lo trova, e quello che non trova lo
+interpreta.
+
+Tre cose da sapere prima di toccarla.
+
+**I `tags` del frontmatter non entrano nel `kb.json`.** La voce di una scheda
+porta `title`, `description` e il corpo, e basta: un messaggio d'errore messo
+solo fra i tag serve alla ricerca dell'Help Desk sul sito e all'assistente non
+arriva. Va nel **corpo**, e conviene anche nella `description`, che è la prima
+riga della voce e quella che il modello legge scegliendo.
+
+**La procedura si scrive coi passi, non con le frecce.** `Area riservata →
+Scadenze → Paga` è una scorciatoia che presuppone di sapere già dove si guarda;
+quello che mancava a chi ha scritto era **quale** importo pagare, e la risposta è
+che sono in ordine di data e il primo in alto è il più vicino nel tempo. Tre
+righe numerate al posto di una freccia.
+
+**E si dice che si fa da soli.** «Non serve passare in segreteria» non è una
+cortesia: senza quella riga, una procedura che una persona può eseguire in
+autonomia si legge come l'ennesima cosa da chiedere a qualcuno.
+
 ### Le date non si calcolano, e una lezione di domani è dentro la finestra
 
 Nella stessa conversazione, primo messaggio: «non riesco a prenotare una lezione
