@@ -27,11 +27,43 @@ interface Props {
 const { prefix: p, titoloId } = Astro.props;
 ---
 
-  {/* ── 1. L'email ──────────────────────────────────────────────────── */}
-  <section class="ap__step" id={`${p}-step-email`}>
+  {/* ── 1. Quando ────────────────────────────────────────────────────
+
+      La prima schermata, sempre: gli orari sono pubblici, e farli aspettare
+      dietro un'email da digitare sarebbe un rallentamento per niente — vedi
+      la nota in testa a `appuntamentoForm.client.js`.
+
+      I giorni sono una fila scorrevole e gli orari una griglia divisa in
+      mattina e pomeriggio. Ventiquattro orari in colonna sarebbero un muro
+      di numeri: raggruppati e in griglia si leggono a colpo d'occhio, e su
+      un telefono la griglia si stringe da sola. */}
+  <section class="ap__step" id={`${p}-step-quando`}>
     <span class="ap__eyebrow">Prenota una chiamata</span>
-    <h3 class="ap__title" id={titoloId} tabindex="-1" data-ap-fuoco>Ti chiamiamo noi.</h3>
-    <p class="ap__claim">Scegli tu giorno e ora. Ti chiamiamo noi, senza attese al telefono.</p>
+    <h3 class="ap__title" id={titoloId} tabindex="-1" data-ap-fuoco>Quando ti chiamiamo?</h3>
+    <p class="ap__lead">
+      Scegli tu giorno e ora, nei prossimi sette giorni. Ti chiamiamo noi, senza attese al telefono.
+    </p>
+
+    <div class="ap__giorni" data-ap-giorni role="group" aria-label="Scegli il giorno"></div>
+    <div class="ap__orari-blocco" data-ap-orari></div>
+
+    <p class="ap__scelta" data-ap-scelta hidden></p>
+    <p class="ap__errore" data-ap-errore hidden></p>
+
+    <div class="ap__azioni">
+      <button type="button" class="btn btn-primary ap__btn" data-ap-avanti-quando disabled>
+        <span class="ap__btn-testo">Continua</span>
+      </button>
+    </div>
+  </section>
+
+  {/* ── 2. L'email, solo per chi non l'ha già lasciata ─────────────────
+
+      Non è più il primo passo: si vede solo se, scelto l'orario, non
+      conosciamo ancora chi è — vedi `proseguiOltreIdentita()`. */}
+  <section class="ap__step" id={`${p}-step-email`} hidden>
+    <span class="ap__eyebrow">Passo 1 di 2</span>
+    <h3 class="ap__title" tabindex="-1" data-ap-fuoco>Chi richiamiamo?</h3>
     <p class="ap__lead">Iniziamo dalla tua email: se ci hai già scritto, saltiamo i convenevoli.</p>
 
     <label class="ap__label" for={`${p}-email`}>La tua email</label>
@@ -47,15 +79,18 @@ const { prefix: p, titoloId } = Astro.props;
 
     <p class="ap__errore" data-ap-errore hidden></p>
 
-    <button type="button" class="btn btn-primary ap__btn" data-ap-verifica>
-      <span class="ap__btn-testo">Continua</span>
-      <span class="ap__spinner" aria-hidden="true"></span>
-    </button>
+    <div class="ap__azioni">
+      <button type="button" class="btn btn-outline-dark ap__btn-secondario" data-ap-indietro="quando">Indietro</button>
+      <button type="button" class="btn btn-primary ap__btn" data-ap-verifica>
+        <span class="ap__btn-testo">Continua</span>
+        <span class="ap__spinner" aria-hidden="true"></span>
+      </button>
+    </div>
   </section>
 
-  {/* ── 2. I dati, solo per chi non ce li ha già ─────────────────────── */}
+  {/* ── 3. I dati, solo per chi non ce li ha già ─────────────────────── */}
   <section class="ap__step" id={`${p}-step-dati`} hidden>
-    <span class="ap__eyebrow">Passo 2 di 4</span>
+    <span class="ap__eyebrow">Passo 2 di 3</span>
     <h3 class="ap__title" tabindex="-1" data-ap-fuoco>Come ti chiamiamo?</h3>
     <p class="ap__lead">Ci servono solo il nome e il numero su cui squillare.</p>
 
@@ -93,34 +128,9 @@ const { prefix: p, titoloId } = Astro.props;
     </div>
   </section>
 
-  {/* ── 3. Quando ────────────────────────────────────────────────────
-
-      I giorni sono una fila scorrevole e gli orari una griglia divisa in
-      mattina e pomeriggio. Ventiquattro orari in colonna sarebbero un muro
-      di numeri: raggruppati e in griglia si leggono a colpo d'occhio, e su
-      un telefono la griglia si stringe da sola. */}
-  <section class="ap__step" id={`${p}-step-quando`} hidden>
-    <span class="ap__eyebrow">Passo 3 di 4</span>
-    <h3 class="ap__title" tabindex="-1" data-ap-fuoco>Quando ti chiamiamo?</h3>
-    <p class="ap__lead">Prossimi sette giorni. Ti chiamiamo noi all’orario che scegli.</p>
-
-    <div class="ap__giorni" data-ap-giorni role="group" aria-label="Scegli il giorno"></div>
-    <div class="ap__orari-blocco" data-ap-orari></div>
-
-    <p class="ap__scelta" data-ap-scelta hidden></p>
-    <p class="ap__errore" data-ap-errore hidden></p>
-
-    <div class="ap__azioni">
-      <button type="button" class="btn btn-outline-dark ap__btn-secondario" data-ap-indietro="email">Indietro</button>
-      <button type="button" class="btn btn-primary ap__btn" data-ap-avanti-quando disabled>
-        <span class="ap__btn-testo">Continua</span>
-      </button>
-    </div>
-  </section>
-
   {/* ── 4. Di cosa ───────────────────────────────────────────────────── */}
   <section class="ap__step" id={`${p}-step-oggetto`} hidden>
-    <span class="ap__eyebrow">Passo 4 di 4</span>
+    <span class="ap__eyebrow">Passo 3 di 3</span>
     <h3 class="ap__title" tabindex="-1" data-ap-fuoco>{ETICHETTA_OGGETTO}</h3>
     <p class="ap__lead">{AIUTO_OGGETTO}</p>
 
