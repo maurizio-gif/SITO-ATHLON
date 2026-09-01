@@ -1,0 +1,88 @@
+---
+/**
+ * /prenota-chiamata — solo il calendario e il form, da mandare come link diretto.
+ *
+ * Ferma da sola, come `/attiva`: nessuna barra del sito, solo il marchio in
+ * alto che riporta alla home. Serve per chi deve solo prenotare una
+ * telefonata — un link mandato via email o WhatsApp non deve far atterrare su
+ * tutto il sito quando la persona vuole fare una cosa sola.
+ *
+ * Il calendario è lo stesso di ovunque (`AppuntamentoInline`, lo stesso
+ * `[data-athlon-appuntamento]` usato nelle schede del wiki): mostra il
+ * percorso intero — quando, poi i dati solo se servono — perché chi arriva
+ * da un link diretto non ha compilato nient'altro prima.
+ *
+ * `noindex`: è un link da mandare, non una pagina da far trovare a chi cerca
+ * «prenota chiamata athlon» — quella richiesta la intercetta il sito vero,
+ * con tutto il contesto del club intorno.
+ */
+import Layout from '../layouts/Layout.astro';
+import AppuntamentoInline from '../components/AppuntamentoInline.astro';
+import { CLUB } from '../data/club';
+---
+
+<Layout
+  title="Prenota una chiamata | Athlon Club"
+  description="Scegli giorno e ora: ti richiamiamo noi, senza attese al telefono."
+  chrome={false}
+  noindex
+>
+  <section class="pc-hero">
+    <div class="container pc-hero__inner">
+      <a href="/" class="pc-logo" aria-label="Athlon Club — vai al sito">
+        <img src={CLUB.logo} alt="Athlon Club 4.0" width="834" height="159" />
+      </a>
+
+      <span class="eyebrow pc-hero__eyebrow">Prenota una chiamata</span>
+      <h1 class="pc-hero__title">Scegli quando ti richiamiamo.</h1>
+      <p class="pc-hero__lede">
+        Giorno e ora li scegli tu, nei prossimi sette giorni: il calendario qui sotto mostra solo gli orari
+        davvero liberi. Ti chiamiamo noi, senza attese al telefono.
+      </p>
+    </div>
+  </section>
+
+  <section class="pc-form">
+    <div class="container pc-form__inner">
+      <div data-athlon-appuntamento data-origine="prenota-chiamata" data-cta="Prenota una chiamata — link diretto"></div>
+    </div>
+  </section>
+
+  <AppuntamentoInline />
+</Layout>
+
+<style>
+  .pc-hero {
+    background: var(--color-dark);
+    color: var(--color-white);
+    padding: var(--space-section-md) 0 var(--space-section-sm);
+  }
+  .pc-logo {
+    display: inline-block;
+    margin-bottom: 24px;
+  }
+  .pc-logo img {
+    height: 2.5rem;
+    width: auto;
+  }
+  .pc-hero__eyebrow {
+    color: var(--color-primary);
+  }
+  .pc-hero__title {
+    font-size: var(--text-3xl);
+    margin: 14px 0 0;
+  }
+  .pc-hero__lede {
+    margin: 12px 0 0;
+    max-width: 34rem;
+    opacity: 0.85;
+  }
+
+  .pc-form {
+    padding: var(--space-section-md) 0 var(--space-section-lg);
+  }
+  .pc-form__inner {
+    display: flex;
+    justify-content: center;
+  }
+</style>
