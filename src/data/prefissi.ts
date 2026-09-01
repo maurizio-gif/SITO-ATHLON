@@ -311,7 +311,9 @@ export const PREFISSI: Prefisso[] = [
  *   accesso, e in forma internazionale si toglie. `+390 6…` non esiste.
  * - **Il prefisso scritto due volte.** Chi ha l'abitudine lo digita comunque,
  *   `+39 320…` dentro un campo che ha già `+39` nella tendina. Se il numero
- *   comincia col prefisso scelto, quello si scarta invece di raddoppiarlo.
+ *   comincia col prefisso scelto, quello si scarta invece di raddoppiarlo —
+ *   **ma solo se quello che resta è più plausibile di quello che c'era**, e
+ *   questa clausola è costata un guasto: vedi `paresseCompleto` qui sotto.
  * - **Lo `00` internazionale.** `0039 320…` è la stessa cosa di `+39 320…`
  *   scritta come la si detta al telefono.
  *
@@ -322,13 +324,50 @@ export const PREFISSI: Prefisso[] = [
  * numero) è più alto di quello di un numero sbagliato che si scopre al primo
  * messaggio.
  */
+/** Il cellulare italiano: comincia per 3, nove o dieci cifre. */
+const CELLULARE_IT = /^3\d{8,9}$/;
+
+/**
+ * Queste cifre sono **già** un numero nazionale completo, così come sono
+ * scritte?
+ *
+ * Serve a una domanda sola, e nasce da un guasto vero: `3931623468` è un
+ * cellulare Wind Tre di dieci cifre, comincia per 39, e la disfatta del
+ * «prefisso scritto due volte» gli mangiava le prime due — restava
+ * `31623468`, otto cifre, e il form rifiutava un numero giusto dicendo alla
+ * persona che il *suo* numero è sbagliato. Vale per tutta la serie 390–393,
+ * che sono milioni di numeri.
+ *
+ * Quindi il prefisso ripetuto si scarta solo quando **tenerlo non sta in
+ * piedi**: `393931623468` non è un cellulare italiano e allora quelle prime
+ * due cifre sono davvero il prefisso, mentre `3931623468` lo è e allora sono
+ * il numero. La regola decide sull'ipotesi più forte, non sulla prima che
+ * capita.
+ *
+ * **Fuori dall'Italia torna `false`, cioè si scarta come si è sempre fatto.**
+ * Non è pigrizia: senza la forma del numero nazionale non c'è niente da
+ * confrontare, e le duecento regole nazionali sono la cosa che questo file ha
+ * deciso di non tenere in pari. Il caso morde in Italia perché i cellulari
+ * `39x` esistono; dove il numero nazionale non può cominciare col codice del
+ * paese — il Regno Unito comincia per 7, la Germania per 15/16/17 — non c'è
+ * ambiguità da sciogliere.
+ */
+function paresseCompleto(pref: string, cifre: string): boolean {
+  return pref === '39' && CELLULARE_IT.test(cifre);
+}
+
 export function componiTelefono(prefisso: string, numero: string): string | null {
   const pref = String(prefisso || PREFISSO_PREDEFINITO).replace(/[^\d]/g, '');
   let cifre = String(numero || '').replace(/[^\d+]/g, '');
   if (!cifre) return '';
 
   cifre = cifre.replace(/^\+/, '').replace(/^00/, '');
-  if (pref && cifre.startsWith(pref) && cifre.length > pref.length) {
+  if (
+    pref &&
+    cifre.startsWith(pref) &&
+    cifre.length > pref.length &&
+    !paresseCompleto(pref, cifre)
+  ) {
     cifre = cifre.slice(pref.length);
   }
   cifre = cifre.replace(/^0+/, '');
@@ -362,12 +401,19 @@ export interface EsitoTelefono {
  * 1. **La forma.** Lunghezza E.164, e per l'Italia il cellulare deve cominciare
  *    per 3 ed essere di nove o dieci cifre. Un fisso in un campo «cellulare» non
  *    è un errore di battitura: è un numero su cui WhatsApp non esiste.
- * 2. **La varietà delle cifre.** Meno di quattro cifre diverse in un numero
- *    italiano vuol dire che è inventato: `3333333333` ne ha una,
- *    `3331231231` ne ha tre. Un numero vero ne ha in media sei o sette, e non
- *    ho trovato numerazioni reali sotto quattro.
+ * 2. **La cifra sola ripetuta.** `3333333333` non è il numero di nessuno.
  * 3. **Le sequenze.** `3401234567` e `3409876543` sono la tastiera percorsa in
  *    ordine, non un numero.
+ *
+ * **Le soglie stanno tutte dalla parte larga, e la seconda è stata allargata
+ * dopo il fatto.** Chiedeva quattro cifre diverse, che è un criterio ragionevole
+ * su un numero medio e sbagliato su quelli belli: `340 111 1111` ne ha tre,
+ * `331 111 1111` ne ha due, e sono numeri che gli operatori assegnano davvero —
+ * anzi, li fanno pagare. Adesso ferma solo la cifra unica ripetuta, che è il
+ * caso per cui il controllo era stato scritto. Il conto è quello di sempre e
+ * vale per tutti e tre: un numero finto che passa lo si scopre al primo
+ * messaggio non consegnato, una persona vera che non riesce a lasciare il suo
+ * numero non torna.
  *
  * Fuori dall'Italia si controllano solo la lunghezza e le due trappole sopra: le
  * regole nazionali sono duecento e cambiano, e un falso negativo — una persona
@@ -385,13 +431,20 @@ export function validaTelefono(prefisso: string, numero: string): EsitoTelefono 
   const nazionale = e164.slice(1 + pref.length);
 
   /* Italia: il cellulare comincia per 3 e ha nove o dieci cifre. I nove sono
-     le vecchie numerazioni ancora in servizio, tipo `33012345`. */
-  if (pref === '39' && !/^3\d{8,9}$/.test(nazionale)) {
+     le vecchie numerazioni ancora in servizio, tipo `33012345`.
+
+     I due messaggi dicono due cose diverse perché sono due errori diversi, e
+     quello sul fisso prima non lo leggeva nessuno: cercava lo zero iniziale su
+     un numero da cui `componiTelefono` lo aveva appena tolto, quindi a chi
+     scriveva `06 8100…` rispondeva «comincia per 3», che è vero e non spiega
+     niente. In Italia il cellulare *è* il 3: qualunque altra cosa — fisso,
+     numero verde, servizio — non è un errore di battitura. */
+  if (pref === '39' && !CELLULARE_IT.test(nazionale)) {
     return {
       ok: false,
-      motivo: nazionale.startsWith('0')
-        ? 'Questo è un numero fisso: serve un cellulare, perché ci scriviamo su WhatsApp.'
-        : 'Un cellulare italiano comincia per 3 e ha dieci cifre.',
+      motivo: nazionale.startsWith('3')
+        ? 'A un cellulare italiano servono dieci cifre: controlla che non ne manchi una.'
+        : 'Questo non sembra un cellulare: serve un numero che comincia per 3, perché ti scriviamo su WhatsApp.',
     };
   }
 
@@ -400,24 +453,24 @@ export function validaTelefono(prefisso: string, numero: string): EsitoTelefono 
   }
 
   const diverse = new Set(nazionale.split('')).size;
-  if (diverse < 4) {
+  if (diverse < 2) {
     return { ok: false, motivo: 'Questo numero non sembra vero: controllalo.' };
   }
 
-  /* La tastiera in ordine, in salita o in discesa, per almeno **sette** cifre di
-     fila. Sette e non sei, e la differenza è misurata: in un numero di dieci
-     cifre una sequenza di sei capita per caso circa una volta su diecimila —
-     `+44 7911 123456` è un numero dalla forma perfettamente britannica che
-     conteneva `123456` e veniva rifiutato. A sette il falso positivo scende di
-     un altro ordine di grandezza, e `1234567890` resta preso.
+  /* La tastiera in ordine, in salita o in discesa, per almeno **otto** cifre di
+     fila. La soglia è salita due volte, sempre nello stesso verso e sempre
+     perché aveva preso un numero vero: a sei rifiutava `+44 7911 123456`, che è
+     britannico di forma perfetta; a sette rifiutava `339 123 4567`, dove 339 è
+     un prefisso Vodafone e il resto è solo sfortuna. A otto restano presi i due
+     casi per cui il controllo esiste, `3401234567` e `1234567890`.
 
      Il verso giusto in cui sbagliare è questo: un numero finto che passa lo si
      scopre al primo messaggio non consegnato, una persona vera che non riesce a
      lasciare il suo numero non torna. */
   const salita = '01234567890123456789';
   const discesa = '98765432109876543210';
-  for (let i = 0; i + 7 <= nazionale.length; i++) {
-    const pezzo = nazionale.slice(i, i + 7);
+  for (let i = 0; i + 8 <= nazionale.length; i++) {
+    const pezzo = nazionale.slice(i, i + 8);
     if (salita.includes(pezzo) || discesa.includes(pezzo)) {
       return { ok: false, motivo: 'Questo numero non sembra vero: controllalo.' };
     }
