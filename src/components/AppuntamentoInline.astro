@@ -1,0 +1,87 @@
+---
+/**
+ * «Prenota una chiamata» incorporato in una pagina, senza pannello.
+ *
+ * Serve dove il calendario è il contenuto e non una risposta a un pulsante:
+ * in fondo a una scheda dell'Help Desk, dove prima c'era l'embed di Calendly
+ * incollato a mano nel Markdown. Là non sappiamo ancora chi è la persona —
+ * non ha compilato niente — quindi mostra il percorso intero: email, dati,
+ * quando, di cosa. È lo stesso di `AppuntamentoModal`, stesso markup e stessa
+ * logica, in un contenitore che sta nel flusso invece che sopra la pagina.
+ *
+ * **Come arriva dentro il Markdown.** Le schede sono file `.md`: non possono
+ * importare un componente Astro. Scrivono un contenitore vuoto —
+ * `<div data-athlon-appuntamento></div>` — e lo script qui sotto ci trasloca
+ * dentro questo riquadro. È lo stesso patto dell'embed che sostituisce, dove
+ * il Markdown scriveva un `div` e lo script di Calendly lo riempiva; la
+ * differenza è che adesso a riempirlo è roba nostra, quindi nessun dominio di
+ * terzi da bloccare e nessun consenso ai cookie da aspettare.
+ */
+import AppuntamentoPassi from './AppuntamentoPassi.astro';
+---
+
+<div class="apx-sezione" data-appuntamento-inline hidden>
+  <AppuntamentoPassi prefix="api" />
+</div>
+
+<style is:global>
+  /* Il riquadro in pagina: la stessa carta del pannello, senza il guscio che
+     lo sovrappone. Le regole dei passi — titoli, campi, giorni, orari — sono
+     già globali e arrivano da `AppuntamentoModal.astro`, che sta nel Layout di
+     ogni pagina: qui c'è solo ciò che distingue un riquadro da un pannello. */
+  .apx-sezione {
+    max-width: 34rem;
+    margin: 2rem 0;
+    padding: 1.75rem 1.5rem 1.5rem;
+    background: var(--color-cream, #fdf8f3);
+    border: 1px solid rgb(36 26 20 / 0.1);
+    border-radius: var(--radius, 20px);
+  }
+  .apx-sezione[hidden] {
+    display: none;
+  }
+  /* Il prefisso e il numero come un campo solo, come nel pannello: la regola
+     lì è scritta su `.ap .tel`, e questo contenitore non è `.ap`. */
+  .apx-sezione .tel {
+    align-items: stretch;
+    margin-bottom: 0.9rem;
+  }
+  .apx-sezione .tel .ap__input {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 30rem) {
+    .apx-sezione {
+      padding: 1.4rem 1.1rem 1.2rem;
+    }
+  }
+
+</style>
+
+<script>
+  import { initAppuntamentoForm } from '../lib/appuntamentoForm.client.js';
+
+  const riquadro = document.querySelector<HTMLElement>('[data-appuntamento-inline]');
+  const posto = document.querySelector<HTMLElement>('[data-athlon-appuntamento]');
+
+  if (riquadro && posto) {
+    // Si trasloca invece di ricostruirsi: il markup dei passi è già qui,
+    // renderizzato da Astro, e clonarlo vorrebbe dire tenerne due copie
+    // allineate a mano.
+    posto.appendChild(riquadro);
+    riquadro.hidden = false;
+
+    const form = initAppuntamentoForm(riquadro, { prefix: 'api', fuoco: false });
+    // Nessun gesto di apertura da aspettare: il riquadro è già in pagina, e
+    // `apri` è quello che gli dice da dove arriva — la scheda che lo ospita.
+    form.apri({
+      pagina: location.pathname,
+      origine: posto.dataset.origine || 'scheda-help-desk',
+      cta: (posto.dataset.cta || document.title || '').trim().slice(0, 80),
+    });
+  } else if (riquadro) {
+    // Nessun posto dove metterlo: si toglie invece di restare nascosto, così
+    // non porta in giro campi vuoti e id doppi.
+    riquadro.remove();
+  }
+</script>

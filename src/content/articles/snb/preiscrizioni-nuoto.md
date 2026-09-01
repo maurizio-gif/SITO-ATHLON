@@ -108,15 +108,12 @@ Ogni link porta al portale, già filtrato sui turni di quella fascia che hanno a
 
 Vuoi saperne di più sull'organizzazione dei corsi, i gruppi, gli orari o semplicemente capire se la Scuola Nuoto Athlon è la scelta giusta per tuo figlio? Puoi fissare un appuntamento telefonico con la nostra assistenza — ti ricontatteremo all'orario che preferisci.
 
-<!-- Calendly inline widget begin -->
+<!-- Il calendario del club: lo riempie AppuntamentoInline.astro, che la pagina
+     della scheda monta quando trova questo contenitore. Gli orari sono quelli
+     veri dell'agenda del desk, e compaiono anche a chi non ha accettato i
+     cookie: non c'e' piu' nessuno script di terzi da bloccare. -->
 
-<!-- Calendly inline widget begin -->
-
-<div class="calendly-inline-widget" data-url="https://calendly.com/athlonclub/assistenza?hide_event_type_details=1&hide_gdpr_banner=1&primary_color=ff5701" style="min-width:320px;height:700px;"></div>
-<script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
-<!-- Calendly inline widget end -->
-
-<!-- Calendly inline widget end -->
+<div data-athlon-appuntamento data-origine="scheda-preiscrizioni-nuoto" data-cta="Scuola Nuoto — informazioni"></div>
 
 ***
 

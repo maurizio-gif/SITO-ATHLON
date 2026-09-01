@@ -1381,34 +1381,16 @@ import CampoTelefono from '../CampoTelefono.astro';
     color: var(--color-dark);
   }
 
-  /* `height` e non `min-height`: il widget prende l'altezza del contenitore
-     solo se il contenitore ce l'ha, altrimenti resta ai suoi 150px iniziali.
-     Più basso che negli altri due pannelli, perché qui il riquadro sta dentro
-     una conversazione che scorre: 34rem lasciano vedere che sopra e sotto c'è
-     altro, e non sequestrano la chat. */
+  /* Nessuna altezza fissata: il calendario è alto quanto i giorni e gli orari
+     che ci sono davvero, e dentro una conversazione che scorre è quello che
+     serve — l'iframe di Calendly ne voleva una, e con pochi orari lasciava
+     mezzo riquadro bianco in mezzo alla chat. */
   .ca__conversazione :global(.ca__richiamo-cal) {
-    height: 34rem;
     margin-top: 0.4rem;
     margin-bottom: 0.2rem;
+    padding: 0.75rem;
     border-radius: 0.75rem;
-    overflow: hidden;
     background: var(--color-white);
-  }
-
-  .ca__conversazione :global(.ca__richiamo-cal iframe) {
-    width: 100% !important;
-    height: 100% !important;
-    border: 0;
-  }
-
-  .ca__conversazione :global(.ca__richiamo-fatto) {
-    margin: 0.6rem 0 0;
-    padding: 0.6rem 0.8rem;
-    border-radius: 0.7rem;
-    background: rgba(255, 87, 1, 0.1);
-    color: var(--accent-text);
-    font-size: var(--text-xs);
-    font-weight: 600;
   }
 
   .ca__conversazione :global(.ca__richiamo-lead) {

@@ -20,7 +20,8 @@
  * la verifica dell'email mentre la persona compila e la richiesta completa alla
  * fine. Nessuna chiave nel browser, nessuna route server, il sito resta statico.
  *
- * Le domande, i rami e le tre destinazioni Calendly stanno in `data/contatto.ts`;
+ * Le domande e i rami stanno in `data/contatto.ts`, il calendario in fondo in
+ * `lib/appuntamentoInline.client.js`;
  * la macchina a stati in `lib/contattaciForm.client.js`, che spiega nel suo
  * commento in testa quali tre scelte si discostano dal form di oggi e perché.
  */
@@ -481,9 +482,10 @@ import CampoTelefono from './CampoTelefono.astro';
         prenotando.
 
         Una schermata sola con tre varianti di testo, e un calendario solo che
-        cambia indirizzo: i tre eventi Calendly — richiamami, baby, assistenza —
-        hanno durate e disponibilità diverse, ma il riquadro è lo stesso, e
-        montarne tre vorrebbe dire caricare tre widget per mostrarne uno. */}
+        cambia testo: quello che si prenota è sempre la stessa telefonata di
+        dieci minuti col desk, e i tre eventi Calendly di prima — richiamami,
+        baby, assistenza — erano tre agende separate per la stessa persona che
+        alza il telefono. Adesso l'agenda è una sola, quella del pannello. */}
     <section class="cf__step" id="cf-step-esito" hidden>
       <span class="cf__eyebrow">Richiesta inviata</span>
       <h3 class="cf__title" tabindex="-1" data-cf-fuoco>Ci risentiamo.</h3>
@@ -512,31 +514,20 @@ import CampoTelefono from './CampoTelefono.astro';
         <h4 class="cf__cal-titolo">Vuoi essere ricontattato?</h4>
         <p class="cf__cal-nota">Scegli quando: dieci minuti, e ti chiamiamo noi.</p>
 
-        {/* Il widget si monta qui quando la schermata si apre, non prima: lo
-            script di Calendly è un terzo dominio, e caricarlo all'apertura del
-            modal vorrebbe dire pagarlo anche a chi non arriva in fondo. */}
+        {/* Il calendario si monta qui quando la schermata si apre, non prima:
+            gli orari liberi si chiedono al pannello, e chiederli a chi non
+            arriva in fondo sarebbe una domanda per niente.
+
+            Niente ripiego e niente link «apri in una scheda nuova»: quelli
+            c'erano perché il widget di Calendly era uno script di terzi, che
+            il blocco dei cookie fermava finché non c'era consenso. Questo è
+            roba nostra — una fetch al pannello del club — e compare sempre.
+
+            Nemmeno la riga «✓ appuntamento fissato»: la conferma la scrive il
+            calendario stesso al posto suo, con giorno e ora dentro, e lasciare
+            il riquadro aperto sotto un segno di spunta invita a prenotarne un
+            secondo per sbaglio. */}
         <div class="cf__cal-riquadro" data-cf-calendario></div>
-
-        {/* Il ripiego, e non è teorico: il blocco automatico di CookieYes ferma
-            gli script di terzi finché non c'è consenso, e il widget di Calendly
-            è fra quelli. Senza questo, chi non ha accettato vedrebbe un
-            rettangolo vuoto in fondo a un form che ha appena compilato. Compare
-            solo se il widget non si monta. */}
-        <div class="cf__cal-ripiego" data-cf-cal-ripiego hidden>
-          <p class="cf__cal-nota">
-            Il calendario non si carica: di solito è il blocco dei cookie, o un'estensione del browser.
-            Si apre comunque in una scheda nuova.
-          </p>
-          <a class="btn btn-primary cf__btn" data-cf-cal-link target="_blank" rel="noopener noreferrer">
-            Apri il calendario →
-          </a>
-        </div>
-
-        {/* La conferma: Calendly ci dice che la prenotazione è andata, e a quel
-            punto il desk ha un appuntamento e non un'intenzione. */}
-        <p class="cf__cal-fatto" data-cf-cal-fatto hidden>
-          ✓ Appuntamento fissato. Ti arriva la conferma via email.
-        </p>
       </div>
 
       <div class="cf__azioni">
@@ -703,11 +694,10 @@ import CampoTelefono from './CampoTelefono.astro';
     transition: transform var(--dur-base) var(--ease-out-crit), width var(--dur-base) ease;
   }
 
-  /* Solo la schermata col calendario: il widget di Calendly in 34rem meno il
-     pieno del pannello sta in 27rem, e a quella larghezza mostra la lista degli
-     orari sotto il mese invece che a fianco — due scroll invece di uno. Lo
-     script aggiunge la classe quando monta il calendario e la toglie in
-     chiusura. */
+  /* Solo la schermata col calendario: la griglia degli orari sta più comoda
+     larga, e con i giorni in fila orizzontale un pannello stretto li manda a
+     scorrere subito. Lo script aggiunge la classe quando monta il calendario e
+     la toglie in chiusura. */
   .cf--largo .cf__panel {
     width: min(46rem, 100%);
   }
@@ -1334,57 +1324,14 @@ import CampoTelefono from './CampoTelefono.astro';
     line-height: 1.5;
   }
 
-  /* `height` e non `min-height`, ed è la differenza fra un calendario e un
-     rettangolo bianco con un calendario alto 150px incollato in cima. Con una
-     `min-height` l'iframe che Calendly inietta resta all'altezza iniziale che
-     si dà da sé, e lo spazio riservato sotto rimane vuoto: il widget prende
-     l'altezza del contenitore solo se il contenitore ce l'ha.
-
-     In rem perché il contenitore la passa all'iframe: su un totem a radice 27
-     un riquadro da 660px conterrebbe un calendario a caratteri doppi tagliato
-     a metà. */
+  /* Nessuna altezza fissata, ed è il contrario di quello che serviva prima.
+     L'iframe di Calendly prendeva l'altezza del contenitore solo se il
+     contenitore ce l'aveva, quindi qui c'era un `height: 41rem` — e sotto,
+     quando il calendario mostrava tre orari, restava mezzo riquadro bianco. Il
+     calendario di adesso è fatto di elementi nostri: è alto quanto i giorni e
+     gli orari che ci sono davvero. */
   .cf__cal-riquadro {
-    height: 41rem;
     border-radius: 0.75rem;
-    overflow: hidden;
-  }
-
-  /* L'iframe è iniettato da uno script, quindi non porta l'attributo di scope
-     di Astro: senza `:global` la regola non lo raggiungerebbe. `!important`
-     perché Calendly gli scrive le misure inline. */
-  .cf__cal-riquadro :global(iframe) {
-    width: 100% !important;
-    height: 100% !important;
-    border: 0;
-  }
-
-  .cf__cal-ripiego {
-    padding: 1.1rem 1.25rem;
-    border: 1px solid var(--border);
-    border-radius: 0.85rem;
-    background: var(--color-cream);
-  }
-
-  .cf__cal-ripiego .cf__cal-nota {
-    margin-bottom: 0.9rem;
-  }
-
-  .cf__cal-fatto {
-    margin: 1rem 0 0;
-    padding: 0.8rem 1rem;
-    border-radius: 0.75rem;
-    background: rgba(255, 87, 1, 0.08);
-    color: var(--accent-text);
-    font-size: var(--text-sm);
-    font-weight: 600;
-  }
-
-  @media (max-width: 640px) {
-    /* Sul telefono il pannello e' gia' a tutta larghezza: allargarlo non fa
-       niente, e il calendario ha bisogno di altezza, non di larghezza. */
-    .cf__cal-riquadro {
-      height: 46rem;
-    }
   }
 
   @media (max-width: 640px) {

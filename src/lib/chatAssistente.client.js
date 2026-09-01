@@ -37,11 +37,10 @@
 
 import { ACTIVITY_AUDIENCE } from '../data/activities';
 import { validaTelefono } from '../data/prefissi';
-import { CALENDLY } from '../data/calendly';
 import { suTotem } from '../scripts/totem';
 import { leggi as emailConosciuta } from '../scripts/emailNota';
 import { leggi as userNumberConosciuto } from '../scripts/numeroSocio';
-import { montaCalendario } from './calendario.client.js';
+import { montaAppuntamento } from './appuntamentoInline.client.js';
 import { plans, GUEST_PASS } from '../data/abbonamenti';
 import { REGISTRAZIONE, PASSI_ATTIVAZIONE } from '../data/guestPass';
 import {
@@ -85,35 +84,16 @@ export function initChatAssistente(root, options) {
      quel posto è di «Contatta il team», che è la via scritta.
 
      I dati li abbiamo già tutti, perché per un nuovo il form viene prima della
-     conversazione: si passano precompilati a Calendly così la persona trova il
-     modulo pieno e sceglie solo giorno e ora.
-
-     **La mappatura dei parametri è qui e solo qui**, e non è più un'ipotesi:
-     letta dall'evento sull'account del club. `recall` è un `outbound_call` —
-     il club chiama, e Calendly chiede il numero come «luogo», quindi il numero
-     va in `location` — e ha **una sola** domanda personalizzata, in posizione
-     0 e **obbligatoria**: «Per favore, condividi tutto ciò che può essere
-     utile per preparare il nostro incontro.» Le domande personalizzate si
-     precompilano con `a1`, `a2`… nell'ordine del modulo, quindi il contesto è
-     `a1`. Che quella domanda sia obbligatoria è il motivo per cui va
-     riempita sempre: vuota, blocca la prenotazione.
-
-     Il nome è il campo unico di Calendly, quindi `name` e basta.
-
-     Se un domani il modulo cambia — una domanda in più prima di quella, o il
-     numero spostato in una domanda invece che nel «luogo» — si aggiorna
-     `campi` qui sotto e non serve toccare altro. Il numero resta comunque
-     anche nella prima riga del contesto, che è la rete di sicurezza. */
+     conversazione: si passano al calendario così la persona sceglie solo
+     giorno e ora. E con loro va **la conversazione**: il testo degli ultimi
+     scambi finisce nell'argomento della chiamata, che è il campo che chi
+     richiama legge prima di comporre il numero. Con Calendly quel testo usciva
+     dal sito e non tornava più indietro; adesso è la nota di programmazione
+     della voce d'agenda. */
   var RICHIAMO = {
-    /* L'indirizzo sta in `data/calendly.ts` col resto degli eventi del club:
-       tre file che ne tenevano una copia ciascuno erano tre posti da aggiornare
-       il giorno in cui un evento viene rinominato — e un link Calendly rotto non
-       dà errore, dà «questo evento non esiste» a chi stava per prenotare. */
-    url: CALENDLY.recall,
-    campi: { telefono: 'location', contesto: 'a1' },
-    /* Il trascritto intero non ci sta in una query string, e un url troppo
-       lungo lo troncano il browser o Calendly: si tengono gli ultimi scambi,
-       che sono quelli che dicono di cosa si stava parlando. */
+    /* Il trascritto intero non ci sta in un campo di briefing, e chi richiama
+       non lo legge comunque: si tengono gli ultimi scambi, che sono quelli che
+       dicono di cosa si stava parlando. */
     maxContesto: 1200,
   };
 
@@ -1054,21 +1034,15 @@ export function initChatAssistente(root, options) {
     return testa.join('\n') + '\n\nConversazione:\n' + (corpo || '(nessuno scambio)');
   }
 
-  /* Il link diretto — il ripiego se l'embed non carica — lo compone
-     `linkDiretto` in `calendario.client.js` a partire dallo stesso
-     `prefill` del widget: due modi di costruire lo stesso indirizzo erano due
-     modi di sbagliarlo diversamente. La mappatura dei campi resta descritta in
-     `RICHIAMO.campi` qui sopra, che è dove si guarda se il modulo cambia. */
-
   /**
    * Il calendario dentro la conversazione, e ci si arriva **solo con un gesto**.
    *
    * **Uno solo, sempre.** Se c'è già si scorre lì invece di montarne un
-   * secondo: due iframe di Calendly nella stessa conversazione sono due
-   * moduli che chiedono la stessa cosa, e il primo che si compila lascia
-   * l'altro aperto a dire che non è stato fissato niente. È anche il motivo
-   * per cui l'icona in intestazione non si disabilita dopo il primo clic —
-   * riportare al calendario è una risposta giusta quanto aprirlo.
+   * secondo: due calendari nella stessa conversazione sono due moduli che
+   * chiedono la stessa cosa, e il primo che si compila lascia l'altro aperto a
+   * dire che non è stato fissato niente. È anche il motivo per cui l'icona in
+   * intestazione non si disabilita dopo il primo clic — riportare al
+   * calendario è una risposta giusta quanto aprirlo.
    *
    * **`ca__richiamo` è il calendario e nient'altro**, ed è una riga che è
    * costata un guasto: le schede delle azioni — iscrizione, Guest Pass —
@@ -1096,11 +1070,7 @@ export function initChatAssistente(root, options) {
     /* Il calendario dentro la conversazione, al posto del pulsante che portava
        fuori. Qui vale più che altrove: la chat è una conversazione in corso, e
        mandare fuori sito a metà discorso la interrompe — chi torna, se torna,
-       trova il filo perso.
-
-       Il precompilato è lo stesso di prima, contesto della conversazione
-       compreso: su Calendly la domanda personalizzata `a1` è obbligatoria, e
-       vuota blocca la prenotazione. Nell'embed si passa da `customAnswers`. */
+       trova il filo perso. */
     var box = document.createElement('div');
     box.className = 'ca__richiamo';
     box.innerHTML =
@@ -1116,38 +1086,48 @@ export function initChatAssistente(root, options) {
       'aria-label="Chiudi il calendario e torna alla chat" title="Chiudi">×</button>' +
       '</div>' +
       '<p class="ca__richiamo-lead">Ti richiamiamo noi: scegli giorno e ora, i tuoi dati e quello di cui abbiamo parlato sono già compilati.</p>' +
-      '<div class="ca__richiamo-cal" data-ca-calendario></div>' +
-      '<div class="ca__richiamo-ripiego" data-ca-cal-ripiego hidden>' +
-      '<p class="ca__richiamo-lead">Il calendario non si carica: di solito è il blocco dei cookie. Si apre comunque in una scheda nuova.</p>' +
-      '<a class="ca__richiamo-btn" data-ca-cal-link target="_blank" rel="noopener">Apri il calendario →</a>' +
-      '</div>' +
-      '<p class="ca__richiamo-fatto" data-ca-cal-fatto hidden>✓ Appuntamento fissato. Ti arriva la conferma via email.</p>';
+      '<div class="ca__richiamo-cal" data-ca-calendario></div>';
     conversazione.appendChild(box);
     conversazione.scrollTop = conversazione.scrollHeight;
 
     /* La maniglia si tiene: chiudere il blocco senza chiamare `distruggi()`
-       lascerebbe il widget vivo e il singolo `attivo` di
-       `calendario.client.js` puntato a un nodo staccato dal documento. */
-    montaggioRichiamo = montaCalendario({
+       lascerebbe il calendario a rispondere a una fetch su un nodo staccato
+       dal documento. */
+    montaggioRichiamo = montaAppuntamento({
       riquadro: box.querySelector('[data-ca-calendario]'),
-      ripiego: box.querySelector('[data-ca-cal-ripiego]'),
-      link: box.querySelector('[data-ca-cal-link]'),
-      url: RICHIAMO.url,
       prefill: {
-        /* Separati: il modulo di `recall` ha «Nome» e «Cognome» in due campi, e
-           un evento cosi' **ignora `name`** — arrivavano vuoti mentre l'email
-           era compilata. Vedi `nomiCompleti` in `calendario.client.js`. */
-        firstName: dati.nome,
-        lastName: dati.cognome,
         email: dati.email,
-        location: dati.telefono || '',
-        customAnswers: { a1: contestoRichiamo() },
+        nome: dati.nome,
+        cognome: dati.cognome,
+        telefono: dati.telefono || '',
+        /* Il consenso l'ha dato al primo passo della chat, che è dove si
+           lasciano i dati: questa è la stessa conversazione, non un secondo
+           trattamento. */
+        privacy: true,
+        marketing: false,
+      },
+      /* La conversazione, riassunta: è quello che chi richiama deve sapere
+         prima di comporre il numero, ed è esattamente ciò che con Calendly
+         finiva in una domanda personalizzata fuori dal sito. Resta
+         modificabile — se la chat ha girato attorno a tre cose, chi prenota
+         può dire quale delle tre gli preme. */
+      oggetto: contestoRichiamo(),
+      invito: 'È il riassunto di quello che ci siamo detti. Correggilo pure: lo legge chi ti chiama.',
+      contesto: {
+        pagina: dati.pagina,
+        origine: 'chat-assistente',
+        cta: 'Richiamo dalla chat',
+        extra: {
+          tipoOrigine: 'chat',
+          attivita: etichettaAttivita(),
+          conversazione: contestoRichiamo(),
+          sessioneChat: sessione(),
+        },
       },
       onPrenotato: function () {
-        var fatto = box.querySelector('[data-ca-cal-fatto]');
-        if (fatto) fatto.hidden = false;
         /* Prenotato: la chiusura non serve più e diventa rumore accanto a una
-           conferma. Il blocco resta, che è quello che dice cosa è successo. */
+           conferma. Il blocco resta, che è quello che dice cosa è successo —
+           e la conferma con giorno e ora la scrive il calendario da sé. */
         var chiudi = box.querySelector('[data-ca-richiamo-chiudi]');
         if (chiudi) chiudi.hidden = true;
         conversazione.scrollTop = conversazione.scrollHeight;

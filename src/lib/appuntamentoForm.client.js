@@ -20,7 +20,13 @@
 // slot sono contesi. Poi **di cosa**, che è la domanda a cui si risponde
 // volentieri una volta che l'orario è già scelto.
 
-import { API_PRENOTA, API_SLOT, WEBHOOK_APPUNTAMENTO, WEBHOOK_VERIFICA } from '../data/appuntamento';
+import {
+  API_PRENOTA,
+  API_SLOT,
+  WEBHOOK_APPUNTAMENTO,
+  WEBHOOK_EMAIL_APPUNTAMENTO,
+  WEBHOOK_VERIFICA,
+} from '../data/appuntamento';
 import { haGiaAccount } from '../data/contatto';
 import { validaTelefono } from '../data/prefissi';
 import { leggi as emailConosciuta } from '../scripts/emailNota';
@@ -28,6 +34,13 @@ import { leggi as emailConosciuta } from '../scripts/emailNota';
 export function initAppuntamentoForm(root, options) {
   var P = options.prefix;
   var onReset = options.onReset || function () {};
+
+  /* Il fuoco al primo passo si salta solo per il riquadro incorporato in
+     pagina: là il form è già visibile all'arrivo, e mettere il fuoco su un
+     titolo a metà articolo fa saltare la lettura al riquadro senza che nessuno
+     l'abbia chiesto. Nel pannello invece il fuoco è obbligatorio — si è appena
+     aperto sopra la pagina, e chi naviga da tastiera deve trovarcisi dentro. */
+  var saltaPrimoFuoco = options.fuoco === false;
 
   var ERR = {
     email: 'Controlla l’indirizzo email: manca qualcosa.',
@@ -161,6 +174,10 @@ export function initAppuntamentoForm(root, options) {
     Object.keys(steps).forEach(function (k) {
       if (steps[k]) steps[k].hidden = k !== nome;
     });
+    if (saltaPrimoFuoco) {
+      saltaPrimoFuoco = false;
+      return;
+    }
     var fuoco = steps[nome] && steps[nome].querySelector('[data-ap-fuoco]');
     if (fuoco) fuoco.focus();
   }
@@ -401,6 +418,14 @@ export function initAppuntamentoForm(root, options) {
     });
   }
 
+  /** «Lunedì 8 settembre alle 10:30»: come si dice l'appuntamento a voce. */
+  function etichettaScelta() {
+    var giorno = giorni.filter(function (g) {
+      return g.data === dati.data;
+    })[0];
+    return (giorno ? giorno.etichetta : dati.data) + ' alle ' + dati.ora;
+  }
+
   function aggiornaSceltaOrario() {
     var avanti = q('[data-ap-avanti-quando]');
     if (avanti) avanti.disabled = !dati.ora;
@@ -411,10 +436,7 @@ export function initAppuntamentoForm(root, options) {
       riassunto.hidden = true;
       return;
     }
-    var giorno = giorni.filter(function (g) {
-      return g.data === dati.data;
-    })[0];
-    riassunto.textContent = (giorno ? giorno.etichetta : dati.data) + ' alle ' + dati.ora;
+    riassunto.textContent = etichettaScelta();
     riassunto.hidden = false;
   }
 
@@ -486,43 +508,59 @@ export function initAppuntamentoForm(root, options) {
       return;
     }
 
-    /* Il lead su PerfectGym lo crea n8n, come per tutti gli altri form. Se
-       questa fallisce l'appuntamento resta: si prosegue senza bloccare. */
-    try {
-      await fetch(WEBHOOK_APPUNTAMENTO, {
+    /* Il lead e le due email, e sono due chiamate perché sono due lavori: il
+       primo webhook crea il lead su PerfectGym come per tutti gli altri form,
+       il secondo manda la conferma a chi ha prenotato e l'avviso al desk.
+       Stesso corpo, così i due log di n8n dicono la stessa cosa.
+
+       `urlGestione` è il link firmato dal pannello, e diventa il pulsante
+       «sposta o annulla» dentro la conferma: senza, quell'email arriva con un
+       pulsante che non porta da nessuna parte.
+
+       Se una delle due non riesce l'appuntamento resta: è già in agenda, e
+       vale più di una email. */
+    var corpo = JSON.stringify({
+      tipo: 'contatto',
+      tipoRichiesta: 'appuntamento',
+      richiesta: dati.oggetto,
+      appuntamento: {
+        id: esito && esito.id,
+        data: dati.data,
+        ora: dati.ora,
+        etichetta: etichettaScelta(),
+        durataMinuti: esito && esito.durataMinuti,
+        urlGestione: esito && esito.urlGestione,
+      },
+      richiamoTelefonico: true,
+      email: dati.email,
+      nome: dati.nome,
+      cognome: dati.cognome,
+      cellulare: dati.cellulare,
+      telefono: dati.cellulare,
+      userNumber: dati.userNumber,
+      privacy: dati.privacy,
+      marketing: dati.marketing,
+      stato: dati.statoPgm,
+      statoNucleo: dati.statoNucleo,
+      memberId: dati.memberId,
+      memberType: dati.memberType,
+      isNewUser: dati.statoPgm === 'nuovo',
+      pagina: dati.pagina,
+      origine: dati.origine,
+      cta: dati.cta,
+      utm: utm(),
+      vid: vid(),
+      sid: sid(),
+    });
+    [WEBHOOK_APPUNTAMENTO, WEBHOOK_EMAIL_APPUNTAMENTO].forEach(function (indirizzo) {
+      fetch(indirizzo, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tipo: 'contatto',
-          tipoRichiesta: 'appuntamento',
-          richiesta: dati.oggetto,
-          appuntamento: { data: dati.data, ora: dati.ora, id: esito && esito.id },
-          richiamoTelefonico: true,
-          email: dati.email,
-          nome: dati.nome,
-          cognome: dati.cognome,
-          cellulare: dati.cellulare,
-          telefono: dati.cellulare,
-          userNumber: dati.userNumber,
-          privacy: dati.privacy,
-          marketing: dati.marketing,
-          stato: dati.statoPgm,
-          statoNucleo: dati.statoNucleo,
-          memberId: dati.memberId,
-          memberType: dati.memberType,
-          isNewUser: dati.statoPgm === 'nuovo',
-          pagina: dati.pagina,
-          origine: dati.origine,
-          cta: dati.cta,
-          utm: utm(),
-          vid: vid(),
-          sid: sid(),
-        }),
+        body: corpo,
+      }).catch(function () {
+        /* Vedi sopra. */
       });
-    } catch (e) {
-      /* Vedi sopra: l'appuntamento è già in agenda, e vale più della riga su
-         PerfectGym. */
-    }
+    });
 
     attesa(bottone, false);
 
@@ -531,12 +569,7 @@ export function initAppuntamentoForm(root, options) {
     }
 
     var riepilogo = q('[data-ap-riepilogo]');
-    if (riepilogo) {
-      var giorno = giorni.filter(function (g) {
-        return g.data === dati.data;
-      })[0];
-      riepilogo.textContent = (giorno ? giorno.etichetta : dati.data) + ' alle ' + dati.ora;
-    }
+    if (riepilogo) riepilogo.textContent = etichettaScelta();
     mostraStep('esito');
   }
 

@@ -19,8 +19,7 @@
 // Se PerfectGym non risponde si prosegue: meglio un lead in più da verificare
 // a mano che una richiesta persa per un timeout.
 
-import { CALENDLY } from '../data/calendly';
-import { montaCalendario } from './calendario.client.js';
+import { montaAppuntamento } from './appuntamentoInline.client.js';
 import { validaTelefono } from '../data/prefissi';
 import { leggi as emailConosciuta } from '../scripts/emailNota';
 
@@ -158,37 +157,46 @@ export function initProvaForm(root, options) {
   var attuale = 'email';
 
   /* ── Il calendario del richiamo ────────────────────────────────────────────
-     Sull'ultima schermata, sotto il codice. La logica dell'embed — script
-     pigro, ripiego se non carica, conferma della prenotazione — sta in
-     `calendario.client.js`, condivisa con il form dei contatti e con la chat.
+     Sull'ultima schermata, sotto il codice. Il come — orari veri chiesti al
+     pannello, argomento della chiamata, presa dello slot, le due email — sta
+     in `appuntamentoInline.client.js`, condiviso con il form dei contatti e
+     con la chat.
 
-     L'evento è `richiamami`, quello degli adulti: chi attiva un Guest Pass è
-     un adulto, e la chiamata serve a farlo partire, non a inserire un bambino
-     in un corso. */
+     L'argomento parte già scritto e dice di cosa si tratta davvero: attivare
+     un Guest Pass. È il punto in cui una prova si perde — fra «ecco il codice»
+     e «il Pass è attivo» ci sono sei passi sul portale — e chi chiama deve
+     sapere che sta chiamando per quello, non per un'informazione generica. */
   var calendario = null;
 
   async function apriCalendario() {
     if (calendario) calendario.distruggi();
     root.classList.add('pf--largo');
-    calendario = await montaCalendario({
+    calendario = await montaAppuntamento({
       riquadro: q('[data-pf-calendario]'),
-      ripiego: q('[data-pf-cal-ripiego]'),
-      link: q('[data-pf-cal-link]'),
-      url: CALENDLY.richiamami,
       prefill: {
-        /* Separati e non uniti: l'evento con «Nome» e «Cognome» in due campi
-           li vuole cosi', e far ricomporre e poi ridividere la stringa
-           sbaglierebbe sui nomi doppi. Vedi `nomiCompleti` in
-           `calendario.client.js`. */
-        firstName: dati.nome,
-        lastName: dati.cognome,
         email: dati.email,
-        // `location` è il campo del telefono negli eventi «chiamata».
-        location: dati.cellulare || '',
+        nome: dati.nome,
+        cognome: dati.cognome,
+        telefono: dati.cellulare,
+        /* Il consenso l'ha già dato per avere il Guest Pass: questo è lo
+           stesso contatto, non un secondo trattamento. Il marketing invece
+           resta quello che ha scelto lui, e questo form non lo chiede. */
+        privacy: true,
+        marketing: false,
       },
-      onPrenotato: function () {
-        var fatto = q('[data-pf-cal-fatto]');
-        if (fatto) fatto.hidden = false;
+      oggetto: 'Attivazione del Guest Pass ' + CODICE + (dati.attivita ? ' — ' + dati.attivita : ''),
+      invito:
+        'Lo legge chi ti chiama. Aggiungi pure quello che vuoi chiedere oltre all’attivazione.',
+      contesto: {
+        pagina: dati.pagina,
+        origine: dati.origine || 'form-prova',
+        cta: dati.cta,
+        extra: {
+          tipoOrigine: 'prova',
+          codice: CODICE,
+          attivita: dati.attivita,
+          stato: dati.statoPgm,
+        },
       },
     });
   }
