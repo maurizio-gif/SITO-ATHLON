@@ -57,11 +57,10 @@ import {
   haGiaAccount,
 } from '../data/contatto';
 import { SITE } from '../data/sito';
-import { CALENDLY } from '../data/calendly';
 import { validaTelefono } from '../data/prefissi';
 import { leggi as emailConosciuta } from '../scripts/emailNota';
 import { leggi as userNumberConosciuto } from '../scripts/numeroSocio';
-import { montaCalendario } from './calendario.client.js';
+import { montaAppuntamento } from './appuntamentoInline.client.js';
 
 export function initContattaciForm(root, options) {
   var P = options.prefix;
@@ -1007,61 +1006,66 @@ export function initContattaciForm(root, options) {
 
   // ── L'esito, e il calendario dentro la pagina ─────────────────────────────
   //
-  // Il pulsante che portava su Calendly è diventato il calendario stesso, sotto
-  // la domanda «Vuoi essere ricontattato?». Il come — script pigro, le due reti
-  // di sicurezza, la conferma della prenotazione — sta in
-  // `calendario.client.js`, condiviso con il form della prova e con la chat, e
-  // lì c'è anche il perché di ognuna. Qui resta solo cosa prenota questo form:
-  // quale dei tre eventi, con quale precompilato, e cosa fare quando Calendly
-  // conferma.
-
-  /* `richiamami` non ha la domanda personalizzata che serve a portare il
-     messaggio nella conferma — solo `recall` (lo stesso evento della chat)
-     ce l'ha, in posizione 0. Qui la persona scrive sempre un testo libero
-     prima di arrivare al calendario, quindi serve quello e non `richiamami`,
-     che lo perderebbe. */
-  function baseCalendario() {
-    if (dati.ramo === 'adulti') return CALENDLY.recall;
-    if (dati.ramo === 'baby') return CALENDLY.baby;
-    return CALENDLY.assistenza;
-  }
-
-  /** Il precompilato: `location` è il campo del telefono negli eventi
-      «chiamata» di Calendly, cioè il numero su cui il club richiama.
-      `customAnswers.a1` è la domanda personalizzata di `recall`, obbligatoria:
-      vuota blocca la prenotazione, quindi ci va sempre il testo scritto nel
-      passo «di cosa hai bisogno» — vedi `RICHIAMO.campi` in
-      `chatAssistente.client.js` per la stessa mappatura. */
-  function precompilato() {
-    return {
-      /* Nome e cognome separati: un evento Calendly con i due campi distinti
-         **ignora `name`**, e chi ci arrivava trovava i due campi vuoti con
-         l'email compilata. `nomiCompleti` in `calendario.client.js` manda
-         comunque tutte e tre le chiavi, così va bene per entrambe le
-         configurazioni; passarli separati evita di dividere una stringa e
-         sbagliare sui nomi doppi. */
-      firstName: dati.nome,
-      lastName: dati.cognome,
-      email: dati.email,
-      location: dati.cellulare || '',
-      customAnswers: dati.ramo === 'adulti' ? { a1: dati.richiesta || '(nessun dettaglio)' } : undefined,
-    };
-  }
+  // Il calendario è quello del club: gli orari li serve il pannello, che è
+  // l'unico posto che sa cosa c'è già in agenda, e l'appuntamento nasce lì
+  // dentro. Prima era l'embed di Calendly, e la differenza non è estetica —
+  // giorno, ora e testo della richiesta finivano in un servizio terzo e non
+  // tornavano più indietro, mentre adesso il desk apre l'agenda e li trova.
+  //
+  // Il come — orari veri al caricamento, campo dell'argomento, presa dello
+  // slot, le due email — sta in `appuntamentoInline.client.js`, condiviso con
+  // il form della prova e con la chat. Qui resta solo cosa prenota questo
+  // form: con quali dati, con quale argomento già scritto e cosa fare quando
+  // è fissato.
 
   var calendario = null;
 
   async function apriCalendario() {
     if (calendario) calendario.distruggi();
-    calendario = await montaCalendario({
+    calendario = await montaAppuntamento({
       riquadro: q('[data-cf-calendario]'),
-      ripiego: q('[data-cf-cal-ripiego]'),
-      link: q('[data-cf-cal-link]'),
-      url: baseCalendario(),
-      prefill: precompilato(),
+      prefill: {
+        email: dati.email,
+        nome: dati.nome,
+        cognome: dati.cognome,
+        telefono: dati.cellulare,
+        privacy: dati.privacy,
+        marketing: dati.marketing,
+      },
+      /* L'argomento arriva già scritto: è la richiesta che la persona ha
+         appena lasciato qualche schermata fa. Il campo resta modificabile —
+         chi ha scritto tre righe di problema può volerne mettere una di
+         riassunto per la telefonata — ma partire dal vuoto qui vorrebbe dire
+         far riscrivere a mano una cosa già detta, che è l'attrito per cui
+         questo passo si abbandona. */
+      oggetto: dati.richiesta || '',
+      invito:
+        'È quello che abbiamo letto nella tua richiesta. Correggilo pure: lo legge chi ti chiama, prima di comporre il numero.',
+      contesto: {
+        pagina: dati.pagina,
+        origine: dati.origine || 'form-contatti',
+        cta: dati.cta,
+        /* Tutto il resto della conversazione va con l'appuntamento: il ramo,
+           le attività scelte, lo stato su PerfectGym e l'id della richiesta
+           già scritta. Nel pannello questa telefonata deve leggersi insieme a
+           ciò che l'ha generata, non come una chiamata da nessun luogo. */
+        extra: {
+          ramo: dati.ramo,
+          macro: dati.macro,
+          attivita: dati.attivita,
+          richiesta: dati.richiesta,
+          richiestaId: dati.richiestaId,
+          userNumber: dati.userNumber,
+          stato: dati.statoPgm,
+          statoNucleo: dati.statoNucleo,
+          memberId: dati.memberId,
+          memberType: dati.memberType,
+          bambino: dati.bambino,
+          attivitaOrigine: dati.attivitaOrigine,
+        },
+      },
       onPrenotato: function () {
         dati.richiamo = true;
-        var fatto = q('[data-cf-cal-fatto]');
-        if (fatto) fatto.hidden = false;
         // Secondo POST: n8n aggiorna la riga per id, e il desk vede un
         // appuntamento fissato invece di un'intenzione dichiarata.
         spedisci(null, { aggiornamento: 'richiamo' });
@@ -1089,9 +1093,6 @@ export function initContattaciForm(root, options) {
     qa('[data-cf-iscrizioni]').forEach(function (el) {
       el.href = ISCRIZIONI;
     });
-    var fatto = q('[data-cf-cal-fatto]');
-    if (fatto) fatto.hidden = true;
-
     /* **Il calendario non esiste per chi ha un abbonamento**, e il blocco si
        toglie dal documento invece di essere solo nascosto: `hidden` lo fa
        uscire anche dal giro del tab, che è la regola del sito per tutto quello
@@ -1105,10 +1106,10 @@ export function initContattaciForm(root, options) {
     var conCalendario = variante !== 'assistenza';
     if (cal) cal.hidden = !conCalendario;
 
-    // Il pannello si allarga prima di montare il widget, così Calendly misura
-    // la larghezza definitiva e non quella di mezzo passaggio. Senza widget non
-    // c'è niente da allargare, e una schermata di tre righe larga il doppio
-    // sembra un errore di caricamento.
+    // Il pannello si allarga prima di montare il calendario, così la griglia
+    // degli orari misura la larghezza definitiva e non quella di mezzo
+    // passaggio. Senza calendario non c'è niente da allargare, e una schermata
+    // di tre righe larga il doppio sembra un errore di caricamento.
     root.classList.toggle('cf--largo', conCalendario);
     mostraStep('esito');
     if (conCalendario) apriCalendario();

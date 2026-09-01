@@ -16,9 +16,7 @@
  * pannello per occupare lo slot e una a n8n per il lead. Nessuna chiave nel
  * browser, nessuna route server, il sito resta statico.
  */
-import { CONSENSO_PRIVACY, CONSENSO_MARKETING } from '../data/contatto';
-import { ETICHETTA_OGGETTO, AIUTO_OGGETTO } from '../data/appuntamento';
-import CampoTelefono from './CampoTelefono.astro';
+import AppuntamentoPassi from './AppuntamentoPassi.astro';
 ---
 
 <div class="ap" id="appuntamento-modal" aria-hidden="true">
@@ -26,127 +24,8 @@ import CampoTelefono from './CampoTelefono.astro';
   <div class="ap__panel" role="dialog" aria-modal="true" aria-labelledby="ap-titolo-corrente">
     <button type="button" class="ap__close" data-ap-close aria-label="Chiudi">×</button>
 
-    {/* ── 1. L'email ──────────────────────────────────────────────────── */}
-    <section class="ap__step" id="ap-step-email">
-      <span class="ap__eyebrow">Prenota una chiamata</span>
-      <h3 class="ap__title" id="ap-titolo-corrente" tabindex="-1" data-ap-fuoco>Ti chiamiamo noi.</h3>
-      <p class="ap__claim">Scegli tu giorno e ora. Ti chiamiamo noi, senza attese al telefono.</p>
-      <p class="ap__lead">Iniziamo dalla tua email: se ci hai già scritto, saltiamo i convenevoli.</p>
+    <AppuntamentoPassi prefix="ap" titoloId="ap-titolo-corrente" />
 
-      <label class="ap__label" for="ap-email">La tua email</label>
-      <input
-        class="ap__input"
-        id="ap-email"
-        data-email-nota
-        type="email"
-        inputmode="email"
-        autocomplete="email"
-        placeholder="mario.rossi@email.it"
-      />
-
-      <p class="ap__errore" data-ap-errore hidden></p>
-
-      <button type="button" class="btn btn-primary ap__btn" data-ap-verifica>
-        <span class="ap__btn-testo">Continua</span>
-        <span class="ap__spinner" aria-hidden="true"></span>
-      </button>
-    </section>
-
-    {/* ── 2. I dati, solo per chi non ce li ha già ─────────────────────── */}
-    <section class="ap__step" id="ap-step-dati" hidden>
-      <span class="ap__eyebrow">Passo 2 di 4</span>
-      <h3 class="ap__title" tabindex="-1" data-ap-fuoco>Come ti chiamiamo?</h3>
-      <p class="ap__lead">Ci servono solo il nome e il numero su cui squillare.</p>
-
-      <div class="ap__coppia">
-        <div>
-          <label class="ap__label" for="ap-nome">Nome</label>
-          <input class="ap__input" id="ap-nome" type="text" autocomplete="given-name" />
-        </div>
-        <div>
-          <label class="ap__label" for="ap-cognome">Cognome</label>
-          <input class="ap__input" id="ap-cognome" type="text" autocomplete="family-name" />
-        </div>
-      </div>
-
-      <label class="ap__label" for="ap-cellulare">Cellulare</label>
-      <CampoTelefono id="ap-cellulare" classe="ap__input" />
-
-      <label class="ap__consenso">
-        <input type="checkbox" id="ap-privacy" />
-        <span>{CONSENSO_PRIVACY} <a href="/privacy">Informativa privacy</a>.</span>
-      </label>
-      <label class="ap__consenso">
-        <input type="checkbox" id="ap-marketing" />
-        <span>{CONSENSO_MARKETING}</span>
-      </label>
-
-      <p class="ap__errore" data-ap-errore hidden></p>
-
-      <div class="ap__azioni">
-        <button type="button" class="btn btn-outline ap__btn-secondario" data-ap-indietro="email">Indietro</button>
-        <button type="button" class="btn btn-primary ap__btn" data-ap-dati>
-          <span class="ap__btn-testo">Continua</span>
-          <span class="ap__spinner" aria-hidden="true"></span>
-        </button>
-      </div>
-    </section>
-
-    {/* ── 3. Quando ────────────────────────────────────────────────────
-
-        I giorni sono una fila scorrevole e gli orari una griglia divisa in
-        mattina e pomeriggio. Ventiquattro orari in colonna sarebbero un muro
-        di numeri: raggruppati e in griglia si leggono a colpo d'occhio, e su
-        un telefono la griglia si stringe da sola. */}
-    <section class="ap__step" id="ap-step-quando" hidden>
-      <span class="ap__eyebrow">Passo 3 di 4</span>
-      <h3 class="ap__title" tabindex="-1" data-ap-fuoco>Quando ti chiamiamo?</h3>
-      <p class="ap__lead">Prossimi sette giorni. Ti chiamiamo noi all’orario che scegli.</p>
-
-      <div class="ap__giorni" data-ap-giorni role="group" aria-label="Scegli il giorno"></div>
-      <div class="ap__orari-blocco" data-ap-orari></div>
-
-      <p class="ap__scelta" data-ap-scelta hidden></p>
-      <p class="ap__errore" data-ap-errore hidden></p>
-
-      <div class="ap__azioni">
-        <button type="button" class="btn btn-outline ap__btn-secondario" data-ap-indietro="email">Indietro</button>
-        <button type="button" class="btn btn-primary ap__btn" data-ap-avanti-quando disabled>
-          <span class="ap__btn-testo">Continua</span>
-        </button>
-      </div>
-    </section>
-
-    {/* ── 4. Di cosa ───────────────────────────────────────────────────── */}
-    <section class="ap__step" id="ap-step-oggetto" hidden>
-      <span class="ap__eyebrow">Passo 4 di 4</span>
-      <h3 class="ap__title" tabindex="-1" data-ap-fuoco>{ETICHETTA_OGGETTO}</h3>
-      <p class="ap__lead">{AIUTO_OGGETTO}</p>
-
-      <label class="ap__label" for="ap-oggetto">L’argomento della chiamata</label>
-      <textarea class="ap__input ap__textarea" id="ap-oggetto" rows="3" placeholder="Vorrei capire quale abbonamento mi conviene…"></textarea>
-
-      <p class="ap__errore" data-ap-errore hidden></p>
-
-      <div class="ap__azioni">
-        <button type="button" class="btn btn-outline ap__btn-secondario" data-ap-indietro="quando">Indietro</button>
-        <button type="button" class="btn btn-primary ap__btn" data-ap-invia>
-          <span class="ap__btn-testo">Prenota la chiamata</span>
-          <span class="ap__spinner" aria-hidden="true"></span>
-        </button>
-      </div>
-    </section>
-
-    {/* ── 5. Fatto ─────────────────────────────────────────────────────── */}
-    <section class="ap__step" id="ap-step-esito" hidden>
-      <span class="ap__eyebrow">Prenotato</span>
-      <h3 class="ap__title" tabindex="-1" data-ap-fuoco>Ti chiamiamo noi.</h3>
-      <p class="ap__scelta ap__scelta--grande" data-ap-riepilogo></p>
-      <p class="ap__lead">
-        Ti aspettiamo al telefono. Se nel frattempo cambia qualcosa, scrivici e spostiamo senza problemi.
-      </p>
-      <button type="button" class="btn btn-primary ap__btn" data-ap-close>Chiudi</button>
-    </section>
   </div>
 </div>
 
@@ -198,6 +77,38 @@ import CampoTelefono from './CampoTelefono.astro';
     opacity: 1;
   }
 
+  @media (max-width: 30rem) {
+    .ap__panel {
+      padding: 1.6rem 1.1rem 1.25rem;
+      /* A tutta altezza: un pannello centrato con gli orari dentro finirebbe
+         per scorrere due volte, se stesso e la pagina sotto. */
+      top: 0;
+      transform: none;
+      margin-top: 1rem;
+      max-height: calc(100dvh - 2rem);
+    }
+  }
+</style>
+
+<!-- Gli stili di ciò che nasce da JavaScript.
+     
+     Devono essere globali, e non è una scorciatoia: Astro marca gli elementi
+     del template con `data-astro-cid-…` e restringe a quelli le regole dello
+     <style> scoped. I giorni e gli orari li crea `appuntamentoForm.client.js`
+     dopo il caricamento, quindi quell'attributo non ce l'hanno e le regole non
+     li toccherebbero — misurato: `display: block` invece di flex, la griglia
+     degli orari inesistente, le pillole dei giorni ridotte a testo a capo.
+     
+     Il prefisso `ap__` è già proprio di questo pannello, quindi globale non
+     collide con niente: stesso ragionamento di CampoTelefono.astro. -->
+<style is:global>
+
+  /* Le regole dei passi stanno qui e non nello <style> scoped, per la stessa
+     ragione dei giorni e degli orari: il markup dei cinque passi vive in
+     `AppuntamentoPassi.astro`, che è un componente a sé e porta un
+     `data-astro-cid-…` suo. Una regola scoped di questo file non lo
+     raggiungerebbe — e non raggiungerebbe nemmeno la copia incorporata in
+     pagina, che è lo stesso markup montato altrove. */
   .ap__eyebrow {
     display: inline-block;
     font-size: 0.72rem;
@@ -298,41 +209,6 @@ import CampoTelefono from './CampoTelefono.astro';
       transform: rotate(360deg);
     }
   }
-
-  @media (max-width: 30rem) {
-    .ap__panel {
-      padding: 1.6rem 1.1rem 1.25rem;
-      /* A tutta altezza: un pannello centrato con gli orari dentro finirebbe
-         per scorrere due volte, se stesso e la pagina sotto. */
-      top: 0;
-      transform: none;
-      margin-top: 1rem;
-      max-height: calc(100dvh - 2rem);
-    }
-    .ap__coppia {
-      grid-template-columns: 1fr;
-    }
-    .ap__azioni {
-      flex-direction: column-reverse;
-    }
-    .ap__azioni .btn {
-      width: 100%;
-    }
-  }
-</style>
-
-<!-- Gli stili di ciò che nasce da JavaScript.
-     
-     Devono essere globali, e non è una scorciatoia: Astro marca gli elementi
-     del template con `data-astro-cid-…` e restringe a quelli le regole dello
-     <style> scoped. I giorni e gli orari li crea `appuntamentoForm.client.js`
-     dopo il caricamento, quindi quell'attributo non ce l'hanno e le regole non
-     li toccherebbero — misurato: `display: block` invece di flex, la griglia
-     degli orari inesistente, le pillole dei giorni ridotte a testo a capo.
-     
-     Il prefisso `ap__` è già proprio di questo pannello, quindi globale non
-     collide con niente: stesso ragionamento di CampoTelefono.astro. -->
-<style is:global>
 
   /* I campi stanno qui e non nello <style> scoped, e la ragione è
      CampoTelefono.astro: quel componente si aspetta che padding, bordo e
@@ -506,12 +382,81 @@ import CampoTelefono from './CampoTelefono.astro';
     margin: 1rem 0 0.9rem;
     font-weight: 700;
   }
+  @media (max-width: 30rem) {
+    .ap__coppia {
+      grid-template-columns: 1fr;
+    }
+    .ap__azioni {
+      flex-direction: column-reverse;
+    }
+    .ap__azioni .btn {
+      width: 100%;
+    }
+  }
+
   .ap__scelta--grande {
     font-size: 1.15rem;
     color: var(--color-primary, #ff5701);
     margin-top: 0.2rem;
   }
 
+
+  /* ── Il calendario da solo ────────────────────────────────────────────────
+     Quello che `appuntamentoInline.client.js` disegna dentro i form che i dati
+     ce li hanno già: niente passi, solo giorni, orari e l'argomento. Giorni e
+     orari riusano le classi `ap__`; qui c'è il contorno. */
+  .apx__label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin: 1.1rem 0 0.35rem;
+  }
+  .apx__aiuto {
+    margin: 0 0 1rem;
+    font-size: 0.82rem;
+    opacity: 0.65;
+    line-height: 1.45;
+  }
+  .apx__scelta {
+    margin: 1rem 0 0;
+    font-weight: 700;
+  }
+  .apx__errore {
+    color: #c0392b;
+    font-size: 0.85rem;
+    margin: 0 0 0.9rem;
+  }
+  .apx__btn {
+    width: 100%;
+    position: relative;
+  }
+  .apx__spinner {
+    display: none;
+  }
+  .apx__btn.is-attesa .apx__btn-testo {
+    opacity: 0.35;
+  }
+  .apx__btn.is-attesa .apx__spinner {
+    display: block;
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 1.05rem;
+    height: 1.05rem;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: ap-gira 0.7s linear infinite;
+  }
+  .apx__fatto {
+    padding: 0.4rem 0 0.2rem;
+  }
+  .apx__fatto-titolo {
+    margin: 0 0 0.35rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--color-primary, #ff5701);
+  }
 </style>
 
 <script>

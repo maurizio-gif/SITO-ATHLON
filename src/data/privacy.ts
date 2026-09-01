@@ -152,8 +152,13 @@ export const DESTINATARI: Destinatario[] = [
   {
     nome: 'Calendly',
     dominio: 'calendly.com',
+    /* Non più il richiamo telefonico: quello si prenota sul calendario del
+       club e resta dentro i nostri sistemi. Restano tre schede dell'Help Desk
+       sulla direzione tecnica del nuoto — vedi `data/calendly.ts` — e finché
+       ci sono, Calendly resta qui: un servizio incorporato che l'informativa
+       non nomina è esattamente ciò che l'informativa deve evitare. */
     perche:
-      "Prenotazione del richiamo telefonico. Il link arriva precompilato con i dati già lasciati e con la conversazione avuta con l'assistente.",
+      'Prenotazione degli appuntamenti con la direzione tecnica del nuoto, dalle schede dell’Help Desk che li ospitano.',
   },
   {
     nome: 'PerfectGym',
@@ -214,8 +219,9 @@ export interface Sezione {
  *    piattaforma di automazione, e la banca dati è in Irlanda — verificato, non
  *    supposto.
  *  - **L'assistente e il richiamo telefonico non erano nominati**, e il secondo
- *    è il punto più significativo della catena: prenotando, a Calendly arriva
- *    anche il testo della conversazione.
+ *    è il punto più significativo della catena: prenotando, il testo della
+ *    conversazione viaggia insieme all'appuntamento. Andava a Calendly, e da
+ *    lì non tornava; oggi resta nell'agenda del club, e la frase lo dice.
  *  - **I trasferimenti fuori UE erano solo quelli di Meta.** Oggi sono anche
  *    Google, Calendly e Vimeo.
  *
@@ -247,7 +253,7 @@ export const INFORMATIVA: Sezione[] = [
       '<p>I moduli non sono gestiti da un server del club: i dati vengono trasmessi a una <strong>piattaforma di automazione</strong> che li instrada verso i nostri sistemi e verso la banca dati del club, ospitata su server nell\'Unione Europea (Irlanda). Chi la gestisce agisce come responsabile del trattamento.</p>',
       '<h3>c) L\'assistente e la richiesta di richiamo telefonico</h3>',
       '<p>L\'assistente del Club Life è una conversazione: quello che scrivi viene trasmesso alla piattaforma di automazione per produrre la risposta e per permetterci di ricontattarti.</p>',
-      '<p>Se durante la conversazione ti proponiamo un <strong>richiamo telefonico</strong> e scegli di prenotarlo, il collegamento che apri porta a <strong>Calendly</strong> già compilato con nome, cognome, email e cellulare, e con il <strong>testo della conversazione</strong> riportato nel campo delle note, perché chi ti richiama sappia di cosa avete parlato. Prenotando, quei dati sono trattati anche da Calendly, società statunitense: se preferisci non trasmetterli, non prenotare da lì e scrivici all\'indirizzo del club.</p>',
+      '<p>Se durante la conversazione ti proponiamo un <strong>richiamo telefonico</strong> e scegli di prenotarlo, il calendario che si apre è nostro: giorno e ora finiscono nell\'agenda del club insieme a nome, cognome, email, cellulare e al <strong>testo della conversazione</strong>, che riportiamo nell\'argomento della chiamata perché chi ti richiama sappia di cosa avete parlato. L\'argomento resta modificabile prima di confermare, e nessuno di questi dati esce dai nostri sistemi.</p>',
       '<h3>d) Identificativo del browser e provenienza della visita</h3>',
       '<p>Se acconsenti ai cookie di marketing, il sito conserva nel tuo browser un <strong>identificativo casuale</strong> — non contiene dati personali — e i parametri della campagna da cui la visita è arrivata. Servono a riconoscere una richiesta che proviene dalla stessa persona e a capire quale campagna l\'ha portata. Vengono allegati ai moduli che invii: dal momento in cui viaggiano insieme al tuo nome e alla tua email, sono dati personali a tutti gli effetti.</p>',
       '<p><strong>Senza il tuo consenso non vengono conservati</strong>, e i moduli funzionano esattamente allo stesso modo: manca solo l\'informazione sulla provenienza.</p>',
@@ -282,7 +288,7 @@ export const INFORMATIVA: Sezione[] = [
       '<h3>Responsabili del trattamento (art. 28 GDPR)</h3>',
       '<ul><li>Consulenti esterni — commercialista, consulente del lavoro, legale — per gli adempimenti fiscali, contabili e legali.</li><li>Il fornitore della <strong>piattaforma di automazione</strong> che riceve i moduli e le conversazioni, e il fornitore della <strong>banca dati</strong> su cui sono conservati, con server nell\'Unione Europea.</li><li>Il fornitore del <strong>portale del club</strong> per abbonamenti, prenotazioni e accessi.</li><li>Il fornitore del <strong>sistema di raccolta del consenso</strong> ai cookie.</li><li>Il fornitore dell\'<strong>infrastruttura di pubblicazione</strong> del sito.</li></ul>',
       '<h3>Titolari autonomi</h3>',
-      '<ul><li><strong>Ente di Promozione Sportiva o Federazione di riferimento</strong>, per i soli adempimenti obbligatori di tesseramento.</li><li><strong>Google Ireland Ltd</strong>, per la gestione dei tag di misurazione e per la mappa della sede.</li><li><strong>Calendly LLC</strong>, quando prenoti un richiamo telefonico.</li><li><strong>Meta Platforms Ireland Ltd</strong>, per le conversazioni avviate sui suoi canali e per gli eventuali strumenti pubblicitari attivati con il tuo consenso.</li><li><strong>Vimeo</strong> e il fornitore del <strong>tour virtuale</strong>, per i contenuti multimediali che il sito incorpora.</li><li><strong>Autorità giudiziarie e amministrative</strong>, nei casi previsti dalla legge.</li></ul>',
+      '<ul><li><strong>Ente di Promozione Sportiva o Federazione di riferimento</strong>, per i soli adempimenti obbligatori di tesseramento.</li><li><strong>Google Ireland Ltd</strong>, per la gestione dei tag di misurazione e per la mappa della sede.</li><li><strong>Calendly LLC</strong>, quando prenoti un appuntamento con la direzione tecnica del nuoto dalle schede che lo consentono.</li><li><strong>Meta Platforms Ireland Ltd</strong>, per le conversazioni avviate sui suoi canali e per gli eventuali strumenti pubblicitari attivati con il tuo consenso.</li><li><strong>Vimeo</strong> e il fornitore del <strong>tour virtuale</strong>, per i contenuti multimediali che il sito incorpora.</li><li><strong>Autorità giudiziarie e amministrative</strong>, nei casi previsti dalla legge.</li></ul>',
       '<p>I tuoi dati <strong>non vengono venduti, ceduti per il marketing di terzi né diffusi pubblicamente</strong>.</p>',
     ],
   },
@@ -291,7 +297,7 @@ export const INFORMATIVA: Sezione[] = [
     corpo: [
       '<p>La banca dati del club è ospitata su <strong>server nell\'Unione Europea (Irlanda)</strong>, e i dati che trattiamo direttamente restano lì.</p>',
       '<p>Alcuni dei servizi che il sito utilizza sono però forniti da società statunitensi, e comportano il trasferimento di dati verso gli Stati Uniti:</p>',
-      '<ul><li><strong>Google</strong>, per la gestione dei tag e per la mappa;</li><li><strong>Calendly</strong>, quando prenoti un richiamo — e in quel caso il trasferimento riguarda anche il testo della conversazione;</li><li><strong>Vimeo</strong>, per i video incorporati;</li><li><strong>Meta</strong>, per i suoi canali e per gli eventuali strumenti pubblicitari.</li></ul>',
+      '<ul><li><strong>Google</strong>, per la gestione dei tag e per la mappa;</li><li><strong>Calendly</strong>, quando prenoti un appuntamento con la direzione tecnica del nuoto;</li><li><strong>Vimeo</strong>, per i video incorporati;</li><li><strong>Meta</strong>, per i suoi canali e per gli eventuali strumenti pubblicitari.</li></ul>',
       '<p>Il trasferimento avviene sulla base della <strong>decisione di adeguatezza</strong> adottata dalla Commissione Europea per gli Stati Uniti (EU-US Data Privacy Framework) per i fornitori che vi hanno aderito, e delle <strong>Clausole Contrattuali Standard</strong> dove quella non è applicabile.</p>',
       '<p>Gli strumenti che richiedono il tuo consenso non vengono attivati, e quindi non trasferiscono nulla, finché non lo dai.</p>',
     ],

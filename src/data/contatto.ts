@@ -58,10 +58,11 @@ export const WEBHOOK_CONTATTO = 'https://automazione.n8ndevelop.it/webhook/athlo
  */
 export const WEBHOOK_RESET = 'https://automazione.n8ndevelop.it/webhook/athlon-reset-password';
 
-/* Il calendario e i suoi indirizzi non stanno più qui: sono in
-   `data/calendly.ts`, perché i posti che lo usano sono tre — questo form,
-   quello della prova e l'assistente in chat — e la logica dell'embed è in
-   `lib/calendario.client.js`. */
+/* Il calendario non sta più qui, e non è più nemmeno di Calendly: gli orari
+   liberi li serve il pannello del club e l'appuntamento nasce nella sua
+   agenda. Gli indirizzi in `data/appuntamento.ts`, la logica in
+   `lib/appuntamentoInline.client.js` — condivisa dai tre posti che la usano:
+   questo form, quello della prova e l'assistente in chat. */
 
 /**
  * Il portale, per chi risulta già registrato: reset password e accesso.

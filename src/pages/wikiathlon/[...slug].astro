@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import { getCollection, render } from 'astro:content';
 import { AREA_LABELS } from '../../data/helpdesk';
 import BottoneChat from '../../components/BottoneChat.astro';
+import AppuntamentoInline from '../../components/AppuntamentoInline.astro';
 import '../../styles/prosa.css';
 import { ACTIVITY_LABEL } from '../../data/activities';
 
@@ -66,6 +67,12 @@ const { entry, tutte } = Astro.props;
 const { Content } = await render(entry);
 const d = entry.data;
 const vicine = correlate(entry, tutte);
+
+/* Il riquadro «Prenota una chiamata» si aggiunge solo alle schede che lo
+   chiedono, e lo chiedono scrivendo il contenitore nel Markdown. Montarlo
+   ovunque vorrebbe dire spedire i campi di un form a ottanta schede che non lo
+   usano. */
+const conAppuntamento = (entry.body ?? '').includes('data-athlon-appuntamento');
 
 const areas = Array.isArray(d.area) ? d.area : [d.area];
 const folder = entry.id.split('/')[0];
@@ -178,6 +185,7 @@ const scheda = {
         <div class="wa__body prosa">
           <Content />
         </div>
+        {conAppuntamento && <AppuntamentoInline />}
       </div>
     </section>
 

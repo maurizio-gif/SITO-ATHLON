@@ -1,0 +1,151 @@
+---
+/**
+ * I cinque passi di «Prenota una chiamata», senza il guscio che li contiene.
+ *
+ * Stanno in un componente a parte perché i posti che li mostrano sono due, e
+ * sono due modi diversi di mostrare la **stessa** cosa: il pannello che si apre
+ * da una CTA (`AppuntamentoModal`) e il riquadro incorporato in fondo a una
+ * pagina (`AppuntamentoInline`). Due copie del markup sarebbero due form che
+ * divergono al primo campo aggiunto in uno solo dei due.
+ *
+ * `prefix` è quello che li tiene distinti: gli id devono essere unici nel
+ * documento, e la logica in `appuntamentoForm.client.js` cerca `#<prefix>-email`
+ * dentro la propria radice. Le classi invece restano `ap__` per tutti e due —
+ * sono lo stesso form e devono avere lo stesso aspetto.
+ */
+import { CONSENSO_PRIVACY, CONSENSO_MARKETING } from '../data/contatto';
+import { ETICHETTA_OGGETTO, AIUTO_OGGETTO } from '../data/appuntamento';
+import CampoTelefono from './CampoTelefono.astro';
+
+interface Props {
+  /** Il prefisso degli id. `ap` nel modal, `api` nel riquadro in pagina. */
+  prefix: string;
+  /** Il titolo del primo passo, che è anche ciò che il pannello annuncia. */
+  titoloId?: string;
+}
+
+const { prefix: p, titoloId } = Astro.props;
+---
+
+  {/* ── 1. L'email ──────────────────────────────────────────────────── */}
+  <section class="ap__step" id={`${p}-step-email`}>
+    <span class="ap__eyebrow">Prenota una chiamata</span>
+    <h3 class="ap__title" id={titoloId} tabindex="-1" data-ap-fuoco>Ti chiamiamo noi.</h3>
+    <p class="ap__claim">Scegli tu giorno e ora. Ti chiamiamo noi, senza attese al telefono.</p>
+    <p class="ap__lead">Iniziamo dalla tua email: se ci hai già scritto, saltiamo i convenevoli.</p>
+
+    <label class="ap__label" for={`${p}-email`}>La tua email</label>
+    <input
+      class="ap__input"
+      id={`${p}-email`}
+      data-email-nota
+      type="email"
+      inputmode="email"
+      autocomplete="email"
+      placeholder="mario.rossi@email.it"
+    />
+
+    <p class="ap__errore" data-ap-errore hidden></p>
+
+    <button type="button" class="btn btn-primary ap__btn" data-ap-verifica>
+      <span class="ap__btn-testo">Continua</span>
+      <span class="ap__spinner" aria-hidden="true"></span>
+    </button>
+  </section>
+
+  {/* ── 2. I dati, solo per chi non ce li ha già ─────────────────────── */}
+  <section class="ap__step" id={`${p}-step-dati`} hidden>
+    <span class="ap__eyebrow">Passo 2 di 4</span>
+    <h3 class="ap__title" tabindex="-1" data-ap-fuoco>Come ti chiamiamo?</h3>
+    <p class="ap__lead">Ci servono solo il nome e il numero su cui squillare.</p>
+
+    <div class="ap__coppia">
+      <div>
+        <label class="ap__label" for={`${p}-nome`}>Nome</label>
+        <input class="ap__input" id={`${p}-nome`} type="text" autocomplete="given-name" />
+      </div>
+      <div>
+        <label class="ap__label" for={`${p}-cognome`}>Cognome</label>
+        <input class="ap__input" id={`${p}-cognome`} type="text" autocomplete="family-name" />
+      </div>
+    </div>
+
+    <label class="ap__label" for={`${p}-cellulare`}>Cellulare</label>
+    <CampoTelefono id={`${p}-cellulare`} classe="ap__input" />
+
+    <label class="ap__consenso">
+      <input type="checkbox" id={`${p}-privacy`} />
+      <span>{CONSENSO_PRIVACY} <a href="/privacy">Informativa privacy</a>.</span>
+    </label>
+    <label class="ap__consenso">
+      <input type="checkbox" id={`${p}-marketing`} />
+      <span>{CONSENSO_MARKETING}</span>
+    </label>
+
+    <p class="ap__errore" data-ap-errore hidden></p>
+
+    <div class="ap__azioni">
+      <button type="button" class="btn btn-outline ap__btn-secondario" data-ap-indietro="email">Indietro</button>
+      <button type="button" class="btn btn-primary ap__btn" data-ap-dati>
+        <span class="ap__btn-testo">Continua</span>
+        <span class="ap__spinner" aria-hidden="true"></span>
+      </button>
+    </div>
+  </section>
+
+  {/* ── 3. Quando ────────────────────────────────────────────────────
+
+      I giorni sono una fila scorrevole e gli orari una griglia divisa in
+      mattina e pomeriggio. Ventiquattro orari in colonna sarebbero un muro
+      di numeri: raggruppati e in griglia si leggono a colpo d'occhio, e su
+      un telefono la griglia si stringe da sola. */}
+  <section class="ap__step" id={`${p}-step-quando`} hidden>
+    <span class="ap__eyebrow">Passo 3 di 4</span>
+    <h3 class="ap__title" tabindex="-1" data-ap-fuoco>Quando ti chiamiamo?</h3>
+    <p class="ap__lead">Prossimi sette giorni. Ti chiamiamo noi all’orario che scegli.</p>
+
+    <div class="ap__giorni" data-ap-giorni role="group" aria-label="Scegli il giorno"></div>
+    <div class="ap__orari-blocco" data-ap-orari></div>
+
+    <p class="ap__scelta" data-ap-scelta hidden></p>
+    <p class="ap__errore" data-ap-errore hidden></p>
+
+    <div class="ap__azioni">
+      <button type="button" class="btn btn-outline ap__btn-secondario" data-ap-indietro="email">Indietro</button>
+      <button type="button" class="btn btn-primary ap__btn" data-ap-avanti-quando disabled>
+        <span class="ap__btn-testo">Continua</span>
+      </button>
+    </div>
+  </section>
+
+  {/* ── 4. Di cosa ───────────────────────────────────────────────────── */}
+  <section class="ap__step" id={`${p}-step-oggetto`} hidden>
+    <span class="ap__eyebrow">Passo 4 di 4</span>
+    <h3 class="ap__title" tabindex="-1" data-ap-fuoco>{ETICHETTA_OGGETTO}</h3>
+    <p class="ap__lead">{AIUTO_OGGETTO}</p>
+
+    <label class="ap__label" for={`${p}-oggetto`}>L’argomento della chiamata</label>
+    <textarea class="ap__input ap__textarea" id={`${p}-oggetto`} rows="3" placeholder="Vorrei capire quale abbonamento mi conviene…"></textarea>
+
+    <p class="ap__errore" data-ap-errore hidden></p>
+
+    <div class="ap__azioni">
+      <button type="button" class="btn btn-outline ap__btn-secondario" data-ap-indietro="quando">Indietro</button>
+      <button type="button" class="btn btn-primary ap__btn" data-ap-invia>
+        <span class="ap__btn-testo">Prenota la chiamata</span>
+        <span class="ap__spinner" aria-hidden="true"></span>
+      </button>
+    </div>
+  </section>
+
+  {/* ── 5. Fatto ─────────────────────────────────────────────────────── */}
+  <section class="ap__step" id={`${p}-step-esito`} hidden>
+    <span class="ap__eyebrow">Prenotato</span>
+    <h3 class="ap__title" tabindex="-1" data-ap-fuoco>Ti chiamiamo noi.</h3>
+    <p class="ap__scelta ap__scelta--grande" data-ap-riepilogo></p>
+    <p class="ap__lead">
+      Ti arriva l’email di conferma: dentro c’è un pulsante per spostare o annullare, se nel frattempo
+      cambia qualcosa.
+    </p>
+    <button type="button" class="btn btn-primary ap__btn" data-ap-close>Chiudi</button>
+  </section>

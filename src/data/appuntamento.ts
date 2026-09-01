@@ -40,6 +40,26 @@ export const API_PRENOTA = `${CRM}/api/prenotazioni`;
 export { WEBHOOK_CONTATTO as WEBHOOK_APPUNTAMENTO, WEBHOOK_VERIFICA } from './contatto';
 
 /**
+ * Le due email dell'appuntamento: la conferma a chi ha prenotato e l'avviso a
+ * desk@.
+ *
+ * Un webhook **suo**, e non quello dei contatti che sta qui sopra: sono due
+ * lavori diversi sullo stesso fatto. Quello dei contatti crea il lead su
+ * PerfectGym e ha cinquantacinque nodi di rami da rispettare; questo manda
+ * posta e basta — è il gemello di `athlon-prova-nuoto`, che fa la stessa cosa
+ * per la prova di inserimento. Infilare le email là dentro avrebbe voluto dire
+ * toccare un'automazione viva per aggiungerci un ramo che non c'entra con i
+ * suoi.
+ *
+ * Nel corpo va `appuntamento.urlGestione`, che è il link firmato dal pannello:
+ * diventa il pulsante «sposta o annulla» dentro la conferma. Lo firma il
+ * pannello perché è l'unico che ha il segreto — vedi `lib/appuntamento-token.ts`
+ * di là.
+ */
+export const WEBHOOK_EMAIL_APPUNTAMENTO =
+  'https://automazione.n8ndevelop.it/webhook/athlon-appuntamento';
+
+/**
  * Di cosa si parla: obbligatorio, ed è la ragione per cui la chiamata serve a
  * qualcosa. Una telefonata senza sapere l'argomento è tempo buttato per tutti
  * e due.
