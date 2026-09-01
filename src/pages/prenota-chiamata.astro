@@ -81,8 +81,14 @@ import { CLUB } from '../data/club';
   .pc-form {
     padding: var(--space-section-md) 0 var(--space-section-lg);
   }
-  .pc-form__inner {
-    display: flex;
-    justify-content: center;
+  /* Non `display:flex; justify-content:center`: un figlio con dentro una riga
+     `flex nowrap` (i giorni del calendario) non si restringe sotto il proprio
+     `min-width:auto`, quindi il riquadro sfonda la larghezza dello schermo e
+     resta bloccato lì — niente scorrimento, solo contenuto tagliato fuori. Il
+     blocco si centra da sé con `margin: 0 auto`, che non ha questo problema:
+     resta dentro lo schermo ed è la riga dei giorni a scorrere, non la pagina. */
+  .pc-form__inner :global(.apx-sezione) {
+    margin-left: auto;
+    margin-right: auto;
   }
 </style>
