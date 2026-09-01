@@ -1,6 +1,6 @@
 ---
 title: "Non riesco a prenotare una lezione"
-description: "Tutte le cause per cui una prenotazione risulta bloccata, con il messaggio che vedi a schermo e come si risolve."
+description: "Tutte le cause per cui una prenotazione risulta bloccata, con il messaggio che vedi a schermo e come si risolve — compreso «your member is on financial debit», che vuol dire un pagamento da saldare da Scadenze."
 area: "Generali"
 order: 3
 tags:
@@ -14,6 +14,9 @@ tags:
   - blocco
   - certificato medico
   - insoluto
+  - your member is on financial debit
+  - financial debit
+  - scadenze
 attivita: []
 ---
 
@@ -86,13 +89,28 @@ Tutti i requisiti sono nella scheda [Certificato Medico](/wikiathlon/generali/ce
 
 ## 3. Pagamento insoluto
 
+### Messaggio che vedi
+
+> your member is on financial debit
+
+Compare in rosso sull'app quando provi a prenotare, ed è in inglese: vuol dire
+che c'è **un pagamento da saldare**, niente di più.
+
 ### Perché appare
 
 **Dal primo giorno di ritardo** nel pagamento l'accesso al club e le prenotazioni sono sospesi, fino a quando la posizione non è regolarizzata.
 
+Può comparire anche a chi si è **appena iscritto**, ed è il caso più frequente: il primo pagamento non è andato a buon fine — con la carta capita quando manca l'autenticazione della banca. L'iscrizione è registrata lo stesso, è la quota che risulta ancora aperta.
+
 ### Come si risolve
 
-Area riservata → **Scadenze** → **Paga**. Le prenotazioni si riattivano appena il pagamento risulta andato a buon fine.
+Lo saldi da solo, dall'area riservata, e non serve passare in segreteria:
+
+1. Apri l'area riservata e vai su **Scadenze**.
+2. Gli importi sono in ordine di data, **il più vicino nel tempo è il primo in alto**: se risulta scaduto, è quello che ti sta bloccando.
+3. Cliccaci sopra, poi su **Paga**.
+
+Le prenotazioni e l'accesso si riattivano appena il pagamento risulta andato a buon fine. Se dopo il pagamento su **Scadenze** non c'è più nulla di aperto, è saldato: [come si verifica](/wikiathlon/generali/verifica-stato-richieste/).
 
 Cosa succede se il ritardo continua: [Non ho pagato e non ho frequentato](/wikiathlon/adulti/insoluti-e-disdetta/).
 

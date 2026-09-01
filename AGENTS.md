@@ -1157,18 +1157,67 @@ lasciare il suo numero digita quello. Quindi tre controlli in fila:
 1. **La forma.** Lunghezza E.164, e per l'Italia il cellulare deve cominciare per
    3 ed essere di nove o dieci cifre. Un fisso in un campo «cellulare» non è un
    errore di battitura: è un numero su cui WhatsApp non esiste.
-2. **La varietà.** Meno di quattro cifre diverse vuol dire inventato.
-3. **Le sequenze.** Sette cifre consecutive in salita o in discesa.
+2. **La cifra sola ripetuta.** `3333333333` non è il numero di nessuno.
+3. **Le sequenze.** Otto cifre consecutive in salita o in discesa.
 
-**Sette e non sei, ed è misurato**: a sei, `+44 7911 123456` — un numero dalla
-forma perfettamente britannica — veniva rifiutato, perché una sequenza di sei
-capita per caso circa una volta su diecimila. Il verso giusto in cui sbagliare è
-questo: un numero finto che passa lo si scopre al primo messaggio non
-consegnato, una persona vera che non riesce a lasciare il suo numero non torna.
+**Le soglie si sono mosse tre volte, sempre allargandosi, e sempre perché
+avevano preso un numero vero.** Le sequenze chiedevano sei cifre e rifiutavano
+`+44 7911 123456`, che è britannico di forma perfetta; a sette rifiutavano
+`339 123 4567`, dove 339 è un prefisso Vodafone e il resto è sfortuna. La
+varietà chiedeva quattro cifre diverse, che è ragionevole su un numero medio e
+sbagliato su quelli belli: `340 111 1111` ne ha tre e `331 111 1111` ne ha due,
+e sono numeri che gli operatori assegnano davvero — anzi, li fanno pagare.
 
-Fuori dall'Italia si controllano solo lunghezza, varietà e sequenze: le regole
-nazionali sono duecento e cambiano, e un falso negativo costa più di un numero
-sbagliato.
+Il verso giusto in cui sbagliare è sempre lo stesso, e vale per tutte e tre: un
+numero finto che passa lo si scopre al primo messaggio non consegnato, una
+persona vera che non riesce a lasciare il suo numero non torna. **Quindi la
+domanda da farsi toccando una di queste soglie non è «quanti numeri finti
+prende» ma «quanti numeri veri rifiuta»**, e si risponde con una spazzata:
+trecentomila `3` più nove cifre a caso, cioè tutto lo spazio dei cellulari
+italiani a dieci cifre, e ne devono passare trecentomila.
+
+E i due messaggi dicono due cose diverse perché sono due errori diversi. Quello
+sul fisso prima non lo leggeva nessuno: cercava lo zero iniziale su un numero da
+cui `componiTelefono` lo aveva appena tolto, quindi a chi scriveva `06 8100…`
+rispondeva «comincia per 3», che è vero e non spiega niente.
+
+Fuori dall'Italia si controllano solo lunghezza, cifra unica e sequenze: le
+regole nazionali sono duecento e cambiano, e un falso negativo costa più di un
+numero sbagliato.
+
+#### Il prefisso ripetuto si scarta solo se scartarlo è l'unica lettura possibile
+
+`3931623468` è un cellulare Wind Tre di dieci cifre, e il form lo rifiutava
+dicendo alla persona che il **suo** numero comincia per 3 e ha dieci cifre —
+cosa che era vera e che il numero faceva. A mangiarselo era la gentilezza di
+`componiTelefono`: chi digita `+39` dentro un campo che ha già `+39` nella
+tendina non deve ritrovarsi `+39+39…`, quindi se le cifre cominciano col
+prefisso scelto quello si scarta. Solo che qui quelle due cifre **erano il
+numero**: restava `31623468`, otto cifre, rifiutato.
+
+Misurato sulla spazzata: **il 10% dello spazio dei cellulari italiani veniva
+rifiutato**, cioè un numero su dieci di tutti quelli che cominciano per 3 —
+tutta la serie `39x`, che è Wind Tre. Ed è un guasto che dal traffico non si
+vede, perché chi non riesce a lasciare il numero non lascia niente: si è visto
+solo perché una persona ha mandato lo screenshot.
+
+Adesso il prefisso ripetuto si scarta solo quando **tenerlo non sta in piedi**:
+`393931623468` non è un cellulare italiano e allora quelle prime due cifre sono
+davvero il prefisso, `3931623468` lo è e allora sono il numero. La decisione va
+sull'ipotesi più forte, non sulla prima che capita.
+
+Due cose da sapere prima di toccarla. **Fuori dall'Italia si scarta come si è
+sempre fatto**, perché senza la forma del numero nazionale non c'è niente da
+confrontare — e il caso morde qui perché i cellulari `39x` esistono, mentre dove
+il numero nazionale non può cominciare col codice del paese (il Regno Unito
+comincia per 7, la Germania per 15/16/17) l'ambiguità non c'è. E **la disfatta
+serve ancora**, quindi non si toglie: `precompila()` di quattro form mette nel
+campo il numero come lo restituisce PerfectGym, che è già `+39340…`.
+
+La lezione generale: **una normalizzazione che indovina va condizionata a ciò
+che rende plausibile, non applicata perché la forma combacia.** Una regola che
+ripulisce l'input è una regola che può cancellare un dato vero, e lo fa in
+silenzio.
 
 Per **verificare un prefisso**: la lista ufficiale è ITU-T E.164. Un prefisso
 sbagliato non dà errore, manda un messaggio a un numero che non esiste, e non lo
@@ -2500,6 +2549,56 @@ perché il limite si legge in tre posti.
 E nel `systemMessage` c'è la regola fissa che chiude il caso anche se la scheda
 dovesse tornare ambigua: **mai dire di disdire una lezione a cui vuole andare per
 liberare il limite.**
+
+### Un messaggio d'errore che la scheda non nomina è una diagnosi che il modello inventa
+
+«Mi sono iscritta ieri e mi esce una scritta in rosso, *your member is on
+financial debit*: che significa?» → *«quel messaggio non dovrebbe comparire se ti
+sei iscritta ieri. Potrebbe essere un errore di sincronizzazione fra l'app e il
+portale, oppure il metodo di pagamento non è stato elaborato correttamente.
+Scrivi al team.»*
+
+Tre cose sbagliate in una risposta. L'«errore di sincronizzazione fra l'app e il
+portale» **non esiste**: è stato inventato lì. «Non dovrebbe comparire se ti sei
+iscritta ieri» è **falso**, ed è anzi il caso più frequente — il primo pagamento
+non è andato a buon fine, cosa che con la carta capita quando manca
+l'autenticazione della banca. E soprattutto: quel messaggio ha una **soluzione
+che la persona può fare da sola in trenta secondi**, e invece è stata mandata a
+scrivere al desk e ad aspettare una risposta via email.
+
+**Il pezzo che mancava era una riga, e la scheda aveva già tutto il resto.**
+`generali/prenotazioni-problemi` elenca sette cause di blocco, la terza è
+«Pagamento insoluto» e portava già `Area riservata → Scadenze → Paga`. Ma era
+**l'unica delle sette senza la sezione «Messaggio che vedi»** — e la scheda apre
+dicendo *«trova il messaggio che vedi a schermo: sotto c'è il motivo e cosa
+fare»*. Cioè prometteva un indice per messaggio e su quella causa aveva un buco,
+per giunta sull'unico messaggio che il portale scrive **in inglese**.
+
+Da qui la regola, che è la sorella di quella sul turno fisso della scuola nuoto:
+là un dato assente diventava una regola generale che si allargava al posto suo,
+qui un messaggio non indicizzato diventa una diagnosi inventata. **Un errore che
+la persona cita è una chiave di ricerca prima che un sintomo**: se la knowledge
+base non lo contiene con le parole esatte con cui appare a schermo — maiuscole e
+lingua originale comprese — il modello non lo trova, e quello che non trova lo
+interpreta.
+
+Tre cose da sapere prima di toccarla.
+
+**I `tags` del frontmatter non entrano nel `kb.json`.** La voce di una scheda
+porta `title`, `description` e il corpo, e basta: un messaggio d'errore messo
+solo fra i tag serve alla ricerca dell'Help Desk sul sito e all'assistente non
+arriva. Va nel **corpo**, e conviene anche nella `description`, che è la prima
+riga della voce e quella che il modello legge scegliendo.
+
+**La procedura si scrive coi passi, non con le frecce.** `Area riservata →
+Scadenze → Paga` è una scorciatoia che presuppone di sapere già dove si guarda;
+quello che mancava a chi ha scritto era **quale** importo pagare, e la risposta è
+che sono in ordine di data e il primo in alto è il più vicino nel tempo. Tre
+righe numerate al posto di una freccia.
+
+**E si dice che si fa da soli.** «Non serve passare in segreteria» non è una
+cortesia: senza quella riga, una procedura che una persona può eseguire in
+autonomia si legge come l'ennesima cosa da chiedere a qualcuno.
 
 ### Le date non si calcolano, e una lezione di domani è dentro la finestra
 
