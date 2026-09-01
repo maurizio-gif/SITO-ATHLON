@@ -1508,6 +1508,41 @@ allenamento. Sta in quattro posti che vanno tenuti in pari: la scheda
 `data/abbonamenti.ts` (che è quello che finisce nel `kb.json`), la scheda
 `adulti/gym-floor` e `generali/prenotazioni`.
 
+#### L'orario di apertura della sala non è l'orario delle due fasce
+
+A «allenarmi in autonomia» la chat ha spiegato bene Con Assistenza e Allenamento
+Libero, e ha chiuso con *«entrambe le fasce partono dalle 6:00 da lunedì a
+venerdì»*. Non esiste nessun dato del genere: né sul sito né nel gestionale c'è
+scritto quando, dentro l'orario di apertura, ricorre l'una o l'altra fascia —
+quello lo dice solo il calendario di prenotazione in app o sul portale.
+
+**Non aveva inventato da sola: aveva fuso due fatti veri che stavano nella
+stessa voce.** `club:orari` elenca l'orario di apertura della sala pesi —
+«Lunedì – Venerdì: 06:00 – 22:00», da `gymFloor.hours` — e subito dopo, nella
+stessa voce, spiega che prenotando si sceglie fra le due fasce. Due dati veri,
+scritti uno accanto all'altro senza dire che sono due cose diverse, sono un
+contesto da cui si compone un terzo dato che non esiste: «apre alle 6:00» più
+«si sceglie una fascia» diventa «le fasce partono alle 6:00» — la stessa
+meccanica dei due orari compresenti e delle due sospensioni, applicata a un
+orario invece che a un regime.
+
+Ora la voce lo dice esplicitamente: gli orari elencati sono **quando la sala è
+aperta**, non **quando c'è l'assistente**, e in quali orari ricorra l'una o
+l'altra fascia «non è scritto da nessuna parte» — con l'invito a mandare quella
+domanda al calendario di prenotazione. Nel `systemMessage` la regola fissa su
+Gym Floor aggiunge il divieto che nessun dato può dare da solo: **non
+inventare un orario per le due fasce**, nemmeno quando l'orario citato è quello
+vero di apertura — «entrambe le fasce partono dalle 6:00», «con assistenza fino
+a mezzogiorno, poi libero», «dal lunedì al venerdì» sono tutte invenzioni allo
+stesso modo, comprese quelle che citano un numero vero preso dalla riga
+sbagliata.
+
+La lezione è la stessa di ogni altra coppia di dati vicini in questo file:
+*due fatti veri scritti uno accanto all'altro, senza dire che sono due dati
+diversi, sono un contesto da cui si può comporre un terzo fatto che non
+esiste* — qui non fra due regimi o due prezzi, ma fra un orario di apertura e
+l'orario (inesistente sul sito) di una fascia dentro quell'apertura.
+
 ### Una lezione che non si può prenotare è una lezione che non c'è
 
 Sabato 29 agosto, dentro la finestra dell'orario estivo, a «sto provando a
