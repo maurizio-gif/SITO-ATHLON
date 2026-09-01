@@ -1700,6 +1700,60 @@ E l'orario **di apertura** del club — anche quello stagionale, come l'estivo d
 agosto — resta scritto nel testo e si cita come sta: quello non è una lezione e
 non cambia ogni settimana.
 
+### Un pulsante promesso e un `fonti` vuoto sono due cose diverse, e solo il modello le confonde
+
+Il 1° settembre, a una madre che aveva già confermato l'anno (2013) del figlio,
+l'assistente ha detto due volte *«clicca sul pulsante qui sotto»* per i turni
+della Scuola Nuoto Bambini — e due volte non è comparso nessun pulsante. Alla
+terza, dopo che lei ha scritto «Non c'è nessun pulsante», si è corretto
+incollando l'indirizzo a mano nel testo: *«Ecco il link diretto:
+https://athlon.perfectgym.com/…?ageLimitId=14&vacancies=1»* — che è la stessa
+regola violata al contrario, perché **i rimandi sono pulsanti, non link nel
+testo**, ed è quello che rende una risposta scritta cliccabile.
+
+**Il dato c'era, ed era quello giusto.** `turniScuolaNuoto()` (`kb.json.ts`)
+scrive una riga `FONTE:` per ciascuna fascia d'età dentro la voce
+`scheda:snb/preiscrizioni-nuoto`, e quella per i nati 2013-14-15 porta esattamente
+`ageLimitId=14` — lo stesso numero che il modello ha incollato a mano al terzo
+turno. Non aveva letto la voce sbagliata e non aveva inventato niente: sapeva
+qual era il link giusto. Ha solo scritto la frase «clicca sul pulsante qui
+sotto» nel campo `risposta` e lasciato `fonti: []` nello stesso oggetto JSON —
+due campi dello stesso output che si sono contraddetti, e nessun controllo se
+n'è accorto prima che arrivasse alla persona.
+
+**`Leggi la risposta` verificava già le fonti dichiarate, non la loro assenza.**
+Il nodo confronta ogni url in `fonti` con le righe `FONTE:` vere del contesto
+(`ripara()`) — un url inventato si butta, uno con l'ancora sbagliata si
+riscrive — ma quel controllo presuppone che il modello abbia *provato* a
+citare qualcosa. Un `fonti: []` accanto a una frase che promette un pulsante
+passava senza che niente lo notasse: è lo stesso principio delle due
+sospensioni e dei due orari applicato a due *campi* invece che a due
+*paragrafi* — un oggetto che contiene due affermazioni compresenti («c'è un
+pulsante» / «non c'è nessuna fonte») è un oggetto da cui si compone
+un'incoerenza che nessuno dei due campi da solo mostrerebbe.
+
+Ora il nodo fa due cose in più, sfruttando la stessa `ripara()` che già
+esisteva:
+
+- **Se `fonti` resta vuoto ma la risposta contiene un url**, quell'url si
+  verifica contro il contesto vero — la stessa identica funzione usata per le
+  fonti dichiarate, non una scorciatoia più permissiva — e se combacia si
+  promuove a fonte vera, togliendolo dal testo. È esattamente il caso della
+  terza risposta: il link incollato a mano diventa il pulsante che avrebbe
+  dovuto essere fin dalla prima.
+- **Se non c'è niente da recuperare** — nessun url nel testo, come nelle prime
+  due risposte — resta la spia `pulsantePromessoSenzaFonte`, accanto a
+  `fontiCorrette` e `fontiScartate`: se sale, è la frase «pulsante qui sotto»
+  (o «clicca sul pulsante» — la stessa formula che la regola sui rimandi dà
+  come esempio a ogni rimando, non solo a questa scheda) che il modello sta
+  scrivendo senza aver messo niente da cliccare.
+
+**Provato sulla conversazione vera**, prima di pubblicare: la terza risposta
+(con il link incollato) recupera il pulsante e il testo torna pulito; la prima
+e la seconda (nessun url nel testo) restano senza fonte ma accendono la spia;
+una risposta normale con una fonte dichiarata giusta — Premium con l'ancora
+`#premium` — passa invariata.
+
 ### La stessa regola vale nella chat, e lì aveva la condizione sbagliata
 
 L'assistente classifica sull'email come il form — `dati.ramo = 'iscritto'`
