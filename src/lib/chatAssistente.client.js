@@ -1108,11 +1108,14 @@ export function initChatAssistente(root, options) {
       },
       /* La conversazione, riassunta: è quello che chi richiama deve sapere
          prima di comporre il numero, ed è esattamente ciò che con Calendly
-         finiva in una domanda personalizzata fuori dal sito. Resta
-         modificabile — se la chat ha girato attorno a tre cose, chi prenota
-         può dire quale delle tre gli preme. */
-      oggetto: contestoRichiamo(),
-      invito: 'È il riassunto di quello che ci siamo detti. Correggilo pure: lo legge chi ti chiama.',
+         finiva in una domanda personalizzata fuori dal sito.
+         `contestoNascosto` e non `oggetto`: è un riassunto scritto da noi,
+         non nelle parole della persona, e non deve comparire nel campo come
+         se lei stessa lo avesse digitato — potrebbe correggerlo o cancellarlo
+         pensando di correggere un proprio testo, e chi chiama perderebbe il
+         contesto. Il campo resta per lei, vuoto e facoltativo: se vuole
+         aggiungere qualcosa, si somma al riassunto invece di sostituirlo. */
+      contestoNascosto: contestoRichiamo(),
       contesto: {
         pagina: dati.pagina,
         origine: 'chat-assistente',

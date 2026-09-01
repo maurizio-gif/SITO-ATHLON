@@ -63,10 +63,19 @@ function el(tag, classe, testo) {
  * @param {HTMLElement} o.riquadro dove disegnare
  * @param {object} o.prefill `{ email, nome, cognome, telefono, privacy, marketing }`
  * @param {object} [o.contesto] pagina, origine, cta e tutto ciò che va nel CRM
- * @param {string} [o.oggetto] l'argomento già noto: la richiesta scritta nel
- *   form o il riassunto della conversazione. Riempie il campo, che resta
- *   modificabile — è il testo che chi chiama legge, e chi l'ha scritto deve
- *   poterlo correggere prima che parta.
+ * @param {string} [o.oggetto] l'argomento già noto **nelle parole della
+ *   persona**: la richiesta che ha scritto lei stessa qualche schermata fa.
+ *   Riempie il campo, che resta modificabile — è testo suo, e deve poterlo
+ *   correggere prima che parta. Non usare per un riassunto scritto da noi:
+ *   per quello c'è `contestoNascosto`.
+ * @param {string} [o.contestoNascosto] il briefing per chi chiama, quando
+ *   **non** è nelle parole della persona — il riassunto della conversazione
+ *   con l'assistente, per dire. Arriva comunque a chi chiama, in coda
+ *   all'oggetto della voce d'agenda, ma non entra mai nel campo: mostrarglielo
+ *   come se l'avesse scritto lei significherebbe farglielo correggere (o
+ *   cancellare) come fosse un testo suo, quando è un nostro riassunto. Con
+ *   questo presente il campo visibile diventa facoltativo: quello che la
+ *   persona ci scrive si aggiunge al contesto, non lo sostituisce.
  * @param {string} [o.invito] la riga sopra il campo dell'argomento
  * @param {function} [o.onPrenotato] chiamata con l'esito quando è fatta
  */
@@ -95,10 +104,19 @@ export async function montaAppuntamento(o) {
   // form completo: prima il quando, che è la cosa per cui la persona è qui e
   // che può sparire mentre esita — gli slot sono contesi — poi di cosa, a cui
   // si risponde volentieri una volta che l'orario è al sicuro.
-  var etichetta = el('label', 'apx__label', 'Di cosa vuoi parlare?');
+  //
+  // Quando c'è un `contestoNascosto` il campo non è più l'unica fonte
+  // dell'argomento — lo è già il contesto — quindi diventa facoltativo, e lo
+  // dicono sia l'etichetta sia il testo sopra.
+  var haContesto = !!(o.contestoNascosto && String(o.contestoNascosto).trim());
+  var etichetta = el('label', 'apx__label', 'Di cosa vuoi parlare?' + (haContesto ? ' (facoltativo)' : ''));
   var campoOggetto = el('textarea', 'ap__input ap__textarea');
   campoOggetto.rows = 3;
-  campoOggetto.placeholder = 'Bastano poche parole: abbonamenti, scuola nuoto per un figlio, orari…';
+  campoOggetto.placeholder = haContesto
+    ? 'Vuoi aggiungere qualcosa a quello che ci siamo già detti?'
+    : 'Bastano poche parole: abbonamenti, scuola nuoto per un figlio, orari…';
+  // Solo `o.oggetto` riempie il campo — è testo della persona. Il contesto
+  // nascosto non ci finisce mai: vedi il commento di `montaAppuntamento`.
   campoOggetto.value = o.oggetto || '';
   var id = 'apx-oggetto-' + Math.random().toString(36).slice(2, 8);
   campoOggetto.id = id;
@@ -106,7 +124,10 @@ export async function montaAppuntamento(o) {
   var aiuto = el(
     'p',
     'apx__aiuto',
-    o.invito || 'Lo legge chi ti chiama, prima di comporre il numero. Puoi correggerlo.'
+    o.invito ||
+      (haContesto
+        ? 'Il contesto della conversazione arriva comunque a chi ti chiama: qui puoi aggiungere altro, se vuoi.'
+        : 'Lo legge chi ti chiama, prima di comporre il numero. Puoi correggerlo.')
   );
 
   var errore = el('p', 'apx__errore');
@@ -306,12 +327,23 @@ export async function montaAppuntamento(o) {
       mostraErrore(ERR.slot);
       return;
     }
-    var oggetto = String(campoOggetto.value || '').trim();
-    if (!oggetto) {
+    var scrittoDallaPersona = String(campoOggetto.value || '').trim();
+    var contestoNascosto = String(o.contestoNascosto || '').trim();
+    // Obbligatorio solo se non c'è già un contesto a monte: senza, l'oggetto
+    // sarebbe vuoto e la telefonata partirebbe senza sapere di cosa parlare.
+    // Con un contesto nascosto, il campo visibile aggiunge e non sostituisce
+    // — può restare bianco.
+    if (!scrittoDallaPersona && !contestoNascosto) {
       mostraErrore(ERR.oggetto);
       campoOggetto.focus();
       return;
     }
+    // Quello che arriva a chi chiama: il contesto nascosto per primo, e
+    // quanto la persona ha aggiunto — se ha aggiunto qualcosa — in coda,
+    // marcato come suo così chi legge distingue le due fonti.
+    var oggetto = contestoNascosto
+      ? contestoNascosto + (scrittoDallaPersona ? '\n\nAggiunto dalla persona: ' + scrittoDallaPersona : '')
+      : scrittoDallaPersona;
 
     attesa(true);
 
