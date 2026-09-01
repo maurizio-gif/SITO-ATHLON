@@ -339,6 +339,13 @@ import AppuntamentoPassi from './AppuntamentoPassi.astro';
   .ap__fascia + .ap__fascia {
     margin-top: 1rem;
   }
+  /* Lo spazio prima di "Continua" di solito lo porta `.ap__scelta`, il
+     margine del testo con l'orario scelto — ma resta nascosto finche' non si
+     sceglie un orario, e la griglia finiva incollata al pulsante. Lo spazio
+     lo mette qui l'ultima fascia, per essere presente da subito. */
+  .ap__orari-blocco .ap__fascia:last-child {
+    margin-bottom: 1rem;
+  }
   .ap__fascia-titolo {
     margin: 0 0 0.5rem;
     font-size: 0.75rem;
