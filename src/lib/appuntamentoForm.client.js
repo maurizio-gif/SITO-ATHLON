@@ -5,20 +5,30 @@
 // versione incorporata in pagina — in fondo a /abbonamenti, per dire — le due
 // copie divergerebbero al primo bug corretto in una sola delle due.
 //
-// Il percorso ha cinque schermate e una regola sola che le decide:
+// Il calendario è la prima cosa che si vede, sempre. Chiedere l'email prima
+// di mostrare gli orari costava un passo a chi magari non trova nemmeno un
+// momento libero che gli vada bene — e chi ha scelto **quando** prima di
+// lasciare un dato è più probabile che arrivi in fondo. Gli orari sono
+// pubblici e non hanno bisogno di sapere chi sei.
 //
-//   email → verifica ─┬─ ha già un account → quando → di cosa → fatto
-//                     └─ non ce l'ha       → dati → quando → di cosa → fatto
+//   quando ─┬─ email/UserNumber già noti, con un account   → di cosa → fatto
+//           ├─ email/UserNumber già noti, senza un account → dati → di cosa → fatto
+//           └─ identità sconosciuta → email → verifica ─┬─ ha un account → di cosa → fatto
+//                                                        └─ non ce l'ha   → dati → di cosa → fatto
 //
-// Chi ha già un account salta i dati: li abbiamo, e richiederli è il modo più
-// rapido per far chiudere la pagina a un socio. Chi non ce l'ha li lascia una
-// volta sola, con il consenso privacy, e da lì nasce il lead su PerfectGym —
-// che lo crea n8n, come per tutti gli altri form.
+// La verifica su PerfectGym parte **in sottofondo**, appena il pannello si
+// apre, se l'email o il numero socio sono già noti nella sessione — dallo
+// stesso browser, in questa visita o in una precedente ricordata dietro
+// consenso (vedi `scripts/emailNota.ts` e `scripts/numeroSocio.ts`). Non
+// mostra niente finché la persona non ha scelto un orario: a quel punto, se
+// la verifica è già tornata, il passo «chi sei» si salta da solo; se ha già
+// un account, si salta anche quello dei dati.
 //
-// L'ordine dei due passi finali non è casuale. Prima **quando**, che è la cosa
-// per cui la persona è arrivata fin qui e che può sparire mentre esita: gli
-// slot sono contesi. Poi **di cosa**, che è la domanda a cui si risponde
-// volentieri una volta che l'orario è già scelto.
+// Chi ha già un account non ricompila niente: i dati ce li abbiamo, e
+// richiederli è il modo più rapido per far chiudere la pagina a un socio.
+// Chi non ce l'ha li lascia una volta sola, con il consenso privacy, e da lì
+// nasce il lead su PerfectGym — che lo crea n8n, come per tutti gli altri
+// form.
 
 import {
   API_PRENOTA,
@@ -30,6 +40,7 @@ import {
 import { haGiaAccount } from '../data/contatto';
 import { validaTelefono } from '../data/prefissi';
 import { leggi as emailConosciuta } from '../scripts/emailNota';
+import { leggi as userNumberConosciuto } from '../scripts/numeroSocio';
 
 export function initAppuntamentoForm(root, options) {
   var P = options.prefix;
@@ -79,6 +90,10 @@ export function initAppuntamentoForm(root, options) {
   var dati = stato();
   var giorni = [];
   var giornoAperto = '';
+  /* La verifica lanciata in sottofondo all'apertura, se l'email o il numero
+     socio erano già noti. Chi clicca «Continua» sul calendario prima che sia
+     tornata deve aspettarla: è lei a dire se il passo dell'identità serve. */
+  var verificaInCorso = null;
 
   // ── Attribuzione ──────────────────────────────────────────────────────────
   // Da `scripts/attribuzione.ts`, caricato dal Layout. Se non ci fossero, il
@@ -101,9 +116,9 @@ export function initAppuntamentoForm(root, options) {
     return Array.prototype.slice.call(root.querySelectorAll(sel));
   }
   var steps = {
+    quando: q('#' + P + '-step-quando'),
     email: q('#' + P + '-step-email'),
     dati: q('#' + P + '-step-dati'),
-    quando: q('#' + P + '-step-quando'),
     oggetto: q('#' + P + '-step-oggetto'),
     esito: q('#' + P + '-step-esito'),
   };
@@ -135,6 +150,11 @@ export function initAppuntamentoForm(root, options) {
     if (body.nome) dati.nome = String(body.nome);
     if (body.cognome) dati.cognome = String(body.cognome);
     if (body.telefono) dati.cellulare = String(body.telefono);
+    /* L'email non arriva sempre — una verifica partita dal solo numero socio
+       può tornare senza — ma quando c'è è quella buona: risparmia il passo a
+       chi il club conosce già anche se lo ha raggiunto da un link, non da un
+       campo digitato. */
+    if (body.email && !dati.email) dati.email = String(body.email).trim().toLowerCase();
     [
       [campoNome, dati.nome],
       [campoCognome, dati.cognome],
@@ -142,6 +162,7 @@ export function initAppuntamentoForm(root, options) {
     ].forEach(function (coppia) {
       if (coppia[0] && !coppia[0].value && coppia[1]) coppia[0].value = coppia[1];
     });
+    if (campoEmail && !campoEmail.value && dati.email) campoEmail.value = dati.email;
   }
 
   function mostraErrore(step, testo) {
@@ -167,13 +188,42 @@ export function initAppuntamentoForm(root, options) {
   }
 
   // ── Navigazione ───────────────────────────────────────────────────────────
-  var attuale = 'email';
+  var attuale = 'quando';
+
+  /* I passi che restano da fare da qui in avanti, nell'ordine in cui si
+     vedranno — usata solo per numerarli («Passo 2 di 3»). Non è una previsione
+     fissata all'apertura: si ricalcola ogni volta che si mostra un passo
+     numerato, con quello che sappiamo *in quel momento*. Sul passo email può
+     ancora non sapere se seguirà «dati» — lo saprà lei stessa, una volta
+     mostrata, e allora il conto si aggiusta da solo. */
+  function passiRestanti() {
+    var passi = [];
+    if (!dati.email) {
+      passi.push('email');
+    } else if (!haGiaAccount({ memberType: dati.memberType, stato: dati.statoPgm })) {
+      passi.push('dati');
+    }
+    passi.push('oggetto');
+    return passi;
+  }
+
+  var STEP_NUMERATI = { email: true, dati: true, oggetto: true };
+
+  function aggiornaEyebrow(nome) {
+    if (!STEP_NUMERATI[nome]) return;
+    var el = steps[nome] && steps[nome].querySelector('.ap__eyebrow');
+    if (!el) return;
+    var passi = passiRestanti();
+    var indice = passi.indexOf(nome);
+    el.textContent = 'Passo ' + (indice >= 0 ? indice + 1 : 1) + ' di ' + passi.length;
+  }
 
   function mostraStep(nome) {
     attuale = nome;
     Object.keys(steps).forEach(function (k) {
       if (steps[k]) steps[k].hidden = k !== nome;
     });
+    aggiornaEyebrow(nome);
     if (saltaPrimoFuoco) {
       saltaPrimoFuoco = false;
       return;
@@ -188,30 +238,69 @@ export function initAppuntamentoForm(root, options) {
     bottone.classList.toggle('is-attesa', acceso);
   }
 
-  // ── 1. L'email ────────────────────────────────────────────────────────────
-  async function verifica() {
-    var step = steps.email;
-    pulisciErrore(step);
-    togliSegno(campoEmail);
-
-    var email = String(campoEmail.value || '').trim().toLowerCase();
-    if (!emailValida(email)) {
-      mostraErrore(step, ERR.email);
-      segnala(campoEmail);
-      return;
+  /** Dove si va dopo aver scelto l'orario: salta l'identità se la conosciamo già. */
+  function proseguiOltreIdentita() {
+    if (!dati.email) {
+      mostraStep('email');
+    } else if (!haGiaAccount({ memberType: dati.memberType, stato: dati.statoPgm })) {
+      mostraStep('dati');
+    } else {
+      mostraStep('oggetto');
     }
-    dati.email = email;
-    if (window.athlonRicordaEmail) window.athlonRicordaEmail(email);
+  }
+
+  // ── L'identità: email o numero socio, solo quando serve davvero ──────────
+  /**
+   * `numero`, quando passato, è un UserNumber già noto (da un link, o da una
+   * verifica precedente riuscita): si salta la lettura del campo email e si
+   * cerca su PerfectGym con quello. È la stessa idea di `contattaciForm` e
+   * dell'assistente — vedi `numeroSocio.ts`.
+   *
+   * Due modi di essere chiamata. **In sottofondo**, dall'apertura del
+   * pannello: `attuale` è ancora `'quando'`, e allora questa funzione si
+   * limita ad aggiornare `dati` senza toccare lo schermo — decide il passo
+   * successivo chi ha in mano il click su «Continua». **Dal passo email**,
+   * quando la persona la digita e conferma: lì `attuale === 'email'`, ed è
+   * questa funzione stessa a decidere dove andare.
+   */
+  async function verifica(numero) {
+    var viaNumero = typeof numero === 'string' && numero;
+    var step = steps.email;
+    var suSchermo = attuale === 'email';
+    if (suSchermo) {
+      pulisciErrore(step);
+      togliSegno(campoEmail);
+    }
+
+    if (!viaNumero) {
+      var email = String(campoEmail.value || '').trim().toLowerCase();
+      if (!emailValida(email)) {
+        if (suSchermo) {
+          mostraErrore(step, ERR.email);
+          segnala(campoEmail);
+        }
+        return;
+      }
+      dati.email = email;
+      if (window.athlonRicordaEmail) window.athlonRicordaEmail(email);
+    } else {
+      dati.userNumber = viaNumero;
+    }
 
     var bottone = q('[data-ap-verifica]');
-    attesa(bottone, true);
+    if (suSchermo) attesa(bottone, true);
 
     var body = {};
     try {
+      var corpo = viaNumero ? { userNumber: viaNumero } : { email: dati.email };
+      corpo.pagina = dati.pagina;
+      corpo.utm = utm();
+      corpo.vid = vid();
+      corpo.sid = sid();
       var risposta = await fetch(WEBHOOK_VERIFICA, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, pagina: dati.pagina, utm: utm(), vid: vid(), sid: sid() }),
+        body: JSON.stringify(corpo),
       });
       body = await risposta.json();
     } catch (e) {
@@ -220,11 +309,13 @@ export function initAppuntamentoForm(root, options) {
          rete — è la regola di tutti i form del sito. */
       body = {};
     }
-    attesa(bottone, false);
+    if (suSchermo) attesa(bottone, false);
 
-    if (body && body.stato === 'email_non_valida') {
-      mostraErrore(step, ERR.email);
-      segnala(campoEmail);
+    if (!viaNumero && body && body.stato === 'email_non_valida') {
+      if (suSchermo) {
+        mostraErrore(step, ERR.email);
+        segnala(campoEmail);
+      }
       return;
     }
 
@@ -232,20 +323,17 @@ export function initAppuntamentoForm(root, options) {
     dati.statoNucleo = (body && (body.statoNucleo || body.stato)) || '';
     dati.memberId = (body && body.memberId) || '';
     dati.memberType = (body && body.memberType) || '';
-    dati.userNumber = (body && body.number) || '';
+    dati.userNumber = (body && body.number) || dati.userNumber;
     if (body) precompila(body);
     if (dati.userNumber && window.athlonRicordaUserNumber) window.athlonRicordaUserNumber(dati.userNumber);
 
-    // Chi ha già un account non ricompila niente: i dati ce li abbiamo, e
-    // chiederglieli di nuovo è il modo più rapido per farlo desistere.
-    if (haGiaAccount({ memberType: dati.memberType, stato: dati.statoPgm })) {
-      await vaiAgliOrari();
-    } else {
-      mostraStep('dati');
-    }
+    // Solo se siamo davvero sul passo dell'email si decide qui dove andare:
+    // la verifica lanciata in sottofondo all'apertura non deve cambiare
+    // schermata da sola mentre la persona sta ancora guardando il calendario.
+    if (suSchermo) proseguiOltreIdentita();
   }
 
-  // ── 2. I dati, solo per chi non ce li ha già ───────────────────────────────
+  // ── I dati, solo per chi non ce li ha già ──────────────────────────────────
   async function confermaDati() {
     var step = steps.dati;
     pulisciErrore(step);
@@ -283,15 +371,17 @@ export function initAppuntamentoForm(root, options) {
     dati.privacy = !!(campoPrivacy && campoPrivacy.checked);
     dati.marketing = !!(campoMarketing && campoMarketing.checked);
 
-    await vaiAgliOrari();
+    mostraStep('oggetto');
   }
 
-  // ── 3. Quando ─────────────────────────────────────────────────────────────
+  // ── Quando ────────────────────────────────────────────────────────────────
 
   /**
-   * Gli orari si chiedono qui e non all'apertura del modal: sono l'unica cosa
-   * che invecchia mentre la persona compila, e caricarli tardi vuol dire
-   * mostrarli veri. Chi non arriva fin qui non paga la chiamata.
+   * Gli orari si chiedono all'apertura, non dietro un passo di identità: sono
+   * pubblici, e farli aspettare dietro un'email da digitare sarebbe un
+   * rallentamento per niente. Restano comunque freschi — è l'unica cosa che
+   * invecchia mentre la persona sceglie — perché si ricaricano anche dopo un
+   * «quell'orario è appena stato preso».
    */
   async function vaiAgliOrari() {
     mostraStep('quando');
@@ -440,7 +530,7 @@ export function initAppuntamentoForm(root, options) {
     riassunto.hidden = false;
   }
 
-  // ── 4. Di cosa ────────────────────────────────────────────────────────────
+  // ── Di cosa ───────────────────────────────────────────────────────────────
   async function invia() {
     var step = steps.oggetto;
     pulisciErrore(step);
@@ -582,6 +672,7 @@ export function initAppuntamentoForm(root, options) {
     dati = stato();
     giorni = [];
     giornoAperto = '';
+    verificaInCorso = null;
     [campoEmail, campoNome, campoCognome, campoCellulare, campoOggetto].forEach(function (c) {
       if (c) {
         c.value = '';
@@ -597,17 +688,33 @@ export function initAppuntamentoForm(root, options) {
     Object.keys(steps).forEach(function (k) {
       if (steps[k]) pulisciErrore(steps[k]);
     });
-    mostraStep('email');
+    mostraStep('quando');
     onReset();
   }
 
   // ── Aggancio ──────────────────────────────────────────────────────────────
   var bVerifica = q('[data-ap-verifica]');
-  if (bVerifica) bVerifica.addEventListener('click', verifica);
+  if (bVerifica) bVerifica.addEventListener('click', function () { verifica(); });
   var bDati = q('[data-ap-dati]');
   if (bDati) bDati.addEventListener('click', confermaDati);
   var bAvanti = q('[data-ap-avanti-quando]');
-  if (bAvanti) bAvanti.addEventListener('click', function () { mostraStep('oggetto'); });
+  if (bAvanti) {
+    bAvanti.addEventListener('click', async function () {
+      if (!dati.ora) return;
+      bAvanti.disabled = true;
+      if (verificaInCorso) {
+        try {
+          await verificaInCorso;
+        } catch (e) {
+          /* La verifica in sottofondo fallisce già in silenzio al suo
+             interno (rete o timeout): si prosegue come contatto nuovo. */
+        }
+        verificaInCorso = null;
+      }
+      bAvanti.disabled = !dati.ora;
+      proseguiOltreIdentita();
+    });
+  }
   var bInvia = q('[data-ap-invia]');
   if (bInvia) bInvia.addEventListener('click', invia);
 
@@ -620,7 +727,7 @@ export function initAppuntamentoForm(root, options) {
   // Invio da tastiera sui campi di testo: su un form a passi, premere Invio
   // deve fare la stessa cosa del pulsante che si ha davanti.
   [
-    [campoEmail, verifica],
+    [campoEmail, function () { verifica(); }],
     [campoNome, confermaDati],
     [campoCognome, confermaDati],
     [campoCellulare, confermaDati],
@@ -640,13 +747,22 @@ export function initAppuntamentoForm(root, options) {
       dati.pagina = (contesto && contesto.pagina) || location.pathname;
       dati.origine = (contesto && contesto.origine) || '';
       dati.cta = (contesto && contesto.cta) || '';
-      // Se l'email è già nota da un altro form, si salta il primo passo e si
-      // verifica da soli: chiederla di nuovo a chi l'ha appena scritta è la
-      // domanda che fa chiudere la pagina.
+
+      // Il calendario si vede subito: non aspetta nessuna verifica.
+      vaiAgliOrari();
+
+      // In parallelo, senza mostrare niente: se questa persona ha già dato
+      // l'email — in questa visita, su un altro form, o ricordata da una
+      // precedente — o è arrivata da un link con un numero socio, la
+      // verifica parte da sola. Quando servirà deciderlo, il passo
+      // sull'identità si sarà già risolto da sé.
+      var numero = userNumberConosciuto();
       var nota = emailConosciuta();
-      if (nota) {
+      if (numero) {
+        verificaInCorso = verifica(numero);
+      } else if (nota) {
         campoEmail.value = nota;
-        verifica();
+        verificaInCorso = verifica();
       }
     },
     chiudi: pulisci,
