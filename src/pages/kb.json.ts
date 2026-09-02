@@ -261,7 +261,20 @@ export const GET: APIRoute = async () => {
       id: `scheda:${a.id}`,
       tipo: 'scheda',
       titolo: a.data.title,
-      url: `${SITE}/wikiathlon/${a.id}/`,
+      /* `snb/preiscrizioni-nuoto` porta l'ancora `#fasce-eta` — un
+         `<a id>` scritto a mano subito sopra «## Turni disponibili» nel
+         markdown, non un id sperato dal rendering — invece del solo
+         indirizzo della pagina: quando il modello cita questa scheda al
+         posto del link diretto per fascia (la sua `FONTE:` specifica,
+         generata da `turniScuolaNuoto()` qui sotto), chi clicca deve
+         arrivare davanti ai turni, non alla cima della pagina. Un'ancora
+         inventata dal modello (es. `#nati-2023`, che non esiste) viene
+         scartata da `ripara()` su n8n e sostituita da questo stesso url: è
+         il fallback, e deve già essere quello giusto. */
+      url:
+        a.id === 'snb/preiscrizioni-nuoto'
+          ? `${SITE}/wikiathlon/${a.id}/#fasce-eta`
+          : `${SITE}/wikiathlon/${a.id}/`,
       area: AREA_LABELS[a.id.split('/')[0]]?.label ?? 'Help Desk',
       attivita: a.data.attivita,
       testo: blocchi(
