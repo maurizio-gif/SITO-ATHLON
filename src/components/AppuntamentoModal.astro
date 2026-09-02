@@ -165,6 +165,22 @@ import AppuntamentoPassi from './AppuntamentoPassi.astro';
     accent-color: var(--color-primary, #ff5701);
   }
 
+  /* Il link all'informativa, fuori dalle due etichette: vedi il commento in
+     `AppuntamentoPassi.astro`. `inline-flex` con `min-height`, non in linea —
+     su un elemento in linea il padding verticale non riserva spazio e il
+     bersaglio ruberebbe i tocchi ai consensi qui sopra. La misura è in rem,
+     quindi sul totem e sul televisore cresce da sé invece di restare della
+     misura di un telefono. */
+  .ap__informativa {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    margin-bottom: 0.5rem;
+    color: var(--accent-text);
+    font-size: var(--text-xs);
+    text-decoration: underline;
+  }
+
   .ap__errore {
     color: #c0392b;
     font-size: 0.85rem;
@@ -323,6 +339,20 @@ import AppuntamentoPassi from './AppuntamentoPassi.astro';
   }
   .ap__giorno.is-scelto .ap__giorno-quanti {
     background: rgb(255 255 255 / 0.25);
+  }
+
+  /* + totem, + tv: vedi «Il totem verticale del club» e «Il televisore 16:9»
+     in global.css. `0,62rem` è una misura fuori dalla scala tipografica,
+     quindi è il primo pezzo che resta indietro dove la radice cresce: sul
+     totem fa 16,7px, sotto il fondo dei 19. Ed è il numero che fa scegliere
+     un giorno invece di rimandare — «resta un posto» si legge o non serve.
+     Come la firma del footer, si riporta dentro `--text-*` solo qui: su
+     telefono e scrivania la pastiglia resta quella misurata lì. */
+  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10),
+    (min-width: 1700px) and (min-height: 1020px) and (max-aspect-ratio: 37/20) {
+    .ap__giorno-quanti {
+      font-size: var(--text-2xs);
+    }
   }
 
   .ap__invito {

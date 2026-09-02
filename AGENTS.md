@@ -4573,3 +4573,71 @@ Per verificare, sul `dist`: le tre schede della direzione tecnica hanno un solo
 `data-appuntamento-nuoto-inline` renderizzato e i campi `apn-minore-nome` e
 `apn-minore-cognome`; `preiscrizioni-nuoto` tiene il suo riquadro del desk e non
 prende quello nuovo; e in `src/` non compare più nessun `calendly-inline-widget`.
+
+### La spazzata di tutte le pagine, e i tre guai che ha trovato
+
+Girata su tutto il `dist` — 99 pagine dopo aver scartato le quattro di `meta
+refresh` — nei due formati, più i **quattro passi** del calendario del Direttore
+Tecnico e il passo dati in tutte e quattro le sue forme (sconosciuto, Lead,
+Member completo, Member senza numero utile). Overflow: nessuno, in nessuno dei
+due formati. Testo sotto i 19px: nessuno. Caratteri per riga: mediana 81 sul
+totem e 115 sulla televisione.
+
+I tre difetti erano lo **stesso** difetto scritto in tre punti, e vale la pena
+riconoscerlo perché tornerà: **una misura fuori da `--text-*` resta indietro
+ovunque la radice cresca**, e la si scopre solo dove la radice cresce.
+
+- **`.footer-contact-btn`** — 0,4rem di padding attorno a una riga di
+  `--text-xs` fanno 1,6rem, cioè 43px sul totem: cinque sotto la misura di un
+  dito, su **ogni** pagina del sito. Il freno è `min-height` e non più padding,
+  perché l'altezza deve stare sopra una soglia e non crescere di una quantità
+  fissa: così il giorno che `--text-xs` viene ritoccato la regola tiene ancora.
+- **`.ap__giorno-quanti`** — `0,62rem`, cioè 16,7px sul totem, ed è il numero
+  dei posti rimasti: quello che fa scegliere un giorno invece di rimandare.
+  Vale per tutte e tre le agende, perché la regola sta nel blocco `is:global`
+  di `AppuntamentoModal.astro`.
+- **`.activity-row__mark`** — il `?` di `/abbonamenti` aveva già la sua regola
+  per il totem e la televisione era rimasta fuori: 17,7px, l'unico testo del
+  sito sotto il fondo della scala in quella modalità.
+
+Tutti e tre si correggono **dentro** le condizioni del totem e della
+televisione, non alla radice: su telefono e scrivania quelle misure sono state
+scelte lì e restano quelle.
+
+E una segnalazione della spazzata non era una misura: il **link
+all'informativa stava dentro l'etichetta del consenso**, in tutte e due le
+agende. È la trappola già scritta per `/tour` — un `<a>` dentro un `<label>` fa
+due cose con un tocco solo, apre la pagina *e* spunta la casella, cioè registra
+un consenso che nessuno ha dato e lo registra proprio mentre la persona stava
+andando a leggere cosa stava accettando. Qui morde più che su un modal, perché
+il riquadro vive **incorporato in una pagina del wiki**: la scheda si apre
+accanto e il modulo resta lì, spuntato. Ora è fuori, `inline-flex` con
+`min-height: 3rem`, e la prova è quella: si tocca l'informativa e il consenso
+resta `false` — provato nei tre formati, telefono compreso, dove il bersaglio
+misura esattamente 48px. Resta da fare in `ContattaciModal`, che ce l'ha in due
+punti.
+
+Tre cose sono **falsi positivi noti**, e conviene saperle o si ritrovano ogni
+volta:
+
+- i quadrati di **`/diagnostica-schermo`** *sono* la prova — la pagina disegna
+  bersagli di misure assortite da premere e misurare;
+- le **briciole del percorso** delle news (`nav.nws__crumbs > a`) sono testo,
+  non bersagli, come i link dentro un paragrafo;
+- le caselle **`disabled`** degli elenchi markdown del wiki (13×13) non si
+  premono: sono un segno di spunta disegnato, non un comando.
+
+E sulla televisione **i bersagli non sono un criterio**: nessuno la tocca. Là
+valgono overflow, corpo del testo e caratteri per riga — gli 84 comandi «sotto
+i 48px» che una spazzata segnala su quel formato sono la barra, il footer e i
+link-comando, tutti governati dalla loro riga di testo.
+
+Resta aperta una cosa, ed è una scelta di disegno e non un difetto: sulla
+televisione **tre schede della home** (`p.card__desc`) fanno 25–27 caratteri per
+riga. Il carosello ne mostra quattro per volta, e su 58rem di contenitore ogni
+scheda tiene 13,4rem contro le 19,9 della scrivania — è il prezzo della radice
+grande, scritto nella sezione della televisione. Scendere a tre schede per
+volta porterebbe la riga sopra i 30, ma quel testo compare **al passaggio del
+puntatore**, che su un televisore non esiste: allargare le schede per una
+descrizione che là non si legge è un cambiamento della home page pagato per
+niente. Se un giorno quel testo diventa sempre visibile, allora sì.
