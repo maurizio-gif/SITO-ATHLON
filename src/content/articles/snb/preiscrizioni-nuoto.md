@@ -22,6 +22,8 @@ draft: false
   🟢 Iscrizioni aperte, con <strong>abbonamento mensile</strong>
 </div>
 
+<a id="fasce-eta"></a>
+
 ## Turni disponibili
 
 > Clicca sulla fascia d'età per visualizzare gli orari disponibili.
