@@ -544,6 +544,25 @@ const DURATA_NASTRO = `${Math.round((45 / affiliazioni.length) * meta.length)}s`
     flex: 0 0 auto;
   }
 
+  /* + totem, + tv: vedi «Il totem verticale del club» e «Il televisore 16:9»
+     in global.css. Il comando è tutto in rem, quindi cresce — e non basta:
+     0,4rem di padding attorno a una riga di --text-xs fanno 1,6rem in tutto,
+     cioè 43px sul totem, cinque sotto la misura minima di un dito. È un
+     bersaglio su **ogni** pagina del sito, e sul pannello all'ingresso è una
+     delle due strade per farsi rispondere subito.
+
+     Il freno è `min-height` e non più padding: l'altezza deve stare sopra una
+     soglia, non crescere di una quantità fissa, quindi il giorno che --text-xs
+     viene ritoccato la regola tiene ancora. Su telefono e scrivania non
+     interviene, perché lì il comando non è dietro queste condizioni. */
+  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10),
+    (min-width: 1700px) and (min-height: 1020px) and (max-aspect-ratio: 37/20) {
+    .footer-contact-btn {
+      min-height: 1.8rem;
+      padding-inline: 1.1rem;
+    }
+  }
+
   /* Gli stessi tre punti sfalsati del comando «Chatta con noi» della barra —
      stessa animazione, stesso motivo: dice che dall'altra parte c'è
      qualcuno. Sull'icona della lettera non serve: una busta non parla. */

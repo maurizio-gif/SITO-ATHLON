@@ -897,8 +897,15 @@ const trust = [
 
   /* Totem: il pallino è in rem e cresce, il «?» dentro no — 19px di glifo a un
      metro e mezzo sono un puntino. Non è testo per un lettore di schermo
-     (aria-hidden), ma per chi guarda distingue «incluso» da «su richiesta». */
-  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
+     (aria-hidden), ma per chi guarda distingue «incluso» da «su richiesta».
+
+     + tv: la stessa riga mancava sul televisore, e lì 0,5625rem fanno 17,7px —
+     l'unico testo di tutto il sito sotto il fondo della scala in quella
+     modalità. È il difetto già scritto due volte nel footer: una misura fuori
+     da --text-* resta indietro ovunque la radice cresca, quindi la condizione
+     va aggiunta accanto a quella del totem e non in un blocco suo. */
+  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10),
+    (min-width: 1700px) and (min-height: 1020px) and (max-aspect-ratio: 37/20) {
     .activity-row__mark {
       width: 1.25rem;
       height: 1.25rem;
