@@ -1,4 +1,5 @@
 import { PG } from './cta';
+import { countLessons, getBand } from './planning';
 
 /**
  * I due piani di abbonamento: nomi, attività comprese, opzioni e prezzi.
@@ -47,13 +48,17 @@ export const activityInfo: Record<string, { title: string; body: string; href?: 
        promettere l'una e dare l'altra è il modo di far arrivare una persona
        delusa alla prima sessione. */
     body:
-      '400 mq di sala aperta dalle 6:00 alle 22:00: area cardio Matrix 4.0 con macchinari connessi all\'app, area isotonica, area funzionale Ziva con rig da 8 metri, manubri fino a 50 kg e area cavi e carico libero. La sessione si prenota da app o portale, scegliendo la fascia Con Assistenza — in sala c\'e\' un assistente che supervisiona l\'attivita\', da\' suggerimenti e aiuta a scegliere fra i trenta piani di allenamento gia\' presenti in app — oppure Allenamento Libero, dove l\'assistente non e\' presente. Per essere seguiti individualmente ci sono le sedute di personal training, che si prenotano e si acquistano a parte.',
+      '400 mq di sala aperta dalle 6:00 alle 22:00: area cardio Matrix 4.0 con macchinari connessi all\'app, area isotonica, area funzionale Ziva con rig da 8 metri, manubri fino a 50 kg e area cavi e carico libero. 30 piani di allenamento già disponibili sulla tua App, con Assistenza di Sala (quando prenoti trovi indicato gli orari con Assistenza). Per essere seguiti individualmente ci sono le sedute di personal training, che si prenotano e si acquistano a parte.',
     href: '/gym-floor',
   },
   'Nuoto Libero Assistito': {
     title: 'Nuoto Libero Assistito',
+    /* A bordo vasca ci sono due figure, non una: Tecnici Federali — gli
+       stessi istruttori della Scuola Nuoto — e Assistenti Bagnanti, entrambi
+       per tutta la durata del turno. Lo dice /nuoto-libero (intro e punti):
+       ridurlo al solo bagnino sottostima chi c'è davvero a bordo vasca. */
     body:
-      'Nuoto libero nella vasca da 25 metri a 5 corsie, con assistenza bagnino sempre presente. Corsie divise per ritmo, temperatura costante fra 28 °C e 28,5 °C.',
+      'Nuoto libero nella vasca da 25 metri a 5 corsie, con Tecnici Federali e Assistenti Bagnanti sempre a bordo vasca, per tutta la durata del turno. Corsie divise per ritmo, temperatura costante fra 28 °C e 28,5 °C.',
     href: '/nuoto-libero',
   },
   'Athlon TV': {
@@ -65,7 +70,7 @@ export const activityInfo: Record<string, { title: string; body: string; href?: 
   'Corsi Fitness': {
     title: 'Corsi Fitness',
     body:
-      'Oltre 80 corsi a settimana in tre sale dedicate: attività aerobiche, olistiche e di tonificazione, HIIT in Sala B e Group Reformer in Sala C. Prenoti dall\'app a partire da 3 giorni prima.',
+      'Oltre 80 corsi a settimana in due sale dedicate: attività aerobiche, olistiche e di tonificazione, più HIIT in Sala B. Prenoti dall\'app a partire da 3 giorni prima.',
     href: '/corsi-fitness',
   },
   'Group Reformer': {
@@ -82,14 +87,19 @@ export const activityInfo: Record<string, { title: string; body: string; href?: 
   },
   'Scuola Nuoto Adulti': {
     title: 'Scuola Nuoto Adulti',
+    /* Il numero di lezioni viene dal planning, non è scritto a mano: cambia
+       da solo quando cambia il palinsesto, come in [corso].astro. */
     body:
-      'Corsi su tre livelli — base, intermedio e avanzato — con istruttori federali. Dal primo approccio all\'acqua al perfezionamento dei quattro stili.',
+      `Corsi su tre livelli — base, intermedio e avanzato — con istruttori federali: ${countLessons(getBand('scuola-nuoto-adulti'))} lezioni a settimana tra cui scegliere, senza limiti di frequenza. Prenoti quando vuoi, negli orari del tuo livello.`,
     href: '/scuola-nuoto-adulti',
   },
   'Corso Gestanti': {
     title: 'Corso Gestanti',
+    /* In Vasca Grande, in sospensione: lo dice il planning (Aqua Gestanti,
+       Vasca Grande) e non la vasca piccola più calda delle altre lezioni
+       in appoggio dell'Aqua Fitness. */
     body:
-      'Attività in acqua pensata per la gravidanza, seguita da personale specializzato, nella vasca a temperatura più alta. Lavoro dolce su respirazione, mobilità e scarico del peso.',
+      'Attività in acqua pensata per la gravidanza, in vasca alta e in sospensione: il peso è sostenuto dall\'acqua, per un lavoro a basso impatto sulle articolazioni. Lavoro dolce su respirazione, mobilità e scarico del peso.',
     href: '/gestanti',
   },
 };
@@ -110,7 +120,8 @@ export const plans = [
       {
         title: 'Annuale',
         sub: 'Pagamento mensile',
-        note: 'Rinnovo automatico annuale · disdetta via email entro 10 giorni dalla fine dell\'abbonamento',
+        note:
+          'Rinnovo automatico annuale · disdetta via email a disdetta@athlonroma.it entro 10 giorni dalla fine dell\'abbonamento',
         savings: 'Risparmio €138 vs Flex',
         amount: '75',
         period: '€/mese',
@@ -119,7 +130,8 @@ export const plans = [
       {
         title: 'Annuale',
         sub: 'Pagamento unico',
-        note: 'Rinnovo automatico annuale · disdetta via email entro 10 giorni dalla fine dell\'abbonamento',
+        note:
+          'Rinnovo automatico annuale · disdetta via email a disdetta@athlonroma.it entro 10 giorni dalla fine dell\'abbonamento',
         savings: 'Risparmio €438 vs Flex annuo',
         amount: '750',
         period: '€/anno',
@@ -155,7 +167,8 @@ export const plans = [
       {
         title: 'Annuale',
         sub: 'Pagamento mensile',
-        note: 'Rinnovo automatico annuale · disdetta via email entro 10 giorni dalla fine dell\'abbonamento',
+        note:
+          'Rinnovo automatico annuale · disdetta via email a disdetta@athlonroma.it entro 10 giorni dalla fine dell\'abbonamento',
         savings: 'Risparmio €288 vs Flex',
         amount: '95',
         period: '€/mese',
@@ -164,7 +177,8 @@ export const plans = [
       {
         title: 'Annuale',
         sub: 'Pagamento unico',
-        note: 'Rinnovo automatico annuale · disdetta via email entro 10 giorni dalla fine dell\'abbonamento',
+        note:
+          'Rinnovo automatico annuale · disdetta via email a disdetta@athlonroma.it entro 10 giorni dalla fine dell\'abbonamento',
         savings: 'Risparmio €488 vs Flex annuo',
         amount: '950',
         period: '€/anno',

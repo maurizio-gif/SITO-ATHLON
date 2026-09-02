@@ -48,7 +48,7 @@ import { POSIZIONI } from './lavora';
 import { PAGINE_ADULTI } from './pagine';
 import { CORSI } from './corsi';
 import { JUNIOR } from './junior';
-import { TALK, TRIAL } from './cta';
+import { TRIAL } from './cta';
 
 export interface VoceLink {
   /** Chiave stabile: finisce in `data-link`, ed è come GTM chiama il comando. */
@@ -147,11 +147,10 @@ export async function comandiLink(): Promise<VoceLink[]> {
       cta: 'assistente',
     },
     {
-      id: 'contatto',
-      label: TALK.label,
-      nota: 'Ti risponde il team, in pochi minuti',
-      href: TALK.href,
-      cta: 'talk',
+      id: 'eventi',
+      label: 'Eventi e Masterclass',
+      nota: 'Masterclass, gare e brevetti',
+      href: '/eventi',
     },
     {
       id: 'mappa',
