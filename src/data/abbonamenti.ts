@@ -120,7 +120,8 @@ export const plans = [
       {
         title: 'Annuale',
         sub: 'Pagamento mensile',
-        note: 'Rinnovo automatico annuale · disdetta via email entro 10 giorni dalla fine dell\'abbonamento',
+        note:
+          'Rinnovo automatico annuale · disdetta via email a disdetta@athlonroma.it entro 10 giorni dalla fine dell\'abbonamento',
         savings: 'Risparmio €138 vs Flex',
         amount: '75',
         period: '€/mese',
@@ -129,7 +130,8 @@ export const plans = [
       {
         title: 'Annuale',
         sub: 'Pagamento unico',
-        note: 'Rinnovo automatico annuale · disdetta via email entro 10 giorni dalla fine dell\'abbonamento',
+        note:
+          'Rinnovo automatico annuale · disdetta via email a disdetta@athlonroma.it entro 10 giorni dalla fine dell\'abbonamento',
         savings: 'Risparmio €438 vs Flex annuo',
         amount: '750',
         period: '€/anno',
@@ -165,7 +167,8 @@ export const plans = [
       {
         title: 'Annuale',
         sub: 'Pagamento mensile',
-        note: 'Rinnovo automatico annuale · disdetta via email entro 10 giorni dalla fine dell\'abbonamento',
+        note:
+          'Rinnovo automatico annuale · disdetta via email a disdetta@athlonroma.it entro 10 giorni dalla fine dell\'abbonamento',
         savings: 'Risparmio €288 vs Flex',
         amount: '95',
         period: '€/mese',
@@ -174,7 +177,8 @@ export const plans = [
       {
         title: 'Annuale',
         sub: 'Pagamento unico',
-        note: 'Rinnovo automatico annuale · disdetta via email entro 10 giorni dalla fine dell\'abbonamento',
+        note:
+          'Rinnovo automatico annuale · disdetta via email a disdetta@athlonroma.it entro 10 giorni dalla fine dell\'abbonamento',
         savings: 'Risparmio €488 vs Flex annuo',
         amount: '950',
         period: '€/anno',
