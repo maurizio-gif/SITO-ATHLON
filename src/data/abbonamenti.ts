@@ -1,4 +1,5 @@
 import { PG } from './cta';
+import { countLessons, getBand } from './planning';
 
 /**
  * I due piani di abbonamento: nomi, attività comprese, opzioni e prezzi.
@@ -82,8 +83,10 @@ export const activityInfo: Record<string, { title: string; body: string; href?: 
   },
   'Scuola Nuoto Adulti': {
     title: 'Scuola Nuoto Adulti',
+    /* Il numero di lezioni viene dal planning, non è scritto a mano: cambia
+       da solo quando cambia il palinsesto, come in [corso].astro. */
     body:
-      'Corsi su tre livelli — base, intermedio e avanzato — con istruttori federali. Dal primo approccio all\'acqua al perfezionamento dei quattro stili.',
+      `Corsi su tre livelli — base, intermedio e avanzato — con istruttori federali: ${countLessons(getBand('scuola-nuoto-adulti'))} lezioni a settimana tra cui scegliere, senza limiti di frequenza. Prenoti quando vuoi, negli orari del tuo livello.`,
     href: '/scuola-nuoto-adulti',
   },
   'Corso Gestanti': {
