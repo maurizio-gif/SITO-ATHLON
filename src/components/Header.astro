@@ -1,5 +1,6 @@
 ---
 import { trialCta, talkCta, joinCta } from '../data/cta';
+import { LEZIONI_FITNESS } from '../data/corsi';
 
 /* La prova è un prodotto solo e vale per tutto il club, quindi qui non porta
    nessuna attività: la pagina di provenienza è l'header, su qualunque pagina.
@@ -21,23 +22,14 @@ const iscriviti = joinCta({ source: 'header' });
 /* I corsi fitness sono il secondo livello del menu, in ordine alfabetico —
    ordinati qui e non a mano, così aggiungerne uno non richiede di rimetterli
    in fila. localeCompare con 'it' perché ® e accenti non devono contare. */
-const corsiFitness = [
-  { label: 'Antigravity®', href: '/antigravity' },
-  { label: 'Balli di Gruppo', href: '/balli-di-gruppo' },
-  { label: 'Body Pump®', href: '/body-pump' },
-  { label: 'Body Sculpt', href: '/body-sculpt' },
-  { label: 'Booty Workout', href: '/booty-workout' },
-  { label: 'Calisthenics', href: '/calisthenics' },
-  { label: 'Difesa Personale', href: '/difesa-personale' },
-  { label: 'GP Coreo', href: '/gpcoreo' },
-  { label: 'Ginnastica Dolce', href: '/ginnastica-dolce' },
-  { label: 'Ginnastica Posturale', href: '/ginnastica-posturale' },
-  { label: 'HBX', href: '/hbx' },
-  { label: 'Motr®', href: '/motr' },
-  { label: 'Pilates', href: '/pilates' },
-  { label: 'Strenght', href: '/strenght' },
-  { label: 'Yoga', href: '/yoga' },
-].sort((a, b) => a.label.localeCompare(b.label, 'it'));
+/* I corsi del sottomenu si leggono da `corsi.ts`, e non si elencano qui.
+   Prima erano una copia scritta a mano ferma al giorno in cui fu scritta:
+   non sapeva di Matwork 4.1, aggiunto più tardi solo alla pagina dei corsi,
+   e il badge diceva «15 corsi» mentre `/corsi-fitness` ne elencava 19.
+   Ora sono diciannove voci - una per lezione, con l'ancora quando un corso
+   ne ha più di una - e il badge è la lunghezza dell'elenco che si apre, non
+   un numero scritto a fianco che può smettere di corrispondere. */
+const corsiFitness = LEZIONI_FITNESS;
 
 /* Primo livello: le otto attività per adulti come le nomina il club. Solo
    "Corsi Fitness" si apre, e dentro ci sono i singoli corsi. */
