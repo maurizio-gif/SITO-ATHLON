@@ -36,7 +36,7 @@
  * un invito perso per un timeout. Il workflow rifà il controllo, che è dove
  * conta.
  */
-import { PASS, VOUCHER, COMPRESO, LIBERATORIA, AMICI } from '../data/referral';
+import { PASS, VOUCHER, VANTAGGIO_AMICO, COMPRESO, LIBERATORIA, AMICI } from '../data/referral';
 import CampoTelefono from './CampoTelefono.astro';
 
 /* I blocchi li genera il numero, non tre righe copiate: `AMICI` è la stessa
@@ -58,7 +58,7 @@ const BLOCCHI = Array.from({ length: AMICI }, (_, i) => i + 1);
       </h3>
       <p class="rfr__claim">
         A loro {PASS.giorni} giorni di club a €{PASS.prezzo} ciascuno. A te €{VOUCHER.valore}
-        {VOUCHER.uso} per ognuno che si iscrive.
+        {VOUCHER.uso} per ognuno che si iscrive — e {VANTAGGIO_AMICO}.
       </p>
 
       {/* Le sette attività per nome, e non «tutto il club»: il pass apre il
@@ -226,7 +226,7 @@ const BLOCCHI = Array.from({ length: AMICI }, (_, i) => i + 1);
       <p class="rfr__nota rfr__nota--fuori" data-rfr-fuori hidden></p>
       <p class="rfr__nota">
         Quando attiva il pass e poi si iscrive, il voucher da €{VOUCHER.valore} arriva a te: te lo
-        diciamo per email.
+        diciamo per email. E {VANTAGGIO_AMICO}.
       </p>
       <div class="rfr__azioni">
         <button type="button" class="btn btn-primary rfr__btn" data-rfr-altro>Invita un altro amico</button>
