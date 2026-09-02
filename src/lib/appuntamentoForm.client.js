@@ -781,7 +781,11 @@ export function initAppuntamentoForm(root, options) {
     Object.keys(steps).forEach(function (k) {
       if (steps[k]) pulisciErrore(steps[k]);
     });
-    mostraStep('quando');
+    /* Non chiama `mostraStep('quando')`: lo fa già `vaiAgliOrari()`, che segue
+       sempre `pulisci()` dentro `apri()`. Chiamarlo qui consumava
+       `saltaPrimoFuoco` un passo prima del previsto, e il fuoco — con lo
+       scroll automatico che porta — finiva comunque sul calendario al primo
+       caricamento del riquadro incorporato in pagina. */
     onReset();
   }
 
