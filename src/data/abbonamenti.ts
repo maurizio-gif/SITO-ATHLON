@@ -53,8 +53,12 @@ export const activityInfo: Record<string, { title: string; body: string; href?: 
   },
   'Nuoto Libero Assistito': {
     title: 'Nuoto Libero Assistito',
+    /* A bordo vasca ci sono due figure, non una: Tecnici Federali — gli
+       stessi istruttori della Scuola Nuoto — e Assistenti Bagnanti, entrambi
+       per tutta la durata del turno. Lo dice /nuoto-libero (intro e punti):
+       ridurlo al solo bagnino sottostima chi c'è davvero a bordo vasca. */
     body:
-      'Nuoto libero nella vasca da 25 metri a 5 corsie, con assistenza bagnino sempre presente. Corsie divise per ritmo, temperatura costante fra 28 °C e 28,5 °C.',
+      'Nuoto libero nella vasca da 25 metri a 5 corsie, con Tecnici Federali e Assistenti Bagnanti sempre a bordo vasca, per tutta la durata del turno. Corsie divise per ritmo, temperatura costante fra 28 °C e 28,5 °C.',
     href: '/nuoto-libero',
   },
   'Athlon TV': {
