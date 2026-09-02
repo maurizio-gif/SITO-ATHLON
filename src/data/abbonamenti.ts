@@ -95,8 +95,11 @@ export const activityInfo: Record<string, { title: string; body: string; href?: 
   },
   'Corso Gestanti': {
     title: 'Corso Gestanti',
+    /* In Vasca Grande, in sospensione: lo dice il planning (Aqua Gestanti,
+       Vasca Grande) e non la vasca piccola più calda delle altre lezioni
+       in appoggio dell'Aqua Fitness. */
     body:
-      'Attività in acqua pensata per la gravidanza, seguita da personale specializzato, nella vasca a temperatura più alta. Lavoro dolce su respirazione, mobilità e scarico del peso.',
+      'Attività in acqua pensata per la gravidanza, in vasca alta e in sospensione: il peso è sostenuto dall\'acqua, per un lavoro a basso impatto sulle articolazioni. Lavoro dolce su respirazione, mobilità e scarico del peso.',
     href: '/gestanti',
   },
 };
