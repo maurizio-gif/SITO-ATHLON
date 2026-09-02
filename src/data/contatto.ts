@@ -17,6 +17,7 @@
  * gli interessa è la domanda che fa chiudere la pagina.
  */
 import { ACTIVITY_TAGS } from './activities';
+import { SNB_ETA } from './junior';
 import { PREFISSO_PREDEFINITO, validaTelefono } from './prefissi';
 
 /** L'endpoint che verifica l'email su PerfectGym: lo stesso del form di prova. */
@@ -245,7 +246,12 @@ export const MACRO: Macro[] = [
   {
     id: 'scuola-nuoto-bambini',
     label: 'Scuola Nuoto Bambini',
-    nota: 'Nati dal 2012 al 2022.',
+    // Letta da `junior.ts` e non ricopiata: questa nota compare nel modulo
+    // contatti, che sta su **ogni** pagina del sito, e portava ancora la
+    // stagione precedente - 2012-2022 - mentre la pagina del corso diceva
+    // 2013-2023. Un genitore poteva concludere che suo figlio e' fuori
+    // quando e' dentro.
+    nota: `Nati dal ${SNB_ETA.dal} al ${SNB_ETA.al}.`,
     ramo: 'junior',
     gruppo: 'junior',
   },

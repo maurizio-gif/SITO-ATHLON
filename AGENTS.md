@@ -4641,3 +4641,55 @@ volta porterebbe la riga sopra i 30, ma quel testo compare **al passaggio del
 puntatore**, che su un televisore non esiste: allargare le schede per una
 descrizione che là non si legge è un cambiamento della home page pagato per
 niente. Se un giorno quel testo diventa sempre visibile, allora sì.
+
+## Un numero in vetrina si legge da un posto solo, e il build lo controlla
+
+Il sito diceva quanti sono i corsi fitness in tre punti, e diceva tre cose
+diverse: il menu «15 corsi», `/corsi-fitness` «19 corsi» — ed elencava 19
+schede vere — la home «Diciotto corsi». Tre file, tre affermazioni sulla
+stessa cosa, nessuno che leggesse dall'altro.
+
+La causa non era la distrazione ma la **copia**: l'header teneva un elenco dei
+corsi ricopiato a mano, fermo al giorno in cui fu scritto (non sapeva di
+Matwork 4.1, aggiunto più tardi solo alla pagina dei corsi), e la home una
+frase fissa mai più toccata. Ora `data/corsi.ts` esporta `CORSI_FITNESS`,
+`LEZIONI_FITNESS` e `NUMERO_CORSI_FITNESS`, e header e home li leggono.
+
+**Fitness è «senza `eyebrow`», non un elenco di slug.** Le quattro attività in
+acqua dichiarano un occhiello proprio — «Athlon Aqua», «Nuoto» — che è già il
+modo in cui il sito le tiene distinte. Un corso fitness nuovo entra da solo;
+uno in acqua ne resta fuori perché ha il suo occhiello, non perché qualcuno si
+è ricordato di escluderlo.
+
+**Si conta `varianti` e non `lezioni`, e questa è la riga da non invertire.**
+`lezioni` è l'elenco dei nomi con cui un corso compare nel palinsesto, e ne
+porta anche gli **alias**: il Pilates ha `['Pilates Matwork', 'Mat 4.1',
+'Matwork 4.1']`, dove le ultime due sono la stessa lezione scritta in due modi
+dal planning. Contando quello vengono venti lezioni, cioè una che non esiste —
+ed è l'errore che una riscrittura fatta «sul campo ovvio» commette. `varianti`
+è quello che la pagina del corso disegna, una scheda per lezione, ognuna col
+suo `id` che è già l'ancora del menu (`/yoga#hatha`, `/pilates#matwork-41`).
+
+**La lista di `/corsi-fitness` resta scritta a mano, e il build la controlla.**
+Porta una foto per scheda e la classificazione per famiglia di allenamento che
+non esistono altrove, quindi non si può derivare; quello che non può fare è
+divergere dal numero. Un `throw` confronta la sua lunghezza con
+`NUMERO_CORSI_FITNESS` e **ferma il deploy** se non combaciano, dicendo quale
+delle due va aggiornata. Si confrontano i **numeri e non i nomi**: qui alcune
+schede si chiamano come le nomina il club («Ginnastica Pilates», «Motr®») e nei
+dati portano il nome della lezione («Pilates Matwork», «MOTR®»), e un confronto
+sui nomi fallirebbe su una differenza voluta.
+
+E la stessa forma di guasto stava sulla **fascia d'età della Scuola Nuoto
+Bambini**: `data/contatto.ts` — il modulo contatti, che compare su *ogni*
+pagina — diceva «Nati dal 2012 al 2022», la stagione precedente, mentre la
+pagina del corso diceva già 2013-2023. Un genitore poteva concludere che suo
+figlio è fuori quando è dentro. Ora `SNB_ETA` in `junior.ts` è l'unica fonte, e
+`contatto.ts` la importa.
+
+Per verificare, sul `dist`: il badge del sottomenu, la descrizione della card
+in home e il titolo di `/corsi-fitness` devono dire lo stesso numero, il menu
+deve avere esattamente quelle voci con le ancore che nelle pagine bersaglio
+esistono davvero, e «nati dal … al …» deve combaciare fra la pagina del corso e
+il modulo contatti su una pagina qualsiasi. L'ultima passata: 19 in tutti e tre
+i posti, 19 voci con sette ancore tutte risolte, 2013-2023 ovunque.

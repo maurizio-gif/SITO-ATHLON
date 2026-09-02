@@ -16,6 +16,7 @@ import { getBand, countLessons, roomsOf } from '../data/planning';
 import { trialCta, ctaAttrs } from '../data/cta';
 import { serviceSchema } from '../data/club';
 import { GUEST_PASS } from '../data/abbonamenti';
+import { NUMERO_CORSI_FITNESS } from '../data/corsi';
 import { fotoPiccola, fotoHero } from '../data/foto';
 /* Il dominio di produzione, per gli @id assoluti degli schemi. */
 const SITE = 'https://www.athlonroma.it';
@@ -110,6 +111,29 @@ const corsi = [
   );
   return { ...c, volte };
 });
+
+/* Questa lista resta scritta a mano, e non e' una dimenticanza: porta una
+   foto per scheda e la classificazione per famiglia di allenamento (forza,
+   fiato, musica, postura, mobilita') che non esiste da nessun'altra parte.
+   Quello che non puo' fare e' divergere dal numero che il resto del sito
+   stampa - l'header e la home lo leggono da `NUMERO_CORSI_FITNESS`.
+
+   Quindi il build si ferma se le due liste non contano lo stesso, e si
+   confrontano i **numeri** e non i nomi: qui alcune schede si chiamano come
+   le nomina il club («Ginnastica Pilates», «Motr®») e nei dati portano il
+   nome della lezione («Pilates Matwork», «MOTR®»). Un confronto sui nomi
+   fallirebbe su una differenza che e' voluta.
+
+   Prima di questa riga il sito diceva 15 nel menu, 18 in home e 19 qui. Ora
+   chi aggiunge una variante a `corsi.ts` senza aggiungere la scheda con la
+   sua foto lo scopre dal deploy che non parte, invece che dai tre numeri
+   diversi in vetrina. */
+if (corsi.length !== NUMERO_CORSI_FITNESS) {
+  throw new Error(
+    `/corsi-fitness: le schede qui sono ${corsi.length}, le lezioni in src/data/corsi.ts sono ${NUMERO_CORSI_FITNESS}. ` +
+      'Aggiungi (o togli) la scheda con foto e famiglie qui, oppure la variante nei dati.'
+  );
+}
 
 /* L'elenco per le risposte esce dalle card: se un corso entra o esce, la
    risposta segue. */

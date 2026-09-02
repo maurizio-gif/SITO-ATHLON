@@ -16,6 +16,23 @@
 import type { RichiestaFaq } from './faq';
 import { ATTIVAZIONE } from './abbonamenti';
 
+/**
+ * La fascia d'età della Scuola Nuoto Bambini, una volta sola.
+ *
+ * Era scritta a mano in tre punti di questo file e in un quarto in
+ * `data/contatto.ts` — e il quarto era rimasto alla stagione precedente:
+ * il modulo contatti, che compare su **ogni** pagina del sito, diceva «Nati
+ * dal 2012 al 2022» mentre la pagina del corso diceva già 2013-2023. Chi
+ * apriva il modulo da una pagina qualsiasi leggeva una fascia d'età sbagliata
+ * di un anno, cioè poteva concludere che suo figlio è fuori quando è dentro.
+ *
+ * `dal` è l'anno dei più grandi e `al` quello dei più piccoli: contano gli
+ * anni di nascita, non le età, ed è la stessa scelta scritta nella f.a.q. del
+ * baby nuoto — «a decidere è l'anno di nascita, non i mesi», perché è così
+ * che lo decide il portale.
+ */
+export const SNB_ETA = { dal: 2013, al: 2023 } as const;
+
 const U = '/wp-content/uploads';
 
 /**
@@ -420,7 +437,7 @@ export const JUNIOR: CorsoJunior[] = [
     video: 'https://www.athlonroma.it/wp-content/uploads/2024/11/SCUOLA-NUOTO-BAMBINI-2.mp4',
     poster: `${U}/2024/08/P1120372-scaled.jpg`,
     facts: [
-      'Per i nati dal 2013 al 2023',
+      `Per i nati dal ${SNB_ETA.dal} al ${SNB_ETA.al}`,
       'Dal 14 settembre 2026 al 20 giugno 2027',
       'Turni divisi per età, gruppi divisi per livello',
       'Brevetto federale a fine stagione',
@@ -432,7 +449,7 @@ export const JUNIOR: CorsoJunior[] = [
         sottotitolo: 'Stagione 2026/27',
         dettagli: [
           { l: 'Durata corso', v: 'Dal 14 settembre 2026 al 20 giugno 2027' },
-          { l: 'Fascia d’età', v: 'Per i nati dal 2023 al 2013' },
+          { l: 'Fascia d’età', v: `Per i nati dal ${SNB_ETA.al} al ${SNB_ETA.dal}` },
           {
             l: 'Turni',
             v: 'Gli orari sono divisi per età. All’interno dello stesso orario i bambini vengono divisi per livello, e per ognuno si stabilisce un percorso didattico individuale',
@@ -507,7 +524,7 @@ export const JUNIOR: CorsoJunior[] = [
       },
       {
         q: 'Da che età si può cominciare la scuola nuoto?',
-        a: 'Dai 3 anni: la Scuola Nuoto Bambini è per i nati dal 2013 al 2023. I più piccoli — i nati nel 2024, 2025 e 2026 — fanno il <a href="/baby-nuoto">Baby Nuoto</a>, in acqua con un genitore. A decidere è l’anno di nascita, non i mesi: un bambino del 2023 fa la scuola nuoto anche se non ha ancora compiuto i 3 anni.',
+        a: `Dai 3 anni: la Scuola Nuoto Bambini è per i nati dal ${SNB_ETA.dal} al ${SNB_ETA.al}. I più piccoli — i nati nel 2024, 2025 e 2026 — fanno il <a href="/baby-nuoto">Baby Nuoto</a>, in acqua con un genitore. A decidere è l’anno di nascita, non i mesi: un bambino del ${SNB_ETA.al} fa la scuola nuoto anche se non ha ancora compiuto i 3 anni.`,
       },
       {
         q: 'Posso accompagnare mio figlio nello spogliatoio?',

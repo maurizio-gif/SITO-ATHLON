@@ -815,6 +815,57 @@ export const CORSI: Corso[] = [
   },
 ];
 
+/**
+ * I corsi fitness, e quante lezioni offrono: la fonte unica di un numero che
+ * stava scritto a mano in tre posti diversi — e che diceva tre cose diverse.
+ *
+ * Misurato prima di questa riga: il menu dell'header diceva «15 corsi» da una
+ * copia dei corsi ricopiata a mano e ferma al giorno in cui fu scritta (non
+ * sapeva di Matwork 4.1), `/corsi-fitness` diceva 19 ed elencava 19 schede
+ * vere, la home diceva «Diciotto corsi» da una frase mai più toccata. Tre
+ * file, tre affermazioni sulla stessa cosa, nessuno che leggesse dall'altro.
+ *
+ * **Fitness è «senza `eyebrow`»**, e non un elenco di slug: le quattro
+ * attività in acqua — aqua fitness, nuoto libero, scuola nuoto adulti,
+ * gestanti — dichiarano un occhiello proprio («Athlon Aqua», «Nuoto»), che è
+ * esattamente il modo in cui il sito le tiene già distinte. Un corso fitness
+ * nuovo entra qui da solo; uno in acqua ne resta fuori perché ha il suo
+ * occhiello, non perché qualcuno si è ricordato di aggiungerlo a una lista.
+ */
+export const CORSI_FITNESS: Corso[] = CORSI.filter((c) => !c.eyebrow);
+
+/**
+ * Una voce per **lezione** e non per corso, con l'ancora quando un corso ne
+ * ha più di una: `/yoga#hatha`, `/hbx#boxing`, `/pilates#matwork-41`. È
+ * quello che serve a un menu — chi cerca «Power Yoga» cerca quello, non
+ * «Yoga» — e sono le stesse diciannove voci che `/corsi-fitness` enumera.
+ *
+ * **Si conta `varianti` e non `lezioni`, e questa è la riga da non
+ * invertire.** `lezioni` è l'elenco dei nomi con cui quel corso compare nel
+ * palinsesto, e ne porta anche gli **alias**: il Pilates ha
+ * `['Pilates Matwork', 'Mat 4.1', 'Matwork 4.1']`, dove le ultime due sono la
+ * stessa lezione scritta in due modi dal planning. Contando quello vengono
+ * venti lezioni, cioè una che non esiste. `varianti` invece è quello che la
+ * pagina del corso disegna, una scheda per lezione, ognuna col suo `id` che
+ * è già l'ancora.
+ */
+export const LEZIONI_FITNESS: { label: string; href: string }[] = CORSI_FITNESS.flatMap((c) =>
+  c.varianti.map((v) => ({
+    // `nome` è null sui corsi a variante unica: là la lezione si chiama come
+    // il corso, e ripetere il nome del corso dentro se stesso non aggiunge
+    // niente a chi lo scrive.
+    label: v.nome ?? c.nome,
+    href: c.varianti.length > 1 && v.id ? `/${c.slug}#${v.id}` : `/${c.slug}`,
+  }))
+).sort((a, b) => a.label.localeCompare(b.label, 'it'));
+
+/**
+ * Quante lezioni fitness ci sono. Non quanti corsi (quindici): quante cose
+ * diverse si possono andare a fare, che è la domanda a cui risponde un
+ * numero in vetrina.
+ */
+export const NUMERO_CORSI_FITNESS = LEZIONI_FITNESS.length;
+
 export function getCorso(slug: string): Corso {
   const c = CORSI.find((x) => x.slug === slug);
   if (!c) throw new Error(`Corso non trovato: ${slug}`);
