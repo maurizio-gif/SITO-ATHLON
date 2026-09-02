@@ -149,17 +149,13 @@ export const DESTINATARI: Destinatario[] = [
          vero, quello che compare sul pulsante e nel modal, è «Prova Athlon». */
       "Riceve i dati del modulo «Prova Athlon» e dell'assistente: nome, cognome, email, cellulare, l'attività di interesse e, se acconsentito, l'attribuzione della campagna. Riceve anche, ad ogni pagina caricata, l'identificativo di visita e la pagina stessa, e allo stesso modo quando apri l'assistente o premi un pulsante «Iscriviti»: è il conteggio di quante pagine vengono viste e di quante volte quei comandi vengono premuti, non un modulo compilato.",
   },
-  {
-    nome: 'Calendly',
-    dominio: 'calendly.com',
-    /* Non più il richiamo telefonico: quello si prenota sul calendario del
-       club e resta dentro i nostri sistemi. Restano tre schede dell'Help Desk
-       sulla direzione tecnica del nuoto — vedi `data/calendly.ts` — e finché
-       ci sono, Calendly resta qui: un servizio incorporato che l'informativa
-       non nomina è esattamente ciò che l'informativa deve evitare. */
-    perche:
-      'Prenotazione degli appuntamenti con la direzione tecnica del nuoto, dalle schede dell’Help Desk che li ospitano.',
-  },
+  /* **Calendly non c'è più**, e la voce si toglie invece di restare per
+     prudenza. Erano tre schede dell'Help Desk sulla direzione tecnica del
+     nuoto, le ultime rimaste: adesso quell'appuntamento si prenota sul
+     calendario del club (`data/appuntamentoNuoto.ts`) e i dati non escono dai
+     nostri sistemi. Un servizio che l'informativa nomina e che non riceve
+     niente è un dato falso quanto un servizio che riceve e non è nominato:
+     dice a chi legge che i suoi dati vanno in un posto dove non vanno. */
   {
     nome: 'PerfectGym',
     dominio: 'athlon.perfectgym.com',
@@ -223,7 +219,9 @@ export interface Sezione {
  *    conversazione viaggia insieme all'appuntamento. Andava a Calendly, e da
  *    lì non tornava; oggi resta nell'agenda del club, e la frase lo dice.
  *  - **I trasferimenti fuori UE erano solo quelli di Meta.** Oggi sono anche
- *    Google, Calendly e Vimeo.
+ *    Google e Vimeo — Calendly non c'è più: era rimasto per tre schede della
+ *    direzione tecnica del nuoto, che adesso prenotano sul calendario del
+ *    club.
  *
  * Due cose del testo originale sono state **togliere e non riscritte**: la
  * partita IVA, che era un segnaposto «[DA VERIFICARE]» e un'informativa non la
@@ -288,7 +286,7 @@ export const INFORMATIVA: Sezione[] = [
       '<h3>Responsabili del trattamento (art. 28 GDPR)</h3>',
       '<ul><li>Consulenti esterni — commercialista, consulente del lavoro, legale — per gli adempimenti fiscali, contabili e legali.</li><li>Il fornitore della <strong>piattaforma di automazione</strong> che riceve i moduli e le conversazioni, e il fornitore della <strong>banca dati</strong> su cui sono conservati, con server nell\'Unione Europea.</li><li>Il fornitore del <strong>portale del club</strong> per abbonamenti, prenotazioni e accessi.</li><li>Il fornitore del <strong>sistema di raccolta del consenso</strong> ai cookie.</li><li>Il fornitore dell\'<strong>infrastruttura di pubblicazione</strong> del sito.</li></ul>',
       '<h3>Titolari autonomi</h3>',
-      '<ul><li><strong>Ente di Promozione Sportiva o Federazione di riferimento</strong>, per i soli adempimenti obbligatori di tesseramento.</li><li><strong>Google Ireland Ltd</strong>, per la gestione dei tag di misurazione e per la mappa della sede.</li><li><strong>Calendly LLC</strong>, quando prenoti un appuntamento con la direzione tecnica del nuoto dalle schede che lo consentono.</li><li><strong>Meta Platforms Ireland Ltd</strong>, per le conversazioni avviate sui suoi canali e per gli eventuali strumenti pubblicitari attivati con il tuo consenso.</li><li><strong>Vimeo</strong> e il fornitore del <strong>tour virtuale</strong>, per i contenuti multimediali che il sito incorpora.</li><li><strong>Autorità giudiziarie e amministrative</strong>, nei casi previsti dalla legge.</li></ul>',
+      '<ul><li><strong>Ente di Promozione Sportiva o Federazione di riferimento</strong>, per i soli adempimenti obbligatori di tesseramento.</li><li><strong>Google Ireland Ltd</strong>, per la gestione dei tag di misurazione e per la mappa della sede.</li><li><strong>Meta Platforms Ireland Ltd</strong>, per le conversazioni avviate sui suoi canali e per gli eventuali strumenti pubblicitari attivati con il tuo consenso.</li><li><strong>Vimeo</strong> e il fornitore del <strong>tour virtuale</strong>, per i contenuti multimediali che il sito incorpora.</li><li><strong>Autorità giudiziarie e amministrative</strong>, nei casi previsti dalla legge.</li></ul>',
       '<p>I tuoi dati <strong>non vengono venduti, ceduti per il marketing di terzi né diffusi pubblicamente</strong>.</p>',
     ],
   },
@@ -297,7 +295,7 @@ export const INFORMATIVA: Sezione[] = [
     corpo: [
       '<p>La banca dati del club è ospitata su <strong>server nell\'Unione Europea (Irlanda)</strong>, e i dati che trattiamo direttamente restano lì.</p>',
       '<p>Alcuni dei servizi che il sito utilizza sono però forniti da società statunitensi, e comportano il trasferimento di dati verso gli Stati Uniti:</p>',
-      '<ul><li><strong>Google</strong>, per la gestione dei tag e per la mappa;</li><li><strong>Calendly</strong>, quando prenoti un appuntamento con la direzione tecnica del nuoto;</li><li><strong>Vimeo</strong>, per i video incorporati;</li><li><strong>Meta</strong>, per i suoi canali e per gli eventuali strumenti pubblicitari.</li></ul>',
+      '<ul><li><strong>Google</strong>, per la gestione dei tag e per la mappa;</li><li><strong>Vimeo</strong>, per i video incorporati;</li><li><strong>Meta</strong>, per i suoi canali e per gli eventuali strumenti pubblicitari.</li></ul>',
       '<p>Il trasferimento avviene sulla base della <strong>decisione di adeguatezza</strong> adottata dalla Commissione Europea per gli Stati Uniti (EU-US Data Privacy Framework) per i fornitori che vi hanno aderito, e delle <strong>Clausole Contrattuali Standard</strong> dove quella non è applicabile.</p>',
       '<p>Gli strumenti che richiedono il tuo consenso non vengono attivati, e quindi non trasferiscono nulla, finché non lo dai.</p>',
     ],

@@ -3,8 +3,11 @@
  *
  * Sostituisce Calendly per il richiamo: gli orari non li decide più un
  * servizio esterno, li serve il pannello — che è l'unico posto che sa cosa c'è
- * già in agenda. Gli eventi Calendly restano in `data/calendly.ts` finché il
- * passaggio non è completo.
+ * già in agenda. Il passaggio adesso è completo: `data/calendly.ts` non esiste
+ * più, perché anche le tre schede della direzione tecnica del nuoto — le
+ * ultime rimaste su Calendly — prenotano sul calendario del club. Il loro sta
+ * in `data/appuntamentoNuoto.ts`, ed è un file a parte perché è un'altra
+ * agenda: quella di una persona sola, un'ora al giorno.
  *
  * Il sito è statico e non ha chiavi: come per n8n, questi sono indirizzi
  * pubblici che rispondono senza autenticazione. Quello degli slot restituisce

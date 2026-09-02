@@ -1,0 +1,78 @@
+---
+/**
+ * «Parla con il Direttore Tecnico» incorporato in una scheda dell'Help Desk.
+ *
+ * È il gemello di `AppuntamentoInline`, e sostituisce ciò che stava nello
+ * stesso posto: l'embed di Calendly `athlonclub/nuoto2`, incollato a mano in
+ * fondo a `direzione-tecnica.md`, `didattica.md` e `brevetti.md`. Il patto col
+ * Markdown è lo stesso di prima — la scheda scrive un contenitore vuoto,
+ * `<div data-athlon-appuntamento-nuoto></div>`, e questo script ci trasloca
+ * dentro il riquadro — e la differenza è che adesso a riempirlo è roba nostra:
+ * nessun dominio di terzi da bloccare, nessun consenso ai cookie da aspettare,
+ * e la prenotazione finisce in una tabella invece che in una casella di posta.
+ *
+ * **Un componente a parte e non una proprietà di `AppuntamentoInline`**, e la
+ * ragione è il contenitore: sono due `div` diversi nel Markdown, quindi due
+ * script che cercano due agganci. Quello che *non* è duplicato è ciò che conta
+ * — i passi (`AppuntamentoPassi`, con `variante="nuoto"`) e tutta la logica
+ * (`appuntamentoForm.client.js`, con la stessa variante).
+ */
+import AppuntamentoPassi from './AppuntamentoPassi.astro';
+---
+
+<div class="apx-sezione" data-appuntamento-nuoto-inline hidden>
+  <AppuntamentoPassi prefix="apn" variante="nuoto" />
+</div>
+
+<style is:global>
+  /* Il riquadro riusa `.apx-sezione`, che è già globale e arriva da
+     `AppuntamentoInline`. Qui c'è solo la riga che dice a chi è riservato il
+     servizio: sta sopra i giorni, e deve leggersi prima di scegliere un orario
+     senza per questo sembrare un avviso di errore. */
+  .ap__nota-riservato {
+    margin: 0 0 1.1rem;
+    padding: 0.7rem 0.85rem;
+    border-left: 3px solid var(--accent, #ff5701);
+    background: rgb(255 87 1 / 0.06);
+    border-radius: 0 8px 8px 0;
+    font-size: var(--text-sm, 0.9rem);
+    line-height: 1.45;
+  }
+
+  /* La pagina che ospita questo riquadro può non ospitare l'altro, e le regole
+     della sezione stanno là: le tre righe che servono davvero si ripetono qui
+     dentro una guardia sul contenitore, così il riquadro è a posto anche da
+     solo. Non è una copia degli stili — è il minimo perché non sia nudo. */
+  [data-appuntamento-nuoto-inline].apx-sezione {
+    max-width: 34rem;
+    margin: 2rem 0;
+  }
+</style>
+
+<script>
+  import { initAppuntamentoForm } from '../lib/appuntamentoForm.client.js';
+
+  const riquadro = document.querySelector<HTMLElement>('[data-appuntamento-nuoto-inline]');
+  const posto = document.querySelector<HTMLElement>('[data-athlon-appuntamento-nuoto]');
+
+  if (riquadro && posto) {
+    // Si trasloca invece di ricostruirsi: il markup dei passi è già qui,
+    // renderizzato da Astro, e clonarlo vorrebbe dire tenerne due copie
+    // allineate a mano.
+    posto.appendChild(riquadro);
+    riquadro.hidden = false;
+
+    const form = initAppuntamentoForm(riquadro, { prefix: 'apn', variante: 'nuoto', fuoco: false });
+    // Nessun gesto di apertura da aspettare: il riquadro è già in pagina, e
+    // `apri` è quello che gli dice da dove arriva — la scheda che lo ospita.
+    form.apri({
+      pagina: location.pathname,
+      origine: posto.dataset.origine || 'scheda-direzione-tecnica',
+      cta: (posto.dataset.cta || document.title || '').trim().slice(0, 80),
+    });
+  } else if (riquadro) {
+    // Nessun posto dove metterlo: si toglie invece di restare nascosto, così
+    // non porta in giro campi vuoti e id doppi.
+    riquadro.remove();
+  }
+</script>

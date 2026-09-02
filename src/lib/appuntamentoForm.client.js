@@ -37,7 +37,8 @@ import {
   WEBHOOK_EMAIL_APPUNTAMENTO,
   WEBHOOK_VERIFICA,
 } from '../data/appuntamento';
-import { haGiaAccount } from '../data/contatto';
+import { API_PRENOTA_NUOTO, API_SLOT_NUOTO } from '../data/appuntamentoNuoto';
+import { anagraficaNota, haGiaAccount, servonoISuoiDati } from '../data/contatto';
 import { validaTelefono } from '../data/prefissi';
 import { leggi as emailConosciuta } from '../scripts/emailNota';
 import { leggi as userNumberConosciuto } from '../scripts/numeroSocio';
@@ -45,6 +46,20 @@ import { leggi as userNumberConosciuto } from '../scripts/numeroSocio';
 export function initAppuntamentoForm(root, options) {
   var P = options.prefix;
   var onReset = options.onReset || function () {};
+
+  /* Quale dei due calendari. `'desk'` è il richiamo commerciale — la telefonata
+     di qualifica, quindici minuti, l'argomento in testo libero — `'nuoto'` è
+     l'appuntamento col Direttore Tecnico: dieci minuti, un'ora al giorno, e al
+     posto dell'argomento il nome del bambino di cui si parla.
+     
+     Una variante e non un secondo file, ed è la ragione per cui questa riga
+     esiste: il percorso è lo stesso — orari, identità, dati, un ultimo passo,
+     fatto — e due copie di quattrocento righe divergerebbero al primo difetto
+     corretto in una sola delle due. Quello che cambia sta tutto in `V`. */
+  var nuoto = options.variante === 'nuoto';
+  var V = nuoto
+    ? { slot: API_SLOT_NUOTO, prenota: API_PRENOTA_NUOTO }
+    : { slot: API_SLOT, prenota: API_PRENOTA };
 
   /* Il fuoco al primo passo si salta solo per il riquadro incorporato in
      pagina: là il form è già visibile all'arrivo, e mettere il fuoco su un
@@ -60,6 +75,8 @@ export function initAppuntamentoForm(root, options) {
     telefono: 'Controlla il numero: è quello su cui ti chiamiamo.',
     privacy: 'Serve il consenso al trattamento dei dati per poterti richiamare.',
     oggetto: 'Scrivi due parole sull’argomento: servono a chi ti chiama.',
+    minoreNome: 'Serve il nome di tuo figlio.',
+    minoreCognome: 'Serve il cognome di tuo figlio.',
     slot: 'Scegli un orario.',
     slotPreso: 'Quell’orario è appena stato preso. Scegline un altro.',
     orari: 'Non riusciamo a leggere gli orari disponibili. Riprova fra poco.',
@@ -75,6 +92,8 @@ export function initAppuntamentoForm(root, options) {
       privacy: false,
       marketing: false,
       oggetto: '',
+      minoreNome: '',
+      minoreCognome: '',
       data: '',
       ora: '',
       statoPgm: 'nuovo',
@@ -129,6 +148,8 @@ export function initAppuntamentoForm(root, options) {
   var campoPrivacy = q('#' + P + '-privacy');
   var campoMarketing = q('#' + P + '-marketing');
   var campoOggetto = q('#' + P + '-oggetto');
+  var campoMinoreNome = q('#' + P + '-minore-nome');
+  var campoMinoreCognome = q('#' + P + '-minore-cognome');
   var elencoGiorni = q('[data-ap-giorni]');
   var elencoOrari = q('[data-ap-orari]');
 
@@ -196,11 +217,38 @@ export function initAppuntamentoForm(root, options) {
      numerato, con quello che sappiamo *in quel momento*. Sul passo email può
      ancora non sapere se seguirà «dati» — lo saprà lei stessa, una volta
      mostrata, e allora il conto si aggiusta da solo. */
+  /**
+   * Se il blocco dei dati va mostrato.
+   *
+   * **Due domande diverse per i due calendari**, e la differenza è il telefono.
+   * Per il richiamo del desk basta «ha un account?»: chi ce l'ha ha lasciato i
+   * suoi dati al club, e richiederglieli è il modo più rapido per far chiudere
+   * la pagina a un socio.
+   *
+   * Per il Direttore Tecnico no, e la ragione è che quella chiamata la fa lui:
+   * un numero che in archivio manca — o che è un fisso — è un numero su cui la
+   * telefonata non arriva, e nasconderebbe il campo proprio nel caso in cui
+   * serve. Quindi vale la regola del totem, `servonoISuoiDati()`: o si chiede
+   * tutto, o si conferma tutto.
+   */
+  function servonoIDati() {
+    if (nuoto) {
+      return servonoISuoiDati({
+        nota: anagraficaNota({ stato: dati.statoPgm, statoNucleo: dati.statoNucleo }),
+        id: dati.memberId,
+        nome: dati.nome,
+        cognome: dati.cognome,
+        telefono: dati.cellulare,
+      });
+    }
+    return !haGiaAccount({ memberType: dati.memberType, stato: dati.statoPgm });
+  }
+
   function passiRestanti() {
     var passi = [];
     if (!dati.email) {
       passi.push('email');
-    } else if (!haGiaAccount({ memberType: dati.memberType, stato: dati.statoPgm })) {
+    } else if (servonoIDati()) {
       passi.push('dati');
     }
     passi.push('oggetto');
@@ -242,7 +290,7 @@ export function initAppuntamentoForm(root, options) {
   function proseguiOltreIdentita() {
     if (!dati.email) {
       mostraStep('email');
-    } else if (!haGiaAccount({ memberType: dati.memberType, stato: dati.statoPgm })) {
+    } else if (servonoIDati()) {
       mostraStep('dati');
     } else {
       mostraStep('oggetto');
@@ -391,7 +439,7 @@ export function initAppuntamentoForm(root, options) {
     elencoOrari.innerHTML = '';
 
     try {
-      var risposta = await fetch(API_SLOT, { headers: { Accept: 'application/json' } });
+      var risposta = await fetch(V.slot, { headers: { Accept: 'application/json' } });
       if (!risposta.ok) throw new Error('slot');
       var body = await risposta.json();
       giorni = (body && body.giorni) || [];
@@ -534,20 +582,43 @@ export function initAppuntamentoForm(root, options) {
   async function invia() {
     var step = steps.oggetto;
     pulisciErrore(step);
-    togliSegno(campoOggetto);
+    /* Il campo dell'argomento non esiste nella variante del Direttore Tecnico:
+       la guardia è quella che rende il passo condiviso davvero condiviso. */
+    if (campoOggetto) togliSegno(campoOggetto);
 
-    var oggetto = String(campoOggetto.value || '').trim();
-    if (!oggetto) {
-      mostraErrore(step, ERR.oggetto);
-      segnala(campoOggetto);
-      return;
+    /* L'ultimo passo chiede due cose diverse nei due calendari, ed è l'unico
+       punto in cui il percorso si biforca davvero: al desk l'argomento della
+       chiamata, al Direttore Tecnico il nome del bambino. */
+    if (nuoto) {
+      [campoMinoreNome, campoMinoreCognome].forEach(togliSegno);
+      var mNome = String((campoMinoreNome && campoMinoreNome.value) || '').trim();
+      var mCognome = String((campoMinoreCognome && campoMinoreCognome.value) || '').trim();
+      if (!mNome) {
+        mostraErrore(step, ERR.minoreNome);
+        segnala(campoMinoreNome);
+        return;
+      }
+      if (!mCognome) {
+        mostraErrore(step, ERR.minoreCognome);
+        segnala(campoMinoreCognome);
+        return;
+      }
+      dati.minoreNome = mNome;
+      dati.minoreCognome = mCognome;
+    } else {
+      var oggetto = String(campoOggetto.value || '').trim();
+      if (!oggetto) {
+        mostraErrore(step, ERR.oggetto);
+        segnala(campoOggetto);
+        return;
+      }
+      dati.oggetto = oggetto;
     }
     if (!dati.data || !dati.ora) {
       mostraStep('quando');
       mostraErrore(steps.quando, ERR.slot);
       return;
     }
-    dati.oggetto = oggetto;
 
     var bottone = q('[data-ap-invia]');
     attesa(bottone, true);
@@ -558,7 +629,7 @@ export function initAppuntamentoForm(root, options) {
        la promessa di una telefonata che non esiste in nessuna agenda. */
     var esito;
     try {
-      var risposta = await fetch(API_PRENOTA, {
+      var risposta = await fetch(V.prenota, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -569,6 +640,10 @@ export function initAppuntamentoForm(root, options) {
           cognome: dati.cognome,
           telefono: dati.cellulare,
           oggetto: dati.oggetto,
+          /* Solo nel calendario del Direttore Tecnico, e la rotta lo pretende:
+             è la chiave con cui questa chiamata si aggancia all'anagrafica del
+             bambino su PerfectGym. */
+          minore: nuoto ? { nome: dati.minoreNome, cognome: dati.minoreCognome } : undefined,
           privacy: dati.privacy,
           marketing: dati.marketing,
           pagina: dati.pagina,
@@ -642,7 +717,14 @@ export function initAppuntamentoForm(root, options) {
       vid: vid(),
       sid: sid(),
     });
-    [WEBHOOK_APPUNTAMENTO, WEBHOOK_EMAIL_APPUNTAMENTO].forEach(function (indirizzo) {
+    /* **Solo il calendario del desk chiama n8n da qui.** Per il Direttore
+       Tecnico le due email le manda la rotta del pannello, appena scritta la
+       riga: metà di ciò che dicono — se la famiglia risulta iscritta, a quale
+       corso — nasce dentro quella rotta, e farlo tornare al browser perché lo
+       rigiri a n8n vorrebbe dire far decidere al client cosa si scrive a
+       nuoto@athlonroma.it. E il lead su PerfectGym non serve: chi prenota qui
+       è già a sistema per definizione. */
+    (nuoto ? [] : [WEBHOOK_APPUNTAMENTO, WEBHOOK_EMAIL_APPUNTAMENTO]).forEach(function (indirizzo) {
       fetch(indirizzo, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -655,7 +737,10 @@ export function initAppuntamentoForm(root, options) {
     attesa(bottone, false);
 
     if (window.dataLayer) {
-      window.dataLayer.push({ event: 'lead_submit', lead_source: 'appuntamento_telefonico' });
+      window.dataLayer.push({
+        event: 'lead_submit',
+        lead_source: nuoto ? 'appuntamento_direzione_tecnica' : 'appuntamento_telefonico',
+      });
     }
 
     var riepilogo = q('[data-ap-riepilogo]');
@@ -673,7 +758,15 @@ export function initAppuntamentoForm(root, options) {
     giorni = [];
     giornoAperto = '';
     verificaInCorso = null;
-    [campoEmail, campoNome, campoCognome, campoCellulare, campoOggetto].forEach(function (c) {
+    [
+      campoEmail,
+      campoNome,
+      campoCognome,
+      campoCellulare,
+      campoOggetto,
+      campoMinoreNome,
+      campoMinoreCognome,
+    ].forEach(function (c) {
       if (c) {
         c.value = '';
         togliSegno(c);
@@ -731,6 +824,10 @@ export function initAppuntamentoForm(root, options) {
     [campoNome, confermaDati],
     [campoCognome, confermaDati],
     [campoCellulare, confermaDati],
+    /* Sui campi del bambino Invio invia, perché il pulsante che si ha davanti
+       è «Prenota»: è l'ultimo passo. */
+    [campoMinoreNome, invia],
+    [campoMinoreCognome, invia],
   ].forEach(function (coppia) {
     if (!coppia[0]) return;
     coppia[0].addEventListener('keydown', function (e) {
