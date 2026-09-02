@@ -26,7 +26,7 @@
  */
 import Layout from '../layouts/Layout.astro';
 import ReferralModal from '../components/ReferralModal.astro';
-import { PASS, VOUCHER, COMPRESO, AMICI } from '../data/referral';
+import { PASS, VOUCHER, VANTAGGIO_AMICO, COMPRESO, AMICI } from '../data/referral';
 import { fotoHero } from '../data/foto';
 
 const FOTO = '/wp-content/uploads/2025/03/Athlon95-scaled.jpg';
@@ -69,7 +69,7 @@ const FOTO = '/wp-content/uploads/2025/03/Athlon95-scaled.jpg';
         altri. Ognuno prova <strong>tutto il club per {PASS.giorni} giorni</strong> praticamente in
         regalo: paga solo il badge di accesso, <strong>€{PASS.prezzo}</strong> invece dei
         €{PASS.prezzoPieno} del Guest Pass. E per ognuno che poi si iscrive, a te arriva
-        un <strong>voucher da €{VOUCHER.valore}</strong> {VOUCHER.uso}.
+        un <strong>voucher da €{VOUCHER.valore}</strong> {VOUCHER.uso} — e {VANTAGGIO_AMICO}.
       </p>
 
       <button type="button" class="btn btn-primary rp-hero__cta" data-cta="referral">

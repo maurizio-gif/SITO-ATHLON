@@ -70,6 +70,25 @@ export const VOUCHER = {
 } as const;
 
 /**
+ * C'è un premio anche per l'amico, se dopo la prova si iscrive — ed è per
+ * questo che non è un numero come `VOUCHER`.
+ *
+ * È concreto: non paga la quota di attivazione, gli stessi €50 del voucher
+ * di chi lo ha invitato. Ma il club non lo vuole rivelare a chi sta ancora
+ * decidendo se provare — lo comunica lo staff a fine settimana, quando
+ * richiama per sapere com'è andata, non il sito né la chat. Quindi qui non
+ * c'è una cifra da esportare: solo questa frase, generica di proposito, che
+ * va usata così com'è nei testi pubblici e nella scheda che alimenta la
+ * chat — mai completata con «cioè» o con un importo. Il giorno che il club
+ * decide di dirlo subito, il vantaggio si trasforma in un secondo `VOUCHER`
+ * con un valore vero, e questa frase si toglie da tutti i posti dove è
+ * scritta a mano (non solo qui: `content/servizi/invita-i-tuoi-amici.md` e
+ * `content/articles/generali/referral-guest-pass.md` non possono importare
+ * questo modulo, quindi la ripetono in chiaro).
+ */
+export const VANTAGGIO_AMICO = 'ci sarà un vantaggio anche per lui, che lo staff gli comunica a fine prova';
+
+/**
  * Cosa comprende il pass. Le stesse sette voci del form vecchio, che è il
  * palinsesto Premium: il pass apre tutto il club, non una parte.
  */
