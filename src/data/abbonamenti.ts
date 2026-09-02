@@ -65,7 +65,7 @@ export const activityInfo: Record<string, { title: string; body: string; href?: 
   'Corsi Fitness': {
     title: 'Corsi Fitness',
     body:
-      'Oltre 80 corsi a settimana in tre sale dedicate: attività aerobiche, olistiche e di tonificazione, HIIT in Sala B e Group Reformer in Sala C. Prenoti dall\'app a partire da 3 giorni prima.',
+      'Oltre 80 corsi a settimana in due sale dedicate: attività aerobiche, olistiche e di tonificazione, più HIIT in Sala B. Prenoti dall\'app a partire da 3 giorni prima.',
     href: '/corsi-fitness',
   },
   'Group Reformer': {
