@@ -15,6 +15,13 @@
  */
 import { CONSENSO_PRIVACY, CONSENSO_MARKETING } from '../data/contatto';
 import { ETICHETTA_OGGETTO, AIUTO_OGGETTO } from '../data/appuntamento';
+import {
+  AIUTO_MINORE,
+  AIUTO_QUANDO,
+  RISERVATO,
+  TITOLO_MINORE,
+  TITOLO_QUANDO,
+} from '../data/appuntamentoNuoto';
 import CampoTelefono from './CampoTelefono.astro';
 
 interface Props {
@@ -22,9 +29,21 @@ interface Props {
   prefix: string;
   /** Il titolo del primo passo, che è anche ciò che il pannello annuncia. */
   titoloId?: string;
+  /**
+   * Quale calendario. `desk` è il richiamo commerciale, `nuoto` l'appuntamento
+   * col Direttore Tecnico: cambiano il testo del primo passo e — l'unica
+   * differenza strutturale — l'ultimo, dove al posto dell'argomento della
+   * chiamata si chiede il nome del bambino.
+   *
+   * Una proprietà e non un secondo componente: i cinque passi sono gli stessi,
+   * e due copie di questo markup divergerebbero al primo campo aggiunto in una
+   * sola delle due — che è la ragione per cui questo file esiste.
+   */
+  variante?: 'desk' | 'nuoto';
 }
 
-const { prefix: p, titoloId } = Astro.props;
+const { prefix: p, titoloId, variante = 'desk' } = Astro.props;
+const nuoto = variante === 'nuoto';
 ---
 
   {/* ── 1. Quando ────────────────────────────────────────────────────
@@ -38,11 +57,22 @@ const { prefix: p, titoloId } = Astro.props;
       di numeri: raggruppati e in griglia si leggono a colpo d'occhio, e su
       un telefono la griglia si stringe da sola. */}
   <section class="ap__step" id={`${p}-step-quando`}>
-    <span class="ap__eyebrow">Prenota una chiamata</span>
-    <h3 class="ap__title" id={titoloId} tabindex="-1" data-ap-fuoco>Quando ti chiamiamo?</h3>
+    <span class="ap__eyebrow">{nuoto ? 'Parla con il Direttore Tecnico' : 'Prenota una chiamata'}</span>
+    <h3 class="ap__title" id={titoloId} tabindex="-1" data-ap-fuoco>
+      {nuoto ? TITOLO_QUANDO : 'Quando ti chiamiamo?'}
+    </h3>
     <p class="ap__lead">
-      Scegli tu giorno e ora, nei prossimi sette giorni. Ti chiamiamo noi, senza attese al telefono.
+      {
+        nuoto
+          ? AIUTO_QUANDO
+          : 'Scegli tu giorno e ora, nei prossimi sette giorni. Ti chiamiamo noi, senza attese al telefono.'
+      }
     </p>
+
+    {/* Chi può prenotare, prima di qualunque campo. Il modulo non blocca
+        nessuno — vedi `RISERVATO` — ma scoprire al telefono che il servizio
+        non era per sé è il momento peggiore per scoprirlo. */}
+    {nuoto && <p class="ap__nota-riservato">{RISERVATO}</p>}
 
     <div class="ap__giorni" data-ap-giorni role="group" aria-label="Scegli il giorno"></div>
     <div class="ap__orari-blocco" data-ap-orari></div>
@@ -128,14 +158,46 @@ const { prefix: p, titoloId } = Astro.props;
     </div>
   </section>
 
-  {/* ── 4. Di cosa ───────────────────────────────────────────────────── */}
+  {/* ── 4. Di cosa, o di chi ─────────────────────────────────────────────
+
+      L'unico passo che cambia fra i due calendari. Al desk si chiede
+      l'argomento, perché una telefonata senza sapere di cosa si parla è tempo
+      buttato per tutti e due; al Direttore Tecnico si chiede il bambino,
+      perché l'argomento è lui — ed è anche la chiave con cui la chiamata si
+      aggancia alla sua scheda su PerfectGym.
+
+      Nome e cognome e nient'altro: chi prenota è già iscritto, quindi la data
+      di nascita e il resto stanno sulla sua anagrafica, e chiederli qui
+      sarebbe far ricopiare a una persona quello che il club ha già scritto. */}
   <section class="ap__step" id={`${p}-step-oggetto`} hidden>
     <span class="ap__eyebrow">Passo 3 di 3</span>
-    <h3 class="ap__title" tabindex="-1" data-ap-fuoco>{ETICHETTA_OGGETTO}</h3>
-    <p class="ap__lead">{AIUTO_OGGETTO}</p>
+    <h3 class="ap__title" tabindex="-1" data-ap-fuoco>{nuoto ? TITOLO_MINORE : ETICHETTA_OGGETTO}</h3>
+    <p class="ap__lead">{nuoto ? AIUTO_MINORE : AIUTO_OGGETTO}</p>
 
-    <label class="ap__label" for={`${p}-oggetto`}>L’argomento della chiamata</label>
-    <textarea class="ap__input ap__textarea" id={`${p}-oggetto`} rows="3" placeholder="Vorrei capire quale abbonamento mi conviene…"></textarea>
+    {
+      nuoto ? (
+        <div class="ap__coppia">
+          <div>
+            <label class="ap__label" for={`${p}-minore-nome`}>Nome di tuo figlio</label>
+            <input class="ap__input" id={`${p}-minore-nome`} type="text" autocomplete="off" />
+          </div>
+          <div>
+            <label class="ap__label" for={`${p}-minore-cognome`}>Cognome</label>
+            <input class="ap__input" id={`${p}-minore-cognome`} type="text" autocomplete="off" />
+          </div>
+        </div>
+      ) : (
+        <>
+          <label class="ap__label" for={`${p}-oggetto`}>L’argomento della chiamata</label>
+          <textarea
+            class="ap__input ap__textarea"
+            id={`${p}-oggetto`}
+            rows="3"
+            placeholder="Vorrei capire quale abbonamento mi conviene…"
+          ></textarea>
+        </>
+      )
+    }
 
     <p class="ap__errore" data-ap-errore hidden></p>
 
@@ -151,7 +213,9 @@ const { prefix: p, titoloId } = Astro.props;
   {/* ── 5. Fatto ─────────────────────────────────────────────────────── */}
   <section class="ap__step" id={`${p}-step-esito`} hidden>
     <span class="ap__eyebrow">Prenotato</span>
-    <h3 class="ap__title" tabindex="-1" data-ap-fuoco>Ti chiamiamo noi.</h3>
+    <h3 class="ap__title" tabindex="-1" data-ap-fuoco>
+      {nuoto ? 'Ti chiama il Direttore Tecnico.' : 'Ti chiamiamo noi.'}
+    </h3>
     <p class="ap__scelta ap__scelta--grande" data-ap-riepilogo></p>
     <p class="ap__lead">
       Ti arriva l’email di conferma: dentro c’è un pulsante per spostare o annullare, se nel frattempo

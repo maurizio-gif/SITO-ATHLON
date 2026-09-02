@@ -95,7 +95,10 @@ Per qualsiasi esigenza, il Direttore Tecnico è la persona giusta — e questo s
 
 ## Prenota il tuo appuntamento
 
-<!-- Calendly inline widget begin -->
-<div class="calendly-inline-widget" data-url="https://calendly.com/athlonclub/nuoto2?hide_event_type_details=1&hide_gdpr_banner=1&primary_color=ff5701" style="min-width:320px;height:700px;"></div>
-<script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
-<!-- Calendly inline widget end -->
+<!-- Il calendario del Direttore Tecnico: lo riempie
+     AppuntamentoNuotoInline.astro, che la pagina del wiki monta solo quando
+     trova questo contenitore. Dieci minuti, dal lunedì al venerdì fra le 15 e
+     le 16, con un'ora di preavviso. Prima qui c'era l'embed di Calendly
+     `athlonclub/nuoto2`: la prenotazione arrivava per email e finiva lì, senza
+     un elenco, senza un esito e senza aggancio all'anagrafica del bambino. -->
+<div data-athlon-appuntamento-nuoto data-origine="scheda-direzione-tecnica" data-cta="Direzione Tecnica — appuntamento"></div>

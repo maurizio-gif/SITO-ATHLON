@@ -4,6 +4,7 @@ import { getCollection, render } from 'astro:content';
 import { AREA_LABELS } from '../../data/helpdesk';
 import BottoneChat from '../../components/BottoneChat.astro';
 import AppuntamentoInline from '../../components/AppuntamentoInline.astro';
+import AppuntamentoNuotoInline from '../../components/AppuntamentoNuotoInline.astro';
 import '../../styles/prosa.css';
 import { ACTIVITY_LABEL } from '../../data/activities';
 
@@ -72,7 +73,14 @@ const vicine = correlate(entry, tutte);
    chiedono, e lo chiedono scrivendo il contenitore nel Markdown. Montarlo
    ovunque vorrebbe dire spedire i campi di un form a ottanta schede che non lo
    usano. */
-const conAppuntamento = (entry.body ?? '').includes('data-athlon-appuntamento');
+/* Due contenitori e non uno, e il primo controllo va scritto in modo che non
+   prenda il secondo: `includes('data-athlon-appuntamento')` è vero anche su
+   `data-athlon-appuntamento-nuoto`, quindi le tre schede della direzione
+   tecnica si vedrebbero montare **tutti e due** i riquadri — due form con gli
+   stessi stili, uno dei quali senza il suo posto dove andare. La guardia è che
+   dopo il nome non ci sia altro. */
+const conAppuntamento = /data-athlon-appuntamento(?![-\w])/.test(entry.body ?? '');
+const conAppuntamentoNuoto = (entry.body ?? '').includes('data-athlon-appuntamento-nuoto');
 
 const areas = Array.isArray(d.area) ? d.area : [d.area];
 const folder = entry.id.split('/')[0];
@@ -186,6 +194,7 @@ const scheda = {
           <Content />
         </div>
         {conAppuntamento && <AppuntamentoInline />}
+        {conAppuntamentoNuoto && <AppuntamentoNuotoInline />}
       </div>
     </section>
 

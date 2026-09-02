@@ -4494,3 +4494,82 @@ il lock non si committa.
 
 La verifica è **il log del deploy di produzione**, non il fatto che il sito sia
 salito: il sito sale comunque, per costruzione.
+
+## Il calendario del Direttore Tecnico e' un'altra agenda, non un parametro
+
+Le tre schede dell'Help Desk sulla direzione tecnica del nuoto —
+`direzione-tecnica.md`, `didattica.md`, `brevetti.md` — avevano in fondo l'embed
+di Calendly `athlonclub/nuoto2`, incollato a mano, ed erano le ultime tre cose
+del sito rimaste su Calendly. Adesso prenotano sul calendario del club:
+`data/appuntamentoNuoto.ts` per gli indirizzi, `AppuntamentoNuotoInline.astro`
+per il riquadro, e nel Markdown un contenitore vuoto
+`<div data-athlon-appuntamento-nuoto>` — lo stesso patto dell'embed che
+sostituisce, dove il Markdown scriveva un `div` e a riempirlo era roba di un
+terzo. **Quindi `data/calendly.ts` non esiste piu'**, la voce di Calendly esce
+da `data/privacy.ts` e i domini terzi del `<head>` restano uno.
+
+Dieci minuti, dal lunedi' al venerdi' fra le 15 e le 16, con un'ora di
+preavviso: trenta slot a settimana, e il numero e' il punto — e' l'ora che una
+persona sola dedica alle famiglie, non lo sportello del club.
+
+**Un file di dati a parte e non un parametro su `data/appuntamento.ts`**, e la
+ragione e' che sono due agende: gli orari li serve un'altra rotta
+(`/api/appuntamenti-nuoto/slot`) che legge un'altra tabella, quindi una
+telefonata del desk alle 15:20 non tocca il Direttore Tecnico e un tour di
+quarantacinque minuti non gli chiude l'ora. Con un calendario solo quel conflitto
+sarebbe stato invisibile e permanente.
+
+**Ma il modulo e' lo stesso, e questa e' l'altra meta' della scelta.** I passi
+sono `AppuntamentoPassi.astro` con `variante="nuoto"` e la logica e'
+`appuntamentoForm.client.js` con la stessa variante: due copie di quel percorso —
+orari, identita', dati, un ultimo passo, fatto — divergerebbero al primo difetto
+corretto in una sola. Quello che la variante cambia sta in tre posti e basta: gli
+indirizzi (`V.slot`, `V.prenota`), i testi del primo passo, e l'ultimo passo.
+
+Cinque cose da sapere prima di toccarlo.
+
+**L'ultimo passo e' l'unico bivio vero.** Al desk si chiede l'argomento della
+chiamata — una telefonata senza sapere di cosa si parla e' tempo buttato per
+tutti e due — al Direttore Tecnico si chiede **il bambino**, perche' l'argomento
+e' lui: nome e cognome sono la chiave con cui la chiamata si aggancia alla sua
+anagrafica su PerfectGym. Nient'altro: chi prenota e' già iscritto, quindi la
+data di nascita e il resto stanno sulla sua scheda, e chiederli qui sarebbe far
+ricopiare a una persona quello che il club ha già scritto. `campoOggetto` non
+esiste in questa variante, e la guardia dentro `invia()` e' cio' che rende il
+passo condiviso davvero condiviso.
+
+**Il blocco dei dati risponde a un'altra domanda.** Per il richiamo del desk
+basta «ha un account?» (`haGiaAccount`): chi ce l'ha ha lasciato i suoi dati, e
+richiederglieli e' il modo più rapido per far chiudere la pagina a un socio. Qui
+no, e la ragione e' il telefono: quella chiamata la fa il Direttore Tecnico, e un
+numero che in archivio manca — o che e' un fisso — e' un numero su cui non
+arriva. Quindi vale la regola del totem, `servonoISuoiDati()`: o si chiede tutto,
+o si conferma tutto. Un fisso in archivio vale come un numero assente.
+
+**La riga «riservato agli iscritti» sta sopra i giorni, prima di qualunque
+campo**, e non e' un cancello: il modulo non blocca nessuno. Vale la regola di
+tutti i form del sito, e la verifica la fa il pannello per chi risponde, non per
+chi chiede — un appuntamento da riconciliare costa meno di una famiglia iscritta
+respinta perche' il nome del bambino su PerfectGym e' scritto in un altro modo.
+Ma dirlo prima serve: scoprire al telefono che il servizio non era per se' e' il
+momento peggiore per scoprirlo.
+
+**Il sito non chiama n8n a prenotazione fatta**, al contrario del calendario del
+desk che chiama due webhook. Le due email le manda la rotta del pannello, e la
+ragione e' che meta' di cio' che dicono — se la famiglia risulta iscritta, a
+quale corso — nasce **dentro** quella rotta, dopo la prenotazione: farlo tornare
+al browser perche' lo rigiri a n8n vorrebbe dire far decidere al client cosa si
+scrive a nuoto@athlonroma.it. E il lead su PerfectGym non serve: chi prenota qui
+e' a sistema per definizione.
+
+**Il controllo del contenitore nel wiki va scritto in negativo.**
+`includes('data-athlon-appuntamento')` e' vero anche su
+`data-athlon-appuntamento-nuoto`, quindi le tre schede della direzione tecnica si
+vedevano montare **tutti e due** i riquadri — due form con gli stessi stili, uno
+senza il suo posto dove andare. La guardia e'
+`/data-athlon-appuntamento(?![-\w])/`: dopo il nome non ci deve essere altro.
+
+Per verificare, sul `dist`: le tre schede della direzione tecnica hanno un solo
+`data-appuntamento-nuoto-inline` renderizzato e i campi `apn-minore-nome` e
+`apn-minore-cognome`; `preiscrizioni-nuoto` tiene il suo riquadro del desk e non
+prende quello nuovo; e in `src/` non compare più nessun `calendly-inline-widget`.
