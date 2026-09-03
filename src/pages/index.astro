@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { NUMERO_TRAINER_PAROLA_CAP } from '../data/trainer';
 import { NUMERO_CORSI_FITNESS } from '../data/corsi';
 import Hero from '../components/home/Hero.astro';
 import Stats from '../components/home/Stats.astro';
@@ -16,7 +17,7 @@ const adultiItems = [
   { title: 'Gym Floor', image: '/wp-content/uploads/2024/08/IMG_2065-scaled.jpg', desc: '400 mq. Da soli o con un trainer in sala.', href: '/gym-floor' },
   { title: 'Corsi Fitness', image: '/wp-content/uploads/2024/08/WM_08332-scaled.jpg', desc: `${NUMERO_CORSI_FITNESS} corsi in due sale, dalle 7:40 alle 21.`, href: '/corsi-fitness' },
   { title: 'Group Reformer', image: '/wp-content/uploads/2025/03/Athlon130-scaled.jpg', desc: 'Dieci Reformer, cinquanta minuti, un coach.', href: '/reformer' },
-  { title: 'Personal Training', image: '/wp-content/uploads/2024/08/WM_07530-scaled.jpg', desc: 'Sei trainer, ognuno con le sue specializzazioni.', href: '/personal-training' },
+  { title: 'Personal Training', image: '/wp-content/uploads/2024/08/WM_07530-scaled.jpg', desc: `${NUMERO_TRAINER_PAROLA_CAP} trainer, ognuno con le sue specializzazioni.`, href: '/personal-training' },
   { title: 'Nuoto Libero Assistito', image: '/wp-content/uploads/2025/03/Athlon85-scaled.jpg', desc: 'Cinque corsie a capienza controllata, tecnico a bordo vasca.', href: '/nuoto-libero' },
   { title: 'Aqua Fitness', image: '/wp-content/uploads/2025/03/Athlon95-scaled.jpg', desc: 'Cinque lezioni in acqua, dalla bike alla vasca grande.', href: '/aqua-fitness' },
   { title: 'Scuola Nuoto Adulti', image: '/wp-content/uploads/2025/03/Athlon86-scaled.jpg', desc: 'Tre livelli: il tuo lo assegnano gli istruttori, gli orari li scegli tu.', href: '/scuola-nuoto-adulti' },
