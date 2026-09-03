@@ -17,6 +17,7 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { CORSI } from '../data/corsi';
 import { JUNIOR } from '../data/junior';
+import { NUMERO_TRAINER_PAROLA } from '../data/trainer';
 import { bands, gymFloor, countLessons, totalLessons, totalHours, openHours } from '../data/planning';
 import { CLUB } from '../data/club';
 import { plans, GUEST_PASS } from '../data/abbonamenti';
@@ -90,7 +91,7 @@ Termini e condizioni per esteso: ${SITE}/regolamento
 - [Gym Floor](${SITE}/gym-floor): sala pesi di 400 m², quattro aree
 - [Corsi Fitness](${SITE}/corsi-fitness): ${fitness.length} corsi in cinque famiglie
 - [Group Reformer](${SITE}/reformer): pilates sul Reformer, gruppi da dieci
-- [Personal Training](${SITE}/personal-training): sei trainer, allenamento individuale
+- [Personal Training](${SITE}/personal-training): ${NUMERO_TRAINER_PAROLA} trainer, allenamento individuale
 - [Athlon TV](${SITE}/athlon-tv): lezioni dall'app, comprese in ogni abbonamento
 - [Club Life](${SITE}/club-life): eventi, news, servizi e Help Desk
 - [Eventi](${SITE}/eventi): masterclass e appuntamenti in calendario
