@@ -224,7 +224,7 @@ export const JUNIOR: CorsoJunior[] = [
         prezzo: '32',
         periodo: 'lezione',
         testo: 'Scegli di prenotare e pagare una lezione alla volta.',
-        nota: 'Non è richiesta quota di attivazione.',
+        nota: `Quota di attivazione contrattuale una tantum ${ATTIVAZIONE.quota} €, come sul mensile.`,
         medium: 'PulsanteLezioneBabyNuoto',
       },
       {
@@ -335,10 +335,18 @@ export const JUNIOR: CorsoJunior[] = [
          parla di «accesso completo al club» — e la propone anche qui, dove il
          Pass non è mai entrato (è un Premium di sette giorni, il listino degli
          adulti). Il Baby Nuoto vende anche la lezione singola, quindi la prova
-         non è un pass: è prenotare e pagare quella lezione. */
+         non è un pass: è prenotare e pagare quella lezione.
+
+         E la lezione singola **non** esenta dalla quota di attivazione, al
+         contrario degli accessi singoli degli adulti: questa risposta diceva
+         «senza quota di attivazione né abbonamento», e il 3/9 la chat l'ha
+         letta e ha risposto a un genitore che per il Baby Nuoto «non c'è quota
+         di attivazione», cioè un prezzo dichiarato cinquanta euro più basso
+         del vero — che si scopre alla cassa. La cifra si legge da
+         `ATTIVAZIONE`, non si riscrive qui. */
       {
         q: 'È possibile effettuare una prova?',
-        a: 'Sì: prenoti e paghi una singola lezione, senza quota di attivazione né abbonamento — è il modo in cui si prova il Baby Nuoto. Il Guest Pass Premium non vale qui: è la prova delle attività per adulti, e non ha mai compreso i corsi per bambini.',
+        a: `Sì: prenoti e paghi una singola lezione, senza abbonamento — è il modo in cui si prova il Baby Nuoto. La quota di attivazione contrattuale di ${ATTIVAZIONE.quota} € una tantum si paga comunque, anche per la sola lezione singola: al Baby Nuoto c'è sempre, perché apre l'anagrafica del bambino. Il Guest Pass Premium non vale qui: è la prova delle attività per adulti, e non ha mai compreso i corsi per bambini.`,
       },
       {
         q: 'Serve il certificato medico per il Baby Nuoto?',

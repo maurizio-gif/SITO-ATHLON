@@ -44,7 +44,7 @@
  * si possono comporre.
  */
 import { CERTIFICATO, PRENOTAZIONE, finestraDisdetta, termineCertificato } from './regole';
-import { SOSPENSIONE, GUEST_PASS } from './abbonamenti';
+import { SOSPENSIONE, GUEST_PASS, ATTIVAZIONE } from './abbonamenti';
 
 export interface FaqEntry {
   q: string;
@@ -149,7 +149,7 @@ export const REGISTRO: VoceRegistro[] = [
        giorni e il Premium è il listino degli adulti. Senza questa riga la
        prova di un corso junior si scopre sbagliata dopo che è stata proposta,
        non prima. */
-    a: `Sì, con il <strong>Guest Pass Premium</strong>: ${GUEST_PASS.giorni} giorni con accesso a tutto il club a <strong>${GUEST_PASS.prezzo} €</strong>. È riservato a chi non ha e non ha mai avuto un abbonamento Athlon dal ${GUEST_PASS.dal} in poi. Se te lo manda un socio che ti invita, hai 30 giorni di tempo per attivarlo da quando ricevi l'invito. In alternativa puoi prenotare e pagare una singola lezione, senza quota di attivazione. <strong>Vale solo per le attività degli adulti</strong>: non comprende i corsi per bambini né il personal training. Per un corso per bambini che vende anche la lezione singola — come il Baby Nuoto — la prova è prenotare e pagare quella lezione, non il Guest Pass.`,
+    a: `Sì, con il <strong>Guest Pass Premium</strong>: ${GUEST_PASS.giorni} giorni con accesso a tutto il club a <strong>${GUEST_PASS.prezzo} €</strong>. È riservato a chi non ha e non ha mai avuto un abbonamento Athlon dal ${GUEST_PASS.dal} in poi. Se te lo manda un socio che ti invita, hai 30 giorni di tempo per attivarlo da quando ricevi l'invito. In alternativa puoi prenotare e pagare una singola lezione, senza quota di attivazione — ma questo vale per gli accessi singoli degli adulti. <strong>Vale solo per le attività degli adulti</strong>: non comprende i corsi per bambini né il personal training. Per un corso per bambini che vende anche la lezione singola — come il Baby Nuoto — la prova è prenotare e pagare quella lezione, non il Guest Pass: là la quota di attivazione contrattuale di ${ATTIVAZIONE.quota} € una tantum si paga comunque, anche sulla singola lezione.`,
   },
   {
     id: 'pagamenti',
