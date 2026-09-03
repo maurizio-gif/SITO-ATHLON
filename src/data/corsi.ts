@@ -109,6 +109,12 @@ export interface Corso {
   /** Cosa serve portare: dalle f.a.q. dell'originale. Ammette HTML. */
   attrezzatura?: string;
   /**
+   * Se la scheda del certificato medico porta il link «Requisiti e modello»
+   * al wiki (`/wikiathlon/generali/certificato-medico/`). Default true; il
+   * corso gestanti lo toglie.
+   */
+  linkCertificato?: boolean;
+  /**
    * I punti che la pagina originale elencava a parte — i vantaggi del nuoto
    * libero, il funzionamento della scuola nuoto. Il titolo è facoltativo:
    * senza, resta il numero.
@@ -795,6 +801,7 @@ export const CORSI: Corso[] = [
     varianti: [{ nome: null, testo: '', lezione: 'Aqua Gestanti' }],
     lezioni: ['Aqua Gestanti'],
     attrezzatura: 'Costume da piscina e cuffia, un asciugamano personale e ciabatte.',
+    linkCertificato: false,
     singola: {
       prezzo: '22',
       testo:

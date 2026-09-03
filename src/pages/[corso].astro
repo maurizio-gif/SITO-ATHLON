@@ -379,7 +379,9 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
             Certificato di idoneità all’attività sportiva non agonistica, da inviare entro le prime
             due settimane. Serve anche per {singola}: è un obbligo di legge.
           </p>
-          <a href="/wikiathlon/generali/certificato-medico/" class="co-plan__cta">Requisiti e modello →</a>
+          {corso.linkCertificato !== false && (
+            <a href="/wikiathlon/generali/certificato-medico/" class="co-plan__cta">Requisiti e modello →</a>
+          )}
         </article>
 
         {corso.singola ? (
