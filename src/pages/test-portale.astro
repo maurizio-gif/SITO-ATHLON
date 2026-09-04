@@ -135,6 +135,19 @@ const SCENARI = [
     ],
   },
   {
+    id: 'modal',
+    scheda: 'Modal',
+    titolo: 'La stessa registrazione, ma a schermo pieno',
+    domanda:
+      'Un modulo lungo dentro un riquadro basso dentro una pagina che scorre è due scorrimenti sovrapposti, ed è il punto in cui si perde chi sta comprando. A schermo pieno il modulo ha tutta l’altezza che c’è e la pagina sotto è ferma.',
+    note: [
+      'Il fondo non chiude, ed è la differenza che conta rispetto a ogni altro pannello del sito: quelli si chiudono toccando fuori perché il costo di riaprirli è nullo. Qui una chiusura per sbaglio butta una registrazione a metà.',
+      'Anche Escape smette di chiudere appena la registrazione è cominciata. Resta la ×, che è esplicita — e sull’uscita si conta quanti passi erano stati fatti: un abbandono al pagamento e un abbandono al primo campo sono due problemi diversi.',
+      'Nessun bordo, nessun angolo arrotondato, nessun ritaglio: sotto la barra il portale ha tutto lo schermo. Su un telefono è la differenza fra un modulo e una fessura.',
+      'La barra sopra resta nostra e dice il piano scelto. È l’unico posto in cui, dentro un percorso che non vestiamo noi, si può ancora dire alla persona che cosa sta comprando.',
+    ],
+  },
+  {
     id: 'sessione',
     scheda: 'Sessione',
     titolo: 'Quello che il sito potrebbe sapere di chi sta leggendo',
@@ -222,6 +235,19 @@ const SCENARI = [
           </div>
         )}
 
+        {s.id === 'modal' && (
+          <div class="tp__comandi">
+            <label class="tp__campo">
+              <span>Indirizzo</span>
+              <select class="tp__select" id="mod-forma">
+                <option value="piano">{PIANO_PROVA.etichetta} (forceUrl)</option>
+                <option value="stato">Registrazione generica (stato #/Registration)</option>
+              </select>
+            </label>
+            <button class="tp__btn" type="button" id="mod-apri">Apri a schermo pieno</button>
+          </div>
+        )}
+
         {s.id === 'sessione' && (
           <div class="tp__comandi">
             <button class="tp__btn" type="button" data-sess="chiedi">Chi è loggato?</button>
@@ -241,15 +267,36 @@ const SCENARI = [
           <p class="tp__diag-esito" data-esito>In attesa…</p>
         </div>
 
-        {(s.id === 'sessione' || s.id === 'registrazione') && (
+        {(s.id === 'sessione' || s.id === 'registrazione' || s.id === 'modal') && (
           <pre class="tp__registro" data-registro={s.id}>Il registro degli eventi compare qui.</pre>
         )}
 
-        <div class="tp__riquadro">
-          <div data-monta={s.id}></div>
-        </div>
+        {s.id !== 'modal' && (
+          <div class="tp__riquadro">
+            <div data-monta={s.id}></div>
+          </div>
+        )}
       </section>
     ))}
+
+    {/* L'overlay sta fuori dai pannelli e dentro `<main>`: dentro un pannello
+        sparirebbe con lui al cambio di scheda, portandosi via una
+        registrazione aperta. */}
+    <div class="tpm" id="tp-modal" aria-hidden="true">
+      <div class="tpm__fondo"></div>
+      <div class="tpm__pannello" role="dialog" aria-modal="true" aria-labelledby="tpm-titolo">
+        <header class="tpm__barra">
+          <div>
+            <p class="tpm__eyebrow">Iscrizione</p>
+            <p class="tpm__piano" id="tpm-titolo" tabindex="-1" data-tpm-piano>—</p>
+          </div>
+          <button class="tpm__chiudi" type="button" data-tpm-chiudi aria-label="Chiudi l’iscrizione">×</button>
+        </header>
+        <div class="tpm__box">
+          <div data-monta="modal"></div>
+        </div>
+      </div>
+    </div>
 
     <p class="tp__nota">
       Se un riquadro resta vuoto, il portale è comunque raggiungibile fuori dal sito:
@@ -455,11 +502,81 @@ const SCENARI = [
       });
     }
 
+    /* Lo scenario a schermo pieno: il portale non si monta all'apertura della
+       scheda ma all'apertura del pannello, perché è quello il gesto — e perché
+       un iframe montato dentro un overlay invisibile è un caricamento che
+       nessuno sta guardando.
+
+       `avviato` conta i passi visti: serve a due cose, e sono la ragione per
+       cui questo scenario esiste. Decide se Escape può chiudere, e dice a
+       quale punto del percorso una persona ha rinunciato. */
+    var mod = document.getElementById('tp-modal');
+    var avviato = 0;
+    var pianoAperto = '';
+
+    function montaModal() {
+      var forma = document.getElementById('mod-forma');
+      var v = forma ? forma.value : 'piano';
+      avviato = 0;
+      var spie = {
+        enableVirtualStates: true,
+        navigation: { hide: true },
+        registration: { logo: false },
+        onStateChangeSuccess: function (st) {
+          avviato++;
+          var nome = st && st.toState && st.toState.name;
+          registra('modal', 'PASSO ' + avviato + '  ' + (nome || '?'));
+        },
+        onUserLoggedIn: function (info) {
+          registra('modal', 'ACCOUNT CREATO  ' + JSON.stringify(info));
+        },
+      };
+      if (v === 'piano') spie.forceUrl = PIANO_PROVA.url;
+      else spie.defaultState = PGL.State.Registration;
+      pianoAperto = v;
+      monta('modal', spie);
+    }
+
+    function apriModal() {
+      var forma = document.getElementById('mod-forma');
+      var etichetta = mod.querySelector('[data-tpm-piano]');
+      if (etichetta && forma) {
+        etichetta.textContent = forma.selectedOptions[0].textContent.replace(/ \(.*\)$/, '');
+      }
+
+      /* Rimontare solo se il piano è cambiato: la libreria non ha un
+         `destroy`, quindi ogni montaggio è un iframe nuovo — e riaprire lo
+         stesso piano deve ritrovare la registrazione dov'era, non ricominciarla. */
+      if (!montati.modal || (forma && forma.value !== pianoAperto)) montaModal();
+
+      document.body.classList.add('amodal-locked');
+      mod.classList.add('aperto');
+      mod.setAttribute('aria-hidden', 'false');
+      /* Lo stile è appena cambiato: senza questa lettura `visibility` è ancora
+         `hidden` nell'istante in cui si chiede il fuoco, e `focus()` su un
+         elemento invisibile non fa niente — il fuoco resterebbe sul pulsante
+         che ha aperto. */
+      void mod.offsetWidth;
+      var t = mod.querySelector('[data-tpm-piano]');
+      if (t) t.focus();
+    }
+
+    function chiudiModal() {
+      mod.classList.remove('aperto');
+      mod.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('amodal-locked');
+      registra('modal', avviato ? 'CHIUSO al passo ' + avviato : 'CHIUSO senza cominciare');
+      var b = document.getElementById('mod-apri');
+      if (b) b.focus();
+    }
+
     var montatori = {
       calendario: montaCalendario,
       registrazione: montaRegistrazione,
       pagamenti: montaPagamenti,
       sessione: montaSessione,
+      /* La scheda non monta niente: lo fa il pulsante. */
+      modal: function () { montati.modal = montati.modal || null; },
     };
 
     /* ---- Le schede -------------------------------------------------- */
@@ -473,7 +590,8 @@ const SCENARI = [
       document.querySelectorAll('[data-pannello]').forEach(function (p) {
         p.hidden = p.dataset.pannello !== id;
       });
-      if (!montati[id]) montatori[id]();
+      if (id === 'modal') { /* il portale lo monta il pulsante */ }
+      else if (!montati[id]) montatori[id]();
       /* Un iframe tornato visibile va rimisurato: iframe-resizer ascolta il
          ridimensionamento della finestra, e mentre il pannello era `hidden` la
          sua altezza è rimasta ferma. */
@@ -493,6 +611,29 @@ const SCENARI = [
     if (ric) ric.addEventListener('click', function () {
       montati.registrazione = null;
       montaRegistrazione();
+    });
+
+    var apre = document.getElementById('mod-apri');
+    if (apre) apre.addEventListener('click', apriModal);
+
+    mod.querySelectorAll('[data-tpm-chiudi]').forEach(function (b) {
+      b.addEventListener('click', chiudiModal);
+    });
+
+    /* **Il fondo non chiude**, e non c'è nessun gestore da leggere per
+       saperlo: qui è l'assenza a essere la scelta. Ogni altro pannello del
+       sito si chiude toccando fuori, perché riaprirlo non costa niente; una
+       registrazione a metà sì.
+
+       Escape chiude solo finché non è cominciato niente: il primo passo è
+       quello che la libreria manda da sé all'apertura, quindi la soglia è due. */
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape' || !mod.classList.contains('aperto')) return;
+      if (avviato > 1) {
+        registra('modal', 'Escape ignorato: registrazione già cominciata (passo ' + avviato + ')');
+        return;
+      }
+      chiudiModal();
     });
 
     document.querySelectorAll('[data-sess]').forEach(function (b) {
@@ -734,6 +875,138 @@ const SCENARI = [
     margin: 1.5rem 0 0;
     font-size: var(--text-sm);
     color: var(--text-muted);
+  }
+
+  /* ---- L'overlay a schermo pieno --------------------------------------
+
+     `visibility` e non solo `opacity`: un pannello chiuso che si può ancora
+     raggiungere col tasto tab è la cosa che fa dire a Lighthouse che l'albero
+     di accessibilità è malformato, e qui dentro ci sono i campi di una
+     registrazione. E `visibility` non sfuma, commuta: durata zero, e un
+     ritardo pari alla dissolvenza solo in chiusura — dargli una durata
+     lascerebbe il valore calcolato a `hidden` nell'istante in cui lo script
+     sposta il fuoco dentro. */
+  .tpm {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity var(--dur-fast) ease, visibility 0s var(--dur-fast);
+  }
+
+  .tpm.aperto {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity var(--dur-fast) ease, visibility 0s;
+  }
+
+  /* Il blocco dello scorrimento va dichiarato **qui**, e questa riga è stata
+     una scoperta: `global.css` usa `body.amodal-locked` — per nascondere il
+     banner dei cookie e il suggerimento della prova — ma non è lui a
+     bloccare il fondo. Quella regola vive dentro `AttivitaModal.astro`, che
+     su questa pagina non c'è: usare la classe senza portarsi la regola dà un
+     modal a schermo pieno con la pagina che scorre dietro.
+
+     La classe si usa comunque, e non una nostra: è quella che tiene fuori il
+     banner CookieYes dal pannello — cioè l'unica cosa che, a schermo pieno,
+     coprirebbe il modulo di registrazione. */
+  :global(body.amodal-locked) {
+    overflow: hidden;
+  }
+
+  .tpm__fondo {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 8, 0.72);
+  }
+
+  /* A schermo pieno vuol dire pieno: nessun raggio, nessun margine, nessun
+     ritaglio. Il portale non lo vestiamo noi e la sua form è lunga — ogni
+     pixel togliergli è una riga in più da scorrere dentro una finestra
+     dentro una pagina, che è il difetto che questo scenario esiste per
+     chiudere. `100dvh` e non `100vh`: su iOS la barra dell'indirizzo che si
+     ritrae cambia l'altezza vera, e con `vh` la barra dei comandi finirebbe
+     sotto il bordo — cioè la × diventerebbe irraggiungibile. */
+  .tpm__pannello {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100dvh;
+    background: var(--color-white);
+  }
+
+  .tpm__barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex: 0 0 auto;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tpm__eyebrow {
+    margin: 0;
+    font-size: var(--text-2xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .tpm__piano {
+    margin: 0.15rem 0 0;
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  .tpm__piano:focus-visible {
+    outline: 2px solid var(--accent-fill);
+    outline-offset: 3px;
+  }
+
+  /* La × è la sola uscita quando la registrazione è cominciata — il fondo non
+     chiude e Escape smette di funzionare — quindi non è un bersaglio come gli
+     altri: 3rem sempre, e più grande dove la radice cresce. */
+  .tpm__chiudi {
+    flex: 0 0 auto;
+    width: 3rem;
+    height: 3rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--color-white);
+    color: var(--text);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  /* + totem */
+  @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10),
+         (min-width: 1700px) and (min-height: 1020px) and (max-aspect-ratio: 37/20) {
+    .tpm__chiudi { width: 3.5rem; height: 3.5rem; }
+  }
+
+  /* Tutto lo spazio che resta è del portale, e l'altezza gliela dà `flex`, non
+     un rapporto: qui non c'è niente sotto con cui stare in proporzione. Vale
+     comunque l'`!important`, perché iframe-resizer riscrive `style.height`
+     sull'iframe a ogni misura — e la sua misura è 150px. */
+  .tpm__box {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .tpm__box > div,
+  .tpm__box :global(.cp-iframe-wrapper),
+  .tpm__box :global(iframe) {
+    height: 100% !important;
+    max-height: 100% !important;
   }
 
   /* La lista dei comandi a forma di link di `global.css`: senza, questo link
