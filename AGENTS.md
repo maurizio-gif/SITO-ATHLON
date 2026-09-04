@@ -2572,6 +2572,45 @@ condizioni e la privacy in fondo, il listino come ripiego del conto alla
 rovescia scaduto — perché non contendono niente e due di quei tre sono
 obbligatori su una pagina che gira senza il footer del sito.
 
+### Una promozione che c'è e non viene detta è un'offerta pagata e non incassata
+
+Il perimetro nel dato serve a non offrirla a chi non può averla. Ma esiste
+l'errore opposto, e costa di più: la voce della promo entra nel contesto **per
+punteggio**, quindi una domanda che non nomina la parola «promozione» — «quanto
+costa il Premium?», «come funzionano gli abbonamenti?» — può non pescarla, e a
+quel punto il club ha un'offerta attiva che l'assistente non nomina a chi la
+sta chiedendo con altre parole.
+
+Quindi la promozione **è dentro le voci dei piani**, che sono quelle che
+qualunque domanda su Smart o Premium pesca per costruzione: una riga per piano
+con le tre cose che servono per nominarla — che cosa dà, entro quando, e che
+serve il codice. Più una riga nella voce della promo che dice quando va
+nominata, perché una regola che vive solo nel prompt il modello la può ignorare.
+
+**E il perimetro sta in ogni voce che la racconta, non solo nella sua.** Sono
+quattro, contate sul `dist` e non sulla lista degli id — è la spazzata del Guest
+Pass, dove chiudere una voce e lasciarne un'altra non proteggeva da niente:
+
+| voce | perché la nomina | come si difende |
+| --- | --- | --- |
+| `promo:promo` | è la promozione | il perimetro sta nel **titolo** e nell'**area**, non solo nel corpo: sono le due righe che il modello legge *scegliendo*. Prima riga: vale solo sugli annuali adulti, e i quattro corsi dei bambini sono nominati uno per uno |
+| `abbonamento:smart` | la pesca chi chiede il piano | «vale solo per gli abbonamenti degli adulti: sui corsi dei bambini no», nella stessa riga |
+| `abbonamento:premium` | idem | idem |
+| `abbonamento:quota-attivazione` | **la pesca anche un genitore** — «quanto è la quota all'iscrizione?» è la sua domanda tanto quanto quella di un adulto | dice il perimetro nella stessa frase e chiude: «a un genitore che chiede della quota per un corso di suo figlio non si nomina, perché per lui non esiste» |
+
+E il verso opposto è chiuso con un fatto invece che con un rimando:
+`abbonamento:junior-mensile` dice che **sui corsi dei bambini non c'è nessuna
+promozione in corso**, e che non si manda al desk «per sapere se c'è» — quello
+che c'è è la finestra della preiscrizione.
+
+**Il cancello su n8n resta a livello di id.** `Vaglio promo` toglie dal contesto
+`promo:` e `faq:promo:` quando l'attività scelta è di un figlio, e i tre id non
+sono cambiati, quindi aggancia ancora. Ma **non** tocca le altre tre voci, che
+sono voci di prodotti per adulti: quelle si difendono col testo, come da
+tabella. Il giorno che si vuole la cintura oltre alle bretelle, la mossa è
+togliere in quel nodo anche il **capoverso** che comincia per `PROMOZIONE IN
+CORSO` e quello della quota — non un altro id da ricordarsi.
+
 ### Dove c'è un codice, la destinazione è generica
 
 I comandi delle formule portavano al `PaymentPlanId` del piano, ed è la strada
@@ -2614,12 +2653,29 @@ e la seconda era nata copiando la prima: è il punto in cui una si sistema e
 l'altra no. Le altre due copie vivono dentro i bundle del modal della prova e
 della chat, dove il markup lo costruisce lo script, e restano là.
 
-**Il popup della promo ha un tetto suo, e alla scadenza va guardato.**
-`FINE_POPUP` in `PromoPopup.astro` è una data scritta a mano, scelta del club per
-la promozione di agosto: passata quella, il popup resta spento **anche con una
-promozione viva**, senza che niente lo segnali. Il verso è quello giusto — un
-popup che non compare è meno grave di uno che promette un'offerta finita — ma è
-la riga da rivedere insieme a `scadenza` ogni volta che la promo cambia.
+**Il popup della promo non ha più un tetto suo, e questo è il seguito di una
+data scritta a mano.** `FINE_POPUP` in `PromoPopup.astro` era la mezzanotte fra
+il 31 agosto e il 1 settembre, scelta del club per la promozione di agosto: il
+popup poteva finire prima della landing, e il conto alla rovescia puntava alla
+prima delle due date. Passato il 1 settembre quella costante è rimasta lì, e con
+la promozione di settembre **viva** il popup non compariva su nessuna pagina —
+senza che niente lo segnalasse, perché un popup che non c'è non si distingue da
+un popup che nessuno ha ancora visto.
+
+Adesso la condizione è una: documento non in bozza e `scadenza` non passata, la
+stessa di `/promo` e della voce di `/link`. Il giorno che il club volesse
+spegnere il solo popup tenendo viva la landing, quella data va **nel documento
+di Tina** accanto a `scadenza`, dove chi cambia la promo la vede — non in una
+costante che nessuno rilegge.
+
+Il resto del comportamento era già quello giusto e non è stato toccato: compare
+**una volta per sessione**, sulla prima pagina adulti che si apre (`sessionStorage`,
+segnato quando la scheda *compare* e non quando si chiude), ed è montato in tre
+posti — `[corso].astro`, `gym-floor.astro`, `reformer.astro` — che sono
+esattamente `PAGINE_ADULTI`: `[corso].astro` genera solo `CORSI`, quindi su una
+pagina junior il componente non esiste nemmeno nel markup. **Sul totem compare a
+ogni pagina**, e non è un difetto: là `suTotem()` non ricorda niente, o la
+chiusura di chi è passato prima nasconderebbe la promo a chi arriva dopo.
 
 ### La fascia la decide l'anno, e l'anno noto non basta: va confermato
 
