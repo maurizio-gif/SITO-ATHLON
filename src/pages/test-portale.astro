@@ -834,12 +834,21 @@ const SCENARI = [
 
      `!important` serve: la regola di `ChatFab` è scritta con l'ambito di quel
      componente (`.cfab[data-astro-cid-…]`), quindi due classi contro una, ed è
-     la stessa trappola già pagata su `/link`. */
+     la stessa trappola già pagata su `/link`.
+
+     E `transition: none` non è di troppo, è **la riga che fa funzionare le
+     altre due**: `ChatFab` anima `visibility` con un ritardo pari alla
+     dissolvenza (`visibility 0s var(--dur-base)`), e durante il ritardo il
+     valore calcolato resta quello di prima — cioè `hidden`. Misurato: con le
+     sole `opacity` e `visibility` in `!important` il pulsante restava
+     invisibile e `getAnimations()` mostrava due transizioni appese. Togliendo
+     la transizione il valore si applica subito. */
   :global(body.amodal-locked) .cfab,
   :global(body.amodal-locked .cfab) {
     opacity: 1 !important;
     visibility: visible !important;
     transform: none !important;
+    transition: none !important;
   }
 
   .tpm__fondo {
