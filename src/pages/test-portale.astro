@@ -663,6 +663,19 @@ const SCENARI = [
 </script>
 
 <style>
+  /* **Il grigio dietro l'iframe non è decorazione.** Le schede del portale
+     sono bianche su un fondo grigio: è il fondo a disegnarne i contorni, e
+     quel fondo lo dipinge la *pagina*, non le schede. Mettendo l'iframe su
+     bianco le schede sparivano dentro il nostro pannello e il modulo si
+     leggeva come un elenco senza bordi — che è esattamente il difetto
+     segnalato. Confrontato con il portale aperto per conto suo: là il grigio
+     c'è. Neutro e non `--color-cream`, che tinge di caldo e cambierebbe il
+     colore delle schede di un'altra applicazione. */
+  .tp,
+  .tpm {
+    --portale-fondo: #efefef;
+  }
+
   .tp {
     max-width: var(--container-width);
     margin: 0 auto;
@@ -862,20 +875,47 @@ const SCENARI = [
     min-height: 34rem;
     max-height: 88svh;
     border-radius: var(--radius);
-    overflow: hidden;
-    background: var(--color-cream);
+    overflow-y: auto;
+    background: var(--portale-fondo);
   }
 
   @media (min-width: 700px) {
     .tp__riquadro { aspect-ratio: 16 / 11; }
   }
 
-  /* Il contenitore lo crea la libreria (`cp-iframe-wrapper`) e l'iframe pure:
-     nessuno dei due porta l'ambito di questo file, quindi `:global`. */
-  .tp__riquadro :global(.cp-iframe-wrapper),
-  .tp__riquadro :global(iframe) {
-    height: 100% !important;
-    max-height: 100% !important;
+  /* **A scorrere è la scatola, non l'iframe**, e ci sono volute due prove
+     sbagliate per arrivarci.
+
+     La prima stesura forzava `height: 100%` sull'iframe: il portale restava
+     tagliato a metà e non si scorreva in nessun modo — né con la rotella né
+     col dito. La causa non è nostra: iframe-resizer scrive `scrolling="no"`
+     sull'iframe, perché il suo modello è l'opposto del nostro — **l'iframe
+     cresce fino a contenere tutto e a scorrere è la pagina intorno**. Con
+     un'altezza fissa imposta da noi, quel contratto si rompe e il contenuto
+     oltre il bordo diventa irraggiungibile.
+
+     E non si rimedia dall'esterno: `overflow: auto !important` sull'iframe
+     resta `clip` nel valore calcolato — su un elemento sostituito quella
+     proprietà non governa il documento dentro — e togliere `scrolling` a
+     caricamento avvenuto non cambia niente. Provate tutte e due.
+
+     Quindi si sta al loro modello: l'iframe prende l'altezza che la libreria
+     gli dà, e la scatola scorre. `flex` è quello che tiene insieme i due casi
+     con una regola sola — `1 0 auto` vuol dire «parti dall'altezza che hai e
+     cresci se avanza posto»: la registrazione dichiara 805px e la scatola
+     scorre, il calendario ne dichiara 150 e riempie lo stesso. Con
+     `min-height: 100%` la percentuale si risolve contro la scatola, che
+     un'altezza definita ce l'ha. */
+  .tp__riquadro > div,
+  .tpm__box > div {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+
+  .tp__riquadro :global(iframe),
+  .tpm__box :global(iframe) {
+    flex: 1 0 auto;
   }
 
   .tp__nota {
@@ -1003,17 +1043,20 @@ const SCENARI = [
      un rapporto: qui non c'è niente sotto con cui stare in proporzione. Vale
      comunque l'`!important`, perché iframe-resizer riscrive `style.height`
      sull'iframe a ogni misura — e la sua misura è 150px. */
+  /* Tutto lo spazio che resta è del portale. A scorrere è questa scatola —
+     il perché sta scritto per esteso accanto a `.tp__riquadro` — e il fondo è
+     il grigio del portale, o le sue schede bianche restano senza contorni.
+
+     `-webkit-overflow-scrolling` non serve più su iOS moderno, ma
+     `overscroll-behavior` sì: senza, arrivati in fondo al modulo lo
+     scorrimento passa alla pagina sotto, che è ferma per il lock e quindi dà
+     l'impressione che il modal si sia incantato. */
   .tpm__box {
     flex: 1 1 auto;
     min-height: 0;
-    overflow: hidden;
-  }
-
-  .tpm__box > div,
-  .tpm__box :global(.cp-iframe-wrapper),
-  .tpm__box :global(iframe) {
-    height: 100% !important;
-    max-height: 100% !important;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: var(--portale-fondo);
   }
 
   /* La lista dei comandi a forma di link di `global.css`: senza, questo link
