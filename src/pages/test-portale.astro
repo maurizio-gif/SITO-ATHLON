@@ -101,7 +101,7 @@ const SCENARI = [
     domanda:
       'Il terzo gradino della scala degli orari — chi tiene la lezione, quanti posti restano — oggi vive solo nel portale, e il sito può soltanto mandarci.',
     note: [
-      'La barra di navigazione del portale è nascosta: dentro il nostro modal sarebbe un secondo menu che compete con la nostra intestazione.',
+      'La barra di navigazione del portale è accesa: da qui si arriva alle proprie prenotazioni e al profilo senza uscire dal modal. È il menu di PerfectGym, non il nostro — la nostra barra sopra dice solo dove si è e come si torna indietro.',
       '«Prenota» non compare a chi non ha fatto login. È il verso giusto: un pulsante che porta a una schermata di accesso è una promessa non mantenuta.',
       'Il palinsesto di /planning resta dov’è. Questo non lo sostituisce: quello si legge senza account e senza JavaScript, questo dice il dato vivo.',
     ],
@@ -344,9 +344,22 @@ const SCENARI = [
         language: 'it',
         minHeight: 600,
         enableVirtualStates: true,
-        navigation: { hide: true },
-        loginPage: { navbar: false, logo: false },
-        registration: { logo: false },
+        /* **La navigazione del portale resta accesa.** La libreria sa
+           spegnerla — `navigation.hide`, `loginPage.navbar`, i due `logo` — e
+           la prima stesura la spegneva, per non avere due menu in pagina. Ma
+           dentro un modal a schermo pieno quel ragionamento si rovescia: il
+           menu del sito qui non c'è, e senza quello del portale la persona è
+           in un'applicazione da cui si può solo uscire. Con la sua barra,
+           invece, dal calendario si arriva alle proprie prenotazioni e dalle
+           scadenze al profilo senza passare da noi.
+
+           Il prezzo è che dentro il modal ci sono due intestazioni, la nostra
+           e la loro. La nostra resta perché è l'unica che dice *dove si è* e
+           porta la via d'uscita: il portale, di suo, non sa di stare dentro
+           una pagina di Athlon. */
+        navigation: { hide: false, logo: true },
+        loginPage: { navbar: true, logo: true },
+        registration: { logo: true },
         onStateChangeSuccess: function (st) {
           passi[id] = (passi[id] || 0) + 1;
           var nome = st && st.toState && st.toState.name;
