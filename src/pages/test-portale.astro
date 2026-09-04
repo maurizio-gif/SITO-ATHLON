@@ -21,6 +21,15 @@
  *    loro; se un giorno il sito vivesse altrove, l'embed smetterebbe di
  *    funzionare senza che nessun nostro codice sia cambiato.
  *
+ * E la seconda cosa che la prova sul dominio vero ha detto: **l'altezza
+ * automatica non funziona con questo portale.** Il riquadro connette, il
+ * calendario si disegna, e iframe-resizer riporta 150px — non per un guasto:
+ * il portale è un'applicazione che riempie la propria finestra e si scorre
+ * dentro un contenitore suo, quindi il suo documento è alto 150px qualunque
+ * cosa contenga. Non c'è warning da cercare, la risposta arriva ed è quella.
+ * L'altezza la scrive il CSS, come un rapporto con un freno in `svh`: sta nel
+ * blocco `.tp__riquadro`, in fondo.
+ *
  * I quattro scenari sono le quattro cose che si è chiesto di provare, e ognuno
  * risponde a una domanda diversa:
  *
@@ -293,8 +302,8 @@ const SCENARI = [
     /* Le opzioni comuni a tutti e quattro, e le due che non sono ovvie:
        `topOffset` tiene conto dell'intestazione appiccicosa, o lo scorrimento
        automatico della libreria porta il riquadro sotto la barra; `minHeight`
-       è solo il posto che il riquadro occupa mentre arriva — l'altezza vera la
-       misura iframe-resizer. */
+       viaggia fino al portale ma non decide niente, perché qui l'altezza la
+       detta il CSS — vedi il blocco `.tp__riquadro`, dove sta il perché. */
     function base(extra) {
       var o = {
         url: URL_PORTALE,
@@ -664,14 +673,41 @@ const SCENARI = [
     word-break: break-word;
   }
 
-  /* Il riquadro non ha un'altezza scritta: la detta iframe-resizer, che misura
-     il contenuto e la aggiorna. `min-height` è solo il posto che il portale
-     occupa mentre arriva, così la pagina non salta quando compare. */
+  /* **L'altezza è nostra, e non è una preferenza: iframe-resizer qui non
+     funziona.** Il portale è un'applicazione a pagina singola che riempie la
+     propria finestra e si scorre dentro un contenitore suo, quindi il suo
+     documento misura 150px qualunque cosa contenga — e 150px è l'altezza che
+     il bambino riporta, senza sbagliarsi e senza dare warning (la spia di
+     iframe-resizer resta muta: ha avuto risposta, la risposta era 150).
+     Misurato sul dominio vero: calendario intero tagliato a un capoverso.
+
+     Quindi vale la regola dell'iframe del tour virtuale — l'altezza di una
+     cosa che inquadra uno spazio è un **rapporto**, con un freno in `svh`
+     perché su un pannello verticale il rapporto la farebbe alta due schermate.
+     4/5 sul telefono, più larga da 700px in su.
+
+     `!important` sull'iframe non è pigrizia: iframe-resizer continua a
+     scrivere `style.height` sull'elemento a ogni misura, e uno stile in linea
+     batte qualunque regola che non lo porti. */
   .tp__riquadro {
-    min-height: 40rem;
+    aspect-ratio: 4 / 5;
+    min-height: 34rem;
+    max-height: 88svh;
     border-radius: var(--radius);
     overflow: hidden;
     background: var(--color-cream);
+  }
+
+  @media (min-width: 700px) {
+    .tp__riquadro { aspect-ratio: 16 / 11; }
+  }
+
+  /* Il contenitore lo crea la libreria (`cp-iframe-wrapper`) e l'iframe pure:
+     nessuno dei due porta l'ambito di questo file, quindi `:global`. */
+  .tp__riquadro :global(.cp-iframe-wrapper),
+  .tp__riquadro :global(iframe) {
+    height: 100% !important;
+    max-height: 100% !important;
   }
 
   .tp__nota {
