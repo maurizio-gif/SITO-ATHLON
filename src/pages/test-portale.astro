@@ -781,16 +781,23 @@ const SCENARI = [
   }
 
   /* A schermo pieno vuol dire pieno: nessun raggio, nessun margine, nessun
-     ritaglio. `100dvh` e non `100vh`: su iOS la barra dell'indirizzo che si
-     ritrae cambia l'altezza vera, e con `vh` la barra dei comandi finirebbe
-     sotto il bordo — cioè la × diventerebbe irraggiungibile. */
+     ritaglio.
+
+     **`height: 100%` e non `100dvh`**, ed è una correzione: il pannello sta
+     dentro `.tpm`, che è `fixed` con `inset: 0` e quindi *è già* alto quanto
+     la finestra. Dichiarare `100dvh` gli fa misurare un'altra cosa, e quando le
+     due non coincidono — misurato su un telefono emulato: finestra 889px,
+     `dvh` 812 — resta in fondo una striscia da cui si vede la pagina sotto,
+     cioè il difetto che un modal a schermo pieno esiste per non avere.
+     Un'unità di viewport dove basta una percentuale è la stessa forma di
+     errore del numero magico che sta per l'altezza di un altro elemento. */
   .tpm__pannello {
     position: relative;
     z-index: 1;
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 100dvh;
+    height: 100%;
     background: var(--portale-fondo);
   }
 
