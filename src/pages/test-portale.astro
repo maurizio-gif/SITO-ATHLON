@@ -353,13 +353,21 @@ const SCENARI = [
            invece, dal calendario si arriva alle proprie prenotazioni e dalle
            scadenze al profilo senza passare da noi.
 
+           **Il logo del portale invece si spegne**, ed è la sola cosa che di
+           quella barra si toglie. Dentro il modal il marchio c'è già due
+           volte sopra — l'intestazione del sito e la nostra riga — e la terza
+           non aggiunge fiducia: sposta in basso il contenuto e fa sembrare
+           l'iframe una pagina dentro un'altra pagina, che è esattamente ciò
+           che il modal serve a non far sentire. Restano le voci, che sono la
+           ragione per cui la barra è accesa.
+
            Il prezzo è che dentro il modal ci sono due intestazioni, la nostra
            e la loro. La nostra resta perché è l'unica che dice *dove si è* e
            porta la via d'uscita: il portale, di suo, non sa di stare dentro
            una pagina di Athlon. */
-        navigation: { hide: false, logo: true },
-        loginPage: { navbar: true, logo: true },
-        registration: { logo: true },
+        navigation: { hide: false, logo: false },
+        loginPage: { navbar: true, logo: false },
+        registration: { logo: false },
         onStateChangeSuccess: function (st) {
           passi[id] = (passi[id] || 0) + 1;
           var nome = st && st.toState && st.toState.name;
@@ -813,6 +821,25 @@ const SCENARI = [
      coprirebbe il portale. */
   :global(body.amodal-locked) {
     overflow: hidden;
+  }
+
+  /* **La chat resta davanti, anche col modal aperto.** `ChatFab` si nasconde
+     da sé quando il `body` porta `amodal-locked` — «con un modal aperto il
+     pulsante non serve», dice la sua regola — e per i pannelli del sito è
+     giusto: quelli *sono* la conversazione. Qui no: dentro c'è
+     un'applicazione di un terzo, ed è proprio il momento in cui una persona si
+     blocca e vuole chiedere. Il pulsante sta già a `z-index: 300` contro i 200
+     di questo overlay, quindi non c'è niente da spostare — c'è solo da non
+     spegnerlo.
+
+     `!important` serve: la regola di `ChatFab` è scritta con l'ambito di quel
+     componente (`.cfab[data-astro-cid-…]`), quindi due classi contro una, ed è
+     la stessa trappola già pagata su `/link`. */
+  :global(body.amodal-locked) .cfab,
+  :global(body.amodal-locked .cfab) {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
   }
 
   .tpm__fondo {
