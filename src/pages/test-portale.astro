@@ -268,6 +268,18 @@ const SCENARI = [
         <div class="tpm__box">
           {SCENARI.map((s) => <div data-monta={s.id} hidden></div>)}
         </div>
+
+        {/* Il footer vero del sito non può stare qui — è alto quanto una
+            schermata e vive in fondo alla pagina — ma la riga che serve
+            davvero mentre si è dentro il portale sì: come si torna indietro, e
+            i due link che devono essere raggiungibili da ogni pagina. */}
+        <footer class="tpm__piede">
+          <button class="tpm__indietro" type="button" data-tpm-chiudi>← Torna al sito</button>
+          <span class="tpm__piede-link">
+            <a href="/privacy/">Privacy</a>
+            <a href="/regolamento/">Condizioni</a>
+          </span>
+        </footer>
       </div>
     </div>
 
@@ -742,9 +754,25 @@ const SCENARI = [
      ritardo pari alla dissolvenza solo in chiusura — dargli una durata
      lascerebbe il valore calcolato a `hidden` nell'istante in cui lo script
      sposta il fuoco dentro. */
+  /* **Il modal comincia sotto l'intestazione**, e questa è una scelta e non un
+     dettaglio: coprendo tutto, il menu del sito sparisce nel momento in cui la
+     persona è dentro un'applicazione che non è la nostra — e l'unica uscita
+     resta la ×. Lasciando l'intestazione dov'è, il portale ha comunque tutto
+     lo schermo che conta e il sito resta navigabile.
+
+     `--header-h` la pubblica il `ResizeObserver` di `Header.astro`, quindi
+     segue la barra quando cambia — sul totem e sulla televisione la barra è
+     più alta, e un numero scritto a mano qui sarebbe il numero magico che sta
+     per l'altezza di un altro elemento: il difetto già pagato due volte in
+     questo progetto (l'hero e la striscia di club-life).
+
+     L'intestazione ha `z-index: 100` e questo overlay 200, quindi non è
+     l'ordine a tenerla visibile ma il fatto che l'overlay cominci più in
+     basso. Il menu del telefono sta a 300: si apre **sopra** il modal, ed è
+     giusto — è la navigazione, e deve vincere. */
   .tpm {
     position: fixed;
-    inset: 0;
+    inset: var(--header-h, 73px) 0 0;
     z-index: 200;
     display: flex;
     opacity: 0;
@@ -905,7 +933,6 @@ const SCENARI = [
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
-    padding-bottom: env(safe-area-inset-bottom);
     background: var(--portale-fondo);
   }
 
@@ -914,6 +941,42 @@ const SCENARI = [
      il calendario — e cresci se avanza posto. `min-height: 100%` sul
      contenitore risolve la percentuale contro la scatola, che un'altezza
      definita ce l'ha. */
+  /* La barra di sotto è bassa di proposito: ogni riga che si prende è una riga
+     in meno per il modulo. Su 320px i due link legali stanno in fila con il
+     comando di ritorno perché sono tre parole in tutto. */
+  .tpm__piede {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex: 0 0 auto;
+    padding: 0.4rem calc(0.75rem + env(safe-area-inset-right))
+             calc(0.4rem + env(safe-area-inset-bottom)) calc(0.75rem + env(safe-area-inset-left));
+    background: var(--color-white);
+    border-top: 1px solid var(--border);
+    font-size: var(--text-2xs);
+  }
+
+  .tpm__indietro,
+  .tpm__piede-link a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 0.5rem;
+    border: 0;
+    background: none;
+    color: var(--accent-text);
+    font-family: inherit;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .tpm__piede-link {
+    display: inline-flex;
+    gap: 0.25rem;
+  }
+
   .tpm__box > div {
     display: flex;
     flex-direction: column;
