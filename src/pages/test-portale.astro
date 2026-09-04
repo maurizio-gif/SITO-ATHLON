@@ -524,8 +524,15 @@ const SCENARI = [
         registration: { logo: false },
         onStateChangeSuccess: function (st) {
           avviato++;
+          /* **`toState.name` non è sempre una stringa**, e questa riga viene da
+             una prova: il primo evento dice `Registration`, il secondo — il
+             primo passo interno della procedura — porta un oggetto, e
+             concatenarlo dava `[object Object]` nel registro. È il dato da cui
+             dipende tutto il funnel, quindi si stampa intero invece di
+             indovinarne la forma. */
           var nome = st && st.toState && st.toState.name;
-          registra('modal', 'PASSO ' + avviato + '  ' + (nome || '?'));
+          if (nome && typeof nome !== 'string') nome = JSON.stringify(nome);
+          registra('modal', 'PASSO ' + avviato + '  ' + (nome || '?') + '   ' + JSON.stringify(st));
         },
         onUserLoggedIn: function (info) {
           registra('modal', 'ACCOUNT CREATO  ' + JSON.stringify(info));
