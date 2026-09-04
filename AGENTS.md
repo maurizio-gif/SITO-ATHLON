@@ -335,8 +335,10 @@ doppiamente vero.
 
 ## La verifica dell’email sta davanti a «Iscriviti», e chi non ha un account passa
 
-Su `/abbonamenti` e `/promo` i pulsanti d'iscrizione portavano diritti dentro
-PerfectGym. Il guaio era in fondo al percorso: chi ha già un account — di solito
+Su `/abbonamenti` i pulsanti d'iscrizione portavano diritti dentro
+PerfectGym — e su `/promo` pure, finché quella pagina non è passata al codice
+promozionale: là il gate è stato tolto, e il perché sta nella sezione «Dove c'è
+un codice, la destinazione è generica». Il guaio era in fondo al percorso: chi ha già un account — di solito
 come **Guest**, perché ha fatto una prova o è in un nucleo — compilava tutta la
 registrazione e solo all'invio leggeva che quell'email esiste già e che deve fare
 il reset. Il lavoro buttato in un punto dove le persone si fermano. Quindi la
@@ -2653,10 +2655,21 @@ non un piano. Tre cose che ne conseguono:
   vale su tutte e due le formule annuali di tutti e due i piani, che è
   esattamente il perimetro di `validoSu`. Su `/abbonamenti` i link col piano
   restano: là si compra un piano, non una promozione.
-- **Il controllo dell'email resta.** `data-iscrizione` sopravvive al cambio di
-  destinazione perché `iscrizione.client.js` legge l'`href` dal pulsante: chi ha
-  già un account continua a scoprirlo prima e non in fondo alla registrazione, e
-  `data-iscrizione-opzione` continua a dire quale formula è stata premuta.
+- **E il controllo dell'email esce, su questa pagina sola.** Aveva resistito al
+  cambio di destinazione — `iscrizione.client.js` legge l'`href` dal pulsante,
+  quindi funzionava ancora — e proprio per questo bisogna dire perché non ci
+  va: su `/abbonamenti` il pulsante *è* l'iscrizione a un piano, e la domanda
+  prima risparmia a chi ha già un account tutta la registrazione; qui il
+  pulsante è **la seconda metà di un gesto** che comincia col codice negli
+  appunti. Chi ha appena copiato `RESTARTPT` si aspetta il portale, e un
+  pannello che chiede l'email in mezzo è il punto in cui il codice si perde e la
+  pagina si chiude. Quello che si rinuncia a fare lo fa comunque il portale, che
+  a un'email già registrata risponde da sé.
+  **Nessun `data-iscrizione` e nessun `IscrizioneModal` montato**, e i due
+  vanno insieme: l'attributo senza il componente sono sei pulsanti che aprono
+  un pannello che non c'è, il componente senza l'attributo è un pannello che
+  nessuno apre. Il gate resta intero su `/abbonamenti`, che è l'unica pagina
+  che ora lo monta.
 
 **L'etichetta è «Vai all'iscrizione» e non «Incollalo qui».** La seconda andava a
 capo su due righe nelle schede strette, e soprattutto direbbe una cosa falsa: il
