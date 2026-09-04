@@ -22,13 +22,16 @@
  * l'offerta in tre parole e `codice` il codice da incollare sul portale. Il
  * giorno che la promo cambia natura non cambia il codice di tre file.
  *
- * Le schede qui sotto sono le stesse della pagina abbonamenti, con il link che
- * porta dritto all'iscrizione del piano.
+ * Le schede qui sotto sono le stesse della pagina abbonamenti, ma il comando è
+ * un altro: **il codice da copiare e la registrazione del portale**, non il
+ * `PaymentPlanId` del piano — è il codice ad aprire il perimetro della promo, e
+ * il campo per incollarlo sta un passo prima dell'iscrizione. Per la stessa
+ * ragione qui non c'è il controllo dell'email: la nota accanto a
+ * `IscrizioneModal`, in fondo alla pagina, dice perché.
  */
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import AttivitaModal from '../components/AttivitaModal.astro';
-import IscrizioneModal from '../components/IscrizioneModal.astro';
 import SpacesGallery from '../components/home/SpacesGallery.astro';
 import Faq from '../components/Faq.astro';
 import { plans, ATTIVAZIONE } from '../data/abbonamenti';
@@ -139,15 +142,14 @@ const contatta = talkCta({ source: '/promo' });
               La destinazione è la **registrazione generica** e non un piano: è
               il codice a dire al portale qual è il perimetro della promozione,
               e un `PaymentPlanId` nel link lo restringerebbe a un piano solo.
-              Passa comunque dal controllo dell'email (`data-iscrizione`), che è
-              il punto: chi ha già un account non deve arrivare in fondo alla
-              registrazione per scoprirlo. */}
+
+              E **non porta `data-iscrizione`**: qui il gesto è copia-e-incolla,
+              e una domanda in mezzo lo spezza. Vedi la nota in fondo alla
+              pagina, dove il modal non viene più montato. */}
           <a
             href={REGISTRAZIONE_PORTALE}
             class="btn btn-primary pr-codice__cta"
             data-cta="buy"
-            data-iscrizione="Abbonamento annuale"
-            data-iscrizione-opzione="Promo · hero"
             target="_blank"
             rel="noopener noreferrer"
           >Vai all'iscrizione →</a>
@@ -285,11 +287,8 @@ const contatta = talkCta({ source: '/promo' });
                       incolla lo dicono la nota del riquadro e i passaggi, che è
                       il posto delle istruzioni.
 
-                      Resta il controllo dell'email (`data-iscrizione`), e resta
-                      il sottotitolo in `data-iscrizione-opzione`: è l'unica cosa
-                      che distingue: questa pagina mostra le sole formule
-                      annuali, quindi i due pulsanti di un piano si chiamano
-                      entrambi «Annuale». */}
+                      Niente `data-iscrizione`: su questa pagina il pulsante
+                      apre il portale e basta, come quello dell'hero. */}
                   {promo.codice && (
                     <button type="button" class="formula__codice u-display" data-copy-code={promo.codice}>
                       {promo.codice} · copia
@@ -299,8 +298,6 @@ const contatta = talkCta({ source: '/promo' });
                     href={REGISTRAZIONE_PORTALE}
                     class="btn btn-primary formula__cta"
                     data-cta="buy"
-                    data-iscrizione={p.name}
-                    data-iscrizione-opzione={o.sub ? `${o.title} · ${o.sub}` : o.title}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -397,8 +394,6 @@ const contatta = talkCta({ source: '/promo' });
             href={REGISTRAZIONE_PORTALE}
             class="btn btn-primary"
             data-cta="buy"
-            data-iscrizione="Abbonamento annuale"
-            data-iscrizione-opzione="Promo · passaggi"
             target="_blank"
             rel="noopener noreferrer"
           >Vai all'iscrizione →</a>
@@ -517,10 +512,18 @@ const contatta = talkCta({ source: '/promo' });
   {/* Il modale dietro ogni attività compresa. */}
   <AttivitaModal />
 
-  {/* Il controllo dell'email davanti ai pulsanti d'iscrizione. Sta qui e non
-      nel Layout perché i pulsanti esistono su questa pagina e su /promo: le
-      altre settantasette non hanno niente da intercettare. */}
-  <IscrizioneModal />
+  {/* **Il controllo dell'email non sta su questa pagina, e resta su
+      `/abbonamenti`.** Là il pulsante *è* l'iscrizione a un piano, quindi
+      chiedere l'email prima fa risparmiare a chi ha già un account tutta la
+      registrazione. Qui il pulsante è la seconda metà di un gesto che comincia
+      col codice negli appunti: chi ha appena copiato `RESTARTPT` si aspetta il
+      portale, e un pannello che chiede l'email in mezzo è il punto in cui il
+      codice si perde e la pagina si chiude. La domanda la fa comunque il
+      portale, che a un'email già registrata risponde da sé.
+
+      Quindi nessun `data-iscrizione` sui sei comandi e nessun `IscrizioneModal`
+      montato: l'uno senza l'altro sarebbe un pannello che nessuno apre, o sei
+      pulsanti che aprono un pannello che non c'è. */}
 </Layout>
 
 <script>
