@@ -346,6 +346,54 @@ const SCENARI = [
       pre.scrollTop = pre.scrollHeight;
     }
 
+    var box = mod && mod.querySelector('.tpm__box');
+
+    /* **Il portale misura la finestra, e da noi la finestra non è quella che
+       scorre.** Il popup della firma del contratto lo disegna PerfectGym
+       dentro l'iframe, e per metterlo dove si vede chiede al genitore dove sia
+       la parte visibile: la libreria risponde con `_getViewport`, che legge
+       `window.scrollY` e `window.innerHeight`. Qui il `body` è bloccato — quei
+       due valgono 0 e l'altezza intera dello schermo — mentre a scorrere è
+       `.tpm__box`, e l'iframe è alto quanto tutto il suo contenuto perché
+       iframe-resizer lavora così. Risultato: a metà di una registrazione lunga
+       il popup finisce nella parte dell'iframe che sta sopra il bordo della
+       scatola, e non si vede.
+       Quindi i numeri li diamo noi, misurati sulla scatola. `top` è la
+       posizione dell'iframe **dentro il contenuto della scatola** e non dentro
+       il documento: è l'analogo onesto di quello che la libreria calcola. */
+    if (PGL && PGL.prototype && PGL.prototype._getViewport && !PGL.prototype.__athlonBox) {
+      PGL.prototype.__athlonBox = true;
+      var vistaOriginale = PGL.prototype._getViewport;
+      PGL.prototype._getViewport = function (opzioni) {
+        try {
+          if (!box || !box.contains(this._element)) return vistaOriginale.call(this, opzioni);
+          var ifr = this._element.querySelector('iframe');
+          var alto = box.clientHeight;
+          var top = ifr
+            ? ifr.getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop
+            : 0;
+          return { navbarHeight: 0, top: top, bottom: alto, windowHeight: alto, scrollTop: box.scrollTop };
+        } catch (e) {
+          return vistaOriginale.call(this, opzioni);
+        }
+      };
+    }
+
+    /* All'apertura di un popup del portale la scatola torna in cima, e
+       **subito, non con lo scorrimento morbido**: la libreria chiama
+       `modal.onShow` e *nella riga dopo* calcola il viewport da mandare
+       dentro. Uno scorrimento animato arriverebbe dopo quei numeri, e il
+       portale posizionerebbe il popup su una posizione già vecchia.
+       Così le due strade portano allo stesso posto: un popup `fixed` nel
+       documento del portale si disegna in cima all'iframe, che ora è la cima
+       di quello che si vede; uno posizionato sui numeri che gli abbiamo dato
+       finisce nello stesso punto. */
+    function popup(id, aperto) {
+      if (aperto && box) box.scrollTop = 0;
+      registra(id, (aperto ? 'POPUP    aperto' : 'POPUP    chiuso') +
+        (box ? '   scatola ' + Math.round(box.clientHeight) + 'px, scorsa a ' + Math.round(box.scrollTop) : ''));
+    }
+
     /* Le opzioni comuni. `topOffset` non serve più — il modal è fisso e la
        pagina è bloccata — ma `minHeight` sì: viaggia fino al portale e gli dice
        di non ripiegare su una schermata da telefono dentro uno spazio alto. */
@@ -387,6 +435,24 @@ const SCENARI = [
         },
         onUserLoggedIn: function (info) { registra(id, 'ENTRATO  ' + JSON.stringify(info)); },
         onUserLoggedOut: function (info) { registra(id, 'USCITO   ' + JSON.stringify(info)); },
+        /* I quattro rettangoli scuri della libreria non ci servono: dentro un
+           modal a schermo pieno non c'è niente attorno all'iframe da oscurare,
+           e sono `position: absolute` dentro un contenitore che scorre — cioè
+           si staccano dal popup al primo movimento del dito. Il popup il suo
+           fondo scuro se lo disegna da sé, dentro. */
+        hideModalOverlay: true,
+        modal: {
+          disableOverlay: true,
+          onShow: function () { popup(id, true); },
+          onHide: function () { popup(id, false); },
+        },
+        /* Quando è il portale a chiedere di scorrere, scorre la scatola: la
+           finestra è bloccata, quindi la `window.scroll` che la libreria
+           farebbe da sé non muoverebbe niente. */
+        onContentScroll: function (y) {
+          if (box) box.scrollTop = Math.max(0, y || 0);
+          registra(id, 'SCORRI   il portale chiede ' + Math.round(y || 0));
+        },
       };
       for (var k in extra) o[k] = extra[k];
       return o;
