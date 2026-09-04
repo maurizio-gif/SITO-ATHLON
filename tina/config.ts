@@ -676,19 +676,18 @@ export default defineConfig({
             required: true,
           },
 
-          // Due righe sul servizio regalato, con il rimando alla sua pagina.
-          // Senza numeri di proposito: prezzi e trainer li stampa la pagina di
-          // quel servizio, che è già l'unico posto in cui vivono.
+          // Due righe sul servizio regalato. Non c'è un campo per il link, ed è
+          // voluto: questa è una landing, e un pulsante che porta su un'altra
+          // pagina compete con l'iscrizione. Le aree e il numero dei trainer li
+          // aggiunge la pagina leggendoli da src/data/trainer.ts.
           { type: 'string', name: 'servizioTitolo', label: 'Il servizio regalato · titolo (facoltativo)' },
           {
             type: 'string',
             name: 'servizioTesto',
             label: 'Il servizio regalato · due righe',
-            description: 'Che cos’è, in breve. Niente prezzi: quelli stanno sulla pagina del servizio.',
+            description: 'Che cos’è, in breve. Niente prezzi e nessun link: il resto lo aggiunge la pagina.',
             ui: { component: 'textarea' },
           },
-          { type: 'string', name: 'servizioLink', label: 'Il servizio regalato · indirizzo della pagina', description: 'Es. «/personal-training/», con lo slash finale.' },
-          { type: 'string', name: 'servizioLinkLabel', label: 'Il servizio regalato · testo del pulsante' },
 
           { type: 'image', name: 'foto', label: 'Foto di sfondo dell’apertura', required: true },
 

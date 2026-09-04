@@ -242,3 +242,38 @@ export const NUMERO_TRAINER_PAROLA = PAROLE[NUMERO_TRAINER] ?? String(NUMERO_TRA
 /** La stessa parola a inizio frase. */
 export const NUMERO_TRAINER_PAROLA_CAP =
   NUMERO_TRAINER_PAROLA.charAt(0).toUpperCase() + NUMERO_TRAINER_PAROLA.slice(1);
+
+/**
+ * Le aree su cui il personal training lavora, una volta sola.
+ *
+ * Stavano scritte a mano in tre punti della sola `/personal-training` — il
+ * sottotitolo della hero, la descrizione dello schema e la f.a.q. su come si
+ * scegle il trainer — e **già divergevano**: «recupero funzionale post
+ * infortunio», «recupero funzionale», «recupero post infortunio» sono la stessa
+ * area scritta in tre modi. Con la promo di settembre, che regala due sedute e
+ * quindi deve raccontare il servizio dentro la landing, la quarta copia sarebbe
+ * arrivata su una pagina che nessuno rilegge quando il servizio cambia.
+ *
+ * Sono le aree dichiarate dal club, non la somma dei «Servizi proposti» dei
+ * trainer: quella lista è di ognuno di loro e cambia col roster, questa è il
+ * perimetro del servizio.
+ */
+export const AREE_TRAINER = [
+  'Postura',
+  'Ipertrofia',
+  'Dimagrimento',
+  'Recupero funzionale post infortunio',
+  'Gravidanza e post parto',
+] as const;
+
+/**
+ * Le stesse aree dentro una frase: minuscole, virgole, e la «e» prima
+ * dell'ultima — «postura, ipertrofia, dimagrimento, recupero funzionale post
+ * infortunio, gravidanza e post parto».
+ *
+ * L'ultima area porta già una «e» dentro di sé («Gravidanza e post parto»),
+ * quindi la congiunzione la fa la virgola e non un «e» aggiunto, che darebbe
+ * «gravidanza e post parto e gravidanza». Da qui il `join(', ')` secco: la
+ * lista finisce con un'area che si legge come una coppia.
+ */
+export const AREE_TRAINER_TESTO = AREE_TRAINER.map((a) => a.toLowerCase()).join(', ');

@@ -500,7 +500,10 @@ export const GET: APIRoute = async () => {
       testo: blocchi(
         pulito(d.claim),
         pulito(d.sommario),
-        `Valida su: ${pulito(d.validoSu)}. ${d.scadenzaLabel}: ${d.scadenza
+        /* `validoSu` è una frase e finisce già col punto: aggiungerne un altro
+           dava «Smart e Premium.. Promo attivabile…», che è il genere di
+           sciatteria che un modello legge come due frasi. */
+        `Valida su: ${pulito(d.validoSu).replace(/\.$/, '')}. ${d.scadenzaLabel}: ${d.scadenza
           .toISOString()
           .slice(0, 10)}.`,
         /* Che cosa regala, e come si ottiene. Erano una riga sola — «quota di
@@ -511,7 +514,7 @@ export const GET: APIRoute = async () => {
            racconta un'offerta che nel portale non si applica. */
         `Che cosa dà: ${pulito(d.vantaggio)}.`,
         d.codice
-          ? `**Si ottiene incollando il codice promozionale \`${d.codice}\` sul portale**, al passo «Ho un codice promozionale», mentre si attiva l'abbonamento — prima di scegliere il giorno di inizio. Senza il codice la promozione non si applica.`
+          ? `**Si ottiene incollando il codice promozionale \`${d.codice}\` sul portale**, nella registrazione, al passo «Ho un codice promozionale»: da lì il portale mostra gli abbonamenti della promozione già selezionati, e si completa l'iscrizione scegliendo la formula annuale e il giorno di inizio. Senza il codice la promozione non si applica. Il codice si copia da ${SITE}/promo.`
           : '',
         d.quotaOmaggio
           ? `Con questa promozione **la quota di attivazione è in omaggio** sulle formule del perimetro qui sopra.`

@@ -34,7 +34,8 @@ import Faq from '../components/Faq.astro';
 import { plans, ATTIVAZIONE } from '../data/abbonamenti';
 import BannerSospensione from '../components/BannerSospensione.astro';
 import { bands, countLessons, bandHours, totalLessons, totalHours, openHours, siContaAOre, gymFloor } from '../data/planning';
-import { talkCta } from '../data/cta';
+import { talkCta, REGISTRAZIONE_PORTALE } from '../data/cta';
+import { NUMERO_TRAINER_PAROLA_CAP, AREE_TRAINER } from '../data/trainer';
 import { urlPiccola } from '../data/foto';
 
 const voci = await getCollection('promo', ({ data }) => !data.draft);
@@ -131,6 +132,25 @@ const contatta = talkCta({ source: '/promo' });
           <button type="button" class="pr-codice__btn u-display" data-copy-code={promo.codice}>
             {promo.codice} · copia
           </button>
+          {/* Il codice e la porta dove si incolla, uno sotto l'altro: sono un
+              gesto solo diviso in due, e separarli vorrebbe dire copiare qui e
+              cercare l'iscrizione da qualche altra parte.
+
+              La destinazione è la **registrazione generica** e non un piano: è
+              il codice a dire al portale qual è il perimetro della promozione,
+              e un `PaymentPlanId` nel link lo restringerebbe a un piano solo.
+              Passa comunque dal controllo dell'email (`data-iscrizione`), che è
+              il punto: chi ha già un account non deve arrivare in fondo alla
+              registrazione per scoprirlo. */}
+          <a
+            href={REGISTRAZIONE_PORTALE}
+            class="btn btn-primary pr-codice__cta"
+            data-cta="buy"
+            data-iscrizione="Abbonamento annuale"
+            data-iscrizione-opzione="Promo · hero"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Vai all'iscrizione →</a>
           {promo.codiceNota && <p class="pr-codice__nota">{promo.codiceNota}</p>}
         </div>
       )}
@@ -244,16 +264,39 @@ const contatta = talkCta({ source: '/promo' });
 
                   <p class="formula__nota">{o.note}</p>
 
-                  {/* Come su /abbonamenti: `data-iscrizione` mette il controllo
-                      dell'email davanti a PerfectGym, l'`href` resta la strada
-                      per chi non ha JavaScript.
+                  {/* Il comando della formula è **il codice più la porta**, non
+                      «Iscriviti a Smart». Con una promozione che passa da un
+                      codice, un pulsante che porta al `PaymentPlanId` del piano
+                      manda la persona dentro un'iscrizione dove il codice non
+                      l'ha ancora copiato — e il campo per incollarlo sta un
+                      passo dopo. Quindi si copia qui e si atterra sulla
+                      registrazione, che è la stessa strada di `/attiva`.
 
-                      Qui il sottotitolo dentro `data-iscrizione-opzione` non è
-                      un di più ma l'unica cosa che distingue: questa pagina
-                      mostra le sole formule annuali, quindi i due pulsanti di
-                      un piano si chiamano entrambi «Annuale». */}
+                      `o.href` non si usa più su questa pagina, e non è una
+                      perdita: il perimetro della promo lo apre il codice, che
+                      vale su tutte e due le formule annuali di tutti e due i
+                      piani. Su `/abbonamenti` invece i link col piano restano,
+                      perché là si compra un piano e non una promozione.
+
+                      L'etichetta è quella di `/attiva` — «Vai all'iscrizione»
+                      — e non «Incollalo qui»: nelle schede strette andava a
+                      capo su due righe, e soprattutto direbbe una cosa falsa,
+                      perché il codice si incolla **dopo**, sul portale. Dove si
+                      incolla lo dicono la nota del riquadro e i passaggi, che è
+                      il posto delle istruzioni.
+
+                      Resta il controllo dell'email (`data-iscrizione`), e resta
+                      il sottotitolo in `data-iscrizione-opzione`: è l'unica cosa
+                      che distingue: questa pagina mostra le sole formule
+                      annuali, quindi i due pulsanti di un piano si chiamano
+                      entrambi «Annuale». */}
+                  {promo.codice && (
+                    <button type="button" class="formula__codice u-display" data-copy-code={promo.codice}>
+                      {promo.codice} · copia
+                    </button>
+                  )}
                   <a
-                    href={o.href}
+                    href={REGISTRAZIONE_PORTALE}
                     class="btn btn-primary formula__cta"
                     data-cta="buy"
                     data-iscrizione={p.name}
@@ -261,7 +304,7 @@ const contatta = talkCta({ source: '/promo' });
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Iscriviti a {p.name} →
+                    {promo.codice ? "Vai all'iscrizione →" : `Iscriviti a ${p.name} →`}
                   </a>
                 </div>
               ))}
@@ -273,24 +316,47 @@ const contatta = talkCta({ source: '/promo' });
     </div>
   </section>
 
-  {/* IL SERVIZIO REGALATO — due righe e un rimando, non un secondo racconto.
+  {/* IL SERVIZIO REGALATO — un estratto, non un rimando.
       Chi legge «due sedute di personal in omaggio» e non sa cos'è il personal
-      training ad Athlon non sa cosa gli è stato regalato; chi lo sa non deve
-      leggere una pagina che esiste già. Niente numeri qui di proposito: prezzi
-      e trainer li stampa `/personal-training`, che è il posto dove vivono. */}
+      training ad Athlon non sa cosa gli è stato regalato. Il primo taglio
+      mandava a `/personal-training` con un pulsante, ed era l'errore di una
+      landing: **un comando che porta via è un comando che compete con
+      l'iscrizione**, e su questa pagina di comandi ne serve uno. Quindi qui c'è
+      quel tanto che basta a riconoscere il servizio — le aree su cui si lavora,
+      quanti sono i trainer, come si scelgono — letto dagli stessi dati che
+      alimentano quella pagina, così i due racconti non possono divergere.
+      Quello che resta fuori sono i prezzi: chi riceve due sedute in omaggio non
+      sta comprando un pacchetto. */}
   {promo.servizioTitolo && (
     <section class="pr-sec pr-sec--dark">
-      <div class="container pr-servizio">
-        <div>
-          <span class="eyebrow" data-anim="from-left">Cosa ti stiamo regalando</span>
-          <h2 class="pr-sec__title" data-anim="reveal">{promo.servizioTitolo}</h2>
-          <p class="pr-sec__sub">{promo.servizioTesto}</p>
-        </div>
-        {promo.servizioLink && (
-          <a href={promo.servizioLink} class="btn btn-outline pr-servizio__cta" data-cta="explore">
-            {promo.servizioLinkLabel || 'Scopri di più'} →
-          </a>
-        )}
+      <div class="container">
+        <span class="eyebrow" data-anim="from-left">Cosa ti stiamo regalando</span>
+        <h2 class="pr-sec__title" data-anim="reveal">{promo.servizioTitolo}</h2>
+        <p class="pr-sec__sub">{promo.servizioTesto}</p>
+
+        {/* Le aree del servizio, dalla lista di `data/trainer.ts`: sono il modo
+            in cui una persona capisce in tre secondi se quelle due ore le
+            servono. Un `<ul>` e non un paragrafo, perché si scorrono. */}
+        <ul class="pr-aree">
+          {AREE_TRAINER.map((a, i) => (
+            <li class="pr-area" data-anim="pop" data-anim-delay={String(i * 50)}>{a}</li>
+          ))}
+        </ul>
+
+        <ul class="pr-servizio__punti">
+          <li data-anim data-anim-delay="60">
+            <strong class="u-display">{NUMERO_TRAINER_PAROLA_CAP} trainer</strong>
+            <span>Ognuno con le sue specializzazioni: scegli chi lavora su quello che ti interessa e prenoti la sua disponibilità, non un turno generico.</span>
+          </li>
+          <li data-anim data-anim-delay="120">
+            <strong class="u-display">Un'ora a testa</strong>
+            <span>Costruita sul tuo obiettivo. Nella prima si guarda come ti muovi e da dove conviene partire.</span>
+          </li>
+          <li data-anim data-anim-delay="180">
+            <strong class="u-display">E poi la scheda</strong>
+            <span>Fuori dalle sedute continui ad allenarti con la scheda che ti prepara lui, di Fitness o di Reformer.</span>
+          </li>
+        </ul>
       </div>
     </section>
   )}
@@ -323,9 +389,20 @@ const contatta = talkCta({ source: '/promo' });
           alla pagina ha l'hero fuori schermo, e mandarlo a cercarlo in cima è
           il punto in cui si apre un'altra scheda e non si torna. */}
       {promo.codice && (
-        <button type="button" class="passi__codice u-display" data-copy-code={promo.codice}>
-          {promo.codice} · copia
-        </button>
+        <div class="passi__azione">
+          <button type="button" class="passi__codice u-display" data-copy-code={promo.codice}>
+            {promo.codice} · copia
+          </button>
+          <a
+            href={REGISTRAZIONE_PORTALE}
+            class="btn btn-primary"
+            data-cta="buy"
+            data-iscrizione="Abbonamento annuale"
+            data-iscrizione-opzione="Promo · passaggi"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Vai all'iscrizione →</a>
+        </div>
       )}
 
       <p class="passi__nota">{promo.proceduraNota}</p>
@@ -1160,6 +1237,12 @@ const contatta = talkCta({ source: '/promo' });
     color: var(--color-white);
   }
 
+  .pr-codice__cta {
+    width: 100%;
+    justify-content: center;
+    margin-top: 12px;
+  }
+
   .pr-codice__nota {
     margin: 12px 0 0;
     font-size: var(--text-2xs);
@@ -1168,10 +1251,23 @@ const contatta = talkCta({ source: '/promo' });
 
   /* Il codice in fondo ai passaggi: non è il riquadro dell'hero, è il gesto
      che serve mentre si leggono — quindi larghezza del passo e non della
-     pagina. */
-  .passi__codice {
-    max-width: 20rem;
+     pagina, e la porta accanto. */
+  .passi__azione {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 12px;
     margin: 18px 0 0;
+  }
+
+  .passi__codice {
+    flex: 0 1 20rem;
+    max-width: 20rem;
+  }
+
+  .passi__azione .btn {
+    flex: 0 1 auto;
+    align-items: center;
   }
 
   /* ---- Il vincolo del regalo ---- */
@@ -1185,20 +1281,111 @@ const contatta = talkCta({ source: '/promo' });
   }
 
   /* ---- Il servizio regalato ---- */
-  .pr-servizio {
+  /* Le aree, in pastiglie: si scorrono con l'occhio invece di leggersi. */
+  .pr-aree {
+    list-style: none;
+    margin: 26px 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .pr-area {
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--border-dark);
+    background: rgba(255, 255, 255, 0.05);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--color-white);
+  }
+
+  /* I tre punti dell'estratto: griglia che si sfascia da sé, quindi nessuna
+     media query — il minimo è in rem, quindi cresce con la radice e sul totem
+     la griglia perde una colonna da sola. */
+  .pr-servizio__punti {
+    list-style: none;
+    margin: 30px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(17rem, 100%), 1fr));
+    gap: 24px 32px;
+  }
+
+  .pr-servizio__punti li {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 16px;
+    border-top: 2px solid var(--color-primary);
+  }
+
+  .pr-servizio__punti strong {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    --lh: 1.05;
+    letter-spacing: var(--tracking-2xl);
+    color: var(--color-white);
+  }
+
+  .pr-servizio__punti span {
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  /* Il codice dentro la scheda della formula: sta sopra il comando e ha la sua
+     stessa larghezza, perché sono un gesto in due tempi — copia, poi vai. Più
+     basso del pulsante di proposito: il comando pieno resta quello che porta
+     avanti. */
+  .formula__codice {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 24px 48px;
+    justify-content: center;
+    width: 100%;
+    min-height: 3rem;
+    margin: 0 0 10px;
+    border: 1px dashed var(--color-primary);
+    border-radius: 0.75rem;
+    background: rgba(255, 87, 1, 0.12);
+    color: var(--accent-text);
+    font-size: var(--text-md);
+    --lh: 1;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
   }
 
-  .pr-servizio > div {
-    max-width: 52ch;
+  .piano--premium .formula__codice {
+    color: var(--color-primary);
   }
 
-  .pr-servizio__cta {
-    flex: 0 0 auto;
+  .formula__codice:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .formula__codice.copied {
+    background: var(--color-dark);
+    border-color: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .piano--premium .formula__codice.copied {
+    background: var(--color-white);
+    border-color: var(--color-white);
+    color: var(--color-dark);
+  }
+
+  /* Il comando resta in fondo alla scheda; il codice gli sta attaccato sopra,
+     quindi è lui a portare il margine automatico. */
+  .formula__codice {
+    margin-top: auto;
+  }
+
+  .formula__codice + .formula__cta {
+    margin-top: 0;
   }
 
   /* Il codice nel prezzo di una scheda: minuscolo e accanto al regalo, perché

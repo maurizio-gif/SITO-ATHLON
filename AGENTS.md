@@ -2551,8 +2551,59 @@ Quindi il vantaggio adesso lo dichiara il documento, e chi lo nomina lo legge:
 - **`regalo`** e **`servizio*`** sono il perché e il che cos'è. Il perché è la
   sola parte della pagina che dice come mai il club sta dando qualcosa, e un
   regalo senza un perché si legge come una svendita; il «che cos'è» sono due
-  righe e un rimando, **senza numeri**, perché prezzi e trainer li stampa la
-  pagina di quel servizio.
+  righe che la pagina completa con un **estratto letto dai dati** — le aree di
+  `AREE_TRAINER`, il numero dei trainer — e non con un rimando.
+
+**Su una landing un comando che porta via compete con l'iscrizione**, e il primo
+taglio di questa sezione ci era cascato: due righe sul personal e un pulsante
+verso `/personal-training`, cioè un secondo comando pieno che porta fuori dalla
+pagina esattamente dove si sta decidendo. Quindi il servizio si racconta **qui**,
+con quel tanto che basta a riconoscerlo, e i dati vengono dagli stessi posti da
+cui li legge la sua pagina — `AREE_TRAINER` e `NUMERO_TRAINER` in
+`data/trainer.ts` — così i due racconti non possono divergere. Le aree in
+particolare erano scritte a mano in tre punti della sola `/personal-training` e
+**già divergevano** in tre forme diverse dello stesso «recupero funzionale post
+infortunio»: la quarta copia sarebbe finita su una landing che nessuno rilegge.
+Quello che resta fuori sono i prezzi: chi riceve due sedute in omaggio non sta
+comprando un pacchetto.
+
+Restano di proposito i link che non sono comandi — il marchio verso la home, le
+condizioni e la privacy in fondo, il listino come ripiego del conto alla
+rovescia scaduto — perché non contendono niente e due di quei tre sono
+obbligatori su una pagina che gira senza il footer del sito.
+
+### Dove c'è un codice, la destinazione è generica
+
+I comandi delle formule portavano al `PaymentPlanId` del piano, ed è la strada
+giusta quando si compra un piano: è quella che `/abbonamenti` tiene. Ma una
+promozione che passa da un codice funziona al contrario — **è il codice ad
+aprire il perimetro**, e il portale mostra da sé gli abbonamenti della promo già
+selezionati. Un pulsante col `PaymentPlanId` porterebbe dentro un'iscrizione
+dove il codice non è stato copiato, e il campo per incollarlo sta un passo
+prima.
+
+Quindi su `/promo`, quando il documento dichiara un `codice`, ogni comando è la
+coppia di `/attiva`: **il codice tratteggiato da copiare e, sotto, «Vai
+all'iscrizione»** verso `REGISTRAZIONE_PORTALE` — la registrazione del portale,
+non un piano. Tre cose che ne conseguono:
+
+- **L'indirizzo è passato in `data/cta.ts`.** Era in `guestPass.ts`, dove è nato,
+  ma non è del Guest Pass: è la destinazione di ogni offerta che passa da un
+  codice, e adesso sono due. `guestPass.ts` lo riesporta col nome che il modal
+  della prova e `/attiva` gli danno.
+- **`o.href` non si usa più su questa pagina, e non è una perdita.** Il codice
+  vale su tutte e due le formule annuali di tutti e due i piani, che è
+  esattamente il perimetro di `validoSu`. Su `/abbonamenti` i link col piano
+  restano: là si compra un piano, non una promozione.
+- **Il controllo dell'email resta.** `data-iscrizione` sopravvive al cambio di
+  destinazione perché `iscrizione.client.js` legge l'`href` dal pulsante: chi ha
+  già un account continua a scoprirlo prima e non in fondo alla registrazione, e
+  `data-iscrizione-opzione` continua a dire quale formula è stata premuta.
+
+**L'etichetta è «Vai all'iscrizione» e non «Incollalo qui».** La seconda andava a
+capo su due righe nelle schede strette, e soprattutto direbbe una cosa falsa: il
+codice si incolla **dopo**, sul portale. Dove si incolla lo dicono la nota del
+riquadro e i passaggi, che è il posto delle istruzioni.
 
 Due cose da sapere prima di toccarlo.
 

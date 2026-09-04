@@ -35,32 +35,36 @@ regaloNota: >-
   dell'abbonamento.
 servizioTitolo: Cos'è il personal training ad Athlon
 servizioTesto: >-
-  Un'ora costruita sul tuo obiettivo, con un trainer che scegli tu in base a
-  quello su cui lavora — postura, ipertrofia, dimagrimento, recupero dopo un
-  infortunio, gravidanza e post parto. Fuori dalle sedute continui ad allenarti
-  con la scheda che ti prepara lui, di Fitness o di Reformer.
-servizioLink: /personal-training/
-servizioLinkLabel: Conosci i trainer e il servizio
+  Non è un'ora di ginnastica guidata: è un allenamento costruito su di te, con
+  un trainer che ti guarda muovere, capisce da dove parti e decide con te da
+  dove cominciare. Le due sedute in omaggio servono esattamente a questo — a
+  non improvvisare le prime settimane.
 foto: /wp-content/uploads/2024/08/ACK2162Giacomo-lattanzio_-1-1024x683.jpg
 senzaAccountTitolo: Non hai ancora un account
 senzaAccountTesto: >-
-  Scegli il piano qui sotto e prosegui: l'account lo crei durante l'attivazione,
+  Copia il codice e apri l'iscrizione: l'account lo crei durante l'attivazione,
   nella stessa procedura. Non serve registrarsi prima.
 conAccountTitolo: Hai già un account
 conAccountTesto: >-
-  Accedi al portale e attiva da lì il tuo abbonamento annuale: i passaggi sono
-  gli stessi, codice compreso.
+  Accedi al portale e attiva da lì il tuo abbonamento annuale: il codice si
+  incolla nello stesso punto, al passo «Ho un codice promozionale».
 proceduraTitolo: Come si attiva
 proceduraIntro: >-
-  Il codice va incollato sul portale mentre attivi l'abbonamento: è il secondo
-  passaggio, prima di scegliere il giorno di inizio.
+  Si parte dal codice: lo copi da qui, apri l'iscrizione sul portale e lo
+  incolli lì. È il codice a farti comparire gli abbonamenti della promozione,
+  quindi non c'è niente da cercare nel listino.
 procedura:
-  - Clicca su <strong>Abbonamenti</strong> e scegli l'abbonamento annuale
+  - Copia il codice della promo dal riquadro qui sotto
   - >-
-    Clicca su <strong>Ho un codice promozionale</strong> e incolla il codice
-  - Clicca su <strong>Avanti</strong> e scegli il giorno di inizio
+    Apri l'iscrizione sul portale e clicca su <strong>Ho un codice
+    promozionale</strong>
+  - >-
+    Incolla il codice: il portale ti mostra gli abbonamenti della promozione,
+    già selezionati
+  - Scegli la formula annuale che preferisci e il giorno di inizio
   - Accetta i termini e firma il contratto
-  - Inserisci il metodo di pagamento
+  - >-
+    Inserisci il metodo di pagamento: carta o conto corrente
 proceduraNota: >-
   Il pagamento si imposta solo con carta di credito o debito, oppure con
   addebito su conto corrente (IBAN).
@@ -68,11 +72,11 @@ faqTitolo: Prima di iscriverti
 faq:
   - q: Come ottengo le due sedute di personal training?
     a: >-
-      Incollando il codice promozionale mentre attivi l'abbonamento annuale,
-      al passaggio <strong>Ho un codice promozionale</strong>. Le sedute te le
-      troviamo noi in anagrafica: le
-      prenoti dall'app o dal portale scegliendo il trainer che preferisci, ed
-      hai tre mesi dall'attivazione per usarle.
+      Copi il codice da questa pagina e lo incolli sul portale, al passaggio
+      <strong>Ho un codice promozionale</strong>: da lì compaiono gli
+      abbonamenti della promozione e completi l'iscrizione. Le sedute te le
+      troviamo noi in anagrafica: le prenoti dall'app o dal portale scegliendo
+      il trainer che preferisci, e hai tre mesi dall'attivazione per usarle.
   - q: Vale anche sul Mensile Flex?
     a: >-
       No: la promozione vale sugli abbonamenti <strong>annuali</strong>, Smart e

@@ -206,15 +206,14 @@ const promo = defineCollection({
     regalo: z.array(z.string()),
     /** Il vincolo che chi accetta deve sapere prima: entro quando si usa. */
     regaloNota: z.string(),
-    /* Due righe sul servizio che la promozione regala, con il rimando alla sua
-       pagina. Facoltativo, e senza numeri di proposito: i prezzi e i conti
-       stanno sulla pagina di quel servizio, che è già l'unico posto in cui
-       vivono. Se la promo non regala un servizio, i campi restano vuoti e la
-       sezione non compare. */
+    /* Due righe sul servizio che la promozione regala. Facoltativo, e **senza
+       un link**: questa è una landing, e un comando che porta via è un comando
+       che compete con l'iscrizione. Quello che la pagina aggiunge attorno a
+       queste due righe è un estratto letto dai dati del servizio — le aree, i
+       trainer — così i due racconti non divergono. Se la promo non regala un
+       servizio, i campi restano vuoti e la sezione non compare. */
     servizioTitolo: z.string().optional().default(''),
     servizioTesto: z.string().optional().default(''),
-    servizioLink: z.string().optional().default(''),
-    servizioLinkLabel: z.string().optional().default(''),
     foto: z.string(),
     /* Le due vie per arrivare all'abbonamento. Sono due perché il portale ne
        ha due davvero: chi non è registrato crea l'account dentro l'iscrizione,
