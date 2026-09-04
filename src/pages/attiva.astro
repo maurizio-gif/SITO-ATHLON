@@ -179,24 +179,10 @@ const faqs: FaqEntry[] = [
 </Layout>
 
 <script>
-  // Copia del codice: stessa meccanica di /abbonamenti e del modal della prova.
-  document.querySelectorAll<HTMLButtonElement>('[data-copy-code]').forEach((btn) => {
-    const code = btn.dataset.copyCode || '';
-    const original = btn.textContent;
-    btn.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(code);
-        btn.textContent = `${code} · copiato ✓`;
-        btn.classList.add('copied');
-      } catch {
-        btn.textContent = `${code} · copia a mano`;
-      }
-      window.setTimeout(() => {
-        btn.textContent = original;
-        btn.classList.remove('copied');
-      }, 2000);
-    });
-  });
+  /* Copia del codice: la meccanica sta in `scripts/copiaCodice.ts`, condivisa
+     con /promo — che è l'altra pagina in cui un codice si copia. */
+  import { montaCopiaCodice } from '../scripts/copiaCodice';
+  montaCopiaCodice();
 </script>
 
 <style>

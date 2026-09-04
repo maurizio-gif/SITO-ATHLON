@@ -13,10 +13,16 @@ import { plans, GUEST_PASS, SOSPENSIONE, activityInfo, SINGOLI, PERSONAL, ATTIVA
 /* Il dominio di produzione, per gli @id assoluti degli schemi. */
 const SITE = 'https://www.athlonroma.it';
 
-/* La quota barrata e la scadenza vengono dallo stesso documento che alimenta
-   /promo, non da un «50» e un «31 agosto» riscritti qui: quando la promozione
-   cambia o finisce, la si spegne mettendo `draft: true` su quel documento — e
-   sia /promo che questa pagina smettono di mostrarla nello stesso commit. */
+/* Il regalo della promozione e la sua scadenza vengono dallo stesso documento
+   che alimenta /promo, non da un «31 agosto» riscritto qui: quando la
+   promozione cambia o finisce, la si spegne mettendo `draft: true` su quel
+   documento — e sia /promo che questa pagina smettono di mostrarla nello
+   stesso commit.
+
+   **Che cosa regala lo dice il documento, non questa pagina.** `quotaOmaggio`
+   accende la quota barrata; senza di lui il regalo è `vantaggio` e la quota
+   resta quella di `ATTIVAZIONE.quota`, che è la sola fonte della cifra — la
+   copia nel CMS (`quotaBarrata`) non esiste più. */
 const promoDoc = (await getCollection('promo', ({ data }) => !data.draft))[0]?.data;
 
 
@@ -250,16 +256,32 @@ const trust = [
                       {/* La promo — vedi `promo.md`, `validoSu` — vale sulle formule
                           annuali, non sul Mensile Flex: senza vincolo mensile non c'è
                           da compensare, ed è la stessa ragione per cui `/promo` mostra
-                          solo `p.annuali`. */}
-                      {promoDoc && o.title === 'Annuale' ? (
+                          solo `p.annuali`.
+
+                          Ma la quota si barra **solo se è lei il regalo**, e lo dice
+                          `quotaOmaggio` sul documento: finché la promo del mese era
+                          sempre quella, questa riga la dava per scontata, e il mese in
+                          cui il regalo è diventato un altro avrebbe dichiarato zero una
+                          quota che si paga. */}
+                      {promoDoc?.quotaOmaggio && o.title === 'Annuale' ? (
                         <Fragment>
-                          <s class="pcard__quota-vecchia">€{promoDoc.quotaBarrata}</s> quota di
+                          <s class="pcard__quota-vecchia">€{ATTIVAZIONE.quota}</s> quota di
                           attivazione — <strong class="pcard__omaggio">in omaggio</strong>, {promoDoc.scadenzaLabel.toLowerCase()}
                         </Fragment>
                       ) : (
                         <Fragment><strong>+ €{ATTIVAZIONE.quota}</strong> quota di attivazione una tantum</Fragment>
                       )}
                     </li>
+                    {/* Il regalo della promo quando non è la quota: sta accanto al
+                        prezzo perché è parte di quello che si compra, e porta il
+                        codice perché senza il codice non arriva. */}
+                    {promoDoc && !promoDoc.quotaOmaggio && o.title === 'Annuale' && (
+                      <li>
+                        <strong class="pcard__omaggio">{promoDoc.vantaggio}</strong>
+                        {promoDoc.codice ? ` col codice ${promoDoc.codice}` : ''}, {promoDoc.scadenzaLabel.toLowerCase()} —{' '}
+                        <a href="/promo/">vedi la promo</a>
+                      </li>
+                    )}
                     <li>{o.note}</li>
                   </ul>
 
@@ -292,15 +314,15 @@ const trust = [
       </div>
 
       <p class="ab-note">
-        {promoDoc ? (
+        {promoDoc?.quotaOmaggio ? (
           <Fragment>
-            <strong>Quota di attivazione:</strong> <s>€{promoDoc.quotaBarrata}</s> in omaggio,{' '}
+            <strong>Quota di attivazione:</strong> <s>€{ATTIVAZIONE.quota}</s> in omaggio,{' '}
             {promoDoc.scadenzaLabel.toLowerCase()}, per tutti i piani annuali. Include il badge di
             accesso e l'attivazione dell'account.
           </Fragment>
         ) : (
           <Fragment>
-            <strong>Quota di attivazione:</strong> €50 una tantum, per tutti i piani. Include il badge di accesso e
+            <strong>Quota di attivazione:</strong> €{ATTIVAZIONE.quota} una tantum, per tutti i piani. Include il badge di accesso e
             l'attivazione dell'account. Non è richiesta in caso di rinnovo.
           </Fragment>
         )}

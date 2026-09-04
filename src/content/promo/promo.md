@@ -1,35 +1,93 @@
 ---
-titolo: Promo Agosto 2026
+titolo: Promo Settembre 2026
 occhiello: La promozione del mese
-claim: Quota di attivazione in omaggio.
+claim: Due sedute di personal training in omaggio.
 sommario: >-
-  I €50 di quota di attivazione non li paghi: attivi un abbonamento annuale
-  entro il 31 agosto e cominci con la sola quota dell'abbonamento.
+  Attivi un abbonamento annuale entro il 15 settembre con il codice RESTARTPT e
+  cominci con due sedute di personal training in omaggio, da usare nei primi tre
+  mesi.
 validoSu: Valido su tutti gli abbonamenti annuali, Smart e Premium.
-scadenza: 2026-08-31T23:59:00+02:00
-scadenzaLabel: Promo attivabile entro il 31 agosto
-quotaBarrata: '50'
+scadenza: 2026-09-15T23:59:00+02:00
+scadenzaLabel: Promo attivabile entro il 15 settembre
+vantaggio: Due sedute di personal in omaggio
+quotaOmaggio: false
+codice: RESTARTPT
+codiceNota: >-
+  Si incolla sul portale, al passo «Ho un codice promozionale», prima di
+  scegliere il giorno di inizio.
+regaloTitolo: Perché ti regaliamo due sedute
+regalo:
+  - >-
+    Settembre è il mese in cui si ricomincia. Torna la stagione, tornano gli
+    orari pieni, e con loro tornano i buoni propositi: rimettersi in moto,
+    tornare in forma, riprendere una cosa lasciata a metà a giugno.
+  - >-
+    Chi in questo mese sceglie di allenarsi da noi per un anno ci sta dando
+    fiducia, e abbiamo deciso di ricambiarla nel modo che serve davvero:
+    non uno sconto, ma due ore con un professionista che ti aiuta a partire
+    nel modo giusto.
+  - >-
+    Le prime settimane sono quelle che decidono se un percorso continua o si
+    ferma. Con un trainer che ti guarda allenarti, ti imposta la scheda e ti
+    dice da dove cominciare, quelle settimane non le improvvisi.
+regaloNota: >-
+  Le due sedute si prenotano e si usano entro tre mesi dall'attivazione
+  dell'abbonamento.
+servizioTitolo: Cos'è il personal training ad Athlon
+servizioTesto: >-
+  Non è un'ora di ginnastica guidata: è un allenamento costruito su di te, con
+  un trainer che ti guarda muovere, capisce da dove parti e decide con te da
+  dove cominciare. Le due sedute in omaggio servono esattamente a questo — a
+  non improvvisare le prime settimane.
 foto: /wp-content/uploads/2024/08/ACK2162Giacomo-lattanzio_-1-1024x683.jpg
 senzaAccountTitolo: Non hai ancora un account
 senzaAccountTesto: >-
-  Scegli il piano qui sotto e prosegui: l'account lo crei durante l'attivazione,
+  Copia il codice e apri l'iscrizione: l'account lo crei durante l'attivazione,
   nella stessa procedura. Non serve registrarsi prima.
 conAccountTitolo: Hai già un account
 conAccountTesto: >-
-  Accedi al portale e attiva da lì il tuo abbonamento annuale: i cinque
-  passaggi sono qui sotto.
+  Accedi al portale e attiva da lì il tuo abbonamento annuale: il codice si
+  incolla nello stesso punto, al passo «Ho un codice promozionale».
 proceduraTitolo: Come si attiva
-proceduraIntro: ''
+proceduraIntro: >-
+  Si parte dal codice: lo copi da qui, apri l'iscrizione sul portale e lo
+  incolli lì. È il codice a farti comparire gli abbonamenti della promozione,
+  quindi non c'è niente da cercare nel listino.
 procedura:
-  - Seleziona l'abbonamento
-  - Scegli il giorno di inizio
+  - Copia il codice della promo dal riquadro qui sotto
+  - >-
+    Apri l'iscrizione sul portale e clicca su <strong>Ho un codice
+    promozionale</strong>
+  - >-
+    Incolla il codice: il portale ti mostra gli abbonamenti della promozione,
+    già selezionati
+  - Scegli la formula annuale che preferisci e il giorno di inizio
   - Accetta i termini e firma il contratto
-  - Inserisci il metodo di pagamento
+  - >-
+    Inserisci il metodo di pagamento: carta o conto corrente
 proceduraNota: >-
   Il pagamento si imposta solo con carta di credito o debito, oppure con
   addebito su conto corrente (IBAN).
 faqTitolo: Prima di iscriverti
 faq:
+  - q: Come ottengo le due sedute di personal training?
+    a: >-
+      Copi il codice da questa pagina e lo incolli sul portale, al passaggio
+      <strong>Ho un codice promozionale</strong>: da lì compaiono gli
+      abbonamenti della promozione e completi l'iscrizione. Le sedute te le
+      troviamo noi in anagrafica: le prenoti dall'app o dal portale scegliendo
+      il trainer che preferisci, e hai tre mesi dall'attivazione per usarle.
+  - q: Vale anche sul Mensile Flex?
+    a: >-
+      No: la promozione vale sugli abbonamenti <strong>annuali</strong>, Smart e
+      Premium, in tutte e due le formule di pagamento — mensile e unica. Sul
+      Mensile Flex, che è la formula senza vincoli, il codice non si applica.
+  - q: La quota di attivazione si paga?
+    a: >-
+      Sì, e resta quella di listino: la trovi indicata su ogni formula qui
+      sopra, ed è una tantum — comprende il badge di accesso e l'attivazione
+      dell'account. La promozione di questo mese non è sulla quota, è sulle due
+      sedute di personal training.
   - q: Se attivo l'abbonamento a metà mese, pago il mese intero?
     a: >-
       No: la prima quota copre solo i giorni che restano fino a fine mese — è il
@@ -66,11 +124,6 @@ faq:
       <a href="mailto:disdetta@athlonroma.it">disdetta@athlonroma.it</a> almeno
       dieci giorni prima della scadenza. Nessuna telefonata, nessun modulo da
       ritirare in sede.
-  - q: La quota di attivazione è davvero zero?
-    a: >-
-      Sì, per tutta la durata della promozione: normalmente sono 50 € una tantum
-      e comprendono il badge di accesso e l'attivazione dell'account. Attivando
-      entro la scadenza non li paghi, e non li paghi nemmeno dopo.
 chiSiamoTitolo: Chi siamo
 chiSiamo:
   - >-
@@ -93,5 +146,5 @@ struttura:
 contattiTitolo: Hai bisogno di maggiori informazioni?
 contattiTesto: >-
   Scrivici: ti rispondiamo noi, con i tuoi orari e quello che cerchi davanti.
-draft: true
+draft: false
 ---

@@ -27,6 +27,24 @@ export const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 export const APP = 'https://onelink.to/athlon';
 
 /**
+ * La registrazione del portale, cioè **dove si incolla un codice
+ * promozionale**: non la home e non un `PaymentPlanId` preciso.
+ *
+ * Sta qui e non in `guestPass.ts`, dove è nata, perché non è del Guest Pass:
+ * è la destinazione di ogni offerta che passa da un codice. Con la promo di
+ * settembre sono due — il Pass su `/attiva` e la promo su `/promo` — e la
+ * seconda non deve importare un file che parla della prova per prendersi un
+ * indirizzo del portale.
+ *
+ * **Il codice fa il lavoro che faceva il link.** Un pulsante con il
+ * `PaymentPlanId` porta a un piano preciso; un codice incollato lì dentro
+ * apre il perimetro della promozione — che è più di un piano, e che il portale
+ * seleziona da sé. Perciò le due cose non si sommano: dove c'è un codice, la
+ * destinazione è generica.
+ */
+export const REGISTRAZIONE_PORTALE = `${PG}/#/Registration`;
+
+/**
  * La prova è un prodotto solo, trasversale: il Guest Pass Premium, sette
  * giorni. Non esiste «prova la Gym Floor» o «prova il Reformer» — esiste
  * conoscere il club per una settimana con l'esperienza Premium.

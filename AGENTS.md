@@ -2497,19 +2497,204 @@ abbonamento di una famiglia la paga come il primo. Detta in modo ambiguo, quella
 riga fa arrivare al desk un genitore con due figli convinto di dover pagare 50 €
 in tutto.
 
-**Con la promozione attiva la quota è in omaggio sulle annuali, e le voci lo
-dicono.** Il gate è lo stesso `promoDoc` che governa la pagina — la collezione
-filtrata su `!draft` — quindi si spegne da sé mettendo `draft: true` sul
-documento della promo. Senza quella riga la voce avrebbe detto «50 €» a chi
-stava attivando un'annuale nella settimana esatta in cui non li paga: il verso
-sbagliato in cui sbagliare, perché è un prezzo dichiarato più alto del vero.
+**La quota è in omaggio solo se è quello che la promozione regala**, e lo dice
+`quotaOmaggio` sul documento — non il fatto che una promozione esista. Il gate
+è lo stesso `promoDoc` che governa la pagina, quindi si spegne da sé mettendo
+`draft: true`; ma finché la promo del mese è stata sempre la stessa, quelle
+voci deducevano l'omaggio dalla sua **presenza**, e il mese in cui il regalo è
+diventato un altro avrebbero dichiarato zero una quota che si paga. La sezione
+qui sotto racconta com'è andata.
 
-**Il numero vive in tre posti, e due non sono evitabili.** `ATTIVAZIONE.quota` è
-la fonte; `quotaBarrata` in `promo.md` e la riga nella tabella di
-`preiscrizioni-nuoto.md` sono contenuti di Tina, che non possono importare
-TypeScript. Il giorno che la quota cambia vanno aggiornati tutti e tre — e la
-verifica è una spazzata sul `dist`: le occorrenze di «quota di attivazione» con
-una cifra devono dire tutte la stessa cifra.
+**Il numero vive in due posti, e il secondo non è evitabile.**
+`ATTIVAZIONE.quota` è la fonte; la riga nella tabella di
+`preiscrizioni-nuoto.md` è contenuto di Tina, che non può importare TypeScript.
+La terza copia — `quotaBarrata` nel documento della promo — **non c'è più**: la
+cifra barrata la prende il sito da `ATTIVAZIONE.quota`, e nel CMS resta solo
+l'interruttore. Il giorno che la quota cambia vanno aggiornati tutti e due — e
+la verifica è una spazzata sul `dist`: le occorrenze di «quota di attivazione»
+con una cifra devono dire tutte la stessa cifra.
+
+### Che cosa regala la promozione è un dato, non una cosa che il codice sa
+
+Per un anno la promo del mese è stata sempre la stessa — la quota di attivazione
+in omaggio — e tre punti del sito l'hanno data per quella: la landing
+(`quotaBarrata` barrata sulle schede), il listino di `/abbonamenti` (`promoDoc`
+&& formula annuale → «in omaggio») e **due voci del `kb.json`**, che sono quelle
+da cui la chat risponde a «quanto costa iscriversi». Nessuno dei tre chiedeva
+*che cosa* regalasse: bastava che un documento non-bozza esistesse.
+
+Settembre 2026 ha cambiato natura all'offerta — due sedute di personal training
+in omaggio, con la quota che torna dovuta — e quella deduzione è diventata **un
+prezzo dichiarato più basso del vero in tre posti insieme**, cioè quello che si
+scopre alla cassa. È la stessa forma di guasto delle due sospensioni e dei due
+orari, spostata dal contenuto allo **schema**: *un dato che vale per un solo
+caso, letto come se valesse per la categoria, è un dato da cui si compone un
+caso che non esiste.*
+
+Quindi il vantaggio adesso lo dichiara il documento, e chi lo nomina lo legge:
+
+- **`vantaggio`** è l'offerta in tre parole. La stampano le schede del listino e
+  la nota della voce di `/link`, che prima diceva «Quota di attivazione in
+  omaggio» **scritta a mano nel codice**. Sta in una riga sola su un telefono da
+  390px, quindi vale il tetto di `/link`: sotto i trentacinque caratteri.
+- **`quotaOmaggio`** è il solo interruttore che accende la quota barrata e la
+  riga «non si paga» nel `kb.json`. Spento, le stesse voci dicono l'opposto per
+  esteso — *la promozione in corso non tocca la quota* — perché la promo è
+  comunque nel contesto e da «c'è una promozione» il modello ricompone
+  volentieri l'omaggio del mese prima.
+- **`codice`** è il codice promozionale da incollare sul portale. Se c'è,
+  compare il riquadro per copiarlo e la voce del `kb.json` dice **dove** si
+  incolla: senza quella riga la chat racconterebbe un'offerta che nel portale
+  non si applica, che è il modo di perdere un'iscrizione dopo averla convinta.
+  Vuoto è uno stato legittimo — una promo che si applica da sé non ha niente da
+  copiare — e il riquadro non compare.
+- **`regalo`** e **`servizio*`** sono il perché e il che cos'è. Il perché è la
+  sola parte della pagina che dice come mai il club sta dando qualcosa, e un
+  regalo senza un perché si legge come una svendita; il «che cos'è» sono due
+  righe che la pagina completa con un **estratto letto dai dati** — le aree di
+  `AREE_TRAINER`, il numero dei trainer — e non con un rimando.
+
+**Su una landing un comando che porta via compete con l'iscrizione**, e il primo
+taglio di questa sezione ci era cascato: due righe sul personal e un pulsante
+verso `/personal-training`, cioè un secondo comando pieno che porta fuori dalla
+pagina esattamente dove si sta decidendo. Quindi il servizio si racconta **qui**,
+con quel tanto che basta a riconoscerlo, e i dati vengono dagli stessi posti da
+cui li legge la sua pagina — `AREE_TRAINER` e `NUMERO_TRAINER` in
+`data/trainer.ts` — così i due racconti non possono divergere. Le aree in
+particolare erano scritte a mano in tre punti della sola `/personal-training` e
+**già divergevano** in tre forme diverse dello stesso «recupero funzionale post
+infortunio»: la quarta copia sarebbe finita su una landing che nessuno rilegge.
+Quello che resta fuori sono i prezzi: chi riceve due sedute in omaggio non sta
+comprando un pacchetto.
+
+Restano di proposito i link che non sono comandi — il marchio verso la home, le
+condizioni e la privacy in fondo, il listino come ripiego del conto alla
+rovescia scaduto — perché non contendono niente e due di quei tre sono
+obbligatori su una pagina che gira senza il footer del sito.
+
+### Una promozione che c'è e non viene detta è un'offerta pagata e non incassata
+
+Il perimetro nel dato serve a non offrirla a chi non può averla. Ma esiste
+l'errore opposto, e costa di più: la voce della promo entra nel contesto **per
+punteggio**, quindi una domanda che non nomina la parola «promozione» — «quanto
+costa il Premium?», «come funzionano gli abbonamenti?» — può non pescarla, e a
+quel punto il club ha un'offerta attiva che l'assistente non nomina a chi la
+sta chiedendo con altre parole.
+
+Quindi la promozione **è dentro le voci dei piani**, che sono quelle che
+qualunque domanda su Smart o Premium pesca per costruzione: una riga per piano
+con le tre cose che servono per nominarla — che cosa dà, entro quando, e che
+serve il codice. Più una riga nella voce della promo che dice quando va
+nominata, perché una regola che vive solo nel prompt il modello la può ignorare.
+
+**E il perimetro sta in ogni voce che la racconta, non solo nella sua.** Sono
+quattro, contate sul `dist` e non sulla lista degli id — è la spazzata del Guest
+Pass, dove chiudere una voce e lasciarne un'altra non proteggeva da niente:
+
+| voce | perché la nomina | come si difende |
+| --- | --- | --- |
+| `promo:promo` | è la promozione | il perimetro sta nel **titolo** e nell'**area**, non solo nel corpo: sono le due righe che il modello legge *scegliendo*. Prima riga: vale solo sugli annuali adulti, e i quattro corsi dei bambini sono nominati uno per uno |
+| `abbonamento:smart` | la pesca chi chiede il piano | «vale solo per gli abbonamenti degli adulti: sui corsi dei bambini no», nella stessa riga |
+| `abbonamento:premium` | idem | idem |
+| `abbonamento:quota-attivazione` | **la pesca anche un genitore** — «quanto è la quota all'iscrizione?» è la sua domanda tanto quanto quella di un adulto | dice il perimetro nella stessa frase e chiude: «a un genitore che chiede della quota per un corso di suo figlio non si nomina, perché per lui non esiste» |
+
+E il verso opposto è chiuso con un fatto invece che con un rimando:
+`abbonamento:junior-mensile` dice che **sui corsi dei bambini non c'è nessuna
+promozione in corso**, e che non si manda al desk «per sapere se c'è» — quello
+che c'è è la finestra della preiscrizione.
+
+**Il cancello su n8n resta a livello di id.** `Vaglio promo` toglie dal contesto
+`promo:` e `faq:promo:` quando l'attività scelta è di un figlio, e i tre id non
+sono cambiati, quindi aggancia ancora. Ma **non** tocca le altre tre voci, che
+sono voci di prodotti per adulti: quelle si difendono col testo, come da
+tabella. Il giorno che si vuole la cintura oltre alle bretelle, la mossa è
+togliere in quel nodo anche il **capoverso** che comincia per `PROMOZIONE IN
+CORSO` e quello della quota — non un altro id da ricordarsi.
+
+**E nel `systemMessage` la regola fissa dice cosa fare della voce**, che è la
+cosa che nessun dato può contenere: *se la voce c'è, nominarla non è
+facoltativo* — in una riga, dentro la risposta, a ogni domanda su un abbonamento
+degli adulti, anche quando la parola «promozione» non è stata scritta; *se non
+c'è, per quella persona la promozione non esiste* — non si nomina, non si
+inventa, e non si dice «chiedi al desk se c'è una promozione». È la stessa forma
+del cancello del Guest Pass, ed è la sola che tiene: la presenza della voce **è**
+il permesso e insieme il momento.
+
+Due cose che quella regola aggiunge, e sono le due che hanno morso:
+
+- **che cosa regala lo dice la voce, e non si deduce.** La regola prima si
+  chiamava «la promozione della quota di attivazione», cioè dava per categoria
+  quello che era vero di un solo caso: adesso dice che se la voce non scrive che
+  la quota è in omaggio, **la quota si paga**.
+- **il codice fa parte della risposta**, con **dove si incolla** — sul portale,
+  durante l'iscrizione. Una promozione raccontata senza il suo codice è
+  un'offerta che nel portale non si applica.
+
+### Dove c'è un codice, la destinazione è generica
+
+I comandi delle formule portavano al `PaymentPlanId` del piano, ed è la strada
+giusta quando si compra un piano: è quella che `/abbonamenti` tiene. Ma una
+promozione che passa da un codice funziona al contrario — **è il codice ad
+aprire il perimetro**, e il portale mostra da sé gli abbonamenti della promo già
+selezionati. Un pulsante col `PaymentPlanId` porterebbe dentro un'iscrizione
+dove il codice non è stato copiato, e il campo per incollarlo sta un passo
+prima.
+
+Quindi su `/promo`, quando il documento dichiara un `codice`, ogni comando è la
+coppia di `/attiva`: **il codice tratteggiato da copiare e, sotto, «Vai
+all'iscrizione»** verso `REGISTRAZIONE_PORTALE` — la registrazione del portale,
+non un piano. Tre cose che ne conseguono:
+
+- **L'indirizzo è passato in `data/cta.ts`.** Era in `guestPass.ts`, dove è nato,
+  ma non è del Guest Pass: è la destinazione di ogni offerta che passa da un
+  codice, e adesso sono due. `guestPass.ts` lo riesporta col nome che il modal
+  della prova e `/attiva` gli danno.
+- **`o.href` non si usa più su questa pagina, e non è una perdita.** Il codice
+  vale su tutte e due le formule annuali di tutti e due i piani, che è
+  esattamente il perimetro di `validoSu`. Su `/abbonamenti` i link col piano
+  restano: là si compra un piano, non una promozione.
+- **Il controllo dell'email resta.** `data-iscrizione` sopravvive al cambio di
+  destinazione perché `iscrizione.client.js` legge l'`href` dal pulsante: chi ha
+  già un account continua a scoprirlo prima e non in fondo alla registrazione, e
+  `data-iscrizione-opzione` continua a dire quale formula è stata premuta.
+
+**L'etichetta è «Vai all'iscrizione» e non «Incollalo qui».** La seconda andava a
+capo su due righe nelle schede strette, e soprattutto direbbe una cosa falsa: il
+codice si incolla **dopo**, sul portale. Dove si incolla lo dicono la nota del
+riquadro e i passaggi, che è il posto delle istruzioni.
+
+Due cose da sapere prima di toccarlo.
+
+**Il codice si copia con `data-copy-code`, e la meccanica sta in un posto solo.**
+`scripts/copiaCodice.ts`, condiviso fra `/promo` e `/attiva` — che sono le due
+**pagine** in cui un codice si copia. Erano la stessa funzione scritta due volte,
+e la seconda era nata copiando la prima: è il punto in cui una si sistema e
+l'altra no. Le altre due copie vivono dentro i bundle del modal della prova e
+della chat, dove il markup lo costruisce lo script, e restano là.
+
+**Il popup della promo non ha più un tetto suo, e questo è il seguito di una
+data scritta a mano.** `FINE_POPUP` in `PromoPopup.astro` era la mezzanotte fra
+il 31 agosto e il 1 settembre, scelta del club per la promozione di agosto: il
+popup poteva finire prima della landing, e il conto alla rovescia puntava alla
+prima delle due date. Passato il 1 settembre quella costante è rimasta lì, e con
+la promozione di settembre **viva** il popup non compariva su nessuna pagina —
+senza che niente lo segnalasse, perché un popup che non c'è non si distingue da
+un popup che nessuno ha ancora visto.
+
+Adesso la condizione è una: documento non in bozza e `scadenza` non passata, la
+stessa di `/promo` e della voce di `/link`. Il giorno che il club volesse
+spegnere il solo popup tenendo viva la landing, quella data va **nel documento
+di Tina** accanto a `scadenza`, dove chi cambia la promo la vede — non in una
+costante che nessuno rilegge.
+
+Il resto del comportamento era già quello giusto e non è stato toccato: compare
+**una volta per sessione**, sulla prima pagina adulti che si apre (`sessionStorage`,
+segnato quando la scheda *compare* e non quando si chiude), ed è montato in tre
+posti — `[corso].astro`, `gym-floor.astro`, `reformer.astro` — che sono
+esattamente `PAGINE_ADULTI`: `[corso].astro` genera solo `CORSI`, quindi su una
+pagina junior il componente non esiste nemmeno nel markup. **Sul totem compare a
+ogni pagina**, e non è un difetto: là `suTotem()` non ricorda niente, o la
+chiusura di chi è passato prima nasconderebbe la promo a chi arriva dopo.
 
 ### La fascia la decide l'anno, e l'anno noto non basta: va confermato
 

@@ -11,10 +11,11 @@
  * - **Non esiste se la promo non esiste.** I testi e la scadenza vengono dalla
  *   collezione `promo` — la stessa che alimenta `/promo` e la voce di `/link` —
  *   e la condizione è la stessa dei due: documento non in bozza **e** scadenza
- *   non passata. Spegnere la promo da Tina spegne anche questo, senza toccare
- *   il codice. Si valuta al build, e va bene: cambiare la promo *è* un commit.
- *   Resta scoperta solo la promo che scade senza che nessuno tocchi niente, e
- *   la chiude il conto alla rovescia, che a zero si toglie di mezzo da solo.
+ *   non passata — **quella della promo, e nessun'altra data.** Spegnere la
+ *   promo da Tina spegne anche questo, senza toccare il codice. Si valuta al
+ *   build, e va bene: cambiare la promo *è* un commit. Resta scoperta solo la
+ *   promo che scade senza che nessuno tocchi niente, e la chiude il conto alla
+ *   rovescia, che a zero si toglie di mezzo da solo.
  * - **Non blocca la pagina.** Niente `amodal-locked` e niente fondo scuro: è
  *   una scheda in un angolo, non un modal. Un pannello che copre la pagina
  *   appena si entra è quello che si chiude senza leggere — e soprattutto il
@@ -40,22 +41,26 @@
 import { getCollection } from 'astro:content';
 
 /**
- * Il popup si spegne alla mezzanotte fra il 31 agosto e il 1 settembre, scelta
- * del club: l'ora di Roma e non UTC, o si spegnerebbe con due ore di anticipo.
+ * **La scadenza è una sola, ed è quella della promozione.**
  *
- * È un tetto **suo**, non la scadenza della promozione: quella la dice il
- * documento di Tina e governa `/promo`, che resta viva finché lo dice lei.
- * Il conto alla rovescia punta alla prima delle due che arriva, così la scheda
- * non promette mai tempo che non c'è — e il giorno che le due date divergono
- * per davvero, è questa costante da guardare, non il countdown.
+ * Qui c'era un tetto scritto a mano — `FINE_POPUP`, la mezzanotte fra il 31
+ * agosto e il 1 settembre — che il club aveva scelto per la promo di agosto: il
+ * popup poteva finire prima di `/promo`, e il conto alla rovescia puntava alla
+ * prima delle due date. La costante ha fatto esattamente il danno che una data
+ * scritta a mano fa: passato il 1 settembre è rimasta lì, e con la promozione
+ * di settembre **viva** il popup non compariva più su nessuna pagina, senza che
+ * niente lo segnalasse. Un tetto che scade da sé e non si vede scadere è la
+ * forma di guasto che questo file esisteva per non avere.
+ *
+ * Quindi la condizione torna a essere una: documento non in bozza e scadenza
+ * non passata, la stessa di `/promo` e della voce di `/link`. Il giorno che il
+ * club volesse spegnere il solo popup tenendo la landing, quella data va nel
+ * documento di Tina accanto a `scadenza` — non in una costante che nessuno
+ * rilegge.
  */
-const FINE_POPUP = new Date('2026-09-01T00:00:00+02:00');
-
 const voci = await getCollection('promo', ({ data }) => !data.draft);
 const promo = voci[0]?.data;
-/* La prima delle due scadenze: il popup non sopravvive né alla promo né al suo
-   tetto. */
-const limite = promo ? new Date(Math.min(promo.scadenza.getTime(), FINE_POPUP.getTime())) : null;
+const limite = promo ? promo.scadenza : null;
 const viva = limite !== null && limite.getTime() > Date.now();
 ---
 

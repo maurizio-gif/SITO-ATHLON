@@ -493,17 +493,49 @@ export const GET: APIRoute = async () => {
     voci.push({
       id: `promo:${voce.id}`,
       tipo: 'promo',
-      titolo: d.titolo,
+      /* Il perimetro sta nel **titolo** e nell'**area**, non solo nel corpo, e
+         la ragione è che quelle due righe sono ciò che il modello legge
+         *scegliendo* la voce: una promozione degli adulti pescata da una
+         domanda di un genitore è già finita due volte in una risposta
+         sbagliata, e la seconda ha dichiarato un prezzo più basso del vero. */
+      titolo: `${d.titolo} — solo abbonamenti annuali per adulti`,
       url: `${SITE}/promo`,
-      area: 'Promozione in corso',
+      area: 'Promozione in corso · solo adulti',
       attivita: [],
       testo: blocchi(
+        /* La prima riga della voce, cioè quella che sopravvive a qualunque
+           troncamento: chi può averla, e chi no per nome. «Adulti» da solo non
+           basta — i quattro corsi dei bambini vanno nominati, o il modello
+           deduce che «annuale» valga anche per una stagione di scuola nuoto. */
+        `**Vale solo per gli abbonamenti annuali degli adulti, Smart e Premium.** Non vale su nessun corso per bambini — Scuola Nuoto Bambini, Baby Nuoto, Nuoto Agonistico e Pallanuoto restano ai loro prezzi — e non vale sul Mensile Flex degli adulti, che è la formula senza vincoli. A un genitore che chiede di un corso per suo figlio questa promozione non si nomina.`,
         pulito(d.claim),
         pulito(d.sommario),
-        `Valida su: ${pulito(d.validoSu)}. ${d.scadenzaLabel}: ${d.scadenza
+        /* `validoSu` è una frase e finisce già col punto: aggiungerne un altro
+           dava «Smart e Premium.. Promo attivabile…», che è il genere di
+           sciatteria che un modello legge come due frasi. */
+        `Valida su: ${pulito(d.validoSu).replace(/\.$/, '')}. ${d.scadenzaLabel}: ${d.scadenza
           .toISOString()
           .slice(0, 10)}.`,
-        `Quota di attivazione barrata: ${d.quotaBarrata} €.`,
+        /* Che cosa regala, e come si ottiene. Erano una riga sola — «quota di
+           attivazione barrata: 50 €» — perché la promo era sempre quella:
+           adesso il regalo lo dichiara il documento, e le tre righe qui sotto
+           sono le tre cose che una persona deve sapere per averlo. Il codice
+           in particolare non si deduce da nessun'altra voce: senza, la chat
+           racconta un'offerta che nel portale non si applica. */
+        `Che cosa dà: ${pulito(d.vantaggio)}.`,
+        d.codice
+          ? `**Si ottiene incollando il codice promozionale \`${d.codice}\` sul portale**, nella registrazione, al passo «Ho un codice promozionale»: da lì il portale mostra gli abbonamenti della promozione già selezionati, e si completa l'iscrizione scegliendo la formula annuale e il giorno di inizio. Senza il codice la promozione non si applica. Il codice si copia da ${SITE}/promo.`
+          : '',
+        d.quotaOmaggio
+          ? `Con questa promozione **la quota di attivazione è in omaggio** sulle formule del perimetro qui sopra.`
+          : `**Questa promozione non riguarda la quota di attivazione**, che si paga come sempre: non dire che è in omaggio.`,
+        /* Quando nominarla. Sta nel dato e non nel prompt per la ragione
+           scritta in tutto questo file: una regola che il modello può ignorare
+           non è una regola, e una promozione che c'è e non viene detta è
+           un'offerta che il club paga e non incassa. */
+        `**Questa promozione è in corso: va nominata** quando si parla di abbonamenti per adulti, dei piani Smart o Premium, dei loro prezzi, o quando qualcuno chiede se ci sono promozioni, sconti o offerte. Si dice che cosa dà, entro quando, e che serve il codice promozionale.`,
+        blocchi(pulito(d.regaloTitolo), ...d.regalo.map(pulito), pulito(d.regaloNota)),
+        blocchi(pulito(d.servizioTitolo), pulito(d.servizioTesto)),
         blocchi(pulito(d.senzaAccountTitolo), pulito(d.senzaAccountTesto)),
         blocchi(pulito(d.conAccountTitolo), pulito(d.conAccountTesto)),
         blocchi(
@@ -522,7 +554,9 @@ export const GET: APIRoute = async () => {
         tipo: 'faq',
         titolo: f.q,
         url: `${SITE}/promo`,
-        area: 'Domande frequenti · Promozione',
+        /* Come per la voce madre: il perimetro nell'area, perché una f.a.q.
+           della promo pescata da sola non porta con sé il titolo di quella. */
+        area: 'Domande frequenti · Promozione (solo adulti)',
         attivita: [],
         testo: pulito(f.a),
       });
@@ -588,6 +622,22 @@ export const GET: APIRoute = async () => {
         /* E l'altro verso dello stesso errore: gli importi di un piano non sono
            quelli dell'altro. */
         `**Questi importi sono ${piano.id === 'smart' ? 'dello Smart' : 'del Premium'} e di nessun altro piano**: ${piano.id === 'smart' ? 'il Premium' : 'lo Smart'} ha i suoi, scritti nella sua voce. Non usare una cifra letta qui per rispondere sull'altro piano.`,
+        /* **La promozione in corso, dentro la voce del piano.**
+           La sua voce entra nel contesto per punteggio, quindi una domanda che
+           non nomina la parola «promozione» può non pescarla — e a quel punto
+           il club ha un'offerta attiva che l'assistente non dice. Qui invece
+           siamo nella voce che *qualunque* domanda su questo piano pesca, e la
+           riga porta con sé le tre cose che servono per nominarla: che cosa dà,
+           entro quando, e che serve il codice.
+
+           Il perimetro è quello delle formule **annuali di questo piano**: sul
+           Mensile Flex non si applica, e dirlo qui evita l'errore simmetrico —
+           una promozione promessa sulla formula che non ce l'ha. Sui corsi dei
+           bambini la riga non arriva affatto, perché questa è la voce di un
+           piano per adulti. */
+        promoAttiva
+          ? `**PROMOZIONE IN CORSO su questo piano** (${promoAttiva.scadenzaLabel.toLowerCase()}): ${pulito(promoAttiva.vantaggio).toLowerCase()} attivando una delle due **formule annuali** qui sopra${promoAttiva.codice ? `, incollando il codice promozionale \`${promoAttiva.codice}\` sul portale durante l'iscrizione` : ''}. Non si applica al Mensile Flex. Vale solo per gli abbonamenti degli adulti: sui corsi dei bambini no. I dettagli stanno nella voce della promozione, e il codice si copia da ${SITE}/promo.`
+          : '',
         /* La quota di attivazione sta accanto ai prezzi e non in una voce a
            parte, perché chi chiede quanto costa un abbonamento sta chiedendo
            anche questo: un mensile citato da solo è un preventivo incompleto,
@@ -598,8 +648,15 @@ export const GET: APIRoute = async () => {
              voce direbbe «50 €» a chi sta attivando un'annuale proprio nella
              settimana in cui non li paga. Si spegne da sé mettendo `draft` sul
              documento della promo, come per la pagina. */
-          (promoAttiva
+          (promoAttiva?.quotaOmaggio
             ? `\n**Ma con la promozione in corso la quota di attivazione è in omaggio sulle formule annuali di questo piano** (${promoAttiva.scadenzaLabel.toLowerCase()}): sull'annuale non si paga, sul Mensile Flex sì. Vale **solo** sugli abbonamenti annuali degli adulti, Smart e Premium: sui corsi dei bambini la quota si paga.`
+            : '') +
+          /* E quando il regalo è un altro, la quota **resta dovuta**: dirlo per
+             esteso, perché la promozione in corso è comunque nel contesto e da
+             «c'è una promozione» il modello ricompone volentieri l'omaggio che
+             c'era il mese prima. */
+          (promoAttiva && !promoAttiva.quotaOmaggio
+            ? `\n**La promozione in corso non tocca la quota di attivazione**, che si paga per intero anche sulle formule annuali: quello che dà è un'altra cosa — ${pulito(promoAttiva.vantaggio).toLowerCase()} — e sta scritta nella sua voce.`
             : '')
       ),
     });
@@ -640,9 +697,17 @@ export const GET: APIRoute = async () => {
       /* Come per le voci dei piani: con la promozione attiva la quota è in
          omaggio sulle annuali, e dirlo qui è il punto — questa è la voce che
          risponde alla domanda diretta. */
-      promoAttiva
+      promoAttiva?.quotaOmaggio
         ? `**Con la promozione in corso la quota è in omaggio, ma solo sugli abbonamenti annuali degli adulti** — Smart e Premium, ${promoAttiva.scadenzaLabel.toLowerCase()} (${pulito(promoAttiva.validoSu)}). Fuori da quelle due formule si paga: sul Mensile Flex degli adulti **e su tutti i corsi dei bambini**, Scuola Nuoto Bambini e Baby Nuoto compresi. A un genitore che iscrive un figlio la quota non è in omaggio, e dirglielo è un prezzo dichiarato più basso del vero.`
-        : ''
+        /* Questa voce la pesca anche un genitore — «quanto è la quota che si
+           paga all'iscrizione?» è la sua domanda tanto quanto quella di un
+           adulto — quindi la riga che nomina la promozione deve dire di chi è
+           **nella stessa frase**. È la spazzata del Guest Pass applicata qui:
+           non basta mettere il perimetro nella voce della promo, perché non è
+           l'unica voce che la racconta. */
+        : promoAttiva
+          ? `**La promozione in corso non è sulla quota**: la quota si paga, per tutti e su tutte le formule. Non c'è nessuna quota in omaggio in questo momento — è stata in omaggio in una promozione passata, e ripeterlo adesso è un prezzo dichiarato più basso del vero. Quello che la promozione dà (${pulito(promoAttiva.vantaggio).toLowerCase()}) vale **solo sugli abbonamenti annuali degli adulti**, ${pulito(promoAttiva.validoSu).replace(/^Valido su /, '').replace(/\.$/, '')}, e ha la sua voce: **a un genitore che chiede della quota per un corso di suo figlio non si nomina**, perché per lui non esiste.`
+          : ''
     ),
   });
 
@@ -672,7 +737,7 @@ export const GET: APIRoute = async () => {
       JUNIOR_MENSILE.voci.map((v) => `- ${v.nome}: **${v.prezzo} €/mese**`).join('\n'),
       `A questi si somma la **quota di attivazione di ${ATTIVAZIONE.quota} € una tantum**, per ogni abbonamento attivato: il secondo figlio la paga come il primo. E ${JUNIOR_MENSILE.proRata}.`,
       `**Gli sconti ci sono, e sono quelli della preiscrizione**, la finestra ${PREISCRIZIONE.finestra} in cui si sceglie il turno per la stagione successiva: li' si compra ${PREISCRIZIONE.su}, scontato del **${PREISCRIZIONE.sconto}%**. Fuori da quella finestra ${PREISCRIZIONE.su} non e' in vendita e **non c'e' nessuno sconto sui prezzi qui sopra**: non e' una promozione che va e viene, e' legata alla preiscrizione.`,
-      `E **le promozioni degli adulti non valgono qui**: hanno il perimetro scritto nella loro voce, che sono gli abbonamenti annuali Smart e Premium.`
+      `E **le promozioni degli adulti non valgono qui**: hanno il perimetro scritto nella loro voce, che sono gli abbonamenti annuali Smart e Premium. **Sui corsi dei bambini non c'è nessuna promozione in corso**, e non si rimanda al desk «per sapere se c'è»: quello che c'è è la finestra della preiscrizione scritta qui sopra.`
     ),
   });
 

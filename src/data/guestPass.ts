@@ -5,11 +5,18 @@
  * manda via email e WhatsApp a chi il codice ce l'ha già — e i due non devono
  * poter divergere il giorno in cui il portale cambia un passaggio.
  */
-import { PG } from './cta';
+import { REGISTRAZIONE_PORTALE } from './cta';
 import { GUEST_PASS } from './abbonamenti';
 
-/** Dove si incolla il codice: la registrazione del portale, non la home. */
-export const REGISTRAZIONE = `${PG}/#/Registration`;
+/**
+ * Dove si incolla il codice: la registrazione del portale, non la home.
+ *
+ * L'indirizzo è passato in `data/cta.ts` — da lì lo legge anche `/promo`, che
+ * col codice della promozione fa esattamente la stessa cosa. Il nome resta
+ * esportato da qui perché è così che lo chiamano il modal della prova e
+ * `/attiva`, e perché in quel contesto «la registrazione» è questa.
+ */
+export const REGISTRAZIONE = REGISTRAZIONE_PORTALE;
 
 /** I sei passi dell'attivazione, gli stessi dell'email e del WhatsApp che manda n8n. */
 export const PASSI_ATTIVAZIONE = [

@@ -9,6 +9,7 @@ import {
   NUMERO_TRAINER,
   NUMERO_TRAINER_PAROLA,
   NUMERO_TRAINER_PAROLA_CAP,
+  AREE_TRAINER_TESTO,
 } from '../data/trainer';
 /* Il dominio di produzione, per gli @id assoluti degli schemi. */
 const SITE = 'https://www.athlonroma.it';
@@ -73,7 +74,7 @@ const faqs = await faqPagina([
   },
   {
     q: 'Come scelgo il trainer giusto per me?',
-    a: 'Qui sopra trovi i sei profili con laurea, specializzazioni e servizi di ciascuno: scegli chi lavora su quello che ti interessa — postura, ipertrofia, dimagrimento, recupero post infortunio, gravidanza — e prenoti direttamente la sua disponibilità.',
+    a: `Qui sopra trovi i ${NUMERO_TRAINER_PAROLA} profili con laurea, specializzazioni e servizi di ciascuno: scegli chi lavora su quello che ti interessa — ${AREE_TRAINER_TESTO} — e prenoti direttamente la sua disponibilità.`,
   },
   'certificato',
   /* Il personal training è una lezione individuale, quindi la finestra di
@@ -95,7 +96,7 @@ const trust = [
   breadcrumb={[{ name: 'Personal Training', path: '/personal-training' }]}
   schema={[serviceSchema(SITE, {
     name: 'Personal Training',
-    description: `Allenamento individuale con ${NUMERO_TRAINER_PAROLA} trainer qualificati: postura, ipertrofia, dimagrimento, recupero funzionale, gravidanza e post parto.`,
+    description: `Allenamento individuale con ${NUMERO_TRAINER_PAROLA} trainer qualificati: ${AREE_TRAINER_TESTO}.`,
     path: '/personal-training',
     type: 'Allenamento individuale',
   })]}
@@ -111,8 +112,7 @@ const trust = [
       </h1>
       <p class="pt-hero__sub">
         Un'ora costruita sul tuo obiettivo. <strong>{NUMERO_TRAINER_PAROLA_CAP} trainer qualificati</strong>, ognuno con
-        le sue specializzazioni: postura, ipertrofia, dimagrimento, recupero funzionale post
-        infortunio, gravidanza e post parto.
+        le sue specializzazioni: {AREE_TRAINER_TESTO}.
       </p>
       <a href="#trainer" class="btn btn-primary pt-hero__cta" data-cta="explore">
         Conosci i nostri trainer →

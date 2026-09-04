@@ -173,8 +173,47 @@ const promo = defineCollection({
     /** Il momento in cui il conto alla rovescia arriva a zero. */
     scadenza: z.coerce.date(),
     scadenzaLabel: z.string(),
-    /** La quota di attivazione barrata, in euro e senza simbolo. */
-    quotaBarrata: z.string(),
+    /* Che cosa regala questa promozione, e perché è **un dato** e non una cosa
+       che il codice sa.
+
+       Per un anno la promo del mese è stata sempre la stessa — la quota di
+       attivazione in omaggio — e la pagina, il listino e il `kb.json` la
+       davano per quella: `quotaBarrata` era un numero nel CMS e tre punti del
+       sito ne deducevano «la quota non si paga». Il giorno che la promozione
+       è diventata un'altra cosa (due sedute di personal in omaggio, con la
+       quota che torna dovuta) quella deduzione è diventata **un prezzo
+       dichiarato più basso del vero** in tre posti insieme, che è il verso
+       sbagliato in cui sbagliare.
+
+       Quindi il vantaggio lo dichiara il documento, e chi lo nomina lo legge:
+       `vantaggio` è l'etichetta corta (la bio di `/link`), `quotaOmaggio` è la
+       sola cosa che accende la quota barrata sul listino e nella knowledge
+       base. La cifra barrata non sta qui: la prende da `ATTIVAZIONE.quota`,
+       dove il prezzo già vive. */
+    /** L'offerta in tre parole, per chi la nomina di passaggio. */
+    vantaggio: z.string(),
+    /** Vero solo se la promozione regala la quota di attivazione. */
+    quotaOmaggio: z.boolean().optional().default(false),
+    /* Il codice promozionale da incollare sul portale, come il Guest Pass su
+       `/attiva`. Vuoto è uno stato legittimo: una promo che si applica da sé
+       non ha niente da copiare, e il riquadro del codice non compare. */
+    codice: z.string().optional().default(''),
+    codiceNota: z.string().optional().default(''),
+    /* Il perché dell'offerta, in due o tre capoversi: è la parte che il club
+       scrive, e l'unica che dice a chi legge come mai gli si sta regalando
+       qualcosa. */
+    regaloTitolo: z.string(),
+    regalo: z.array(z.string()),
+    /** Il vincolo che chi accetta deve sapere prima: entro quando si usa. */
+    regaloNota: z.string(),
+    /* Due righe sul servizio che la promozione regala. Facoltativo, e **senza
+       un link**: questa è una landing, e un comando che porta via è un comando
+       che compete con l'iscrizione. Quello che la pagina aggiunge attorno a
+       queste due righe è un estratto letto dai dati del servizio — le aree, i
+       trainer — così i due racconti non divergono. Se la promo non regala un
+       servizio, i campi restano vuoti e la sezione non compare. */
+    servizioTitolo: z.string().optional().default(''),
+    servizioTesto: z.string().optional().default(''),
     foto: z.string(),
     /* Le due vie per arrivare all'abbonamento. Sono due perché il portale ne
        ha due davvero: chi non è registrato crea l'account dentro l'iscrizione,
