@@ -2611,6 +2611,25 @@ tabella. Il giorno che si vuole la cintura oltre alle bretelle, la mossa è
 togliere in quel nodo anche il **capoverso** che comincia per `PROMOZIONE IN
 CORSO` e quello della quota — non un altro id da ricordarsi.
 
+**E nel `systemMessage` la regola fissa dice cosa fare della voce**, che è la
+cosa che nessun dato può contenere: *se la voce c'è, nominarla non è
+facoltativo* — in una riga, dentro la risposta, a ogni domanda su un abbonamento
+degli adulti, anche quando la parola «promozione» non è stata scritta; *se non
+c'è, per quella persona la promozione non esiste* — non si nomina, non si
+inventa, e non si dice «chiedi al desk se c'è una promozione». È la stessa forma
+del cancello del Guest Pass, ed è la sola che tiene: la presenza della voce **è**
+il permesso e insieme il momento.
+
+Due cose che quella regola aggiunge, e sono le due che hanno morso:
+
+- **che cosa regala lo dice la voce, e non si deduce.** La regola prima si
+  chiamava «la promozione della quota di attivazione», cioè dava per categoria
+  quello che era vero di un solo caso: adesso dice che se la voce non scrive che
+  la quota è in omaggio, **la quota si paga**.
+- **il codice fa parte della risposta**, con **dove si incolla** — sul portale,
+  durante l'iscrizione. Una promozione raccontata senza il suo codice è
+  un'offerta che nel portale non si applica.
+
 ### Dove c'è un codice, la destinazione è generica
 
 I comandi delle formule portavano al `PaymentPlanId` del piano, ed è la strada
