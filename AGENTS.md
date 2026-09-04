@@ -2497,19 +2497,78 @@ abbonamento di una famiglia la paga come il primo. Detta in modo ambiguo, quella
 riga fa arrivare al desk un genitore con due figli convinto di dover pagare 50 €
 in tutto.
 
-**Con la promozione attiva la quota è in omaggio sulle annuali, e le voci lo
-dicono.** Il gate è lo stesso `promoDoc` che governa la pagina — la collezione
-filtrata su `!draft` — quindi si spegne da sé mettendo `draft: true` sul
-documento della promo. Senza quella riga la voce avrebbe detto «50 €» a chi
-stava attivando un'annuale nella settimana esatta in cui non li paga: il verso
-sbagliato in cui sbagliare, perché è un prezzo dichiarato più alto del vero.
+**La quota è in omaggio solo se è quello che la promozione regala**, e lo dice
+`quotaOmaggio` sul documento — non il fatto che una promozione esista. Il gate
+è lo stesso `promoDoc` che governa la pagina, quindi si spegne da sé mettendo
+`draft: true`; ma finché la promo del mese è stata sempre la stessa, quelle
+voci deducevano l'omaggio dalla sua **presenza**, e il mese in cui il regalo è
+diventato un altro avrebbero dichiarato zero una quota che si paga. La sezione
+qui sotto racconta com'è andata.
 
-**Il numero vive in tre posti, e due non sono evitabili.** `ATTIVAZIONE.quota` è
-la fonte; `quotaBarrata` in `promo.md` e la riga nella tabella di
-`preiscrizioni-nuoto.md` sono contenuti di Tina, che non possono importare
-TypeScript. Il giorno che la quota cambia vanno aggiornati tutti e tre — e la
-verifica è una spazzata sul `dist`: le occorrenze di «quota di attivazione» con
-una cifra devono dire tutte la stessa cifra.
+**Il numero vive in due posti, e il secondo non è evitabile.**
+`ATTIVAZIONE.quota` è la fonte; la riga nella tabella di
+`preiscrizioni-nuoto.md` è contenuto di Tina, che non può importare TypeScript.
+La terza copia — `quotaBarrata` nel documento della promo — **non c'è più**: la
+cifra barrata la prende il sito da `ATTIVAZIONE.quota`, e nel CMS resta solo
+l'interruttore. Il giorno che la quota cambia vanno aggiornati tutti e due — e
+la verifica è una spazzata sul `dist`: le occorrenze di «quota di attivazione»
+con una cifra devono dire tutte la stessa cifra.
+
+### Che cosa regala la promozione è un dato, non una cosa che il codice sa
+
+Per un anno la promo del mese è stata sempre la stessa — la quota di attivazione
+in omaggio — e tre punti del sito l'hanno data per quella: la landing
+(`quotaBarrata` barrata sulle schede), il listino di `/abbonamenti` (`promoDoc`
+&& formula annuale → «in omaggio») e **due voci del `kb.json`**, che sono quelle
+da cui la chat risponde a «quanto costa iscriversi». Nessuno dei tre chiedeva
+*che cosa* regalasse: bastava che un documento non-bozza esistesse.
+
+Settembre 2026 ha cambiato natura all'offerta — due sedute di personal training
+in omaggio, con la quota che torna dovuta — e quella deduzione è diventata **un
+prezzo dichiarato più basso del vero in tre posti insieme**, cioè quello che si
+scopre alla cassa. È la stessa forma di guasto delle due sospensioni e dei due
+orari, spostata dal contenuto allo **schema**: *un dato che vale per un solo
+caso, letto come se valesse per la categoria, è un dato da cui si compone un
+caso che non esiste.*
+
+Quindi il vantaggio adesso lo dichiara il documento, e chi lo nomina lo legge:
+
+- **`vantaggio`** è l'offerta in tre parole. La stampano le schede del listino e
+  la nota della voce di `/link`, che prima diceva «Quota di attivazione in
+  omaggio» **scritta a mano nel codice**. Sta in una riga sola su un telefono da
+  390px, quindi vale il tetto di `/link`: sotto i trentacinque caratteri.
+- **`quotaOmaggio`** è il solo interruttore che accende la quota barrata e la
+  riga «non si paga» nel `kb.json`. Spento, le stesse voci dicono l'opposto per
+  esteso — *la promozione in corso non tocca la quota* — perché la promo è
+  comunque nel contesto e da «c'è una promozione» il modello ricompone
+  volentieri l'omaggio del mese prima.
+- **`codice`** è il codice promozionale da incollare sul portale. Se c'è,
+  compare il riquadro per copiarlo e la voce del `kb.json` dice **dove** si
+  incolla: senza quella riga la chat racconterebbe un'offerta che nel portale
+  non si applica, che è il modo di perdere un'iscrizione dopo averla convinta.
+  Vuoto è uno stato legittimo — una promo che si applica da sé non ha niente da
+  copiare — e il riquadro non compare.
+- **`regalo`** e **`servizio*`** sono il perché e il che cos'è. Il perché è la
+  sola parte della pagina che dice come mai il club sta dando qualcosa, e un
+  regalo senza un perché si legge come una svendita; il «che cos'è» sono due
+  righe e un rimando, **senza numeri**, perché prezzi e trainer li stampa la
+  pagina di quel servizio.
+
+Due cose da sapere prima di toccarlo.
+
+**Il codice si copia con `data-copy-code`, e la meccanica sta in un posto solo.**
+`scripts/copiaCodice.ts`, condiviso fra `/promo` e `/attiva` — che sono le due
+**pagine** in cui un codice si copia. Erano la stessa funzione scritta due volte,
+e la seconda era nata copiando la prima: è il punto in cui una si sistema e
+l'altra no. Le altre due copie vivono dentro i bundle del modal della prova e
+della chat, dove il markup lo costruisce lo script, e restano là.
+
+**Il popup della promo ha un tetto suo, e alla scadenza va guardato.**
+`FINE_POPUP` in `PromoPopup.astro` è una data scritta a mano, scelta del club per
+la promozione di agosto: passata quella, il popup resta spento **anche con una
+promozione viva**, senza che niente lo segnali. Il verso è quello giusto — un
+popup che non compare è meno grave di uno che promette un'offerta finita — ma è
+la riga da rivedere insieme a `scadenza` ogni volta che la promo cambia.
 
 ### La fascia la decide l'anno, e l'anno noto non basta: va confermato
 

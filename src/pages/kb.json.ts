@@ -503,7 +503,21 @@ export const GET: APIRoute = async () => {
         `Valida su: ${pulito(d.validoSu)}. ${d.scadenzaLabel}: ${d.scadenza
           .toISOString()
           .slice(0, 10)}.`,
-        `Quota di attivazione barrata: ${d.quotaBarrata} €.`,
+        /* Che cosa regala, e come si ottiene. Erano una riga sola — «quota di
+           attivazione barrata: 50 €» — perché la promo era sempre quella:
+           adesso il regalo lo dichiara il documento, e le tre righe qui sotto
+           sono le tre cose che una persona deve sapere per averlo. Il codice
+           in particolare non si deduce da nessun'altra voce: senza, la chat
+           racconta un'offerta che nel portale non si applica. */
+        `Che cosa dà: ${pulito(d.vantaggio)}.`,
+        d.codice
+          ? `**Si ottiene incollando il codice promozionale \`${d.codice}\` sul portale**, al passo «Ho un codice promozionale», mentre si attiva l'abbonamento — prima di scegliere il giorno di inizio. Senza il codice la promozione non si applica.`
+          : '',
+        d.quotaOmaggio
+          ? `Con questa promozione **la quota di attivazione è in omaggio** sulle formule del perimetro qui sopra.`
+          : `**Questa promozione non riguarda la quota di attivazione**, che si paga come sempre: non dire che è in omaggio.`,
+        blocchi(pulito(d.regaloTitolo), ...d.regalo.map(pulito), pulito(d.regaloNota)),
+        blocchi(pulito(d.servizioTitolo), pulito(d.servizioTesto)),
         blocchi(pulito(d.senzaAccountTitolo), pulito(d.senzaAccountTesto)),
         blocchi(pulito(d.conAccountTitolo), pulito(d.conAccountTesto)),
         blocchi(
@@ -598,8 +612,15 @@ export const GET: APIRoute = async () => {
              voce direbbe «50 €» a chi sta attivando un'annuale proprio nella
              settimana in cui non li paga. Si spegne da sé mettendo `draft` sul
              documento della promo, come per la pagina. */
-          (promoAttiva
+          (promoAttiva?.quotaOmaggio
             ? `\n**Ma con la promozione in corso la quota di attivazione è in omaggio sulle formule annuali di questo piano** (${promoAttiva.scadenzaLabel.toLowerCase()}): sull'annuale non si paga, sul Mensile Flex sì. Vale **solo** sugli abbonamenti annuali degli adulti, Smart e Premium: sui corsi dei bambini la quota si paga.`
+            : '') +
+          /* E quando il regalo è un altro, la quota **resta dovuta**: dirlo per
+             esteso, perché la promozione in corso è comunque nel contesto e da
+             «c'è una promozione» il modello ricompone volentieri l'omaggio che
+             c'era il mese prima. */
+          (promoAttiva && !promoAttiva.quotaOmaggio
+            ? `\n**La promozione in corso non tocca la quota di attivazione**, che si paga per intero anche sulle formule annuali: quello che dà è un'altra cosa — ${pulito(promoAttiva.vantaggio).toLowerCase()} — e sta scritta nella sua voce.`
             : '')
       ),
     });
@@ -640,9 +661,11 @@ export const GET: APIRoute = async () => {
       /* Come per le voci dei piani: con la promozione attiva la quota è in
          omaggio sulle annuali, e dirlo qui è il punto — questa è la voce che
          risponde alla domanda diretta. */
-      promoAttiva
+      promoAttiva?.quotaOmaggio
         ? `**Con la promozione in corso la quota è in omaggio, ma solo sugli abbonamenti annuali degli adulti** — Smart e Premium, ${promoAttiva.scadenzaLabel.toLowerCase()} (${pulito(promoAttiva.validoSu)}). Fuori da quelle due formule si paga: sul Mensile Flex degli adulti **e su tutti i corsi dei bambini**, Scuola Nuoto Bambini e Baby Nuoto compresi. A un genitore che iscrive un figlio la quota non è in omaggio, e dirglielo è un prezzo dichiarato più basso del vero.`
-        : ''
+        : promoAttiva
+          ? `**La promozione in corso non è sulla quota**: la quota si paga, per tutti e su tutte le formule. La promozione dà ${pulito(promoAttiva.vantaggio).toLowerCase()} (${pulito(promoAttiva.validoSu)}) e ha la sua voce. Non c'è nessuna quota in omaggio in questo momento — è stata in omaggio in una promozione passata, e ripeterlo adesso è un prezzo dichiarato più basso del vero.`
+          : ''
     ),
   });
 

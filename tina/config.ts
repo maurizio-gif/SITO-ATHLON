@@ -597,7 +597,7 @@ export default defineConfig({
             type: 'string',
             name: 'claim',
             label: 'L’offerta in una riga',
-            description: 'Es. «Quota di attivazione in omaggio». È la frase arancione sotto il titolo.',
+            description: 'Es. «Due sedute di personal training in omaggio». È la frase arancione sotto il titolo.',
             required: true,
           },
           {
@@ -616,13 +616,80 @@ export default defineConfig({
             required: true,
           },
           { type: 'string', name: 'scadenzaLabel', label: 'Etichetta sopra il conto alla rovescia', required: true },
+          // Che cosa regala la promozione. Prima qui c'era solo la quota di
+          // attivazione barrata, perché la promo del mese era sempre quella: da
+          // quel numero la pagina, il listino e la knowledge base deducevano «la
+          // quota non si paga», e il mese in cui il regalo è diventato un altro
+          // avrebbero dichiarato zero una quota che si paga. Ora il vantaggio è
+          // un dato, e la cifra barrata la prende il sito da
+          // src/data/abbonamenti.ts — nel CMS i prezzi non ci sono.
           {
             type: 'string',
-            name: 'quotaBarrata',
-            label: 'Quota di attivazione barrata (solo il numero)',
-            description: 'Il prezzo che compare sbarrato sulle schede. Senza il simbolo €.',
+            name: 'vantaggio',
+            label: 'Il regalo in tre parole',
+            description:
+              'Es. «Due sedute di personal in omaggio». Compare sulle schede del listino e nella bio di /link: sta in una riga sola, quindi tienilo sotto i 35 caratteri.',
             required: true,
           },
+          {
+            type: 'boolean',
+            name: 'quotaOmaggio',
+            label: 'La promozione regala la quota di attivazione',
+            description:
+              'Accendilo solo se il regalo è la quota: è quello che fa comparire i 50 € barrati sul listino e che dice all’assistente in chat che la quota non si paga. Spento, la quota resta quella di listino.',
+          },
+          {
+            type: 'string',
+            name: 'codice',
+            label: 'Codice promozionale (facoltativo)',
+            description:
+              'Il codice da incollare sul portale, es. «RESTARTPT». Se lo metti, sulla pagina compare il riquadro per copiarlo e l’assistente in chat sa dirlo. Lascialo vuoto se la promo si applica da sé.',
+          },
+          {
+            type: 'string',
+            name: 'codiceNota',
+            label: 'Codice · riga sotto il riquadro',
+            description: 'Dove si incolla. Lasciala vuota e sotto il codice non compare niente.',
+            ui: { component: 'textarea' },
+          },
+
+          {
+            type: 'string',
+            name: 'regaloTitolo',
+            label: 'Perché lo facciamo · titolo',
+            required: true,
+          },
+          {
+            type: 'string',
+            name: 'regalo',
+            label: 'Perché lo facciamo · capoversi',
+            description: 'Il motivo dell’offerta. È la sola parte della pagina che dice come mai il club sta regalando qualcosa.',
+            list: true,
+            ui: { component: 'textarea' },
+            required: true,
+          },
+          {
+            type: 'string',
+            name: 'regaloNota',
+            label: 'Il vincolo del regalo (entro quando si usa)',
+            ui: { component: 'textarea' },
+            required: true,
+          },
+
+          // Due righe sul servizio regalato, con il rimando alla sua pagina.
+          // Senza numeri di proposito: prezzi e trainer li stampa la pagina di
+          // quel servizio, che è già l'unico posto in cui vivono.
+          { type: 'string', name: 'servizioTitolo', label: 'Il servizio regalato · titolo (facoltativo)' },
+          {
+            type: 'string',
+            name: 'servizioTesto',
+            label: 'Il servizio regalato · due righe',
+            description: 'Che cos’è, in breve. Niente prezzi: quelli stanno sulla pagina del servizio.',
+            ui: { component: 'textarea' },
+          },
+          { type: 'string', name: 'servizioLink', label: 'Il servizio regalato · indirizzo della pagina', description: 'Es. «/personal-training/», con lo slash finale.' },
+          { type: 'string', name: 'servizioLinkLabel', label: 'Il servizio regalato · testo del pulsante' },
+
           { type: 'image', name: 'foto', label: 'Foto di sfondo dell’apertura', required: true },
 
           {
@@ -655,7 +722,14 @@ export default defineConfig({
             description: 'Lasciala vuota e sopra i passaggi non compare niente.',
             ui: { component: 'textarea' },
           },
-          { type: 'string', name: 'procedura', label: 'Procedura · passaggi', list: true, required: true },
+          {
+            type: 'string',
+            name: 'procedura',
+            label: 'Procedura · passaggi',
+            description: 'Un passaggio per riga. Ammettono il grassetto HTML sui nomi dei pulsanti del portale: <strong>Ho un codice promozionale</strong>.',
+            list: true,
+            required: true,
+          },
           {
             type: 'string',
             name: 'proceduraNota',

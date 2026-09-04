@@ -15,9 +15,15 @@
  *    vivono. Un listino ricopiato in una landing diverge al primo ritocco, e
  *    qui il numero sbagliato è quello che una persona paga.
  *
- * La promozione, in concreto, è la quota di attivazione in omaggio: le schede
- * qui sotto sono le stesse della pagina abbonamenti, con i €50 barrati e il
- * link che porta dritto all'iscrizione del piano.
+ * **Che cosa regala la promozione è un dato del documento, non una cosa che
+ * questa pagina sa.** Per un anno è stata sempre la stessa — la quota di
+ * attivazione in omaggio — e la pagina la dava per quella: `quotaOmaggio` è
+ * adesso il solo interruttore che accende la quota barrata, `vantaggio` dice
+ * l'offerta in tre parole e `codice` il codice da incollare sul portale. Il
+ * giorno che la promo cambia natura non cambia il codice di tre file.
+ *
+ * Le schede qui sotto sono le stesse della pagina abbonamenti, con il link che
+ * porta dritto all'iscrizione del piano.
  */
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
@@ -25,7 +31,7 @@ import AttivitaModal from '../components/AttivitaModal.astro';
 import IscrizioneModal from '../components/IscrizioneModal.astro';
 import SpacesGallery from '../components/home/SpacesGallery.astro';
 import Faq from '../components/Faq.astro';
-import { plans } from '../data/abbonamenti';
+import { plans, ATTIVAZIONE } from '../data/abbonamenti';
 import BannerSospensione from '../components/BannerSospensione.astro';
 import { bands, countLessons, bandHours, totalLessons, totalHours, openHours, siContaAOre, gymFloor } from '../data/planning';
 import { talkCta } from '../data/cta';
@@ -111,9 +117,47 @@ const contatta = talkCta({ source: '/promo' });
         <p class="countdown__finita" hidden>La promozione è terminata. Gli abbonamenti restano attivi: <a href="/abbonamenti">vedi i piani →</a></p>
       </div>
 
+      {/* Il codice, sopra la piega e copiabile, come su `/attiva`.
+          L'offerta si sblocca incollandolo sul portale, quindi è la cosa
+          concreta che questa pagina consegna: lasciarlo solo dentro i
+          passaggi, in fondo alla pagina, vorrebbe dire farlo cercare.
+
+          Compare solo se il documento ne dichiara uno: una promozione che si
+          applica da sé non ha niente da copiare, e un riquadro vuoto che dice
+          «il tuo codice» è peggio di nessun riquadro. */}
+      {promo.codice && (
+        <div class="pr-codice" data-anim="scale" data-anim-delay="200">
+          <span class="pr-codice__pre">Il codice della promo</span>
+          <button type="button" class="pr-codice__btn u-display" data-copy-code={promo.codice}>
+            {promo.codice} · copia
+          </button>
+          {promo.codiceNota && <p class="pr-codice__nota">{promo.codiceNota}</p>}
+        </div>
+      )}
+
       <div class="pr-hero__actions" data-anim data-anim-delay="260">
         <a href="#piani" class="btn btn-primary">Vedi gli abbonamenti in promo →</a>
         <a href={contatta.href} class="btn btn-outline" {...contatta.attrs}>{contatta.label}</a>
+      </div>
+    </div>
+  </section>
+
+  {/* PERCHÉ — il motivo dell'offerta, prima della richiesta.
+      Chi arriva qui da una campagna legge un regalo, e un regalo senza un
+      perché si legge come una svendita. I capoversi li scrive il club: sono la
+      sola parte della pagina che dice come mai il club sta dando qualcosa. */}
+  <section class="pr-sec pr-sec--alt">
+    <div class="container pr-chi">
+      <div>
+        <span class="eyebrow" data-anim="from-left">{promo.claim}</span>
+        <h2 class="pr-sec__title" data-anim="reveal">{promo.regaloTitolo}</h2>
+      </div>
+      <div class="pr-chi__testi" data-anim data-anim-delay="90">
+        {promo.regalo.map((t) => <p class="pr-testo">{t}</p>)}
+        {/* Il vincolo sta accanto al regalo e non in una f.a.q.: «entro tre
+            mesi» è parte dell'offerta, e un'offerta raccontata senza il suo
+            limite è un'offerta che qualcuno scopre scaduta. */}
+        <p class="pr-regalo__nota">{promo.regaloNota}</p>
       </div>
     </div>
   </section>
@@ -123,9 +167,24 @@ const contatta = talkCta({ source: '/promo' });
     <div class="container">
       <span class="eyebrow" data-anim="from-left">{promo.validoSu}</span>
       <h2 class="pr-sec__title" data-anim="reveal">Attiva il tuo abbonamento</h2>
+      {/* Che cosa dire qui dipende da che cosa regala la promozione, e le due
+          frasi non sono intercambiabili: se il regalo è la quota, la quota non
+          si paga; se il regalo è altro, la quota si paga come sempre — e
+          tacerne sarebbe un prezzo dichiarato più basso del vero, cioè quello
+          che si scopre alla cassa. */}
       <p class="pr-sec__sub">
-        Lo sconto è già applicato: scegli la formula e prosegui sul portale. La quota di attivazione,
-        normalmente €{promo.quotaBarrata} una tantum, in promozione non si paga.
+        {promo.quotaOmaggio ? (
+          <Fragment>
+            Lo sconto è già applicato: scegli la formula e prosegui sul portale. La quota di
+            attivazione, normalmente €{ATTIVAZIONE.quota} una tantum, in promozione non si paga.
+          </Fragment>
+        ) : (
+          <Fragment>
+            Scegli la formula e prosegui sul portale: il codice della promo si incolla durante
+            l'attivazione. La quota di attivazione resta quella di listino, €{ATTIVAZIONE.quota} una
+            tantum, e comprende {ATTIVAZIONE.comprende}.
+          </Fragment>
+        )}
       </p>
 
       <div class="piani" id="formule">
@@ -169,11 +228,18 @@ const contatta = talkCta({ source: '/promo' });
 
                   {o.savings && <span class="formula__risparmio">{o.savings}</span>}
 
-                  {/* Il cuore della promo: la quota c'è, si vede, ed è barrata.
-                      Un «gratis» senza il prezzo accanto non dice quanto vale. */}
+                  {/* Il cuore della promo, su ogni formula a cui si applica.
+                      Con la quota in omaggio il prezzo c'è, si vede ed è
+                      barrato — un «gratis» senza il prezzo accanto non dice
+                      quanto vale; con un regalo di altra natura la cifra da
+                      barrare non esiste, e quello che si dice è il regalo più
+                      il codice che lo sblocca. */}
                   <p class="formula__omaggio">
-                    <s class="formula__omaggio-vecchio">€{promo.quotaBarrata}</s>
-                    <span class="formula__omaggio-nuovo">Attivazione in omaggio</span>
+                    {promo.quotaOmaggio && <s class="formula__omaggio-vecchio">€{ATTIVAZIONE.quota}</s>}
+                    <span class="formula__omaggio-nuovo">{promo.quotaOmaggio ? 'Attivazione in omaggio' : promo.vantaggio}</span>
+                    {!promo.quotaOmaggio && promo.codice && (
+                      <span class="formula__omaggio-codice">col codice {promo.codice}</span>
+                    )}
                   </p>
 
                   <p class="formula__nota">{o.note}</p>
@@ -207,10 +273,37 @@ const contatta = talkCta({ source: '/promo' });
     </div>
   </section>
 
+  {/* IL SERVIZIO REGALATO — due righe e un rimando, non un secondo racconto.
+      Chi legge «due sedute di personal in omaggio» e non sa cos'è il personal
+      training ad Athlon non sa cosa gli è stato regalato; chi lo sa non deve
+      leggere una pagina che esiste già. Niente numeri qui di proposito: prezzi
+      e trainer li stampa `/personal-training`, che è il posto dove vivono. */}
+  {promo.servizioTitolo && (
+    <section class="pr-sec pr-sec--dark">
+      <div class="container pr-servizio">
+        <div>
+          <span class="eyebrow" data-anim="from-left">Cosa ti stiamo regalando</span>
+          <h2 class="pr-sec__title" data-anim="reveal">{promo.servizioTitolo}</h2>
+          <p class="pr-sec__sub">{promo.servizioTesto}</p>
+        </div>
+        {promo.servizioLink && (
+          <a href={promo.servizioLink} class="btn btn-outline pr-servizio__cta" data-cta="explore">
+            {promo.servizioLinkLabel || 'Scopri di più'} →
+          </a>
+        )}
+      </div>
+    </section>
+  )}
+
   <!-- PROCEDURA -->
   <section class="pr-sec pr-sec--alt">
     <div class="container">
-      <span class="eyebrow" data-anim="from-left">Se hai già un account</span>
+      {/* L'occhiello diceva «Se hai già un account», ed era vero finché la
+          promozione si applicava da sé: i passaggi erano quelli di chi entra
+          nel portale. Con un codice da incollare la procedura è di tutti —
+          anche chi crea l'account lo incolla nello stesso punto — e dirla
+          riservata a metà delle persone la farebbe saltare all'altra metà. */}
+      <span class="eyebrow" data-anim="from-left">Sul portale</span>
       <h2 class="pr-sec__title" data-anim="reveal">{promo.proceduraTitolo}</h2>
       {promo.proceduraIntro && <p class="pr-sec__sub">{promo.proceduraIntro}</p>}
 
@@ -218,10 +311,22 @@ const contatta = talkCta({ source: '/promo' });
         {promo.procedura.map((p, i) => (
           <li class="passo" data-anim data-anim-delay={String(i * 60)}>
             <span class="passo__n u-display">{i + 1}</span>
-            <span class="passo__t">{p}</span>
+            {/* I passaggi ammettono il grassetto sui nomi dei pulsanti del
+                portale, come quelli di `/attiva`: «Ho un codice promozionale»
+                è un'etichetta da riconoscere a schermo, non una parola. */}
+            <span class="passo__t" set:html={p} />
           </li>
         ))}
       </ol>
+
+      {/* Il codice una seconda volta, qui dove si usa: chi è arrivato in fondo
+          alla pagina ha l'hero fuori schermo, e mandarlo a cercarlo in cima è
+          il punto in cui si apre un'altra scheda e non si torna. */}
+      {promo.codice && (
+        <button type="button" class="passi__codice u-display" data-copy-code={promo.codice}>
+          {promo.codice} · copia
+        </button>
+      )}
 
       <p class="passi__nota">{promo.proceduraNota}</p>
     </div>
@@ -340,6 +445,14 @@ const contatta = talkCta({ source: '/promo' });
       altre settantasette non hanno niente da intercettare. */}
   <IscrizioneModal />
 </Layout>
+
+<script>
+  /* Copia del codice: la meccanica sta in `scripts/copiaCodice.ts`, condivisa
+     con `/attiva`. Aggancia da sé i due pulsanti della pagina — quello
+     dell'hero e quello in fondo ai passaggi. */
+  import { montaCopiaCodice } from '../scripts/copiaCodice';
+  montaCopiaCodice();
+</script>
 
 <script>
   /* Il conto alla rovescia. Un solo intervallo, e si ferma da solo a zero:
@@ -988,6 +1101,118 @@ const contatta = talkCta({ source: '/promo' });
     margin-bottom: 0;
   }
 
+  /* ---- Il codice della promo ----
+     Stessa forma del riquadro di `/attiva`: bordo tratteggiato, arancione su
+     fondo scuro, e la conferma che ribalta i colori. Le due pagine sono le due
+     in cui un codice si copia, e vestirle diverse le farebbe leggere come due
+     meccanismi. */
+  .pr-codice {
+    margin-top: 28px;
+    padding: 20px 22px 18px;
+    max-width: 26rem;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.34);
+    border: 1px solid var(--border-dark);
+  }
+
+  .pr-codice__pre {
+    display: block;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.62);
+    margin-bottom: 12px;
+  }
+
+  .pr-codice__btn,
+  .passi__codice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 3.5rem;
+    border: 1px dashed var(--color-primary);
+    border-radius: 0.75rem;
+    background: rgba(255, 87, 1, 0.12);
+    color: var(--accent-text);
+    font-size: var(--text-lg);
+    --lh: 1;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
+  }
+
+  .pr-codice__btn {
+    color: var(--color-primary);
+  }
+
+  .pr-codice__btn:hover,
+  .passi__codice:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .pr-codice__btn.copied,
+  .passi__codice.copied {
+    background: var(--color-dark);
+    border-color: var(--color-dark);
+    color: var(--color-white);
+  }
+
+  .pr-codice__nota {
+    margin: 12px 0 0;
+    font-size: var(--text-2xs);
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  /* Il codice in fondo ai passaggi: non è il riquadro dell'hero, è il gesto
+     che serve mentre si leggono — quindi larghezza del passo e non della
+     pagina. */
+  .passi__codice {
+    max-width: 20rem;
+    margin: 18px 0 0;
+  }
+
+  /* ---- Il vincolo del regalo ---- */
+  .pr-regalo__nota {
+    margin: 18px 0 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: var(--text-sm);
+    color: var(--color-dark);
+    font-weight: 600;
+  }
+
+  /* ---- Il servizio regalato ---- */
+  .pr-servizio {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 24px 48px;
+  }
+
+  .pr-servizio > div {
+    max-width: 52ch;
+  }
+
+  .pr-servizio__cta {
+    flex: 0 0 auto;
+  }
+
+  /* Il codice nel prezzo di una scheda: minuscolo e accanto al regalo, perché
+     dice come si ottiene e non che cosa si ottiene. */
+  .formula__omaggio-codice {
+    flex-basis: 100%;
+    font-size: var(--text-2xs);
+    color: var(--text-muted);
+  }
+
+  .piano--premium .formula__omaggio-codice {
+    color: rgba(255, 255, 255, 0.55);
+  }
+
   /* + totem: vedi «Il totem verticale del club» in global.css */
   @media (max-width: 700px),
     (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10) {
@@ -997,6 +1222,14 @@ const contatta = talkCta({ source: '/promo' });
 
     .countdown__cifre {
       gap: 14px;
+    }
+
+    /* Il riquadro del codice prende la colonna intera: su un telefono e sul
+       totem non c'è nessuna larghezza da risparmiare, e un codice più grande è
+       un codice che si legge. */
+    .pr-codice,
+    .passi__codice {
+      max-width: none;
     }
   }
 </style>

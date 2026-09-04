@@ -95,11 +95,20 @@ const INDIRIZZO = `${CLUB.street}, ${CLUB.postalCode} ${CLUB.city}`;
  * resta scoperto è la promo che scade senza che nessuno tocchi niente, e lo
  * chiude il deploy successivo.
  */
-async function promoAttiva(): Promise<boolean> {
+type Promo = { vantaggio: string };
+
+/* Restituisce la promo **e** la sua etichetta, non un booleano: la nota della
+   voce diceva «Quota di attivazione in omaggio» scritta a mano, cioè una
+   promessa che valeva finché la promo era sempre quella. Adesso è il documento
+   a dire che cosa regala (`vantaggio`), e la bio lo ripete invece di indovinare
+   — una nota sbagliata in una bio è un'offerta inventata, che è la cosa che
+   questa condizione esiste per evitare. */
+async function promoAttiva(): Promise<Promo | null> {
   const voci = await getCollection('promo', ({ data }) => !data.draft);
   const promo = voci[0]?.data;
-  if (!promo) return false;
-  return promo.scadenza.getTime() > Date.now();
+  if (!promo) return null;
+  if (promo.scadenza.getTime() <= Date.now()) return null;
+  return { vantaggio: promo.vantaggio };
 }
 
 /**
@@ -128,7 +137,7 @@ export async function comandiLink(): Promise<VoceLink[]> {
           {
             id: 'promo',
             label: 'La promo del mese',
-            nota: 'Quota di attivazione in omaggio',
+            nota: promo.vantaggio,
             href: '/promo',
           },
         ]
