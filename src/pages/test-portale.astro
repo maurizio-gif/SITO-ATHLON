@@ -256,10 +256,32 @@ const SCENARI = [
     <div class="tpm" id="tp-modal" aria-hidden="true">
       <div class="tpm__fondo"></div>
       <div class="tpm__pannello" role="dialog" aria-modal="true" aria-labelledby="tpm-titolo">
-        {/* Una × e basta. Il titolo resta nel documento ma non a schermo:
-            un `role="dialog"` senza nome accessibile è un pannello che uno
-            screen reader annuncia come «finestra», e basta. */}
+        {/* A sinistra chi ospita, a destra come si esce. La striscia era vuota
+            con la sola × in fondo, e a schermo pieno una barra bianca senza
+            niente non dice dove si è: dentro c'è l'applicazione di un terzo,
+            e il pittogramma col nome è l'unica cosa in pagina che dichiari
+            che quella schermata è ancora del club.
+
+            **Non è il logo del portale che è stato tolto**, che stava *dentro*
+            l'iframe e ripeteva il marchio una terza volta spingendo giù il
+            contenuto: questa è la nostra cornice, alta quanto la × che c'era
+            già, e non sposta nulla.
+
+            Il titolo resta nel documento ma non a schermo: porta il nome dello
+            scenario, che è il nome accessibile del `dialog` e il posto dove va
+            il fuoco all'apertura — due cose che «Portale Athlon Club», uguale
+            per tutti e quattro, non potrebbe fare. */}
         <header class="tpm__barra">
+          <p class="tpm__marchio">
+            <img
+              class="tpm__pittogramma"
+              src="/wp-content/uploads/2025/08/Pittogramma.png"
+              alt=""
+              width="316"
+              height="256"
+            />
+            <span class="tpm__nome u-display">Portale Athlon Club</span>
+          </p>
           <p class="tpm__titolo" id="tpm-titolo" tabindex="-1" data-tpm-titolo>—</p>
           <button class="tpm__chiudi" type="button" data-tpm-chiudi aria-label="Chiudi">
             <span aria-hidden="true">×</span>
@@ -883,13 +905,47 @@ const SCENARI = [
   .tpm__barra {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 1rem;
     flex: 0 0 auto;
     padding: calc(0.75rem + env(safe-area-inset-top)) calc(1rem + env(safe-area-inset-right))
              0.75rem calc(1rem + env(safe-area-inset-left));
     background: var(--color-white);
     border-bottom: 1px solid var(--border);
+  }
+
+  /* Il marchio: un blocco solo, così il pittogramma e le parole non si
+     separano quando la barra si stringe. `min-width: 0` perché è il figlio
+     flessibile che deve poter cedere spazio — senza, su uno schermo da 360px
+     spingerebbe la × oltre il bordo invece di accorciarsi. */
+  .tpm__marchio {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-width: 0;
+    margin: 0;
+  }
+
+  /* Il pittogramma è più alto che largo: l'altezza la detta la riga di testo
+     accanto e la larghezza la trova da sé. In rem, come ogni misura che un
+     occhio legge: sul totem e sulla televisione cresce con la radice, e la
+     barra resta proporzionata alla × che le sta di fronte. */
+  .tpm__pittogramma {
+    flex: 0 0 auto;
+    height: 1.6rem;
+    width: auto;
+  }
+
+  /* Sul telefono lo stampatello con la crenatura piena della faccia display
+     arriva a toccare la ×: la misura è la stessa scelta per la pastiglia della
+     chat nella barra del sito, e la ragione è identica. */
+  .tpm__nome {
+    font-size: var(--text-sm);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* Il titolo esce dallo schermo ma non dall'albero: serve a nominare il
