@@ -1,19 +1,23 @@
 ---
 /**
- * Banco di prova dell'embed del Client Portal PerfectGym — quattro scenari.
+ * Banco di prova dell'embed del Client Portal PerfectGym.
  *
- * La domanda che questa pagina esisteva per rispondere ha una risposta, e sta
- * nelle intestazioni del portale:
+ * Quattro scenari, e **tutti e quattro a schermo pieno**: la pagina spiega e
+ * misura, il portale vive dentro un modal solo. Il perché sta scritto per
+ * esteso accanto a `.tpm`, e in una riga è questo: il portale è
+ * un'applicazione, non un riquadro, e un'applicazione dentro una finestra
+ * dentro una pagina che scorre è due scorrimenti sovrapposti — il punto in cui
+ * si perde chi sta comprando.
+ *
+ * ## Il fatto che decide tutto
  *
  *     content-security-policy: frame-ancestors 'self'
  *       https://athlonroma.it https://www.athlonroma.it
  *
- * Cioè **l'incorporamento è già autorizzato**, e solo da lì. Da qui discendono
- * le due cose da sapere prima di provarla:
+ * **L'incorporamento è già autorizzato**, e solo da lì. Quindi:
  *
  *  - **in locale e su un'anteprima Vercel il riquadro resta bianco**, sempre,
- *    e non è un difetto di questa pagina: `localhost` e
- *    `sito-athlon.vercel.app` non sono nell'elenco. La prova si fa su
+ *    e non è un difetto di questa pagina. La prova si fa su
  *    `www.athlonroma.it/test-portale/` e da nessun'altra parte. È la stessa
  *    forma di guasto della chiave CookieYes su un host che il fornitore non
  *    conosce — configurazione giusta, host sbagliato, sintomo muto.
@@ -21,40 +25,28 @@
  *    loro; se un giorno il sito vivesse altrove, l'embed smetterebbe di
  *    funzionare senza che nessun nostro codice sia cambiato.
  *
- * E la seconda cosa che la prova sul dominio vero ha detto: **l'altezza
- * automatica non funziona con questo portale.** Il riquadro connette, il
- * calendario si disegna, e iframe-resizer riporta 150px — non per un guasto:
- * il portale è un'applicazione che riempie la propria finestra e si scorre
- * dentro un contenitore suo, quindi il suo documento è alto 150px qualunque
- * cosa contenga. Non c'è warning da cercare, la risposta arriva ed è quella.
- * L'altezza la scrive il CSS, come un rapporto con un freno in `svh`: sta nel
- * blocco `.tp__riquadro`, in fondo.
+ * ## Le tre cose che la prova sul dominio vero ha insegnato
  *
- * I quattro scenari sono le quattro cose che si è chiesto di provare, e ognuno
- * risponde a una domanda diversa:
+ * **L'altezza automatica non funziona, e a scorrere dev'essere la scatola.**
+ * iframe-resizer scrive `scrolling="no"` sull'iframe perché il suo modello è
+ * l'opposto del nostro: l'iframe cresce fino a contenere tutto e a scorrere è
+ * quello che gli sta intorno. Imporgli `height: 100%` rompe quel contratto e
+ * il contenuto oltre il bordo diventa **irraggiungibile** — né rotella né
+ * dito. E non si rimedia da fuori: `overflow: auto !important` su un elemento
+ * sostituito resta `clip` nel valore calcolato, e togliere `scrolling` a
+ * caricamento avvenuto non cambia niente. Provate tutte e due.
  *
- *  1. **Calendario**, com'è se lo mettessimo in `/planning`.
- *  2. **Registrazione**, com'è dentro il flusso di `/abbonamenti` — e in due
- *     forme, perché i pulsanti del listino non puntano a `#/Registration` ma a
- *     `Registration/Start?clubID=1&PaymentPlanId=…`, che è una rotta del
- *     server e non uno stato dell'applicazione. Se la seconda non "connette",
- *     l'embed del piano preciso non si può fare e va saputo adesso.
- *  3. **Scadenze e pagamenti**, che è la procedura di
- *     `generali/prenotazioni-problemi` ridotta a un riquadro.
- *  4. **La sessione**: quello che il sito potrebbe *sapere* — se chi legge è
- *     dentro, chi è, e in che pagina del portale si trova. Oggi il sito lo
- *     deduce dal `memberType` che gli torna dalla verifica dell'email, che è
- *     un'altra domanda: «può fare login», non «ha fatto login adesso».
+ * **Le altezze dichiarate sono due mondi.** La registrazione dichiara 805px,
+ * il calendario 150 — quest'ultimo perché quella schermata riempie la propria
+ * finestra e si scorre dentro un contenitore suo. Una regola sola deve reggere
+ * tutti e due, ed è `flex: 1 0 auto`: parti dall'altezza che hai, cresci se
+ * avanza posto.
  *
- * Perché una pagina sola con le schede invece di quattro riquadri in fila, ed
- * è una misura e non un gusto: la libreria, al `load` dell'iframe, **fa
- * scorrere la finestra** fino al riquadro (`window.scroll` in `_createIframe`,
- * senza condizioni). Quattro riquadri in fila sono quattro istanze del portale
- * che si contendono lo scorrimento della pagina mentre arrivano. Uno alla
- * volta, montato al primo clic sulla scheda, toglie il problema e insieme
- * risparmia tre caricamenti che nessuno stava guardando.
+ * **Il grigio dietro l'iframe non è decorazione.** Le schede del portale sono
+ * bianche su fondo grigio, e quel fondo lo dipinge la pagina, non le schede:
+ * su bianco spariscono, e il modulo si legge come un elenco senza contorni.
  *
- * Le altre scelte, tutte con la loro ragione:
+ * ## Le scelte di questa pagina
  *
  *  - **due domini di terzi in più** (jsDelivr per le due librerie). La regola
  *    del progetto è che l'unico terzo dominio è GTM: qui l'eccezione è
@@ -71,8 +63,7 @@
  *    `window.PerfectGym` non esisterebbe ancora all'inizializzazione.
  *  - **niente `loadMask`**, di proposito: quella maschera è un elemento fisso
  *    attaccato al `body` e **condiviso fra tutte le istanze** della libreria —
- *    con più riquadri in pagina, quello che finisce di caricare per primo la
- *    toglie a tutti.
+ *    con più portali montati, quello che finisce per primo la toglie a tutti.
  *
  * Non è una pagina del club: `noindex`, fuori dalla sitemap, e va cancellata o
  * promossa a pagina vera quando la prova ha dato il suo esito.
@@ -97,15 +88,20 @@ const IFRAME_RESIZER = 'https://cdn.jsdelivr.net/npm/@iframe-resizer/parent@5.5.
 const CLIENT_PORTAL = 'https://cdn.jsdelivr.net/npm/@perfectgym/client-portal@1.13.3/dist/ClientPortal.min.js';
 const CLIENT_PORTAL_CSS = 'https://cdn.jsdelivr.net/npm/@perfectgym/client-portal@1.13.3/dist/ClientPortal.css';
 
+/* `barra` è quello che il modal scrive sopra il portale. Non è il titolo dello
+   scenario: è l'unica cosa che, dentro un percorso che non vestiamo noi, dice
+   alla persona dove si trova e che cosa sta facendo. */
 const SCENARI = [
   {
     id: 'calendario',
     scheda: 'Calendario',
+    barra: 'Prenota una lezione',
+    apri: 'Apri il calendario',
     titolo: 'Il calendario delle lezioni, come starebbe in /planning',
     domanda:
-      'Il terzo gradino della scala degli orari — chi tiene la lezione, quanti posti restano — oggi vive solo nel portale, e il sito può soltanto mandarci. Qui sta in pagina.',
+      'Il terzo gradino della scala degli orari — chi tiene la lezione, quanti posti restano — oggi vive solo nel portale, e il sito può soltanto mandarci.',
     note: [
-      'La barra di navigazione del portale è nascosta: dentro una nostra pagina sarebbe un secondo menu che compete con il nostro.',
+      'La barra di navigazione del portale è nascosta: dentro il nostro modal sarebbe un secondo menu che compete con la nostra intestazione.',
       '«Prenota» non compare a chi non ha fatto login. È il verso giusto: un pulsante che porta a una schermata di accesso è una promessa non mantenuta.',
       'Il palinsesto di /planning resta dov’è. Questo non lo sostituisce: quello si legge senza account e senza JavaScript, questo dice il dato vivo.',
     ],
@@ -113,50 +109,43 @@ const SCENARI = [
   {
     id: 'registrazione',
     scheda: 'Registrazione',
+    barra: 'Iscrizione',
+    apri: 'Apri l’iscrizione',
     titolo: 'La registrazione, come starebbe nel flusso di /abbonamenti',
     domanda:
-      'Oggi il pulsante «Iscriviti» porta fuori dal sito, dopo il controllo dell’email. Qui la registrazione resta in pagina — in due forme, perché sono due indirizzi diversi.',
+      'Oggi il pulsante «Iscriviti» porta fuori dal sito, dopo il controllo dell’email. Qui la registrazione resta nostra — in due forme, perché sono due indirizzi diversi.',
     note: [
+      'La forma «con il piano» è l’indirizzo vero dei pulsanti del listino e passa da forceUrl: arriva con l’abbonamento già scelto, e il primo passo del portale è un upsell di Personal Training.',
       'La forma «stato» è la registrazione generica, quella che la libreria sa raggiungere da sé. Non porta nessun piano: la persona lo sceglie dentro il portale.',
-      'La forma «con il piano» è l’indirizzo vero dei pulsanti del listino, e passa da forceUrl. È una rotta del server e non uno stato dell’applicazione: se la diagnostica non arriva a «risposta del portale», vuol dire che quella pagina non parla con la libreria — quindi niente altezza automatica e niente eventi, e l’embed del piano preciso non si può fare.',
       'Il campo email prova a passare l’indirizzo già verificato come parametro. Non è documentato: serve a vedere se il portale lo raccoglie o lo ignora.',
-      'Il registro qui sotto è la parte che serve a decidere: prova a percorrere la registrazione e guarda quali passi il sito riesce a vedere. Quello che compare lì è tutto e solo quello su cui si può contare per misurare dove le persone si fermano — il resto succede dentro il portale e resta invisibile.',
+      'Il registro qui sotto è la parte che serve a decidere: percorri la registrazione e guarda quali passi il sito riesce a vedere. Quello che compare lì è tutto e solo quello su cui si può contare — il resto succede dentro il portale e resta invisibile.',
     ],
   },
   {
     id: 'pagamenti',
     scheda: 'Scadenze',
+    barra: 'Scadenze e pagamenti',
+    apri: 'Apri le scadenze',
     titolo: 'Scadenze e pagamenti, cioè «your member is on financial debit»',
     domanda:
-      'Quel messaggio in rosso ha una soluzione che la persona fa da sola in trenta secondi, e oggi è una procedura in tre passi dentro un’altra applicazione. Qui è un riquadro.',
+      'Quel messaggio in rosso ha una soluzione che la persona fa da sola in trenta secondi, e oggi è una procedura in tre passi dentro un’altra applicazione.',
     note: [
       'Richiede il login: senza, il portale mostra la sua schermata di accesso. È il comportamento giusto — questi sono i dati di una persona.',
       'Il riquadro è la prova che lo stato esiste ed è raggiungibile, non una proposta di metterlo in una pagina pubblica: la sua casa naturale è una scheda dell’Help Desk, accanto alle sette cause di blocco.',
     ],
   },
   {
-    id: 'modal',
-    scheda: 'Modal',
-    titolo: 'La stessa registrazione, ma a schermo pieno',
-    domanda:
-      'Un modulo lungo dentro un riquadro basso dentro una pagina che scorre è due scorrimenti sovrapposti, ed è il punto in cui si perde chi sta comprando. A schermo pieno il modulo ha tutta l’altezza che c’è e la pagina sotto è ferma.',
-    note: [
-      'Il fondo non chiude, ed è la differenza che conta rispetto a ogni altro pannello del sito: quelli si chiudono toccando fuori perché il costo di riaprirli è nullo. Qui una chiusura per sbaglio butta una registrazione a metà.',
-      'Anche Escape smette di chiudere appena la registrazione è cominciata. Resta la ×, che è esplicita — e sull’uscita si conta quanti passi erano stati fatti: un abbandono al pagamento e un abbandono al primo campo sono due problemi diversi.',
-      'Nessun bordo, nessun angolo arrotondato, nessun ritaglio: sotto la barra il portale ha tutto lo schermo. Su un telefono è la differenza fra un modulo e una fessura.',
-      'La barra sopra resta nostra e dice il piano scelto. È l’unico posto in cui, dentro un percorso che non vestiamo noi, si può ancora dire alla persona che cosa sta comprando.',
-    ],
-  },
-  {
     id: 'sessione',
     scheda: 'Sessione',
+    barra: 'Accedi al portale',
+    apri: 'Apri l’accesso',
     titolo: 'Quello che il sito potrebbe sapere di chi sta leggendo',
     domanda:
-      'Questo è il punto 4. Il portale, incorporato, parla con la pagina: dice quando qualcuno entra, chi è, e in che schermata si trova. Il sito oggi non ha nessuna di queste tre informazioni.',
+      'Il portale, incorporato, parla con la pagina: dice quando qualcuno entra, chi è, e in che schermata si trova. Il sito oggi non ha nessuna di queste tre informazioni.',
     note: [
-      'La differenza con quello che il sito sa già: haGiaAccount() risponde a «può fare login», dedotto dal memberType che torna dalla verifica dell’email. Questo risponde a «ha fatto login adesso», che è un’altra domanda e apre altre risposte — salutare per nome, saltare il passo dell’email, non offrire il Guest Pass a chi è dentro.',
-      'Il riquadro parte dalla schermata di accesso apposta: fai login e guarda il registro qui sotto riempirsi da sé.',
-      'E il prezzo, che va detto: sapere questo costa avere il portale caricato in pagina. Su una pagina qualsiasi sarebbe un iframe di terzi montato per una comodità — quindi vale dove la persona sta già facendo qualcosa nel portale, non dappertutto.',
+      'La differenza con quello che il sito sa già: haGiaAccount() risponde a «può fare login», dedotto dal memberType che torna dalla verifica dell’email. Questo risponde a «ha fatto login adesso», e apre altre risposte — salutare per nome, saltare il passo dell’email, non offrire il Guest Pass a chi è dentro.',
+      'Fai login nel modal e guarda il registro qui sotto riempirsi da sé. I comandi provano goTo(), isUserLoggedIn() e logout() dalla pagina.',
+      'E il prezzo, che va detto: sapere questo costa avere il portale caricato. Vale dove la persona sta già facendo qualcosa nel portale, non dappertutto.',
     ],
   },
 ];
@@ -174,14 +163,14 @@ const SCENARI = [
       <p class="tp__eyebrow">Pagina di prova</p>
       <h1 class="tp__titolo">Il portale PerfectGym dentro il sito</h1>
       <p class="tp__testo">
-        Quattro modi di incorporare il Client Portal, uno per scheda. Ogni riquadro è il
-        portale vero, non una simulazione: quello che si vede qui è quello che vedrebbe
-        una persona nella pagina in cui lo mettessimo.
+        Quattro modi di incorporare il Client Portal, uno per scheda. Ogni scenario apre
+        il portale vero a schermo pieno: quello che si vede è quello che vedrebbe una
+        persona nella pagina in cui lo mettessimo.
       </p>
       <p class="tp__testo tp__testo--avviso">
         <strong>Funziona solo su <code>www.athlonroma.it</code>.</strong> PerfectGym
         autorizza l’incorporamento a due indirizzi soli, e in locale o su un’anteprima il
-        riquadro resta bianco senza dare errore. Se stai leggendo questa pagina altrove,
+        pannello resta bianco senza dare errore. Se stai leggendo questa pagina altrove,
         la diagnostica te lo dirà.
       </p>
     </div>
@@ -218,88 +207,72 @@ const SCENARI = [
           {s.note.map((n) => <li>{n}</li>)}
         </ul>
 
-        {s.id === 'registrazione' && (
-          <div class="tp__comandi">
-            <label class="tp__campo">
-              <span>Indirizzo</span>
-              <select class="tp__select" id="reg-forma">
-                <option value="stato">Registrazione generica (stato #/Registration)</option>
-                <option value="piano">{PIANO_PROVA.etichetta} (forceUrl)</option>
-              </select>
-            </label>
-            <label class="tp__campo">
-              <span>Email da passare</span>
-              <input class="tp__input" id="reg-email" type="email" placeholder="mario@esempio.it" autocomplete="off" />
-            </label>
-            <button class="tp__btn" type="button" id="reg-ricarica">Ricarica il riquadro</button>
-          </div>
-        )}
+        <div class="tp__comandi">
+          {s.id === 'registrazione' && (
+            <>
+              <label class="tp__campo">
+                <span>Indirizzo</span>
+                <select class="tp__select" id="reg-forma">
+                  <option value="piano">{PIANO_PROVA.etichetta}</option>
+                  <option value="stato">Registrazione generica</option>
+                </select>
+              </label>
+              <label class="tp__campo">
+                <span>Email da passare</span>
+                <input class="tp__input" id="reg-email" type="email" placeholder="mario@esempio.it" autocomplete="off" />
+              </label>
+            </>
+          )}
 
-        {s.id === 'modal' && (
-          <div class="tp__comandi">
-            <label class="tp__campo">
-              <span>Indirizzo</span>
-              <select class="tp__select" id="mod-forma">
-                <option value="piano">{PIANO_PROVA.etichetta} (forceUrl)</option>
-                <option value="stato">Registrazione generica (stato #/Registration)</option>
-              </select>
-            </label>
-            <button class="tp__btn" type="button" id="mod-apri">Apri a schermo pieno</button>
-          </div>
-        )}
+          <button class="tp__btn" type="button" data-apri={s.id}>{s.apri}</button>
 
-        {s.id === 'sessione' && (
-          <div class="tp__comandi">
-            <button class="tp__btn" type="button" data-sess="chiedi">Chi è loggato?</button>
-            <button class="tp__btn" type="button" data-sess="calendario">Vai al calendario</button>
-            <button class="tp__btn" type="button" data-sess="scadenze">Vai alle scadenze</button>
-            <button class="tp__btn tp__btn--vuoto" type="button" data-sess="logout">Esci</button>
-          </div>
-        )}
+          {s.id === 'sessione' && (
+            <>
+              <button class="tp__btn tp__btn--vuoto" type="button" data-sess="chiedi">Chi è loggato?</button>
+              <button class="tp__btn tp__btn--vuoto" type="button" data-sess="calendario">Vai al calendario</button>
+              <button class="tp__btn tp__btn--vuoto" type="button" data-sess="logout">Esci</button>
+            </>
+          )}
+        </div>
 
-        {/* La diagnostica sta **prima** del riquadro di proposito: quando la
-            prova fallisce, il riquadro è vuoto e chi guarda deve trovare la
-            spiegazione senza scorrere sotto un vuoto alto mille pixel. */}
+        {/* La diagnostica sta in pagina e non nel modal: quando la prova
+            fallisce il pannello è bianco, e la spiegazione dev'essere dove si
+            torna a guardare — non dentro la cosa che non ha funzionato. */}
         <div class="tp__diag" data-diag={s.id} data-stato="attesa">
           <p class="tp__diag-riga"><span class="tp__spia" data-spia="script">…</span> Librerie da jsDelivr</p>
           <p class="tp__diag-riga"><span class="tp__spia" data-spia="init">…</span> Inizializzazione</p>
           <p class="tp__diag-riga"><span class="tp__spia" data-spia="connect">…</span> Risposta del portale</p>
-          <p class="tp__diag-esito" data-esito>In attesa…</p>
+          <p class="tp__diag-esito" data-esito>Non ancora aperto.</p>
         </div>
 
-        {(s.id === 'sessione' || s.id === 'registrazione' || s.id === 'modal') && (
-          <pre class="tp__registro" data-registro={s.id}>Il registro degli eventi compare qui.</pre>
-        )}
-
-        {s.id !== 'modal' && (
-          <div class="tp__riquadro">
-            <div data-monta={s.id}></div>
-          </div>
-        )}
+        <pre class="tp__registro" data-registro={s.id}>Il registro degli eventi compare qui.</pre>
       </section>
     ))}
 
-    {/* L'overlay sta fuori dai pannelli e dentro `<main>`: dentro un pannello
-        sparirebbe con lui al cambio di scheda, portandosi via una
-        registrazione aperta. */}
+    {/* Un modal solo per tutti e quattro, e i quattro punti di montaggio
+        vivono dentro di lui: così una registrazione cominciata sopravvive alla
+        chiusura e al cambio di scheda — la libreria non ha un `destroy`,
+        quindi ogni montaggio è un portale nuovo che riparte da capo. */}
     <div class="tpm" id="tp-modal" aria-hidden="true">
       <div class="tpm__fondo"></div>
       <div class="tpm__pannello" role="dialog" aria-modal="true" aria-labelledby="tpm-titolo">
         <header class="tpm__barra">
-          <div>
-            <p class="tpm__eyebrow">Iscrizione</p>
-            <p class="tpm__piano" id="tpm-titolo" tabindex="-1" data-tpm-piano>—</p>
+          <div class="tpm__testa">
+            <p class="tpm__eyebrow">Athlon Club</p>
+            <p class="tpm__titolo" id="tpm-titolo" tabindex="-1" data-tpm-titolo>—</p>
           </div>
-          <button class="tpm__chiudi" type="button" data-tpm-chiudi aria-label="Chiudi l’iscrizione">×</button>
+          <button class="tpm__chiudi" type="button" data-tpm-chiudi aria-label="Chiudi">
+            <span aria-hidden="true">×</span>
+          </button>
         </header>
         <div class="tpm__box">
-          <div data-monta="modal"></div>
+          {SCENARI.map((s) => <div data-monta={s.id} hidden></div>)}
         </div>
       </div>
     </div>
 
     <p class="tp__nota">
-      Se un riquadro resta vuoto, il portale è comunque raggiungibile fuori dal sito:
+      Se un pannello resta vuoto, il portale è comunque raggiungibile fuori dal sito:
       <a class="tp__link" href={`${URL_PORTALE}#/Classes`} target="_blank" rel="noopener">
         apri PerfectGym in una scheda nuova
       </a>
@@ -312,14 +285,21 @@ const SCENARI = [
 <script is:inline src={IFRAME_RESIZER} data-tp="resizer"></script>
 <script is:inline src={CLIENT_PORTAL} data-tp="portale"></script>
 
-<script is:inline define:vars={{ URL_PORTALE, PIANO_PROVA }}>
+<script is:inline define:vars={{ URL_PORTALE, PIANO_PROVA, SCENARI }}>
   (function () {
     var PGL = window.PerfectGym && window.PerfectGym.ClientPortal;
+    var mod = document.getElementById('tp-modal');
     var montati = {};
+    /** Quanti movimenti ha fatto ogni scenario: dice se Escape può chiudere. */
+    var passi = {};
+    /** Con quale variante è stato montato, per sapere se va rifatto. */
+    var variante = {};
+    var attivo = '';
 
-    function diag(id) {
-      return document.querySelector('[data-diag="' + id + '"]');
-    }
+    var testi = {};
+    SCENARI.forEach(function (s) { testi[s.id] = s.barra; });
+
+    function diag(id) { return document.querySelector('[data-diag="' + id + '"]'); }
 
     function segna(id, nome, ok) {
       var e = diag(id) && diag(id).querySelector('[data-spia="' + nome + '"]');
@@ -328,7 +308,7 @@ const SCENARI = [
       e.className = 'tp__spia ' + (ok ? 'tp__spia--si' : 'tp__spia--no');
     }
 
-    function chiudi(id, ok, testo) {
+    function chiudiDiag(id, ok, testo) {
       var d = diag(id);
       if (!d) return;
       d.dataset.stato = ok ? 'ok' : 'ko';
@@ -338,26 +318,31 @@ const SCENARI = [
     function registra(id, riga) {
       var pre = document.querySelector('[data-registro="' + id + '"]');
       if (!pre) return;
-      if (pre.dataset.usato !== '1') {
-        pre.textContent = '';
-        pre.dataset.usato = '1';
-      }
-      var ora = new Date().toLocaleTimeString('it-IT');
-      pre.textContent += ora + '  ' + riga + '\n';
+      if (pre.dataset.usato !== '1') { pre.textContent = ''; pre.dataset.usato = '1'; }
+      pre.textContent += new Date().toLocaleTimeString('it-IT') + '  ' + riga + '\n';
       pre.scrollTop = pre.scrollHeight;
     }
 
-    /* Le opzioni comuni a tutti e quattro, e le due che non sono ovvie:
-       `topOffset` tiene conto dell'intestazione appiccicosa, o lo scorrimento
-       automatico della libreria porta il riquadro sotto la barra; `minHeight`
-       viaggia fino al portale ma non decide niente, perché qui l'altezza la
-       detta il CSS — vedi il blocco `.tp__riquadro`, dove sta il perché. */
-    function base(extra) {
+    /* Le opzioni comuni. `topOffset` non serve più — il modal è fisso e la
+       pagina è bloccata — ma `minHeight` sì: viaggia fino al portale e gli dice
+       di non ripiegare su una schermata da telefono dentro uno spazio alto. */
+    function base(id, extra) {
       var o = {
         url: URL_PORTALE,
         language: 'it',
-        topOffset: 96,
-        minHeight: 700,
+        minHeight: 600,
+        enableVirtualStates: true,
+        navigation: { hide: true },
+        loginPage: { navbar: false, logo: false },
+        registration: { logo: false },
+        onStateChangeSuccess: function (st) {
+          passi[id] = (passi[id] || 0) + 1;
+          var nome = st && st.toState && st.toState.name;
+          if (nome && typeof nome !== 'string') nome = JSON.stringify(nome);
+          registra(id, 'PASSO ' + passi[id] + '  ' + (nome || '?') + '   ' + JSON.stringify(st));
+        },
+        onUserLoggedIn: function (info) { registra(id, 'ENTRATO  ' + JSON.stringify(info)); },
+        onUserLoggedOut: function (info) { registra(id, 'USCITO   ' + JSON.stringify(info)); },
       };
       for (var k in extra) o[k] = extra[k];
       return o;
@@ -370,11 +355,10 @@ const SCENARI = [
       /* Primo bivio: le librerie sono arrivate? Se no, la causa non è
          PerfectGym — è la rete, un blocco pubblicitario, o CookieYes che tiene
          fermi gli script di terzi finché non c'è il consenso. Sono guasti
-         diversi con lo stesso sintomo, e distinguerli è metà del lavoro di
-         questa pagina. */
+         diversi con lo stesso sintomo, e distinguerli è metà del lavoro. */
       if (!PGL) {
         segna(id, 'script', false);
-        chiudi(id, false,
+        chiudiDiag(id, false,
           'Le librerie non sono state caricate. Cause tipiche: blocco degli script di terzi ' +
           '(CookieYes o un ad blocker), oppure jsDelivr irraggiungibile. Non è ancora una ' +
           'risposta su PerfectGym.');
@@ -382,179 +366,83 @@ const SCENARI = [
       }
       segna(id, 'script', true);
 
-      /* Rimontare vuol dire buttare l'iframe di prima: la libreria non ha un
-         `destroy`, e senza questo il riquadro della registrazione accumulerebbe
-         un portale a ogni ricarica. */
+      /* Rimontare vuol dire buttare il portale di prima: la libreria non ha un
+         `destroy`, e senza questo ogni riapertura ne aggiungerebbe uno. */
       posto.innerHTML = '';
       posto.className = '';
+      passi[id] = 0;
 
       var connesso = false;
-      var istanza;
       try {
-        istanza = new PGL(posto, base(Object.assign({
+        montati[id] = new PGL(posto, base(id, Object.assign({
           onConnect: function () {
             connesso = true;
             segna(id, 'connect', true);
-            chiudi(id, true, 'Il portale risponde: l’incorporamento è permesso da questo dominio.');
+            chiudiDiag(id, true, 'Il portale risponde: l’incorporamento è permesso da questo dominio.');
           },
         }, opzioni)));
         segna(id, 'init', true);
       } catch (e) {
         segna(id, 'init', false);
-        chiudi(id, false, 'La libreria ha sollevato un errore in inizializzazione: ' + e.message);
+        chiudiDiag(id, false, 'La libreria ha sollevato un errore in inizializzazione: ' + e.message);
         return;
       }
 
-      montati[id] = istanza;
-
       /* Il caso che conta, e il solo che il browser non segnala: un iframe
-         rifiutato da `frame-ancestors` resta bianco e muto. Dieci secondi sono
-         larghi per una rete normale e stretti abbastanza da non far dubitare
-         chi guarda. */
+         rifiutato da `frame-ancestors` resta bianco e muto. */
       setTimeout(function () {
         if (connesso) return;
         segna(id, 'connect', false);
-        chiudi(id, false,
-          'Il portale non ha risposto entro dieci secondi. Se il riquadro è bianco, guarda la ' +
+        chiudiDiag(id, false,
+          'Il portale non ha risposto entro dieci secondi. Se il pannello è bianco, guarda la ' +
           'console: «Refused to display … in a frame» vuol dire che questo indirizzo non è fra ' +
           'quelli autorizzati (frame-ancestors) — succede sempre in locale e sulle anteprime.');
       }, 10000);
-
-      return istanza;
     }
 
-    /* ---- I quattro scenari ------------------------------------------ */
+    /* ---- Cosa monta ogni scenario ----------------------------------- */
 
-    function montaCalendario() {
-      if (montati.calendario) return;
-      monta('calendario', {
-        defaultState: PGL.State.Classes,
-        navigation: { hide: true },
-        calendarPage: { hideBookingIfNotLogged: true },
-        minHeight: 900,
-      });
-    }
+    function opzioniDi(id) {
+      if (id === 'calendario') {
+        return { v: 'x', o: { defaultState: PGL.State.Classes, calendarPage: { hideBookingIfNotLogged: true } } };
+      }
+      if (id === 'pagamenti') return { v: 'x', o: { defaultState: PGL.State.ProfilePayments } };
+      if (id === 'sessione') return { v: 'x', o: { defaultState: PGL.State.Login } };
 
-    function montaRegistrazione() {
       var forma = document.getElementById('reg-forma');
       var email = document.getElementById('reg-email');
-      var v = forma ? forma.value : 'stato';
-      var params = {};
-      if (email && email.value) params.email = email.value;
-
-      /* Le spie della registrazione, che sono il motivo per cui questo
-         riquadro esiste: `enableVirtualStates` è la sola riga che fa vedere i
-         **passi interni** del percorso. Senza, la libreria scarta gli stati
-         marcati `isVirtual` (`if (!o.enableVirtualStates && i.isVirtual)
-         break;` dentro `recieveMsg`) — e i passi di una procedura guidata sono
-         esattamente quelli. È la differenza fra sapere «è entrato nella
-         registrazione» e sapere «si è fermato al passo del pagamento». */
-      var spie = {
-        enableVirtualStates: true,
-        navigation: { hide: true },
-        registration: { logo: false },
-        onStateChangeSuccess: function (st) {
-          var nome = st && st.toState && st.toState.name;
-          registra('registrazione', 'PASSO  ' + (nome || '?') + '   ' + JSON.stringify(st));
-        },
-        onUserLoggedIn: function (info) {
-          registra('registrazione', 'ENTRATO  ' + JSON.stringify(info));
-        },
-        onShowModal: function () { registra('registrazione', 'MODALE aperta'); },
-      };
-
+      var v = forma ? forma.value : 'piano';
+      var chiave = v + '|' + (email ? email.value : '');
       if (v === 'piano') {
         var u = PIANO_PROVA.url;
         if (email && email.value) u += '&email=' + encodeURIComponent(email.value);
-        spie.forceUrl = u;
-        monta('registrazione', spie);
+        return { v: chiave, o: { forceUrl: u } };
+      }
+      var params = {};
+      if (email && email.value) params.email = email.value;
+      return { v: chiave, o: { defaultState: PGL.State.Registration, defaultStateParams: params } };
+    }
+
+    /* ---- Aprire e chiudere ------------------------------------------ */
+
+    function apriModal(id) {
+      attivo = id;
+      var t = mod.querySelector('[data-tpm-titolo]');
+      if (t) t.textContent = testi[id] || '';
+
+      document.querySelectorAll('[data-monta]').forEach(function (p) {
+        p.hidden = p.dataset.monta !== id;
+      });
+
+      var scelta = opzioniDi(id);
+      if (!montati[id] || variante[id] !== scelta.v) {
+        variante[id] = scelta.v;
+        monta(id, scelta.o);
       } else {
-        spie.defaultState = PGL.State.Registration;
-        spie.defaultStateParams = params;
-        monta('registrazione', spie);
+        /* Tornato visibile, l'iframe va rimisurato: mentre stava sotto
+           `hidden` la libreria ha continuato a non vederlo. */
+        window.dispatchEvent(new Event('resize'));
       }
-    }
-
-    function montaPagamenti() {
-      if (montati.pagamenti) return;
-      monta('pagamenti', {
-        defaultState: PGL.State.ProfilePayments,
-        navigation: { hide: true },
-        loginPage: { navbar: false, logo: false },
-      });
-    }
-
-    function montaSessione() {
-      if (montati.sessione) return;
-      monta('sessione', {
-        defaultState: PGL.State.Login,
-        navigation: { hide: true },
-        loginPage: { navbar: false, logo: false },
-        onUserLoggedIn: function (info) {
-          registra('sessione', 'ENTRATO  ' + JSON.stringify(info));
-        },
-        onUserLoggedOut: function (info) {
-          registra('sessione', 'USCITO   ' + JSON.stringify(info));
-        },
-        onStateChangeSuccess: function (stato) {
-          registra('sessione', 'SCHERMATA  ' + JSON.stringify(stato));
-        },
-      });
-    }
-
-    /* Lo scenario a schermo pieno: il portale non si monta all'apertura della
-       scheda ma all'apertura del pannello, perché è quello il gesto — e perché
-       un iframe montato dentro un overlay invisibile è un caricamento che
-       nessuno sta guardando.
-
-       `avviato` conta i passi visti: serve a due cose, e sono la ragione per
-       cui questo scenario esiste. Decide se Escape può chiudere, e dice a
-       quale punto del percorso una persona ha rinunciato. */
-    var mod = document.getElementById('tp-modal');
-    var avviato = 0;
-    var pianoAperto = '';
-
-    function montaModal() {
-      var forma = document.getElementById('mod-forma');
-      var v = forma ? forma.value : 'piano';
-      avviato = 0;
-      var spie = {
-        enableVirtualStates: true,
-        navigation: { hide: true },
-        registration: { logo: false },
-        onStateChangeSuccess: function (st) {
-          avviato++;
-          /* **`toState.name` non è sempre una stringa**, e questa riga viene da
-             una prova: il primo evento dice `Registration`, il secondo — il
-             primo passo interno della procedura — porta un oggetto, e
-             concatenarlo dava `[object Object]` nel registro. È il dato da cui
-             dipende tutto il funnel, quindi si stampa intero invece di
-             indovinarne la forma. */
-          var nome = st && st.toState && st.toState.name;
-          if (nome && typeof nome !== 'string') nome = JSON.stringify(nome);
-          registra('modal', 'PASSO ' + avviato + '  ' + (nome || '?') + '   ' + JSON.stringify(st));
-        },
-        onUserLoggedIn: function (info) {
-          registra('modal', 'ACCOUNT CREATO  ' + JSON.stringify(info));
-        },
-      };
-      if (v === 'piano') spie.forceUrl = PIANO_PROVA.url;
-      else spie.defaultState = PGL.State.Registration;
-      pianoAperto = v;
-      monta('modal', spie);
-    }
-
-    function apriModal() {
-      var forma = document.getElementById('mod-forma');
-      var etichetta = mod.querySelector('[data-tpm-piano]');
-      if (etichetta && forma) {
-        etichetta.textContent = forma.selectedOptions[0].textContent.replace(/ \(.*\)$/, '');
-      }
-
-      /* Rimontare solo se il piano è cambiato: la libreria non ha un
-         `destroy`, quindi ogni montaggio è un iframe nuovo — e riaprire lo
-         stesso piano deve ritrovare la registrazione dov'era, non ricominciarla. */
-      if (!montati.modal || (forma && forma.value !== pianoAperto)) montaModal();
 
       document.body.classList.add('amodal-locked');
       mod.classList.add('aperto');
@@ -564,7 +452,6 @@ const SCENARI = [
          elemento invisibile non fa niente — il fuoco resterebbe sul pulsante
          che ha aperto. */
       void mod.offsetWidth;
-      var t = mod.querySelector('[data-tpm-piano]');
       if (t) t.focus();
     }
 
@@ -572,56 +459,19 @@ const SCENARI = [
       mod.classList.remove('aperto');
       mod.setAttribute('aria-hidden', 'true');
       document.body.classList.remove('amodal-locked');
-      registra('modal', avviato ? 'CHIUSO al passo ' + avviato : 'CHIUSO senza cominciare');
-      var b = document.getElementById('mod-apri');
-      if (b) b.focus();
+      if (attivo) {
+        registra(attivo, passi[attivo] > 1 ? 'CHIUSO al passo ' + passi[attivo] : 'CHIUSO senza cominciare');
+        var b = document.querySelector('[data-apri="' + attivo + '"]');
+        if (b) b.focus();
+      }
     }
 
-    var montatori = {
-      calendario: montaCalendario,
-      registrazione: montaRegistrazione,
-      pagamenti: montaPagamenti,
-      sessione: montaSessione,
-      /* La scheda non monta niente: lo fa il pulsante. */
-      modal: function () { montati.modal = montati.modal || null; },
-    };
+    /** Dove si stanno digitando dati, una chiusura per sbaglio costa. */
+    function delicato(id) { return id === 'registrazione' && passi[id] > 1; }
 
-    /* ---- Le schede -------------------------------------------------- */
-
-    var schede = [].slice.call(document.querySelectorAll('[data-scheda]'));
-
-    function apri(id) {
-      schede.forEach(function (b) {
-        b.setAttribute('aria-selected', String(b.dataset.scheda === id));
-      });
-      document.querySelectorAll('[data-pannello]').forEach(function (p) {
-        p.hidden = p.dataset.pannello !== id;
-      });
-      if (id === 'modal') { /* il portale lo monta il pulsante */ }
-      else if (!montati[id]) montatori[id]();
-      /* Un iframe tornato visibile va rimisurato: iframe-resizer ascolta il
-         ridimensionamento della finestra, e mentre il pannello era `hidden` la
-         sua altezza è rimasta ferma. */
-      else window.dispatchEvent(new Event('resize'));
-    }
-
-    schede.forEach(function (b) {
-      b.addEventListener('click', function () { apri(b.dataset.scheda); });
+    document.querySelectorAll('[data-apri]').forEach(function (b) {
+      b.addEventListener('click', function () { apriModal(b.dataset.apri); });
     });
-
-    /* Il primo scenario si monta subito: è quello che la pagina mostra. */
-    montaCalendario();
-
-    /* ---- I comandi dei due scenari che ne hanno --------------------- */
-
-    var ric = document.getElementById('reg-ricarica');
-    if (ric) ric.addEventListener('click', function () {
-      montati.registrazione = null;
-      montaRegistrazione();
-    });
-
-    var apre = document.getElementById('mod-apri');
-    if (apre) apre.addEventListener('click', apriModal);
 
     mod.querySelectorAll('[data-tpm-chiudi]').forEach(function (b) {
       b.addEventListener('click', chiudiModal);
@@ -632,31 +482,41 @@ const SCENARI = [
        sito si chiude toccando fuori, perché riaprirlo non costa niente; una
        registrazione a metà sì.
 
-       Escape chiude solo finché non è cominciato niente: il primo passo è
-       quello che la libreria manda da sé all'apertura, quindi la soglia è due. */
+       Escape chiude, tranne dove si stanno digitando dati. Il primo passo lo
+       manda la libreria da sé all'apertura, quindi la soglia è due. */
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape' || !mod.classList.contains('aperto')) return;
-      if (avviato > 1) {
-        registra('modal', 'Escape ignorato: registrazione già cominciata (passo ' + avviato + ')');
+      if (delicato(attivo)) {
+        registra(attivo, 'Escape ignorato: registrazione già cominciata (passo ' + passi[attivo] + ')');
         return;
       }
       chiudiModal();
     });
 
+    /* ---- Le schede della pagina ------------------------------------- */
+
+    document.querySelectorAll('[data-scheda]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var id = b.dataset.scheda;
+        document.querySelectorAll('[data-scheda]').forEach(function (x) {
+          x.setAttribute('aria-selected', String(x.dataset.scheda === id));
+        });
+        document.querySelectorAll('[data-pannello]').forEach(function (p) {
+          p.hidden = p.dataset.pannello !== id;
+        });
+      });
+    });
+
+    /* ---- I comandi dello scenario «sessione» ------------------------ */
+
     document.querySelectorAll('[data-sess]').forEach(function (b) {
       b.addEventListener('click', function () {
         var i = montati.sessione;
-        if (!i) return registra('sessione', '(il riquadro non è montato)');
+        if (!i) return registra('sessione', '(apri prima il pannello)');
         var che = b.dataset.sess;
-        if (che === 'chiedi') {
-          i.isUserLoggedIn().then(function (r) { registra('sessione', 'CHIESTO  ' + JSON.stringify(r)); });
-        } else if (che === 'calendario') {
-          i.goTo(PGL.State.Classes);
-        } else if (che === 'scadenze') {
-          i.goTo(PGL.State.ProfilePayments);
-        } else if (che === 'logout') {
-          i.logout().then(function () { registra('sessione', 'LOGOUT chiesto dalla pagina'); });
-        }
+        if (che === 'chiedi') i.isUserLoggedIn().then(function (r) { registra('sessione', 'CHIESTO  ' + JSON.stringify(r)); });
+        else if (che === 'calendario') i.goTo(PGL.State.Classes);
+        else if (che === 'logout') i.logout().then(function () { registra('sessione', 'LOGOUT chiesto dalla pagina'); });
       });
     });
   })();
@@ -665,12 +525,10 @@ const SCENARI = [
 <style>
   /* **Il grigio dietro l'iframe non è decorazione.** Le schede del portale
      sono bianche su un fondo grigio: è il fondo a disegnarne i contorni, e
-     quel fondo lo dipinge la *pagina*, non le schede. Mettendo l'iframe su
-     bianco le schede sparivano dentro il nostro pannello e il modulo si
-     leggeva come un elenco senza bordi — che è esattamente il difetto
-     segnalato. Confrontato con il portale aperto per conto suo: là il grigio
-     c'è. Neutro e non `--color-cream`, che tinge di caldo e cambierebbe il
-     colore delle schede di un'altra applicazione. */
+     quel fondo lo dipinge la *pagina*, non le schede. Su bianco spariscono e
+     il modulo si legge come un elenco senza bordi. Neutro e non
+     `--color-cream`, che tinge di caldo e cambierebbe il colore delle schede
+     di un'altra applicazione. */
   .tp,
   .tpm {
     --portale-fondo: #efefef;
@@ -713,10 +571,6 @@ const SCENARI = [
     border-left: 3px solid var(--accent-fill);
     background: var(--color-cream);
     color: var(--text);
-  }
-
-  .tp__testo code {
-    font-size: 0.95em;
   }
 
   /* Le schede si avvolgono invece di scorrere: sono quattro parole, e una riga
@@ -808,7 +662,7 @@ const SCENARI = [
   }
 
   .tp__diag {
-    margin: 0 0 1.5rem;
+    margin: 0 0 1.25rem;
     padding: 1.25rem;
     border: 1px solid var(--border-strong);
     border-radius: var(--radius);
@@ -842,7 +696,7 @@ const SCENARI = [
 
   .tp__registro {
     max-height: 14rem;
-    margin: 0 0 1.5rem;
+    margin: 0;
     padding: 1rem;
     overflow: auto;
     border: 1px solid var(--border);
@@ -854,77 +708,32 @@ const SCENARI = [
     word-break: break-word;
   }
 
-  /* **L'altezza è nostra, e non è una preferenza: iframe-resizer qui non
-     funziona.** Il portale è un'applicazione a pagina singola che riempie la
-     propria finestra e si scorre dentro un contenitore suo, quindi il suo
-     documento misura 150px qualunque cosa contenga — e 150px è l'altezza che
-     il bambino riporta, senza sbagliarsi e senza dare warning (la spia di
-     iframe-resizer resta muta: ha avuto risposta, la risposta era 150).
-     Misurato sul dominio vero: calendario intero tagliato a un capoverso.
-
-     Quindi vale la regola dell'iframe del tour virtuale — l'altezza di una
-     cosa che inquadra uno spazio è un **rapporto**, con un freno in `svh`
-     perché su un pannello verticale il rapporto la farebbe alta due schermate.
-     4/5 sul telefono, più larga da 700px in su.
-
-     `!important` sull'iframe non è pigrizia: iframe-resizer continua a
-     scrivere `style.height` sull'elemento a ogni misura, e uno stile in linea
-     batte qualunque regola che non lo porti. */
-  .tp__riquadro {
-    aspect-ratio: 4 / 5;
-    min-height: 34rem;
-    max-height: 88svh;
-    border-radius: var(--radius);
-    overflow-y: auto;
-    background: var(--portale-fondo);
-  }
-
-  @media (min-width: 700px) {
-    .tp__riquadro { aspect-ratio: 16 / 11; }
-  }
-
-  /* **A scorrere è la scatola, non l'iframe**, e ci sono volute due prove
-     sbagliate per arrivarci.
-
-     La prima stesura forzava `height: 100%` sull'iframe: il portale restava
-     tagliato a metà e non si scorreva in nessun modo — né con la rotella né
-     col dito. La causa non è nostra: iframe-resizer scrive `scrolling="no"`
-     sull'iframe, perché il suo modello è l'opposto del nostro — **l'iframe
-     cresce fino a contenere tutto e a scorrere è la pagina intorno**. Con
-     un'altezza fissa imposta da noi, quel contratto si rompe e il contenuto
-     oltre il bordo diventa irraggiungibile.
-
-     E non si rimedia dall'esterno: `overflow: auto !important` sull'iframe
-     resta `clip` nel valore calcolato — su un elemento sostituito quella
-     proprietà non governa il documento dentro — e togliere `scrolling` a
-     caricamento avvenuto non cambia niente. Provate tutte e due.
-
-     Quindi si sta al loro modello: l'iframe prende l'altezza che la libreria
-     gli dà, e la scatola scorre. `flex` è quello che tiene insieme i due casi
-     con una regola sola — `1 0 auto` vuol dire «parti dall'altezza che hai e
-     cresci se avanza posto»: la registrazione dichiara 805px e la scatola
-     scorre, il calendario ne dichiara 150 e riempie lo stesso. Con
-     `min-height: 100%` la percentuale si risolve contro la scatola, che
-     un'altezza definita ce l'ha. */
-  .tp__riquadro > div,
-  .tpm__box > div {
-    display: flex;
-    flex-direction: column;
-    min-height: 100%;
-  }
-
-  .tp__riquadro :global(iframe),
-  .tpm__box :global(iframe) {
-    flex: 1 0 auto;
-  }
-
   .tp__nota {
     margin: 1.5rem 0 0;
     font-size: var(--text-sm);
     color: var(--text-muted);
   }
 
-  /* ---- L'overlay a schermo pieno --------------------------------------
+  /* La lista dei comandi a forma di link di `global.css`: senza, questo link
+     resta alto quanto il testo e sul totem è sotto i 48px. */
+  .tp__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    padding: 0.25rem 0;
+    color: var(--accent-text);
+    font-weight: 600;
+  }
+
+  /* ---- Il modal, e perché tutti gli embed passano di qui --------------
+
+     Il portale è un'applicazione, non un riquadro: la registrazione dichiara
+     805px di contenuto, il calendario disegna una griglia di giorni, le
+     scadenze un elenco. Dentro una finestra alta seicento pixel in mezzo a una
+     pagina che scorre, ognuna di queste cose diventa due scorrimenti
+     sovrapposti — e su un telefono è il punto in cui si chiude la pagina.
+     A schermo pieno il portale ha tutto lo spazio che c'è e la pagina sotto è
+     ferma.
 
      `visibility` e non solo `opacity`: un pannello chiuso che si può ancora
      raggiungere col tasto tab è la cosa che fa dire a Lighthouse che l'albero
@@ -953,14 +762,14 @@ const SCENARI = [
 
   /* Il blocco dello scorrimento va dichiarato **qui**, e questa riga è stata
      una scoperta: `global.css` usa `body.amodal-locked` — per nascondere il
-     banner dei cookie e il suggerimento della prova — ma non è lui a
-     bloccare il fondo. Quella regola vive dentro `AttivitaModal.astro`, che
-     su questa pagina non c'è: usare la classe senza portarsi la regola dà un
-     modal a schermo pieno con la pagina che scorre dietro.
+     banner dei cookie e il suggerimento della prova — ma non è lui a bloccare
+     il fondo. Quella regola vive dentro `AttivitaModal.astro`, che su questa
+     pagina non c'è: usare la classe senza portarsi la regola dà un modal a
+     schermo pieno con la pagina che scorre dietro.
 
      La classe si usa comunque, e non una nostra: è quella che tiene fuori il
      banner CookieYes dal pannello — cioè l'unica cosa che, a schermo pieno,
-     coprirebbe il modulo di registrazione. */
+     coprirebbe il portale. */
   :global(body.amodal-locked) {
     overflow: hidden;
   }
@@ -972,10 +781,7 @@ const SCENARI = [
   }
 
   /* A schermo pieno vuol dire pieno: nessun raggio, nessun margine, nessun
-     ritaglio. Il portale non lo vestiamo noi e la sua form è lunga — ogni
-     pixel togliergli è una riga in più da scorrere dentro una finestra
-     dentro una pagina, che è il difetto che questo scenario esiste per
-     chiudere. `100dvh` e non `100vh`: su iOS la barra dell'indirizzo che si
+     ritaglio. `100dvh` e non `100vh`: su iOS la barra dell'indirizzo che si
      ritrae cambia l'altezza vera, e con `vh` la barra dei comandi finirebbe
      sotto il bordo — cioè la × diventerebbe irraggiungibile. */
   .tpm__pannello {
@@ -985,18 +791,38 @@ const SCENARI = [
     flex-direction: column;
     width: 100%;
     height: 100dvh;
-    background: var(--color-white);
+    background: var(--portale-fondo);
   }
 
+  /* Su uno schermo largo il portale non va stirato per tutta la sua
+     larghezza: un modulo di iscrizione a 1900px sono righe da duecento
+     caratteri, e la griglia del calendario si sfilaccia. Il pannello resta
+     alto quanto lo schermo e largo quanto serve, centrato — a schermo pieno
+     resta il *comportamento*, non per forza il rettangolo. */
+  @media (min-width: 1100px) {
+    .tpm__pannello {
+      width: min(72rem, 100%);
+      margin: 0 auto;
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  /* La barra è nostra, e su un telefono con la tacca va sotto l'incavo: senza
+     `safe-area`, su iPhone in verticale il titolo finisce dietro la barra di
+     stato e la × diventa un bersaglio a metà. */
   .tpm__barra {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
     flex: 0 0 auto;
-    padding: 0.75rem 1rem;
+    padding: calc(0.75rem + env(safe-area-inset-top)) calc(1rem + env(safe-area-inset-right))
+             0.75rem calc(1rem + env(safe-area-inset-left));
+    background: var(--color-white);
     border-bottom: 1px solid var(--border);
   }
+
+  .tpm__testa { min-width: 0; }
 
   .tpm__eyebrow {
     margin: 0;
@@ -1006,13 +832,18 @@ const SCENARI = [
     color: var(--accent-text);
   }
 
-  .tpm__piano {
+  .tpm__titolo {
     margin: 0.15rem 0 0;
     font-size: var(--text-sm);
     font-weight: 600;
+    /* Il titolo non va a capo: su 320px «Scadenze e pagamenti» farebbe due
+       righe e la barra crescerebbe, rubando altezza al portale. */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  .tpm__piano:focus-visible {
+  .tpm__titolo:focus-visible {
     outline: 2px solid var(--accent-fill);
     outline-offset: 3px;
   }
@@ -1022,6 +853,9 @@ const SCENARI = [
      altri: 3rem sempre, e più grande dove la radice cresce. */
   .tpm__chiudi {
     flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 3rem;
     height: 3rem;
     border: 1px solid var(--border-strong);
@@ -1033,40 +867,53 @@ const SCENARI = [
     cursor: pointer;
   }
 
-  /* + totem */
+  /* + totem, + tv */
   @media (min-width: 900px) and (min-height: 1200px) and (max-aspect-ratio: 7/10),
          (min-width: 1700px) and (min-height: 1020px) and (max-aspect-ratio: 37/20) {
     .tpm__chiudi { width: 3.5rem; height: 3.5rem; }
   }
 
-  /* Tutto lo spazio che resta è del portale, e l'altezza gliela dà `flex`, non
-     un rapporto: qui non c'è niente sotto con cui stare in proporzione. Vale
-     comunque l'`!important`, perché iframe-resizer riscrive `style.height`
-     sull'iframe a ogni misura — e la sua misura è 150px. */
-  /* Tutto lo spazio che resta è del portale. A scorrere è questa scatola —
-     il perché sta scritto per esteso accanto a `.tp__riquadro` — e il fondo è
-     il grigio del portale, o le sue schede bianche restano senza contorni.
+  /* **A scorrere è la scatola, non l'iframe**, e ci sono volute due prove
+     sbagliate per arrivarci.
 
-     `-webkit-overflow-scrolling` non serve più su iOS moderno, ma
-     `overscroll-behavior` sì: senza, arrivati in fondo al modulo lo
-     scorrimento passa alla pagina sotto, che è ferma per il lock e quindi dà
-     l'impressione che il modal si sia incantato. */
+     La prima stesura forzava `height: 100%` sull'iframe: il portale restava
+     tagliato a metà e non si scorreva in nessun modo — né con la rotella né
+     col dito. La causa non è nostra: iframe-resizer scrive `scrolling="no"`
+     sull'iframe, perché il suo modello è l'opposto — **l'iframe cresce fino a
+     contenere tutto e a scorrere è quello che gli sta intorno**. Con
+     un'altezza fissa imposta da noi, quel contratto si rompe e il contenuto
+     oltre il bordo diventa irraggiungibile.
+
+     E non si rimedia dall'esterno: `overflow: auto !important` sull'iframe
+     resta `clip` nel valore calcolato — su un elemento sostituito quella
+     proprietà non governa il documento dentro — e togliere `scrolling` a
+     caricamento avvenuto non cambia niente. Provate tutte e due.
+
+     `overscroll-behavior` serve: senza, arrivati in fondo lo scorrimento passa
+     alla pagina sotto, che è ferma per il lock — e sembra che il modal si sia
+     incantato. E la `safe-area` in basso tiene il pulsante «Avanti» del
+     portale sopra la barra gestuale dell'iPhone. */
   .tpm__box {
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
+    padding-bottom: env(safe-area-inset-bottom);
     background: var(--portale-fondo);
   }
 
-  /* La lista dei comandi a forma di link di `global.css`: senza, questo link
-     resta alto quanto il testo e sul totem è sotto i 48px. */
-  .tp__link {
-    display: inline-flex;
-    align-items: center;
-    min-height: 3rem;
-    padding: 0.25rem 0;
-    color: var(--accent-text);
-    font-weight: 600;
+  /* `flex: 1 0 auto` è la regola sola che regge i due mondi delle altezze
+     dichiarate: parti da quella che hai — 805px per la registrazione, 150 per
+     il calendario — e cresci se avanza posto. `min-height: 100%` sul
+     contenitore risolve la percentuale contro la scatola, che un'altezza
+     definita ce l'ha. */
+  .tpm__box > div {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+
+  .tpm__box :global(iframe) {
+    flex: 1 0 auto;
   }
 </style>
