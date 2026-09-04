@@ -1,41 +1,72 @@
 ---
 /**
- * Pagina di prova dell'embed del Client Portal PerfectGym — solo il calendario.
+ * Banco di prova dell'embed del Client Portal PerfectGym — quattro scenari.
  *
- * Esiste per rispondere a una domanda sola, che da qui non si può verificare:
- * **`athlon.perfectgym.com` accetta di stare dentro un iframe del nostro
- * dominio?** Lo decidono due intestazioni HTTP che manda PerfectGym,
- * `X-Frame-Options` e `Content-Security-Policy: frame-ancestors`, e il browser
- * le applica in silenzio — un iframe rifiutato resta bianco, senza errore in
- * pagina. Per questo il riquadro di diagnostica qui sotto non è un ornamento:
- * è il solo modo di distinguere «non è ancora arrivato» da «è stato rifiutato».
+ * La domanda che questa pagina esisteva per rispondere ha una risposta, e sta
+ * nelle intestazioni del portale:
  *
- * Non è una pagina del club: `noindex`, fuori dalla sitemap, e va cancellata o
- * promossa a pagina vera quando la prova ha dato il suo esito. Il nome dice
- * cos'è, così nessuno la scambia per un'area riservata a metà.
+ *     content-security-policy: frame-ancestors 'self'
+ *       https://athlonroma.it https://www.athlonroma.it
  *
- * Tre cose che questa pagina fa diversamente dal resto del sito, e ognuna ha
- * una ragione:
+ * Cioè **l'incorporamento è già autorizzato**, e solo da lì. Da qui discendono
+ * le due cose da sapere prima di provarla:
+ *
+ *  - **in locale e su un'anteprima Vercel il riquadro resta bianco**, sempre,
+ *    e non è un difetto di questa pagina: `localhost` e
+ *    `sito-athlon.vercel.app` non sono nell'elenco. La prova si fa su
+ *    `www.athlonroma.it/test-portale/` e da nessun'altra parte. È la stessa
+ *    forma di guasto della chiave CookieYes su un host che il fornitore non
+ *    conosce — configurazione giusta, host sbagliato, sintomo muto.
+ *  - **un dominio nuovo va chiesto a PerfectGym.** Quell'elenco lo scrivono
+ *    loro; se un giorno il sito vivesse altrove, l'embed smetterebbe di
+ *    funzionare senza che nessun nostro codice sia cambiato.
+ *
+ * I quattro scenari sono le quattro cose che si è chiesto di provare, e ognuno
+ * risponde a una domanda diversa:
+ *
+ *  1. **Calendario**, com'è se lo mettessimo in `/planning`.
+ *  2. **Registrazione**, com'è dentro il flusso di `/abbonamenti` — e in due
+ *     forme, perché i pulsanti del listino non puntano a `#/Registration` ma a
+ *     `Registration/Start?clubID=1&PaymentPlanId=…`, che è una rotta del
+ *     server e non uno stato dell'applicazione. Se la seconda non "connette",
+ *     l'embed del piano preciso non si può fare e va saputo adesso.
+ *  3. **Scadenze e pagamenti**, che è la procedura di
+ *     `generali/prenotazioni-problemi` ridotta a un riquadro.
+ *  4. **La sessione**: quello che il sito potrebbe *sapere* — se chi legge è
+ *     dentro, chi è, e in che pagina del portale si trova. Oggi il sito lo
+ *     deduce dal `memberType` che gli torna dalla verifica dell'email, che è
+ *     un'altra domanda: «può fare login», non «ha fatto login adesso».
+ *
+ * Perché una pagina sola con le schede invece di quattro riquadri in fila, ed
+ * è una misura e non un gusto: la libreria, al `load` dell'iframe, **fa
+ * scorrere la finestra** fino al riquadro (`window.scroll` in `_createIframe`,
+ * senza condizioni). Quattro riquadri in fila sono quattro istanze del portale
+ * che si contendono lo scorrimento della pagina mentre arrivano. Uno alla
+ * volta, montato al primo clic sulla scheda, toglie il problema e insieme
+ * risparmia tre caricamenti che nessuno stava guardando.
+ *
+ * Le altre scelte, tutte con la loro ragione:
  *
  *  - **due domini di terzi in più** (jsDelivr per le due librerie). La regola
  *    del progetto è che l'unico terzo dominio è GTM: qui l'eccezione è
- *    confinata a questa route — gli script stanno nella pagina, mai nel Layout
- *    — e non blocca il rendering, perché sta in fondo al contenuto e non nel
- *    `<head>`. Il CSS del portale è l'unica cosa che deve arrivare presto, ed è
- *    un `<link>` nel corpo: 2 kB, e riguarda solo il riquadro.
+ *    confinata a questa route — gli script stanno nella pagina, mai nel Layout.
  *  - **le versioni sono fissate** (`@1.13.3`, `@5.5.7`) e non `@latest`, che è
  *    quello che consiglia il README di PerfectGym. `latest` vuol dire che una
  *    loro pubblicazione cambia il nostro sito senza un nostro commit.
+ *  - **l'ordine dei due script non è negoziabile.** `ClientPortal.js` legge
+ *    `window.iframeResize` **al caricamento** (`var a = window.iframeResize`),
+ *    non quando serve: se arriva per primo, quella variabile è `undefined` e
+ *    l'altezza non si aggiorna mai più, senza un errore.
  *  - **niente `client:` di Astro e niente modulo**: `is:inline` passa gli
- *    script al browser come sono. Senza, Astro li tratterebbe come moduli suoi
- *    e li servirebbe differiti, quindi `window.PerfectGym` non esisterebbe
- *    ancora quando l'inizializzazione lo cerca.
+ *    script al browser come sono. Senza, Astro li servirebbe differiti e
+ *    `window.PerfectGym` non esisterebbe ancora all'inizializzazione.
+ *  - **niente `loadMask`**, di proposito: quella maschera è un elemento fisso
+ *    attaccato al `body` e **condiviso fra tutte le istanze** della libreria —
+ *    con più riquadri in pagina, quello che finisce di caricare per primo la
+ *    toglie a tutti.
  *
- * E una che va saputa prima di provarla: **se CookieYes ha il blocco
- * automatico degli script di terzi attivo**, questi due `<script>` possono
- * essere bloccati finché non si dà il consenso — e il sintomo è identico a un
- * iframe rifiutato. La diagnostica distingue anche questo, perché guarda prima
- * se `window.PerfectGym` è arrivato.
+ * Non è una pagina del club: `noindex`, fuori dalla sitemap, e va cancellata o
+ * promossa a pagina vera quando la prova ha dato il suo esito.
  */
 import Layout from '../layouts/Layout.astro';
 import { PG } from '../data/cta';
@@ -44,15 +75,73 @@ import { PG } from '../data/cta';
    (`#/...`) e senza lo slash comporrebbe `ClientPortal2#/Classes`. */
 const URL_PORTALE = `${PG}/`;
 
+/* Il piano su cui si prova la registrazione con il carrello già scelto: è lo
+   Smart Annuale a pagamento mensile, la prima riga del listino di
+   `/abbonamenti`. L'indirizzo è quello vero del pulsante, non uno inventato. */
+const PIANO_PROVA = {
+  etichetta: 'Smart · Annuale, pagamento mensile — 75 €/mese',
+  url: `${PG}/Registration/Start?clubID=1&PaymentPlanId=263`,
+};
+
 /* Versioni fissate. Alzarle è un commit, ed è il punto. */
 const IFRAME_RESIZER = 'https://cdn.jsdelivr.net/npm/@iframe-resizer/parent@5.5.7/index.umd.min.js';
 const CLIENT_PORTAL = 'https://cdn.jsdelivr.net/npm/@perfectgym/client-portal@1.13.3/dist/ClientPortal.min.js';
 const CLIENT_PORTAL_CSS = 'https://cdn.jsdelivr.net/npm/@perfectgym/client-portal@1.13.3/dist/ClientPortal.css';
+
+const SCENARI = [
+  {
+    id: 'calendario',
+    scheda: 'Calendario',
+    titolo: 'Il calendario delle lezioni, come starebbe in /planning',
+    domanda:
+      'Il terzo gradino della scala degli orari — chi tiene la lezione, quanti posti restano — oggi vive solo nel portale, e il sito può soltanto mandarci. Qui sta in pagina.',
+    note: [
+      'La barra di navigazione del portale è nascosta: dentro una nostra pagina sarebbe un secondo menu che compete con il nostro.',
+      '«Prenota» non compare a chi non ha fatto login. È il verso giusto: un pulsante che porta a una schermata di accesso è una promessa non mantenuta.',
+      'Il palinsesto di /planning resta dov’è. Questo non lo sostituisce: quello si legge senza account e senza JavaScript, questo dice il dato vivo.',
+    ],
+  },
+  {
+    id: 'registrazione',
+    scheda: 'Registrazione',
+    titolo: 'La registrazione, come starebbe nel flusso di /abbonamenti',
+    domanda:
+      'Oggi il pulsante «Iscriviti» porta fuori dal sito, dopo il controllo dell’email. Qui la registrazione resta in pagina — in due forme, perché sono due indirizzi diversi.',
+    note: [
+      'La forma «stato» è la registrazione generica, quella che la libreria sa raggiungere da sé. Non porta nessun piano: la persona lo sceglie dentro il portale.',
+      'La forma «con il piano» è l’indirizzo vero dei pulsanti del listino, e passa da forceUrl. È una rotta del server e non uno stato dell’applicazione: se la diagnostica non arriva a «risposta del portale», vuol dire che quella pagina non parla con la libreria — quindi niente altezza automatica e niente eventi, e l’embed del piano preciso non si può fare.',
+      'Il campo email prova a passare l’indirizzo già verificato come parametro. Non è documentato: serve a vedere se il portale lo raccoglie o lo ignora.',
+    ],
+  },
+  {
+    id: 'pagamenti',
+    scheda: 'Scadenze',
+    titolo: 'Scadenze e pagamenti, cioè «your member is on financial debit»',
+    domanda:
+      'Quel messaggio in rosso ha una soluzione che la persona fa da sola in trenta secondi, e oggi è una procedura in tre passi dentro un’altra applicazione. Qui è un riquadro.',
+    note: [
+      'Richiede il login: senza, il portale mostra la sua schermata di accesso. È il comportamento giusto — questi sono i dati di una persona.',
+      'Il riquadro è la prova che lo stato esiste ed è raggiungibile, non una proposta di metterlo in una pagina pubblica: la sua casa naturale è una scheda dell’Help Desk, accanto alle sette cause di blocco.',
+    ],
+  },
+  {
+    id: 'sessione',
+    scheda: 'Sessione',
+    titolo: 'Quello che il sito potrebbe sapere di chi sta leggendo',
+    domanda:
+      'Questo è il punto 4. Il portale, incorporato, parla con la pagina: dice quando qualcuno entra, chi è, e in che schermata si trova. Il sito oggi non ha nessuna di queste tre informazioni.',
+    note: [
+      'La differenza con quello che il sito sa già: haGiaAccount() risponde a «può fare login», dedotto dal memberType che torna dalla verifica dell’email. Questo risponde a «ha fatto login adesso», che è un’altra domanda e apre altre risposte — salutare per nome, saltare il passo dell’email, non offrire il Guest Pass a chi è dentro.',
+      'Il riquadro parte dalla schermata di accesso apposta: fai login e guarda il registro qui sotto riempirsi da sé.',
+      'E il prezzo, che va detto: sapere questo costa avere il portale caricato in pagina. Su una pagina qualsiasi sarebbe un iframe di terzi montato per una comodità — quindi vale dove la persona sta già facendo qualcosa nel portale, non dappertutto.',
+    ],
+  },
+];
 ---
 
 <Layout
   title="Prova embed portale — Athlon"
-  description="Pagina di prova dell'incorporamento del calendario PerfectGym."
+  description="Banco di prova dell'incorporamento del Client Portal PerfectGym."
   noindex
 >
   <link rel="stylesheet" href={CLIENT_PORTAL_CSS} />
@@ -60,120 +149,339 @@ const CLIENT_PORTAL_CSS = 'https://cdn.jsdelivr.net/npm/@perfectgym/client-porta
   <main class="tp">
     <div class="tp__intro">
       <p class="tp__eyebrow">Pagina di prova</p>
-      <h1 class="tp__titolo">Calendario PerfectGym incorporato</h1>
+      <h1 class="tp__titolo">Il portale PerfectGym dentro il sito</h1>
       <p class="tp__testo">
-        Il riquadro qui sotto è il calendario delle lezioni del portale, dentro questa
-        pagina. Serve a vedere se PerfectGym permette di essere incorporato dal nostro
-        dominio: se il riquadro resta vuoto, la diagnostica dice quale delle cause è.
+        Quattro modi di incorporare il Client Portal, uno per scheda. Ogni riquadro è il
+        portale vero, non una simulazione: quello che si vede qui è quello che vedrebbe
+        una persona nella pagina in cui lo mettessimo.
+      </p>
+      <p class="tp__testo tp__testo--avviso">
+        <strong>Funziona solo su <code>www.athlonroma.it</code>.</strong> PerfectGym
+        autorizza l’incorporamento a due indirizzi soli, e in locale o su un’anteprima il
+        riquadro resta bianco senza dare errore. Se stai leggendo questa pagina altrove,
+        la diagnostica te lo dirà.
       </p>
     </div>
 
-    {/* La diagnostica sta **prima** del riquadro di proposito: quando la prova
-        fallisce, il riquadro è vuoto e chi guarda deve trovare la spiegazione
-        senza scorrere sotto un vuoto alto mille pixel. */}
-    <div class="tp__diag" id="tp-diag" data-stato="attesa">
-      <p class="tp__diag-riga"><span class="tp__spia" data-spia="script">…</span> Librerie da jsDelivr</p>
-      <p class="tp__diag-riga"><span class="tp__spia" data-spia="init">…</span> Inizializzazione</p>
-      <p class="tp__diag-riga"><span class="tp__spia" data-spia="connect">…</span> Risposta del portale</p>
-      <p class="tp__diag-esito" id="tp-esito">In attesa…</p>
+    <div class="tp__schede" role="tablist" aria-label="Scenari di prova">
+      {SCENARI.map((s, i) => (
+        <button
+          class="tp__scheda"
+          role="tab"
+          type="button"
+          id={`tab-${s.id}`}
+          aria-controls={`pan-${s.id}`}
+          aria-selected={i === 0 ? 'true' : 'false'}
+          data-scheda={s.id}
+        >
+          {s.scheda}
+        </button>
+      ))}
     </div>
 
-    <div class="tp__riquadro">
-      <div id="pg-client-portal-calendar"></div>
-    </div>
+    {SCENARI.map((s, i) => (
+      <section
+        class="tp__pannello"
+        role="tabpanel"
+        id={`pan-${s.id}`}
+        aria-labelledby={`tab-${s.id}`}
+        data-pannello={s.id}
+        hidden={i !== 0}
+      >
+        <h2 class="tp__h2">{s.titolo}</h2>
+        <p class="tp__testo">{s.domanda}</p>
+
+        <ul class="tp__note">
+          {s.note.map((n) => <li>{n}</li>)}
+        </ul>
+
+        {s.id === 'registrazione' && (
+          <div class="tp__comandi">
+            <label class="tp__campo">
+              <span>Indirizzo</span>
+              <select class="tp__select" id="reg-forma">
+                <option value="stato">Registrazione generica (stato #/Registration)</option>
+                <option value="piano">{PIANO_PROVA.etichetta} (forceUrl)</option>
+              </select>
+            </label>
+            <label class="tp__campo">
+              <span>Email da passare</span>
+              <input class="tp__input" id="reg-email" type="email" placeholder="mario@esempio.it" autocomplete="off" />
+            </label>
+            <button class="tp__btn" type="button" id="reg-ricarica">Ricarica il riquadro</button>
+          </div>
+        )}
+
+        {s.id === 'sessione' && (
+          <div class="tp__comandi">
+            <button class="tp__btn" type="button" data-sess="chiedi">Chi è loggato?</button>
+            <button class="tp__btn" type="button" data-sess="calendario">Vai al calendario</button>
+            <button class="tp__btn" type="button" data-sess="scadenze">Vai alle scadenze</button>
+            <button class="tp__btn tp__btn--vuoto" type="button" data-sess="logout">Esci</button>
+          </div>
+        )}
+
+        {/* La diagnostica sta **prima** del riquadro di proposito: quando la
+            prova fallisce, il riquadro è vuoto e chi guarda deve trovare la
+            spiegazione senza scorrere sotto un vuoto alto mille pixel. */}
+        <div class="tp__diag" data-diag={s.id} data-stato="attesa">
+          <p class="tp__diag-riga"><span class="tp__spia" data-spia="script">…</span> Librerie da jsDelivr</p>
+          <p class="tp__diag-riga"><span class="tp__spia" data-spia="init">…</span> Inizializzazione</p>
+          <p class="tp__diag-riga"><span class="tp__spia" data-spia="connect">…</span> Risposta del portale</p>
+          <p class="tp__diag-esito" data-esito>In attesa…</p>
+        </div>
+
+        {s.id === 'sessione' && (
+          <pre class="tp__registro" data-registro>Il registro degli eventi compare qui.</pre>
+        )}
+
+        <div class="tp__riquadro">
+          <div data-monta={s.id}></div>
+        </div>
+      </section>
+    ))}
 
     <p class="tp__nota">
-      Se qui non compare niente, il calendario resta raggiungibile fuori dal sito:
+      Se un riquadro resta vuoto, il portale è comunque raggiungibile fuori dal sito:
       <a class="tp__link" href={`${URL_PORTALE}#/Classes`} target="_blank" rel="noopener">
-        apri il portale PerfectGym
+        apri PerfectGym in una scheda nuova
       </a>
     </p>
   </main>
 </Layout>
 
 {/* Gli script stanno qui, dopo il contenuto, e in quest'ordine: iframe-resizer
-    è una dipendenza dichiarata di ClientPortal, che al caricamento la cerca. */}
+    è una dipendenza che ClientPortal legge al caricamento. */}
 <script is:inline src={IFRAME_RESIZER} data-tp="resizer"></script>
 <script is:inline src={CLIENT_PORTAL} data-tp="portale"></script>
 
-<script is:inline define:vars={{ URL_PORTALE }}>
+<script is:inline define:vars={{ URL_PORTALE, PIANO_PROVA }}>
   (function () {
-    var diag = document.getElementById('tp-diag');
-    var esito = document.getElementById('tp-esito');
-    var spie = {};
-    document.querySelectorAll('[data-spia]').forEach(function (e) {
-      spie[e.dataset.spia] = e;
-    });
+    var PGL = window.PerfectGym && window.PerfectGym.ClientPortal;
+    var montati = {};
 
-    function segna(nome, ok) {
-      if (spie[nome]) {
-        spie[nome].textContent = ok ? '✓' : '✕';
-        spie[nome].className = 'tp__spia ' + (ok ? 'tp__spia--si' : 'tp__spia--no');
+    function diag(id) {
+      return document.querySelector('[data-diag="' + id + '"]');
+    }
+
+    function segna(id, nome, ok) {
+      var e = diag(id) && diag(id).querySelector('[data-spia="' + nome + '"]');
+      if (!e) return;
+      e.textContent = ok ? '✓' : '✕';
+      e.className = 'tp__spia ' + (ok ? 'tp__spia--si' : 'tp__spia--no');
+    }
+
+    function chiudi(id, ok, testo) {
+      var d = diag(id);
+      if (!d) return;
+      d.dataset.stato = ok ? 'ok' : 'ko';
+      d.querySelector('[data-esito]').textContent = testo;
+    }
+
+    function registra(riga) {
+      var pre = document.querySelector('[data-registro]');
+      if (!pre) return;
+      if (pre.dataset.usato !== '1') {
+        pre.textContent = '';
+        pre.dataset.usato = '1';
+      }
+      var ora = new Date().toLocaleTimeString('it-IT');
+      pre.textContent += ora + '  ' + riga + '\n';
+      pre.scrollTop = pre.scrollHeight;
+    }
+
+    /* Le opzioni comuni a tutti e quattro, e le due che non sono ovvie:
+       `topOffset` tiene conto dell'intestazione appiccicosa, o lo scorrimento
+       automatico della libreria porta il riquadro sotto la barra; `minHeight`
+       è solo il posto che il riquadro occupa mentre arriva — l'altezza vera la
+       misura iframe-resizer. */
+    function base(extra) {
+      var o = {
+        url: URL_PORTALE,
+        language: 'it',
+        topOffset: 96,
+        minHeight: 700,
+      };
+      for (var k in extra) o[k] = extra[k];
+      return o;
+    }
+
+    function monta(id, opzioni) {
+      var posto = document.querySelector('[data-monta="' + id + '"]');
+      if (!posto) return;
+
+      /* Primo bivio: le librerie sono arrivate? Se no, la causa non è
+         PerfectGym — è la rete, un blocco pubblicitario, o CookieYes che tiene
+         fermi gli script di terzi finché non c'è il consenso. Sono guasti
+         diversi con lo stesso sintomo, e distinguerli è metà del lavoro di
+         questa pagina. */
+      if (!PGL) {
+        segna(id, 'script', false);
+        chiudi(id, false,
+          'Le librerie non sono state caricate. Cause tipiche: blocco degli script di terzi ' +
+          '(CookieYes o un ad blocker), oppure jsDelivr irraggiungibile. Non è ancora una ' +
+          'risposta su PerfectGym.');
+        return;
+      }
+      segna(id, 'script', true);
+
+      /* Rimontare vuol dire buttare l'iframe di prima: la libreria non ha un
+         `destroy`, e senza questo il riquadro della registrazione accumulerebbe
+         un portale a ogni ricarica. */
+      posto.innerHTML = '';
+      posto.className = '';
+
+      var connesso = false;
+      var istanza;
+      try {
+        istanza = new PGL(posto, base(Object.assign({
+          onConnect: function () {
+            connesso = true;
+            segna(id, 'connect', true);
+            chiudi(id, true, 'Il portale risponde: l’incorporamento è permesso da questo dominio.');
+          },
+        }, opzioni)));
+        segna(id, 'init', true);
+      } catch (e) {
+        segna(id, 'init', false);
+        chiudi(id, false, 'La libreria ha sollevato un errore in inizializzazione: ' + e.message);
+        return;
+      }
+
+      montati[id] = istanza;
+
+      /* Il caso che conta, e il solo che il browser non segnala: un iframe
+         rifiutato da `frame-ancestors` resta bianco e muto. Dieci secondi sono
+         larghi per una rete normale e stretti abbastanza da non far dubitare
+         chi guarda. */
+      setTimeout(function () {
+        if (connesso) return;
+        segna(id, 'connect', false);
+        chiudi(id, false,
+          'Il portale non ha risposto entro dieci secondi. Se il riquadro è bianco, guarda la ' +
+          'console: «Refused to display … in a frame» vuol dire che questo indirizzo non è fra ' +
+          'quelli autorizzati (frame-ancestors) — succede sempre in locale e sulle anteprime.');
+      }, 10000);
+
+      return istanza;
+    }
+
+    /* ---- I quattro scenari ------------------------------------------ */
+
+    function montaCalendario() {
+      if (montati.calendario) return;
+      monta('calendario', {
+        defaultState: PGL.State.Classes,
+        navigation: { hide: true },
+        calendarPage: { hideBookingIfNotLogged: true },
+        minHeight: 900,
+      });
+    }
+
+    function montaRegistrazione() {
+      var forma = document.getElementById('reg-forma');
+      var email = document.getElementById('reg-email');
+      var v = forma ? forma.value : 'stato';
+      var params = {};
+      if (email && email.value) params.email = email.value;
+
+      if (v === 'piano') {
+        var u = PIANO_PROVA.url;
+        if (email && email.value) u += '&email=' + encodeURIComponent(email.value);
+        monta('registrazione', { forceUrl: u, navigation: { hide: true }, registration: { logo: false } });
+      } else {
+        monta('registrazione', {
+          defaultState: PGL.State.Registration,
+          defaultStateParams: params,
+          navigation: { hide: true },
+          registration: { logo: false },
+        });
       }
     }
 
-    function chiudi(ok, testo) {
-      if (diag) diag.dataset.stato = ok ? 'ok' : 'ko';
-      if (esito) esito.textContent = testo;
-    }
-
-    /* Primo bivio: le librerie sono arrivate? Se no, la causa non è PerfectGym
-       — è la rete, un blocco pubblicitario, o CookieYes che tiene fermi gli
-       script di terzi finché non c'è il consenso. Sono guasti diversi con lo
-       stesso sintomo, e distinguerli è metà del lavoro di questa pagina. */
-    if (!window.PerfectGym || !window.PerfectGym.ClientPortal) {
-      segna('script', false);
-      chiudi(
-        false,
-        'Le librerie non sono state caricate. Cause tipiche: blocco degli script di terzi ' +
-          '(CookieYes o un ad blocker), oppure jsDelivr irraggiungibile. Non è ancora una ' +
-          'risposta su PerfectGym.',
-      );
-      return;
-    }
-    segna('script', true);
-
-    var elemento = document.getElementById('pg-client-portal-calendar');
-    var connesso = false;
-
-    try {
-      new window.PerfectGym.ClientPortal(elemento, {
-        url: URL_PORTALE,
-        /* Solo il calendario: niente barra di navigazione del portale, e
-           nessun «Prenota» a chi non ha fatto login — chi non è entrato non
-           deve trovare un pulsante che lo porta a una pagina di errore. */
+    function montaPagamenti() {
+      if (montati.pagamenti) return;
+      monta('pagamenti', {
+        defaultState: PGL.State.ProfilePayments,
         navigation: { hide: true },
-        calendarPage: { hideBookingIfNotLogged: true },
-        defaultState: window.PerfectGym.ClientPortal.State.Classes,
-        language: 'it',
-        minHeight: 900,
-        onConnect: function () {
-          connesso = true;
-          segna('connect', true);
-          chiudi(true, 'Il portale risponde: l’incorporamento è permesso da questo dominio.');
+        loginPage: { navbar: false, logo: false },
+      });
+    }
+
+    function montaSessione() {
+      if (montati.sessione) return;
+      monta('sessione', {
+        defaultState: PGL.State.Login,
+        navigation: { hide: true },
+        loginPage: { navbar: false, logo: false },
+        onUserLoggedIn: function (info) {
+          registra('ENTRATO  ' + JSON.stringify(info));
+        },
+        onUserLoggedOut: function (info) {
+          registra('USCITO   ' + JSON.stringify(info));
+        },
+        onStateChangeSuccess: function (stato) {
+          registra('SCHERMATA  ' + JSON.stringify(stato));
         },
       });
-      segna('init', true);
-    } catch (e) {
-      segna('init', false);
-      chiudi(false, 'La libreria ha sollevato un errore in inizializzazione: ' + e.message);
-      return;
     }
 
-    /* Il caso che conta, e il solo che il browser non segnala: un iframe
-       rifiutato da `X-Frame-Options` o da `frame-ancestors` resta bianco e
-       muto. Dieci secondi sono larghi per un portale che carica su rete
-       normale, e stretti abbastanza da non far dubitare chi guarda. */
-    setTimeout(function () {
-      if (connesso) return;
-      segna('connect', false);
-      chiudi(
-        false,
-        'Il portale non ha risposto entro dieci secondi. Se il riquadro è bianco, ' +
-          'guarda la console del browser: «Refused to display … in a frame» vuol dire che ' +
-          'PerfectGym deve autorizzare questo dominio (X-Frame-Options o frame-ancestors).',
-      );
-    }, 10000);
+    var montatori = {
+      calendario: montaCalendario,
+      registrazione: montaRegistrazione,
+      pagamenti: montaPagamenti,
+      sessione: montaSessione,
+    };
+
+    /* ---- Le schede -------------------------------------------------- */
+
+    var schede = [].slice.call(document.querySelectorAll('[data-scheda]'));
+
+    function apri(id) {
+      schede.forEach(function (b) {
+        b.setAttribute('aria-selected', String(b.dataset.scheda === id));
+      });
+      document.querySelectorAll('[data-pannello]').forEach(function (p) {
+        p.hidden = p.dataset.pannello !== id;
+      });
+      if (!montati[id]) montatori[id]();
+      /* Un iframe tornato visibile va rimisurato: iframe-resizer ascolta il
+         ridimensionamento della finestra, e mentre il pannello era `hidden` la
+         sua altezza è rimasta ferma. */
+      else window.dispatchEvent(new Event('resize'));
+    }
+
+    schede.forEach(function (b) {
+      b.addEventListener('click', function () { apri(b.dataset.scheda); });
+    });
+
+    /* Il primo scenario si monta subito: è quello che la pagina mostra. */
+    montaCalendario();
+
+    /* ---- I comandi dei due scenari che ne hanno --------------------- */
+
+    var ric = document.getElementById('reg-ricarica');
+    if (ric) ric.addEventListener('click', function () {
+      montati.registrazione = null;
+      montaRegistrazione();
+    });
+
+    document.querySelectorAll('[data-sess]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var i = montati.sessione;
+        if (!i) return registra('(il riquadro non è montato)');
+        var che = b.dataset.sess;
+        if (che === 'chiedi') {
+          i.isUserLoggedIn().then(function (r) { registra('CHIESTO  ' + JSON.stringify(r)); });
+        } else if (che === 'calendario') {
+          i.goTo(PGL.State.Classes);
+        } else if (che === 'scadenze') {
+          i.goTo(PGL.State.ProfilePayments);
+        } else if (che === 'logout') {
+          i.logout().then(function () { registra('LOGOUT chiesto dalla pagina'); });
+        }
+      });
+    });
   })();
 </script>
 
@@ -198,27 +506,127 @@ const CLIENT_PORTAL_CSS = 'https://cdn.jsdelivr.net/npm/@perfectgym/client-porta
     margin: 0 0 1rem;
   }
 
+  .tp__h2 {
+    font-size: var(--text-lg);
+    --lh: 1;
+    margin: 0 0 0.75rem;
+  }
+
   .tp__testo {
     max-width: 58ch;
     color: var(--text-muted);
-    margin: 0;
+    margin: 0 0 0.75rem;
+  }
+
+  .tp__testo--avviso {
+    padding: 0.9rem 1rem;
+    border-left: 3px solid var(--accent-fill);
+    background: var(--color-cream);
+    color: var(--text);
+  }
+
+  .tp__testo code {
+    font-size: 0.95em;
+  }
+
+  /* Le schede si avvolgono invece di scorrere: sono quattro parole, e una riga
+     che scorre di lato nasconde la quarta senza dirlo. */
+  .tp__schede {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 2rem 0 1.5rem;
+  }
+
+  .tp__scheda {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    padding: 0 1.1rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--color-white);
+    color: var(--text);
+    font-family: inherit;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .tp__scheda[aria-selected='true'] {
+    background: var(--accent-fill);
+    border-color: var(--accent-fill);
+    color: var(--color-white);
+  }
+
+  .tp__note {
+    max-width: 62ch;
+    margin: 0 0 1.25rem;
+    padding-left: 1.1rem;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .tp__note li { margin-bottom: 0.45rem; }
+
+  .tp__comandi {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.75rem;
+    margin: 0 0 1.25rem;
+  }
+
+  .tp__campo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: var(--text-2xs);
+    color: var(--text-muted);
+  }
+
+  .tp__select,
+  .tp__input {
+    min-height: 3rem;
+    padding: 0 0.75rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--color-white);
+    color: var(--text);
+    font-family: inherit;
+    font-size: var(--text-sm);
+  }
+
+  .tp__btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    padding: 0 1.1rem;
+    border: 1px solid var(--accent-fill);
+    border-radius: var(--radius);
+    background: var(--accent-fill);
+    color: var(--color-white);
+    font-family: inherit;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .tp__btn--vuoto {
+    background: transparent;
+    color: var(--accent-text);
   }
 
   .tp__diag {
-    margin: 2rem 0 1.5rem;
+    margin: 0 0 1.5rem;
     padding: 1.25rem;
     border: 1px solid var(--border-strong);
     border-radius: var(--radius);
     background: var(--color-white);
   }
 
-  .tp__diag[data-stato='ok'] {
-    border-color: rgba(31, 122, 60, 0.35);
-  }
-
-  .tp__diag[data-stato='ko'] {
-    border-color: rgba(176, 60, 0, 0.35);
-  }
+  .tp__diag[data-stato='ok'] { border-color: rgba(31, 122, 60, 0.35); }
+  .tp__diag[data-stato='ko'] { border-color: rgba(176, 60, 0, 0.35); }
 
   .tp__diag-riga {
     margin: 0 0 0.4rem;
@@ -242,8 +650,22 @@ const CLIENT_PORTAL_CSS = 'https://cdn.jsdelivr.net/npm/@perfectgym/client-porta
     max-width: 70ch;
   }
 
+  .tp__registro {
+    max-height: 14rem;
+    margin: 0 0 1.5rem;
+    padding: 1rem;
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--color-cream);
+    font-size: var(--text-2xs);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
   /* Il riquadro non ha un'altezza scritta: la detta iframe-resizer, che misura
-     il contenuto e la aggiorna. `min-height` è solo il posto che il calendario
+     il contenuto e la aggiorna. `min-height` è solo il posto che il portale
      occupa mentre arriva, così la pagina non salta quando compare. */
   .tp__riquadro {
     min-height: 40rem;
