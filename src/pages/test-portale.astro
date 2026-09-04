@@ -120,6 +120,7 @@ const SCENARI = [
       'La forma «stato» è la registrazione generica, quella che la libreria sa raggiungere da sé. Non porta nessun piano: la persona lo sceglie dentro il portale.',
       'La forma «con il piano» è l’indirizzo vero dei pulsanti del listino, e passa da forceUrl. È una rotta del server e non uno stato dell’applicazione: se la diagnostica non arriva a «risposta del portale», vuol dire che quella pagina non parla con la libreria — quindi niente altezza automatica e niente eventi, e l’embed del piano preciso non si può fare.',
       'Il campo email prova a passare l’indirizzo già verificato come parametro. Non è documentato: serve a vedere se il portale lo raccoglie o lo ignora.',
+      'Il registro qui sotto è la parte che serve a decidere: prova a percorrere la registrazione e guarda quali passi il sito riesce a vedere. Quello che compare lì è tutto e solo quello su cui si può contare per misurare dove le persone si fermano — il resto succede dentro il portale e resta invisibile.',
     ],
   },
   {
@@ -240,8 +241,8 @@ const SCENARI = [
           <p class="tp__diag-esito" data-esito>In attesa…</p>
         </div>
 
-        {s.id === 'sessione' && (
-          <pre class="tp__registro" data-registro>Il registro degli eventi compare qui.</pre>
+        {(s.id === 'sessione' || s.id === 'registrazione') && (
+          <pre class="tp__registro" data-registro={s.id}>Il registro degli eventi compare qui.</pre>
         )}
 
         <div class="tp__riquadro">
@@ -287,8 +288,8 @@ const SCENARI = [
       d.querySelector('[data-esito]').textContent = testo;
     }
 
-    function registra(riga) {
-      var pre = document.querySelector('[data-registro]');
+    function registra(id, riga) {
+      var pre = document.querySelector('[data-registro="' + id + '"]');
       if (!pre) return;
       if (pre.dataset.usato !== '1') {
         pre.textContent = '';
@@ -394,17 +395,36 @@ const SCENARI = [
       var params = {};
       if (email && email.value) params.email = email.value;
 
+      /* Le spie della registrazione, che sono il motivo per cui questo
+         riquadro esiste: `enableVirtualStates` è la sola riga che fa vedere i
+         **passi interni** del percorso. Senza, la libreria scarta gli stati
+         marcati `isVirtual` (`if (!o.enableVirtualStates && i.isVirtual)
+         break;` dentro `recieveMsg`) — e i passi di una procedura guidata sono
+         esattamente quelli. È la differenza fra sapere «è entrato nella
+         registrazione» e sapere «si è fermato al passo del pagamento». */
+      var spie = {
+        enableVirtualStates: true,
+        navigation: { hide: true },
+        registration: { logo: false },
+        onStateChangeSuccess: function (st) {
+          var nome = st && st.toState && st.toState.name;
+          registra('registrazione', 'PASSO  ' + (nome || '?') + '   ' + JSON.stringify(st));
+        },
+        onUserLoggedIn: function (info) {
+          registra('registrazione', 'ENTRATO  ' + JSON.stringify(info));
+        },
+        onShowModal: function () { registra('registrazione', 'MODALE aperta'); },
+      };
+
       if (v === 'piano') {
         var u = PIANO_PROVA.url;
         if (email && email.value) u += '&email=' + encodeURIComponent(email.value);
-        monta('registrazione', { forceUrl: u, navigation: { hide: true }, registration: { logo: false } });
+        spie.forceUrl = u;
+        monta('registrazione', spie);
       } else {
-        monta('registrazione', {
-          defaultState: PGL.State.Registration,
-          defaultStateParams: params,
-          navigation: { hide: true },
-          registration: { logo: false },
-        });
+        spie.defaultState = PGL.State.Registration;
+        spie.defaultStateParams = params;
+        monta('registrazione', spie);
       }
     }
 
@@ -424,13 +444,13 @@ const SCENARI = [
         navigation: { hide: true },
         loginPage: { navbar: false, logo: false },
         onUserLoggedIn: function (info) {
-          registra('ENTRATO  ' + JSON.stringify(info));
+          registra('sessione', 'ENTRATO  ' + JSON.stringify(info));
         },
         onUserLoggedOut: function (info) {
-          registra('USCITO   ' + JSON.stringify(info));
+          registra('sessione', 'USCITO   ' + JSON.stringify(info));
         },
         onStateChangeSuccess: function (stato) {
-          registra('SCHERMATA  ' + JSON.stringify(stato));
+          registra('sessione', 'SCHERMATA  ' + JSON.stringify(stato));
         },
       });
     }
@@ -478,16 +498,16 @@ const SCENARI = [
     document.querySelectorAll('[data-sess]').forEach(function (b) {
       b.addEventListener('click', function () {
         var i = montati.sessione;
-        if (!i) return registra('(il riquadro non è montato)');
+        if (!i) return registra('sessione', '(il riquadro non è montato)');
         var che = b.dataset.sess;
         if (che === 'chiedi') {
-          i.isUserLoggedIn().then(function (r) { registra('CHIESTO  ' + JSON.stringify(r)); });
+          i.isUserLoggedIn().then(function (r) { registra('sessione', 'CHIESTO  ' + JSON.stringify(r)); });
         } else if (che === 'calendario') {
           i.goTo(PGL.State.Classes);
         } else if (che === 'scadenze') {
           i.goTo(PGL.State.ProfilePayments);
         } else if (che === 'logout') {
-          i.logout().then(function () { registra('LOGOUT chiesto dalla pagina'); });
+          i.logout().then(function () { registra('sessione', 'LOGOUT chiesto dalla pagina'); });
         }
       });
     });
