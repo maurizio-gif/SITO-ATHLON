@@ -2191,9 +2191,24 @@ export function initChatAssistente(root, options) {
     return validaTelefono(pref ? pref.value : '+39', valoreScritto);
   }
 
-  /** Il numero già pronto, o `''`. Per i punti che non devono validare niente. */
+  /** Il numero già pronto, o `''`. Per i punti che non devono validare niente.
+   *
+   * **Passa dal prefisso scelto, e non da `'+39'` fisso.** Con l'Italia scritta
+   * dentro, questa funzione rivalidava come italiano un numero che il controllo
+   * a schermo aveva appena approvato come tedesco — `validaTelefono` applica la
+   * regola del 3 solo quando il prefisso è 39 — e restituiva `''`. Il campo si
+   * svuotava **fra il controllo e la spedizione**: la persona vedeva il modulo
+   * accettare il suo numero, e il workflow riceveva `cellulare: ""` e rifiutava
+   * tutto con «cellulare non valido».
+   *
+   * Successo davvero il 05/09/2026 alle 15:38, a una visitatrice tedesca su
+   * `/gym-floor/`: nome e cognome arrivati, cellulare vuoto, esecuzione morta in
+   * 31 ms. Su PerfectGym non è stata creata, nel CRM è rimasta una riga con la
+   * sola email, e lei è andata avanti in chat a chiedere quanto costa un
+   * abbonamento di quattro mesi. La tendina dei prefissi c'è dal principio ed è
+   * giusta: era questo punto a non guardarla. */
   function telefonoPronto(v) {
-    var e = validaTelefono('+39', v);
+    var e = telefonoScelto(v);
     return e.ok ? e.e164 : '';
   }
 
