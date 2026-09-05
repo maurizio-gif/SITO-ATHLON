@@ -272,7 +272,7 @@ export const JUNIOR: CorsoJunior[] = [
       {
         titolo: 'Il corso',
         testo:
-          'Il corso ha carattere ludico-didattico. La durata è di 40 minuti e prevede l’ingresso di un genitore o accompagnatore. I gruppi vengono divisi in base all’età del bambino: per i più piccoli si privilegia il rapporto genitore-bambino, mentre per i più grandi si introducono elementi ludici di gruppo.',
+          'Il corso ha carattere ludico-didattico. La durata è di 40 minuti e prevede l’ingresso di un genitore o accompagnatore. I turni sono divisi in due gruppi per età — fino ai 15 mesi e oltre i 15 mesi — e non per livello: per i più piccoli si privilegia il rapporto genitore-bambino, mentre per i più grandi si introducono elementi ludici di gruppo.',
       },
       {
         titolo: 'I benefici',
@@ -306,7 +306,14 @@ export const JUNIOR: CorsoJunior[] = [
         dettagli: [
           { l: 'Periodo', v: 'Da settembre a luglio, con interruzione nel solo mese di agosto' },
           { l: 'Giorni', v: 'Sabato e domenica mattina' },
-          { l: 'Orari', v: '9.40 · 10.20 · 11.00 · 11.40' },
+          { l: 'Gruppi', v: 'Due, divisi per età: fino ai 15 mesi e oltre i 15 mesi' },
+          /* Gli orari dei singoli turni non si scrivono qui: cambiano per
+             gruppo e nel tempo, e un elenco di orari accanto alla riga dei due
+             gruppi è un elenco da cui si ricompone «tutti e due i gruppi hanno
+             questi orari» — che è l'errore già visto in chat. Il dato vero sta
+             nel calendario di prenotazione, che mostra il turno della fascia
+             del bambino insieme ai posti che restano. */
+          { l: 'Orari', v: 'L’orario di ciascun turno si vede prenotando, da app o dal portale: il calendario mostra i turni della fascia d’età del bambino' },
           { l: 'Durata', v: '40 minuti, con un genitore in acqua' },
         ],
       },
@@ -351,6 +358,10 @@ export const JUNIOR: CorsoJunior[] = [
       {
         q: 'Serve il certificato medico per il Baby Nuoto?',
         a: 'No: per il Baby Nuoto non è richiesto il certificato medico né altre certificazioni.',
+      },
+      {
+        q: 'I turni sono divisi per età o per livello?',
+        a: 'Per età. I gruppi sono due — <strong>fino ai 15 mesi</strong> e <strong>oltre i 15 mesi</strong> — e dentro ogni gruppo l’istruttore adatta l’attività al singolo bambino: non ci sono livelli da superare né turni per competenza. Quali orari abbia il turno della fascia di tuo figlio si vede in fase di prenotazione, da app o dal portale, insieme ai posti che restano.',
       },
       {
         q: 'A quale età si può cominciare il Baby Nuoto?',
