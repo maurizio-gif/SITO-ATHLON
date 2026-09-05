@@ -1603,10 +1603,10 @@ lezione che non c'è*. Il portale mostra il palinsesto vero, quindi un giorno
 vuoto o «non sono presenti lezioni nel giorno che hai selezionato» vogliono dire
 che quel giorno quella lezione non è in programma — o perché il club è chiuso in
 quella fascia, o perché quell'attività quel giorno non c'è, e il palinsesto
-cambia ogni mese. Le **sette cause** di `prenotazioni-problemi.md` sono blocchi
+cambia ogni mese. Le **otto cause** di `prenotazioni-problemi.md` sono blocchi
 su una lezione **che esiste**: elencarle a chi ha davanti un giorno vuoto è
 rispondere a un'altra domanda. La scheda ora se lo dice da sola, in un blocco
-che viene prima delle sette e non è numerato — non è un blocco, è l'assenza
+che viene prima delle otto e non è numerato — non è un blocco, è l'assenza
 della lezione — e il prompt manda al planning invece che a «riprova» e allo
 screenshot.
 
@@ -2854,9 +2854,9 @@ che la persona può fare da sola in trenta secondi**, e invece è stata mandata 
 scrivere al desk e ad aspettare una risposta via email.
 
 **Il pezzo che mancava era una riga, e la scheda aveva già tutto il resto.**
-`generali/prenotazioni-problemi` elenca sette cause di blocco, la terza è
-«Pagamento insoluto» e portava già `Area riservata → Scadenze → Paga`. Ma era
-**l'unica delle sette senza la sezione «Messaggio che vedi»** — e la scheda apre
+`generali/prenotazioni-problemi` elenca le cause di blocco, e quella del
+pagamento insoluto portava già `Area riservata → Scadenze → Paga`. Ma era
+**l'unica senza la sezione «Messaggio che vedi»** — e la scheda apre
 dicendo *«trova il messaggio che vedi a schermo: sotto c'è il motivo e cosa
 fare»*. Cioè prometteva un indice per messaggio e su quella causa aveva un buco,
 per giunta sull'unico messaggio che il portale scrive **in inglese**.
@@ -2886,6 +2886,55 @@ righe numerate al posto di una freccia.
 **E si dice che si fa da soli.** «Non serve passare in segreteria» non è una
 cortesia: senza quella riga, una procedura che una persona può eseguire in
 autonomia si legge come l'ennesima cosa da chiedere a qualcuno.
+
+### Una nota bloccante non scade, e la scheda diceva il contrario
+
+Il 5 settembre, a una moglie che scriveva per il marito — «non riesce a
+prenotare gym floor alle 12:30» — l'assistente ha fatto tutto giusto fino
+all'ultimo turno: ha chiesto il messaggio a schermo invece di indovinare, e
+lei ha risposto `Booking blocked due to bloking note`. Da lì la risposta è
+stata: *«Guido ha un blocco automatico delle prenotazioni per 3 giorni…
+scade da solo dopo 3 giorni — non serve fare niente, non serve scriverci»*, e
+la coppia è stata mandata ad aspettare un blocco che non si sarebbe tolto.
+
+**Il modello non ha inventato: ha letto la scheda, che accoppiava quel
+messaggio alla causa sbagliata.** `prenotazioni-problemi.md` apriva con «1.
+Blocco per mancate disdette» e metteva `booking blocked due to blocking node`
+sotto quel titolo come *suo* messaggio. Sono due cose diverse che il testo
+teneva in una: il blocco delle mancate disdette è automatico e dura 3 giorni,
+una **nota bloccante** è un promemoria che il club mette sulla scheda della
+persona — nella grandissima parte dei casi il certificato medico scaduto o mai
+consegnato — e **la toglie il club**, quindi aspettare non toglie niente.
+
+Ora sono due cause, la 1 e la 2, ognuna con il proprio «Messaggio che vedi», e
+ognuna nomina l'altra per negarla: è la stessa medicina delle due sospensioni e
+dei due orari — *un contesto che contiene due regimi è un contesto da cui si
+può comporre un terzo regime che non esiste*, e qui il terzo era «la nota scade
+da sé».
+
+Tre cose da sapere prima di toccarla.
+
+**La risposta è il team, e non è un ripiego.** Il messaggio non dice *quale*
+nota sia: quello si legge sulla scheda, che da fuori non si vede. Quindi la
+risposta giusta non è una diagnosi ma un passaggio di mano — l'icona del
+messaggio in alto nella chat, o il modulo dell'Help Desk — e in chat vale
+l'azione `{"tipo": "team"}`, che quel modulo lo apre invece di nominarlo.
+Nominare il certificato medico come **causa più probabile** è utile e va detto;
+darlo per certo no, ed è la stessa differenza fra «di solito è questo» e «è
+questo».
+
+**Il messaggio si indicizza nelle due grafie.** Il portale scrive `blocking
+note`, e chi lo ricopia a mano scrive spessissimo `blocking node` — il tag
+c'era solo nella seconda forma, cioè nella forma sbagliata. Vale la regola già
+scritta per «your member is on financial debit»: *un errore che la persona cita
+è una chiave di ricerca prima che un sintomo*, e una chiave che esiste in una
+grafia sola è una chiave che manca metà delle volte.
+
+**Le cause sono numerate, e la numerazione è citata altrove.** Passando da
+sette a otto sono cambiati il cappello della scheda, i rimandi interni («causa
+5» per la lista d'attesa) e la regola fissa del prompt che mandava «alle sette
+cause della scheda». Numerare aiuta chi legge e costa questo: chi aggiunge una
+causa le rinumera tutte, e cerca «sette» anche fuori dal file.
 
 ### Le date non si calcolano, e una lezione di domani è dentro la finestra
 
