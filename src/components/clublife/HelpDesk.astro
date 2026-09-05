@@ -294,19 +294,39 @@ const SUGGESTIONS: Record<string, string[]> = {
         è tornare su. Il «oppure» è la parola giusta: non annulla quello che
         c'è sopra, aggiunge la strada che resta.
 
-        `data-open-support` è lo stesso attributo che usa la chat quando offre
-        di scrivere al team: un aggancio solo, e l'ascoltatore sta sulla sezione
-        e non sull'area delle risposte, così vale anche per questo pulsante. */}
+        Il modulo dell'assistenza resta montato in fondo alla sezione — lo
+        aprono i `data-open-support` dentro le risposte della ricerca e la
+        chat, quando offre di scrivere al team. Il comando qui sotto invece
+        apre l'assistente, e il perché sta nel commento accanto. */}
     {/* Il comando resta anche qui, e non è una ripetizione da togliere: chi ha
         scorso tutte le schede fino in fondo è a mille pixel da quello in cima,
-        e mandarlo a cercarlo su è la cosa che fa chiudere la pagina. È lo stesso
-        `data-open-support`, quindi un ascoltatore per due posti. */}
+        e mandarlo a cercarlo su è la cosa che fa chiudere la pagina.
+
+        **Ma qui apre la chat, non il modulo.** Chi arriva in fondo alla pagina
+        senza aver trovato la risposta ha una domanda, non una pratica da aprire:
+        l'assistente risponde adesso, e quando non basta ha «Contatta il team»
+        dentro la conversazione — cioè lo stesso `SupportForm`, un passo dopo e
+        solo per chi serve davvero. Un modulo che chiede l'email e promette una
+        risposta per email è il passo giusto per un problema personale, ed è
+        quello che l'icona in alto nella chat continua a dare.
+
+        L'aggancio è `data-cta="assistente"`, lo stesso di ogni comando della
+        chat sul sito (`ChatModal` lo ascolta delegato al documento): **non**
+        `data-open-support`, che qui aprirebbe il modulo. `data-cta-testo` dà
+        alla chat l'etichetta con cui contestualizzare il primo messaggio. */}
     <div class="hd__staff">
       <p class="hd__staff__testo">
-        Non hai trovato la risposta? <strong>Scrivi al nostro team</strong>: la legge una persona
-        del club e ti risponde per email in pochi minuti.
+        Non hai trovato la risposta? <strong>Chiedi all'assistente</strong>: risponde adesso, e se
+        non basta ti mette in contatto con una persona del club.
       </p>
-      <button type="button" class="hd__staff__btn" data-open-support>
+      <button
+        type="button"
+        class="hd__staff__btn"
+        data-cta="assistente"
+        data-cta-source="help-desk-fondo"
+        data-cta-testo="Richiedi assistenza"
+        aria-haspopup="dialog"
+      >
         Richiedi assistenza →
       </button>
     </div>
