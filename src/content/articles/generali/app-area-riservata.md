@@ -52,6 +52,17 @@ No, l'account è lo stesso e le operazioni sono le stesse. Il portale si vede me
 </details>
 
 <details>
+<summary><strong>Si comprano cose dal club? Cuffia, costume, merchandising</strong></summary>
+
+Sì, e il posto è uno: **Shopping**, nel tuo account — da app o da portale. Lì vedi **quello che è disponibile in quel momento** e lo acquisti direttamente, senza passare dalla reception.
+
+L'elenco è quello che fa fede: cambia nel tempo, quindi la domanda «avete X?» ha la sua risposta lì dentro e non in una pagina di questo sito.
+
+I **kit tecnici** dell'agonistica e della pallanuoto sono un'altra cosa e stanno in **Prodotti**: sono kit di squadra, con la consegna e il cambio taglia che passano dall'allenatore o da un incaricato. Le condizioni stanno nelle f.a.q. dei due corsi.
+
+</details>
+
+<details>
 <summary><strong>Ho fatto un'operazione ma non sono sicuro che sia registrata</strong></summary>
 
 C'è una scheda che elenca dove si controlla, operazione per operazione: [come verifico che una richiesta sia andata a buon fine](/wikiathlon/generali/verifica-stato-richieste/).
