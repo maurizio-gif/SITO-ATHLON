@@ -1,12 +1,14 @@
 ---
 title: "Non riesco a prenotare una lezione"
-description: "Tutte le cause per cui una prenotazione risulta bloccata, con il messaggio che vedi a schermo e come si risolve — compreso «your member is on financial debit», che vuol dire un pagamento da saldare da Scadenze."
+description: "Tutte le cause per cui una prenotazione risulta bloccata, con il messaggio che vedi a schermo e come si risolve — compreso «booking blocked due to blocking note», che è una nota sul tuo account e si toglie solo scrivendo al team, e «your member is on financial debit», che vuol dire un pagamento da saldare da Scadenze."
 area: "Generali"
 order: 3
 tags:
   - prenotazione
   - errori
+  - booking blocked due to blocking note
   - booking blocked due to blocking node
+  - nota bloccante
   - hai troppe prenotazioni
   - online booking limit exceeded
   - non soddisfa i requisiti d'età
@@ -21,10 +23,10 @@ attivita: []
 ---
 
 <div class="ci-hero">
-  🔒 Prima controlla che quella lezione ci sia · Poi le sette cause di blocco
+  🔒 Prima controlla che quella lezione ci sia · Poi le otto cause di blocco
 </div>
 
-Se il sistema non ti lascia prenotare, la prima domanda non è quale blocco sia scattato: è se quella lezione, in quel giorno e a quell'ora, esiste. Se esiste, quasi sempre è una delle sette cause qui sotto. Trova il messaggio che vedi a schermo: sotto c'è il motivo e cosa fare. Se nessuna corrisponde, [scrivi all'assistenza](/club-life#help-desk) allegando uno **screenshot dell'errore** — è la prima cosa che ti chiediamo, e mandarla subito dimezza i tempi.
+Se il sistema non ti lascia prenotare, la prima domanda non è quale blocco sia scattato: è se quella lezione, in quel giorno e a quell'ora, esiste. Se esiste, quasi sempre è una delle otto cause qui sotto. Trova il messaggio che vedi a schermo: sotto c'è il motivo e cosa fare. Se nessuna corrisponde, [scrivi all'assistenza](/club-life#help-desk) allegando uno **screenshot dell'errore** — è la prima cosa che ti chiediamo, e mandarla subito dimezza i tempi.
 
 ---
 
@@ -49,17 +51,37 @@ I motivi sono due, e si controllano in un minuto:
 
 Guarda il [planning del mese](/planning/): dice quali lezioni ci sono, in che giorno e a che ora. Scegli un giorno in cui quella lezione è in programma e la prenotazione si apre normalmente.
 
-> 💡 Le sette cause qui sotto sono blocchi su una lezione **che esiste**: se il giorno è vuoto, nessuna delle sette c'entra.
+> 💡 Le otto cause qui sotto sono blocchi su una lezione **che esiste**: se il giorno è vuoto, nessuna delle otto c'entra.
 
 ---
 
-## 1. Blocco per mancate disdette
+## 1. Una nota bloccante sul tuo account
 
 ### Messaggio che vedi
 
-> booking blocked due to blocking node
+> Booking blocked due to blocking note
 
-Oppure le prenotazioni risultano bloccate senza nessuna spiegazione.
+Compare in inglese, e lo stesso messaggio si legge anche scritto `blocking node`.
+
+### Perché appare
+
+Una **nota bloccante** è un promemoria che il club mette sulla tua scheda quando c'è qualcosa da sistemare prima di poter prenotare. Il caso di gran lunga più frequente è il **certificato medico** scaduto o mai consegnato (causa 3), ma può essere anche un'altra cosa da regolarizzare con la segreteria.
+
+**Non è il blocco automatico delle mancate disdette** (causa 2), e la differenza è tutta qui: quello scade da sé dopo 3 giorni, una nota la toglie il club. Quindi aspettare non serve, e il messaggio non dice da solo quale sia il motivo: quello si legge sulla tua scheda.
+
+### Come si risolve
+
+**Scrivendo al team, che guarda la tua scheda e ti dice cos'è.** Dalla chat lo fai con l'icona del messaggio in alto, oppure [apri una richiesta](/club-life#help-desk): indica nome e cognome dell'iscritto e allega lo screenshot del messaggio.
+
+Se sai già che il certificato è scaduto o non l'hai mai mandato, sei a posto mandandolo: [Certificato Medico](/wikiathlon/generali/certificato-medico/).
+
+---
+
+## 2. Blocco per mancate disdette
+
+### Messaggio che vedi
+
+Le prenotazioni risultano bloccate senza nessuna spiegazione, dopo che non sei andato a due o più lezioni prenotate.
 
 ### Perché appare
 
@@ -67,13 +89,13 @@ Se non disdici una prenotazione e risulti assente **più di due volte in 30 gior
 
 ### Come si risolve
 
-Da sola: **il blocco dura 3 giorni e scade automaticamente**, non serve scriverci né chiedere di sbloccarlo.
+Da sola: **il blocco dura 3 giorni e scade automaticamente**, non serve scriverci né chiedere di sbloccarlo. Se invece a schermo compare `booking blocked due to blocking note`, non è questo: è una nota sulla tua scheda (causa 1) e si toglie solo scrivendo al team.
 
 > 💡 Per evitarlo: disdici entro 1 ora dall'inizio. Il posto va a chi è in lista d'attesa, e a te non resta nessun blocco.
 
 ---
 
-## 2. Certificato medico scaduto o mancante
+## 3. Certificato medico scaduto o mancante
 
 ### Perché appare
 
@@ -87,7 +109,7 @@ Tutti i requisiti sono nella scheda [Certificato Medico](/wikiathlon/generali/ce
 
 ---
 
-## 3. Pagamento insoluto
+## 4. Pagamento insoluto
 
 ### Messaggio che vedi
 
@@ -116,7 +138,7 @@ Cosa succede se il ritardo continua: [Non ho pagato e non ho frequentato](/wikia
 
 ---
 
-## 4. Sei già in lista d'attesa
+## 5. Sei già in lista d'attesa
 
 È la causa più fraintesa di tutte.
 
@@ -136,7 +158,7 @@ Oppure non riesci a prenotare anche se vedi posti liberi.
 
 ---
 
-## 5. Hai raggiunto il massimo di prenotazioni attive
+## 6. Hai raggiunto il massimo di prenotazioni attive
 
 ### Messaggio che vedi
 
@@ -151,7 +173,7 @@ Hai raggiunto il numero massimo di prenotazioni **ancora da svolgere**. Ogni att
 | Corsi Fitness, Aqua Fitness, Scuola Nuoto Adulti | max **3** |
 | Group Reformer | max **1** |
 
-**«Attiva» vuol dire in programma**: una lezione che si è già svolta non occupa più niente. Una lista d'attesa invece sì, conta come una prenotazione (causa 4).
+**«Attiva» vuol dire in programma**: una lezione che si è già svolta non occupa più niente. Una lista d'attesa invece sì, conta come una prenotazione (causa 5).
 
 ### Come si risolve
 
@@ -163,7 +185,7 @@ Se il conto non torna, cioè il messaggio compare e non hai né prenotazioni in 
 
 ---
 
-## 6. Requisiti d'età non soddisfatti (scuola nuoto)
+## 7. Requisiti d'età non soddisfatti (scuola nuoto)
 
 ### Messaggio che vedi
 
@@ -179,7 +201,7 @@ Ogni livello di corso è associato a fasce di anno di nascita. Se tuo figlio è 
 
 ---
 
-## 7. Abbonamento appena attivato
+## 8. Abbonamento appena attivato
 
 ### Messaggio che vedi
 
