@@ -33,6 +33,41 @@ import { ATTIVAZIONE } from './abbonamenti';
  */
 export const SNB_ETA = { dal: 2013, al: 2023 } as const;
 
+/**
+ * Le due vasche della Scuola Nuoto, e a chi tocca quale. Lo decide l'anno di
+ * nascita, come ogni altra cosa di questo corso: i tre più piccoli — 2021,
+ * 2022, 2023 — stanno nella vasca piccola, dove si tocca; tutti gli altri
+ * nella grande, che è la vasca da 25 metri del club.
+ *
+ * Sta qui e non nel testo di una f.a.q. perché la domanda arriva in due forme
+ * («in quale vasca?» e «quanto è profonda?») e la risposta è una sola: due
+ * copie divergerebbero al primo ritocco. La profondità è il dato che i
+ * genitori chiedono davvero — 120 cm vuol dire che il bambino tocca — e la
+ * temperatura sta dentro gli intervalli già dichiarati altrove sul sito
+ * (30–30,5 la piccola, 28–28,5 la grande): se un giorno cambia, vanno
+ * guardati anche `abbonamenti.ts` e la scheda della piscina piccola qui
+ * sotto, o il sito dirà due cose diverse sulla stessa acqua.
+ */
+export const VASCHE_SNB = {
+  piccola: {
+    anni: [2021, 2022, 2023],
+    misura: '12 metri',
+    profondita: '120 cm',
+    temperatura: '30,5 °C',
+  },
+  grande: {
+    misura: '25 metri',
+    profondita: 'da 140 a 240 cm',
+    temperatura: '28,3 °C',
+  },
+} as const;
+
+/** «2021, 2022 e 2023», scritto una volta sola. */
+export function anniVascaPiccola(): string {
+  const a = VASCHE_SNB.piccola.anni;
+  return a.slice(0, -1).join(', ') + ' e ' + a[a.length - 1];
+}
+
 const U = '/wp-content/uploads';
 
 /**
@@ -544,6 +579,16 @@ export const JUNIOR: CorsoJunior[] = [
       {
         q: 'Da che età si può cominciare la scuola nuoto?',
         a: `Dai 3 anni: la Scuola Nuoto Bambini è per i nati dal ${SNB_ETA.dal} al ${SNB_ETA.al}. I più piccoli — i nati nel 2024, 2025 e 2026 — fanno il <a href="/baby-nuoto">Baby Nuoto</a>, in acqua con un genitore. A decidere è l’anno di nascita, non i mesi: un bambino del ${SNB_ETA.al} fa la scuola nuoto anche se non ha ancora compiuto i 3 anni.`,
+      },
+      /* La domanda è arrivata in chat il 06/09, e la risposta non stava scritta
+         da nessuna parte: una mamma ha chiesto in quale vasca si tenesse il
+         turno del figlio e l'assistente non aveva il dato. Sta accanto alla
+         domanda sull'età perché è la stessa regola — decide l'anno di
+         nascita — e la profondità c'è perché è quello che un genitore
+         intende davvero chiedendo «dove nuota». */
+      {
+        q: 'In quale vasca si svolge il corso?',
+        a: `Dipende dall’anno di nascita, come i turni. I nati nel ${anniVascaPiccola()} nuotano nella <strong>vasca piccola</strong>, ${VASCHE_SNB.piccola.misura} con ${VASCHE_SNB.piccola.profondita} di profondità e l’acqua intorno ai ${VASCHE_SNB.piccola.temperatura}: lì il bambino tocca. Tutti gli altri, cioè i più grandi, nuotano nella <strong>vasca grande</strong> da ${VASCHE_SNB.grande.misura}, profonda ${VASCHE_SNB.grande.profondita}, intorno ai ${VASCHE_SNB.grande.temperatura}.`,
       },
       {
         q: 'Posso accompagnare mio figlio nello spogliatoio?',
