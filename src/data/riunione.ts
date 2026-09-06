@@ -26,7 +26,7 @@ export type Parte = 'maurizio' | 'valentina';
 
 export type Slide = {
   /** Il tipo decide la forma della slide, non il suo contenuto. */
-  tipo: 'sezione' | 'punti' | 'numero' | 'numeri' | 'citazione' | 'confronto' | 'ruolo' | 'schema';
+  tipo: 'sezione' | 'punti' | 'numero' | 'numeri' | 'citazione' | 'ruolo' | 'schema';
   parte: Parte;
   /** La sezione corrente, stampata in basso insieme al numero di slide. */
   sezione: string;
@@ -40,8 +40,6 @@ export type Slide = {
   cifraNota?: string;
   /** `numeri`: la griglia di dati. Il valore lo passa la pagina, dai dati veri. */
   dati?: { valore: string; cosa: string }[];
-  /** `confronto`: le righe prima → dopo. */
-  coppie?: { prima: string; dopo: string }[];
   /** `schema`: i blocchi affiancati (i concorrenti, l'organigramma). */
   blocchi?: { titolo: string; nota?: string }[];
   /**
@@ -67,7 +65,6 @@ export const SLIDE: Slide[] = [
     sezione: 'Apertura',
     occhiello: 'Athlon Club',
     titolo: 'Riunione staff',
-    righe: ['Maurizio, poi Valentina'],
     blocco: { titolo: 'Perché siamo qui', minuti: 2 },
     nota: 'Slide di attesa mentre entrano tutti. Non parlare finché non sono seduti.',
   },
@@ -112,52 +109,6 @@ export const SLIDE: Slide[] = [
     video: { vimeo: '30039264', inizio: 0 },
     blocco: { titolo: 'Da dove veniamo', minuti: 5 },
     nota: 'Il filmato parte da solo, muto e in ciclo: parlaci sopra e vai avanti con la freccia quando vuoi. Se la rete non regge resta la slide scura col titolo, che va bene lo stesso. PROVALO IN SALA PRIMA DELLA RIUNIONE.',
-  },
-  {
-    tipo: 'numero',
-    parte: 'maurizio',
-    sezione: 'Da dove veniamo',
-    occhiello: 'I primi anni',
-    titolo: 'Si lamentavano dell’impianto',
-    cifra: '9 su 10',
-    cifraNota: 'Il mio ufficio era all’ingresso: sentivo cosa dicevano uscendo',
-    nota: 'Dillo piano e lascialo lì. Annuncia che a questo numero ci torniamo fra un quarto d’ora: è il filo di tutta la prima parte.',
-  },
-  {
-    tipo: 'punti',
-    parte: 'maurizio',
-    sezione: 'Da dove veniamo',
-    occhiello: '1973',
-    titolo: 'Non nasciamo come club per famiglie',
-    righe: [
-      'Nasce come centro sportivo polisportivo',
-      'Nuoto, pattinaggio sul ghiaccio, danza',
-      'Di fitness non si parlava',
-    ],
-  },
-  {
-    tipo: 'punti',
-    parte: 'maurizio',
-    sezione: 'Da dove veniamo',
-    occhiello: '1973',
-    titolo: 'Tre discipline tecniche',
-    righe: [
-      'Con maestro e progressione didattica',
-      'Un posto dove si impara qualcosa con un metodo',
-      'La scuola nuoto è la linea diretta con quel 1973',
-    ],
-  },
-  {
-    tipo: 'punti',
-    parte: 'maurizio',
-    sezione: 'Da dove veniamo',
-    occhiello: 'Dal 2010',
-    titolo: 'Quello che ho preso in mano',
-    righe: [
-      'Non era l’Athlon di oggi: né offerta, né volumi, né sostenibilità',
-      'Immobile con problemi seri, impiantistici e strutturali',
-      'Un percorso duro. Ha formato me e ha formato molti di voi',
-    ],
   },
 
   {
@@ -227,7 +178,7 @@ export const SLIDE: Slide[] = [
     occhiello: 'L’investimento',
     titolo: 'Fra finanziamenti e risparmi personali',
     cifra: '2 milioni',
-    cifraNota: 'Modello lean e digital, come si fa in Inghilterra. Leggero, non povero',
+    cifraNota: 'Modello lean e digital. Leggero, non povero',
   },
   {
     tipo: 'citazione',
@@ -236,23 +187,6 @@ export const SLIDE: Slide[] = [
     occhiello: 'Perché è raro',
     titolo: 'Nelle società sportive dilettantistiche in Italia questo non è stato fatto',
     righe: ['Siamo un caso a parte'],
-  },
-  {
-    tipo: 'confronto',
-    parte: 'maurizio',
-    sezione: 'Il salto',
-    occhiello: 'Gli interventi',
-    titolo: 'Prima → dopo',
-    coppie: [
-      /* TODO — da completare con Maurizio: quattro o cinque interventi veri,
-         una riga per lato. Non inventarli: finché non sono confermati questa
-         slide resta con i segnaposto, che è il modo giusto di accorgersene. */
-      { prima: 'TODO — intervento 1, com’era', dopo: 'TODO — com’è oggi' },
-      { prima: 'TODO — intervento 2, com’era', dopo: 'TODO — com’è oggi' },
-      { prima: 'TODO — intervento 3, com’era', dopo: 'TODO — com’è oggi' },
-      { prima: 'TODO — intervento 4, com’era', dopo: 'TODO — com’è oggi' },
-    ],
-    nota: 'DA COMPLETARE. Quattro o cinque interventi concreti sulla struttura, una riga per lato. Se restano dei TODO il giorno della riunione, salta la slide con la freccia.',
   },
 
   {
@@ -268,7 +202,7 @@ export const SLIDE: Slide[] = [
     parte: 'maurizio',
     sezione: 'Dove siamo oggi',
     occhiello: 'Il mio lavoro',
-    titolo: 'Athlon è stato il mio flagship',
+    titolo: 'Athlon è il mio flagship',
     righe: [
       'Da qui è nata la seconda parte del mio lavoro',
       'Consulenza digitale, software custom, formazione',
@@ -283,7 +217,7 @@ export const SLIDE: Slide[] = [
     titolo: 'Giro impianti in Italia e all’estero',
     righe: [
       'Vedo organizzazioni e livelli di stress antitetici ai nostri',
-      'Non lo dico per vanto: è la misura di quello che avete costruito',
+      'Non lo dico per vanto: è la misura di quanto abbiamo costruito',
       'E voi, da dentro, non potete vederlo',
     ],
     nota: 'Guardali in faccia mentre dici l’ultima riga.',
@@ -295,16 +229,6 @@ export const SLIDE: Slide[] = [
     occhiello: 'Il livello',
     titolo: 'Solidità, impianti, qualità del servizio a 360°',
     righe: ['Livello di una multinazionale, non di un club a gestione familiare'],
-  },
-  {
-    tipo: 'numero',
-    parte: 'maurizio',
-    sezione: 'Dove siamo oggi',
-    occhiello: 'Torniamo al numero',
-    titolo: 'Quel problema oggi non esiste più',
-    cifra: '9 su 10',
-    cifraNota: 'È esattamente ciò che i 2 milioni hanno chiuso',
-    nota: 'Qui si chiude il filo aperto all’inizio. Aggiungi: oggi siamo in una riunione dove parliamo di ottimizzare ciò che già funziona. Quella è la distanza percorsa.',
   },
   {
     tipo: 'punti',
@@ -464,7 +388,7 @@ export const SLIDE: Slide[] = [
     blocchi: [
       { titolo: 'Virgin Active Talenti', nota: 'Investe e alza gli standard. Competitor serio' },
       { titolo: 'FitActive', nota: 'Piazza Sempione. Low cost puro, 19–29 € al mese' },
-      { titolo: 'Anytime Fitness', nota: 'Talent Village. Medium price' },
+      { titolo: 'Anytime Fitness', nota: 'Talenti Village. Medium price' },
       { titolo: 'Piscina comunale', nota: 'Se ne parla da anni. Prima o poi apre' },
     ],
   },
@@ -498,7 +422,7 @@ export const SLIDE: Slide[] = [
     parte: 'maurizio',
     sezione: 'Il mercato',
     occhiello: 'Dove facciamo la differenza',
-    titolo: 'Possono comprare i macchinari. Non dieci anni di persone che si conoscono',
+    titolo: 'Possono comprare i macchinari. Non persone che lavorano insieme da decadi',
     righe: ['Capacità relazionale e staff consolidato. La gestione in team è il fattore differenziante'],
   },
 

@@ -64,9 +64,6 @@ const totale = minuti('maurizio') + minuti('valentina');
             {s.righe && (
               <ul class="rl__righe">{s.righe.map((r) => <li>{r}</li>)}</ul>
             )}
-            {s.coppie && (
-              <ul class="rl__righe">{s.coppie.map((c) => <li>{c.prima} → {c.dopo}</li>)}</ul>
-            )}
             {s.blocchi && (
               <ul class="rl__righe">{s.blocchi.map((b) => <li>{b.titolo}{b.nota ? ` — ${b.nota}` : ''}</li>)}</ul>
             )}
