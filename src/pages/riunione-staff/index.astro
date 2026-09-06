@@ -99,9 +99,27 @@ const totale = SLIDE.length;
       const barra = document.getElementById('dk-avanzamento') as HTMLElement;
       let corrente = 0;
 
+      /* Il filmato d'archivio si accende arrivando sulla sua slide e si spegne
+       * andando oltre, e la seconda metà conta quanto la prima: un iframe di
+       * Vimeo dentro una slide `hidden` continua a scaricare e, su qualche
+       * browser, a suonare — cioè un filmato che gira per un'ora dietro la
+       * presentazione consumando la rete della sala. Togliere l'attributo
+       * `src` chiude il player davvero; rimetterlo lo fa ripartire dall'inizio,
+       * che per una scenografia in ciclo è il comportamento giusto.
+       */
+      function video(dentro: HTMLElement | null) {
+        document.querySelectorAll<HTMLIFrameElement>('.sl__video iframe').forEach((f) => {
+          const acceso = dentro?.contains(f) ?? false;
+          const url = f.dataset.videoSrc ?? '';
+          if (acceso && f.getAttribute('src') !== url) f.setAttribute('src', url);
+          if (!acceso && f.hasAttribute('src')) f.removeAttribute('src');
+        });
+      }
+
       function mostra(i: number, storia = true) {
         corrente = Math.max(0, Math.min(slide.length - 1, i));
         slide.forEach((s, n) => { s.hidden = n !== corrente; });
+        video(slide[corrente]);
         barra.style.width = `${((corrente + 1) / slide.length) * 100}%`;
         if (storia) history.replaceState(null, '', `#${corrente + 1}`);
         document.title = `${corrente + 1}/${slide.length} — Riunione staff`;

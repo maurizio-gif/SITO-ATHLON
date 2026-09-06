@@ -44,6 +44,14 @@ export type Slide = {
   coppie?: { prima: string; dopo: string }[];
   /** `schema`: i blocchi affiancati (i concorrenti, l'organigramma). */
   blocchi?: { titolo: string; nota?: string }[];
+  /**
+   * Il filmato d'archivio dietro la slide, se ce n'è uno.
+   *
+   * Muto, in ciclo, senza comandi: è scenografia, non un video da guardare.
+   * `inizio` sono i secondi da cui parte — un filmato lungo non comincia dalla
+   * sigla, e questo comincia sotto una frase che dura venti secondi.
+   */
+  video?: { vimeo: string; inizio?: number };
   /** Il blocco del discorso che comincia qui, e quanto dovrebbe durare. */
   blocco?: { titolo: string; minuti: number };
   /** Indicazioni per chi parla: stanno nella vista relatore, mai sulla slide. */
@@ -94,9 +102,16 @@ export const SLIDE: Slide[] = [
     tipo: 'sezione',
     parte: 'maurizio',
     sezione: 'Da dove veniamo',
-    occhiello: 'Parte prima',
+    occhiello: 'Come eravamo',
     titolo: 'Da dove veniamo',
+    /* Il filmato d'archivio sta qui e in nessun altro posto del mazzo: è
+       lungo, e messo a girare sotto tutta la presentazione farebbe concorrenza
+       a chi parla per un'ora. Su questa slide invece *è* il discorso — mentre
+       scorre si racconta il 1973 — e la slide dura quanto serve, perché il
+       ciclo non finisce mai e il passaggio avanti lo dà la freccia. */
+    video: { vimeo: '30039264', inizio: 0 },
     blocco: { titolo: 'Da dove veniamo', minuti: 5 },
+    nota: 'Il filmato parte da solo, muto e in ciclo: parlaci sopra e vai avanti con la freccia quando vuoi. Se la rete non regge resta la slide scura col titolo, che va bene lo stesso. PROVALO IN SALA PRIMA DELLA RIUNIONE.',
   },
   {
     tipo: 'numero',

@@ -135,6 +135,40 @@
   .sl--sezione .sl__titolo { font-size: 7.6rem; --lh: 0.88; }
   .sl--sezione .sl__occhiello { margin-bottom: 2.4rem; }
 
+  /* ── Il filmato d'archivio, dietro una slide di sezione ───────────────── */
+
+  .sl__video {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background: var(--color-dark);
+  }
+  /* Il filmato riempie lo schermo e si lascia tagliare ai lati: un 4:3
+     d'archivio dentro un 16:9 lascerebbe due bande nere larghe un quarto di
+     pannello, che in sala si leggono come un guasto. `cover` fatto a mano,
+     perché un iframe non ha `object-fit`. */
+  .sl__video iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: max(100vw, 177.78vh);
+    height: max(100vh, 56.25vw);
+    border: 0;
+    pointer-events: none;
+  }
+  /* Senza questo velo il titolo bianco sta sopra un'immagine che si muove, e
+     da cinque metri non si legge in nessuno dei due modi. Il fondo scuro del
+     club, all'80%: il filmato si vede, la scritta si legge. */
+  .sl__video::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(39, 36, 35, 0.92) 0%, rgba(39, 36, 35, 0.82) 45%, rgba(39, 36, 35, 0.5) 100%);
+  }
+  .sl--con-video { position: relative; z-index: 1; }
+
   /* ── Numero: una cifra sola, ed è l'immagine della slide ──────────────── */
 
   .sl--numero .sl__titolo { font-size: 3.6rem; order: 3; margin-top: 1.6rem; }
