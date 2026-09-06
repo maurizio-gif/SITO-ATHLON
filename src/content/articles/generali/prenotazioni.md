@@ -1,6 +1,6 @@
 ---
 title: "Prenotazioni"
-description: "Regole di prenotazione, disdetta, lista d'attesa e penali per tutte le attività."
+description: "Regole di prenotazione, disdetta, lista d'attesa, capienze e penali per tutte le attività, comprese le corsie e i turni del Nuoto Libero."
 area: "Generali"
 order: 1
 tags:
@@ -14,6 +14,8 @@ tags:
   - capienza
   - posti
   - affluenza
+  - corsie
+  - nuoto libero
 attivita: []
 ---
 
@@ -125,10 +127,19 @@ Varia per sala, non per corso: due lezioni diverse nella stessa sala hanno la st
 | Vasca Piccola (Aqua Fitness) | 16-18 posti |
 | Vasca Grande (Aqua Fitness) | 30 posti |
 | Scuola Nuoto Adulti | 7 posti per corsia |
-| Nuoto Libero | 20 posti totali in vasca, fra i due turni che si sovrappongono |
+| Nuoto Libero | 12 posti per turno, 24 in vasca fra i due turni che si sovrappongono · 5 per corsia |
 | Gym Floor | Nessun limite di capienza |
 
 Per il numero esatto di posti liberi su una lezione specifica, il dato in tempo reale è quello che vedi prenotando dall'app o dal <a href="https://athlon.perfectgym.com/ClientPortal2/#/Classes/1/Calendar" target="_blank" rel="noopener noreferrer">portale</a>.
+
+</details>
+
+<details>
+<summary><strong>Nuoto Libero: come funzionano i turni e le corsie?</strong></summary>
+
+Il turno dura **60 minuti** e le partenze sono ogni **30 minuti**: per questo due turni si sovrappongono sempre. Ogni turno tiene **12 posti**, quindi in vasca ci sono al massimo **24 persone**, ed è il numero del turno quello che vedi prenotando — «11 su 12» vuol dire undici posti liberi in quel turno.
+
+Ogni corsia tiene **5 persone** e le corsie sono divise per ritmo. **La corsia non si sceglie prenotando**: prenotando prendi il posto nel turno, e in quale corsia nuotare te lo dice a bordo vasca l'**Assistente Bagnanti**, che è anche **Tecnico Federale**: ti mette con chi tiene il tuo stesso ritmo. È il motivo per cui la corsia non compare fra le cose da scegliere nell'app o nel portale.
 
 </details>
 
