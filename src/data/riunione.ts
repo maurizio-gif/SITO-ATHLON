@@ -67,7 +67,6 @@ export const SLIDE: Slide[] = [
     sezione: 'Apertura',
     occhiello: 'Athlon Club',
     titolo: 'Riunione staff',
-    righe: ['Maurizio, poi Valentina'],
     blocco: { titolo: 'Perché siamo qui', minuti: 2 },
     nota: 'Slide di attesa mentre entrano tutti. Non parlare finché non sono seduti.',
   },
