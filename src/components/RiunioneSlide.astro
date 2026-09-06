@@ -62,18 +62,6 @@ const s = slide;
     </ul>
   )}
 
-  {s.tipo === 'confronto' && (
-    <ul class="sl__coppie">
-      {s.coppie?.map((c) => (
-        <li>
-          <span class="sl__prima">{c.prima}</span>
-          <span class="sl__freccia" aria-hidden="true">→</span>
-          <span class="sl__dopo">{c.dopo}</span>
-        </li>
-      ))}
-    </ul>
-  )}
-
   {s.tipo === 'schema' && (
     <ul class="sl__blocchi">
       {s.blocchi?.map((b) => (
