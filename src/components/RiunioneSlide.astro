@@ -1,0 +1,93 @@
+---
+/**
+ * Una slide della presentazione dello staff.
+ *
+ * Sta in un componente e non dentro la pagina perché la disegnano in due — le
+ * slide e l'anteprima della vista relatore — e due copie del markup
+ * divergerebbero al primo ritocco.
+ *
+ * Le misure stanno tutte in `rem`, mai in `px`: la radice del mazzo è in `vw`
+ * (vedi `riunione-staff/index.astro`), quindi la stessa dichiarazione dà 60px
+ * su un pannello Full HD e 120 su un 4K. Una misura in px qui è una riga che su
+ * un 82" da cinque metri non si legge.
+ */
+import type { Slide } from '../data/riunione';
+
+interface Props {
+  slide: Slide;
+  dati?: { valore: string; cosa: string }[];
+}
+const { slide, dati = [] } = Astro.props;
+const s = slide;
+---
+
+{s.video && (
+  /* L'iframe nasce **senza `src`**: lo scrive lo script della pagina quando la
+     slide arriva a schermo, e glielo toglie quando si va oltre. Sessanta slide
+     con un player dentro una di loro non devono aprire una connessione a Vimeo
+     all'apertura del mazzo, né lasciarlo girare dietro le altre cinquantanove.
+
+     `background=1` è l'interruttore di Vimeo per esattamente questo caso:
+     parte da solo, muto, in ciclo, senza comandi e senza il titolo sopra. I
+     tre parametri espliciti restano perché quello da solo è cambiato di
+     comportamento in passato, e `allow="autoplay"` serve **oltre** al
+     parametro — il parametro da solo viene rifiutato. */
+  <div class="sl__video" aria-hidden="true">
+    <iframe
+      data-video-src={`https://player.vimeo.com/video/${s.video.vimeo}?background=1&autoplay=1&muted=1&loop=1&autopause=0${s.video.inizio ? `#t=${s.video.inizio}s` : ''}`}
+      allow="autoplay; fullscreen"
+      title="Filmato d'archivio"
+      tabindex="-1"
+    ></iframe>
+  </div>
+)}
+
+<div class:list={['sl', `sl--${s.tipo}`, s.video && 'sl--con-video']}>
+  {s.occhiello && <p class="sl__occhiello">{s.occhiello}</p>}
+  <h2 class="sl__titolo">{s.titolo}</h2>
+
+  {s.tipo === 'numero' && (
+    <p class="sl__cifra u-display">{s.cifra}</p>
+  )}
+  {s.tipo === 'numero' && s.cifraNota && <p class="sl__cifra-nota">{s.cifraNota}</p>}
+
+  {s.tipo === 'numeri' && (
+    <ul class="sl__dati">
+      {dati.map((d) => (
+        <li>
+          <span class="sl__dato-valore u-display">{d.valore}</span>
+          <span class="sl__dato-cosa">{d.cosa}</span>
+        </li>
+      ))}
+    </ul>
+  )}
+
+  {s.tipo === 'confronto' && (
+    <ul class="sl__coppie">
+      {s.coppie?.map((c) => (
+        <li>
+          <span class="sl__prima">{c.prima}</span>
+          <span class="sl__freccia" aria-hidden="true">→</span>
+          <span class="sl__dopo">{c.dopo}</span>
+        </li>
+      ))}
+    </ul>
+  )}
+
+  {s.tipo === 'schema' && (
+    <ul class="sl__blocchi">
+      {s.blocchi?.map((b) => (
+        <li>
+          <span class="sl__blocco-titolo u-display">{b.titolo}</span>
+          {b.nota && <span class="sl__blocco-nota">{b.nota}</span>}
+        </li>
+      ))}
+    </ul>
+  )}
+
+  {s.righe && s.righe.length > 0 && (
+    <ul class:list={['sl__righe', (s.tipo === 'sezione' || s.tipo === 'citazione') && 'sl__righe--piane']}>
+      {s.righe.map((r) => <li>{r}</li>)}
+    </ul>
+  )}
+</div>

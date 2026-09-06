@@ -1,0 +1,161 @@
+---
+/**
+ * La presentazione della riunione dello staff.
+ *
+ * **Pagina di servizio, non pagina del club**, e per questo non passa da
+ * `Layout.astro`: quel guscio porta con sé header, footer, i modal della prova
+ * e dei contatti, il pulsante della chat, il banner del consenso e Google Tag
+ * Manager — tutte cose che su un pannello in sala riunione sono, nell'ordine,
+ * inutili e imbarazzanti. Qui il `<head>` ha il minimo: charset, viewport,
+ * `noindex, nofollow` e il CSS del sito, da cui vengono i font e i token.
+ *
+ * Fuori dalla sitemap (`astro.config.mjs`), fuori da `llms.txt` — che elenca
+ * `PAGINE` a mano e quindi non la vede — fuori dal menu e dal footer, e fuori
+ * dalla knowledge base della chat. **Va cancellata a riunione passata**: questa
+ * pagina, `relatore.astro`, `data/riunione.ts`, i due componenti e la riga
+ * della sitemap.
+ *
+ * I numeri dell'offerta li legge dalle stesse fonti di `llms.txt`: il
+ * palinsesto conta le lezioni e le ore, `corsi.ts` i corsi, `junior.ts` quelli
+ * dei bambini, `trainer.ts` i personal trainer. Cambia il planning e cambia la
+ * slide, senza che nessuno se ne ricordi.
+ */
+import '../../styles/global.css';
+import RiunioneSlide from '../../components/RiunioneSlide.astro';
+import RiunioneStile from '../../components/RiunioneStile.astro';
+import { SLIDE } from '../../data/riunione';
+import { totalLessons, totalHours, openHours } from '../../data/planning';
+import { CORSI, NUMERO_CORSI_FITNESS } from '../../data/corsi';
+import { JUNIOR } from '../../data/junior';
+import { NUMERO_TRAINER } from '../../data/trainer';
+
+/* Le attività in acqua sono quelle che dichiarano un occhiello proprio — è già
+   il modo in cui il sito le tiene distinte dai corsi fitness, che l'occhiello
+   non ce l'hanno. Un elenco di slug scritto qui divergerebbe. */
+const IN_ACQUA = CORSI.filter((c) => c.eyebrow).length;
+
+const DATI = [
+  { valore: String(totalLessons()), cosa: 'lezioni a settimana' },
+  { valore: String(totalHours()), cosa: 'ore di palinsesto' },
+  { valore: String(openHours()), cosa: 'ore di sala aperta' },
+  { valore: String(NUMERO_CORSI_FITNESS), cosa: 'corsi fitness' },
+  { valore: String(IN_ACQUA), cosa: 'attività in acqua' },
+  { valore: String(JUNIOR.length), cosa: 'corsi per bambini' },
+  { valore: String(NUMERO_TRAINER), cosa: 'personal trainer' },
+  { valore: '1973', cosa: 'la scuola nuoto, da allora' },
+];
+
+const totale = SLIDE.length;
+---
+
+<!doctype html>
+<html lang="it" data-senza-intestazione>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Riunione staff — Athlon Club</title>
+    <RiunioneStile />
+  </head>
+  <body class="dk">
+    <div class="dk__avanzamento" id="dk-avanzamento" style="width:0"></div>
+
+    {SLIDE.map((s, i) => (
+      <section
+        class:list={['dk__slide', s.tipo === 'sezione' && 'dk__slide--scura']}
+        id={`slide-${i + 1}`}
+        data-slide={i + 1}
+        hidden={i > 0}
+        aria-label={`Slide ${i + 1} di ${totale}`}
+      >
+        <RiunioneSlide slide={s} dati={DATI} />
+        <div class="dk__chrome">
+          <span>{s.sezione}</span>
+          <span class="dk__conta">{i + 1} / {totale}</span>
+        </div>
+      </section>
+    ))}
+
+    <script>
+      /* La navigazione, e non c'è altro script in pagina.
+       *
+       * Tre cose non ovvie:
+       *
+       *  - le slide chiuse portano l'attributo `hidden`, non una classe: la
+       *    regola `[hidden] { display: none !important }` di `global.css` è
+       *    quella che le toglie davvero dal giro del tab, oltre che dalla
+       *    vista. Una slide nascosta con l'opacità resterebbe raggiungibile
+       *    dalla tastiera, che è il difetto già scritto per gli overlay;
+       *  - i telecomandi da presentazione non mandano le frecce, mandano
+       *    `PageUp` e `PageDown`: senza quei due tasti il mazzo si gira solo
+       *    dal portatile;
+       *  - l'indirizzo porta il numero della slide (`#12`), così la riunione
+       *    si riprende da dove si era fermata anche dopo un ricaricamento —
+       *    e `replaceState` invece di `location.hash`, o ogni freccia
+       *    lascerebbe una voce nella cronologia e il tasto indietro
+       *    diventerebbe un secondo comando «slide precedente».
+       */
+      const slide = Array.from(document.querySelectorAll<HTMLElement>('.dk__slide'));
+      const barra = document.getElementById('dk-avanzamento') as HTMLElement;
+      let corrente = 0;
+
+      /* Il filmato d'archivio si accende arrivando sulla sua slide e si spegne
+       * andando oltre, e la seconda metà conta quanto la prima: un iframe di
+       * Vimeo dentro una slide `hidden` continua a scaricare e, su qualche
+       * browser, a suonare — cioè un filmato che gira per un'ora dietro la
+       * presentazione consumando la rete della sala. Togliere l'attributo
+       * `src` chiude il player davvero; rimetterlo lo fa ripartire dall'inizio,
+       * che per una scenografia in ciclo è il comportamento giusto.
+       */
+      function video(dentro: HTMLElement | null) {
+        document.querySelectorAll<HTMLIFrameElement>('.sl__video iframe').forEach((f) => {
+          const acceso = dentro?.contains(f) ?? false;
+          const url = f.dataset.videoSrc ?? '';
+          if (acceso && f.getAttribute('src') !== url) f.setAttribute('src', url);
+          if (!acceso && f.hasAttribute('src')) f.removeAttribute('src');
+        });
+      }
+
+      function mostra(i: number, storia = true) {
+        corrente = Math.max(0, Math.min(slide.length - 1, i));
+        slide.forEach((s, n) => { s.hidden = n !== corrente; });
+        video(slide[corrente]);
+        barra.style.width = `${((corrente + 1) / slide.length) * 100}%`;
+        if (storia) history.replaceState(null, '', `#${corrente + 1}`);
+        document.title = `${corrente + 1}/${slide.length} — Riunione staff`;
+      }
+
+      function daHash() {
+        const n = Number(location.hash.replace('#', ''));
+        mostra(Number.isFinite(n) && n > 0 ? n - 1 : 0, false);
+      }
+
+      document.addEventListener('keydown', (e) => {
+        const k = e.key;
+        if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'PageDown' || k === ' ') {
+          e.preventDefault();
+          mostra(corrente + 1);
+        } else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp') {
+          e.preventDefault();
+          mostra(corrente - 1);
+        } else if (k === 'Home') {
+          e.preventDefault();
+          mostra(0);
+        } else if (k === 'End') {
+          e.preventDefault();
+          mostra(slide.length - 1);
+        }
+      });
+
+      /* Un tocco avanti, il quinto sinistro indietro: serve solo per provarla
+         da un portatile senza tastiera comoda, non è il modo in cui si guida. */
+      document.addEventListener('click', (e) => {
+        const x = (e as MouseEvent).clientX;
+        mostra(x < window.innerWidth * 0.2 ? corrente - 1 : corrente + 1);
+      });
+
+      window.addEventListener('hashchange', daHash);
+      daHash();
+    </script>
+  </body>
+</html>
