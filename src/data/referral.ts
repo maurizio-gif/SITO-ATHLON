@@ -85,8 +85,18 @@ export const VOUCHER = {
  * scritta a mano (non solo qui: `content/servizi/invita-i-tuoi-amici.md` e
  * `content/articles/generali/referral-guest-pass.md` non possono importare
  * questo modulo, quindi la ripetono in chiaro).
+ *
+ * **La finestra invece si dice, ed è la sola cosa di questo vantaggio che si
+ * dichiara prima.** Vale se si iscrive entro i giorni del pass, cioè
+ * `PASS.giorni`: una scadenza taciuta non protegge niente — è un'offerta che
+ * scade a una persona che non sapeva di doversi muovere, e la scopre quando
+ * non c'è più. Tacere *cosa* è resta la scelta del club; tacere *entro quando*
+ * sarebbe un'altra cosa. I giorni si leggono da `PASS`, non si riscrivono: il
+ * pass e la finestra sono lo stesso numero per costruzione.
  */
-export const VANTAGGIO_AMICO = 'ci sarà un vantaggio anche per lui, che lo staff gli comunica a fine prova';
+export const VANTAGGIO_AMICO =
+  `ci sarà un vantaggio anche per lui se si iscrive entro i ${PASS.giorni} giorni della ` +
+  'prova, e glielo dice lo staff quando lo richiama per sapere com’è andata';
 
 /**
  * Cosa comprende il pass. Le stesse sette voci del form vecchio, che è il
