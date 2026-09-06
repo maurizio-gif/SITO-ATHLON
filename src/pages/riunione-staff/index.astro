@@ -116,10 +116,39 @@ const totale = SLIDE.length;
         });
       }
 
+      /* La rete sotto la tipografia.
+       *
+       * Le misure delle slide sono scelte a mano e stanno nello schermo: la
+       * spazzata a 1920×1080 e a 3840×2160 lo verifica. Ma il testo di questo
+       * mazzo si corregge la sera prima, e una riga aggiunta a una slide che
+       * ne ha già cinque la fa sfondare in silenzio — sullo schermo grande
+       * sparisce l'ultima riga, e nessuno se ne accorge finché non è in sala.
+       *
+       * Quindi: se il contenuto non ci sta, si rimpicciolisce quanto basta.
+       * `transform` e non `font-size`, perché scala tutto insieme — margini,
+       * interlinea, il filetto dell'elenco — invece di rimettere in gioco ogni
+       * andata a capo. Il freno a 0,85 è il punto oltre il quale il testo
+       * scende sotto la misura leggibile da cinque metri: lì la slide non va
+       * rimpicciolita, va spezzata in due, e la spazzata lo dice.
+       */
+      function adatta(sl: HTMLElement | null) {
+        const dentro = sl?.querySelector<HTMLElement>('.sl');
+        if (!dentro) return;
+        dentro.style.transform = '';
+        const cs = getComputedStyle(sl!);
+        const spazio = sl!.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+        const serve = dentro.scrollHeight;
+        if (serve > spazio) {
+          dentro.style.transformOrigin = 'left center';
+          dentro.style.transform = `scale(${Math.max(0.85, spazio / serve)})`;
+        }
+      }
+
       function mostra(i: number, storia = true) {
         corrente = Math.max(0, Math.min(slide.length - 1, i));
         slide.forEach((s, n) => { s.hidden = n !== corrente; });
         video(slide[corrente]);
+        adatta(slide[corrente]);
         barra.style.width = `${((corrente + 1) / slide.length) * 100}%`;
         if (storia) history.replaceState(null, '', `#${corrente + 1}`);
         document.title = `${corrente + 1}/${slide.length} — Riunione staff`;
@@ -154,6 +183,9 @@ const totale = SLIDE.length;
         mostra(x < window.innerWidth * 0.2 ? corrente - 1 : corrente + 1);
       });
 
+      /* Cambiando risoluzione — un cavo staccato, il proiettore che rinegozia —
+         la misura di prima non vale più. */
+      window.addEventListener('resize', () => adatta(slide[corrente]));
       window.addEventListener('hashchange', daHash);
       daHash();
     </script>

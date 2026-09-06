@@ -676,10 +676,20 @@ export const SLIDE: Slide[] = [
       'Guasti e ammanchi: segnalazione immediata a manutenzione',
       'Tutto ciò che riguarda l’utente passa dal CRM',
       'Se non è tracciato, non esiste',
+    ],
+    nota: 'Sui guasti: senza aspettare che se ne accorga qualcun altro.',
+  },
+  {
+    tipo: 'punti',
+    parte: 'valentina',
+    sezione: 'Come si mette a terra',
+    occhiello: 'Come si mette a terra',
+    titolo: 'E il resto',
+    righe: [
       'Foto e comunicazione esterna: si concordano con Claudia',
       'Contratti, turni, retribuzioni: si parla con Valentina',
     ],
-    nota: 'Sui guasti: senza aspettare che se ne accorga qualcun altro. Sulla comunicazione: non si pubblica in autonomia.',
+    nota: 'Sulla comunicazione: non si pubblica in autonomia.',
   },
   {
     tipo: 'punti',
