@@ -139,7 +139,7 @@ Per il numero esatto di posti liberi su una lezione specifica, il dato in tempo 
 
 Il turno dura **60 minuti** e le partenze sono ogni **30 minuti**: per questo due turni si sovrappongono sempre. Ogni turno tiene **12 posti**, quindi in vasca ci sono al massimo **24 persone**, ed è il numero del turno quello che vedi prenotando — «11 su 12» vuol dire undici posti liberi in quel turno.
 
-Ogni corsia tiene **5 persone** e le corsie sono divise per ritmo. **La corsia non si sceglie prenotando**: prenotando prendi il posto nel turno, e in quale corsia nuotare te lo dice l'**Assistente Bagnanti** a bordo vasca, che ti mette con chi tiene il tuo stesso ritmo. È il motivo per cui la corsia non compare fra le cose da scegliere nell'app o nel portale.
+Ogni corsia tiene **5 persone** e le corsie sono divise per ritmo. **La corsia non si sceglie prenotando**: prenotando prendi il posto nel turno, e in quale corsia nuotare te lo dice a bordo vasca l'**Assistente Bagnanti**, che è anche **Tecnico Federale**: ti mette con chi tiene il tuo stesso ritmo. È il motivo per cui la corsia non compare fra le cose da scegliere nell'app o nel portale.
 
 </details>
 
