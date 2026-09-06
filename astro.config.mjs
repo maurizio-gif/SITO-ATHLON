@@ -112,11 +112,6 @@ export default defineConfig({
            strumento come `/diagnostica-schermo`, non una pagina del club. Va via
            insieme alla pagina, il giorno che la prova ha dato il suo esito. */
         !page.includes('/test-portale') &&
-        /* `/riunione-staff` è la presentazione di una riunione interna: una
-           pagina di servizio con `noindex`, senza il guscio del sito, che
-           esiste per un pomeriggio. Va via — pagina e questa riga — quando la
-           riunione è passata. */
-        !page.includes('/riunione-staff') &&
         /* `/promo` solo mentre la promozione esiste: spenta, quell'indirizzo è
            un reindirizzamento verso il listino. Vedi `promoViva()` qui sopra. */
         (promoViva() || !page.endsWith('/promo/')) &&
