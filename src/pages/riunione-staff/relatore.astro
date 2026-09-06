@@ -1,0 +1,84 @@
+---
+/**
+ * La vista relatore: tutte le slide in colonna, con le note e i tempi.
+ *
+ * Sta su una rotta a parte e non su un tasto della presentazione perché il
+ * pannello in sala mostra **una** finestra: la vista relatore si apre sul
+ * portatile, accanto, mentre il mazzo gira sullo schermo grande. Un pannello
+ * che si sovrappone alle slide sarebbe il modo di proiettare le proprie note.
+ *
+ * I tempi: `blocco.minuti` è la durata suggerita del blocco che comincia in
+ * quella slide, e il cumulato è la somma dei blocchi fino a lì. Servono a stare
+ * dentro l'ora, e per questo **non compaiono sulle slide** — un tempo scritto
+ * sullo schermo lo legge la sala e diventa una promessa.
+ */
+import '../../styles/global.css';
+import RiunioneStile from '../../components/RiunioneStile.astro';
+import { SLIDE } from '../../data/riunione';
+
+let cumulato = 0;
+const voci = SLIDE.map((s, i) => {
+  if (s.blocco) cumulato += s.blocco.minuti;
+  return { s, n: i + 1, cumulato };
+});
+
+const minuti = (p: 'maurizio' | 'valentina') =>
+  SLIDE.filter((s) => s.parte === p).reduce((n, s) => n + (s.blocco?.minuti ?? 0), 0);
+const totale = minuti('maurizio') + minuti('valentina');
+---
+
+<!doctype html>
+<html lang="it" data-senza-intestazione>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Vista relatore — Riunione staff</title>
+    <RiunioneStile />
+  </head>
+  <body class="rl">
+    <div class="rl__wrap">
+      <div class="rl__intro">
+        <h1>Vista relatore</h1>
+        <p class="rl__meta">
+          {SLIDE.length} slide · Maurizio {minuti('maurizio')}′ · Valentina {minuti('valentina')}′ ·
+          totale {totale}′. Le slide stanno su <a href="/riunione-staff/">/riunione-staff/</a>,
+          e ogni numero è un indirizzo: <code>#12</code>.
+        </p>
+      </div>
+
+      {voci.map(({ s, n, cumulato }) => (
+        <div class="rl__voce">
+          <span class="rl__n">{n}</span>
+          <div>
+            {s.blocco && (
+              <p class="rl__blocco">
+                {s.blocco.titolo} · {s.blocco.minuti}′ · al minuto {cumulato}
+              </p>
+            )}
+            <p class="rl__titolo">
+              {s.occhiello && <span style="font-weight:400">{s.occhiello} — </span>}
+              {s.titolo}
+            </p>
+            {s.cifra && <p class="rl__titolo">{s.cifra} — {s.cifraNota}</p>}
+            {s.righe && (
+              <ul class="rl__righe">{s.righe.map((r) => <li>{r}</li>)}</ul>
+            )}
+            {s.coppie && (
+              <ul class="rl__righe">{s.coppie.map((c) => <li>{c.prima} → {c.dopo}</li>)}</ul>
+            )}
+            {s.blocchi && (
+              <ul class="rl__righe">{s.blocchi.map((b) => <li>{b.titolo}{b.nota ? ` — ${b.nota}` : ''}</li>)}</ul>
+            )}
+            {s.tipo === 'numeri' && (
+              <ul class="rl__righe"><li>I numeri dell’offerta, letti dal palinsesto e dai dati del sito.</li></ul>
+            )}
+            {s.nota && (
+              <p class="rl__nota"><strong>Nota</strong>{s.nota}</p>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </body>
+</html>
