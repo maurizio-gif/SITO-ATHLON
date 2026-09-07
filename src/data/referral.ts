@@ -22,14 +22,27 @@
  * perimetro del Guest Pass di listino, portato sull'invito: due porte per la
  * stessa prima settimana non possono avere due soglie diverse.
  *
- * **Il controllo automatico e' piu' largo di questa regola, e va saputo.**
- * `Amico e socio?` su n8n guarda un campo solo — `memberType`, e scarta i
- * `Member` — perche' «ha gia' avuto un Guest Pass» e «ha avuto un abbonamento
- * dal 2021» non stanno in quel campo: stanno nei contratti, che quel flusso non
- * legge. Quindi la condizione e' **dichiarata**, come lo e' gia' quella del
- * Guest Pass di listino, e chi la verifica davvero e' il desk. Il verso in cui
- * si sbaglia e' scelto: un invito di troppo si riconcilia, un amico idoneo
- * rifiutato da un controllo approssimativo non torna.
+ * **Le due cose stanno su due piani diversi, e non e' una lacuna: e' la
+ * divisione.** Quello che il codice **verifica** e' il socio, da tutte e due le
+ * parti: `Amico e socio?` su n8n guarda `memberType` e scarta i `Member`, ed e'
+ * il controllo giusto — confermato dal club il 07/09/2026, e non va stretto.
+ * Quello che invece si **dichiara** e' il perimetro qui sopra: «mai avuto un
+ * Guest Pass ne' un abbonamento dal 2021» non sta in `memberType`, sta nei
+ * contratti, ed e' una condizione spiegata a chi legge e verificata dal desk
+ * prima di attivare il pass. Esattamente come quella del Guest Pass di listino,
+ * che nessun controllo automatico ha mai applicato.
+ *
+ * **Quindi non "chiudere il buco" stringendo il vaglio.** Scartare tutti i
+ * `Guest` sembrerebbe la correzione ovvia e sarebbe piu' severo del vero: su
+ * PerfectGym un Guest puo' essere un bambino di un nucleo o chi ha lasciato i
+ * dati a un tour, senza aver mai avuto un pass. Il verso in cui si sbaglia e'
+ * scelto: un invito di troppo si riconcilia al desk, un amico idoneo rifiutato
+ * da un controllo approssimativo non torna.
+ *
+ * E per la stessa ragione **il testo pubblico non promette quel controllo**: la
+ * landing dice che dell'abbonamento se ne occupa la pagina mentre compili, e
+ * del resto la segreteria. Scrivere «lo controlliamo noi» su una condizione che
+ * nessun codice guarda sarebbe la promessa che si scopre dopo.
  *
  * La domanda su chi invita la risponde `eSocio()` in `data/contatto.ts`.
  */
