@@ -2850,7 +2850,7 @@ pagina junior il componente non esiste nemmeno nel markup. **Sul totem compare a
 ogni pagina**, e non è un difetto: là `suTotem()` non ricorda niente, o la
 chiusura di chi è passato prima nasconderebbe la promo a chi arriva dopo.
 
-### La fascia la decide l'anno, e l'anno noto non basta: va confermato
+### La fascia la decide l'anno, e l'anno che il form ci ha dato non si fa confermare
 
 Il 28/08, bambina nata il **2021**-04-23 — l'anno nel contesto, messo lì dal
 form compilato due minuti prima — la mamma scrive «la bimba ha 5 anni compiuti
@@ -2875,21 +2875,27 @@ controlli fissi ora ne fa tre:
    Nominare quello sbagliato *mentre* si nomina il giusto («non è Baby Nuoto ma
    Scuola Nuoto») resta legittimo, quindi il controllo scatta solo se il giusto
    manca.
-3. **Se il genitore ha parlato in età, l'anno si fa confermare.** Anche quando
-   il corso è quello giusto: un'età lascia un margine di un anno intero, e i
-   genitori parlano quasi sempre in età. Una riga in cima, e solo se la risposta
-   non nomina già l'anno.
+3. **Se il genitore ha parlato in età e l'anno non ce l'abbiamo, il turno è solo
+   la domanda.** La risposta si butta e resta la richiesta dell'anno: un'età
+   lascia un margine di un anno intero, e senza l'anno qualunque cosa si dica è
+   detta su un corso non ancora deciso.
 
 Tre cose da sapere prima di toccarlo.
 
-**Il terzo controllo è una deroga deliberata al «non chiedere conferma».** La
-regola dice di usare l'anno noto senza richiederlo, e vale ancora: chi si sente
-rifare la stessa domanda pensa che non l'abbiano letto. Ma quando la persona ha
-appena parlato in età, la conferma non è una domanda già fatta — è la sola cosa
-che tiene insieme il dato del form e la frase che ha scritto lei, e le due
-possono divergere davvero (un fratello, un anno digitato male). **La conferma la
-mette il nodo e non il modello**, e questa è la parte che conta: una regola che il
-modello può ignorare non è una regola, e qui l'aveva già ignorata due volte.
+**La trattenuta vale solo dove l'anno manca, e questa riga è una correzione.**
+Per un po' il terzo controllo ha chiesto conferma *anche* con l'anno nel form,
+come deroga dichiarata al «non chiedere conferma» — e il 7 settembre quella
+deroga ha fatto il danno che doveva evitare: una mamma che aveva scelto la
+Scuola Nuoto nel passo dell'attività e scritto la data di nascita nel modulo
+chiede prezzi, orari e se si può provare, e si vede rispondere con una richiesta
+di conferma dell'anno. Due domande a cui aveva già risposto al posto delle tre
+risposte che aveva chiesto. **Un dato che il club ha nel modulo non si fa
+confermare da chi lo ha scritto**: dove l'anno c'è la rete è il controllo (2),
+che il corso sbagliato lo **corregge** invece di chiederlo — e infatti il caso
+del 03/09 (bambina del 2023 mandata nel Baby Nuoto) oggi lo chiude quello. Da lì
+anche il testo del (2): l'anno si **afferma** — «con il 2022 che ho dal modulo il
+corso è la Scuola Nuoto Bambini» — e la sola porta che resta aperta è «se l'anno
+non fosse quello scrivimelo».
 
 **Le due fasce stanno in chiaro nel nodo**, non lette da `junior.ts`: n8n non
 importa il codice del sito. Il giorno che il club sposta la stagione vanno
@@ -2903,6 +2909,47 @@ non si era visto perché la correzione toglieva una frase; con la riscrittura
 intera la divergenza sarebbe stata quella fra il CRM e la realtà — cioè
 esattamente il posto da cui si guarda per capire se una correzione ha funzionato.
 Ora legge il nodo della correzione.
+
+#### Una domanda a cui il pulsante ha già risposto
+
+Nella stessa conversazione del 7 settembre, il turno prima: la mamma apre la
+chat dalla pagina della Scuola Nuoto Bambini, sceglie quel corso al passo
+dell'attività — la conversazione è `ramo junior` — e scrive «vorrei sapere se è
+possibile fare una prova. Poi volevo sapere prezzi e orari». La risposta:
+*«Prima di tutto: **quale attività ti interessa?** Palestra, corsi in sala,
+acqua, o ancora non hai deciso?»* — la domanda a cui il pulsante aveva già
+risposto, per giunta con le voci **degli adulti** dentro una conversazione
+junior, e nessuna delle tre risposte chieste.
+
+Il `systemMessage` ha una regola fissa tutta dedicata a questo («l'attività l'ha
+già scelta: non chiedergli quale»), e il modello l'ha ignorata. Vale allora
+quello che vale per l'anno di nascita, ed è la terza volta che questo file lo
+scrive: **una regola che il modello può ignorare non è una regola**, quindi la
+domanda si toglie dal testo. È il controllo (7) di `Correggi anno gia' noto`, e
+funziona come il (1): si taglia la frase che contiene la domanda, e con lei
+l'elenco di opzioni che la segue — «Palestra, corsi in sala, acqua…» senza la
+domanda è un elenco orfano, la stessa cosa della giustificazione tagliata dal
+controllo (1).
+
+Tre cose da sapere prima di toccarlo.
+
+**La regex è stretta di proposito.** Deve prendere la domanda su *quale*
+attività, non ogni frase che contiene «ti interessa»: «se ti interessa, la prova
+costa 19 €» è una risposta, e tagliarla sarebbe peggio del difetto che il
+controllo chiude. Il verso in cui sbaglia è dichiarato — una domanda non
+riconosciuta resta a schermo, una risposta tagliata sparisce.
+
+**Se tolta la domanda resta un saluto, la riga si aggiunge invece di
+sostituire.** Qui la bolla era «Ciao! Perfetto, allora partiamo da quello che ti
+serve davvero.» più la domanda: tagliata quella resta una frase che non dice
+niente. Sotto ci va il corso di cui si sta parlando — la sola cosa certa che il
+nodo ha — e l'invito a chiedere. La soglia è larga (120 caratteri) perché un
+saluto che passa per risposta è esattamente il difetto da chiudere.
+
+**L'attività è nota quasi sempre, quindi il controllo è quasi sempre acceso.**
+`attivitaJunior` o `attivita` non vuoto: il passo dei cinque pulsanti viene
+prima della conversazione, quindi chi scrive ha già scelto per costruzione. Non
+è un caso raro da coprire, è la regola.
 
 ### Chi si lamenta non riceve un'informazione, riceve una persona
 
