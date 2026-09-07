@@ -17,7 +17,9 @@ attivita:
 
 - Orari divisi per **età**
 - Nello stesso orario: **più corsi e più istruttori**
-- Istruttore assegnato definitivamente dopo **2 settimane** dall'inizio
+- Istruttore assegnato definitivamente dopo **2 settimane** dall'inizio — prima non c'è un
+  nome da sapere, e **non lo dice il calendario di prenotazione**: quello mostra chi tiene
+  una lezione che si prenota, cioè le attività degli adulti e, qui, solo il recupero
 - Suddivisione per livello **direttamente in vasca**
 - Passaggi di gruppo possibili durante la stagione — senza cambio orario
 

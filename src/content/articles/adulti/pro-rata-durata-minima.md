@@ -26,6 +26,16 @@ attivita:
 
 È la regola che genera più malintesi di tutte, e vale la pena leggerla prima di iscriversi. In breve: se attivi l'abbonamento a metà mese, **la prima quota copre solo i giorni che restano** (il pro-rata) e la durata minima si conta **dal mese intero successivo**. Quindi la scadenza minima non è il mese dopo, ma quello dopo ancora.
 
+## Il mese dell'abbonamento è il mese solare
+
+Prima del pro-rata va detta questa, perché è quella che si dà per scontata al contrario: **il mese di abbonamento comincia il 1° e finisce l'ultimo giorno del mese**, e il rinnovo cade sempre il 1°. Non è un mese che scorre dal giorno in cui hai cominciato.
+
+Quindi, partendo il **7 settembre**:
+
+- il primo periodo va dal **7 al 30 settembre**, e paghi quei giorni — non dal 7 settembre al 7 ottobre
+- dal **1° ottobre** si rinnova a mensilità piene, il 1° di ogni mese
+- l'impegno minimo resta un mese: qui è il pro-rata di settembre **+ tutto ottobre**
+
 ## La regola
 
 > La durata del ciclo di pagamento è di almeno un mese. In presenza di pro rata, la durata minima sarà data dal pro rata + un mese.
@@ -77,7 +87,7 @@ Perché la disdetta ferma il **rinnovo**, non la durata minima ancora in corso. 
 
 </details>
 
-> 💡 **La data di inizio la scegli tu, e non devi rimandare l'iscrizione per sceglierla.** In fase di iscrizione imposti quando parte l'abbonamento: lo stesso giorno, oppure una data futura fino a **14 giorni** dopo. Quindi iscriversi oggi non costa più che iscriversi domani — si paga da quando l'abbonamento comincia. Se lo fai partire il **1° del mese** non c'è pro-rata e la scadenza minima è la fine di quello stesso mese; se lo fai partire a mese iniziato paghi solo i giorni che restano, e la durata minima si conta dal primo mese intero.
+> 💡 **La data di inizio la scegli tu, e non devi rimandare l'iscrizione per sceglierla.** In fase di iscrizione imposti quando parte l'abbonamento: lo stesso giorno, oppure una data futura fino a **14 giorni** dopo. Quindi iscriversi oggi non costa più che iscriversi domani: la quota si paga **al momento dell'iscrizione**, e la data di inizio non sposta il pagamento — decide da quale giorno parte il periodo che quella quota copre. Se lo fai partire il **1° del mese** non c'è pro-rata e la scadenza minima è la fine di quello stesso mese; se lo fai partire a mese iniziato paghi solo i giorni che restano, e la durata minima si conta dal primo mese intero.
 
 <div class="ci-cta">
   <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary" target="_blank" rel="noopener noreferrer">VEDI LA TUA SCADENZA</a>

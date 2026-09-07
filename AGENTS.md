@@ -2394,6 +2394,147 @@ reindirizzamento non ci va. Non è stato escluso perché quando la promo è viva
 quella pagina è `index, follow` per scelta, e un'esclusione fissa la terrebbe
 fuori anche allora.
 
+### Il nome dell'istruttore non sta nel calendario, e prima di due settimane non esiste
+
+A «ma posso sapere l'istruttore?» — un genitore della Scuola Nuoto Bambini — la
+chat ha risposto bene sulla prima metà (assegnato dopo le prime due settimane,
+guardando come nuota il bambino) e ha chiuso con la seconda sbagliata: *«nel
+portale, quando prenoti il turno, vedi chi lo tiene questa settimana»*, con il
+pulsante «Calendario e posti liberi». È la **regola degli adulti** — dove la
+lezione si prenota una per una e il calendario porta l'istruttore, come dice la
+scala dei tre posti degli orari — applicata a un corso in cui il turno è fisso e
+la sola lezione che si prenota è il recupero. Cioè un genitore mandato a cercare
+in un calendario un nome che lì non decide niente.
+
+**Il dato c'era a metà**, e la metà mancante era il perimetro: `junior.ts` diceva
+che l'istruttore «viene assegnato definitivamente dopo le prime due settimane» e
+si fermava lì. Da «l'assegnazione arriva dopo» più «il calendario mostra chi
+tiene la lezione» il modello ricompone «intanto guarda nel calendario» — la
+meccanica dei due fatti veri vicini, applicata a due regole che valgono per due
+persone diverse.
+
+Ora quel testo dice le due cose che mancavano, e le dicono con lui tre posti:
+
+- **prima delle due settimane non c'è un istruttore da sapere** — non è un dato
+  che non diamo, è un'assegnazione non ancora fatta — e **non lo dice il
+  calendario di prenotazione**, perché quel dato appartiene alle attività degli
+  adulti;
+- **dopo, l'interlocutore è il Direttore Tecnico**, che si prenota. Non
+  l'istruttore: la sua scheda spiega già perché.
+
+I tre posti sono il pilastro «Inserimento» di `junior.ts` (che è anche la voce
+del corso nel `kb.json`), una **f.a.q. del corso** — che è la domanda esatta
+arrivata in chat, e le f.a.q. dei corsi il `kb.json` le prende, a differenza di
+quelle scritte in una pagina `.astro` — e la scheda `snb/direzione-tecnica`, dove
+sta accanto alla domanda «posso parlare con l'istruttore?». `snb/didattica`
+porta la stessa riga nell'elenco dell'organizzazione dei gruppi.
+
+Due cose da sapere prima di toccarlo.
+
+**La scala dei tre posti degli orari resta valida, e va letta col suo
+perimetro**: «chi la tiene questa settimana → il calendario del portale» è vero
+per una lezione che si prenota. Sui corsi junior a turno fisso quella terza riga
+non si applica, e questa è la seconda volta che una regola delle prenotazioni
+degli adulti si allarga alla Scuola Nuoto — la prima era la finestra dei tre
+giorni.
+
+**Il divieto è sul rimando, non sul fatto.** Dire quando l'istruttore viene
+assegnato è giusto e va detto; quello che non si fa è mandare al calendario per
+saperlo, che è la parte che sembra utile e non lo è.
+
+### La lezione privata non esiste, e il personal training non è la sua versione in acqua
+
+Stessa giornata, altro difetto della stessa forma: a un genitore che ha scritto
+«una lezione solo per lui», la chat ha risposto *«le lezioni private in acqua —
+il **personal training** — si prenotano e si acquistano a parte, con formule e
+prezzi loro»*, e lo ha mandato a farsi mandare per email il listino. Il personal
+training è **per adulti** e riguarda **le attività in palestra**: quel listino
+non esiste, e i corsi in acqua per bambini sono **collettivi**.
+
+**Il modello non ha letto una riga sbagliata: ne ha composta una.** Aveva
+«lezione individuale» dalla domanda e «personal training» dal contesto, e nessun
+dato che dicesse che le due cose non si incontrano — la voce
+`abbonamento:personal-training` diceva pacchetti e prezzi **e nient'altro**, senza
+una parola su per chi vale e dove si tiene. È la lezione già scritta tre volte in
+questo file: *una regola che non dichiara il proprio perimetro è una regola che
+si allarga al caso vicino*, e qui il caso vicino era un bambino in vasca.
+
+Il testo sta in `SOLO_COLLETTIVE` (`data/junior.ts`) e da lì lo leggono **i due
+lati della stessa domanda**, che sono i due posti da cui pesca:
+
+- la voce di **tutti e quattro i corsi junior** (`testoJunior`): i corsi sono
+  collettivi, la lezione individuale non esiste, e il personal training non è la
+  sua versione in acqua. Su un corso che vende la lezione singola — il Baby
+  Nuoto — c'è anche la riga che la distingue: **«singola» non vuol dire
+  «privata»**, è una lezione del corso pagata una alla volta, con gli altri
+  bambini;
+- la voce del **personal training**: vale solo per gli adulti (da
+  `ETA_MINIMA_ADULTI.anni`) e per le attività in palestra, con le aree lette da
+  `AREE_TRAINER` — e la stessa frase che a un genitore non si nomina.
+
+Due cose da sapere prima di toccarlo.
+
+**La riga arriva su tutti e quattro i corsi e non solo sulla Scuola Nuoto**,
+perché la domanda non nomina il corso: la fa chi sta guardando la pagina che ha
+davanti, e con la voce su un corso solo il difetto si sposta invece di chiudersi
+— è la spazzata del Guest Pass applicata prima che l'errore torni.
+
+**E il divieto è scritto anche per l'adulto.** «Non c'è nessun modo di comprare
+una lezione di nuoto privata, né per un bambino né per un adulto»: senza
+quell'inciso resta aperta la lettura peggiore — che la lezione privata in acqua
+esista e sia solo dei grandi — cioè esattamente la frase da cui questo giro è
+partito.
+
+### Un elenco di attività comprese non si riassume in una categoria
+
+Il 7 settembre, a chi chiedeva l'Aqua Tonic delle 13:30, la chat ha chiuso la
+risposta con *«lo Smart include tutta l'acqua, oppure il Premium che comprende
+anche i corsi in sala e il Reformer»*. Lo Smart in acqua ha il **solo Nuoto
+Libero Assistito**: l'Aqua Tonic è Aqua Fitness, quindi è Premium. Cioè la
+frase mandava una persona a comprare il piano più economico per una lezione che
+quel piano non apre — l'errore si scopre alla prima prenotazione, che è il verso
+peggiore.
+
+**I dati erano giusti**: `plans` dice da sempre `['Gym Floor', 'Nuoto Libero
+Assistito', 'Athlon TV']`, e la voce del piano stampava quell'elenco per
+intero. A sbagliare è stata la **sintesi**: tre voci, di cui una in acqua e una
+in sala, si riassumono volentieri in due categorie — «l'acqua» e «la sala» — e
+la prima categoria è falsa. È la stessa meccanica delle due sospensioni e dei
+due orari, spostata dal contenuto alla *categoria*: *un elenco è anche un
+contesto da cui si può comporre l'insieme che quell'elenco non è*.
+
+Quindi la voce di ogni piano dice adesso anche **quello che non comprende**, in
+due righe che sono **derivate** — l'una dalla differenza fra i due piani, l'altra
+da `WATER_ACTIVITIES` (`data/activities.ts`) incrociata con `plans`:
+
+- «**Questo piano NON comprende: …** — sono nel Premium», con il divieto di
+  riassumerlo in una categoria («tutta l'acqua», «tutto il club», «tutti i
+  corsi»);
+- «**In acqua comprende soltanto Nuoto Libero Assistito**», con le tre attività
+  in vasca che restano fuori nominate una per una.
+
+Tre cose da sapere prima di toccarle.
+
+**Sono derivate perché un'attività si sposta.** Il giorno che il club mettesse
+l'Aqua Fitness nello Smart, una frase scritta a mano resterebbe indietro proprio
+nel posto da cui la chat risponde — e nessuna pagina se ne accorgerebbe. Sul
+Premium le due righe **non compaiono affatto**: l'elenco delle escluse è vuoto
+perché quel piano è il soprainsieme, e una riga «non comprende: niente» è una
+riga da cui si compone un dubbio.
+
+**Quali siano le lezioni di Aqua Fitness non si ricopia qui.** Aqua Aerobic,
+Aqua Soft, Aqua Tonic, Hydrobike e Aqua Training stanno in
+`activityInfo['Aqua Fitness']`, che è già una voce del `kb.json`: la riga del
+piano nomina l'attività e manda a leggere lì. Due elenchi delle stesse lezioni
+divergono al primo corso aggiunto.
+
+**La riga chiude il buco dal lato del dato, e resta da chiuderlo dal lato del
+prompt.** Nel `systemMessage` non c'è ancora una regola fissa che vieti la
+sintesi per categoria — quella che dice «cosa comprende un piano si copia voce
+per voce» accanto alla regola sull'importo citato col suo piano. Il divieto per
+ora vive dentro la voce, ed è il posto in cui il modello lo legge insieme al
+dato; se l'errore torna, la regola fissa è il passo dopo.
+
 ### Due righe che si leggono allo stesso modo sono due righe che si scambiano
 
 Il 30 agosto, a chi voleva cominciare la Scuola Nuoto Adulti e chiedeva
@@ -3027,8 +3168,16 @@ fai partire il mese prossimo»: sono tutte la stessa frase, e un divieto scritto
 su una sola di esse lascia passare le altre quattro. È la lezione dell'assistente
 di sala applicata al commerciale.
 
-**La risposta giusta è che è indifferente**, e finisce lì: si paga da quando
-l'abbonamento comincia, non da quando si firma. La scelta della data è di chi si
+**La risposta giusta è che è indifferente**, e finisce lì. Ma «indifferente» non
+si spiega dicendo *quando* si paga: **la quota si paga al momento
+dell'iscrizione**, anche scegliendo una data di inizio futura, e quello che la
+data governa è **cosa copre** la prima quota. Il 7 settembre, a chi chiedeva se
+iscrivendosi il 10 avrebbe pagato i primi dieci giorni di settembre, la chat ha
+risposto *«lo paghi da quando l'abbonamento comincia, non da quando firmi il
+contratto»*: la seconda metà è falsa, e fa aspettare l'addebito a chi ha scelto
+di partire fra due settimane — un fatto che si scopre alla cassa. Le due
+affermazioni vanno tenute separate: *quando si paga* è l'iscrizione, *cosa si
+paga* lo dice la data di inizio. La scelta della data è di chi si
 iscrive e non va consigliata — nemmeno nel verso opposto, perché «iscriviti oggi
 che conviene» è la stessa invadenza al contrario.
 
@@ -3036,6 +3185,42 @@ che conviene» è la stessa invadenza al contrario.
 ragione: `DATA_INIZIO.giorniMax` è la fonte, le due copie stanno in
 `pro-rata-durata-minima.md` e in `promo.md`, che sono contenuti di Tina e non
 possono importare TypeScript.
+
+#### Il mese dell'abbonamento è il mese solare, e il rinnovo cade il 1°
+
+Subito dopo la riga sul pagamento, la stessa conversazione: «quindi se inizio
+oggi pago il mese che finisce il 7 ottobre?» → *«Esatto. Se fai partire
+l'abbonamento oggi 7 settembre, il primo mese copre da oggi fino al 7 ottobre»*.
+No: partendo il 7 settembre il primo periodo va dal **7 al 30 settembre**, si
+paga quello, e dal **1° ottobre** si rinnova a mensilità piene. L'impegno minimo
+resta un mese — qui il pro-rata di settembre più tutto ottobre.
+
+**Il modello ha accettato la premessa di chi scriveva**, e il dato non lo
+smentiva: `DATA_INIZIO` e la scheda dicevano «la prima quota copre solo i giorni
+che restano», che è vero e non dice *fino a quando* — e nessuno dei due diceva
+**quando cade il rinnovo**. Da «paghi solo i giorni che restano» più una domanda
+che propone il mese a scorrimento si compone il mese a scorrimento: è la
+meccanica di sempre, con la variante che qui il terzo fatto lo ha suggerito la
+persona e il modello ci ha messo l'«esatto».
+
+Ora il fatto sta scritto in due posti: `DATA_INIZIO.testo` — con l'esempio del 7
+settembre, che è il caso vero — e un blocco della scheda
+`adulti/pro-rata-durata-minima` messo **prima** della regola del pro-rata,
+perché è il presupposto di quella regola e non un suo dettaglio: *il mese di
+abbonamento comincia il 1° e finisce l'ultimo giorno del mese, e il rinnovo cade
+sempre il 1°, non all'anniversario del giorno in cui hai cominciato.*
+
+Due cose da sapere prima di toccarlo.
+
+**Non è una correzione del pro-rata, è il suo presupposto.** La tabella «trova
+il tuo caso» era già giusta — `2 marzo → pro-rata 2→31 marzo` — e lo diceva
+soltanto in forma di esempio: chi legge la riga in prosa, e un modello che
+riassume, prende quella. Un dato che vive solo in una tabella è un dato che
+sopravvive alla lettura di chi ha già capito.
+
+**«Sempre il 1°» va detto per esteso**, non per differenza. «Non dal 7 al 7» da
+solo nega la lettura sbagliata senza dare quella giusta, e resta la domanda vera
+di chi paga — quando mi rinnova.
 
 #### Il pro-rata si calcola, ed è l'eccezione dichiarata alla regola 2
 

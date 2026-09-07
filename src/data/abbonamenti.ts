@@ -331,7 +331,17 @@ export const ATTIVITA_GUEST_PASS: readonly string[] =
  *
  * Il come è questo: ci si iscrive oggi e si imposta la data di inizio nel
  * contratto. Quindi non c'è niente da rimandare, e non c'è nessun risparmio da
- * inseguire — si paga da quando si comincia, e basta.
+ * inseguire.
+ *
+ * **E «quando si paga» non è «da quando si paga»**, che è la riga corretta il
+ * 7/9: a chi chiedeva se iscrivendosi oggi perdeva i primi dieci giorni di
+ * settembre, la chat ha risposto «lo paghi da quando l'abbonamento comincia,
+ * non da quando firmi il contratto». Il **pagamento si fa all'iscrizione**, e
+ * quello che la data di inizio governa non è il momento in cui si paga ma
+ * **cosa copre** quella prima quota. Detta così, quella frase fa aspettare
+ * l'addebito a chi ha scelto una data futura, e la sorpresa arriva alla cassa —
+ * il verso sbagliato in cui sbagliare, come la quota di attivazione «in
+ * omaggio».
  *
  * Il numero vive in tre posti e due non sono evitabili: qui è la fonte, e le
  * due copie stanno in `pro-rata-durata-minima.md` e in `promo.md`, che sono
@@ -342,7 +352,7 @@ export const DATA_INIZIO = {
   /** Giorni di anticipo massimo fra iscrizione e inizio dell'abbonamento. */
   giorniMax: '14',
   testo:
-    "Iscrivendoti scegli tu la data di inizio dell'abbonamento: può essere lo stesso giorno oppure una data futura, fino a 14 giorni dopo l'iscrizione. Quindi non c'è un momento più conveniente di un altro per iscriversi — paghi da quando parte l'abbonamento, non da quando firmi. Se fai partire l'abbonamento a mese iniziato la prima quota copre solo i giorni che restano; se lo fai partire il 1° del mese non c'è pro-rata. In tutti e due i casi ti iscrivi quando vuoi e imposti la data che preferisci in fase di iscrizione.",
+    "Iscrivendoti scegli tu la data di inizio dell'abbonamento: può essere lo stesso giorno oppure una data futura, fino a 14 giorni dopo l'iscrizione. Quindi non c'è un momento più conveniente di un altro per iscriversi. L'abbonamento si paga **al momento dell'iscrizione**, anche quando scegli una data di inizio futura: la data di inizio non sposta il pagamento, decide **cosa copre** la prima quota — il periodo che parte da quel giorno. Se fai partire l'abbonamento a mese iniziato la prima quota copre solo i giorni che restano **fino alla fine di quel mese solare** — partendo il 7 settembre copre dal 7 al 30 settembre, non dal 7 settembre al 7 ottobre — e dal 1° del mese dopo si rinnova a mensilità piene: **il rinnovo cade sempre il 1°, non all'anniversario del giorno in cui hai cominciato.** L'impegno minimo resta un mese, quindi con una partenza a mese iniziato è il pro-rata più il primo mese intero. Se lo fai partire il 1° del mese non c'è pro-rata. In tutti e due i casi ti iscrivi quando vuoi e imposti la data che preferisci in fase di iscrizione.",
 } as const;
 
 export const ATTIVAZIONE = {

@@ -26,7 +26,7 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { CORSI, type Corso } from '../data/corsi';
 import { conNumeri } from '../data/servizi';
-import { JUNIOR, type CorsoJunior, type CorsoStagione } from '../data/junior';
+import { JUNIOR, SOLO_COLLETTIVE, type CorsoJunior, type CorsoStagione } from '../data/junior';
 import { clausole, urlClausola, TERMINI_VERSIONE } from '../data/termini';
 import {
   bands,
@@ -53,7 +53,8 @@ import {
   JUNIOR_MENSILE,
   PREISCRIZIONE,
 } from '../data/abbonamenti';
-import { ACTIVITY_TAGS, ACTIVITY_IDS } from '../data/activities';
+import { ACTIVITY_TAGS, ACTIVITY_IDS, ACTIVITY_LABEL, WATER_ACTIVITIES } from '../data/activities';
+import { AREE_TRAINER_TESTO } from '../data/trainer';
 import { AREA_LABELS } from '../data/helpdesk';
 import { vociFaq } from '../data/faq';
 import { PG, APP } from '../data/cta';
@@ -235,6 +236,16 @@ function testoJunior(c: CorsoJunior): string {
           )
           .join('\n')
       ),
+    /* **Collettive, e la lezione privata non esiste.** La riga arriva su tutti
+       e quattro i corsi junior perché la domanda — «una lezione solo per lui?»
+       — non nomina il corso: la fa chi sta guardando quello che ha davanti. Il
+       testo sta in `SOLO_COLLETTIVE` (`data/junior.ts`) e non qui, perché la
+       stessa cosa la dice anche la voce del personal training, dall'altro lato. */
+    blocchi(
+      SOLO_COLLETTIVE.testo,
+      c.adesione?.length ? SOLO_COLLETTIVE.singola : '',
+      SOLO_COLLETTIVE.personal
+    ),
     (c.corsi ?? []).map(testoStagione).join('\n\n'),
     (c.spazi ?? []).map((s) => blocchi(pulito(s.nome), pulito(s.testo))).join('\n\n')
   );
@@ -582,6 +593,47 @@ export const GET: APIRoute = async () => {
         pulito(piano.claim),
         pulito(piano.desc),
         `Attività comprese: ${piano.activities.join(', ')}.`,
+        /* **E quello che NON comprende, scritto per esteso.**
+           L'elenco delle attività comprese e' un elenco, e un elenco si legge
+           anche per quello che *sembra* dire: il 7/9, a chi chiedeva l'Aqua
+           Tonic, la chat ha risposto che «lo Smart include tutta l'acqua» —
+           cioe' ha riassunto tre voci in una categoria, e la categoria era
+           falsa. Lo Smart in acqua ha il solo Nuoto Libero Assistito; una
+           lezione di Aqua Fitness vuole il Premium, e dirlo al contrario e' un
+           abbonamento venduto per una cosa che non apre.
+
+           Le due righe sono **derivate** dai due piani e da `WATER_ACTIVITIES`:
+           un'attività spostata fra Smart e Premium le riscrive da sé, mentre
+           una frase scritta a mano resterebbe indietro nel posto da cui la chat
+           risponde. Sul Premium l'elenco delle escluse e' vuoto — e' il
+           soprainsieme — quindi le righe non compaiono. */
+        (() => {
+          const altro = plans.find((p) => p.id !== piano.id);
+          if (!altro) return '';
+          const escluse = altro.activities.filter((a) => !piano.activities.includes(a));
+          if (!escluse.length) return '';
+          const acqua = WATER_ACTIVITIES.map((id) => ACTIVITY_LABEL[id]).filter(Boolean);
+          const acquaComprese = piano.activities.filter((a) => acqua.includes(a));
+          const acquaEscluse = escluse.filter((a) => acqua.includes(a));
+          // «nel Smart» e «con il Smart»: l'articolo lo decide il nome, non
+          // la concatenazione.
+          const art = (n: string) => (n === 'Smart' ? 'lo Smart' : `il ${n}`);
+          const righe = [
+            `**Questo piano NON comprende: ${escluse.join(', ')}** — sono nel ${altro.name}. ` +
+              `Non riassumerlo mai in una categoria («tutta l'acqua», «tutto il club», «tutti i corsi»): ` +
+              `vale l'elenco delle attività comprese, voce per voce.`,
+          ];
+          if (acquaEscluse.length) {
+            righe.push(
+              `**In acqua comprende ${acquaComprese.length ? `soltanto ${acquaComprese.join(', ')}` : 'nulla'}.** ` +
+                `${acquaEscluse.join(', ')} ${acquaEscluse.length > 1 ? 'sono' : 'e\''} nel ${altro.name}: ` +
+                `una lezione in vasca che non sia il nuoto libero — le lezioni di Aqua Fitness, la Scuola ` +
+                `Nuoto Adulti, il Corso Gestanti — con ${art(piano.name)} non si prenota. Quali siano quelle ` +
+                `lezioni lo dice la voce dell'attività, e va letta lì: un elenco ricopiato qui resterebbe indietro.`
+            );
+          }
+          return righe.join('\n');
+        })(),
         /* Ogni riga porta il nome del piano, e non e' ridondanza: le due voci
            hanno la stessa forma — tre righe, le stesse etichette — e l'unica
            cosa che le distingue e' il titolo in cima. Una riga letta senza il
@@ -820,7 +872,15 @@ export const GET: APIRoute = async () => {
     testo: blocchi(
       'I pacchetti di personal training si aggiungono a un abbonamento attivo. La seduta singola invece e\u2019 aperta anche a chi non e\u2019 iscritto.',
       PERSONAL.pacchetti.map((x) => `${x.etichetta}: ${x.prezzo} \u20ac.`).join('\n'),
-      `Seduta singola: ${PERSONAL.singolaIscritti} \u20ac per gli iscritti, ${PERSONAL.singolaEsterni} \u20ac per gli esterni.`
+      `Seduta singola: ${PERSONAL.singolaIscritti} \u20ac per gli iscritti, ${PERSONAL.singolaEsterni} \u20ac per gli esterni.`,
+      /* **Il perimetro, che qui mancava del tutto.** La voce diceva pacchetti e
+         prezzi e nient'altro, e a un genitore che chiedeva «una lezione solo
+         per lui» per il figlio in acqua l'assistente ha risposto che le lezioni
+         private in acqua *sono* il personal training. Il servizio e' per adulti
+         e in palestra: chi lo racconta senza dire per chi vale lo vende a
+         chiunque. Il testo sta in `SOLO_COLLETTIVE`, insieme a quello che le
+         voci dei corsi junior dicono dall'altro lato. */
+      `**Vale solo per gli adulti** (da ${ETA_MINIMA_ADULTI.anni} anni) **e per le attivita' in palestra**: le aree sono ${AREE_TRAINER_TESTO}. ${SOLO_COLLETTIVE.personal} ${SOLO_COLLETTIVE.testo}`
     ),
   });
 
