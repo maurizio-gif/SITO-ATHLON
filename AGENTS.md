@@ -395,6 +395,156 @@ indirizzo che non è suo deve avere qualcosa da cliccare. Quel comando **toglie
 ogni campo vuoto che lo porta, quindi svuotare e mettere il fuoco rimetterebbe
 dentro la stessa email. L'attributo è l'adesione, e lì si ritira.
 
+## Prima del listino si lascia l'email, e la pagina resta pubblica lo stesso
+
+I comandi che portano agli abbonamenti erano venticinque `href` sparsi in dodici
+file, e chi li premeva arrivava sul listino senza lasciare traccia: l'interesse
+esisteva e non lo sapeva nessuno. Ora `InfoAbbonamentiModal` chiede
+l'indirizzo, lo verifica su PerfectGym e poi apre `/abbonamenti`.
+
+**Sono due decisioni diverse, e vanno tenute distinte.** Da un **comando** del
+sito l'email è obbligatoria: è il momento in cui l'interesse è vivo, ed è
+l'unico modo di sapere che è esistito. La **pagina** non è protetta da niente —
+`/abbonamenti` è pubblica e indicizzata — perché un listino dietro un modulo è
+un listino che Google e gli LLM non leggono. Chi conosce l'indirizzo, arriva da
+un motore o apre in una scheda nuova lo scavalca, e va bene: il gate misura il
+percorso interno, non chiude una porta. Il ripiego senza JavaScript è l'`href`,
+che è il listino.
+
+**L'aggancio è `data-cta="buy"` più `data-cta-intent="membership"`, e i due
+insieme non sono ridondanza.** Su `/personal-training` `data-cta="buy"` sta
+anche su «Prenota una seduta» e «Aggiungi al tuo abbonamento»: agganciare il
+solo `buy` avrebbe chiesto l'email per prenotare un allenamento. È la stessa
+trappola già scritta per `IscrizioneModal`, che infatti usa `data-iscrizione`.
+
+**Cosa non passa dal gate**, e sono tre categorie:
+
+- **i link dentro il testo che scorre** — quello di `/personal-training`, le
+  frasi «fanno parte dello stesso club» delle pagine attività. Sono testo, non
+  comandi, e la regola è la stessa della spazzata del totem;
+- **`#accessi-singoli` e `#guest-pass`**, che il modal della prova, il referral
+  e la chat offrono a chi si è appena sentito dire di no. Metterci davanti un
+  gate vorrebbe dire chiedere l'email a chi l'ha appena data;
+- **la pagina degli abbonamenti stessa.** La pastiglia dell'header e la voce
+  del footer stanno anche lì, e aprire un pannello per portare qualcuno dov'è
+  già è un passo per niente: il client confronta il percorso e si astiene.
+
+### I dati non si chiedono a chi li abbiamo, e il timeout salta il passo
+
+Nome, cognome e cellulare compaiono solo quando `servonoISuoiDati()` è vera —
+la stessa funzione del totem e della chat, in `data/contatto.ts`. Non sono una
+domanda: sono la **composizione** del `personalData` della chiamata che crea
+l'anagrafica. Se l'anagrafica c'è, quella chiamata non parte, e chiedere quei
+campi vorrebbe dire far ricopiare a una persona quello che il club ha già
+scritto.
+
+E se la verifica non risponde — sei secondi, poi si passa — **il secondo passo
+si salta**: non sappiamo se quell'anagrafica esista, quindi non si crea nessun
+lead e non si chiede niente. Un attrito in più a chi ha appena subito un
+timeout è il modo più rapido di perdere insieme il contatto e la visita.
+
+### L'esito viaggia nella sessione, e per questo non aspetta il consenso
+
+`data/infoAbbonamenti.ts` mette in `sessionStorage` quello che la verifica ha
+detto, e `iscrizione.client.js` lo legge: chi ha appena scritto la sua email
+non se la vede richiedere due schermate dopo, e la verifica non si rifà.
+
+**Nella sessione e non nello storage**, ed è la ragione per cui non passa da
+`quandoConsentito`: è lo stato del servizio che la persona ha chiesto — ha
+digitato quell'indirizzo *per fare questo percorso* — dura la visita e non
+profila. È la stessa categoria della sessione della chat e del passo dell'Help
+Desk. Il ricordo fra una visita e l'altra è un'altra cosa e ha un'altra regola:
+lo fa `emailNota.ts`, sotto consenso **funzionale**. I due convivono, e chi
+rifiuta i funzionali non perde niente dentro la sua visita.
+
+**Sul totem non si ricorda niente**, e `ricorda()` esce subito su `suTotem()`:
+là il dispositivo è condiviso davvero, e l'indirizzo di chi è passato prima non
+deve vederlo chi arriva dopo. Il prezzo è che al desk la stessa persona si vede
+richiedere l'email sul listino, ed è il verso giusto in cui sbagliare.
+
+### `INFO ABBONAMENTI - SUPABASE`, e la qualifica che non è «ha un account»
+
+Il webhook `athlon-info-abbonamenti` scrive su `richieste_info_abbonamenti`
+**prima di ogni altra cosa**: i nodi a valle hanno `continueRegularOutput`,
+quindi falliscono in silenzio, e nell'ordine inverso un timeout di PerfectGym
+sarebbe un'opportunità perduta che non vede nessuno.
+
+**La qualifica la decide `statoNucleo`, non `memberType`.** Un Lead o un Guest
+hanno un'anagrafica e nessun abbonamento vivo: sono esattamente le opportunità
+da chiamare. Il flusso vecchio decideva su «PerfectGym lo conosce» e li
+metteva fra i clienti. Le quattro voci sono un `check` in tabella perché sono
+una decisione chiusa:
+
+| qualifica | cosa succede |
+| --- | --- |
+| `nuovo` | lead + privacy + nota su PerfectGym, **e l'email di riepilogo** |
+| `noto_senza_abbonamento` | la nota sulla scheda, e basta |
+| `iscritto` | niente: la riga resta, ed è un segnale di upsell |
+| `sconosciuta` | niente — la verifica non ha risposto, e quando non sappiamo non si crea e non si scrive |
+
+**L'email parte solo a chi su PerfectGym non c'è**, cioè la prima volta che il
+club gli scrive.
+
+**Un lead non creato lascia scritto perché.** Visto sul traffico vero: il sito
+diceva `nuovo` e PerfectGym ha risposto `499 EmailDuplication`, perché la
+verifica era di qualche minuto prima. Il flusso prosegue — la riga si scrive,
+l'email parte — ma senza `motivo_scarto` da fuori non si distingue un lead mai
+tentato da uno rifiutato. Vale la regola del referral: gli scarti si registrano
+come i successi.
+
+### L'email di riepilogo: nessun prezzo, e due dati scritti a mano
+
+Niente cifre, mai: una cifra dentro un template è una cifra che il giorno del
+ritocco al listino resta indietro in un posto che nessuno rilegge, e un prezzo
+sbagliato in un'email è un prezzo che la persona ha in mano alla cassa. I costi
+li stampa `/abbonamenti`, che l'email linka.
+
+Il perimetro dei piani si copia **voce per voce** e non si riassume in una
+categoria: lo Smart in acqua ha il solo Nuoto Libero Assistito, e «tutta
+l'acqua» è la sintesi che manda una persona a comprare il piano sbagliato.
+
+**Due dati sono ricopiati e vanno tenuti in pari con `CLUB`:** l'indirizzo —
+Via Ugo Ojetti 134, 00137 Roma — e il logo, che è
+`/wp-content/uploads/2025/08/Logo-oriz-full-2.png`. n8n non può importare
+`data/club.ts`, quindi è una duplicazione dichiarata. Sono costati due errori
+veri in una stessa email: un indirizzo **inventato** — e un dato inventato è
+peggio di un dato assente, in un'email doppiamente — e un logo che dava 404
+perché il percorso era stato preso dalla nota su un altro workflow.
+
+**Il link della chiamata è `/prenota-chiamata/`**, che è una pagina vera e
+ferma (`chrome={false}`, `noindex`): un link dentro un'email vuole un
+indirizzo, non un parametro che apre un pannello sopra un'altra pagina.
+
+E `AppuntamentoModal` impara `?athlon-appuntamento=1`, lo stesso patto della
+chat con `?athlon-chat=1`: apre il calendario **sopra** la pagina che si stava
+guardando, e serve per il caso opposto — quando quella pagina conta ancora, il
+listino per primo.
+
+### Dove vivono le due viste, e perché la migrazione è in due repository
+
+`richieste_info_abbonamenti` e il ramo in `email_tutte` stanno qui. Il ramo in
+**`utente_attivita` sta in APP-ATHLON**, perché quella vista è definita là e
+porta tre rami dello storico Airtable che questo repository non conosce:
+ridichiararla qui la farebbe tornare indietro. La migrazione del pannello va
+eseguita **dopo** quella del sito, o il `create or replace` non trova la
+tabella.
+
+Attenzione a una cosa scoperta scrivendola: **la vista in produzione era più
+avanti di tutti e due i file**. Aveva `utm_source` e `pagina` in più, aggiunte
+dalla dashboard e mai riportate in una migrazione — il caso che la sezione su
+Supabase descrive. Quando si tocca una vista, la definizione si prende da
+`pg_get_viewdef` sul database vivo, non dal file: il file può essere vecchio.
+
+Per verificare: sul `dist`, ogni pagina ha il pannello e i comandi verso il
+listino portano tutti e due gli attributi, mentre i tre pulsanti di
+`/personal-training` con `data-cta="buy"` non ne portano il secondo. In un
+browser: il pannello si apre dal comando senza navigare, il campo del prefisso
+è vestito come gli altri (si misurano gli stili calcolati, non si guarda), il
+numero esce in E.164, il payload porta `keepalive`, e sul listino il pulsante
+«Iscriviti» non rifà la verifica — l'unica chiamata di rete deve essere quella
+di Google Analytics. Sul totem `sessionStorage` resta vuoto. Su Supabase,
+`info_abbonamenti_esiti` dice per mese quante opportunità calde sono arrivate.
+
 ## `/link` è la bio di Instagram, e non è l'indice del sito
 
 Una pagina sola, sei comandi, `noindex` e fuori dalla sitemap come `/attiva` e
