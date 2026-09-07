@@ -272,23 +272,33 @@ import CampoTelefono from '../CampoTelefono.astro';
       </div>
 
       {/* Il blocco del bambino: nel ramo junior servono due anagrafiche, e la
-          seconda si crea sotto la prima. */}
+          seconda si crea sotto la prima.
+
+          Ogni etichetta dice **di chi** e' il campo, e il titolo non e' piu'
+          «E il bambino». Quel «E» presuppone un blocco prima, e quando il
+          genitore e' gia' su PerfectGym il blocco prima e' nascosto: a schermo
+          restano tre campi — Nome, Cognome, Data di nascita — che una persona
+          compila con i propri. E' successo il 06/09/2026 a una socia, che si e'
+          registrata come figlia di se stessa: su PerfectGym e' nata
+          un'anagrafica «figlio» del 1985, e la chat le ha risposto sull'anno
+          sbagliato. Un'etichetta generica dentro un blocco che puo' comparire
+          da solo e' un'etichetta senza soggetto. */}
       <div class="ca__bimbo" data-ca-bimbo hidden>
-        <span class="ca__sezione">E il bambino</span>
+        <span class="ca__sezione">I dati di tuo figlio o tua figlia</span>
 
         <div class="ca__griglia">
           <div class="ca__campo">
-            <label class="ca__label" for="ca-bnome">Nome</label>
+            <label class="ca__label" for="ca-bnome">Nome del bambino/a</label>
             <input class="ca__input" id="ca-bnome" type="text" data-ca-f="bnome" />
           </div>
           <div class="ca__campo">
-            <label class="ca__label" for="ca-bcognome">Cognome</label>
+            <label class="ca__label" for="ca-bcognome">Cognome del bambino/a</label>
             <input class="ca__input" id="ca-bcognome" type="text" data-ca-f="bcognome" />
           </div>
         </div>
 
         <div class="ca__campo">
-          <label class="ca__label" for="ca-bnascita">Data di nascita</label>
+          <label class="ca__label" for="ca-bnascita">Data di nascita del bambino/a</label>
           <input class="ca__input" id="ca-bnascita" type="date" data-ca-f="bnascita" />
           {/* Il pulsante scelto un passo prima ("Scuola Nuoto Bambini" o "Baby
               Nuoto") è una stima di chi scrive; questa data è il dato esatto.

@@ -172,18 +172,26 @@ export function servonoISuoiDati(persona: {
 }
 
 /**
- * Se questa email è di un **socio**, non solo di chi ha un account.
+ * Se questa email è **già passata dal club**: iscritta una volta, o una prova
+ * fatta anche anni fa.
  *
- * È una domanda diversa da `haGiaAccount`, e la differenza è tutto il referral:
- * là dentro `Guest` conta come «ha un account», qui no. Chi invita deve essere
- * socio — un guest non ha un abbonamento da cui far partire un invito — e chi
- * viene invitato non deve esserlo, perché il pass è per chi non frequenta.
- * La stessa riga risponde alle due domande da due lati.
+ * Il nome dice «socio» e la lettura ovvia sarebbe «paga un abbonamento adesso»:
+ * non è quella. Su PerfectGym `Member` vuol dire che quella persona **è stata
+ * iscritta o ha fatto una prova in passato**, e resta `Member` anche a
+ * contratto finito — quindi questa riga risponde a «l'abbiamo già avuta?», non
+ * a «l'abbiamo adesso?». Confermato dal club il 07/09/2026, ed è la ragione per
+ * cui il confronto va bene com'è per tutte e due le domande del referral.
  *
- * `Guest` passa di proposito, sul lato invitato: chi ha fatto una prova in
- * passato può riceverne un'altra. È la regola che il flusso su n8n applica
- * oggi, confermata dal club, e va detta perché il messaggio di rifiuto di
- * quel flusso promette il contrario — «o ha già attivato una prova».
+ * È diversa da `haGiaAccount`, e la differenza è tutto il referral: là dentro
+ * `Guest` conta come «ha un account», qui no. Chi invita dev'essere già dei
+ * nostri; chi è invitato non deve esserlo mai stato, perché il pass è la prima
+ * settimana di chi il club non lo conosce.
+ *
+ * **`Guest` passa, e non è una svista.** Non è il contrario della regola qui
+ * sopra: un `Guest` su PerfectGym può essere un bambino di un nucleo o chi ha
+ * lasciato i dati a un tour, senza aver mai avuto un pass né un abbonamento.
+ * Scartarli tutti sarebbe più severo del vero, e il verso in cui si sbaglia è
+ * scelto — vedi `data/referral.ts`, dove il perimetro sta scritto per esteso.
  */
 export function eSocio(esito: { memberType?: string; stato?: string }): boolean {
   if (esito.memberType) return /member/i.test(esito.memberType);

@@ -2294,6 +2294,21 @@ export function initChatAssistente(root, options) {
     return false;
   }
 
+  /** Diciotto anni compiuti alla data di oggi. Si contano sull'anno e poi si
+      arretra di uno se il compleanno deve ancora arrivare: `Date` con le
+      stringhe `YYYY-MM-DD` sta in UTC, e a Roma un confronto fra timestamp
+      sposterebbe di un giorno chi è nato il 6 settembre. */
+  function maggiorenne(v) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return false;
+    var oggi = new Date();
+    var anni = oggi.getFullYear() - Number(v.slice(0, 4));
+    var mese = Number(v.slice(5, 7));
+    var giorno = Number(v.slice(8, 10));
+    var meseOggi = oggi.getMonth() + 1;
+    if (mese > meseOggi || (mese === meseOggi && giorno > oggi.getDate())) anni -= 1;
+    return anni >= 18;
+  }
+
   function validaDati() {
     if (erroreDati) erroreDati.hidden = true;
     Object.keys(campi).forEach(function (k) {
@@ -2334,6 +2349,23 @@ export function initChatAssistente(root, options) {
     if (!valore('bnascita')) return segnala('bnascita', 'Serve la data di nascita del bambino.');
     if (valore('bnascita') > oggi) {
       return segnala('bnascita', 'La data di nascita non può essere nel futuro.');
+    }
+    /* Un maggiorenne in questo campo non è un refuso di battitura: è il campo
+       sbagliato. Quando il genitore è già su PerfectGym il suo blocco è
+       nascosto, quindi a schermo restano tre campi che chiedono nome, cognome e
+       data di nascita e basta, e si compilano con i propri — è successo il
+       06/09/2026, e su PerfectGym è nata l'anagrafica di una figlia del 1985.
+       Il messaggio dice qual è il campo, non che la data è invalida: «formato
+       non valido» a chi ha scritto una data vera fa riscrivere la stessa data.
+       Il limite è a 18 anni compiuti e non alla fascia del corso: quale corso
+       spetta a quell'anno lo dice già `correggiAttivitaJunior()`, e un tetto
+       stretto rifiuterebbe l'agonistica junior, che arriva fino alla maggiore
+       età. */
+    if (maggiorenne(valore('bnascita'))) {
+      return segnala(
+        'bnascita',
+        'Questa sembra la tua data di nascita: qui serve quella di tuo figlio o tua figlia.'
+      );
     }
     if (campi.consenso && !campi.consenso.checked) {
       if (erroreDati) {

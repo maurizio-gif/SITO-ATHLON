@@ -26,7 +26,7 @@
  */
 import Layout from '../layouts/Layout.astro';
 import ReferralModal from '../components/ReferralModal.astro';
-import { PASS, VOUCHER, VANTAGGIO_AMICO, COMPRESO, AMICI } from '../data/referral';
+import { PASS, VOUCHER, VANTAGGIO_AMICO, IDONEITA_AMICO, COMPRESO, AMICI } from '../data/referral';
 import { fotoHero } from '../data/foto';
 
 const FOTO = '/wp-content/uploads/2025/03/Athlon95-scaled.jpg';
@@ -126,13 +126,16 @@ const FOTO = '/wp-content/uploads/2025/03/Athlon95-scaled.jpg';
         <button type="button" class="btn btn-primary rp-hero__cta" data-cta="referral">
           Manda l'invito →
         </button>
-        {/* Le due condizioni che decidono se l'invito parte, dette qui e non in
-            fondo in corpo minuscolo: sono le sole due ragioni per cui il form
-            può dire no, e chi le legge prima non ci sbatte contro dopo. */}
+        {/* Le condizioni che decidono se l'invito parte, dette qui e non in
+            fondo in corpo minuscolo: sono le sole ragioni per cui il form può
+            dire no, e chi le legge prima non ci sbatte contro dopo.
+
+            «Lo controlliamo noi mentre compili» vale per l'abbonamento, che il
+            form guarda davvero; il resto lo verifica il desk, quindi la frase
+            non promette più un controllo che non c'è. */}
         <p class="rp-chiusura__nota">
-          Serve un abbonamento attivo per invitare, e chi inviti non deve essere già iscritto: il
-          pass è per chi non frequenta. Lo controlliamo noi mentre compili, così non mandi un
-          invito che non può partire.
+          Serve un abbonamento attivo per invitare, e {IDONEITA_AMICO}. L'abbonamento lo
+          controlliamo mentre compili, così non mandi un invito che non può partire.
         </p>
       </div>
     </div>
