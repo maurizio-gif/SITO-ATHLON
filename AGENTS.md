@@ -2394,6 +2394,49 @@ reindirizzamento non ci va. Non è stato escluso perché quando la promo è viva
 quella pagina è `index, follow` per scelta, e un'esclusione fissa la terrebbe
 fuori anche allora.
 
+### La lezione privata non esiste, e il personal training non è la sua versione in acqua
+
+Stessa giornata, altro difetto della stessa forma: a un genitore che ha scritto
+«una lezione solo per lui», la chat ha risposto *«le lezioni private in acqua —
+il **personal training** — si prenotano e si acquistano a parte, con formule e
+prezzi loro»*, e lo ha mandato a farsi mandare per email il listino. Il personal
+training è **per adulti** e riguarda **le attività in palestra**: quel listino
+non esiste, e i corsi in acqua per bambini sono **collettivi**.
+
+**Il modello non ha letto una riga sbagliata: ne ha composta una.** Aveva
+«lezione individuale» dalla domanda e «personal training» dal contesto, e nessun
+dato che dicesse che le due cose non si incontrano — la voce
+`abbonamento:personal-training` diceva pacchetti e prezzi **e nient'altro**, senza
+una parola su per chi vale e dove si tiene. È la lezione già scritta tre volte in
+questo file: *una regola che non dichiara il proprio perimetro è una regola che
+si allarga al caso vicino*, e qui il caso vicino era un bambino in vasca.
+
+Il testo sta in `SOLO_COLLETTIVE` (`data/junior.ts`) e da lì lo leggono **i due
+lati della stessa domanda**, che sono i due posti da cui pesca:
+
+- la voce di **tutti e quattro i corsi junior** (`testoJunior`): i corsi sono
+  collettivi, la lezione individuale non esiste, e il personal training non è la
+  sua versione in acqua. Su un corso che vende la lezione singola — il Baby
+  Nuoto — c'è anche la riga che la distingue: **«singola» non vuol dire
+  «privata»**, è una lezione del corso pagata una alla volta, con gli altri
+  bambini;
+- la voce del **personal training**: vale solo per gli adulti (da
+  `ETA_MINIMA_ADULTI.anni`) e per le attività in palestra, con le aree lette da
+  `AREE_TRAINER` — e la stessa frase che a un genitore non si nomina.
+
+Due cose da sapere prima di toccarlo.
+
+**La riga arriva su tutti e quattro i corsi e non solo sulla Scuola Nuoto**,
+perché la domanda non nomina il corso: la fa chi sta guardando la pagina che ha
+davanti, e con la voce su un corso solo il difetto si sposta invece di chiudersi
+— è la spazzata del Guest Pass applicata prima che l'errore torni.
+
+**E il divieto è scritto anche per l'adulto.** «Non c'è nessun modo di comprare
+una lezione di nuoto privata, né per un bambino né per un adulto»: senza
+quell'inciso resta aperta la lettura peggiore — che la lezione privata in acqua
+esista e sia solo dei grandi — cioè esattamente la frase da cui questo giro è
+partito.
+
 ### Un elenco di attività comprese non si riassume in una categoria
 
 Il 7 settembre, a chi chiedeva l'Aqua Tonic delle 13:30, la chat ha chiuso la

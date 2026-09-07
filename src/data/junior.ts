@@ -68,6 +68,38 @@ export function anniVascaPiccola(): string {
   return a.slice(0, -1).join(', ') + ' e ' + a[a.length - 1];
 }
 
+/**
+ * **I corsi in acqua per bambini sono collettivi, e la lezione privata non
+ * esiste.**
+ *
+ * Il 7/9 un genitore ha chiesto «una lezione solo per lui» e l'assistente ha
+ * risposto che le lezioni private in acqua sono il **personal training**, che
+ * «si prenota e si acquista a parte» — mandandolo a farsi mandare per email un
+ * listino di una cosa che non c'è: il personal training è per adulti e riguarda
+ * le attività in palestra, non il nuoto. Il modello non ha letto una riga
+ * sbagliata, ne ha composta una: aveva «lezione individuale» da una parte e
+ * «personal training» dall'altra, e nessun dato che dicesse che le due cose non
+ * si incontrano.
+ *
+ * Sta nei dati e non in una f.a.q. di una pagina perché deve arrivare **al
+ * `kb.json` accanto a ogni corso junior e accanto ai pacchetti di personal
+ * training**: sono i due posti da cui quella domanda pesca, e una frase in una
+ * pagina sola sarebbe la metà che il modello non legge.
+ *
+ * `SINGOLA` è la distinzione che serve subito dopo: il Baby Nuoto vende la
+ * lezione singola, e «singola» non vuol dire «privata» — è una lezione del
+ * corso pagata una alla volta, con gli altri bambini e lo stesso istruttore.
+ */
+export const SOLO_COLLETTIVE = {
+  testo:
+    'I corsi in acqua per bambini sono **collettivi**: si nuota in gruppo con l\'istruttore in vasca, negli orari del turno. **La lezione individuale non esiste** — non c\'è nessun modo di comprare una lezione di nuoto privata, né per un bambino né per un adulto, e non va proposta in nessuna forma.',
+  singola:
+    'La **lezione singola** del Baby Nuoto non è una lezione privata: è una lezione del corso, con gli altri bambini, pagata una alla volta invece che con l\'abbonamento.',
+  /** Che cos'è il personal training, detto dal lato di chi lo esclude. */
+  personal:
+    'Il **personal training** non è la versione privata di un corso di nuoto: è un servizio **per adulti**, sulle attività in palestra, e non si tiene in acqua. A un genitore che chiede una lezione solo per suo figlio non si nomina.',
+} as const;
+
 const U = '/wp-content/uploads';
 
 /**
