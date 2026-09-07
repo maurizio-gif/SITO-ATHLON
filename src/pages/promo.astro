@@ -118,7 +118,12 @@ const contatta = talkCta({ source: '/promo' });
           <span class="cd"><b class="cd__n u-display" data-cd="m">–</b><span class="cd__l">minuti</span></span>
           <span class="cd"><b class="cd__n u-display" data-cd="s">–</b><span class="cd__l">secondi</span></span>
         </div>
-        <p class="countdown__finita" hidden>La promozione è terminata. Gli abbonamenti restano attivi: <a href="/abbonamenti">vedi i piani →</a></p>
+        {/* L'unico comando di questa pagina che passa dal gate, e non
+            contraddice la scelta di tenerlo fuori dai comandi dell'offerta:
+            quelli sono la seconda metà di un gesto che comincia col codice
+            negli appunti, questo compare quando il codice è scaduto e il
+            listino è l'unica strada che resta. */}
+        <p class="countdown__finita" hidden>La promozione è terminata. Gli abbonamenti restano attivi: <a href="/abbonamenti" data-cta="buy" data-cta-intent="membership" data-cta-source="promo-scaduta">vedi i piani →</a></p>
       </div>
 
       {/* Il codice, sopra la piega e copiabile, come su `/attiva`.

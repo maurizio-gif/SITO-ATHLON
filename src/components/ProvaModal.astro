@@ -84,7 +84,13 @@ import CampoTelefono from './CampoTelefono.astro';
 
             L'abbonamento punta a `#piani`, non alla cima della pagina: chi ha
             già scelto «abbonamento» ha superato l'introduzione, e deve trovarsi
-            davanti «Come vuoi vivere il club?». */}
+            davanti «Come vuoi vivere il club?».
+
+            E nessuno dei due porta `data-cta-intent="membership"`, benché
+            portino al listino: chi legge questa schermata ha appena digitato e
+            verificato la sua email in questo pannello, quindi il gate gliela
+            richiederebbe due secondi dopo averla data. Vale per tutti e due, e
+            non per il solo `#accessi-singoli`. */}
         <div class="pf__scelta">
           <a class="btn btn-primary pf__btn" href="/abbonamenti#accessi-singoli">Lezione singola →</a>
           <a class="btn btn-primary pf__btn" href="/abbonamenti#piani">Abbonamenti →</a>
