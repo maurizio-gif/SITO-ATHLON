@@ -14,16 +14,27 @@
  * abbonamento. Nel flusso vecchio era uno `Switch` su
  * `memberType contains 'Member'`.
  *
- * **Chi è invitato non deve essere socio.** Il pass è per chi non frequenta.
- * Chi ha già fatto una prova in passato — in PerfectGym è `Guest` — **può
- * riceverne un'altra**: confermato dal club, ed è quello che il flusso su n8n
- * fa oggi. Va detto perché il messaggio di rifiuto di quel flusso promette il
- * contrario — «è già stato nostro iscritto o ha già attivato una prova» — e
- * quel messaggio qui è stato riscritto per dire quello che il controllo fa
- * davvero.
+ * **Chi è invitato dev'essere nuovo davvero**, ed è la regola che il 07/09/2026
+ * ha cambiato verso. Prima diceva che chi aveva già fatto una prova — in
+ * PerfectGym un `Guest` — poteva riceverne un'altra, «confermato dal club»:
+ * adesso il club dice il contrario, e l'amico non deve aver **mai** avuto un
+ * Guest Pass ne' un abbonamento Athlon da `GUEST_PASS.dal`. E' lo stesso
+ * perimetro del Guest Pass di listino, portato sull'invito: due porte per la
+ * stessa prima settimana non possono avere due soglie diverse.
  *
- * Le due domande le risponde `eSocio()` in `data/contatto.ts`, dai due lati.
+ * **Il controllo automatico e' piu' largo di questa regola, e va saputo.**
+ * `Amico e socio?` su n8n guarda un campo solo — `memberType`, e scarta i
+ * `Member` — perche' «ha gia' avuto un Guest Pass» e «ha avuto un abbonamento
+ * dal 2021» non stanno in quel campo: stanno nei contratti, che quel flusso non
+ * legge. Quindi la condizione e' **dichiarata**, come lo e' gia' quella del
+ * Guest Pass di listino, e chi la verifica davvero e' il desk. Il verso in cui
+ * si sbaglia e' scelto: un invito di troppo si riconcilia, un amico idoneo
+ * rifiutato da un controllo approssimativo non torna.
+ *
+ * La domanda su chi invita la risponde `eSocio()` in `data/contatto.ts`.
  */
+
+import { GUEST_PASS } from './abbonamenti';
 
 /**
  * Quanti amici si possono invitare in una volta.
@@ -86,17 +97,43 @@ export const VOUCHER = {
  * `content/articles/generali/referral-guest-pass.md` non possono importare
  * questo modulo, quindi la ripetono in chiaro).
  *
- * **La finestra invece si dice, ed è la sola cosa di questo vantaggio che si
- * dichiara prima.** Vale se si iscrive entro i giorni del pass, cioè
- * `PASS.giorni`: una scadenza taciuta non protegge niente — è un'offerta che
- * scade a una persona che non sapeva di doversi muovere, e la scopre quando
- * non c'è più. Tacere *cosa* è resta la scelta del club; tacere *entro quando*
- * sarebbe un'altra cosa. I giorni si leggono da `PASS`, non si riscrivono: il
- * pass e la finestra sono lo stesso numero per costruzione.
+ * **Le condizioni invece si dicono, e sono le sole cose di questo vantaggio che
+ * si dichiarano prima.** Sono due e vanno insieme: iscriversi **entro la
+ * scadenza del pass**, e far partire l'abbonamento **dal giorno dopo** quella
+ * scadenza — la settimana di prova e il primo mese si toccano, senza un giorno
+ * di buco in mezzo. Tacere *cosa* e' il vantaggio resta la scelta del club;
+ * tacere *come si ottiene* sarebbe un'altra cosa: e' un'offerta che si perde
+ * facendo una cosa ragionevole, cioe' aspettare qualche giorno prima di
+ * iscriversi, e chi la perde lo scopre quando non c'e' piu'.
+ *
+ * **La seconda condizione e' quella che si dimentica**, ed e' la ragione per
+ * cui non basta dire «entro la scadenza»: la data di inizio dell'abbonamento
+ * si sceglie durante l'iscrizione (vedi `DATA_INIZIO`), quindi e' una cosa che
+ * la persona fa, non una che le capita. Detta a meta', il vantaggio si perde
+ * con l'iscrizione fatta nei tempi giusti.
  */
 export const VANTAGGIO_AMICO =
-  `ci sarà un vantaggio anche per lui se si iscrive entro i ${PASS.giorni} giorni della ` +
-  'prova, e glielo dice lo staff quando lo richiama per sapere com’è andata';
+  'ci sarà un vantaggio anche per lui, a due condizioni: che si iscriva entro la ' +
+  'scadenza del pass e che faccia partire l’abbonamento dal giorno dopo, senza ' +
+  'buchi. Glielo dice lo staff quando lo richiama per sapere com’è andata';
+
+/**
+ * Chi puo' ricevere l'invito, in una frase sola e in un posto solo.
+ *
+ * Stava scritta a mano in tre punti — la landing, la scheda del servizio, il
+ * markdown del wiki — e quando la regola e' cambiata quei tre punti dicevano
+ * ancora la versione vecchia. Adesso la landing e il modal la leggono da qui;
+ * i due markdown non possono importare TypeScript e restano copie dichiarate,
+ * come per `VANTAGGIO_AMICO`.
+ *
+ * L'anno si legge da `GUEST_PASS.dal` e non si riscrive: e' lo stesso
+ * perimetro del Pass di listino, e il giorno che il club lo sposta si sposta
+ * una volta sola.
+ */
+export const IDONEITA_AMICO =
+  'chi inviti non deve avere un abbonamento in corso né aver già avuto un Guest ' +
+  `Pass o un abbonamento Athlon dal ${GUEST_PASS.dal}: il pass è la prima settimana ` +
+  'di chi il club non lo conosce';
 
 /**
  * Cosa comprende il pass. Le stesse sette voci del form vecchio, che è il

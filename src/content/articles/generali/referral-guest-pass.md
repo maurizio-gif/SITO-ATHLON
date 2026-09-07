@@ -24,7 +24,13 @@ Il pass si genera da **[athlonroma.it/referral](https://www.athlonroma.it/referr
 1. Generi l'invito dalla pagina referral
 2. Il tuo amico riceve l'email con il pass
 3. Attiva la settimana di prova quando vuole, **entro 30 giorni** dalla ricezione
-4. Se poi si iscrive, a te arriva un **voucher di 50 €** — e ci sarà un vantaggio anche per lui **se si iscrive entro i 7 giorni della prova**, che lo staff gli comunica quando lo richiama per sapere com'è andata
+4. Se poi si iscrive, a te arriva un **voucher di 50 €** — e ci sarà un vantaggio anche per lui **se si iscrive entro la scadenza del pass e fa partire l'abbonamento dal giorno dopo**, senza giorni di buco fra la prova e il primo mese — glielo comunica lo staff quando lo richiama per sapere com'è andata
+
+## Chi puoi invitare
+
+Il pass è la **prima settimana** di chi il club non lo conosce: chi inviti non deve avere un abbonamento in corso, e non deve aver già avuto un Guest Pass o un abbonamento Athlon **dal 2021**. Chi è già passato di qui una volta non può riceverne un altro.
+
+L'abbonamento attivo di chi invita lo controlla la pagina mentre compili; il resto lo verifica la segreteria prima di attivare il pass.
 
 > il tuo amico ha 30 giorni di tempo a disposizione dal momento in cui riceve l'invito per poterlo attivare
 
