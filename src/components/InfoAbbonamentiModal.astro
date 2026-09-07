@@ -1,0 +1,268 @@
+---
+/**
+ * «Prima di aprirti il listino, dimmi chi sei»: il gate degli abbonamenti.
+ *
+ * Sta nel Layout, quindi è presente su ogni pagina, e lo apre qualunque comando
+ * con `data-cta="buy"` e `data-cta-intent="membership"` — cioè quelli che
+ * `joinCta()` genera in `data/cta.ts`. Chi non ha JavaScript segue l'`href` e
+ * arriva al listino come prima: il gate è un miglioramento del percorso, non un
+ * requisito per vedere la pagina.
+ *
+ * **Fuori dal `chrome`, come il modulo contatti**, e per la stessa ragione: i
+ * comandi verso il listino compaiono anche su pagine senza intestazione — la
+ * 404, e domani qualunque scheda che ne voglia uno. Dentro il gate quelle CTA
+ * aprirebbero il nulla.
+ *
+ * ## Perché l'email è obbligatoria qui e la pagina resta pubblica
+ *
+ * Sono due decisioni diverse e vanno tenute distinte. Da un **comando** del
+ * sito l'indirizzo si lascia: è il momento in cui l'interesse è vivo, ed è
+ * l'unico modo di sapere che è esistito. La **pagina** invece non è protetta da
+ * niente — `/abbonamenti` è indicizzata e la leggono Google e gli LLM — perché
+ * un listino dietro un modulo è un listino che nessuno cita.
+ *
+ * Chi conosce l'indirizzo o arriva da un motore lo scavalca, e va bene: il gate
+ * misura e raccoglie il percorso interno, non chiude una porta.
+ *
+ * ## I due passi, e perché il secondo spesso non c'è
+ *
+ * 1. **l'email**, sempre;
+ * 2. **nome, cognome e cellulare**, solo se `servonoISuoiDati()` è vera.
+ *
+ * Il secondo passo non è una domanda: è la **composizione** del `personalData`
+ * della chiamata che crea l'anagrafica su PerfectGym. Se l'anagrafica c'è già
+ * quella chiamata non parte, e chiedere quei campi vorrebbe dire far ricopiare
+ * a una persona quello che il club ha già scritto. È la stessa condizione del
+ * totem e della chat, e vive in `data/contatto.ts` una volta sola.
+ *
+ * E se la verifica non risponde — sei secondi, poi si passa — il secondo passo
+ * **si salta**: non sappiamo se quell'anagrafica esista, quindi non si crea
+ * nessun lead e non si chiede niente. Un attrito in più a chi ha appena subito
+ * un timeout sarebbe il modo più rapido di perdere sia il contatto sia la
+ * visita.
+ */
+import CampoTelefono from './CampoTelefono.astro';
+---
+
+<div class="ia" id="info-abbonamenti-modal" aria-hidden="true">
+  <div class="ia__backdrop" data-ia-close></div>
+  <div class="ia__panel" role="dialog" aria-modal="true" aria-labelledby="ia-titolo">
+    <button type="button" class="ia__close" data-ia-close aria-label="Chiudi">×</button>
+
+    <p class="ia__eyebrow" data-ia-occhiello>Abbonamenti</p>
+
+    <section id="ia-step-email" data-ia-passo="email">
+      <h2 class="ia__title u-display" id="ia-titolo" tabindex="-1" data-ia-fuoco>
+        Ti apriamo il listino
+      </h2>
+      <p class="ia__testo">
+        Lasciaci il tuo indirizzo: apriamo gli abbonamenti e, se non ti conosciamo
+        ancora, ti arriva anche un riepilogo di come funzionano.
+      </p>
+
+      <label class="ia__label" for="ia-email">La tua email</label>
+      <input
+        class="ia__input"
+        type="email"
+        id="ia-email"
+        name="email"
+        autocomplete="email"
+        inputmode="email"
+        placeholder="nome@email.com"
+        data-email-nota
+      />
+      <p class="ia__errore" data-ia-errore hidden></p>
+
+      <button type="button" class="btn btn-primary ia__btn" data-ia-verifica>
+        Vedi gli abbonamenti
+        <span class="ia__spinner" data-ia-spinner hidden aria-hidden="true"></span>
+      </button>
+    </section>
+
+    <section id="ia-step-dati" data-ia-passo="dati" hidden>
+      <h2 class="ia__title u-display" tabindex="-1" data-ia-fuoco>Come ti chiami?</h2>
+      <p class="ia__testo">
+        Due campi e ti apriamo il listino. Ci servono per scriverti il riepilogo
+        e per riconoscerti quando ci vieni a trovare.
+      </p>
+
+      <div class="ia__riga">
+        <div>
+          <label class="ia__label" for="ia-nome">Nome</label>
+          <input class="ia__input" type="text" id="ia-nome" autocomplete="given-name" />
+        </div>
+        <div>
+          <label class="ia__label" for="ia-cognome">Cognome</label>
+          <input class="ia__input" type="text" id="ia-cognome" autocomplete="family-name" />
+        </div>
+      </div>
+
+      <label class="ia__label" for="ia-cell">Cellulare</label>
+      <CampoTelefono id="ia-cell" classe="ia__input" />
+
+      <p class="ia__errore" data-ia-errore-dati hidden></p>
+
+      <button type="button" class="btn btn-primary ia__btn" data-ia-invia>
+        Vedi gli abbonamenti
+        <span class="ia__spinner" data-ia-spinner-dati hidden aria-hidden="true"></span>
+      </button>
+    </section>
+
+    <p class="ia__nota">
+      Ti scriviamo solo per questo. L’informativa è sulla <a href="/privacy/">pagina della privacy</a>.
+    </p>
+  </div>
+</div>
+
+<style>
+  .ia {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+  }
+  .ia.open {
+    display: block;
+  }
+  .ia__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgb(20 14 10 / 0.55);
+    backdrop-filter: blur(2px);
+  }
+  .ia__panel {
+    position: relative;
+    margin: auto;
+    inset: 0;
+    max-width: 30rem;
+    width: calc(100% - 2rem);
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+    background: var(--color-cream, #fdf8f3);
+    border-radius: var(--radius, 20px);
+    padding: 2rem 1.75rem 1.5rem;
+    box-shadow: 0 24px 60px rgb(20 14 10 / 0.28);
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .ia__close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 3rem;
+    height: 3rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    line-height: 1;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    color: inherit;
+  }
+  .ia__eyebrow {
+    font-size: var(--text-2xs);
+    letter-spacing: 0.104em;
+    text-transform: uppercase;
+    color: var(--accent-text, #bb4001);
+    margin: 0 0 0.25rem;
+  }
+  .ia__title {
+    font-size: var(--text-2xl);
+    --lh: 0.95;
+    margin: 0 0 0.5rem;
+    outline: none;
+  }
+  .ia__testo {
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    margin: 0 0 1.25rem;
+    max-width: 42ch;
+  }
+  .ia__label {
+    display: block;
+    font-size: var(--text-2xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0 0 0.35rem;
+  }
+  .ia__riga {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+  @media (max-width: 460px) {
+    .ia__riga {
+      grid-template-columns: 1fr;
+    }
+  }
+  /* `:global`, e non e' un dettaglio: il `select` e l'`input` del prefisso li
+     rende `CampoTelefono.astro`, quindi portano l'ambito di quel file. Una
+     regola con ambito scritta qui diventa `.ia__input[data-astro-cid-…]` e non
+     li raggiunge mai — il campo resterebbe nudo, come e' successo in tutti e
+     quattro i pannelli prima che qualcuno lo guardasse. */
+  .ia :global(.ia__input) {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.75rem 0.9rem;
+    font-family: inherit;
+    font-size: var(--text-sm);
+    color: inherit;
+    background: #fff;
+    border: 1px solid rgb(20 14 10 / 0.18);
+    border-radius: 0.65rem;
+    margin-bottom: 0.75rem;
+  }
+  .ia :global(.ia__input:focus-visible) {
+    outline: 2px solid var(--color-primary, #ff5701);
+    outline-offset: 1px;
+  }
+  .ia :global(.ia__input.segnalato) {
+    border-color: #dc2626;
+  }
+  .ia__errore {
+    font-size: var(--text-2xs);
+    color: #dc2626;
+    margin: 0 0 0.75rem;
+  }
+  .ia__btn {
+    width: 100%;
+    min-height: 3rem;
+    justify-content: center;
+  }
+  .ia__spinner {
+    width: 1rem;
+    height: 1rem;
+    margin-left: 0.5rem;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    animation: ia-gira 0.7s linear infinite;
+  }
+  @keyframes ia-gira {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ia__spinner {
+      animation-duration: 3s;
+    }
+  }
+  .ia__nota {
+    font-size: var(--text-2xs);
+    line-height: 1.5;
+    opacity: 0.75;
+    margin: 1rem 0 0;
+  }
+  .ia__nota a {
+    color: var(--accent-text, #bb4001);
+  }
+</style>
+
+<script>
+  import '../lib/infoAbbonamenti.client.js';
+</script>

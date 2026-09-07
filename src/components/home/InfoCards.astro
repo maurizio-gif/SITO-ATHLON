@@ -14,6 +14,10 @@ const cards = [
     html: 'Scopri i nuovi <strong>Abbonamenti Smart</strong> e <strong>Premium</strong>, con pagamento mensile o annuale.',
     link: '/abbonamenti',
     cta: 'Iscriviti ora',
+    /* L'unica delle tre card che porta al listino, quindi l'unica che passa
+       dal gate dell'email: le altre due sono `explore`, cioe' guardare senza
+       lasciare niente in cambio. Gli attributi sono quelli di `joinCta()`. */
+    intento: 'buy',
   },
   {
     variant: 'photo',
@@ -62,7 +66,13 @@ const cards = [
         <div class="card-content">
           <h3>{c.title}</h3>
           <p set:html={c.html} />
-          <a href={c.link} class="btn btn-outline-dark" data-cta="explore">{c.cta}</a>
+          <a
+            href={c.link}
+            class="btn btn-outline-dark"
+            data-cta={c.intento || 'explore'}
+            data-cta-intent={c.intento === 'buy' ? 'membership' : undefined}
+            data-cta-source={c.intento === 'buy' ? 'home-card' : undefined}
+          >{c.cta}</a>
         </div>
       </div>
     ))}

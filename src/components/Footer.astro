@@ -28,7 +28,18 @@ const corsiJunior = [
 ];
 
 const ilClub = [
-  { label: 'Iscriviti online', href: '/abbonamenti' },
+  /* Passa dal gate come gli altri comandi verso il listino: e' su ogni pagina
+     del sito, quindi e' anche la strada che prende chi ha scorrolato fino in
+     fondo senza premere niente. */
+  {
+    label: 'Iscriviti online',
+    href: '/abbonamenti',
+    attrs: {
+      'data-cta': 'buy',
+      'data-cta-intent': 'membership',
+      'data-cta-source': 'footer-menu',
+    },
+  },
   { label: 'Orari Corsi', href: '/planning' },
   { label: 'Eventi', href: '/eventi' },
   /* «Contattaci» apre **la chat**, come il pulsante qui sopra e come nel menu

@@ -405,7 +405,7 @@ const conVideo = varianti.filter((v) => v.media.video || v.media.stats.length);
             {corso.nome} è compreso nell’abbonamento {pianiTesto}, insieme alle altre attività che
             quell’abbonamento comprende.
           </p>
-          <a href="/abbonamenti" class="co-plan__cta">Vedi gli abbonamenti →</a>
+          <a href="/abbonamenti" class="co-plan__cta" data-cta="buy" data-cta-intent="membership" data-cta-source="corso" data-cta-activity={corso.slug}>Vedi gli abbonamenti →</a>
         </article>
         )}
       </div>

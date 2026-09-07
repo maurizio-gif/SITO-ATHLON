@@ -42,7 +42,7 @@ const contatta = talkCta({ source: '/404' });
 
       <div class="err-hero__link" data-anim data-anim-delay="140">
         <a href="/" class="btn btn-primary">Vai alla home →</a>
-        <a href="/abbonamenti" class="btn btn-outline-dark">Vedi gli abbonamenti</a>
+        <a href="/abbonamenti" class="btn btn-outline-dark" data-cta="buy" data-cta-intent="membership" data-cta-source="404">Vedi gli abbonamenti</a>
         <a href="/planning" class="btn btn-outline-dark">Orari e planning</a>
         <a href={contatta.href} class="btn btn-outline-dark" {...contatta.attrs}>{contatta.label}</a>
       </div>

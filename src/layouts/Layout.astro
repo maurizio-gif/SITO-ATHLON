@@ -25,6 +25,7 @@ import ProvaModal from '../components/ProvaModal.astro';
 import ContattaciModal from '../components/ContattaciModal.astro';
 import AppuntamentoModal from '../components/AppuntamentoModal.astro';
 import ProvaNuotoModal from '../components/ProvaNuotoModal.astro';
+import InfoAbbonamentiModal from '../components/InfoAbbonamentiModal.astro';
 import ChatModal from '../components/clublife/ChatModal.astro';
 import ChatFab from '../components/ChatFab.astro';
 import { CLUB, clubSchema, breadcrumbSchema } from '../data/club';
@@ -288,6 +289,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     {/* La prenotazione della chiamata: come gli altri, presente ovunque e
         aperta da qualunque comando con data-cta="call". */}
     <AppuntamentoModal />
+
+    {/* Il gate del listino: chiede l'email a chi preme un comando verso gli
+        abbonamenti, e poi lo porta lì. Fuori dal `chrome` come il form dei
+        contatti — quei comandi compaiono anche dove l'intestazione non c'è,
+        la 404 per prima — e senza JavaScript resta l'`href`, che è il listino.
+
+        /abbonamenti resta pubblica e indicizzata: il gate è un attrito sul
+        percorso interno, non un controllo d'accesso. */}
+    <InfoAbbonamentiModal />
 
     {/* La prova di inserimento di pallanuoto e nuoto agonistico. Fuori dal
         `chrome` come il form dei contatti, e per la stessa ragione: la CTA

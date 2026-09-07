@@ -19,6 +19,7 @@
  */
 import { WEBHOOK_VERIFICA, WEBHOOK_RESET, PORTALE, haGiaAccount } from '../data/contatto';
 import { leggi as emailConosciuta } from '../scripts/emailNota';
+import { ricordato } from '../data/infoAbbonamenti';
 
 (function () {
   var modal = document.getElementById('iscrizione-modal');
@@ -78,6 +79,27 @@ import { leggi as emailConosciuta } from '../scripts/emailNota';
        al portale se l'account c'è già, dritto sulla registrazione
        altrimenti — quindi qui basta riempire il campo e chiamarla, senza
        dare il fuoco a un campo che nessuno deve compilare. */
+    /* Il gate del listino ha gia' verificato questo indirizzo un momento fa, e
+       ha lasciato l'esito nella sessione: qui non si richiama il webhook, si
+       decide con quello che si sa. E' l'altra meta' del gate — senza, chi ha
+       appena scritto la sua email se la vedrebbe richiedere due schermate
+       dopo, ed e' esattamente l'attrito che quel pannello esiste per togliere.
+
+       La verifica si rifa' solo se l'esito non c'e': in sessione ci finisce
+       solo chi e' passato dal gate, e a `/abbonamenti` ci si arriva anche da
+       Google, da un LLM o digitando l'indirizzo — la pagina e' pubblica
+       apposta. */
+    var dalGate = ricordato();
+    if (dalGate && campo) {
+      campo.value = dalGate.email;
+      if (haGiaAccount({ memberType: dalGate.memberType, stato: dalGate.stato })) {
+        mostra('portale');
+      } else {
+        vai();
+      }
+      return;
+    }
+
     var emailGiaNota = emailConosciuta();
     if (emailGiaNota && campo) {
       campo.value = emailGiaNota;

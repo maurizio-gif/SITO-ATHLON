@@ -504,15 +504,15 @@ import AppuntamentoPassi from './AppuntamentoPassi.astro';
     const form = initAppuntamentoForm(modal, { prefix: 'ap' });
     let ultimoComando: HTMLElement | null = null;
 
-    function apri(comando: HTMLElement) {
+    function apri(comando: HTMLElement | null, origineEsterna?: string) {
       ultimoComando = comando;
       modal!.classList.add('open');
       modal!.setAttribute('aria-hidden', 'false');
       document.body.classList.add('amodal-locked');
       form.apri({
         pagina: location.pathname,
-        origine: comando.dataset.ctaSource || '',
-        cta: (comando.textContent || '').trim().slice(0, 80),
+        origine: comando?.dataset.ctaSource || origineEsterna || '',
+        cta: (comando?.textContent || 'link esterno').trim().slice(0, 80),
       });
     }
 
@@ -536,6 +536,31 @@ import AppuntamentoPassi from './AppuntamentoPassi.astro';
       e.preventDefault();
       apri(cta);
     });
+
+    /* Un indirizzo che apre il calendario da solo, per chi arriva da fuori il
+       sito — l'email di riepilogo degli abbonamenti, una newsletter, un QR — e
+       non da un `data-cta="call"` in pagina. È lo stesso patto di
+       `?athlon-chat=1` sulla chat: il modal sta nel Layout, quindi
+       `?athlon-appuntamento=1` in coda a qualunque indirizzo del sito lo apre
+       al caricamento.
+
+       La pagina sotto resta quella dell'indirizzo, ed è la parte che conta:
+       chi arriva dall'email atterra sul listino e il calendario gli si apre
+       sopra, quindi senza JavaScript — o se un giorno questo blocco sparisse —
+       resta comunque la pagina che stava cercando. Il verso giusto in cui
+       sbagliare.
+
+       `null` come comando: non c'è nessun pulsante da cui si è partiti, quindi
+       non c'è niente a cui restituire il fuoco alla chiusura, e l'origine la
+       dichiara la stringa. */
+    (function apriDaIndirizzo() {
+      let richiesta = false;
+      try {
+        richiesta = new URLSearchParams(location.search).get('athlon-appuntamento') === '1';
+      } catch (err) {}
+      if (!richiesta) return;
+      apri(null, 'link-esterno');
+    })();
 
     modal.querySelectorAll('[data-ap-close]').forEach((el) => el.addEventListener('click', chiudi));
 
