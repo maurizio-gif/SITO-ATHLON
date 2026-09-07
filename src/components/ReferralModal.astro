@@ -102,6 +102,10 @@ const BLOCCHI = Array.from({ length: AMICI }, (_, i) => i + 1);
         cui usarlo.
       </p>
       <div class="rfr__azioni">
+        {/* Senza `data-cta-intent="membership"`, come i due della schermata
+            «già dei nostri» e come quelli del modal della prova: l'email in
+            questo pannello è appena stata digitata e verificata, e il gate la
+            richiederebbe subito dopo. */}
         <a class="btn btn-primary rfr__btn" href="/abbonamenti#piani">Vedi gli abbonamenti →</a>
         {/* Apre il modulo contatti: `data-cta="talk"` è tutto il meccanismo, e
             il gestore qui sotto chiude questo pannello perché i due non si

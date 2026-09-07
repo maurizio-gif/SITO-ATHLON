@@ -262,8 +262,12 @@ const trust = [
         </article>
       </div>
 
+      {/* Il solo comando di questa pagina che porta al listino, quindi il solo
+          che prende `data-cta-intent="membership"`: i tre `data-cta="buy"` qui
+          sopra restano senza, o il gate chiederebbe l'email per prenotare una
+          seduta. */}
       <p class="pt-note">
-        Non hai ancora un abbonamento? <a href="/abbonamenti">Scopri i piani Smart e Premium →</a>
+        Non hai ancora un abbonamento? <a href="/abbonamenti" data-cta="buy" data-cta-intent="membership" data-cta-source="personal-training-nota" data-cta-activity="personal-training">Scopri i piani Smart e Premium →</a>
       </p>
     </div>
   </section>

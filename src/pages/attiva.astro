@@ -169,7 +169,11 @@ const faqs: FaqEntry[] = [
     {/* La landing gira senza il footer del sito: le condizioni non avrebbero
         nessun'altra strada per farsi trovare da qui. */}
     <div class="container at-legale">
-      <a href="/abbonamenti">Vedi tutti gli abbonamenti</a>
+      {/* Passa dal gate come la voce del footer, che su una pagina col
+          `chrome` è lo stesso comando in fondo alla stessa colonna. Il codice
+          del Pass sta sopra e non c'entra: chi arriva qui e scende a guardare
+          il listino sta chiedendo un'altra cosa. */}
+      <a href="/abbonamenti" data-cta="buy" data-cta-intent="membership" data-cta-source="attiva-legale">Vedi tutti gli abbonamenti</a>
       <span aria-hidden="true">·</span>
       <a href="/regolamento">Termini e condizioni</a>
       <span aria-hidden="true">·</span>

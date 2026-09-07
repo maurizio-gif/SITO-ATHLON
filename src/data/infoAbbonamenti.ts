@@ -3,7 +3,13 @@
  *
  * Ogni comando che significa «portami agli abbonamenti» — la pastiglia
  * dell'header, «Iscriviti ora» in home, «Vedi gli abbonamenti» in fondo alle
- * pagine delle attività — chiede l'indirizzo prima di aprire `/abbonamenti`.
+ * pagine delle attività, e anche i link dentro il testo che scorre, la nota di
+ * `/personal-training` e le frasi «fanno parte dello stesso club» — chiede
+ * l'indirizzo prima di aprire `/abbonamenti`. **La forma del link non decide
+ * niente, la destinazione sì**: chi clicca «guarda quali comprende il tuo
+ * abbonamento» sta andando al listino come chi preme un pulsante, e le
+ * eccezioni sono quelle dichiarate nel `CLAUDE.md` — i pannelli che l'email
+ * l'hanno appena chiesta, e la pagina stessa.
  * Serve a due cose insieme: dare un contatto al desk mentre l'interesse è vivo,
  * e non chiedere due volte la stessa cosa a chi arriva in fondo — l'esito della
  * verifica viaggia fino al pulsante «Iscriviti» del listino.

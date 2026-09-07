@@ -417,17 +417,58 @@ anche su «Prenota una seduta» e «Aggiungi al tuo abbonamento»: agganciare il
 solo `buy` avrebbe chiesto l'email per prenotare un allenamento. È la stessa
 trappola già scritta per `IscrizioneModal`, che infatti usa `data-iscrizione`.
 
-**Cosa non passa dal gate**, e sono tre categorie:
+**La forma del link non decide niente, la destinazione sì.** Per un pezzo i
+link dentro il testo che scorre erano esentati — «sono testo, non comandi», la
+regola della spazzata del totem — e l'esenzione era un errore per una ragione
+che la spazzata non riguarda: là si misura *cosa si preme col dito*, qui si
+misura *chi sta andando al listino*, e una persona che clicca «guarda quali
+comprende il tuo abbonamento» in fondo alla pagina di un corso ci sta andando
+esattamente come chi preme «Vedi gli abbonamenti» due sezioni sopra. Le due
+frasi erano sette comandi che non lasciavano traccia — le tre «fanno parte dello
+stesso club» delle pagine attività (`[corso]`, `gym-floor`, `reformer`), la nota
+di `/personal-training`, la f.a.q. dell'accesso singolo in sala, l'invito di
+`/prova` e la striscia legale di `/attiva` — cioè un pezzo di percorso interno
+che nel `richieste_info_abbonamenti` non compariva.
 
-- **i link dentro il testo che scorre** — quello di `/personal-training`, le
-  frasi «fanno parte dello stesso club» delle pagine attività. Sono testo, non
-  comandi, e la regola è la stessa della spazzata del totem;
-- **`#accessi-singoli` e `#guest-pass`**, che il modal della prova, il referral
-  e la chat offrono a chi si è appena sentito dire di no. Metterci davanti un
-  gate vorrebbe dire chiedere l'email a chi l'ha appena data;
+**Ognuno porta un `data-cta-source` suo**, e questa è la parte che rende la
+modifica utile invece che soltanto coerente: su `/gym-floor` il comando della
+hero era già `gym-floor`, quindi dare lo stesso valore alla frase in fondo e
+alla f.a.q. le renderebbe indistinguibili nella colonna che dice da dove è
+partito l'interesse — `gym-floor-correlati` e `gym-floor-faq` sono due posti
+diversi della stessa pagina, e quale dei due converta è la domanda per cui
+quella colonna esiste. Il `data-cta-activity` invece è quello della pagina, che
+è la stessa attività.
+
+**Cosa non passa dal gate**, e sono due categorie:
+
+- **i comandi dentro i pannelli che l'email l'hanno appena chiesta** — il modal
+  della prova, il referral, la chat. Sono `#accessi-singoli`, `#guest-pass` **e
+  `#piani`**, che quei pannelli offrono a chi si è appena sentito dire di no:
+  metterci davanti un gate vorrebbe dire chiedere l'email a chi l'ha data due
+  secondi prima. Ed è tutti e tre e non i due con l'ancora più stretta — un
+  cancello che chiude `#accessi-singoli` e lascia `#piani` nella stessa
+  schermata non è un cancello, è la falla già scritta per il Guest Pass;
 - **la pagina degli abbonamenti stessa.** La pastiglia dell'header e la voce
   del footer stanno anche lì, e aprire un pannello per portare qualcuno dov'è
   già è un passo per niente: il client confronta il percorso e si astiene.
+
+E una terza, che è di un'altra natura e per questo va scritta invece che
+dedotta: **la riga `fonte` in fondo a una survey**. `/surveys/generale/` rimanda
+a `/abbonamenti` con «Cosa comprende ogni abbonamento», e quel link esiste per
+una ragione precisa — chi ha dato due stelle a «il tuo abbonamento comprende
+quello che pensavi comprendesse» deve poter vedere cosa avevamo dichiarato. È
+una **citazione dentro un modulo di feedback**, accanto al link della privacy, e
+chi la preme ha già un abbonamento: mettergli davanti una raccolta di contatto
+mentre sta rispondendo a un questionario è il modo di far leggere «ci interessa
+il tuo giudizio» e sentire il contrario. Il gate raccoglie chi sta comprando,
+non chi sta dando un parere.
+
+**E `/promo` è il caso da leggere con attenzione, perché è mezzo dentro e mezzo
+fuori.** I comandi dell'offerta non passano da nessun gate — sono la seconda
+metà di un gesto che comincia col codice negli appunti, e il perché sta nella
+sezione «Dove c'è un codice, la destinazione è generica» — ma il link del conto
+alla rovescia **scaduto** sì: compare quando quel codice non vale più, e a quel
+punto il listino non è un passaggio del gesto, è l'unica strada che resta.
 
 ### I dati non si chiedono a chi li abbiamo, e il timeout salta il passo
 
@@ -535,14 +576,39 @@ dalla dashboard e mai riportate in una migrazione — il caso che la sezione su
 Supabase descrive. Quando si tocca una vista, la definizione si prende da
 `pg_get_viewdef` sul database vivo, non dal file: il file può essere vecchio.
 
-Per verificare: sul `dist`, ogni pagina ha il pannello e i comandi verso il
-listino portano tutti e due gli attributi, mentre i tre pulsanti di
-`/personal-training` con `data-cta="buy"` non ne portano il secondo. In un
+Per verificare: sul `dist`, ogni pagina ha il pannello, e la spazzata è **su
+tutti gli `href` verso `/abbonamenti`** e non sui soli pulsanti — è l'unica
+forma che trova un link nuovo dentro un paragrafo. Ognuno deve portare tutti e
+due gli attributi tranne le eccezioni dichiarate qui sopra, che sono le sole
+tollerate: i comandi dei tre pannelli (`#accessi-singoli`, `#guest-pass`,
+`#piani`), la f.a.q. di `/prova` che rimanda agli accessi singoli, la riga
+`fonte` della survey, e i comandi dell'offerta di `/promo`. L'ultima passata:
+282 `href` verso il listino, 183 col gate e 99 senza, e i 99 sono esattamente
+quelle eccezioni — 90 dei pannelli della prova ripetuti su ogni pagina col
+`chrome`, 6 del referral, il ripiego del Guest Pass di `/link`, la f.a.q. di
+`/prova`, la `fonte` della survey. E i tre pulsanti di `/personal-training` con
+`data-cta="buy"` continuano a non portare il secondo, mentre la nota «non hai
+ancora un abbonamento?» della stessa pagina sì: è il solo comando di lì che
+porta al listino. In un
 browser: il pannello si apre dal comando senza navigare, il campo del prefisso
 è vestito come gli altri (si misurano gli stili calcolati, non si guarda), il
 numero esce in E.164, il payload porta `keepalive`, e sul listino il pulsante
 «Iscriviti» non rifà la verifica — l'unica chiamata di rete deve essere quella
-di Google Analytics. Sul totem `sessionStorage` resta vuoto. Su Supabase,
+di Google Analytics.
+
+**E i comandi dentro il testo si provano uno per uno, perché due di loro non
+sono a schermo.** Con la verifica intercettata: dalle sette frasi il pannello
+si apre al passo dell'email, con `body.amodal-locked` e `visibility: visible`,
+e `location.pathname` **non** cambia; un `ctrl+click` sulla stessa frase non
+apre niente e segue l'`href`. La f.a.q. dell'accesso singolo in sala vuole
+prima l'apertura del suo accordion — che non è un `<details>` ma un pannello
+governato da `[data-faq-trigger]`, quindi mettere `open` a mano non fa niente e
+il click finisce sul bottone che lo copre — e il link del conto alla rovescia
+di `/promo` vuole che gli si tolga `hidden`, perché la scadenza vera non è
+passata. Poi il percorso intero da una di quelle frasi: email, verifica che non
+risponde, e si arriva su `/abbonamenti/` lo stesso, con
+`athlon_gate_abbonamenti` nella sessione — è la regola «chi passa, passa
+sempre», e valeva la pena riprovarla da qui. Sul totem `sessionStorage` resta vuoto. Su Supabase,
 `info_abbonamenti_esiti` dice per mese quante opportunità calde sono arrivate.
 
 ## `/link` è la bio di Instagram, e non è l'indice del sito
