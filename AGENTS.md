@@ -3186,6 +3186,42 @@ ragione: `DATA_INIZIO.giorniMax` è la fonte, le due copie stanno in
 `pro-rata-durata-minima.md` e in `promo.md`, che sono contenuti di Tina e non
 possono importare TypeScript.
 
+#### Il mese dell'abbonamento è il mese solare, e il rinnovo cade il 1°
+
+Subito dopo la riga sul pagamento, la stessa conversazione: «quindi se inizio
+oggi pago il mese che finisce il 7 ottobre?» → *«Esatto. Se fai partire
+l'abbonamento oggi 7 settembre, il primo mese copre da oggi fino al 7 ottobre»*.
+No: partendo il 7 settembre il primo periodo va dal **7 al 30 settembre**, si
+paga quello, e dal **1° ottobre** si rinnova a mensilità piene. L'impegno minimo
+resta un mese — qui il pro-rata di settembre più tutto ottobre.
+
+**Il modello ha accettato la premessa di chi scriveva**, e il dato non lo
+smentiva: `DATA_INIZIO` e la scheda dicevano «la prima quota copre solo i giorni
+che restano», che è vero e non dice *fino a quando* — e nessuno dei due diceva
+**quando cade il rinnovo**. Da «paghi solo i giorni che restano» più una domanda
+che propone il mese a scorrimento si compone il mese a scorrimento: è la
+meccanica di sempre, con la variante che qui il terzo fatto lo ha suggerito la
+persona e il modello ci ha messo l'«esatto».
+
+Ora il fatto sta scritto in due posti: `DATA_INIZIO.testo` — con l'esempio del 7
+settembre, che è il caso vero — e un blocco della scheda
+`adulti/pro-rata-durata-minima` messo **prima** della regola del pro-rata,
+perché è il presupposto di quella regola e non un suo dettaglio: *il mese di
+abbonamento comincia il 1° e finisce l'ultimo giorno del mese, e il rinnovo cade
+sempre il 1°, non all'anniversario del giorno in cui hai cominciato.*
+
+Due cose da sapere prima di toccarlo.
+
+**Non è una correzione del pro-rata, è il suo presupposto.** La tabella «trova
+il tuo caso» era già giusta — `2 marzo → pro-rata 2→31 marzo` — e lo diceva
+soltanto in forma di esempio: chi legge la riga in prosa, e un modello che
+riassume, prende quella. Un dato che vive solo in una tabella è un dato che
+sopravvive alla lettura di chi ha già capito.
+
+**«Sempre il 1°» va detto per esteso**, non per differenza. «Non dal 7 al 7» da
+solo nega la lettura sbagliata senza dare quella giusta, e resta la domanda vera
+di chi paga — quando mi rinnova.
+
 #### Il pro-rata si calcola, ed è l'eccezione dichiarata alla regola 2
 
 La prima stesura della regola vietava il conto, e vietava troppo: il pro-rata si

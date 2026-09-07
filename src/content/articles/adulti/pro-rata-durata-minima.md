@@ -26,6 +26,16 @@ attivita:
 
 È la regola che genera più malintesi di tutte, e vale la pena leggerla prima di iscriversi. In breve: se attivi l'abbonamento a metà mese, **la prima quota copre solo i giorni che restano** (il pro-rata) e la durata minima si conta **dal mese intero successivo**. Quindi la scadenza minima non è il mese dopo, ma quello dopo ancora.
 
+## Il mese dell'abbonamento è il mese solare
+
+Prima del pro-rata va detta questa, perché è quella che si dà per scontata al contrario: **il mese di abbonamento comincia il 1° e finisce l'ultimo giorno del mese**, e il rinnovo cade sempre il 1°. Non è un mese che scorre dal giorno in cui hai cominciato.
+
+Quindi, partendo il **7 settembre**:
+
+- il primo periodo va dal **7 al 30 settembre**, e paghi quei giorni — non dal 7 settembre al 7 ottobre
+- dal **1° ottobre** si rinnova a mensilità piene, il 1° di ogni mese
+- l'impegno minimo resta un mese: qui è il pro-rata di settembre **+ tutto ottobre**
+
 ## La regola
 
 > La durata del ciclo di pagamento è di almeno un mese. In presenza di pro rata, la durata minima sarà data dal pro rata + un mese.
