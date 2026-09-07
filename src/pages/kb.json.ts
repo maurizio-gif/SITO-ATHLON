@@ -53,7 +53,7 @@ import {
   JUNIOR_MENSILE,
   PREISCRIZIONE,
 } from '../data/abbonamenti';
-import { ACTIVITY_TAGS, ACTIVITY_IDS } from '../data/activities';
+import { ACTIVITY_TAGS, ACTIVITY_IDS, ACTIVITY_LABEL, WATER_ACTIVITIES } from '../data/activities';
 import { AREA_LABELS } from '../data/helpdesk';
 import { vociFaq } from '../data/faq';
 import { PG, APP } from '../data/cta';
@@ -582,6 +582,47 @@ export const GET: APIRoute = async () => {
         pulito(piano.claim),
         pulito(piano.desc),
         `Attività comprese: ${piano.activities.join(', ')}.`,
+        /* **E quello che NON comprende, scritto per esteso.**
+           L'elenco delle attività comprese e' un elenco, e un elenco si legge
+           anche per quello che *sembra* dire: il 7/9, a chi chiedeva l'Aqua
+           Tonic, la chat ha risposto che «lo Smart include tutta l'acqua» —
+           cioe' ha riassunto tre voci in una categoria, e la categoria era
+           falsa. Lo Smart in acqua ha il solo Nuoto Libero Assistito; una
+           lezione di Aqua Fitness vuole il Premium, e dirlo al contrario e' un
+           abbonamento venduto per una cosa che non apre.
+
+           Le due righe sono **derivate** dai due piani e da `WATER_ACTIVITIES`:
+           un'attività spostata fra Smart e Premium le riscrive da sé, mentre
+           una frase scritta a mano resterebbe indietro nel posto da cui la chat
+           risponde. Sul Premium l'elenco delle escluse e' vuoto — e' il
+           soprainsieme — quindi le righe non compaiono. */
+        (() => {
+          const altro = plans.find((p) => p.id !== piano.id);
+          if (!altro) return '';
+          const escluse = altro.activities.filter((a) => !piano.activities.includes(a));
+          if (!escluse.length) return '';
+          const acqua = WATER_ACTIVITIES.map((id) => ACTIVITY_LABEL[id]).filter(Boolean);
+          const acquaComprese = piano.activities.filter((a) => acqua.includes(a));
+          const acquaEscluse = escluse.filter((a) => acqua.includes(a));
+          // «nel Smart» e «con il Smart»: l'articolo lo decide il nome, non
+          // la concatenazione.
+          const art = (n: string) => (n === 'Smart' ? 'lo Smart' : `il ${n}`);
+          const righe = [
+            `**Questo piano NON comprende: ${escluse.join(', ')}** — sono nel ${altro.name}. ` +
+              `Non riassumerlo mai in una categoria («tutta l'acqua», «tutto il club», «tutti i corsi»): ` +
+              `vale l'elenco delle attività comprese, voce per voce.`,
+          ];
+          if (acquaEscluse.length) {
+            righe.push(
+              `**In acqua comprende ${acquaComprese.length ? `soltanto ${acquaComprese.join(', ')}` : 'nulla'}.** ` +
+                `${acquaEscluse.join(', ')} ${acquaEscluse.length > 1 ? 'sono' : 'e\''} nel ${altro.name}: ` +
+                `una lezione in vasca che non sia il nuoto libero — le lezioni di Aqua Fitness, la Scuola ` +
+                `Nuoto Adulti, il Corso Gestanti — con ${art(piano.name)} non si prenota. Quali siano quelle ` +
+                `lezioni lo dice la voce dell'attività, e va letta lì: un elenco ricopiato qui resterebbe indietro.`
+            );
+          }
+          return righe.join('\n');
+        })(),
         /* Ogni riga porta il nome del piano, e non e' ridondanza: le due voci
            hanno la stessa forma — tre righe, le stesse etichette — e l'unica
            cosa che le distingue e' il titolo in cima. Una riga letta senza il

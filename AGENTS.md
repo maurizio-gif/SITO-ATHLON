@@ -2394,6 +2394,56 @@ reindirizzamento non ci va. Non è stato escluso perché quando la promo è viva
 quella pagina è `index, follow` per scelta, e un'esclusione fissa la terrebbe
 fuori anche allora.
 
+### Un elenco di attività comprese non si riassume in una categoria
+
+Il 7 settembre, a chi chiedeva l'Aqua Tonic delle 13:30, la chat ha chiuso la
+risposta con *«lo Smart include tutta l'acqua, oppure il Premium che comprende
+anche i corsi in sala e il Reformer»*. Lo Smart in acqua ha il **solo Nuoto
+Libero Assistito**: l'Aqua Tonic è Aqua Fitness, quindi è Premium. Cioè la
+frase mandava una persona a comprare il piano più economico per una lezione che
+quel piano non apre — l'errore si scopre alla prima prenotazione, che è il verso
+peggiore.
+
+**I dati erano giusti**: `plans` dice da sempre `['Gym Floor', 'Nuoto Libero
+Assistito', 'Athlon TV']`, e la voce del piano stampava quell'elenco per
+intero. A sbagliare è stata la **sintesi**: tre voci, di cui una in acqua e una
+in sala, si riassumono volentieri in due categorie — «l'acqua» e «la sala» — e
+la prima categoria è falsa. È la stessa meccanica delle due sospensioni e dei
+due orari, spostata dal contenuto alla *categoria*: *un elenco è anche un
+contesto da cui si può comporre l'insieme che quell'elenco non è*.
+
+Quindi la voce di ogni piano dice adesso anche **quello che non comprende**, in
+due righe che sono **derivate** — l'una dalla differenza fra i due piani, l'altra
+da `WATER_ACTIVITIES` (`data/activities.ts`) incrociata con `plans`:
+
+- «**Questo piano NON comprende: …** — sono nel Premium», con il divieto di
+  riassumerlo in una categoria («tutta l'acqua», «tutto il club», «tutti i
+  corsi»);
+- «**In acqua comprende soltanto Nuoto Libero Assistito**», con le tre attività
+  in vasca che restano fuori nominate una per una.
+
+Tre cose da sapere prima di toccarle.
+
+**Sono derivate perché un'attività si sposta.** Il giorno che il club mettesse
+l'Aqua Fitness nello Smart, una frase scritta a mano resterebbe indietro proprio
+nel posto da cui la chat risponde — e nessuna pagina se ne accorgerebbe. Sul
+Premium le due righe **non compaiono affatto**: l'elenco delle escluse è vuoto
+perché quel piano è il soprainsieme, e una riga «non comprende: niente» è una
+riga da cui si compone un dubbio.
+
+**Quali siano le lezioni di Aqua Fitness non si ricopia qui.** Aqua Aerobic,
+Aqua Soft, Aqua Tonic, Hydrobike e Aqua Training stanno in
+`activityInfo['Aqua Fitness']`, che è già una voce del `kb.json`: la riga del
+piano nomina l'attività e manda a leggere lì. Due elenchi delle stesse lezioni
+divergono al primo corso aggiunto.
+
+**La riga chiude il buco dal lato del dato, e resta da chiuderlo dal lato del
+prompt.** Nel `systemMessage` non c'è ancora una regola fissa che vieti la
+sintesi per categoria — quella che dice «cosa comprende un piano si copia voce
+per voce» accanto alla regola sull'importo citato col suo piano. Il divieto per
+ora vive dentro la voce, ed è il posto in cui il modello lo legge insieme al
+dato; se l'errore torna, la regola fissa è il passo dopo.
+
 ### Due righe che si leggono allo stesso modo sono due righe che si scambiano
 
 Il 30 agosto, a chi voleva cominciare la Scuola Nuoto Adulti e chiedeva
