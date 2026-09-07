@@ -22,27 +22,32 @@
  * perimetro del Guest Pass di listino, portato sull'invito: due porte per la
  * stessa prima settimana non possono avere due soglie diverse.
  *
- * **Le due cose stanno su due piani diversi, e non e' una lacuna: e' la
- * divisione.** Quello che il codice **verifica** e' il socio, da tutte e due le
- * parti: `Amico e socio?` su n8n guarda `memberType` e scarta i `Member`, ed e'
- * il controllo giusto — confermato dal club il 07/09/2026, e non va stretto.
- * Quello che invece si **dichiara** e' il perimetro qui sopra: «mai avuto un
- * Guest Pass ne' un abbonamento dal 2021» non sta in `memberType`, sta nei
- * contratti, ed e' una condizione spiegata a chi legge e verificata dal desk
- * prima di attivare il pass. Esattamente come quella del Guest Pass di listino,
- * che nessun controllo automatico ha mai applicato.
+ * **E il controllo che c'e' gia' su n8n e' esattamente questo perimetro**, che
+ * e' la cosa da non fraintendere leggendo il nome del nodo. `Amico e socio?`
+ * scarta chi ha `memberType` uguale a `Member`, e su PerfectGym **`Member` non
+ * vuol dire «paga un abbonamento adesso»: vuol dire che quella persona e' gia'
+ * stata iscritta o ha gia' fatto una prova**, anche anni fa. Quindi quel
+ * confronto non e' un controllo largo che approssima la regola: e' la regola,
+ * detta nel campo che PerfectGym usa per dirla. Confermato dal club il
+ * 07/09/2026, e **non va toccato**.
  *
- * **Quindi non "chiudere il buco" stringendo il vaglio.** Scartare tutti i
- * `Guest` sembrerebbe la correzione ovvia e sarebbe piu' severo del vero: su
- * PerfectGym un Guest puo' essere un bambino di un nucleo o chi ha lasciato i
- * dati a un tour, senza aver mai avuto un pass. Il verso in cui si sbaglia e'
+ * Quello che resta fuori dal campo e' solo la **data**: `memberType` dice che
+ * e' gia' passato di qui, non da quando. Il taglio a `GUEST_PASS.dal` e' quindi
+ * la parte dichiarata, e la verifica il desk prima di attivare il pass —
+ * esattamente come per il Guest Pass di listino, dove nessun controllo
+ * automatico l'ha mai applicata.
+ *
+ * **Non stringerlo ai `Guest`.** Sembra la correzione ovvia — «anche loro sono
+ * passati di qui» — e sarebbe piu' severa del vero: un `Guest` su PerfectGym
+ * puo' essere un bambino di un nucleo o chi ha lasciato i dati a un tour, senza
+ * aver mai avuto un pass ne' un abbonamento. Il verso in cui si sbaglia e'
  * scelto: un invito di troppo si riconcilia al desk, un amico idoneo rifiutato
  * da un controllo approssimativo non torna.
  *
- * E per la stessa ragione **il testo pubblico non promette quel controllo**: la
- * landing dice che dell'abbonamento se ne occupa la pagina mentre compili, e
- * del resto la segreteria. Scrivere «lo controlliamo noi» su una condizione che
- * nessun codice guarda sarebbe la promessa che si scopre dopo.
+ * E il **testo pubblico promette solo il controllo che esiste**: la landing dice
+ * che dell'abbonamento se ne occupa la pagina mentre compili, e del resto la
+ * segreteria. «Lo controlliamo noi» su una condizione che nessun codice guarda
+ * sarebbe la promessa che si scopre dopo.
  *
  * La domanda su chi invita la risponde `eSocio()` in `data/contatto.ts`.
  */
