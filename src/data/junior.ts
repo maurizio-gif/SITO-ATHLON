@@ -498,7 +498,7 @@ export const JUNIOR: CorsoJunior[] = [
           nome: 'Inserimento',
           titolo: 'Il gruppo si decide in vasca',
           testo:
-            'Gli orari sono divisi per età, e dentro lo stesso orario ci sono più corsi e più istruttori. Il gruppo di tuo figlio si definisce guardandolo nuotare, e l’istruttore viene assegnato definitivamente dopo le prime due settimane.',
+            'Gli orari sono divisi per età, e dentro lo stesso orario ci sono più corsi e più istruttori. Il gruppo di tuo figlio si definisce guardandolo nuotare, e l’istruttore viene assegnato definitivamente dopo le prime due settimane. Prima di allora non c’è un istruttore da sapere — l’assegnazione non è ancora stata fatta — e il calendario di prenotazione non lo dice: quel dato è delle attività degli adulti, dove la lezione si prenota una per una. Passate le due settimane l’assegnazione è definitiva, e se vuoi parlarne c’è il Direttore Tecnico, che si prenota.',
         },
         {
           nome: 'Livello',
@@ -644,6 +644,17 @@ export const JUNIOR: CorsoJunior[] = [
       {
         q: 'Posso scegliere orari diversi ogni settimana?',
         a: 'No: il turno è fisso. Giorno e ora si scelgono all’iscrizione e restano quelli per tutta la stagione, e con il bisettimanale i turni fissi sono due. Le lezioni non si prenotano una per una: la sola prenotazione che si fa è il <a href="/wikiathlon/snb/recuperi-lezioni">recupero</a>, quando una lezione si perde. Se serve cambiare turno in modo definitivo, c’è la richiesta di <a href="/wikiathlon/snb/cambio-corso">cambio corso</a>.',
+      },
+      /* **«Ma posso sapere l'istruttore?»** Il 7/9 l'assistente ha risposto che
+         nel portale, prenotando il turno, si vede chi lo tiene questa settimana:
+         e' la regola degli **adulti** — dove la lezione si prenota una per una e
+         il calendario porta quel dato — applicata a un corso dove il turno e'
+         fisso e l'istruttore si assegna dopo due settimane. Cioe' ha mandato un
+         genitore a cercare in un calendario un nome che li' non decide niente.
+         La domanda arriva sulla pagina del corso, quindi la risposta sta qui. */
+      {
+        q: 'Posso sapere chi sarà l’istruttore di mio figlio?',
+        a: 'Non prima dell’inizio: l’istruttore viene assegnato <strong>definitivamente dopo le prime due settimane</strong> di corso, guardando come nuota tuo figlio, così ogni bambino finisce nel gruppo giusto per il suo livello. Prima di allora l’assegnazione non è stata fatta, e non la si trova nel calendario di prenotazione — quello mostra chi tiene una lezione che si prenota, che per la Scuola Nuoto è solo il <a href="/wikiathlon/snb/recuperi-lezioni">recupero</a>. Passate le due settimane l’interlocutore per parlare dell’istruttore e del gruppo è il <a href="/wikiathlon/snb/direzione-tecnica">Direttore Tecnico</a>, che si prenota: ti richiamiamo noi.',
       },
       {
         q: 'Si possono recuperare le lezioni perse?',

@@ -2394,6 +2394,54 @@ reindirizzamento non ci va. Non è stato escluso perché quando la promo è viva
 quella pagina è `index, follow` per scelta, e un'esclusione fissa la terrebbe
 fuori anche allora.
 
+### Il nome dell'istruttore non sta nel calendario, e prima di due settimane non esiste
+
+A «ma posso sapere l'istruttore?» — un genitore della Scuola Nuoto Bambini — la
+chat ha risposto bene sulla prima metà (assegnato dopo le prime due settimane,
+guardando come nuota il bambino) e ha chiuso con la seconda sbagliata: *«nel
+portale, quando prenoti il turno, vedi chi lo tiene questa settimana»*, con il
+pulsante «Calendario e posti liberi». È la **regola degli adulti** — dove la
+lezione si prenota una per una e il calendario porta l'istruttore, come dice la
+scala dei tre posti degli orari — applicata a un corso in cui il turno è fisso e
+la sola lezione che si prenota è il recupero. Cioè un genitore mandato a cercare
+in un calendario un nome che lì non decide niente.
+
+**Il dato c'era a metà**, e la metà mancante era il perimetro: `junior.ts` diceva
+che l'istruttore «viene assegnato definitivamente dopo le prime due settimane» e
+si fermava lì. Da «l'assegnazione arriva dopo» più «il calendario mostra chi
+tiene la lezione» il modello ricompone «intanto guarda nel calendario» — la
+meccanica dei due fatti veri vicini, applicata a due regole che valgono per due
+persone diverse.
+
+Ora quel testo dice le due cose che mancavano, e le dicono con lui tre posti:
+
+- **prima delle due settimane non c'è un istruttore da sapere** — non è un dato
+  che non diamo, è un'assegnazione non ancora fatta — e **non lo dice il
+  calendario di prenotazione**, perché quel dato appartiene alle attività degli
+  adulti;
+- **dopo, l'interlocutore è il Direttore Tecnico**, che si prenota. Non
+  l'istruttore: la sua scheda spiega già perché.
+
+I tre posti sono il pilastro «Inserimento» di `junior.ts` (che è anche la voce
+del corso nel `kb.json`), una **f.a.q. del corso** — che è la domanda esatta
+arrivata in chat, e le f.a.q. dei corsi il `kb.json` le prende, a differenza di
+quelle scritte in una pagina `.astro` — e la scheda `snb/direzione-tecnica`, dove
+sta accanto alla domanda «posso parlare con l'istruttore?». `snb/didattica`
+porta la stessa riga nell'elenco dell'organizzazione dei gruppi.
+
+Due cose da sapere prima di toccarlo.
+
+**La scala dei tre posti degli orari resta valida, e va letta col suo
+perimetro**: «chi la tiene questa settimana → il calendario del portale» è vero
+per una lezione che si prenota. Sui corsi junior a turno fisso quella terza riga
+non si applica, e questa è la seconda volta che una regola delle prenotazioni
+degli adulti si allarga alla Scuola Nuoto — la prima era la finestra dei tre
+giorni.
+
+**Il divieto è sul rimando, non sul fatto.** Dire quando l'istruttore viene
+assegnato è giusto e va detto; quello che non si fa è mandare al calendario per
+saperlo, che è la parte che sembra utile e non lo è.
+
 ### La lezione privata non esiste, e il personal training non è la sua versione in acqua
 
 Stessa giornata, altro difetto della stessa forma: a un genitore che ha scritto

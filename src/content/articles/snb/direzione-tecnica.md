@@ -71,6 +71,15 @@ Non c'è un argomento troppo piccolo o troppo grande. Se riguarda la vita di tuo
 ## Domande frequenti
 
 <details>
+<summary><strong>Posso sapere chi sarà l'istruttore di mio figlio?</strong></summary>
+
+Non prima dell'inizio dei corsi: l'istruttore viene assegnato **definitivamente dopo le prime due settimane**, quando i bambini sono stati visti nuotare e i gruppi sono formati per livello. Prima di allora l'assegnazione non è stata fatta, quindi non c'è un nome da dare — e non lo si trova nel calendario di prenotazione, che mostra chi tiene una lezione **che si prenota**: per la Scuola Nuoto è soltanto il [recupero](/wikiathlon/snb/recuperi-lezioni), perché il turno settimanale è fisso.
+
+Passate le due settimane, l'istruttore assegnato e il gruppo di tuo figlio si possono discutere con il Direttore Tecnico, prenotando qui sotto.
+
+</details>
+
+<details>
 <summary><strong>Posso parlare direttamente con l'istruttore di mio figlio?</strong></summary>
 
 No — e c'è una ragione precisa. La nostra organizzazione prevede la figura del **Direttore Tecnico**, che coordina l'intero team di istruttori e gestisce le decisioni didattiche in base agli obiettivi sportivi del gruppo. È lui il tuo interlocutore ufficiale, perché ha una visione completa del percorso di ogni allievo.
