@@ -3168,8 +3168,16 @@ fai partire il mese prossimo»: sono tutte la stessa frase, e un divieto scritto
 su una sola di esse lascia passare le altre quattro. È la lezione dell'assistente
 di sala applicata al commerciale.
 
-**La risposta giusta è che è indifferente**, e finisce lì: si paga da quando
-l'abbonamento comincia, non da quando si firma. La scelta della data è di chi si
+**La risposta giusta è che è indifferente**, e finisce lì. Ma «indifferente» non
+si spiega dicendo *quando* si paga: **la quota si paga al momento
+dell'iscrizione**, anche scegliendo una data di inizio futura, e quello che la
+data governa è **cosa copre** la prima quota. Il 7 settembre, a chi chiedeva se
+iscrivendosi il 10 avrebbe pagato i primi dieci giorni di settembre, la chat ha
+risposto *«lo paghi da quando l'abbonamento comincia, non da quando firmi il
+contratto»*: la seconda metà è falsa, e fa aspettare l'addebito a chi ha scelto
+di partire fra due settimane — un fatto che si scopre alla cassa. Le due
+affermazioni vanno tenute separate: *quando si paga* è l'iscrizione, *cosa si
+paga* lo dice la data di inizio. La scelta della data è di chi si
 iscrive e non va consigliata — nemmeno nel verso opposto, perché «iscriviti oggi
 che conviene» è la stessa invadenza al contrario.
 

@@ -77,7 +77,7 @@ Perché la disdetta ferma il **rinnovo**, non la durata minima ancora in corso. 
 
 </details>
 
-> 💡 **La data di inizio la scegli tu, e non devi rimandare l'iscrizione per sceglierla.** In fase di iscrizione imposti quando parte l'abbonamento: lo stesso giorno, oppure una data futura fino a **14 giorni** dopo. Quindi iscriversi oggi non costa più che iscriversi domani — si paga da quando l'abbonamento comincia. Se lo fai partire il **1° del mese** non c'è pro-rata e la scadenza minima è la fine di quello stesso mese; se lo fai partire a mese iniziato paghi solo i giorni che restano, e la durata minima si conta dal primo mese intero.
+> 💡 **La data di inizio la scegli tu, e non devi rimandare l'iscrizione per sceglierla.** In fase di iscrizione imposti quando parte l'abbonamento: lo stesso giorno, oppure una data futura fino a **14 giorni** dopo. Quindi iscriversi oggi non costa più che iscriversi domani: la quota si paga **al momento dell'iscrizione**, e la data di inizio non sposta il pagamento — decide da quale giorno parte il periodo che quella quota copre. Se lo fai partire il **1° del mese** non c'è pro-rata e la scadenza minima è la fine di quello stesso mese; se lo fai partire a mese iniziato paghi solo i giorni che restano, e la durata minima si conta dal primo mese intero.
 
 <div class="ci-cta">
   <a href="https://athlon.perfectgym.com/ClientPortal2/#/Login" class="ci-btn-primary" target="_blank" rel="noopener noreferrer">VEDI LA TUA SCADENZA</a>
