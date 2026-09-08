@@ -1988,6 +1988,34 @@ export function initChatAssistente(root, options) {
   }
 
   /**
+   * L'ultima battuta dell'assistente, cioè la domanda a cui questa risposta
+   * risponde. Serve al workflow per un caso solo, e il caso è **la conferma**.
+   *
+   * Il 08/09, a *«Ti va di sapere quanto costa?»* una persona ha risposto
+   * «Certo». Al workflow arrivavano due parole — «Certo» e «Acqua», la domanda
+   * di prima — e su quelle due si sceglie il contesto: nessuna ancora si è
+   * accesa, e delle due voci del listino è entrata solo quella dello Smart,
+   * pescata dalla parola «acqua» che nella voce del Premium non c'è. Il modello
+   * aveva davanti mezzo listino, e l'altra metà se l'è inventata — 119 €/mese,
+   * 1.190 €/anno, 149 € di Mensile Flex, nessuno dei quali esiste.
+   *
+   * Una conferma non ha un argomento suo: il suo argomento è la domanda a cui
+   * dice di sì, e quella l'ha fatta l'assistente. È l'unica battuta della
+   * conversazione che al workflow non arrivava.
+   *
+   * Il saluto d'apertura è una bolla dell'assistente come le altre, e va bene
+   * che lo sia: se la prima cosa che scrive la persona è «certo», il workflow
+   * si ritrova davanti il saluto, che non nomina nessun argomento e quindi non
+   * accende niente — lo stesso di oggi.
+   */
+  function rispostaPrecedente() {
+    for (var i = trascritto.length - 1; i >= 0; i--) {
+      if (trascritto[i].ruolo === 'assistente') return trascritto[i].testo;
+    }
+    return '';
+  }
+
+  /**
    * Chi scrive così non sta ponendo una domanda: sta chiedendo di uscire
    * dalla conversazione con il modello. Mandarla comunque al workflow
    * rischia di tornare con l'invito a «toccare l'icona in alto» — la stessa
@@ -2018,6 +2046,7 @@ export function initChatAssistente(root, options) {
 
     // Da leggere prima di aggiungere la domanda nuova al trascritto.
     var precedente = domandaPrecedente();
+    var precedenteAssistente = rispostaPrecedente();
 
     inCorso = true;
     /* Ha scritto: né il sollecito né la proposta di richiamo hanno più niente
@@ -2048,6 +2077,9 @@ export function initChatAssistente(root, options) {
         body: JSON.stringify({
           domanda: domanda,
           precedente: precedente,
+          /* Vedi `rispostaPrecedente()`: serve al workflow per capire di cosa
+             parla un «certo», che da solo non parla di niente. */
+          precedenteAssistente: precedenteAssistente,
           sessione: sessione(),
           pagina: dati.pagina,
           origine: 'assistente',

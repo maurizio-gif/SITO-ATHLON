@@ -2563,6 +2563,101 @@ un «ti avvisiamo noi». Un dato inventato è peggio di un dato assente, e qui
 peggio ancora: è una promessa che il club non può mantenere e che nessuno
 scoprirà finché la stagione non è cominciata senza quel bambino.
 
+#### E il 08/09 è tornata, perché la stessa scheda la nega e la offre
+
+Stessa promessa, otto giorni dopo (esecuzione `1519819`, `ramo junior`,
+`attivitaJunior: scuola-nuoto-bambini`). Una mamma con due bambini, 2021 e 2023:
+*«per i nati del 2023 c'è un posto il giovedì alle 16.40, mentre per i nati nel
+2021 in quello stesso orario è al completo. non c'è possibilità di essere
+inseriti?»*
+
+> Purtroppo no, il numero massimo di bambini per vasca non si può superare —
+> dipende dalle norme di sicurezza e dal rapporto istruttore-allievi […] Quello
+> che potete fare è **iscrivere il 2021 in lista d'attesa** per lo stesso orario:
+> se qualcuno disdice, riceverete una notifica via email e potrete subentrare.
+
+E al turno dopo la meccanica per esteso — *«il sistema vi mette automaticamente
+in lista d'attesa […] avrete fino a un'ora dall'inizio della lezione per
+subentrare»* — che è la regola della **prenotazione** applicata a un'iscrizione.
+Venti minuti più tardi la mamma è tornata: *«non mi fa mettere in lista d'attesa,
+mi dice che non posso iscrivere mio figlio perché il gruppo è già al completo»*.
+La risposta è stata una diagnosi inventata — *«potrebbe essere il certificato
+medico che manca o è scaduto»* — e un passaggio al team, per una cosa che il team
+non può sbloccare.
+
+**La correzione del 31 agosto c'era, e il modello aveva davanti anche lei.** Nel
+contesto di quel turno la frase giusta compariva **due volte**: in
+`scheda:snb/recuperi-lezioni` («per l'iscrizione a un turno della Scuola Nuoto
+non c'è nessuna lista d'attesa») e in cima alla f.a.q. della lista d'attesa in
+`scheda:generali/prenotazioni`. Non è bastato, perché nella **stessa voce**
+c'erano due passaggi che dicevano il contrario senza dire per chi valgono:
+
+- il capoverso **subito sotto** quella frase: «Se il corso è al completo puoi
+  iscriverti in lista d'attesa […] fino a 1 ora dall'inizio»;
+- la f.a.q. **«Il corso è pieno: potete aggiungere un posto?»**, che chiudeva con
+  «Iscriviti in lista d'attesa, che scorre in ordine cronologico».
+
+La seconda è quella che ha risposto, e si vede: il modello l'ha ricopiata quasi
+alla lettera — norme di sicurezza, rapporto istruttore-allievi, e poi la coda.
+Non aveva letto la voce sbagliata: aveva letto **la f.a.q. che rispondeva alla
+sua domanda con le sue stesse parole**, e quella f.a.q. parlava d'altro.
+
+**La parola che fa il danno è «corso».** Nelle regole di prenotazione significa
+la lezione di quel giorno; per un genitore significa il corso di suo figlio. Due
+significati nella stessa scheda, e il secondo è quello di chi la domanda la fa.
+Quindi dove si parla di prenotazioni si scrive **lezione**, e dove si parla di
+iscrizioni si scrive **turno** — la correzione è tutta qui, ed è la stessa forma
+già scritta per le due sospensioni e per i due orari, applicata a un sinonimo
+invece che a un regime.
+
+Cosa è cambiato, e perché in cinque posti e non in uno:
+
+- **`LISTA_ATTESA` in `data/regole.ts`** è il perimetro come dato: dove vale,
+  dove non vale — i tre corsi letti da `JUNIOR_MENSILE.valePer`, che è già la
+  loro sorgente — cosa si fa davvero quando un turno è pieno, e il messaggio del
+  portale con le parole con cui appare. `perimetroListaAttesa()` lo compone per
+  chi lo stampa.
+- **La f.a.q. `lista-attesa` di `data/faq.ts`** apre col perimetro invece di
+  chiuderci: chi riassume tiene la prima riga. E «se un corso è pieno» della
+  f.a.q. sulle prenotazioni diventa «se una **lezione** è al completo».
+- **La f.a.q. «È pieno: potete aggiungere un posto?»** risponde alle due domande
+  separate — l'iscrizione prima, perché è quella che arriva da un genitore — e il
+  titolo perde la parola «corso», che era metà del problema.
+- **Il messaggio del portale è indicizzato**, con le parole con cui appare a
+  schermo, in una f.a.q. sua e nella scheda dell'iscrizione: vale la regola di
+  «your member is on financial debit» — *un errore che la persona cita è una
+  chiave di ricerca prima che un sintomo* — e qui la risposta giusta è due righe:
+  quel turno è pieno, se ne sceglie un altro.
+- **E la riga arriva sulla voce del corso**, per i tre a turno fisso
+  (`testoJunior` in `kb.json.ts`, condizionata su `LISTA_ATTESA.nonValePer`).
+  Perché la domanda si fa da lì: la scheda delle prenotazioni è la voce di
+  un'altra cosa, e sperare che il modello ne legga il perimetro mentre risponde
+  su un corso è esattamente ciò che non è successo. Il **Baby Nuoto resta fuori**,
+  e non è un'eccezione da ricordarsi: è l'unico corso per bambini che **non ha
+  un'iscrizione a un turno** — si prenota una lezione per volta, come le attività
+  degli adulti — quindi la lista d'attesa ce l'ha per costruzione, e dargli la
+  riga sposterebbe l'errore invece di chiuderlo. È la stessa linea che divide
+  `LISTA_ATTESA.valePer` da `nonValePer`: **dove non c'è un'iscrizione a un turno
+  non c'è niente da mettere in coda**, e i tre corsi a turno fisso sono
+  `JUNIOR_MENSILE.valePer` perché turno fisso e abbonamento mensile sono la
+  stessa cosa detta due volte.
+
+  La prima stesura di questa correzione aveva tenuto la riga che il testo del 31
+  agosto affiancava — «per iscriversi a un turno della Scuola Nuoto Bambini **o
+  del Baby Nuoto** non esiste nessuna lista d'attesa» — perché era già sul sito e
+  non sembrava una cosa da inventare. Era sbagliata: al Baby Nuoto quel turno non
+  si «iscrive» affatto. Vale la regola di sempre, e vale anche per una frase
+  ereditata — *una regola che non dichiara il proprio perimetro è una regola che
+  si allarga al caso vicino*, e qui il caso vicino era il corso che le somiglia
+  di più.
+
+**La lezione, che è la terza volta che questo file la scrive e la prima in cui
+morde dentro una voce sola:** aggiungere la frase giusta non chiude niente finché
+la frase sbagliata resta nella stessa voce. Quando si corregge una risposta della
+chat, la domanda non è «ho scritto la regola?» ma **«quante frasi di questo
+contesto rispondono a quella domanda, e cosa dicono?»** — e si conta con un grep
+sul contesto vero di un'esecuzione, non sulla scheda che si è appena riletta.
+
 ### La promozione ha un perimetro, e nel ramo dei genitori non deve entrare
 
 `promo.md` lo dichiara — «Valido su tutti gli abbonamenti annuali, Smart e
@@ -2791,6 +2886,123 @@ sbagliata, e questo il modello lo può verificare da sé prima di scrivere.
 struttura e differiscono solo per un titolo, il titolo non basta — ogni riga che
 porta un numero deve portarsi dietro di chi è. Vale per i piani, e varrà per la
 prossima coppia di listini che si somigliano.
+
+#### E mezzo listino nel contesto è peggio di nessun listino
+
+Il 08/09 (esecuzione `1520074`) una persona arrivata su `/reformer` da un
+annuncio — `utm_term: pilates reformer roma` — si è sentita rispondere così:
+
+> Lo **Smart Annuale a rate costa 75 €/mese** […] Oppure **750 €/anno** […] E il
+> **Mensile Flex senza vincoli è 99 €/mese**. Ma aspetta — tu vuoi il Reformer,
+> che non è nello Smart. Il **Premium Annuale a rate è 119 €/mese** — risparmi
+> **180 €** […] oppure **1.190 €/anno** […] Il **Premium Mensile Flex è
+> 149 €/mese**.
+
+I tre importi dello Smart sono quelli veri, alla lettera. **I tre del Premium non
+esistono**: sono 95, 950 e 119, e i due risparmi sono 288 e 488. Cioè al Premium
+è stato attribuito un listino gonfiato di un quarto, alla persona che lo stava
+per comprare.
+
+**Il modello non aveva letto la riga sbagliata: aveva davanti mezzo listino.** Nel
+contesto di quel turno c'era `abbonamento:smart` e **non** `abbonamento:premium` —
+si legge dall'esecuzione, `kbVoci: 40` e la voce del Premium non fra loro. Le
+difese scritte nella sezione qui sopra c'erano tutte e tre e nessuna poteva
+servire: «questi importi sono dello Smart e di nessun altro piano» difende dallo
+**scambio**, e qui non c'era niente da scambiare — c'era una colonna mancante, e
+il modello l'ha ricostruita per proporzione. Vale anche per la regola 2 del
+prompt, che vieta l'aritmetica in cinque modi: **una regola non può difendere da
+un numero che non c'è.**
+
+Il perché quella voce non ci fosse sono due cause indipendenti, e ognuna da sola
+sarebbe bastata.
+
+**Una conferma non ha un argomento suo.** Il turno prima l'assistente aveva
+chiuso con *«Ti va di sapere quanto costa?»*, e la persona aveva scritto
+**«Certo»**. A `Componi contesto` arrivano la domanda e la **domanda precedente**
+— cioè «certo» e «acqua» — e su quelle si accendono le ancore: nessuna parola di
+prezzo, `kbAncore` vuoto, ancora del listino spenta. La battuta che conteneva
+l'argomento era l'unica della conversazione che al workflow non arrivava, perché
+era dell'assistente.
+
+**E le due voci del listino si pescano una alla volta.** Spenta l'ancora, restava
+il punteggio, e le keyword erano `certo` (che non compare da nessuna parte) e
+`acqua`. «Acqua» sta nella voce dello **Smart** — è il piano che l'acqua ce l'ha
+a metà, quindi la sua voce elenca cosa resta fuori — e nella voce del **Premium**
+non compariva affatto: il Premium è il soprainsieme, non esclude niente, e il
+blocco che scrive quella riga usciva a mani vuote. Punteggio 1 contro 0, e le
+voci con zero non entrano.
+
+Quindi la parola che descrive *il piano che l'acqua ce l'ha tutta* pescava
+**l'altro**. Ed è un difetto che si legge anche da fermo, senza questa
+conversazione: a «quale abbonamento mi serve per l'acqua?» vinceva per punteggio
+la voce del piano che risponde di no.
+
+La correzione sta nei dati, ed è una riga: **chi in acqua non esclude niente dice
+cosa comprende**, per esteso e con la stessa parola. Resta derivata da `plans` e
+`WATER_ACTIVITIES` come la sua gemella — nessun elenco scritto a mano — e vale la
+regola di sempre: *due voci che si somigliano devono somigliarsi anche nelle
+parole con cui si cercano*, o quella che risponde meglio è quella che il contesto
+lascia fuori. Provata contro il `kb.json` vero di quell'esecuzione: con la riga,
+`abbonamento:premium` entra nel contesto dello stesso identico turno.
+
+**Su n8n è stata applicata una cosa sola, e la seconda è stata tolta dopo averla
+provata.** Vale la pena tenere tutte e due scritte, perché la seconda ha
+insegnato una cosa sul workflow che non era scritta da nessuna parte.
+
+**Fatta: in `Normalizza`, una conferma eredita l'argomento dalla battuta
+dell'assistente.** Il sito manda `precedenteAssistente` — `chatAssistente.client.js`,
+`rispostaPrecedente()` — e quando la domanda è una conferma *tutta intera*
+(`CONFERMA`, ancorata ai due capi) `precedente` **diventa** quella battuta. Il
+posto è lo stesso — la riga che dice di cosa si sta parlando — quindi ancore e
+punteggio la vedono senza toccare `Componi contesto`, che legge `$('Normalizza')`.
+Provata sul contesto vero di `1520074`: `kbAncore` passa da vuoto a
+`listino orari`, entrano tutte e due le voci dei piani, e il Group Reformer col
+suo planning prende il posto di quattro voci di corsi junior. Il cancello è
+stretto di proposito — «Certo, ma quanto costa il Reformer?» ha un argomento suo
+e non deve trascinarsi dietro le cento parole dell'assistente — e sbaglia nel
+verso giusto: una conferma non riconosciuta lascia le cose come stanno. La spia è
+`innesco`, accanto a `kbAncore` e `kbChiaviPrima`.
+
+**Tolta: un nodo dopo `Componi contesto` che completava la coppia del listino.**
+L'idea era la garanzia che la correzione nei dati non dà — le due voci si pescano
+per punteggio una alla volta, e «che temperatura ha la vasca?» pesca ancora il
+solo Smart. Il nodo funzionava: preso il contesto in ingresso, se conteneva una
+sola delle due voci del listino aggiungeva l'altra in coda, oltre il tetto di
+quaranta. **E non serviva a niente**, perché il contesto non viaggia nell'item.
+
+**Sei nodi leggono il contesto per nome, non dall'item che ricevono**, e sono
+`Apri conversazione`, `Trova conversazione`, `Salva domanda`, `Memoria
+conversazione`, `Assistente` e `Leggi la risposta`. I due che contano lo dicono
+per esteso: il `systemMessage` dell'agente comincia con
+`{{ $('Componi contesto').first().json.istruzioni }}`, e `ripara()` in
+`Leggi la risposta` valida le fonti citate contro
+`$('Componi contesto').first().json.kb`. Quindi un nodo messo **dopo** `Componi
+contesto` non tocca il contesto che il modello vede — e nel caso peggiore fa
+scartare come inventata la fonte della voce che ha appena aggiunto, perché quella
+voce nel `kb` di `Componi contesto` non c'è. Un nodo che dichiara di completare il
+listino e non lo completa è peggio di un nodo che non c'è: tolto, topologia
+rimessa com'era.
+
+**La lezione, che vale oltre questo caso: in questo workflow il contesto ha un
+proprietario, ed è `Componi contesto`.** Finché sei nodi lo prendono per nome, la
+pipeline del contesto non si allunga a valle — qualunque cosa debba cambiare
+quello che il modello legge va **dentro** quel nodo, o davanti a lui, o va spostata
+la lettura in tutti e sei. Il giorno che si vuole davvero la coppia garantita, il
+posto è là: dopo `scelte` e prima di `voci`, aggiungendo la voce mancante fra
+`PIANI = ['abbonamento:smart', 'abbonamento:premium']` **dopo** il tetto e il
+minimo — completare prima vorrebbe dire far concorrere la compagna per uno slot,
+cioè togliere dal contesto la voce che rispondeva alla domanda per metterci un
+piano che nessuno ha nominato.
+
+**E una cosa da guardare che non è un difetto del software.** Le due stringhe
+`savings` di `data/abbonamenti.ts` non tornano con l'aritmetica dei loro importi:
+lo Smart annuale a rate dichiara «Risparmio €138 vs Flex» mentre 99 − 75 per
+dodici mesi fa **288** (ed è esattamente la cifra che dichiara il Premium, che ha
+la stessa differenza di 24 €), e il pagamento unico del Premium dichiara
+«Risparmio €488 vs Flex annuo» mentre 1.428 − 950 fa **478**. Gli altri due
+tornano. Non sono stati toccati — un prezzo dichiarato è una decisione del club e
+non un conto da correggere in silenzio — ma vanno confermati o corretti: sono la
+cifra che l'assistente cita alla lettera, e il 08/09 l'ha citata.
 
 ### «Ci sono sconti?» sui corsi dei bambini: la modalità è una, e lo sconto ha una finestra
 

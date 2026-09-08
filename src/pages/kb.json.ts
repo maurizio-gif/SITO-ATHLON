@@ -27,6 +27,7 @@ import { getCollection } from 'astro:content';
 import { CORSI, type Corso } from '../data/corsi';
 import { conNumeri } from '../data/servizi';
 import { JUNIOR, SOLO_COLLETTIVE, type CorsoJunior, type CorsoStagione } from '../data/junior';
+import { LISTA_ATTESA } from '../data/regole';
 import { clausole, urlClausola, TERMINI_VERSIONE } from '../data/termini';
 import {
   bands,
@@ -246,6 +247,26 @@ function testoJunior(c: CorsoJunior): string {
       c.adesione?.length ? SOLO_COLLETTIVE.singola : '',
       SOLO_COLLETTIVE.personal
     ),
+    /* **Un turno pieno non ha una coda, e la riga sta qui perché la domanda si
+       fa da qui.** «Non c'è possibilità di essere inseriti?» la scrive chi sta
+       guardando i turni del corso di suo figlio, e la scheda delle prenotazioni
+       — che il perimetro ce l'ha — è la voce di un'altra cosa: l'8/9 il modello
+       ha pescato da lì la f.a.q. «il corso è pieno» e ne ha dato la risposta
+       delle *lezioni*, cioè una lista d'attesa che per un'iscrizione non
+       esiste. È la spazzata del Guest Pass applicata prima che l'errore torni:
+       la voce che risponde deve portarsi dietro la sua regola.
+
+       Arriva solo sui tre corsi a turno fisso, letti da `LISTA_ATTESA.nonValePer`
+       (che è `JUNIOR_MENSILE.valePer`): il Baby Nuoto si prenota turno per turno
+       come gli adulti, quindi per le sue lezioni la lista d'attesa **c'è**, e
+       dargli questa riga sarebbe spostare l'errore invece di chiuderlo. */
+    LISTA_ATTESA.nonValePer.includes(c.nome as (typeof LISTA_ATTESA.nonValePer)[number])
+      ? blocchi(
+          `**Se il turno che vuoi è al completo non c'è nessuna lista d'attesa: se ne sceglie un altro.** ${LISTA_ATTESA.turnoPieno}`,
+          `Il numero massimo di bambini per vasca non è superabile su richiesta, nemmeno in via eccezionale — dipende dalle norme di sicurezza e dal rapporto istruttore-allievi — e la risposta a «non c'è possibilità di essere inseriti?» e' quindi un altro turno, non una coda. **La lista d'attesa del club è quella delle lezioni che si prenotano** (i recuperi compresi) e non c'entra con l'iscrizione: non usare quella regola qui, e non nominare né il subentro né la notifica via email.`,
+          `**E «${LISTA_ATTESA.messaggioPortale}» dice proprio questo**: quel turno è pieno. Non è un blocco sulla scheda, non è il certificato medico, non è un insoluto e non è un guasto del portale — non si diagnostica niente e non si manda al team per sbloccarlo, si sceglie un altro turno fra quelli che hanno posto.`
+        )
+      : '',
     (c.corsi ?? []).map(testoStagione).join('\n\n'),
     (c.spazi ?? []).map((s) => blocchi(pulito(s.nome), pulito(s.testo))).join('\n\n')
   );
@@ -605,31 +626,54 @@ export const GET: APIRoute = async () => {
            Le due righe sono **derivate** dai due piani e da `WATER_ACTIVITIES`:
            un'attività spostata fra Smart e Premium le riscrive da sé, mentre
            una frase scritta a mano resterebbe indietro nel posto da cui la chat
-           risponde. Sul Premium l'elenco delle escluse e' vuoto — e' il
-           soprainsieme — quindi le righe non compaiono. */
+           risponde.
+
+           **La riga dell'acqua la scrivono tutti e due i piani, e prima no.**
+           Il Premium è il soprainsieme, quindi non ha niente da escludere e
+           usciva da qui a mani vuote: la parola «acqua» finiva nella voce dello
+           Smart — il piano che l'acqua ce l'ha a metà — e non in quella del
+           piano che l'acqua ce l'ha tutta. Il contesto della chat si sceglie per
+           parole, e con quell'asimmetria «acqua» pescava lo Smart e lasciava
+           fuori il Premium: ed è così che l'08/09 il modello si è trovato davanti mezzo
+           listino e ha inventato l'altra metà (119 €/mese, 1.190 €/anno, 149 €
+           di Flex — nessuno dei tre esiste). Ed è anche il difetto letto da
+           fermo: a «quale abbonamento mi serve per l'acqua?» la voce che vince
+           per punteggio dev'essere quella del piano che risponde di sì.
+
+           Quindi chi non esclude niente in acqua dice **che cosa comprende**,
+           per esteso e con la stessa parola. La riga resta derivata: non c'è
+           nessun elenco scritto a mano né qui né là. */
         (() => {
-          const altro = plans.find((p) => p.id !== piano.id);
-          if (!altro) return '';
-          const escluse = altro.activities.filter((a) => !piano.activities.includes(a));
-          if (!escluse.length) return '';
           const acqua = WATER_ACTIVITIES.map((id) => ACTIVITY_LABEL[id]).filter(Boolean);
           const acquaComprese = piano.activities.filter((a) => acqua.includes(a));
+          const altro = plans.find((p) => p.id !== piano.id);
+          const escluse = altro ? altro.activities.filter((a) => !piano.activities.includes(a)) : [];
           const acquaEscluse = escluse.filter((a) => acqua.includes(a));
           // «nel Smart» e «con il Smart»: l'articolo lo decide il nome, non
           // la concatenazione.
           const art = (n: string) => (n === 'Smart' ? 'lo Smart' : `il ${n}`);
-          const righe = [
-            `**Questo piano NON comprende: ${escluse.join(', ')}** — sono nel ${altro.name}. ` +
-              `Non riassumerlo mai in una categoria («tutta l'acqua», «tutto il club», «tutti i corsi»): ` +
-              `vale l'elenco delle attività comprese, voce per voce.`,
-          ];
-          if (acquaEscluse.length) {
+          const righe: string[] = [];
+          if (altro && escluse.length) {
+            righe.push(
+              `**Questo piano NON comprende: ${escluse.join(', ')}** — sono nel ${altro.name}. ` +
+                `Non riassumerlo mai in una categoria («tutta l'acqua», «tutto il club», «tutti i corsi»): ` +
+                `vale l'elenco delle attività comprese, voce per voce.`
+            );
+          }
+          if (acquaEscluse.length && altro) {
             righe.push(
               `**In acqua comprende ${acquaComprese.length ? `soltanto ${acquaComprese.join(', ')}` : 'nulla'}.** ` +
                 `${acquaEscluse.join(', ')} ${acquaEscluse.length > 1 ? 'sono' : 'e\''} nel ${altro.name}: ` +
                 `una lezione in vasca che non sia il nuoto libero — le lezioni di Aqua Fitness, la Scuola ` +
                 `Nuoto Adulti, il Corso Gestanti — con ${art(piano.name)} non si prenota. Quali siano quelle ` +
                 `lezioni lo dice la voce dell'attività, e va letta lì: un elenco ricopiato qui resterebbe indietro.`
+            );
+          } else if (acquaComprese.length) {
+            righe.push(
+              `**In acqua comprende ${acquaComprese.join(', ')}: tutta l'acqua del club.** ` +
+                `Nessuna attività in acqua resta fuori da questo piano — le lezioni di Aqua Fitness, la ` +
+                `Scuola Nuoto Adulti e il Corso Gestanti si prenotano con ${art(piano.name)}, oltre al nuoto ` +
+                `libero. Quali siano quelle lezioni lo dice la voce dell'attività, e va letta lì.`
             );
           }
           return righe.join('\n');
