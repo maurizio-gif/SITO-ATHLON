@@ -13,6 +13,8 @@ tags:
   - blocco
   - capienza
   - posti
+  - gruppo al completo
+  - turno pieno
   - affluenza
   - corsie
   - nuoto libero
@@ -66,14 +68,15 @@ La prenotazione non è un adempimento: è il filo che tiene aggiornati te e noi.
 <summary><strong>Come funziona la lista d'attesa?</strong></summary>
 
 > **La lista d'attesa è delle prenotazioni, non delle iscrizioni.** Vale per la
-> singola lezione che si prenota — corsi fitness, acqua, sala pesi, recuperi
-> della Scuola Nuoto. **Per iscriversi a un turno della Scuola Nuoto Bambini o
-> del Baby Nuoto non esiste nessuna lista d'attesa**: se il turno che vuoi è al
-> completo si sceglie fra quelli che hanno ancora posto, e se nessuno va bene
-> scrivi al team — nessuno viene messo in coda e nessuno riceve una notifica
-> automatica per un posto che si libera.
+> singola lezione che si prenota — corsi fitness, acqua, sala pesi, Scuola Nuoto
+> Adulti, Group Reformer, e i recuperi della Scuola Nuoto Bambini. **Per
+> iscriversi a un turno della Scuola Nuoto Bambini, del Nuoto Agonistico o della
+> Pallanuoto non esiste nessuna lista d'attesa**, e nemmeno per l'adesione al
+> Baby Nuoto: se il turno che vuoi è al completo si sceglie fra quelli che hanno
+> ancora posto, e se nessuno va bene scrivi al team — nessuno viene messo in coda
+> e nessuno riceve una notifica automatica per un posto che si libera.
 
-Se il corso è al completo puoi iscriverti in lista d'attesa. In caso di disdetta di un prenotato, la lista scorre in ordine cronologico e il subentrante viene avvisato via email. Il subentro è possibile fino a **1 ora dall'inizio**.
+Se la **lezione** che vuoi prenotare è al completo puoi iscriverti in lista d'attesa. In caso di disdetta di un prenotato, la lista scorre in ordine cronologico e il subentrante viene avvisato via email. Il subentro è possibile fino a **1 ora dall'inizio**.
 
 Nel caso di acquisto della singola lezione, la stessa verrà riaccreditata se non si subentra.
 
@@ -108,9 +111,30 @@ Oltre il termine la cancellazione non è possibile, e la segreteria non ha facol
 </details>
 
 <details>
-<summary><strong>Il corso è pieno: potete aggiungere un posto?</strong></summary>
+<summary><strong>È pieno: potete aggiungere un posto?</strong></summary>
 
-No. Il numero massimo di partecipanti per corso e di bambini per vasca **non è superabile su richiesta**, nemmeno in via eccezionale: dipende dalle norme di sicurezza e dal rapporto istruttore-allievi. Iscriviti in lista d'attesa, che scorre in ordine cronologico.
+No. Il numero massimo di partecipanti per corso e di bambini per vasca **non è superabile su richiesta**, nemmeno in via eccezionale: dipende dalle norme di sicurezza e dal rapporto istruttore-allievi. Da qui in poi però le due domande sono diverse, e la risposta non è la stessa.
+
+> **Se è il turno di un corso dei bambini — Scuola Nuoto Bambini, Nuoto
+> Agonistico, Pallanuoto — cioè un'iscrizione, non c'è nessuna lista d'attesa.**
+> Il portale mostra **tutti** i turni che hanno ancora posto: se quello che
+> volevi è al completo si sceglie fra gli altri della stessa fascia d'età, e se
+> nessuno va bene si scrive al team. Nessuno viene messo in coda, nessuno riceve
+> una notifica per un posto che si libera, e non esiste nessun modo di «essere
+> inseriti» in un turno pieno.
+
+Se invece è una **singola lezione da prenotare** — un corso fitness, l'acqua, la sala pesi, la Scuola Nuoto Adulti, un recupero — puoi iscriverti in lista d'attesa, che scorre in ordine cronologico.
+
+</details>
+
+<details>
+<summary><strong>«Il gruppo è già al completo»: non riesco a iscrivere mio figlio</strong></summary>
+
+Quel messaggio dice esattamente quello che dice: **quel turno è pieno**, e non è un blocco sulla tua scheda. Non c'è niente da sistemare e niente da chiedere al team per sbloccarlo — non è il certificato medico, non è un insoluto, non è un problema del portale.
+
+**Si sceglie un altro turno.** Il portale mostra tutti quelli che hanno ancora posto per la fascia d'età di tuo figlio: se nessuno degli orari disponibili va bene, allora sì, scrivi al team.
+
+E non c'è nessuna lista d'attesa in cui mettersi: vedi la f.a.q. qui sopra.
 
 </details>
 

@@ -43,7 +43,13 @@
  * le risposte che interpolano numeri del planning, che senza quel contesto non
  * si possono comporre.
  */
-import { CERTIFICATO, PRENOTAZIONE, finestraDisdetta, termineCertificato } from './regole';
+import {
+  CERTIFICATO,
+  PRENOTAZIONE,
+  finestraDisdetta,
+  perimetroListaAttesa,
+  termineCertificato,
+} from './regole';
 import { SOSPENSIONE, GUEST_PASS, ATTIVAZIONE } from './abbonamenti';
 
 export interface FaqEntry {
@@ -101,7 +107,7 @@ export const REGISTRO: VoceRegistro[] = [
     q: 'Come si prenota una lezione?',
     /* «A partire da», non «fino a»: la finestra si apre a 72 ore dalla lezione.
        Metà del sito diceva il contrario, che è la regola opposta. */
-    a: `Dall'app Athlon Club o dal portale web, a partire da ${PRENOTAZIONE.anticipoGiorni} giorni prima della lezione (${PRENOTAZIONE.anticipoOre} ore) e resta aperta finché la lezione non comincia: puoi prenotare anche all'ultimo momento, non c'è un termine anticipato. I posti sono limitati — massimo ${PRENOTAZIONE.attiveCorsi} prenotazioni attive insieme per Corsi Fitness, Aqua Fitness e Scuola Nuoto Adulti, ${PRENOTAZIONE.attiveReformer} per il Group Reformer — e se un corso è pieno puoi iscriverti in lista d'attesa: se qualcuno disdice, subentri in ordine cronologico.`,
+    a: `Dall'app Athlon Club o dal portale web, a partire da ${PRENOTAZIONE.anticipoGiorni} giorni prima della lezione (${PRENOTAZIONE.anticipoOre} ore) e resta aperta finché la lezione non comincia: puoi prenotare anche all'ultimo momento, non c'è un termine anticipato. I posti sono limitati — massimo ${PRENOTAZIONE.attiveCorsi} prenotazioni attive insieme per Corsi Fitness, Aqua Fitness e Scuola Nuoto Adulti, ${PRENOTAZIONE.attiveReformer} per il Group Reformer — e se una **lezione** è al completo puoi iscriverti in lista d'attesa: se qualcuno disdice, subentri in ordine cronologico. La lista d'attesa è delle prenotazioni: per l'iscrizione a un turno dei corsi dei bambini non esiste, vedi la sua f.a.q.`,
   },
   {
     id: 'disdetta-lezione',
@@ -116,7 +122,9 @@ export const REGISTRO: VoceRegistro[] = [
   {
     id: 'lista-attesa',
     q: "Come funziona la lista d'attesa?",
-    a: `Se il corso è al completo puoi iscriverti in lista d'attesa: quando un prenotato disdice, la lista scorre in ordine cronologico e chi subentra riceve un'email, fino a ${PRENOTAZIONE.disdettaOreGruppo} ora dall'inizio. Attenzione: la lista d'attesa occupa uno slot come una prenotazione confermata.`,
+    /* Il perimetro sta **davanti** e non in coda: è la riga che decide se la
+       risposta è giusta per chi la legge, e chi riassume tiene la prima. */
+    a: `${perimetroListaAttesa()} Sulla lezione, invece, funziona così: se è al completo puoi iscriverti in lista d'attesa, quando un prenotato disdice la lista scorre in ordine cronologico e chi subentra riceve un'email, fino a ${PRENOTAZIONE.disdettaOreGruppo} ora dall'inizio. Attenzione: la lista d'attesa occupa uno slot come una prenotazione confermata.`,
   },
   {
     id: 'prenotazioni-attive',

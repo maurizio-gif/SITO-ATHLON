@@ -1,3 +1,7 @@
+/* I tre corsi a turno fisso li elenca `JUNIOR_MENSILE`, che è già la loro
+   sorgente: vedi `LISTA_ATTESA` in fondo. */
+import { JUNIOR_MENSILE } from './abbonamenti';
+
 /**
  * Le regole del club in numeri: i fatti che il sito ripete in più punti.
  *
@@ -98,3 +102,72 @@ export const finestraDisdetta = (tipo?: 'gruppo' | 'individuale') => {
   if (tipo === 'individuale') return `fino a ${i} dall'inizio della seduta`;
   return `fino a ${g} dall'inizio per le lezioni di gruppo e ${i} per quelle individuali`;
 };
+
+/**
+ * La lista d'attesa, e **il suo perimetro**, che è la parte che è costata due
+ * volte.
+ *
+ * La lista d'attesa è delle **prenotazioni**: vale per la singola lezione che
+ * si prenota, e quando quella è al completo si entra in coda e si subentra se
+ * qualcuno disdice. Per **l'iscrizione a un turno** dei corsi a stagione dei
+ * bambini non esiste, e non è una dimenticanza del portale: i turni con posto
+ * sono tutti visibili, e un turno pieno si sostituisce con un altro turno.
+ *
+ * Il 31 agosto la chat aveva promesso a una mamma una lista d'attesa per un
+ * turno della Scuola Nuoto, e la correzione di allora aveva aggiunto la frase
+ * giusta — «la lista d'attesa è delle prenotazioni, non delle iscrizioni» —
+ * dentro la f.a.q. che spiega la lista d'attesa. **E non è bastato**, perché
+ * nella stessa scheda restavano due passaggi che dicevano il contrario senza
+ * dire per chi valgono: il capoverso subito sotto quella frase («Se il corso è
+ * al completo puoi iscriverti in lista d'attesa») e la f.a.q. «Il corso è
+ * pieno: potete aggiungere un posto?», che chiudeva con «Iscriviti in lista
+ * d'attesa, che scorre in ordine cronologico».
+ *
+ * L'8 settembre (esecuzione 1519819) una mamma con due bambini, 2021 e 2023,
+ * ha chiesto se il 2021 potesse essere inserito in un turno al completo. Il
+ * modello ha risposto **citando la seconda alla lettera** — norme di sicurezza,
+ * rapporto istruttore-allievi, e poi la lista d'attesa — e al turno dopo le ha
+ * spiegato il subentro «fino a un'ora dall'inizio della lezione», che è la
+ * meccanica della prenotazione applicata a un'iscrizione. Non aveva inventato
+ * niente: aveva davanti la frase giusta e due frasi sbagliate, e ha preso
+ * quella che rispondeva alla domanda con le parole della domanda.
+ *
+ * Da qui la costante: **il perimetro è un dato, e lo compongono tutti**. La
+ * parola che manda fuori strada è «corso» — nelle regole di prenotazione
+ * significa la lezione di quel giorno, per un genitore significa il corso di
+ * suo figlio — quindi dove si parla di prenotazioni si dice «lezione», e dove
+ * si parla di iscrizioni si dice «turno».
+ *
+ * I tre corsi si leggono da `JUNIOR_MENSILE.valePer`: sono gli stessi che si
+ * vendono a turno fisso e ad abbonamento mensile, e riscriverli qui vorrebbe
+ * dire poterli cambiare in un posto solo dei due.
+ */
+export const LISTA_ATTESA = {
+  /** Dove vale: la singola lezione che si prenota. */
+  valePer:
+    'la singola lezione che si prenota — corsi fitness, Aqua Fitness, sala pesi, Scuola Nuoto Adulti, Group Reformer, e i recuperi della Scuola Nuoto Bambini',
+  /** Dove non vale: l'iscrizione a un turno dei corsi a stagione dei bambini. */
+  nonValePer: JUNIOR_MENSILE.valePer,
+  /**
+   * Cosa si fa davvero quando un turno è al completo, ed è l'unica risposta
+   * vera: non una coda, non una notifica, non un «vi avvisiamo noi». Un rimedio
+   * inventato è una promessa che il club non può mantenere e che nessuno
+   * scopre finché la stagione non è cominciata senza quel bambino.
+   */
+  turnoPieno:
+    "Il portale mostra **tutti** i turni che hanno ancora posto: se quello che volevi è al completo si sceglie fra gli altri della stessa fascia d'età, e se nessuno va bene si scrive al team. Non c'è nessuna lista d'attesa per l'iscrizione, nessuno viene messo in coda e nessuno riceve una notifica per un posto che si libera.",
+  /**
+   * Il messaggio che il portale scrive, con le parole con cui appare a
+   * schermo: è una chiave di ricerca prima che un sintomo, e senza di lei il
+   * modello lo interpreta. L'8 settembre l'ha letto come un blocco sulla
+   * scheda — «potrebbe essere il certificato medico che manca o è scaduto» —
+   * e ha mandato al team una persona che doveva solo scegliere un altro turno.
+   */
+  messaggioPortale: 'il gruppo è già al completo',
+} as const;
+
+/** «La lista d'attesa è delle prenotazioni, non delle iscrizioni», per esteso. */
+export const perimetroListaAttesa = () =>
+  `**La lista d'attesa è delle prenotazioni, non delle iscrizioni.** Vale per ${LISTA_ATTESA.valePer}. ` +
+  `**Per iscriversi a un turno di ${LISTA_ATTESA.nonValePer.join(', ')} non esiste nessuna lista d'attesa.** ` +
+  LISTA_ATTESA.turnoPieno;

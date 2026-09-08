@@ -2563,6 +2563,86 @@ un «ti avvisiamo noi». Un dato inventato è peggio di un dato assente, e qui
 peggio ancora: è una promessa che il club non può mantenere e che nessuno
 scoprirà finché la stagione non è cominciata senza quel bambino.
 
+#### E il 08/09 è tornata, perché la stessa scheda la nega e la offre
+
+Stessa promessa, otto giorni dopo (esecuzione `1519819`, `ramo junior`,
+`attivitaJunior: scuola-nuoto-bambini`). Una mamma con due bambini, 2021 e 2023:
+*«per i nati del 2023 c'è un posto il giovedì alle 16.40, mentre per i nati nel
+2021 in quello stesso orario è al completo. non c'è possibilità di essere
+inseriti?»*
+
+> Purtroppo no, il numero massimo di bambini per vasca non si può superare —
+> dipende dalle norme di sicurezza e dal rapporto istruttore-allievi […] Quello
+> che potete fare è **iscrivere il 2021 in lista d'attesa** per lo stesso orario:
+> se qualcuno disdice, riceverete una notifica via email e potrete subentrare.
+
+E al turno dopo la meccanica per esteso — *«il sistema vi mette automaticamente
+in lista d'attesa […] avrete fino a un'ora dall'inizio della lezione per
+subentrare»* — che è la regola della **prenotazione** applicata a un'iscrizione.
+Venti minuti più tardi la mamma è tornata: *«non mi fa mettere in lista d'attesa,
+mi dice che non posso iscrivere mio figlio perché il gruppo è già al completo»*.
+La risposta è stata una diagnosi inventata — *«potrebbe essere il certificato
+medico che manca o è scaduto»* — e un passaggio al team, per una cosa che il team
+non può sbloccare.
+
+**La correzione del 31 agosto c'era, e il modello aveva davanti anche lei.** Nel
+contesto di quel turno la frase giusta compariva **due volte**: in
+`scheda:snb/recuperi-lezioni` («per l'iscrizione a un turno della Scuola Nuoto
+non c'è nessuna lista d'attesa») e in cima alla f.a.q. della lista d'attesa in
+`scheda:generali/prenotazioni`. Non è bastato, perché nella **stessa voce**
+c'erano due passaggi che dicevano il contrario senza dire per chi valgono:
+
+- il capoverso **subito sotto** quella frase: «Se il corso è al completo puoi
+  iscriverti in lista d'attesa […] fino a 1 ora dall'inizio»;
+- la f.a.q. **«Il corso è pieno: potete aggiungere un posto?»**, che chiudeva con
+  «Iscriviti in lista d'attesa, che scorre in ordine cronologico».
+
+La seconda è quella che ha risposto, e si vede: il modello l'ha ricopiata quasi
+alla lettera — norme di sicurezza, rapporto istruttore-allievi, e poi la coda.
+Non aveva letto la voce sbagliata: aveva letto **la f.a.q. che rispondeva alla
+sua domanda con le sue stesse parole**, e quella f.a.q. parlava d'altro.
+
+**La parola che fa il danno è «corso».** Nelle regole di prenotazione significa
+la lezione di quel giorno; per un genitore significa il corso di suo figlio. Due
+significati nella stessa scheda, e il secondo è quello di chi la domanda la fa.
+Quindi dove si parla di prenotazioni si scrive **lezione**, e dove si parla di
+iscrizioni si scrive **turno** — la correzione è tutta qui, ed è la stessa forma
+già scritta per le due sospensioni e per i due orari, applicata a un sinonimo
+invece che a un regime.
+
+Cosa è cambiato, e perché in cinque posti e non in uno:
+
+- **`LISTA_ATTESA` in `data/regole.ts`** è il perimetro come dato: dove vale,
+  dove non vale — i tre corsi letti da `JUNIOR_MENSILE.valePer`, che è già la
+  loro sorgente — cosa si fa davvero quando un turno è pieno, e il messaggio del
+  portale con le parole con cui appare. `perimetroListaAttesa()` lo compone per
+  chi lo stampa.
+- **La f.a.q. `lista-attesa` di `data/faq.ts`** apre col perimetro invece di
+  chiuderci: chi riassume tiene la prima riga. E «se un corso è pieno» della
+  f.a.q. sulle prenotazioni diventa «se una **lezione** è al completo».
+- **La f.a.q. «È pieno: potete aggiungere un posto?»** risponde alle due domande
+  separate — l'iscrizione prima, perché è quella che arriva da un genitore — e il
+  titolo perde la parola «corso», che era metà del problema.
+- **Il messaggio del portale è indicizzato**, con le parole con cui appare a
+  schermo, in una f.a.q. sua e nella scheda dell'iscrizione: vale la regola di
+  «your member is on financial debit» — *un errore che la persona cita è una
+  chiave di ricerca prima che un sintomo* — e qui la risposta giusta è due righe:
+  quel turno è pieno, se ne sceglie un altro.
+- **E la riga arriva sulla voce del corso**, per i tre a turno fisso
+  (`testoJunior` in `kb.json.ts`, condizionata su `LISTA_ATTESA.nonValePer`).
+  Perché la domanda si fa da lì: la scheda delle prenotazioni è la voce di
+  un'altra cosa, e sperare che il modello ne legga il perimetro mentre risponde
+  su un corso è esattamente ciò che non è successo. Il **Baby Nuoto resta fuori**:
+  là si prenota turno per turno, quindi per le sue lezioni la lista d'attesa c'è
+  davvero, e dargli la riga sposterebbe l'errore invece di chiuderlo.
+
+**La lezione, che è la terza volta che questo file la scrive e la prima in cui
+morde dentro una voce sola:** aggiungere la frase giusta non chiude niente finché
+la frase sbagliata resta nella stessa voce. Quando si corregge una risposta della
+chat, la domanda non è «ho scritto la regola?» ma **«quante frasi di questo
+contesto rispondono a quella domanda, e cosa dicono?»** — e si conta con un grep
+sul contesto vero di un'esecuzione, non sulla scheda che si è appena riletta.
+
 ### La promozione ha un perimetro, e nel ramo dei genitori non deve entrare
 
 `promo.md` lo dichiara — «Valido su tutti gli abbonamenti annuali, Smart e

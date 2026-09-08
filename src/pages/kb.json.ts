@@ -27,6 +27,7 @@ import { getCollection } from 'astro:content';
 import { CORSI, type Corso } from '../data/corsi';
 import { conNumeri } from '../data/servizi';
 import { JUNIOR, SOLO_COLLETTIVE, type CorsoJunior, type CorsoStagione } from '../data/junior';
+import { LISTA_ATTESA } from '../data/regole';
 import { clausole, urlClausola, TERMINI_VERSIONE } from '../data/termini';
 import {
   bands,
@@ -246,6 +247,26 @@ function testoJunior(c: CorsoJunior): string {
       c.adesione?.length ? SOLO_COLLETTIVE.singola : '',
       SOLO_COLLETTIVE.personal
     ),
+    /* **Un turno pieno non ha una coda, e la riga sta qui perché la domanda si
+       fa da qui.** «Non c'è possibilità di essere inseriti?» la scrive chi sta
+       guardando i turni del corso di suo figlio, e la scheda delle prenotazioni
+       — che il perimetro ce l'ha — è la voce di un'altra cosa: l'8/9 il modello
+       ha pescato da lì la f.a.q. «il corso è pieno» e ne ha dato la risposta
+       delle *lezioni*, cioè una lista d'attesa che per un'iscrizione non
+       esiste. È la spazzata del Guest Pass applicata prima che l'errore torni:
+       la voce che risponde deve portarsi dietro la sua regola.
+
+       Arriva solo sui tre corsi a turno fisso, letti da `LISTA_ATTESA.nonValePer`
+       (che è `JUNIOR_MENSILE.valePer`): il Baby Nuoto si prenota turno per turno
+       come gli adulti, quindi per le sue lezioni la lista d'attesa **c'è**, e
+       dargli questa riga sarebbe spostare l'errore invece di chiuderlo. */
+    LISTA_ATTESA.nonValePer.includes(c.nome as (typeof LISTA_ATTESA.nonValePer)[number])
+      ? blocchi(
+          `**Se il turno che vuoi è al completo non c'è nessuna lista d'attesa: se ne sceglie un altro.** ${LISTA_ATTESA.turnoPieno}`,
+          `Il numero massimo di bambini per vasca non è superabile su richiesta, nemmeno in via eccezionale — dipende dalle norme di sicurezza e dal rapporto istruttore-allievi — e la risposta a «non c'è possibilità di essere inseriti?» e' quindi un altro turno, non una coda. **La lista d'attesa del club è quella delle lezioni che si prenotano** (i recuperi compresi) e non c'entra con l'iscrizione: non usare quella regola qui, e non nominare né il subentro né la notifica via email.`,
+          `**E «${LISTA_ATTESA.messaggioPortale}» dice proprio questo**: quel turno è pieno. Non è un blocco sulla scheda, non è il certificato medico, non è un insoluto e non è un guasto del portale — non si diagnostica niente e non si manda al team per sbloccarlo, si sceglie un altro turno fra quelli che hanno posto.`
+        )
+      : '',
     (c.corsi ?? []).map(testoStagione).join('\n\n'),
     (c.spazi ?? []).map((s) => blocchi(pulito(s.nome), pulito(s.testo))).join('\n\n')
   );
