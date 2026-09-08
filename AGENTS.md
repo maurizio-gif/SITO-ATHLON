@@ -2632,9 +2632,24 @@ Cosa è cambiato, e perché in cinque posti e non in uno:
   (`testoJunior` in `kb.json.ts`, condizionata su `LISTA_ATTESA.nonValePer`).
   Perché la domanda si fa da lì: la scheda delle prenotazioni è la voce di
   un'altra cosa, e sperare che il modello ne legga il perimetro mentre risponde
-  su un corso è esattamente ciò che non è successo. Il **Baby Nuoto resta fuori**:
-  là si prenota turno per turno, quindi per le sue lezioni la lista d'attesa c'è
-  davvero, e dargli la riga sposterebbe l'errore invece di chiuderlo.
+  su un corso è esattamente ciò che non è successo. Il **Baby Nuoto resta fuori**,
+  e non è un'eccezione da ricordarsi: è l'unico corso per bambini che **non ha
+  un'iscrizione a un turno** — si prenota una lezione per volta, come le attività
+  degli adulti — quindi la lista d'attesa ce l'ha per costruzione, e dargli la
+  riga sposterebbe l'errore invece di chiuderlo. È la stessa linea che divide
+  `LISTA_ATTESA.valePer` da `nonValePer`: **dove non c'è un'iscrizione a un turno
+  non c'è niente da mettere in coda**, e i tre corsi a turno fisso sono
+  `JUNIOR_MENSILE.valePer` perché turno fisso e abbonamento mensile sono la
+  stessa cosa detta due volte.
+
+  La prima stesura di questa correzione aveva tenuto la riga che il testo del 31
+  agosto affiancava — «per iscriversi a un turno della Scuola Nuoto Bambini **o
+  del Baby Nuoto** non esiste nessuna lista d'attesa» — perché era già sul sito e
+  non sembrava una cosa da inventare. Era sbagliata: al Baby Nuoto quel turno non
+  si «iscrive» affatto. Vale la regola di sempre, e vale anche per una frase
+  ereditata — *una regola che non dichiara il proprio perimetro è una regola che
+  si allarga al caso vicino*, e qui il caso vicino era il corso che le somiglia
+  di più.
 
 **La lezione, che è la terza volta che questo file la scrive e la prima in cui
 morde dentro una voce sola:** aggiungere la frase giusta non chiude niente finché

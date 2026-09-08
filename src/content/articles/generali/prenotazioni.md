@@ -69,12 +69,17 @@ La prenotazione non è un adempimento: è il filo che tiene aggiornati te e noi.
 
 > **La lista d'attesa è delle prenotazioni, non delle iscrizioni.** Vale per la
 > singola lezione che si prenota — corsi fitness, acqua, sala pesi, Scuola Nuoto
-> Adulti, Group Reformer, e i recuperi della Scuola Nuoto Bambini. **Per
-> iscriversi a un turno della Scuola Nuoto Bambini, del Nuoto Agonistico o della
-> Pallanuoto non esiste nessuna lista d'attesa**, e nemmeno per l'adesione al
-> Baby Nuoto: se il turno che vuoi è al completo si sceglie fra quelli che hanno
-> ancora posto, e se nessuno va bene scrivi al team — nessuno viene messo in coda
-> e nessuno riceve una notifica automatica per un posto che si libera.
+> Adulti, Group Reformer, **il Baby Nuoto** e i recuperi della Scuola Nuoto
+> Bambini. **Per iscriversi a un turno della Scuola Nuoto Bambini, del Nuoto
+> Agonistico o della Pallanuoto non esiste nessuna lista d'attesa**: se il turno
+> che vuoi è al completo si sceglie fra quelli che hanno ancora posto, e se
+> nessuno va bene scrivi al team — nessuno viene messo in coda e nessuno riceve
+> una notifica automatica per un posto che si libera.
+>
+> **Il Baby Nuoto sta dalla parte delle prenotazioni**, e non è un'eccezione da
+> ricordare: là non ci si iscrive a un turno per la stagione, si prenota una
+> lezione per volta come le attività degli adulti. Quindi se la lezione che vuoi
+> è al completo la lista d'attesa **c'è**, con le regole di questa scheda.
 
 Se la **lezione** che vuoi prenotare è al completo puoi iscriverti in lista d'attesa. In caso di disdetta di un prenotato, la lista scorre in ordine cronologico e il subentrante viene avvisato via email. Il subentro è possibile fino a **1 ora dall'inizio**.
 

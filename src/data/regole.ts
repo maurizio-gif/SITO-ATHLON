@@ -143,10 +143,26 @@ export const finestraDisdetta = (tipo?: 'gruppo' | 'individuale') => {
  * dire poterli cambiare in un posto solo dei due.
  */
 export const LISTA_ATTESA = {
-  /** Dove vale: la singola lezione che si prenota. */
+  /**
+   * Dove vale: la singola lezione che si prenota. **Il Baby Nuoto è qui**, e non
+   * è un'eccezione da ricordare: e' l'unico corso per bambini che non ha
+   * un'iscrizione a un turno — si prenota una lezione per volta, come le
+   * attivita' degli adulti — quindi la lista d'attesa ce l'ha per costruzione.
+   * La riga sotto, `nonValePer`, elenca i corsi *a turno fisso*, ed e' quello
+   * che li distingue.
+   */
   valePer:
-    'la singola lezione che si prenota — corsi fitness, Aqua Fitness, sala pesi, Scuola Nuoto Adulti, Group Reformer, e i recuperi della Scuola Nuoto Bambini',
-  /** Dove non vale: l'iscrizione a un turno dei corsi a stagione dei bambini. */
+    'la singola lezione che si prenota — corsi fitness, Aqua Fitness, sala pesi, Scuola Nuoto Adulti, Group Reformer, il Baby Nuoto, e i recuperi della Scuola Nuoto Bambini',
+  /**
+   * Dove non vale: l'iscrizione a un turno dei corsi a stagione dei bambini.
+   *
+   * Sono `JUNIOR_MENSILE.valePer`, e la coincidenza non e' casuale: sono gli
+   * stessi tre che si vendono a **turno fisso** e ad abbonamento mensile, cioe'
+   * quelli in cui giorno e ora si scelgono all'iscrizione e restano quelli per
+   * la stagione. Dove non c'e' un'iscrizione a un turno non c'e' niente da
+   * mettere in coda — ed e' esattamente il motivo per cui il Baby Nuoto sta
+   * dall'altra parte.
+   */
   nonValePer: JUNIOR_MENSILE.valePer,
   /**
    * Cosa si fa davvero quando un turno è al completo, ed è l'unica risposta
