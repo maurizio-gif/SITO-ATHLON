@@ -2850,32 +2850,54 @@ parole con cui si cercano*, o quella che risponde meglio è quella che il contes
 lascia fuori. Provata contro il `kb.json` vero di quell'esecuzione: con la riga,
 `abbonamento:premium` entra nel contesto dello stesso identico turno.
 
-**Restano da fare due cose su n8n**, e sono quelle che chiudono il caso invece di
-chiudere questo caso. Non sono state applicate qui perché la scrittura sul
-workflow vivo non è passata:
+**Su n8n è stata applicata una cosa sola, e la seconda è stata tolta dopo averla
+provata.** Vale la pena tenere tutte e due scritte, perché la seconda ha
+insegnato una cosa sul workflow che non era scritta da nessuna parte.
 
-- **In `Normalizza`, una conferma eredita l'argomento dalla battuta
-  dell'assistente.** Il sito manda `precedenteAssistente` — `chatAssistente.client.js`
-  lo fa già, vedi `rispostaPrecedente()` — e quando la domanda è una conferma
-  *tutta intera* (`/^(si|sì|certo|ok|va bene|volentieri|dimmi|prego|…)[\s.,!]*$/i`,
-  ancorata ai due capi) `precedente` **diventa** quella battuta. Il posto è lo
-  stesso — la riga che dice di cosa si sta parlando — quindi ancore e punteggio la
-  vedono senza toccare `Componi contesto`. Provata: `kbAncore` passa da vuoto a
-  `listino orari` e nel contesto entrano tutte e due le voci dei piani, con il
-  Group Reformer e il suo planning al posto di quattro voci di corsi junior. Il
-  cancello è stretto di proposito — «Certo, ma quanto costa il Reformer?» ha un
-  argomento suo e non deve trascinarsi dietro le cento parole dell'assistente — e
-  sbaglia nel verso giusto: una conferma non riconosciuta lascia le cose come
-  stanno.
-- **Le due voci del listino entrano insieme o non entrano.** È la garanzia che la
-  correzione nei dati non dà: le voci si pescano per punteggio una alla volta, e
-  le parole che le distinguono non hanno niente a che vedere con il prezzo — «che
-  temperatura ha la vasca?» pesca ancora il solo Smart. Un nodo dopo `Componi
-  contesto` che, se nel contesto c'è una delle due, aggiunge in coda l'altra —
-  **oltre il tetto di quaranta**, perché completare prima vorrebbe dire togliere
-  una voce che risponde alla domanda per metterci un piano che nessuno ha
-  nominato. Una voce in più su quaranta, in cambio di un listino che non arriva
-  mai a metà.
+**Fatta: in `Normalizza`, una conferma eredita l'argomento dalla battuta
+dell'assistente.** Il sito manda `precedenteAssistente` — `chatAssistente.client.js`,
+`rispostaPrecedente()` — e quando la domanda è una conferma *tutta intera*
+(`CONFERMA`, ancorata ai due capi) `precedente` **diventa** quella battuta. Il
+posto è lo stesso — la riga che dice di cosa si sta parlando — quindi ancore e
+punteggio la vedono senza toccare `Componi contesto`, che legge `$('Normalizza')`.
+Provata sul contesto vero di `1520074`: `kbAncore` passa da vuoto a
+`listino orari`, entrano tutte e due le voci dei piani, e il Group Reformer col
+suo planning prende il posto di quattro voci di corsi junior. Il cancello è
+stretto di proposito — «Certo, ma quanto costa il Reformer?» ha un argomento suo
+e non deve trascinarsi dietro le cento parole dell'assistente — e sbaglia nel
+verso giusto: una conferma non riconosciuta lascia le cose come stanno. La spia è
+`innesco`, accanto a `kbAncore` e `kbChiaviPrima`.
+
+**Tolta: un nodo dopo `Componi contesto` che completava la coppia del listino.**
+L'idea era la garanzia che la correzione nei dati non dà — le due voci si pescano
+per punteggio una alla volta, e «che temperatura ha la vasca?» pesca ancora il
+solo Smart. Il nodo funzionava: preso il contesto in ingresso, se conteneva una
+sola delle due voci del listino aggiungeva l'altra in coda, oltre il tetto di
+quaranta. **E non serviva a niente**, perché il contesto non viaggia nell'item.
+
+**Sei nodi leggono il contesto per nome, non dall'item che ricevono**, e sono
+`Apri conversazione`, `Trova conversazione`, `Salva domanda`, `Memoria
+conversazione`, `Assistente` e `Leggi la risposta`. I due che contano lo dicono
+per esteso: il `systemMessage` dell'agente comincia con
+`{{ $('Componi contesto').first().json.istruzioni }}`, e `ripara()` in
+`Leggi la risposta` valida le fonti citate contro
+`$('Componi contesto').first().json.kb`. Quindi un nodo messo **dopo** `Componi
+contesto` non tocca il contesto che il modello vede — e nel caso peggiore fa
+scartare come inventata la fonte della voce che ha appena aggiunto, perché quella
+voce nel `kb` di `Componi contesto` non c'è. Un nodo che dichiara di completare il
+listino e non lo completa è peggio di un nodo che non c'è: tolto, topologia
+rimessa com'era.
+
+**La lezione, che vale oltre questo caso: in questo workflow il contesto ha un
+proprietario, ed è `Componi contesto`.** Finché sei nodi lo prendono per nome, la
+pipeline del contesto non si allunga a valle — qualunque cosa debba cambiare
+quello che il modello legge va **dentro** quel nodo, o davanti a lui, o va spostata
+la lettura in tutti e sei. Il giorno che si vuole davvero la coppia garantita, il
+posto è là: dopo `scelte` e prima di `voci`, aggiungendo la voce mancante fra
+`PIANI = ['abbonamento:smart', 'abbonamento:premium']` **dopo** il tetto e il
+minimo — completare prima vorrebbe dire far concorrere la compagna per uno slot,
+cioè togliere dal contesto la voce che rispondeva alla domanda per metterci un
+piano che nessuno ha nominato.
 
 **E una cosa da guardare che non è un difetto del software.** Le due stringhe
 `savings` di `data/abbonamenti.ts` non tornano con l'aritmetica dei loro importi:
