@@ -2792,6 +2792,101 @@ struttura e differiscono solo per un titolo, il titolo non basta — ogni riga c
 porta un numero deve portarsi dietro di chi è. Vale per i piani, e varrà per la
 prossima coppia di listini che si somigliano.
 
+#### E mezzo listino nel contesto è peggio di nessun listino
+
+Il 08/09 (esecuzione `1520074`) una persona arrivata su `/reformer` da un
+annuncio — `utm_term: pilates reformer roma` — si è sentita rispondere così:
+
+> Lo **Smart Annuale a rate costa 75 €/mese** […] Oppure **750 €/anno** […] E il
+> **Mensile Flex senza vincoli è 99 €/mese**. Ma aspetta — tu vuoi il Reformer,
+> che non è nello Smart. Il **Premium Annuale a rate è 119 €/mese** — risparmi
+> **180 €** […] oppure **1.190 €/anno** […] Il **Premium Mensile Flex è
+> 149 €/mese**.
+
+I tre importi dello Smart sono quelli veri, alla lettera. **I tre del Premium non
+esistono**: sono 95, 950 e 119, e i due risparmi sono 288 e 488. Cioè al Premium
+è stato attribuito un listino gonfiato di un quarto, alla persona che lo stava
+per comprare.
+
+**Il modello non aveva letto la riga sbagliata: aveva davanti mezzo listino.** Nel
+contesto di quel turno c'era `abbonamento:smart` e **non** `abbonamento:premium` —
+si legge dall'esecuzione, `kbVoci: 40` e la voce del Premium non fra loro. Le
+difese scritte nella sezione qui sopra c'erano tutte e tre e nessuna poteva
+servire: «questi importi sono dello Smart e di nessun altro piano» difende dallo
+**scambio**, e qui non c'era niente da scambiare — c'era una colonna mancante, e
+il modello l'ha ricostruita per proporzione. Vale anche per la regola 2 del
+prompt, che vieta l'aritmetica in cinque modi: **una regola non può difendere da
+un numero che non c'è.**
+
+Il perché quella voce non ci fosse sono due cause indipendenti, e ognuna da sola
+sarebbe bastata.
+
+**Una conferma non ha un argomento suo.** Il turno prima l'assistente aveva
+chiuso con *«Ti va di sapere quanto costa?»*, e la persona aveva scritto
+**«Certo»**. A `Componi contesto` arrivano la domanda e la **domanda precedente**
+— cioè «certo» e «acqua» — e su quelle si accendono le ancore: nessuna parola di
+prezzo, `kbAncore` vuoto, ancora del listino spenta. La battuta che conteneva
+l'argomento era l'unica della conversazione che al workflow non arrivava, perché
+era dell'assistente.
+
+**E le due voci del listino si pescano una alla volta.** Spenta l'ancora, restava
+il punteggio, e le keyword erano `certo` (che non compare da nessuna parte) e
+`acqua`. «Acqua» sta nella voce dello **Smart** — è il piano che l'acqua ce l'ha
+a metà, quindi la sua voce elenca cosa resta fuori — e nella voce del **Premium**
+non compariva affatto: il Premium è il soprainsieme, non esclude niente, e il
+blocco che scrive quella riga usciva a mani vuote. Punteggio 1 contro 0, e le
+voci con zero non entrano.
+
+Quindi la parola che descrive *il piano che l'acqua ce l'ha tutta* pescava
+**l'altro**. Ed è un difetto che si legge anche da fermo, senza questa
+conversazione: a «quale abbonamento mi serve per l'acqua?» vinceva per punteggio
+la voce del piano che risponde di no.
+
+La correzione sta nei dati, ed è una riga: **chi in acqua non esclude niente dice
+cosa comprende**, per esteso e con la stessa parola. Resta derivata da `plans` e
+`WATER_ACTIVITIES` come la sua gemella — nessun elenco scritto a mano — e vale la
+regola di sempre: *due voci che si somigliano devono somigliarsi anche nelle
+parole con cui si cercano*, o quella che risponde meglio è quella che il contesto
+lascia fuori. Provata contro il `kb.json` vero di quell'esecuzione: con la riga,
+`abbonamento:premium` entra nel contesto dello stesso identico turno.
+
+**Restano da fare due cose su n8n**, e sono quelle che chiudono il caso invece di
+chiudere questo caso. Non sono state applicate qui perché la scrittura sul
+workflow vivo non è passata:
+
+- **In `Normalizza`, una conferma eredita l'argomento dalla battuta
+  dell'assistente.** Il sito manda `precedenteAssistente` — `chatAssistente.client.js`
+  lo fa già, vedi `rispostaPrecedente()` — e quando la domanda è una conferma
+  *tutta intera* (`/^(si|sì|certo|ok|va bene|volentieri|dimmi|prego|…)[\s.,!]*$/i`,
+  ancorata ai due capi) `precedente` **diventa** quella battuta. Il posto è lo
+  stesso — la riga che dice di cosa si sta parlando — quindi ancore e punteggio la
+  vedono senza toccare `Componi contesto`. Provata: `kbAncore` passa da vuoto a
+  `listino orari` e nel contesto entrano tutte e due le voci dei piani, con il
+  Group Reformer e il suo planning al posto di quattro voci di corsi junior. Il
+  cancello è stretto di proposito — «Certo, ma quanto costa il Reformer?» ha un
+  argomento suo e non deve trascinarsi dietro le cento parole dell'assistente — e
+  sbaglia nel verso giusto: una conferma non riconosciuta lascia le cose come
+  stanno.
+- **Le due voci del listino entrano insieme o non entrano.** È la garanzia che la
+  correzione nei dati non dà: le voci si pescano per punteggio una alla volta, e
+  le parole che le distinguono non hanno niente a che vedere con il prezzo — «che
+  temperatura ha la vasca?» pesca ancora il solo Smart. Un nodo dopo `Componi
+  contesto` che, se nel contesto c'è una delle due, aggiunge in coda l'altra —
+  **oltre il tetto di quaranta**, perché completare prima vorrebbe dire togliere
+  una voce che risponde alla domanda per metterci un piano che nessuno ha
+  nominato. Una voce in più su quaranta, in cambio di un listino che non arriva
+  mai a metà.
+
+**E una cosa da guardare che non è un difetto del software.** Le due stringhe
+`savings` di `data/abbonamenti.ts` non tornano con l'aritmetica dei loro importi:
+lo Smart annuale a rate dichiara «Risparmio €138 vs Flex» mentre 99 − 75 per
+dodici mesi fa **288** (ed è esattamente la cifra che dichiara il Premium, che ha
+la stessa differenza di 24 €), e il pagamento unico del Premium dichiara
+«Risparmio €488 vs Flex annuo» mentre 1.428 − 950 fa **478**. Gli altri due
+tornano. Non sono stati toccati — un prezzo dichiarato è una decisione del club e
+non un conto da correggere in silenzio — ma vanno confermati o corretti: sono la
+cifra che l'assistente cita alla lettera, e il 08/09 l'ha citata.
+
 ### «Ci sono sconti?» sui corsi dei bambini: la modalità è una, e lo sconto ha una finestra
 
 Il 30 agosto, a un genitore che chiedeva «ci sono sconti per la scuola nuoto

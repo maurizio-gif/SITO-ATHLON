@@ -605,31 +605,54 @@ export const GET: APIRoute = async () => {
            Le due righe sono **derivate** dai due piani e da `WATER_ACTIVITIES`:
            un'attività spostata fra Smart e Premium le riscrive da sé, mentre
            una frase scritta a mano resterebbe indietro nel posto da cui la chat
-           risponde. Sul Premium l'elenco delle escluse e' vuoto — e' il
-           soprainsieme — quindi le righe non compaiono. */
+           risponde.
+
+           **La riga dell'acqua la scrivono tutti e due i piani, e prima no.**
+           Il Premium è il soprainsieme, quindi non ha niente da escludere e
+           usciva da qui a mani vuote: la parola «acqua» finiva nella voce dello
+           Smart — il piano che l'acqua ce l'ha a metà — e non in quella del
+           piano che l'acqua ce l'ha tutta. Il contesto della chat si sceglie per
+           parole, e con quell'asimmetria «acqua» pescava lo Smart e lasciava
+           fuori il Premium: ed è così che l'08/09 il modello si è trovato davanti mezzo
+           listino e ha inventato l'altra metà (119 €/mese, 1.190 €/anno, 149 €
+           di Flex — nessuno dei tre esiste). Ed è anche il difetto letto da
+           fermo: a «quale abbonamento mi serve per l'acqua?» la voce che vince
+           per punteggio dev'essere quella del piano che risponde di sì.
+
+           Quindi chi non esclude niente in acqua dice **che cosa comprende**,
+           per esteso e con la stessa parola. La riga resta derivata: non c'è
+           nessun elenco scritto a mano né qui né là. */
         (() => {
-          const altro = plans.find((p) => p.id !== piano.id);
-          if (!altro) return '';
-          const escluse = altro.activities.filter((a) => !piano.activities.includes(a));
-          if (!escluse.length) return '';
           const acqua = WATER_ACTIVITIES.map((id) => ACTIVITY_LABEL[id]).filter(Boolean);
           const acquaComprese = piano.activities.filter((a) => acqua.includes(a));
+          const altro = plans.find((p) => p.id !== piano.id);
+          const escluse = altro ? altro.activities.filter((a) => !piano.activities.includes(a)) : [];
           const acquaEscluse = escluse.filter((a) => acqua.includes(a));
           // «nel Smart» e «con il Smart»: l'articolo lo decide il nome, non
           // la concatenazione.
           const art = (n: string) => (n === 'Smart' ? 'lo Smart' : `il ${n}`);
-          const righe = [
-            `**Questo piano NON comprende: ${escluse.join(', ')}** — sono nel ${altro.name}. ` +
-              `Non riassumerlo mai in una categoria («tutta l'acqua», «tutto il club», «tutti i corsi»): ` +
-              `vale l'elenco delle attività comprese, voce per voce.`,
-          ];
-          if (acquaEscluse.length) {
+          const righe: string[] = [];
+          if (altro && escluse.length) {
+            righe.push(
+              `**Questo piano NON comprende: ${escluse.join(', ')}** — sono nel ${altro.name}. ` +
+                `Non riassumerlo mai in una categoria («tutta l'acqua», «tutto il club», «tutti i corsi»): ` +
+                `vale l'elenco delle attività comprese, voce per voce.`
+            );
+          }
+          if (acquaEscluse.length && altro) {
             righe.push(
               `**In acqua comprende ${acquaComprese.length ? `soltanto ${acquaComprese.join(', ')}` : 'nulla'}.** ` +
                 `${acquaEscluse.join(', ')} ${acquaEscluse.length > 1 ? 'sono' : 'e\''} nel ${altro.name}: ` +
                 `una lezione in vasca che non sia il nuoto libero — le lezioni di Aqua Fitness, la Scuola ` +
                 `Nuoto Adulti, il Corso Gestanti — con ${art(piano.name)} non si prenota. Quali siano quelle ` +
                 `lezioni lo dice la voce dell'attività, e va letta lì: un elenco ricopiato qui resterebbe indietro.`
+            );
+          } else if (acquaComprese.length) {
+            righe.push(
+              `**In acqua comprende ${acquaComprese.join(', ')}: tutta l'acqua del club.** ` +
+                `Nessuna attività in acqua resta fuori da questo piano — le lezioni di Aqua Fitness, la ` +
+                `Scuola Nuoto Adulti e il Corso Gestanti si prenotano con ${art(piano.name)}, oltre al nuoto ` +
+                `libero. Quali siano quelle lezioni lo dice la voce dell'attività, e va letta lì.`
             );
           }
           return righe.join('\n');
