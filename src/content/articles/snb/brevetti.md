@@ -1,14 +1,14 @@
 ---
 title: Brevetti
-description: Date, modalità e informazioni sulla sessione di brevetti di fine
-  stagione per la Scuola Nuoto e Baby Nuoto.
+description: La sessione di brevetti di fine stagione per Scuola Nuoto e Baby
+  Nuoto si tiene a giugno; le date verranno comunicate.
 area:
   - Scuola Nuoto Bambini
 order: 1
 tags:
   - brevetti
   - diploma
-  - maggio
+  - giugno
   - fine stagione
   - fotografi
   - libretto
@@ -17,19 +17,23 @@ attivita:
   - scuola-nuoto-bambini
 ---
 <div class="ci-hero">
-  🎓 Scuola Nuoto: 11–16 Maggio · Baby Nuoto: 16–17 Maggio · Fotografi presenti · Diploma e Libretto
+  🎓 A giugno, durante le lezioni · Date da comunicare · Fotografi presenti · Diploma e Libretto
 </div>
 
 Al termine della stagione sportiva, la Direzione Tecnica valuterà i progressi didattici dei piccoli atleti dei corsi **Monosettimanali** e **Bisettimanali**, direttamente durante il normale orario e giorno di lezione.
 
 - - -
 
-## Date da segnare in calendario
+## Quando si tengono
+
+I brevetti si svolgono durante il mese di **giugno**, nelle lezioni ordinarie: le
+**date esatte verranno comunicate**, e fino a quel momento non c'è un giorno da
+segnare in calendario.
 
 <details>
-<summary><strong>🏊 Scuola Nuoto — dal 11 al 16 Maggio 2026</strong></summary>
+<summary><strong>🏊 Scuola Nuoto — a giugno, nel giorno del turno</strong></summary>
 
-Le valutazioni si svolgeranno durante le lezioni ordinarie nella settimana dall'**11 al 16 Maggio 2026**, nel giorno e nell'orario abituali del corso.
+Le valutazioni si svolgono durante le lezioni ordinarie della settimana dei brevetti, nel giorno e nell'orario abituali del corso.
 
 * **Corsi Monosettimanali** — il brevetto si tiene nel **primo giorno di turno** della settimana dei brevetti.
 * **Corsi Bisettimanali** — il brevetto si tiene nel **primo giorno di turno** della settimana dei brevetti.
@@ -39,9 +43,9 @@ Le valutazioni si svolgeranno durante le lezioni ordinarie nella settimana dall'
 </details>
 
 <details>
-<summary><strong>👶 Baby Nuoto — 16 e 17 Maggio 2026</strong></summary>
+<summary><strong>👶 Baby Nuoto — a giugno, nelle giornate comunicate</strong></summary>
 
-Per i corsi Baby Nuoto le giornate dei brevetti sono il **16 e 17 Maggio 2026**, durante le lezioni ordinarie.
+Anche per i corsi Baby Nuoto i brevetti si tengono a giugno, durante le lezioni ordinarie, nelle giornate che verranno comunicate.
 
 </details>
 
@@ -91,7 +95,7 @@ I file digitali saranno conservati dallo studio per un massimo di 90 giorni. I d
 
 ## In caso di assenza
 
-In caso di assenza nel giorno previsto, il brevetto potrà essere sostenuto in un **normale turno di lezione assegnato**, entro e non oltre il **31 Maggio 2026**.
+In caso di assenza nel giorno previsto, il brevetto potrà essere sostenuto in un **normale turno di lezione assegnato**, entro il termine che verrà indicato insieme alle date.
 
 > Non è necessaria alcuna comunicazione.
 

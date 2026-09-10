@@ -197,7 +197,7 @@ Ogni livello di corso è associato a fasce di anno di nascita. Se tuo figlio è 
 
 ### Come si risolve
 
-[Apri una richiesta](/club-life#help-desk) indicando **2-3 turni di interesse**: il desk verifica e conferma l'inserimento.
+[Apri una richiesta](/club-life#help-desk) indicando **il turno di interesse**: il desk verifica e conferma l'inserimento.
 
 ---
 
