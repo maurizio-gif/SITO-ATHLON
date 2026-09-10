@@ -100,6 +100,45 @@ export const SOLO_COLLETTIVE = {
     'Il **personal training** non è la versione privata di un corso di nuoto: è un servizio **per adulti**, sulle attività in palestra, e non si tiene in acqua. A un genitore che chiede una lezione solo per suo figlio non si nomina.',
 } as const;
 
+/**
+ * I giorni e le ore dei turni della Scuola Nuoto Bambini: il perimetro come
+ * dato, perché sul sito quel dato non c'è.
+ *
+ * `junior.ts` pubblica gli orari di tre corsi per bambini su quattro — il Baby
+ * Nuoto («Sabato e domenica mattina», i quattro turni alle 9:30, 10:10, 10:50 e
+ * 11:30), la pallanuoto e il nuoto agonistico, che portano `orari` sulle loro
+ * stagioni. La Scuola Nuoto Bambini **no**, e non è una dimenticanza: i turni
+ * sono decine, divisi per fascia di nascita, cambiano di stagione, e quello che
+ * conta — quali hanno ancora posto — lo sa solo il portale.
+ *
+ * Il 10 settembre (esecuzione `1536279`) quella asimmetria ha prodotto il
+ * guasto esatto che ci si aspetta da due dati veri messi vicino. Una madre
+ * arrivata da un annuncio, sulla pagina della Scuola Nuoto Bambini, con l'anno
+ * del figlio già nel modulo (2023): *«Vorrei sapere su corsi di nuoto bambini 3
+ * anni di sabato mattina»*. Risposta: **«Perfetto, il sabato mattina è un
+ * orario molto richiesto per i corsi di nuoto»** — e il sabato mattina, per
+ * questo corso, non esiste. Il modello non ha inventato: ha preso il weekend
+ * dall'unico corso per bambini che ce l'ha scritto, il Baby Nuoto, e l'ha
+ * confermato a una famiglia che si sarebbe organizzata su quell'orario.
+ *
+ * Da qui la regola, che è del club e non una prudenza: **un giorno o un'ora dei
+ * turni non si afferma e non si smentisce.** Si chiede l'anno di nascita, si dà
+ * il link della sua fascia, e i turni con giorno, ora e posti liberi li legge
+ * lì. Il divieto vale nei due versi perché anche «il sabato non c'è» è una
+ * risposta su un giorno, e la sola cosa vera che possiamo dire è dove si guarda.
+ */
+export const TURNI_SNB = {
+  /** Il fatto: dove sta il dato, e dove non sta. */
+  testo:
+    '**Giorno e ora dei singoli turni non sono scritti da nessuna parte sul sito.** Il sito dice che i turni sono divisi per fascia di anno di nascita e che dentro lo stesso orario ci sono più gruppi per livello, e finisce lì: in quali giorni e a che ora ricorra il turno di una fascia lo dice **solo** il link di quella fascia sul portale, che elenca i turni con ancora posto libero.',
+  /** La conseguenza, che nessun elenco di orari può contenere. */
+  vietato:
+    '**Quindi un giorno o un’ora non si affermano e non si smentiscono, mai**: né «sì, il sabato mattina c’è», né «il sabato non c’è», né «di solito sono al pomeriggio», né «è un orario molto richiesto». A chi chiede di un giorno preciso si risponde con l’**anno di nascita**: con l’anno si dà il link della sua fascia, e lì vede i turni disponibili con giorno, ora e posti che restano. Confermare un giorno che poi in elenco non c’è è una famiglia che si organizza su un orario che non esiste.',
+  /** Da dove arriva il weekend, e perché non è di questo corso. */
+  babyNuoto:
+    '**E i turni del sabato e della domenica mattina che il sito pubblica sono del Baby Nuoto** (nati nel 2024, 2025 e 2026): è l’unico corso per bambini che ha gli orari scritti, e quei quattro turni non valgono per la Scuola Nuoto Bambini. Non prenderli da lì per rispondere su questo corso.',
+} as const;
+
 const U = '/wp-content/uploads';
 
 /**
@@ -655,6 +694,14 @@ export const JUNIOR: CorsoJunior[] = [
       {
         q: 'Come sono suddivisi i corsi di nuoto per bambini?',
         a: 'I corsi sono suddivisi per fascia d’età. All’interno dello stesso orario sono presenti più corsi: durante la stagione i bambini vengono assegnati al corso più adatto alla loro progressione didattica.',
+      },
+      /* La domanda del 10/09, con le parole con cui è arrivata: «corsi di nuoto
+         bambini 3 anni di sabato mattina». La chat ha confermato il sabato, che
+         qui non esiste, prendendolo dai turni del Baby Nuoto. Vedi `TURNI_SNB`:
+         il giorno e l'ora non li diciamo noi, li mostra il portale per fascia. */
+      {
+        q: 'In quali giorni e a che ora sono i turni?',
+        a: 'Dipende dalla fascia d’età, e l’elenco vero è quello del portale: scegli l’anno di nascita di tuo figlio nella <a href="/wikiathlon/snb/preiscrizioni-nuoto/#fasce-eta">pagina dell’iscrizione</a> e vedi i turni della sua fascia che hanno <strong>ancora posto</strong>, con giorno e ora di ognuno. Sul sito non li elenchiamo di proposito: sono decine, cambiano di stagione, e quello che ti serve sapere — quali sono ancora liberi — è scritto solo lì.',
       },
       {
         q: 'Dove posso attendere mio figlio durante il corso?',

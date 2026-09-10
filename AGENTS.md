@@ -2084,6 +2084,94 @@ desk ha già risposto per email a qualcuno. La verifica incrociata era lì
 accanto — il corso gestanti che quella mamma nominava è nel palinsesto al sabato
 alle 11:00–11:50, esattamente come glielo aveva scritto il desk.
 
+#### E quelli della Scuola Nuoto non sono pubblici: un giorno non si conferma
+
+Le due sezioni sono l'una il rovescio dell'altra, e il 10 settembre — lo stesso
+giorno in cui i quattro turni del Baby Nuoto sono stati pubblicati — quel
+rovescio ha morso. Una madre arrivata da un annuncio (`utm_term: palestra
+athlon`), sulla pagina della Scuola Nuoto Bambini, con l'anno del figlio già nel
+modulo: *«Vorrei sapere su corsi di nuoto bambini 3 anni di sabato mattina»*.
+
+> **Perfetto, il sabato mattina è un orario molto richiesto per i corsi di
+> nuoto.** Tuo figlio è nato nel 2023?
+
+Per la Scuola Nuoto Bambini il **sabato mattina non esiste**, e quella frase è
+una famiglia che si organizza su un orario che in elenco non troverà.
+
+**Il modello non ha inventato: ha preso il weekend dal corso accanto.** Dei
+quattro corsi per bambini, **tre hanno gli orari scritti sul sito** — il Baby
+Nuoto («Sabato e domenica mattina», più i quattro turni della sezione qui
+sopra), la pallanuoto e il nuoto agonistico, che portano `orari` sulle loro
+stagioni — e la Scuola Nuoto Bambini **no**. È la meccanica di sempre, e questa
+volta l'asimmetria l'avevamo appena creata noi: *due dati veri messi uno accanto
+all'altro sono un contesto da cui si compone il terzo che non esiste*, e qui il
+terzo era il sabato di un corso che il sabato non lo fa.
+
+**La regola del club è che un giorno non si conferma e non si smentisce.** Né
+«sì, il sabato mattina c'è» né «il sabato non c'è»: la sola cosa vera che
+possiamo dire è **dove si guarda** — si chiede l'anno di nascita, si dà il link
+di quella fascia, e i turni con giorno, ora e posti liberi li legge lì. Il
+divieto vale nei due versi perché anche la smentita è una risposta su un giorno,
+e i turni cambiano di stagione mentre una frase in chat resta.
+
+Quindi il dato e l'esecuzione, come sempre in coppia:
+
+- **`TURNI_SNB`** (`data/junior.ts`) è il perimetro come dato, in tre righe che
+  la voce del corso stampa: dove sta il dato (solo il portale, per fascia), il
+  divieto con le quattro forme vietate per nome, e **da dove arriva il
+  weekend** — «i turni del sabato e della domenica che il sito pubblica sono del
+  Baby Nuoto, non prenderli da lì». La riga arriva sulla **sola** Scuola Nuoto
+  Bambini, e il perimetro è ciò che la rende giusta: sugli altri tre un giorno
+  si dice come sta scritto.
+- **La f.a.q. «In quali giorni e a che ora sono i turni?»** sulla pagina del
+  corso, che è la domanda arrivata in chat. Dice anche perché il sito non li
+  elenca: sono decine, cambiano di stagione, e quello che serve sapere — quali
+  sono ancora liberi — è scritto solo sul portale.
+- **Il controllo (8) di `Correggi anno gia' noto`**, che è quello che rende la
+  regola una regola: toglie la frase che afferma un giorno o un'ora e ci mette
+  la riga giusta. Con l'anno noto nomina il pulsante che il controllo (4)
+  aggiunge subito sotto; senza l'anno chiede l'anno, che è il solo dato che
+  manca.
+
+Tre cose da sapere prima di toccarlo.
+
+**Il cancello guarda il corso, non l'anno, e la prova l'ha corretto una volta.**
+Con il solo `giusto === 'snb'` un bambino del 2015 che fa **pallanuoto** cadeva
+dentro — quell'anno è nella fascia della Scuola Nuoto — e il controllo
+cancellava «il martedì e il sabato dalle 14:30 alle 16:00», che è un dato
+pubblicato e la risposta giusta. Ora i tre corsi con gli orari scritti escono
+**per nome** (`ALTRI_JUNIOR`, più `NOMINA_ALTRI` sulla domanda). Il perimetro
+non è l'anno di nascita: è quale corso ha gli orari sul sito.
+
+**Il taglio è la frase, non le parole**, come nei controlli (1) e (7): «il sabato
+mattina è un orario molto richiesto» tagliata a metà lascerebbe un moncone. E la
+riga si **aggiunge** invece di sostituire tutto, così quello che la risposta
+diceva di buono resta.
+
+**E `GIORNO_ORA` non contiene la parola «giorno».** Deve prendere i nomi dei
+giorni, il weekend, le parti della giornata e un'ora sull'orologio — non la
+frase legittima «il turno è fisso: **giorno** e ora si scelgono
+all'iscrizione», che è la risposta giusta a un'altra domanda. Provato su otto
+casi, i quattro che non deve toccare compresi: il Baby Nuoto coi suoi quattro
+turni, la pallanuoto coi suoi orari, il turno fisso, e i recuperi «entro il 31
+maggio».
+
+**E nello stesso turno c'era un secondo difetto, di un'altra regola.** La
+risposta chiudeva con «Tuo figlio è nato nel 2023?» — l'anno era nel modulo
+(`2023-10-14`), quindi è la domanda che il controllo (1) esiste per togliere, e
+non l'ha tolta: `CHIEDE_ANNO` cercava le parole della domanda *aperta* («che
+anno», «quando è nato»), e questa è la **conferma** di un anno che già
+sappiamo — la forma che il commento di `Componi contesto` dichiara vietata da
+sempre («*«è nata nel 2018, giusto?» è comunque una domanda, ed è lo stesso
+errore scritto meglio*»). La chiude `CONFERMA_ANNO`, che pretende il punto
+interrogativo: senza, la stessa frase è l'affermazione legittima del controllo
+(2) — «con il 2023 che ho dal modulo il corso è la Scuola Nuoto Bambini».
+
+Per verificare: il nodo si esegue fuori da n8n con l'item di `Normalizza` di
+quell'esecuzione (`1536279`) e la risposta vera. La spia è `corretto`, che su
+quel turno deve dire `domanda-anno-noto+giorno-turno-snb+turno-aggiunto` — le
+tre correzioni in fila — e la bolla che ne esce non nomina nessun giorno.
+
 ### Un pulsante promesso e un `fonti` vuoto sono due cose diverse, e solo il modello le confonde
 
 Il 1° settembre, a una madre che aveva già confermato l'anno (2013) del figlio,

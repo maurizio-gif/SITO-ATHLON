@@ -26,7 +26,7 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { CORSI, type Corso } from '../data/corsi';
 import { conNumeri } from '../data/servizi';
-import { JUNIOR, SOLO_COLLETTIVE, type CorsoJunior, type CorsoStagione } from '../data/junior';
+import { JUNIOR, SOLO_COLLETTIVE, TURNI_SNB, type CorsoJunior, type CorsoStagione } from '../data/junior';
 import { LISTA_ATTESA, dettaglioLezione } from '../data/regole';
 import { clausole, urlClausola, TERMINI_VERSIONE } from '../data/termini';
 import {
@@ -274,6 +274,16 @@ function testoJunior(c: CorsoJunior): string {
           `Il numero massimo di bambini per vasca non è superabile su richiesta, nemmeno in via eccezionale — dipende dalle norme di sicurezza e dal rapporto istruttore-allievi — e la risposta a «non c'è possibilità di essere inseriti?» e' quindi un altro turno, non una coda. **La lista d'attesa del club è quella delle lezioni che si prenotano** (i recuperi compresi) e non c'entra con l'iscrizione: non usare quella regola qui, e non nominare né il subentro né la notifica via email.`,
           `**E «${LISTA_ATTESA.messaggioPortale}» dice proprio questo**: quel turno è pieno. Non è un blocco sulla scheda, non è il certificato medico, non è un insoluto e non è un guasto del portale — non si diagnostica niente e non si manda al team per sbloccarlo, si sceglie un altro turno fra quelli che hanno posto.`
         )
+      : '',
+    /* **Un giorno o un'ora dei turni non si affermano e non si smentiscono.**
+       La riga arriva sulla sola Scuola Nuoto Bambini, e il perimetro è la cosa
+       che la rende giusta: gli altri tre corsi per bambini hanno gli orari
+       scritti (`orari` sulle loro stagioni), quindi là un giorno si dice come
+       sta. È qui che non c'è, ed è da qui che il 10/09 il modello ha preso il
+       weekend del Baby Nuoto per confermare un sabato che non esiste — due
+       dati veri messi vicino, di nuovo. Vedi `TURNI_SNB` in `data/junior.ts`. */
+    c.slug === 'scuola-nuoto-bambini'
+      ? blocchi(TURNI_SNB.testo, TURNI_SNB.vietato, TURNI_SNB.babyNuoto)
       : '',
     (c.corsi ?? []).map(testoStagione).join('\n\n'),
     (c.spazi ?? []).map((s) => blocchi(pulito(s.nome), pulito(s.testo))).join('\n\n')
