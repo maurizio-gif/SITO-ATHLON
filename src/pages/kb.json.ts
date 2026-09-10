@@ -875,7 +875,7 @@ export const GET: APIRoute = async () => {
     testo: blocchi(
       `**Vale per ${SOSPENSIONE.junior.valePer.join(', ')}**, e solo per quelli. Per gli abbonamenti degli adulti e per il Baby Nuoto vedi la voce «Sospendere l'abbonamento: adulti e Baby Nuoto» — sono regole diverse, e i numeri non si scambiano.`,
       `**La sospensione a pagamento qui non esiste**: non proporla e non dire i ${SOSPENSIONE.prezzo} €, che sono degli adulti.`,
-      `Quello che c'e' e' la sospensione **gratuita per inidoneita' documentata di almeno ${SOSPENSIONE.junior.giorni} giorni continuativi**: certificato medico (struttura pubblica o privata) con l'inidoneita' e il termine espliciti, mandato al desk, e la sospensione decorre dalla **data del certificato**, non dal giorno in cui la documentazione arriva.`,
+      `Quello che c'e' e' la sospensione **gratuita per inidoneita' documentata di almeno ${SOSPENSIONE.junior.giorni} giorni continuativi**: certificato medico (struttura pubblica o privata) con l'inidoneita' e il termine espliciti, mandato al desk, e la sospensione si concede **solo a partire dalla data in cui la documentazione arriva**, non dalla data del certificato.`,
       `Due cose che qui sono diverse dagli adulti, e sono quelle che si sbagliano: durante la sospensione **la quota mensile resta dovuta**, e il ristoro e' un **credito pari ad almeno ${SOSPENSIONE.junior.creditoMensilita} mensilita' pagate, da usare entro ${SOSPENSIONE.junior.creditoEntroMesi} mesi dalla fine del corso**, non trasferibile.`,
       `La sospensione e' **alternativa al recupero delle lezioni** e non cumulabile con esso: per un'assenza di qualche lezione la strada e' quella dei recuperi, non questa.`
     ),

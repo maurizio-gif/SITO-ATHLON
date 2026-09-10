@@ -43,7 +43,7 @@ In caso di malattia o infortunio con **inidoneità documentata per almeno 60 gio
 2. Invialo a **[desk@athlonroma.it](mailto:desk@athlonroma.it)** con la richiesta di sospensione
 3. Attendi la conferma via email
 
-> La sospensione **decorre dalla data del certificato**, non dal giorno in cui ci arriva la documentazione.
+> La sospensione **potrà essere concessa esclusivamente a partire dalla data di ricezione della documentazione**, non dalla data del certificato né dal giorno in cui l'assenza è cominciata.
 
 ## Il credito, e i suoi limiti
 
