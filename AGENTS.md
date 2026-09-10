@@ -4324,6 +4324,50 @@ vuoto, e `sessionStorage` avere le sole due chiavi dell'attribuzione
 (`athlon_utm`, `athlon_sid`): non è un dato di una persona, ed è la ragione per
 cui la regola «niente nella sessione» è rispettata pur con due chiavi in mezzo.
 
+### E un appuntamento telefonico non è una richiesta dal sito
+
+Il calendario del desk chiama **due** webhook: `athlon-contatto-compilato`, che
+crea il lead su PerfectGym e scrive la riga come ogni altro form, e
+`athlon-appuntamento`, che manda le due email della prenotazione — la conferma a
+chi ha prenotato e l'avviso al desk con giorno, ora e oggetto. Il primo però
+mandava anche la **sua** email al desk, e quella email era il difetto: intestata
+«RICHIESTA DAL SITO», con `IL BAMBINO —`, `AREA —`, `ATTIVITÀ —`, `GRUPPO —`,
+perché **dal calendario non si scelgono né l'area, né l'attività, né un
+bambino**. Il desk riceveva due avvisi per la stessa telefonata, e il secondo
+era una colonna di trattini.
+
+Ora `tipoRichiestaVista === 'appuntamento'` spegne le **notifiche** e lascia i
+**dati**, che è esattamente la scelta già fatta per il tour al totem:
+
+- **`Componi Email Desk` fa `return []`**, accanto a quello del tour e con la
+  stessa forma — la condizione sta vicino al testo che governa, non in un ramo
+  del canvas;
+- **`C'e' un'Email da Mandare?`** esclude l'appuntamento: la conferma la manda
+  `athlon-appuntamento`, e senza questa condizione **un iscritto** che prenota
+  una chiamata riceveva anche la «presa in carico» del ramo assistenza, cioè due
+  email per un gesto solo. Qui la guardia sta nel filtro e non dentro
+  `Componi Email Utente`: quel nodo è ventidue kilobyte di HTML, e riscriverlo
+  per una riga è il tipo di modifica che si porta dietro un errore di
+  trascrizione che nessun test vede;
+- **`Solo Nuovi Junior`** prende la quinta condizione, come l'aveva presa per il
+  tour: un genitore che prenota una chiamata non deve ricevere il WhatsApp delle
+  modalità d'iscrizione.
+
+Due cose da sapere prima di toccarlo.
+
+**Il lead su PerfectGym e le due righe restano, e non è una dimenticanza.** Chi
+prenota una chiamata da `/prenota-chiamata` può essere una persona nuova: senza
+quella chiamata resterebbe in Agenda e in nessun archivio, quindi la riga su
+`richieste_contatto` (che è anche ciò che la aggancia a `utenti`) e quella su
+Airtable si scrivono come sempre. La regola è quella del tour: *un'email che
+annuncia una cosa già visibile è rumore; una riga in una tabella è un dato.*
+
+**Si guarda `tipoRichiestaVista` e non `tipoRichiesta`.** Il secondo lo
+**ricalcola** `Normalizza e Componi Email` da `statoNucleo` e vale solo
+`assistenza` o `informazioni`: la domanda qui non è «che tipo di richiesta è» ma
+«da quale modulo arriva», e quella risposta la porta solo ciò che ha dichiarato
+il browser. È la stessa distinzione con cui il tour si riconosce.
+
 ## Il form dell'assistenza chiede poco, e il resto lo va a prendere
 
 Il form dell'Help Desk — `components/clublife/SupportForm.astro`, dentro
