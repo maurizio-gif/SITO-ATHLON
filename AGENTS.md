@@ -1952,11 +1952,17 @@ arrivano insieme sulla pagina (il riquadro «Orari» di `PaginaJunior`) e nel
 
 Quattro cose da sapere prima di toccarli.
 
-**Quello che resta non pubblicato è l'abbinamento fascia → turno**, e la riga
-che lo dice ha preso il posto di quella vecchia: «quale dei quattro turni della
-mattina è quello della sua fascia d'età si vede prenotando». È la stessa forma
-di sempre — il perimetro dentro il dato — e chiude la composizione che il
-commento vecchio temeva, senza costare l'orario.
+**La riga «Orari» dei dettagli non è stata riscritta, è stata tolta.** La prima
+stesura di questa correzione ci aveva messo al suo posto «Il turno del tuo
+bambino: lo decide la sua fascia d'età, e si vede prenotando» — cioè teneva il
+perimetro dentro la scheda, che è la forma di sempre. Sulla pagina non
+funzionava: **i quattro turni stanno nel riquadro subito sotto**, quindi quella
+riga descriveva a parole il riquadro accanto a lei, e la prima cosa che un
+genitore leggeva della sezione «Orari» era ancora una frase su come *non* averli.
+Un perimetro si scrive dove la domanda si fa, e quella domanda — quale delle due
+fasce è la mia — si fa nella f.a.q. «I turni sono divisi per età o per livello?»,
+che infatti la porta. Vale in generale: *una riga che spiega dove trovare un dato
+che sta due centimetri più in basso è una riga che allontana il dato*.
 
 **Sono orari d'inizio e non intervalli.** Il club li dice così («si tengono alle
 9:30 e alle 10:50»), e i quattro sono distanti quaranta minuti l'uno dall'altro,

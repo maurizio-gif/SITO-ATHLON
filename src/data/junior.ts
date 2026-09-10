@@ -375,32 +375,30 @@ export const JUNIOR: CorsoJunior[] = [
           { l: 'Giorni', v: 'Sabato e domenica mattina' },
           { l: 'Gruppi', v: 'Due, divisi per età: fino ai 15 mesi e oltre i 15 mesi' },
           { l: 'Durata', v: '40 minuti, con un genitore in acqua' },
-          /* **Quale dei quattro turni sia il suo resta la sola cosa che si vede
-             prenotando**, ed è quel che resta della riga vecchia — che invece
-             teneva nascosti anche gli orari, «perché un elenco accanto alla
-             riga dei due gruppi è un elenco da cui si ricompone *tutti e due i
-             gruppi hanno questi orari*».
-
-             Il timore era giusto e la cura era sbagliata: il 10/9 una mamma
-             incinta ha chiesto in chat gli orari del sabato per non
-             sovrapporli al corso gestanti delle 11:00, l'assistente ha
-             risposto che «non sono pubblicati prima della prenotazione» — che
-             è quel che leggeva qui — e il desk gliel'ha detti per email
-             quindici minuti dopo. Un dato che il club dà a voce e per email è
-             un dato pubblico: nasconderlo sul sito non protegge da niente e
-             costa un contatto per volta. Quindi gli orari stanno in `orari`
-             qui sotto, e la composizione sbagliata la chiude questa riga, che
-             dice per esteso che la fascia la assegna il calendario.
-
-             E non fa un rimando in avanti ai «quattro turni qui sotto»: viene
-             stampata **prima** del riquadro degli orari, sulla pagina e nel
-             `kb.json`, quindi deve stare in piedi da sola. */
-          {
-            l: 'Il turno del tuo bambino',
-            v: 'Lo decide la sua fascia d’età, e si vede prenotando da app o dal portale, insieme ai posti che restano',
-          },
         ],
-        /* I quattro turni sono gli stessi il sabato e la domenica, e sono
+        /* **Gli orari si scrivono, e la riga «Orari» dei dettagli non c'è
+           più.** Diceva «l'orario di ciascun turno si vede prenotando», e per
+           un pezzo il timore che la giustificava era scritto qui: un elenco di
+           orari accanto alla riga dei due gruppi è un elenco da cui si
+           ricompone «tutti e due i gruppi hanno questi orari».
+
+           Il timore era giusto e la cura era sbagliata. Il 10/9 una mamma
+           incinta ha chiesto in chat gli orari del sabato per non sovrapporli
+           al corso gestanti delle 11:00, l'assistente ha risposto che «non
+           sono pubblicati prima della prenotazione» — che è quel che leggeva
+           qui — e il desk gliel'ha detti per email quindici minuti dopo. Un
+           dato che il club dà a voce e per email è un dato pubblico:
+           nasconderlo sul sito non protegge da niente e costa un contatto per
+           volta.
+
+           E non è rimasta nemmeno una riga a dire che la fascia la assegna il
+           calendario: **i turni stanno subito sotto**, quindi una riga che
+           spiega dove trovarli è una riga che descrive il riquadro accanto a
+           lei. La distinzione fra le due fasce, dove serve davvero, sta nella
+           f.a.q. «I turni sono divisi per età o per livello?» — che è il posto
+           in cui quella domanda si fa.
+
+           I quattro turni sono gli stessi il sabato e la domenica, e sono
            distanti quaranta minuti l'uno dall'altro — cioè esattamente la
            durata della lezione qui sopra. Sono gli orari d'inizio, che è come
            il club li dice a voce e per email («si tengono alle 9:30 e alle
