@@ -22,7 +22,6 @@ attivita: []
 
 - **Le mie prenotazioni** — visualizza i turni attivi
 - **Corsi/PT → Prenota** — prenota recuperi
-- **Prodotti** — acquista singole lezioni
 
 </details>
 
@@ -41,8 +40,6 @@ attivita: []
 - **Nucleo familiare** — gestisci tutta la famiglia da un unico account
 - **Edita profilo** — aggiorna dati e foto
 - **Documenti** — contratti firmati e ricevute
-
-> 💡 Per i minori di 12 anni l'email non è obbligatoria.
 
 </details>
 

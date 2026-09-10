@@ -15,7 +15,7 @@ attivita:
 
 Il turno della Scuola Nuoto Bambini è **fisso** — giorno e ora scelti all'iscrizione, per tutta la stagione — quindi il recupero è la sola lezione che si prenota: serve quando quella del proprio turno si perde.
 
-> ⚠️ Durante le **prime due settimane** di corso non sono previsti recuperi. L'assenza deve essere dichiarata in anticipo — senza disdetta non è possibile prenotare il recupero.
+> ⚠️ Durante la **prima settimana** di corso non sono previsti recuperi. L'assenza deve essere dichiarata in anticipo — senza disdetta non è possibile prenotare il recupero.
 
 ## Procedura
 
@@ -62,7 +62,7 @@ Se il corso di recupero è al completo puoi iscriverti in lista d'attesa. La lis
 - Recupero prenotabile solo con **abbonamento attivo** e pagamenti in regola
 - In caso di **disdetta del contratto** i recuperi vengono persi
 - I recuperi non possono essere prenotati **oltre la scadenza del corso**
-- La stagione termina il **31 maggio**: i recuperi vanno utilizzati entro quella data, non si trasferiscono all'anno successivo
+- La stagione termina il **20 giugno**: i recuperi vanno utilizzati entro quella data, non si trasferiscono all'anno successivo
 - Durante la **settimana dei Brevetti** non sono previsti recuperi
 
 Per verificare i recuperi disponibili: accedi al tuo account → **"Prodotti"**

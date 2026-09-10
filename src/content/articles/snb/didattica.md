@@ -10,14 +10,14 @@ attivita:
 ---
 
 <div class="ci-hero">
-  🎓 Progressione monitorabile in app · Brevetti a fine Maggio · Gruppi per età e livello
+  🎓 Progressione monitorabile in app · Brevetti a giugno · Gruppi per età e livello
 </div>
 
 ## Organizzazione dei gruppi
 
 - Orari divisi per **età**
 - Nello stesso orario: **più corsi e più istruttori**
-- Istruttore assegnato definitivamente dopo **2 settimane** dall'inizio — prima non c'è un
+- Istruttore assegnato definitivamente dopo la **prima settimana** dall'inizio — prima non c'è un
   nome da sapere, e **non lo dice il calendario di prenotazione**: quello mostra chi tiene
   una lezione che si prenota, cioè le attività degli adulti e, qui, solo il recupero
 - Suddivisione per livello **direttamente in vasca**
@@ -39,7 +39,7 @@ Nel Portale → Profilo → **"Brevetti"** trovi:
 <details>
 <summary><strong>Quando si tengono i Brevetti?</strong></summary>
 
-A fine **Maggio** — evento conclusivo della stagione:
+Durante il mese di **giugno** — evento conclusivo della stagione. Le **date verranno comunicate**:
 
 - 🎓 **Diploma Finale** della Scuola Nuoto Athlon
 - 📖 **Libretto cartaceo** aggiornato

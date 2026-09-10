@@ -6,14 +6,13 @@ order: 7
 tags: ["cambio orario", "turno", "frequenza", "bisettimanale", "monosettimanale"]
 attivita:
   - scuola-nuoto-bambini
-  - baby-nuoto
 ---
 
 <div class="ci-hero">
   🔄 Cambio turno possibile nello stesso contratto · Contattaci via "Richiedi Assistenza"
 </div>
 
-> 📌 **Questa è la strada per i corsi dei bambini**, Scuola Nuoto e Baby Nuoto:
+> 📌 **Questa è la strada per la Scuola Nuoto Bambini**, dove il turno è fisso:
 > non si passa dal modulo di [cambio abbonamento](/wikiathlon/adulti/cambio-abbonamento/),
 > che è degli adulti, e non c'è nessun conteggio del credito residuo da
 > aspettare via email. Il cambio di **turno** lo fa la Segreteria dentro lo
@@ -34,10 +33,10 @@ Possibile all'interno dello stesso contratto (bisettimanale↔bisettimanale, mon
    - <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=12&vacancies=1" target="_blank" rel="noopener noreferrer">Nati 2019-20</a>
    - <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=13&vacancies=1" target="_blank" rel="noopener noreferrer">Nati 2016-17-18</a>
    - <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=14&vacancies=1" target="_blank" rel="noopener noreferrer">Nati 2013-14-15</a>
-2. Contattaci tramite **"Richiedi Assistenza"** indicando **2-3 turni di interesse** tra quelli disponibili
+2. Contattaci tramite **"Richiedi Assistenza"** indicando **il turno di interesse** tra quelli disponibili
 3. Se idoneo, il cambio viene effettuato dalla Segreteria
 
-> ℹ️ Il cambio **non è automatico**: indicare più di un turno evita un secondo giro di email se il primo si riempie nel frattempo. Attendi la conferma prima di considerarlo fatto.
+> ℹ️ Il cambio **non è automatico**: attendi la conferma prima di considerarlo fatto.
 
 </details>
 
