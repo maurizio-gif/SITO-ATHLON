@@ -1,7 +1,7 @@
 ---
-title: "Fermarsi durante la stagione: Scuola Nuoto e agonistica"
+title: "Sospensione abbonamento: Scuola Nuoto e Agonismo"
 seoTitle: "Sospensione corsi bambini · Athlon Club"
-description: "Come funziona la sospensione per i corsi in vasca dei bambini: non c'è quella a pagamento, c'è quella per inidoneità documentata, e il ristoro è un credito."
+description: "Come funziona la sospensione in caso di inidoneità certificata per i corsi in vasca dei bambini; prevista l'emissione di un credito."
 area: "Scuola Nuoto Bambini"
 order: 5
 tags:
@@ -43,7 +43,7 @@ In caso di malattia o infortunio con **inidoneità documentata per almeno 60 gio
 2. Invialo a **[desk@athlonroma.it](mailto:desk@athlonroma.it)** con la richiesta di sospensione
 3. Attendi la conferma via email
 
-> La sospensione **decorre dalla data in cui riceviamo la documentazione**, non dalla data del certificato né dal giorno in cui l'assenza è cominciata.
+> La sospensione **potrà essere concessa esclusivamente a partire dalla data di ricezione della documentazione**, non dalla data del certificato né dal giorno in cui l'assenza è cominciata.
 
 ## Il credito, e i suoi limiti
 

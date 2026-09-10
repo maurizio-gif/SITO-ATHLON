@@ -885,7 +885,7 @@ export const GET: APIRoute = async () => {
     area: 'Abbonamenti',
     attivita: [],
     testo: blocchi(
-      `**Vale per ${SOSPENSIONE.valePer}**, e solo per quelli. Per ${SOSPENSIONE.junior.valePer.join(', ')} le regole sono altre: vedi la voce «Fermarsi durante la stagione», e non usare i numeri di questa.`,
+      `**Vale per ${SOSPENSIONE.valePer}**, e solo per quelli. Per ${SOSPENSIONE.junior.valePer.join(', ')} le regole sono altre: vedi la voce «Sospensione abbonamento: ${SOSPENSIONE.junior.valePer.join(', ')}», e non usare i numeri di questa.`,
       `**A pagamento:** costa ${SOSPENSIONE.prezzo} € e vale un mese solare per volta, senza limite al numero di sospensioni. Si chiede dall'area riservata (Abbonamenti → Sospensioni) con ${SOSPENSIONE.preavviso} giorni di preavviso rispetto al mese da sospendere, e non e' retroattiva: non si sospende il mese in corso. Il tempo sospeso non si perde — la scadenza del contratto si sposta in avanti di pari durata.`,
       `**Per inabilita' fisica:** gratuita, per inidoneita' documentata di almeno ${SOSPENSIONE.inabilita.giorni} giorni continuativi. Serve un certificato di struttura sanitaria nazionale che dichiari l'inidoneita' all'attivita' sportiva e il termine del periodo, da mandare al desk; sotto i ${SOSPENSIONE.inabilita.recuperoMesiMinimo} mesi non si recupera niente, e non e' sovrapponibile ad altre sospensioni.`
     ),
@@ -894,14 +894,14 @@ export const GET: APIRoute = async () => {
   voci.push({
     id: 'abbonamento:sospensione-junior',
     tipo: 'abbonamento',
-    titolo: 'Fermarsi durante la stagione: Scuola Nuoto, Agonistico, Pallanuoto',
+    titolo: `Sospensione abbonamento: ${SOSPENSIONE.junior.valePer.join(', ')}`,
     url: `${SITE}${SOSPENSIONE.junior.scheda}`,
     area: 'Abbonamenti',
     attivita: [],
     testo: blocchi(
       `**Vale per ${SOSPENSIONE.junior.valePer.join(', ')}**, e solo per quelli. Per gli abbonamenti degli adulti e per il Baby Nuoto vedi la voce «Sospendere l'abbonamento: adulti e Baby Nuoto» — sono regole diverse, e i numeri non si scambiano.`,
       `**La sospensione a pagamento qui non esiste**: non proporla e non dire i ${SOSPENSIONE.prezzo} €, che sono degli adulti.`,
-      `Quello che c'e' e' la sospensione **gratuita per inidoneita' documentata di almeno ${SOSPENSIONE.junior.giorni} giorni continuativi**: certificato medico (struttura pubblica o privata) con l'inidoneita' e il termine espliciti, mandato al desk, e la sospensione decorre da quando la documentazione arriva.`,
+      `Quello che c'e' e' la sospensione **gratuita per inidoneita' documentata di almeno ${SOSPENSIONE.junior.giorni} giorni continuativi**: certificato medico (struttura pubblica o privata) con l'inidoneita' e il termine espliciti, mandato al desk, e la sospensione si concede **solo a partire dalla data in cui la documentazione arriva**, non dalla data del certificato.`,
       `Due cose che qui sono diverse dagli adulti, e sono quelle che si sbagliano: durante la sospensione **la quota mensile resta dovuta**, e il ristoro e' un **credito pari ad almeno ${SOSPENSIONE.junior.creditoMensilita} mensilita' pagate, da usare entro ${SOSPENSIONE.junior.creditoEntroMesi} mesi dalla fine del corso**, non trasferibile.`,
       `La sospensione e' **alternativa al recupero delle lezioni** e non cumulabile con esso: per un'assenza di qualche lezione la strada e' quella dei recuperi, non questa.`
     ),

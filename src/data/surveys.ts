@@ -300,9 +300,9 @@ export const SURVEYS: Survey[] = [
     intro: 'Scuola Nuoto, Baby Nuoto, agonistico: com’è per tuo figlio e per te.',
     /* Il Metodo Athlon è la promessa più dettagliata del sito, e ognuno dei
        suoi quattro pilastri qui è una domanda: il gruppo deciso in vasca e
-       l'istruttore assegnato dopo due settimane, il cambio di gruppo senza
+       l'istruttore assegnato dopo la prima settimana, il cambio di gruppo senza
        cambiare orario, i brevetti aggiornati **circa ogni due mesi** nel
-       proprio account, la sessione di fine maggio. Più il turno fisso e i
+       proprio account, la sessione di giugno. Più il turno fisso e i
        recuperi, che sono le due cose su cui il desk riceve più domande. */
     domande: [
       { id: 'istruttori', testo: 'Gli istruttori seguono i bambini con attenzione' },
