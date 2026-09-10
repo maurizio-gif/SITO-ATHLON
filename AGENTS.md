@@ -1918,6 +1918,73 @@ E l'orario **di apertura** del club — anche quello stagionale, come l'estivo d
 agosto — resta scritto nel testo e si cita come sta: quello non è una lezione e
 non cambia ogni settimana.
 
+#### E gli orari del Baby Nuoto sono pubblici: non si manda al portale per saperli
+
+Il 10 settembre una mamma incinta ha chiesto in chat gli orari dei turni del
+Baby Nuoto — le servivano per non sovrapporre il sabato del figlio al corso
+gestanti che voleva fare lei — e si è sentita rispondere tre volte che «gli
+orari esatti li vedi prenotando». Alla terza ha insistito («non c'è modo di
+saperlo prima?») ed è stata mandata a scrivere al team. **Quindici minuti dopo
+il desk gliel'ha detti per email**, in due righe.
+
+**Il modello non ha sbagliato: ha ricopiato il dato.** La riga «Orari» della
+scheda del corso diceva testualmente «l'orario di ciascun turno si vede
+prenotando, da app o dal portale», e lo stesso dicevano la f.a.q. dei turni e
+`generali/prenotazioni` — tre voci del `kb.json` che affermavano che un dato
+pubblico non fosse pubblicabile. Il commento nel codice spiegava anche perché:
+un elenco di orari accanto alla riga dei due gruppi è un elenco da cui si
+ricompone «tutti e due i gruppi hanno questi orari», che è la meccanica dei due
+fatti veri vicini già scritta dieci volte in questo file.
+
+**Il timore era giusto e la cura era sbagliata**, ed è la lezione che vale oltre
+questo caso: *quando il rischio è che due dati vicini si ricompongano male, la
+risposta è dire il secondo dato, non nascondere il primo.* Nascondendo l'orario
+non si è evitata l'associazione sbagliata — si è tolta alla persona l'unica
+informazione che le serviva per decidere, e la si è mandata a chiederla a una
+casella. Un dato che il club dà a voce al desk e per email è un dato pubblico:
+tenerlo fuori dal sito non protegge da niente e costa un contatto per volta.
+
+Adesso i quattro turni — **9:30, 10:10, 10:50 e 11:30**, gli stessi il sabato e
+la domenica — stanno in `orari` sulla stagione del Baby Nuoto in `junior.ts`,
+cioè nello stesso campo che pallanuoto e nuoto agonistico usavano già. Da lì
+arrivano insieme sulla pagina (il riquadro «Orari» di `PaginaJunior`) e nel
+`kb.json` (`testoStagione` li stampa), senza nessun elenco ricopiato.
+
+Quattro cose da sapere prima di toccarli.
+
+**La riga «Orari» dei dettagli non è stata riscritta, è stata tolta.** La prima
+stesura di questa correzione ci aveva messo al suo posto «Il turno del tuo
+bambino: lo decide la sua fascia d'età, e si vede prenotando» — cioè teneva il
+perimetro dentro la scheda, che è la forma di sempre. Sulla pagina non
+funzionava: **i quattro turni stanno nel riquadro subito sotto**, quindi quella
+riga descriveva a parole il riquadro accanto a lei, e la prima cosa che un
+genitore leggeva della sezione «Orari» era ancora una frase su come *non* averli.
+Un perimetro si scrive dove la domanda si fa, e quella domanda — quale delle due
+fasce è la mia — si fa nella f.a.q. «I turni sono divisi per età o per livello?»,
+che infatti la porta. Vale in generale: *una riga che spiega dove trovare un dato
+che sta due centimetri più in basso è una riga che allontana il dato*.
+
+**Sono orari d'inizio e non intervalli.** Il club li dice così («si tengono alle
+9:30 e alle 10:50»), e i quattro sono distanti quaranta minuti l'uno dall'altro,
+cioè esattamente la durata della lezione dichiarata due righe sopra. Scriverli
+come intervalli vorrebbe dire *dedurre* la fine da una durata: se un turno
+finisse cinque minuti prima per il cambio, avremmo pubblicato un dato che
+nessuno ha mai dichiarato.
+
+**Il Baby Nuoto non è nel palinsesto, e non è una dimenticanza da sanare qui.**
+`planning-corrente.json` ha cinque fasce, tutte adulti, e **nessuna colonna
+della domenica** — l'unica cosa domenicale è il Nuoto Libero, infilato nella
+cella del sabato come «Dom 09:30–12:30». Mettercelo vorrebbe dire prima
+aggiungere il giorno alla tabella; finché non c'è, `junior.ts` è la casa giusta,
+ed è la stessa degli altri tre corsi junior.
+
+**E il dato si è ritrovato nella casella del desk, non nel repository.** Vale la
+pena scriverlo perché sarà di nuovo così: quando il club dice «quel dato è
+pubblico, sta sul sito» e sul sito non c'è, la fonte da guardare è quello che il
+desk ha già risposto per email a qualcuno. La verifica incrociata era lì
+accanto — il corso gestanti che quella mamma nominava è nel palinsesto al sabato
+alle 11:00–11:50, esattamente come glielo aveva scritto il desk.
+
 ### Un pulsante promesso e un `fonti` vuoto sono due cose diverse, e solo il modello le confonde
 
 Il 1° settembre, a una madre che aveva già confermato l'anno (2013) del figlio,
