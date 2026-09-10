@@ -1,6 +1,7 @@
 /* I tre corsi a turno fisso li elenca `JUNIOR_MENSILE`, che è già la loro
    sorgente: vedi `LISTA_ATTESA` in fondo. */
 import { JUNIOR_MENSILE } from './abbonamenti';
+import { CALENDARIO_PORTALE } from './cta';
 
 /**
  * Le regole del club in numeri: i fatti che il sito ripete in più punti.
@@ -187,3 +188,72 @@ export const perimetroListaAttesa = () =>
   `**La lista d'attesa è delle prenotazioni, non delle iscrizioni.** Vale per ${LISTA_ATTESA.valePer}. ` +
   `**Per iscriversi a un turno di ${LISTA_ATTESA.nonValePer.join(', ')} non esiste nessuna lista d'attesa.** ` +
   LISTA_ATTESA.turnoPieno;
+
+/**
+ * Il dettaglio di una singola lezione: chi la tiene, quanti posti restano e —
+ * dove i livelli esistono — di quale livello è quel turno.
+ *
+ * **Nessuna delle tre cose sta sul sito**, ed è un fatto sui dati e non una
+ * scelta editoriale: `planning-corrente.json` porta per ogni lezione l'orario,
+ * il nome e la sala, e nient'altro. Il nome dell'istruttore non c'è né sul
+ * planning né sulla pagina del corso, la capienza residua nemmeno, e i quindici
+ * turni della Scuola Nuoto Adulti sono quindici righe identiche — «Scuola
+ * Nuoto», Vasca Grande — senza il livello accanto.
+ *
+ * Il 10 settembre (esecuzione 1536674) una persona sulla pagina della Scuola
+ * Nuoto Adulti ha chiesto tre volte quali orari fossero del suo livello, e alla
+ * terza si è sentita rispondere *«No, purtroppo quella informazione non ce
+ * l'ho — il sito non specifica quale orario corrisponde a quale livello»* e
+ * mandare a scrivere al team. La prima metà era vera, la seconda era il guasto:
+ * quel dato **esiste**, si vede nel calendario delle prenotazioni del portale,
+ * e la risposta era un link invece di un'attesa. Il campo `fonti` di quel turno
+ * era vuoto.
+ *
+ * La regola 2bis della chat aveva già il calendario come «posto (3)», ma
+ * elencava due dati soli — chi tiene la lezione, quanti posti restano — e il
+ * livello non era fra loro: un perimetro che non nomina il caso è un perimetro
+ * che il caso non incontra, ed è la stessa lezione scritta dieci volte in
+ * questo repository. Quindi il dato sta qui, e da qui lo leggono la scheda
+ * delle prenotazioni, le voci del `kb.json` e la f.a.q. del corso.
+ *
+ * **Vale per le attività degli adulti e non per i corsi dei bambini**: là il
+ * turno è fisso, l'istruttore lo assegna il Direttore Tecnico dopo le prime due
+ * settimane e il calendario di prenotazione non decide niente — mandarci un
+ * genitore è la finestra dei tre giorni allargata alla Scuola Nuoto, cioè
+ * l'errore già scritto due volte.
+ */
+export const DETTAGLIO_LEZIONE = {
+  /** Dove sta il dato. Il titolo è quello che la chat dà già a questo url. */
+  url: CALENDARIO_PORTALE,
+  titolo: 'Calendario e posti liberi',
+  /**
+   * Le attività degli adulti divise per livello: oggi la Scuola Nuoto Adulti e
+   * nessun'altra. Il Nuoto Libero **non** è qui: là le corsie sono divise per
+   * ritmo, la corsia non si sceglie prenotando e a bordo vasca la assegna
+   * l'Assistente Bagnanti — dirlo un livello prenotabile sarebbe un dato falso.
+   */
+  conLivelli: ['scuola-nuoto-adulti'],
+} as const;
+
+/**
+ * «Il dettaglio della lezione sta nel calendario del portale», per esteso.
+ *
+ * `attivita` è l'id della fascia o del corso: serve solo a decidere se
+ * aggiungere la riga sul livello, che è vera per la sola Scuola Nuoto Adulti.
+ * La riga `FONTE:` fa dell'indirizzo un url reale del contesto, come in
+ * `turniScuolaNuoto()`: da lì la chat lo può citare fra le fonti, dove diventa
+ * un pulsante, invece di scriverlo in prosa dove resta testo da ricopiare.
+ */
+export const dettaglioLezione = (attivita?: string) => {
+  const livelli = !!attivita && DETTAGLIO_LEZIONE.conLivelli.includes(attivita as 'scuola-nuoto-adulti');
+  return [
+    "**Il dettaglio di una singola lezione sta nel calendario delle prenotazioni del portale, e solo lì.** Il sito porta il palinsesto — giorno, ora, sala — mentre **il nome dell'istruttore e i posti che restano non sono scritti da nessuna parte**, né qui né sul planning: il calendario del portale li mostra dal vivo, lezione per lezione, e si apre con il proprio account.",
+    livelli
+      ? "**E quale turno è di quale livello lo dice lo stesso calendario.** Gli orari elencati qui sono il palinsesto completo della Scuola Nuoto Adulti: non dicono quale turno è Base, quale Intermedio e quale Avanzato, e il sito quel dato non lo ha. Sta nel calendario del portale, accanto all'istruttore e ai posti liberi."
+      : '',
+    "Chi chiede uno di questi dati va mandato **là**: è il posto in cui esistono, e non è una cosa da far chiedere al team né una cosa che non abbiamo.",
+    `FONTE: ${DETTAGLIO_LEZIONE.url}`,
+  ]
+    .filter(Boolean)
+    .join('\n\n');
+};

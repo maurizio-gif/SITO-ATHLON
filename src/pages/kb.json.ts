@@ -27,7 +27,7 @@ import { getCollection } from 'astro:content';
 import { CORSI, type Corso } from '../data/corsi';
 import { conNumeri } from '../data/servizi';
 import { JUNIOR, SOLO_COLLETTIVE, type CorsoJunior, type CorsoStagione } from '../data/junior';
-import { LISTA_ATTESA } from '../data/regole';
+import { LISTA_ATTESA, dettaglioLezione } from '../data/regole';
 import { clausole, urlClausola, TERMINI_VERSIONE } from '../data/termini';
 import {
   bands,
@@ -189,7 +189,15 @@ function testoCorso(c: Corso): string {
     c.punti?.length && c.punti.map((x) => blocchi(x.titolo && pulito(x.titolo), pulito(x.testo))).join('\n\n'),
     c.attrezzatura && `Cosa serve portare: ${pulito(c.attrezzatura)}`,
     c.singola && `Lezione singola: ${pulito(c.singola.prezzo)} — ${pulito(c.singola.testo)}`,
-    c.lezioni.length && `In palinsesto come: ${c.lezioni.join(', ')}.`
+    c.lezioni.length && `In palinsesto come: ${c.lezioni.join(', ')}.`,
+    /* **Chi tiene la lezione, che livello è, quanti posti restano: nel
+       calendario del portale.** La riga arriva su *ogni* attività per adulti e
+       non solo sulla Scuola Nuoto, perché la domanda non nomina il corso — la
+       fa chi sta guardando la pagina che ha davanti, ed è la stessa spazzata
+       già scritta per `SOLO_COLLETTIVE`. Il testo sta in `dettaglioLezione()`
+       (`data/regole.ts`) perché lo dicono anche le voci del palinsesto,
+       dall'altro lato della stessa domanda. */
+    dettaglioLezione(c.banda ?? c.slug)
   );
 }
 
@@ -439,7 +447,15 @@ export const GET: APIRoute = async () => {
               `${d.full}: ` +
               d.classes.map((l) => `${l.time} ${l.name}${l.sala ? ` (${l.sala})` : ''}`).join(' · ')
           )
-          .join('\n')
+          .join('\n'),
+        /* **Ed è la voce da cui la domanda si fa.** Questo elenco è il
+           palinsesto e nient'altro: quindici righe «Scuola Nuoto · Vasca
+           Grande» senza il livello, senza l'istruttore e senza i posti. Un
+           elenco così, letto da solo, è un contesto da cui si compone «allora
+           quegli orari sono tutti del mio livello» — oppure, come il 10/09, un
+           «quel dato non ce l'ho». Le cinque fasce del planning sono tutte
+           degli adulti, quindi la riga può arrivare su tutte per costruzione. */
+        dettaglioLezione(b.id)
       ),
     });
   }

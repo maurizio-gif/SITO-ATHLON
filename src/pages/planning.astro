@@ -44,6 +44,12 @@ const faqs = await faqPagina([
     a: `Sì, tutte le attività — ${[gymFloor.title, ...bands.map((b) => b.title)].join(', ')} — richiedono la prenotazione obbligatoria tramite app o portale web.`,
   },
   'prenotazione-come',
+  /* Sta subito dopo «come si prenota» perché è la stessa risposta vista dal
+     lato di chi guarda questa tabella: il palinsesto è qui, il dettaglio della
+     singola lezione — istruttore, posti, livello — sta nel calendario del
+     portale. Senza questa riga il planning è un elenco da cui si deduce quello
+     che non dice. */
+  'dettaglio-lezione',
   'disdetta-lezione',
   'prenotazioni-attive',
   'lista-attesa',

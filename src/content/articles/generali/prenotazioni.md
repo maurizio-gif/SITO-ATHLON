@@ -18,6 +18,9 @@ tags:
   - affluenza
   - corsie
   - nuoto libero
+  - istruttore
+  - livelli
+  - calendario
 attivita: []
 ---
 
@@ -38,6 +41,14 @@ La prenotazione non è un adempimento: è il filo che tiene aggiornati te e noi.
 - **In sala, ti dice quando c'è l'assistente.** Prenotando la Gym Floor scegli fra la fascia **Con Assistenza** — un assistente di sala che supervisiona l'attività, dà suggerimenti e aiuta a scegliere fra i trenta piani dell'app — e **Allenamento Libero**, dove l’assistente non c’è e ti alleni con il piano che hai già. L'assistenza in sala c'è: dall'app vedi in quali orari. Per essere seguito individualmente ci sono le sedute di [personal training](/personal-training/), a parte.
 
 > 📌 **Della Scuola Nuoto Bambini si prenotano i recuperi, non le lezioni.** Là il turno è fisso: giorno e ora si scelgono all'iscrizione e restano quelli per la stagione, e con il bisettimanale i turni fissi sono due — non si scelgono orari diversi di settimana in settimana. Il Baby Nuoto invece si prenota turno per turno, come le attività degli adulti: i turni sono il sabato e la domenica mattina alle **9:30, 10:10, 10:50 e 11:30**, divisi in **due gruppi per età** — fino ai 15 mesi e oltre i 15 mesi — e quale dei quattro sia quello della fascia di tuo figlio si vede prenotando, insieme ai posti che restano.
+
+### Il dettaglio di una lezione si vede prenotando
+
+Il [planning](/planning/) porta il palinsesto — giorno, ora, sala — e si apre senza account. **Chi tiene quella lezione, quanti posti restano e, per la Scuola Nuoto Adulti, di quale livello è quel turno** sul sito non ci sono: si vedono nel <a href="https://athlon.perfectgym.com/ClientPortal2/#/Classes/1/Calendar" target="_blank" rel="noopener noreferrer">calendario delle prenotazioni</a> del portale, che li mostra dal vivo lezione per lezione. Ci si entra col proprio account, ed è lo stesso posto da cui si prenota.
+
+Quindi «quali sono gli orari del mio livello?» ha una risposta, e non è il team: gli orari della Scuola Nuoto Adulti che il planning elenca sono il palinsesto completo del corso e non dicono quale turno è Base, quale Intermedio e quale Avanzato — quello lo dice il calendario del portale, accanto all'istruttore e ai posti liberi.
+
+> 📌 **Vale per le attività degli adulti.** Per la Scuola Nuoto Bambini, il Nuoto Agonistico e la Pallanuoto il turno è fisso e l'istruttore viene assegnato dopo le prime due settimane, guardando come nuota il bambino: là il calendario di prenotazione non decide niente, e l'interlocutore è la [Direzione Tecnica](/wikiathlon/snb/direzione-tecnica/).
 
 ## Regole principali
 

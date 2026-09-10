@@ -1879,7 +1879,7 @@ arriva:
 | --- | --- | --- |
 | una lezione o un corso **per nome** | la **pagina di quel corso** | lo racconta per intero, e la pagina porta i suoi orari |
 | gli orari in generale, un giorno, una fascia, **un periodo** | il **planning** | tiene tutto il palinsesto del mese e si apre senza account |
-| **chi la tiene questa settimana, quanti posti restano** | il **calendario del portale** | è il solo posto dove quel dato esiste |
+| **chi la tiene questa settimana, di che livello è quel turno, quanti posti restano** | il **calendario del portale** | è il solo posto dove quei dati esistono |
 
 Il link del planning **ci va sempre quando si parla di orari**, anche accanto a
 quello della pagina del corso: è il riferimento del club. E quando ne servono
@@ -1891,17 +1891,24 @@ login per una cosa che sta su una pagina aperta.
 una cosa che va sapendo guardata nei dati e non immaginata: `planning-corrente.json`
 porta per ogni lezione l'orario, il nome e la sala, **e nient'altro** — il nome
 dell'istruttore sul sito non c'è da nessuna parte, né sul planning né sulla pagina
-del corso, e la capienza rimasta nemmeno. Se la regola dicesse «per gli istruttori
+del corso, e la capienza rimasta nemmeno — e i quindici turni della Scuola Nuoto
+Adulti sono quindici righe identiche, «Scuola Nuoto» in Vasca Grande, senza il
+livello accanto. Se la regola dicesse «per gli istruttori
 manda al planning», manderebbe su una pagina che quel dato non ha.
 
 Tre cose da sapere prima di toccarlo.
 
-**Quell'indirizzo non è un'eccezione alla regola delle fonti, è già dentro la
-knowledge base.** Lo scrive la scheda `generali/prenotazioni`, che lo indica come
-il posto dove si vede il dato in tempo reale: il modello non se lo inventa, lo
-legge. La regola 3 lo nomina esplicitamente perché altrimenti la clausola «solo
-gli url delle righe FONTE» glielo farebbe scartare — un url scritto *dentro* il
-testo di una voce è reale quanto quello della sua FONTE.
+**Quell'indirizzo non è un'eccezione alla regola delle fonti, è dentro la
+knowledge base** — e da settembre lo è con una riga `FONTE:` sua su ogni voce
+delle attività per adulti, che è il modo in cui un url del contesto è
+verificabile. Prima lo scriveva soltanto la scheda `generali/prenotazioni`,
+dentro un `<a href>`: la scheda lo indica come il posto dove si vede il dato in
+tempo reale, ma `testoCompleto()` spoglia i tag, quindi nel `kb.json` restava il
+solo testo dell'ancora e nel contesto quell'indirizzo **non arrivava**. La
+regola 3 lo nominava comunque come deroga — e la deroga era l'unica cosa che
+teneva in piedi la citazione. Ora non serve: vedi «Il terzo posto ha tre dati»
+qui sotto. Resta vera la ragione per cui la deroga fu scritta — un url scritto
+*dentro* il testo di una voce è reale quanto quello della sua FONTE.
 
 **Va fra le `fonti`, non nel testo della bolla.** `chatAssistente.client.js`
 passa la risposta dall'escape e converte solo il `**grassetto**`: un indirizzo
@@ -1909,14 +1916,106 @@ scritto in prosa resta testo da ricopiare a mano, mentre `rimandi()` disegna le
 fonti come link che si aprono in una scheda nuova. È il solo posto della chat in
 cui un link è cliccabile, e quindi è il solo posto dove ha senso metterlo.
 
-**Capienze e nomi degli istruttori si nominano solo se li ha chiesti.** Il
-calendario li mostra tutti e due, ma metterli in vetrina a chi ha chiesto un
+**Capienze, nomi degli istruttori e livello del turno si nominano solo se li ha
+chiesti.** Il calendario li mostra tutti, ma metterli in vetrina a chi ha chiesto un
 orario è rispondere a una domanda che non ha fatto — la stessa regola per cui la
 lezione singola non si nomina «per completezza».
 
 E l'orario **di apertura** del club — anche quello stagionale, come l'estivo di
 agosto — resta scritto nel testo e si cita come sta: quello non è una lezione e
 non cambia ogni settimana.
+
+#### Il terzo posto ha tre dati, non due: il livello era il buco
+
+Quel gradino elencava «chi la tiene questa settimana, quanti posti restano», e
+il 10 settembre (esecuzione `1536674`) ha mostrato il dato che gli mancava. Una
+persona sulla pagina della Scuola Nuoto Adulti, con un account Guest, ha chiesto
+**tre volte di fila** quali orari fossero del suo livello — perché voleva
+saperlo *prima* di iscriversi, per non ritrovarsi con turni inutilizzabili — e
+alla terza si è sentita rispondere:
+
+> No, purtroppo quella informazione non ce l'ho — il sito non specifica quale
+> orario corrisponde a quale livello. […] la strada è scrivere al nostro team
+> dall'icona del messaggio in alto.
+
+Con `fonti: []`. **La prima metà era vera e la seconda era il guasto**: quel dato
+esiste, si vede nel calendario delle prenotazioni del portale, e la risposta era
+un link invece di un'attesa. Chi è stato mandato al team aspetta una email per
+una cosa che poteva guardare in dieci secondi — e stava decidendo se comprare.
+
+**Il modello non ha ignorato la regola: la regola non conteneva il caso.** La
+2bis nominava due dati e il livello non era fra loro, quindi la domanda sul
+livello non incontrava nessun perimetro. È la stessa lezione scritta dieci volte
+in questo file, applicata all'elenco dentro una regola invece che a una voce
+della knowledge base: *un perimetro che non nomina il caso è un perimetro che il
+caso non incontra.*
+
+E c'era una seconda ragione, questa nei dati: **l'url del calendario nel
+`kb.json` non c'era.** La regola 3 diceva che si può citare «perché sta scritto
+dentro la scheda Prenotazioni qui sotto», e non era vero — `testoCompleto()`
+spoglia i tag HTML, quindi i due `<a href>` di `prenotazioni.md` arrivavano nel
+contesto come il solo testo dell'ancora. Il modello non aveva alcun indirizzo da
+copiare. (`PORTALE_ECCEZIONI` in `Leggi la risposta` glielo avrebbe fatto
+passare, ma è un'altra cosa: quello non lo mette nel contesto, lo perdona
+all'uscita.)
+
+Quindi la correzione sta nei due posti, e il primo è il dato:
+
+- **`DETTAGLIO_LEZIONE` e `dettaglioLezione()`** (`data/regole.ts`) sono il fatto
+  come dato: chi tiene la lezione, quanti posti restano e — dove i livelli
+  esistono — di quale livello è quel turno, più la riga `FONTE:` che rende
+  l'indirizzo un url reale del contesto, come fa già `turniScuolaNuoto()`. La
+  riga arriva su **ogni** voce delle attività per adulti, `corso:` e
+  `club:planning:`, e la ragione è la spazzata del Guest Pass: la domanda non
+  nomina il corso, la fa chi sta guardando la pagina che ha davanti. Misurato
+  sul `dist`: 24 voci la portano, 6 delle quali entrano nel contesto di quel
+  turno.
+- **I livelli sono uno solo.** `conLivelli` è `['scuola-nuoto-adulti']`. Il
+  Nuoto Libero **non** c'è: là le corsie sono divise per ritmo, la corsia non si
+  sceglie prenotando e a bordo vasca la assegna l'Assistente Bagnanti —
+  chiamarlo un livello prenotabile sarebbe un dato falso.
+- **La f.a.q. che mancava sta sulla pagina del corso**, ed è la domanda arrivata
+  in chat parola per parola. Nasce dalla f.a.q. accanto: «prenoti liberamente i
+  turni del tuo livello» lascia in mano a chi legge «e quali sono?», e per un
+  anno quella seconda domanda non ha avuto risposta. Vale la regola di sempre —
+  *quando il rischio è che due dati vicini si ricompongano male, la risposta è
+  dire il secondo dato, non nascondere il primo.*
+- **E la riga `dettaglio-lezione` del registro** (`data/faq.ts`) sta su
+  `/planning`, subito dopo «come si prenota»: è la stessa risposta vista dal
+  lato di chi guarda quella tabella, che senza di lei è un elenco da cui si
+  deduce quello che non dice.
+
+Sul prompt, la 2bis passa da due dati a tre, dichiara il perimetro — **qualunque
+attività degli adulti, mai i corsi dei bambini**, dove il turno è fisso e
+l'interlocutore è la Direzione Tecnica — e vieta per nome il «non ce l'ho» e il
+rimando al team su quei tre dati.
+
+**E vieta anche le due invenzioni della stessa conversazione**, che sono la
+ragione per cui la correzione non è solo «dai il link». Nei turni prima il
+modello aveva detto che «il portale ti filtra automaticamente e ti mostra solo i
+turni del tuo livello» e che «i livelli stanno tutti in quegli stessi orari,
+divisi in corsie diverse dentro la vasca»: **nessuna delle due sta scritta da
+nessuna parte.** Sono la meccanica di sempre — da «il livello lo assegna
+l'istruttore» più «prenoti i turni del tuo livello» si compone un filtro che
+nessuno ha dichiarato. Quello che si dice è solo che nel calendario ogni lezione
+ha i suoi dettagli, e che ci si entra col proprio account.
+
+Due cose da sapere prima di toccarlo.
+
+**Non c'è una regola fissa nel `systemMessage`, ed è deliberato.** Qui il
+modello non ha disobbedito a una regola che c'era: ha risposto correttamente a
+un perimetro incompleto, e il perimetro si chiude dove vive — nella 2bis e nelle
+voci. Vale la scelta già fatta per la sintesi per categoria dei piani: il
+divieto sta dentro il dato e la regola che lo governa, e **se l'errore torna la
+regola fissa è il passo dopo**.
+
+**La verifica è il contesto vero, non la scheda riletta.** Il nodo `Componi
+contesto` si esegue fuori da n8n con l'item di `Normalizza` di quell'esecuzione e
+il `kb.json` del `dist`: sulle stesse quaranta voci di allora la nuova f.a.q. del
+corso entra, la voce del planning della Scuola Nuoto Adulti porta la riga sul
+livello, e le righe `FONTE:` del calendario nel contesto sono sei. Il prezzo del
+cambio è **1776 caratteri** di prompt su 126 mila, e l'elenco delle voci scelte
+non si muove.
 
 #### E gli orari del Baby Nuoto sono pubblici: non si manda al portale per saperli
 

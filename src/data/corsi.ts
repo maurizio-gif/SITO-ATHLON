@@ -22,6 +22,7 @@
  * verificata, e non un testo inventato per riempire la pagina.
  */
 import { getLessonCard, type LessonStat } from './planning';
+import { CALENDARIO_PORTALE } from './cta';
 
 const U = '/wp-content/uploads';
 
@@ -758,6 +759,16 @@ export const CORSI: Corso[] = [
       {
         q: 'Come funzionano i livelli della Scuola Nuoto Adulti?',
         a: 'I corsi sono divisi in <strong>Base, Intermedio e Avanzato</strong>. Il livello lo assegnano gli istruttori dopo averti visto in acqua, e da quel momento prenoti liberamente i turni del tuo livello.',
+      },
+      /* La domanda che la f.a.q. qui sopra fa nascere, e per un anno non ha
+         avuto risposta: «prenoti i turni del tuo livello» lascia in mano a chi
+         legge la domanda «e quali sono?». Il 10 settembre è arrivata in chat
+         tre volte di fila, e la terza risposta è stata «quella informazione non
+         ce l'ho» più un rimando al team. Il dato esiste: sta nel calendario
+         delle prenotazioni. Vedi `DETTAGLIO_LEZIONE` in `data/regole.ts`. */
+      {
+        q: 'Come sono divisi gli orari in base al livello?',
+        a: `Gli orari che vedi sul <a href="/planning">planning</a> sono il palinsesto completo della Scuola Nuoto Adulti. Quale turno è Base, quale Intermedio e quale Avanzato lo vedi nel <a href="${CALENDARIO_PORTALE}" target="_blank" rel="noopener noreferrer">calendario delle prenotazioni</a> del portale, che per ogni lezione mostra anche l’istruttore e i posti che restano: si apre con il tuo account, ed è lo stesso posto da cui prenoti.`,
       },
     ],
     simili: [
