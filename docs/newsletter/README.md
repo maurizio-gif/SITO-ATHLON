@@ -112,10 +112,12 @@ e poi le richiede alla chat ottiene l'altra risposta, ed è il difetto che
   resta sospeso, che è la regola e non il margine;
 - **il Direttore Tecnico non riceve nella prima settimana di corso** —
   `direzione-tecnica.md` dice per chi è il servizio e non dice da quando;
-- **i braccioli non servono** — `cosa-occorre-2.md` elenca cosa portare e cosa
-  il club fornisce, e non li nomina: sono la cosa che un genitore di un
-  bambino piccolo mette in borsa per istinto, quindi l'assenza dall'elenco non
-  risponde alla domanda;
+- **i braccioli li fornisce il club** — `cosa-occorre-2.md` la regola ce l'ha
+  già («tavolette, pull buoy, pinne e tutto il materiale didattico necessario
+  per le lezioni è fornito dal club») e non li nomina. Un genitore non sa se
+  un bracciolo conti come materiale didattico, quindi lo mette in borsa per
+  istinto: qui è nominato perché una regola generale non risponde alla domanda
+  che le persone fanno davvero;
 - **nell'area attesa le telecamere mostrano la vasca** — `accosso-corso.md`
   nomina la «zona attesa» e non dice che da lì si vede nuotare, che è l'unica
   cosa per cui un genitore la sceglie invece della balconata;
