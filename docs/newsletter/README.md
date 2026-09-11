@@ -13,10 +13,17 @@ legge dall'URL e ricorda per tutta la visita. Chi apre la newsletter arriva sul
 sito **già riconosciuto**: la chat, «contattaci», il referral e l'Help Desk non
 gli richiedono l'email, perché il numero c'è già.
 
-`{{UserNumber}}` è la forma handlebars di SendGrid, che è il mittente dei
-workflow n8n del club. **Su un altro ESP la sintassi cambia** — Mailchimp vuole
+`@UserNumber` è la forma che usa l'ESP del club, ed è quella nel file. **Su un
+altro ESP la sintassi cambia** — SendGrid vuole `{{UserNumber}}`, Mailchimp
 `*|USERNUMBER|*`, Brevo `{{contact.USERNUMBER}}` — e allora si sostituisce in
-blocco: il segnaposto compare solo lì, e un `sed` sul file basta.
+blocco: il segnaposto compare solo dentro i link del sito, e un `sed` sul file
+basta.
+
+**Il segnaposto della disiscrizione invece è ancora `{{UnsubscribeURL}}`**, e
+va allineato alla stessa sintassi il giorno che si tocca: è nel footer, una
+occorrenza sola. Sta scritto qui perché è l'unico posto del file che continua a
+parlare un'altra lingua, e un link di disiscrizione che non si risolve è il
+genere di cosa che nessuno prova prima di inviare.
 
 Tre cose da sapere.
 
