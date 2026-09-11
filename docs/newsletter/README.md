@@ -99,6 +99,26 @@ da guardare in anteprima:
   quello.
 
 
+### Due cose che l'email dice e il sito no
+
+Vengono dal club e non dal wiki, quindi **in chat l'assistente risponde
+diversamente**: il `kb.json` legge le schede, non questo file. Chi le legge qui
+e poi le richiede alla chat ottiene l'altra risposta, ed è il difetto che
+`CLAUDE.md` descrive per le f.a.q. scritte solo in una pagina. Vanno portate in
+`src/content/articles/snb/` la prossima volta che si toccano quelle schede:
+
+- **la tolleranza sul certificato medico nelle prime settimane** —
+  `cosa-occorre-2.md` e il punto 4.1 dicono solo che senza certificato il badge
+  resta sospeso, che è la regola e non il margine;
+- **il Direttore Tecnico non riceve nella prima settimana di corso** —
+  `direzione-tecnica.md` dice per chi è il servizio e non dice da quando.
+
+La tolleranza è scritta **con la sua scadenza nella stessa riga**, e non è uno
+scrupolo: «nelle prime settimane c'è tolleranza» da solo è una frase da cui si
+compone «allora il certificato può aspettare», che è la meccanica dei due fatti
+vicini scritta dieci volte in `CLAUDE.md`. Margine e scadenza stanno insieme o
+non tengono.
+
 Prima di inviare, due valori da confermare col desk perché **il wiki li dice in
 due modi**:
 
