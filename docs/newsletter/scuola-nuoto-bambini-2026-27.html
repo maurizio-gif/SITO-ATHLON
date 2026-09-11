@@ -75,6 +75,34 @@
               Da leggere una volta sola, e poi si nuota.
             </p>
 
+            <!-- Il video, che in una email non si puo' incorporare: Gmail, Outlook e
+                 Apple Mail buttano <iframe> e <video>, e un blocco che non rende
+                 lascia un buco bianco in cima all'email. Si fa quello che fanno tutti:
+                 un poster cliccabile con la barra del play sotto, e il click porta
+                 allo Short.
+            
+                 Il blocco e' costruito per reggere anche senza l'immagine — che e' il
+                 caso normale, perche' molti client non caricano le immagini finche'
+                 non glielo si chiede: la barra scura e' HTML, non un ritaglio del
+                 poster, quindi resta visibile e cliccabile da sola, e l'`alt`
+                 dell'immagine dice cos'era. -->
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 22px 0;">
+              <tr>
+                <td bgcolor="#272423" style="background-color:#272423; line-height:0; font-size:0; border-radius:12px 12px 0 0;">
+                  <a href="https://www.youtube.com/shorts/uZcxkejW8fE" target="_blank" style="text-decoration:none;">
+                    <img src="https://i.ytimg.com/vi/uZcxkejW8fE/maxresdefault.jpg" width="536" alt="Guarda il video della Scuola Nuoto Athlon" style="display:block; border:0; outline:none; width:100%; max-width:536px; height:auto; border-radius:12px 12px 0 0;" />
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td align="center" bgcolor="#272423" style="background-color:#272423; border-radius:0 0 12px 12px;">
+                  <a href="https://www.youtube.com/shorts/uZcxkejW8fE" target="_blank" style="display:block; padding:15px 20px; font-family:Arial,Helvetica,sans-serif; font-size:16px; line-height:22px; font-weight:bold; color:#ffffff; text-decoration:none;">
+                    <span style="color:#ff5701; font-size:18px;">&#9654;</span>&nbsp;&nbsp;Guarda il video
+                  </a>
+                </td>
+              </tr>
+            </table>
+
             <!-- Le due date della stagione -->
             <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#272423; border-radius:12px;">
               <tr>

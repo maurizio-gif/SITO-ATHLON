@@ -61,6 +61,36 @@ mesi nelle caselle — un logo che dà 404 il giorno dello spostamento del domin
 l'immagine ma quale dei due nomi l'host risponde, ed è per questo che qui non
 si usa il `CLUB.logo` del sito.
 
+### Il video nella hero è un poster, non un player
+
+Gmail, Outlook e Apple Mail buttano `<iframe>` e `<video>`: un blocco che non
+rende lascia un buco bianco in cima all'email. Quindi il video è un **poster
+cliccabile** con la barra del play sotto, e il click porta allo Short
+(`youtube.com/shorts/uZcxkejW8fE`). Il link va a YouTube e **non porta
+`UserNumber`**, per la stessa ragione del Portale: quel parametro lì non lo
+legge nessuno.
+
+Il blocco regge **anche senza l'immagine**, che è il caso normale — molti
+client non caricano le immagini finché non glielo si chiede: la barra scura è
+HTML e non un ritaglio del poster, quindi resta visibile e cliccabile da sola,
+e l'`alt` dice cos'era. Provato nei due stati.
+
+Il poster è la copertina che YouTube genera,
+`i.ytimg.com/vi/uZcxkejW8fE/maxresdefault.jpg`. **Non è verificabile da qui** —
+`i.ytimg.com` è fuori dalla policy di rete di questo ambiente — e ha due cose
+da guardare in anteprima:
+
+- **`maxresdefault` non esiste per ogni video**, solo per quelli con una
+  sorgente da 720p in su. Se manca, l'indirizzo da mettere è `hqdefault.jpg`,
+  che c'è sempre: è 480 × 360, quindi meno nitido, ma un poster sgranato è
+  meglio di un'immagine rotta.
+- **Uno Short è verticale**, e la copertina 16:9 può uscire con le bande ai
+  lati. Se non convince, al posto suo va bene una foto del club già su
+  WordPress — per esempio la hero della pagina del corso,
+  `/wp-content/uploads/2024/08/P1120412.jpg`: cambia una riga, il link resta
+  quello.
+
+
 Prima di inviare, due valori da confermare col desk perché **il wiki li dice in
 due modi**:
 
