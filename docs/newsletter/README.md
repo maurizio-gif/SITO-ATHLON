@@ -114,7 +114,13 @@ e poi le richiede alla chat ottiene l'altra risposta, ed è il difetto che
   `direzione-tecnica.md` dice per chi è il servizio e non dice da quando;
 - **nell'area attesa le telecamere mostrano la vasca** — `accosso-corso.md`
   nomina la «zona attesa» e non dice che da lì si vede nuotare, che è l'unica
-  cosa per cui un genitore la sceglie invece della balconata.
+  cosa per cui un genitore la sceglie invece della balconata;
+- **le gare della Scuola Nuoto si nuotano in casa** — `snb/gare-nuoto.md` dice
+  «nel nostro impianto o in altri di Roma», e quella seconda metà è dei gruppi
+  agonistici: sono loro che vanno in trasferta. Questa non è una riga in più
+  come le altre tre, è una **correzione**: finché la scheda resta com'è,
+  l'assistente manda un genitore della Scuola Nuoto a prepararsi per una gara
+  fuori sede.
 
 La tolleranza è scritta **con la sua scadenza nella stessa riga**, e non è uno
 scrupolo: «nelle prime settimane c'è tolleranza» da solo è una frase da cui si
