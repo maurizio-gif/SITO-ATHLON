@@ -53,6 +53,14 @@ cui questo repository si scrive — la stessa condizione già scritta in
 un dominio irraggiungibile. Un'immagine rotta nell'intestazione la vede ogni
 destinatario, e non si corregge dopo l'invio.
 
+**La testata è su banda scura perché il logo lo è.** `Logo-oriz-full.png`
+porta la scritta «ATHLON CLUB 4.0» in bianco — è la versione per fondo scuro,
+la stessa che il Footer del sito usa sul suo fondo nero. Su bianco restava il
+solo pittogramma arancione e il nome del club spariva dalla testata. Si vede
+renderizzando e non leggendo: nel file il logo sembra a posto finché non lo si
+guarda su un fondo. Il repository non ha una variante con la scritta scura, e
+inventarne una vorrebbe dire un file nuovo che su WordPress non c'è.
+
 **Il logo è `Logo-oriz-full.png` e non `-2`.** È la copia fatta apposta in
 `public/`: il WordPress originale serve il primo nome, e una email vive per
 mesi nelle caselle — un logo che dà 404 il giorno dello spostamento del dominio
