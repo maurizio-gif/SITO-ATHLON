@@ -90,20 +90,21 @@ client non caricano le immagini finché non glielo si chiede: la barra scura è
 HTML e non un ritaglio del poster, quindi resta visibile e cliccabile da sola,
 e l'`alt` dice cos'era. Provato nei due stati.
 
-Il poster è la copertina che YouTube genera,
-`i.ytimg.com/vi/uZcxkejW8fE/maxresdefault.jpg`. **Non è verificabile da qui** —
-`i.ytimg.com` è fuori dalla policy di rete di questo ambiente — e ha due cose
-da guardare in anteprima:
+Il poster è una **foto del club** — `/wp-content/uploads/2024/08/P1120372-scaled.jpg`,
+la stessa che il sito usa come poster del video della Scuola Nuoto — e **non**
+la copertina di YouTube.
 
-- **`maxresdefault` non esiste per ogni video**, solo per quelli con una
-  sorgente da 720p in su. Se manca, l'indirizzo da mettere è `hqdefault.jpg`,
-  che c'è sempre: è 480 × 360, quindi meno nitido, ma un poster sgranato è
-  meglio di un'immagine rotta.
-- **Uno Short è verticale**, e la copertina 16:9 può uscire con le bande ai
-  lati. Se non convince, al posto suo va bene una foto del club già su
-  WordPress — per esempio la hero della pagina del corso,
-  `/wp-content/uploads/2024/08/P1120412.jpg`: cambia una riga, il link resta
-  quello.
+Prima era `i.ytimg.com/vi/uZcxkejW8fE/maxresdefault.jpg`, e **nelle caselle non
+arrivava**: visto su un invio vero, non dedotto. Le due cause possibili sono
+tutte e due fuori dal nostro controllo — `maxresdefault` esiste solo per i video
+con una sorgente da 720p in su, e un dominio terzo lo può bloccare il client —
+quindi non si tratta di sceglierne un'altra di YouTube: si mette un'immagine su
+un host di cui sappiamo che le sue immagini arrivano, che è quello del logo.
+
+Pesa 372 kB e misura 2560 × 1441, servita a 536: è più del necessario, e resta
+così perché le varianti ottimizzate (`-1280`, `-640`) le genera **questo**
+repository e su WordPress non esistono. Il giorno dello spostamento del dominio
+si può passare alla `-1280`, che pesa 91 kB.
 
 
 ### Due cose che l'email dice e il sito no
