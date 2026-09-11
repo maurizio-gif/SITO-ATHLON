@@ -16,7 +16,16 @@
  */
 import { CRM } from './appuntamento';
 
-/** Gli orari ancora liberi del Direttore Tecnico, nei prossimi sette giorni. */
+/**
+ * Gli orari ancora liberi del Direttore Tecnico, nella sua finestra.
+ *
+ * **Quattordici giorni e non sette**, al contrario del calendario del desk, e
+ * la finestra la decide `GIORNI_VISIBILI` in `lib/appuntamentiNuoto.ts` di
+ * APP-ATHLON: qui non si ricopia, perche' il numero vive dove si applica.
+ * Sei slot al giorno e un'ora sola dal lunedi' al venerdi' vogliono dire che
+ * un genitore occupato nel primo pomeriggio di questa settimana, con
+ * l'orizzonte corto, non trova niente e non ha un giorno a cui tornare.
+ */
 export const API_SLOT_NUOTO = `${CRM}/api/appuntamenti-nuoto/slot`;
 
 /**

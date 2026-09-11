@@ -265,9 +265,12 @@ import AppuntamentoPassi from './AppuntamentoPassi.astro';
     margin-bottom: 0;
   }
   /* ── I giorni ──────────────────────────────────────────────────────────
-     Una fila che scorre in orizzontale invece di sette righe incolonnate:
-     su un telefono le sette righe avrebbero riempito lo schermo prima
-     ancora di mostrare un orario. */
+     Una fila che scorre in orizzontale invece di righe incolonnate: su un
+     telefono le righe avrebbero riempito lo schermo prima ancora di mostrare
+     un orario. Regge una finestra di qualunque lunghezza — sette giorni per il
+     desk, quattordici per il Direttore Tecnico — perche' le pillole sono
+     `flex: 0 0 auto` dentro un `overflow-x: auto`: si allunga la fila, non la
+     sezione. */
   .ap__giorni {
     display: flex;
     gap: 0.7rem;
