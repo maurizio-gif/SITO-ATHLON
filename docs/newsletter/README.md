@@ -121,6 +121,11 @@ e poi le richiede alla chat ottiene l'altra risposta, ed è il difetto che
 - **nell'area attesa le telecamere mostrano la vasca** — `accosso-corso.md`
   nomina la «zona attesa» e non dice che da lì si vede nuotare, che è l'unica
   cosa per cui un genitore la sceglie invece della balconata;
+- **la prima settimana vale per il centro, non per i soli spogliatoi** —
+  `accosso-corso.md` ha la regola dell'accompagnatore unico, ma non dice che
+  nei giorni di apertura è più stretta e riguarda l'ingresso al club;
+- **negli spogliatoi non si portano né si consumano alimenti** — non è scritto
+  da nessuna parte nel wiki;
 - **le gare della Scuola Nuoto si nuotano in casa** — `snb/gare-nuoto.md` dice
   «nel nostro impianto o in altri di Roma», e quella seconda metà è dei gruppi
   agonistici: sono loro che vanno in trasferta. Questa non è una riga in più
