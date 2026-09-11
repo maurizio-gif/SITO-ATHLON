@@ -56,7 +56,10 @@ destinatario, e non si corregge dopo l'invio.
 **Il logo è `Logo-oriz-full.png` e non `-2`.** È la copia fatta apposta in
 `public/`: il WordPress originale serve il primo nome, e una email vive per
 mesi nelle caselle — un logo che dà 404 il giorno dello spostamento del dominio
-è un buco nell'intestazione di ogni copia già inviata.
+è un buco nell'intestazione di ogni copia già inviata. I due file sono
+**identici byte a byte** (834 × 159, 7,3 kB): quello che cambia non è
+l'immagine ma quale dei due nomi l'host risponde, ed è per questo che qui non
+si usa il `CLUB.logo` del sito.
 
 Prima di inviare, due valori da confermare col desk perché **il wiki li dice in
 due modi**:
