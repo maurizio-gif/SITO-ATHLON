@@ -111,7 +111,10 @@ e poi le richiede alla chat ottiene l'altra risposta, ed è il difetto che
   `cosa-occorre-2.md` e il punto 4.1 dicono solo che senza certificato il badge
   resta sospeso, che è la regola e non il margine;
 - **il Direttore Tecnico non riceve nella prima settimana di corso** —
-  `direzione-tecnica.md` dice per chi è il servizio e non dice da quando.
+  `direzione-tecnica.md` dice per chi è il servizio e non dice da quando;
+- **nell'area attesa le telecamere mostrano la vasca** — `accosso-corso.md`
+  nomina la «zona attesa» e non dice che da lì si vede nuotare, che è l'unica
+  cosa per cui un genitore la sceglie invece della balconata.
 
 La tolleranza è scritta **con la sua scadenza nella stessa riga**, e non è uno
 scrupolo: «nelle prime settimane c'è tolleranza» da solo è una frase da cui si
