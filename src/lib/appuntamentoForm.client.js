@@ -471,9 +471,11 @@ export function initAppuntamentoForm(root, options) {
       '<p class="ap__invito">Scegli un giorno per vedere gli orari liberi.</p>';
   }
 
-  /* I giorni come una fila di pillole scorrevole: sette voci in orizzontale
-     occupano una riga sola anche su un telefono stretto, dove sette righe
-     avrebbero riempito lo schermo prima ancora di mostrare un orario. */
+  /* I giorni come una fila di pillole scorrevole, e non incolonnati: su un
+     telefono stretto le righe avrebbero riempito lo schermo prima ancora di
+     mostrare un orario. Quante siano lo decide la rotta — sette per il desk,
+     quattordici per il Direttore Tecnico — e questo codice non le conta: la
+     fila scorre, quindi l'altezza del passo non cambia con la finestra. */
   function disegnaGiorni() {
     elencoGiorni.innerHTML = '';
     giorni.forEach(function (g) {

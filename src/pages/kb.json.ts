@@ -330,7 +330,15 @@ export const GET: APIRoute = async () => {
       testo: blocchi(
         a.data.description,
         testoCompleto(a.body ?? ''),
-        a.id === 'snb/preiscrizioni-nuoto' ? turniScuolaNuoto(a.body ?? '') : ''
+        a.id === 'snb/preiscrizioni-nuoto' ? turniScuolaNuoto(a.body ?? '') : '',
+        /* L'elenco dei centri medici consigliati è la parte più lunga della
+           scheda, e citarlo tutto in chat è un muro di nomi e numeri. Questa
+           `FONTE:` porta all'ancora scritta a mano sopra «## Centri medici
+           consigliati in zona»: se la risposta riassume invece di elencare,
+           il link porta comunque davanti alla lista, non in cima alla pagina. */
+        a.id === 'generali/certificato-medico'
+          ? `Elenco completo dei centri medici consigliati in zona:\nFONTE: ${SITE}/wikiathlon/${a.id}/#centri-medici-in-zona`
+          : ''
       ),
     });
   }
