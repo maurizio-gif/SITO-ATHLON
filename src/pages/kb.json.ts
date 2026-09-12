@@ -746,7 +746,7 @@ export const GET: APIRoute = async () => {
            parte, perché chi chiede quanto costa un abbonamento sta chiedendo
            anche questo: un mensile citato da solo è un preventivo incompleto,
            ed è il motivo per cui la pagina la stampa sotto ogni formula. */
-        `**Oltre alla quota mensile o annuale si paga la quota di attivazione contrattuale: ${ATTIVAZIONE.quota} € una tantum**, per ogni abbonamento attivato, e comprende ${ATTIVAZIONE.comprende}. Non si paga sugli accessi singoli degli adulti; sulla lezione singola del Baby Nuoto invece si paga.` +
+        `**Oltre alla quota mensile o annuale si paga la quota di attivazione contrattuale: ${ATTIVAZIONE.quota} € una tantum**, per ogni abbonamento attivato, e comprende ${ATTIVAZIONE.comprende}. Non si paga sugli accessi singoli degli adulti, e non si paga nemmeno sulla lezione singola del Baby Nuoto: solo attivando il mensile.` +
           /* Con una promozione attiva la quota è in omaggio sulle annuali, ed è
              lo stesso `promoDoc` che governa la pagina: senza questa riga la
              voce direbbe «50 €» a chi sta attivando un'annuale proprio nella
@@ -796,7 +796,7 @@ export const GET: APIRoute = async () => {
     testo: blocchi(
       `La quota di attivazione contrattuale — quella che si paga **al momento dell'iscrizione** — è di **${ATTIVAZIONE.quota} € una tantum** e comprende ${ATTIVAZIONE.comprende}.`,
       `Si paga **una volta per ogni abbonamento attivato** — il secondo abbonamento di una famiglia la paga come il primo — e si somma alla prima quota mensile o annuale, che resta quella del listino. **La quota** vale per gli abbonamenti degli adulti e per i corsi dei bambini allo stesso modo; le eventuali promozioni no, e hanno il perimetro scritto nella loro voce.`,
-      `**Non si paga sugli accessi singoli degli adulti**, che sono il modo di entrare senza abbonarsi: là c'è il solo badge di accesso, ${SINGOLI.badge} € la prima volta. **La lezione singola del Baby Nuoto è un'altra cosa e la quota la paga**: al Baby Nuoto ci sono sempre i ${ATTIVAZIONE.quota} €, sia sul mensile sia sulla singola lezione. Non usare l'esenzione degli adulti per rispondere su un corso dei bambini.`,
+      `**Non si paga sugli accessi singoli degli adulti**, che sono il modo di entrare senza abbonarsi: là c'è il solo badge di accesso, ${SINGOLI.badge} € la prima volta. **Vale lo stesso per la lezione singola del Baby Nuoto**: la quota si paga solo attivando il mensile, non per una lezione pagata una alla volta.`,
       `Se si disdice e più avanti si torna, la quota di attivazione va versata di nuovo.`,
       /* Come per le voci dei piani: con la promozione attiva la quota è in
          omaggio sulle annuali, e dirlo qui è il punto — questa è la voce che
@@ -836,7 +836,7 @@ export const GET: APIRoute = async () => {
     area: 'Junior',
     attivita: [],
     testo: blocchi(
-      `**Vale per ${JUNIOR_MENSILE.valePer.join(', ')}.** Per il Baby Nuoto le formule sono altre — c'e' anche la lezione singola — e stanno nella sua pagina; la **quota di attivazione di ${ATTIVAZIONE.quota} €** invece vale anche la', su tutte e due le formule.`,
+      `**Vale per ${JUNIOR_MENSILE.valePer.join(', ')}.** Per il Baby Nuoto le formule sono altre — c'e' anche la lezione singola — e stanno nella sua pagina; la **quota di attivazione di ${ATTIVAZIONE.quota} €** invece vale anche la', ma solo sul mensile: la lezione singola non la prevede.`,
       `**A stagione iniziata l'unica formula in vendita e' l'abbonamento mensile**: si paga un mese per volta, il rinnovo e' ${JUNIOR_MENSILE.rinnovo}, e non ci si lega alla stagione intera — per fermarsi basta la disdetta con dieci giorni di preavviso sul primo del mese.`,
       JUNIOR_MENSILE.voci.map((v) => `- ${v.nome}: **${v.prezzo} €/mese**`).join('\n'),
       `A questi si somma la **quota di attivazione di ${ATTIVAZIONE.quota} € una tantum**, per ogni abbonamento attivato: il secondo figlio la paga come il primo. E ${JUNIOR_MENSILE.proRata}.`,
