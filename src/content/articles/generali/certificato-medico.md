@@ -69,7 +69,7 @@ Se hai già la visita in programma c'è una tolleranza:
 
 > una volta scaduto il certificato medico, lo staff del desk provvederà a inserire un rinnovo temporaneo di **14 giorni**. Ti basterà quindi fermarti in segreteria per attivarlo una volta che ti recherai in sede.
 
-> ℹ️ **Le visite non si effettuano in struttura.** Abbiamo una convenzione attiva con il Centro Medico Tiziano.
+> ℹ️ **Le visite non si effettuano in struttura.** Qui sotto trovi alcuni centri medici della zona a cui rivolgerti.
 
 ## Validità
 
@@ -113,4 +113,15 @@ Per ottenere il certificato agonistico è necessario presentare al medico il **m
 
 ---
 
-> 💡 **Partner consigliato:** [Centro Medico Tiziano](https://www.centromedicotiziano.it) — certificati non agonistici e agonistici
+<a id="centri-medici-in-zona"></a>
+
+## Centri medici consigliati in zona
+
+Nessuna convenzione: sono strutture della zona a cui rivolgerti per la visita, non un passaggio obbligato.
+
+- **Ritmos — Dott. Maurizio Nargi** — Via Luciano Zuccoli, 11, 00137 Roma — Tel. 06 556 6111 — [ritmos.it](https://www.ritmos.it)
+- **Loft Poliambulatorio** — Via Ugo Ojetti, 380/e, 00137 Roma — Tel. 06 8689 1590 — [loft.rm.it](https://www.loft.rm.it)
+- **Montesacro-Nomentano Group** — Via Nomentana, 550, 00141 Roma — Tel. 06 8689 5611 — [studionomentano.it](https://www.studionomentano.it)
+- **Dott. Fabrizio Michielan** — Via Ugo Ojetti, 16, 00137 Roma — Tel. 333 594 6262 — [ilmedicodellosport.it](https://www.ilmedicodellosport.it)
+- **Poliambulatorio Talenti** — Via Pietro Aretino, 41/43, 00137 Roma — Tel. 06 8680 2204 — [poliambulatoriotalenti.it](https://www.poliambulatoriotalenti.it)
+- **Centro Medico Tiziano** — Via Renato Fucini, 59/Bis, 00137 Roma — Tel. 06 8713 7015 — [centromedicotiziano.it](https://www.centromedicotiziano.it)
