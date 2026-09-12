@@ -117,7 +117,7 @@ Per ottenere il certificato agonistico è necessario presentare al medico il **m
 
 ## Centri medici consigliati in zona
 
-Nessuna convenzione: sono strutture della zona a cui rivolgerti per la visita, non un passaggio obbligato.
+Ecco una lista di centri medici in zona a cui rivolgerti per la visita.
 
 - **Ritmos — Dott. Maurizio Nargi** — Via Luciano Zuccoli, 11, 00137 Roma — Tel. 06 556 6111 — [ritmos.it](https://www.ritmos.it)
 - **Loft Poliambulatorio** — Via Ugo Ojetti, 380/e, 00137 Roma — Tel. 06 8689 1590 — [loft.rm.it](https://www.loft.rm.it)
