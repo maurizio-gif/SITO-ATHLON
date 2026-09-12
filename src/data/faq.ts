@@ -45,6 +45,7 @@
  */
 import {
   CERTIFICATO,
+  DETTAGLIO_LEZIONE,
   PRENOTAZIONE,
   finestraDisdetta,
   perimetroListaAttesa,
@@ -125,6 +126,17 @@ export const REGISTRO: VoceRegistro[] = [
     /* Il perimetro sta **davanti** e non in coda: è la riga che decide se la
        risposta è giusta per chi la legge, e chi riassume tiene la prima. */
     a: `${perimetroListaAttesa()} Sulla lezione, invece, funziona così: se è al completo puoi iscriverti in lista d'attesa, quando un prenotato disdice la lista scorre in ordine cronologico e chi subentra riceve un'email, fino a ${PRENOTAZIONE.disdettaOreGruppo} ora dall'inizio. Attenzione: la lista d'attesa occupa uno slot come una prenotazione confermata.`,
+  },
+  {
+    /* La domanda che il palinsesto fa nascere e che il sito non sapeva chiudere:
+       il planning elenca gli orari e non dice chi tiene la lezione, quanti posti
+       restano né — sulla Scuola Nuoto Adulti — quale turno è di quale livello.
+       Il 10/09 in chat quella domanda è finita in «non ce l'ho» più un rimando
+       al team, per un dato che sta nel calendario del portale. Vedi
+       `DETTAGLIO_LEZIONE`. */
+    id: 'dettaglio-lezione',
+    q: 'Chi tiene la lezione, quanti posti restano, di che livello è il turno?',
+    a: `Il planning porta il palinsesto — giorno, ora, sala — e si apre senza account. L'istruttore di quella lezione, i posti che restano e, per la Scuola Nuoto Adulti, il livello di quel turno si vedono nel <a href="${DETTAGLIO_LEZIONE.url}" target="_blank" rel="noopener noreferrer">calendario delle prenotazioni</a> del portale, dal vivo e lezione per lezione: ci entri col tuo account, ed è lo stesso posto da cui prenoti.`,
   },
   {
     id: 'prenotazioni-attive',

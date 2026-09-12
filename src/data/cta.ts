@@ -27,6 +27,18 @@ export const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 export const APP = 'https://onelink.to/athlon';
 
 /**
+ * Il calendario delle prenotazioni, cioè **il solo posto in cui una lezione ha
+ * i suoi dettagli**: chi la tiene, quale livello è dove i livelli esistono, e
+ * quanti posti restano. Il sito porta il palinsesto — giorni, orari, sala — e
+ * quelle tre cose no, né sul planning né sulla pagina del corso.
+ *
+ * Stava scritto a mano in tre punti (due volte nella scheda delle prenotazioni,
+ * una nella regola 2bis del prompt della chat) e da qui lo legge chi lo stampa:
+ * è la destinazione di ogni domanda sul dettaglio di una singola lezione.
+ */
+export const CALENDARIO_PORTALE = `${PG}/#/Classes/1/Calendar`;
+
+/**
  * La registrazione del portale, cioè **dove si incolla un codice
  * promozionale**: non la home e non un `PaymentPlanId` preciso.
  *
