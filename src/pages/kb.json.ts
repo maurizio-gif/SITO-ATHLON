@@ -134,32 +134,55 @@ const coppie = (dati?: { l: string; v: string }[]) =>
   elenco((dati ?? []).map((d) => `${d.l}: ${d.v}`));
 
 /**
- * I link di iscrizione per fascia di nascita della scuola nuoto bambini.
+ * I link ai turni per fascia di nascita della scuola nuoto bambini.
  *
- * `testoCompleto` butta via l'indirizzo di ogni link markdown e lascia solo
- * il testo cliccabile — corretto per leggere la scheda, sbagliato per questi
- * otto: quale sia quello giusto dipende dall'anno di nascita del bambino, e
- * senza l'indirizzo la chat non può citarlo, solo descriverlo. Le righe
- * `FONTE:` qui sotto seguono lo stesso formato con cui `Componi contesto` ne
- * cita già altre (il planning, il calendario prenotazioni): il validatore
- * delle fonti scandisce ogni riga che comincia per `FONTE: ` in tutto il
- * contesto, non solo la prima di ogni voce.
+ * `testoCompleto` butta via l'indirizzo di ogni link e lascia solo il testo
+ * cliccabile — corretto per leggere la scheda, sbagliato per questi: quale sia
+ * quello giusto dipende dall'anno di nascita del bambino, e senza l'indirizzo
+ * la chat non può citarlo, solo descriverlo. Le righe `FONTE:` qui sotto
+ * seguono lo stesso formato con cui `Componi contesto` ne cita già altre (il
+ * planning, il calendario prenotazioni): il validatore delle fonti scandisce
+ * ogni riga che comincia per `FONTE: ` in tutto il contesto, non solo la prima
+ * di ogni voce.
+ *
+ * **Le schede che li portano sono due, e servono a due domande diverse.**
+ * `snb/preiscrizioni-nuoto` li usa per iscriversi; `snb/cambio-corso` per
+ * cambiare turno restando nella stessa frequenza — e lì, fino a questa riga,
+ * i cinque link sparivano dal contesto: la chat sapeva che esistono e non
+ * poteva darli, quindi rimandava alla scheda invece di rispondere. È lo stesso
+ * difetto per cui questa funzione è nata, ripetuto su un'altra scheda.
+ *
+ * **Due forme di link, una regola sola.** Le due schede li scrivono in modo
+ * diverso — `* Per i nati **2023** → <a …>clicca qui</a>` l'una,
+ * `- <a …>Nati 2023</a>` l'altra — e sono tutte e due contenuto di Tina, cioè
+ * si possono riscrivere domani in una terza. Quindi l'etichetta si prende da
+ * dove c'è: il testo prima della freccia se c'è, altrimenti quello dentro
+ * l'ancora. Un elenco scritto qui a mano avrebbe ricopiato per la terza volta
+ * gli stessi cinque indirizzi.
+ *
+ * **Il filtro è `ageLimitId`, non la posizione nell'elenco.** È il parametro
+ * che *fa* di quell'indirizzo un turno per fascia d'età: qualunque altro link
+ * dentro un elenco di quelle schede — il certificato medico, il regolamento —
+ * resta fuori da sé, senza doversi ricordare di escluderlo.
  */
-function turniScuolaNuoto(md: string): string {
+function turniScuolaNuoto(md: string, titolo: string): string {
   const righe: string[] = [];
   // Il sorgente porta questi link come ancore HTML (serve `target="_blank"`,
   // che il markdown puro non esprime), non come `[testo](url)`: un regex
   // scritto per la sintassi markdown non trovava più niente qui, e gli otto
   // link sparivano dal contesto senza errore. Vedi il commento sopra la
   // funzione.
-  const rx = /^\*\s+(.+?)\s+→\s+<a\s+href="([^"]+)"[^>]*>[^<]*<\/a>/gm;
+  const rx = /^[ \t]*[*-][ \t]+(.*?)<a\s+href="([^"]+)"[^>]*>([^<]*)<\/a>/gm;
   let m: RegExpExecArray | null;
   while ((m = rx.exec(md))) {
-    righe.push(`${pulito(m[1])}:\nFONTE: ${m[2].replace(/&amp;/g, '&').replace(/\\&/g, '&')}`);
+    const url = m[2].replace(/&amp;/g, '&').replace(/\\&/g, '&');
+    if (!url.includes('ageLimitId')) continue;
+    const prima = pulito(m[1].replace(/[→>-]+\s*$/, ''));
+    const etichetta = prima || pulito(m[3]);
+    if (!etichetta) continue;
+    righe.push(`${etichetta}:\nFONTE: ${url}`);
   }
-  return righe.length
-    ? blocchi('Link diretti di iscrizione per fascia di nascita', righe.join('\n'))
-    : '';
+  return righe.length ? blocchi(titolo, righe.join('\n')) : '';
 }
 
 /**
@@ -312,7 +335,16 @@ export const GET: APIRoute = async () => {
       testo: blocchi(
         a.data.description,
         testoCompleto(a.body ?? ''),
-        a.id === 'snb/preiscrizioni-nuoto' ? turniScuolaNuoto(a.body ?? '') : '',
+        /* Il titolo del blocco dice a cosa servono **su questa scheda**: sulla
+           preiscrizione sono i link con cui ci si iscrive, sul cambio turno
+           sono i turni che hanno ancora posto — e chiamarli «di iscrizione»
+           davanti a un genitore che è già iscritto è la parola che manda a
+           cercare una seconda iscrizione. */
+        a.id === 'snb/preiscrizioni-nuoto'
+          ? turniScuolaNuoto(a.body ?? '', 'Link diretti di iscrizione per fascia di nascita')
+          : a.id === 'snb/cambio-corso'
+            ? turniScuolaNuoto(a.body ?? '', 'Turni con posti disponibili, per anno di nascita')
+            : '',
         /* L'elenco dei centri medici consigliati è la parte più lunga della
            scheda, e citarlo tutto in chat è un muro di nomi e numeri. Questa
            `FONTE:` porta all'ancora scritta a mano sopra «## Centri medici
