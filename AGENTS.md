@@ -2597,6 +2597,69 @@ Tecnico e chi deve ancora iscriversi, il cambio abbonamento e il cambio corso �
 ignorare non è una regola, e una voce che non dice per chi vale è una voce che
 verrà applicata a chi le somiglia.
 
+#### E il cambio turno si risponde, non si rimanda: i turni e il modulo nello stesso turno
+
+Il club ha chiesto di essere più diretti. Chi chiede di **spostarsi di orario
+restando nella stessa frequenza** — mono→mono, bi→bi — non deve leggere una
+procedura in tre passi: deve vedere i turni con posti liberi e avere subito
+dove scrivere quale gli interessa. Quindi la chat dà il link della fascia del
+bambino e **apre lei** la richiesta di assistenza, con `{"tipo": "team"}`.
+
+**Non poteva farlo, e il motivo era un dato che spariva.** Sulla scheda
+`snb/cambio-corso` i cinque link per fascia di nascita erano scritti come
+ancore HTML dentro un elenco, e `testoCompleto` butta via l'indirizzo di ogni
+link lasciando solo il testo: nel `kb.json` restava «Nati 2023» senza niente
+da cliccare. `turniScuolaNuoto()` girava sulla sola `preiscrizioni-nuoto`,
+quindi l'assistente sapeva che quei turni esistono e non poteva darli — e
+rimandava alla scheda. È lo stesso difetto per cui quella funzione è nata,
+ripetuto su un'altra scheda: **quando una risposta rimanda invece di
+rispondere, guarda se il dato per rispondere è arrivato fin lì.**
+
+Ora `turniScuolaNuoto()` gira su tutte e due, con una regola sola per le due
+forme che le due schede usano — l'etichetta si prende da prima della freccia
+se c'è, altrimenti da dentro l'ancora — e il filtro è **`ageLimitId`**, che è
+il parametro che *fa* di quell'indirizzo un turno per fascia: qualunque altro
+link dentro quegli elenchi resta fuori da sé. Il titolo del blocco cambia con
+la scheda, perché «link di iscrizione» davanti a un genitore già iscritto è la
+parola che manda a cercare una seconda iscrizione.
+
+**L'apertura del modulo è l'eccezione già dichiarata**, quella del certificato
+medico: aprire un modulo non impegna a niente e non manda niente — il messaggio
+lo scrive e lo invia la persona — quindi non serve una conferma prima.
+
+**E i turni li dà per la sua fascia, non tutti e cinque.** La regola dura
+dell'anno di nascita resta intera: un elenco che non è il suo gli fa guardare
+un turno che non potrà scegliere, e la fascia la sceglie il codice dal dato del
+form, mai il modello da un'età.
+
+#### Il cambio frequenza non è simmetrico, e le due direzioni si scrivono separate
+
+Fino al 14/09 le due direzioni avevano una riga sola — «disdetta e nuova
+iscrizione, quindi anche una nuova quota di attivazione» — e valeva per
+entrambe. Il club l'ha corretta, e adesso sono due regimi:
+
+| | da monosettimanale a bisettimanale | da bisettimanale a monosettimanale |
+| --- | --- | --- |
+| il contratto | non si disdice e non si rifà | si chiude e si rifà |
+| quota di attivazione | **non è richiesta** | si paga |
+| come si fa | si chiede a noi, indicando il secondo turno | disdetta entro i 10 giorni, poi nuova iscrizione |
+| quando | subito | il **primo giorno del mese successivo** |
+
+La data non è un dettaglio: l'iscrizione **decorre da quando la si fa**, non da
+una data che si sceglie — è il contrario degli adulti, dove `DATA_INIZIO`
+lascia scegliere fino a 14 giorni avanti — quindi la nuova non si può firmare
+prima, e il giorno giusto è il primo del mese nuovo.
+
+Vale la lezione di sempre, applicata a una coppia di direzioni invece che a una
+coppia di regimi: **due casi che si somigliano e costano diverso vanno scritti
+separati**, o chi riassume ne compone uno terzo. Qui il verso sbagliato è
+dichiarare la quota anche sull'upgrade: è un prezzo più alto del vero, e fa
+rinunciare a un passaggio che il club vuole dare.
+
+Stanno in tre posti da tenere in pari: la scheda `snb/cambio-corso`, le due
+regole fisse del `systemMessage` di `CHAT ATHLON`, e i 10 giorni, che si citano
+dalla scheda della disdetta invece di ricopiare le date.
+
 ### La lista d'attesa è delle prenotazioni, e il Direttore Tecnico è degli iscritti
 
 Il 31 agosto, a una mamma che voleva iscrivere la figlia del 2023 a un turno
