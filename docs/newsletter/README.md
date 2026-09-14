@@ -13,10 +13,17 @@ legge dall'URL e ricorda per tutta la visita. Chi apre la newsletter arriva sul
 sito **già riconosciuto**: la chat, «contattaci», il referral e l'Help Desk non
 gli richiedono l'email, perché il numero c'è già.
 
-`{{UserNumber}}` è la forma handlebars di SendGrid, che è il mittente dei
-workflow n8n del club. **Su un altro ESP la sintassi cambia** — Mailchimp vuole
+`@UserNumber` è la forma che usa l'ESP del club, ed è quella nel file. **Su un
+altro ESP la sintassi cambia** — SendGrid vuole `{{UserNumber}}`, Mailchimp
 `*|USERNUMBER|*`, Brevo `{{contact.USERNUMBER}}` — e allora si sostituisce in
-blocco: il segnaposto compare solo lì, e un `sed` sul file basta.
+blocco: il segnaposto compare solo dentro i link del sito, e un `sed` sul file
+basta.
+
+**Il segnaposto della disiscrizione invece è ancora `{{UnsubscribeURL}}`**, e
+va allineato alla stessa sintassi il giorno che si tocca: è nel footer, una
+occorrenza sola. Sta scritto qui perché è l'unico posto del file che continua a
+parlare un'altra lingua, e un link di disiscrizione che non si risolve è il
+genere di cosa che nessuno prova prima di inviare.
 
 Tre cose da sapere.
 
@@ -83,20 +90,21 @@ client non caricano le immagini finché non glielo si chiede: la barra scura è
 HTML e non un ritaglio del poster, quindi resta visibile e cliccabile da sola,
 e l'`alt` dice cos'era. Provato nei due stati.
 
-Il poster è la copertina che YouTube genera,
-`i.ytimg.com/vi/uZcxkejW8fE/maxresdefault.jpg`. **Non è verificabile da qui** —
-`i.ytimg.com` è fuori dalla policy di rete di questo ambiente — e ha due cose
-da guardare in anteprima:
+Il poster è una **foto del club** — `/wp-content/uploads/2024/08/P1120372-scaled.jpg`,
+la stessa che il sito usa come poster del video della Scuola Nuoto — e **non**
+la copertina di YouTube.
 
-- **`maxresdefault` non esiste per ogni video**, solo per quelli con una
-  sorgente da 720p in su. Se manca, l'indirizzo da mettere è `hqdefault.jpg`,
-  che c'è sempre: è 480 × 360, quindi meno nitido, ma un poster sgranato è
-  meglio di un'immagine rotta.
-- **Uno Short è verticale**, e la copertina 16:9 può uscire con le bande ai
-  lati. Se non convince, al posto suo va bene una foto del club già su
-  WordPress — per esempio la hero della pagina del corso,
-  `/wp-content/uploads/2024/08/P1120412.jpg`: cambia una riga, il link resta
-  quello.
+Prima era `i.ytimg.com/vi/uZcxkejW8fE/maxresdefault.jpg`, e **nelle caselle non
+arrivava**: visto su un invio vero, non dedotto. Le due cause possibili sono
+tutte e due fuori dal nostro controllo — `maxresdefault` esiste solo per i video
+con una sorgente da 720p in su, e un dominio terzo lo può bloccare il client —
+quindi non si tratta di sceglierne un'altra di YouTube: si mette un'immagine su
+un host di cui sappiamo che le sue immagini arrivano, che è quello del logo.
+
+Pesa 372 kB e misura 2560 × 1441, servita a 536: è più del necessario, e resta
+così perché le varianti ottimizzate (`-1280`, `-640`) le genera **questo**
+repository e su WordPress non esistono. Il giorno dello spostamento del dominio
+si può passare alla `-1280`, che pesa 91 kB.
 
 
 ### Due cose che l'email dice e il sito no
@@ -112,9 +120,26 @@ e poi le richiede alla chat ottiene l'altra risposta, ed è il difetto che
   resta sospeso, che è la regola e non il margine;
 - **il Direttore Tecnico non riceve nella prima settimana di corso** —
   `direzione-tecnica.md` dice per chi è il servizio e non dice da quando;
+- **i braccioli li fornisce il club** — `cosa-occorre-2.md` la regola ce l'ha
+  già («tavolette, pull buoy, pinne e tutto il materiale didattico necessario
+  per le lezioni è fornito dal club») e non li nomina. Un genitore non sa se
+  un bracciolo conti come materiale didattico, quindi lo mette in borsa per
+  istinto: qui è nominato perché una regola generale non risponde alla domanda
+  che le persone fanno davvero;
 - **nell'area attesa le telecamere mostrano la vasca** — `accosso-corso.md`
   nomina la «zona attesa» e non dice che da lì si vede nuotare, che è l'unica
-  cosa per cui un genitore la sceglie invece della balconata.
+  cosa per cui un genitore la sceglie invece della balconata;
+- **la prima settimana vale per il centro, non per i soli spogliatoi** —
+  `accosso-corso.md` ha la regola dell'accompagnatore unico, ma non dice che
+  nei giorni di apertura è più stretta e riguarda l'ingresso al club;
+- **negli spogliatoi non si portano né si consumano alimenti** — non è scritto
+  da nessuna parte nel wiki;
+- **le gare della Scuola Nuoto si nuotano in casa** — `snb/gare-nuoto.md` dice
+  «nel nostro impianto o in altri di Roma», e quella seconda metà è dei gruppi
+  agonistici: sono loro che vanno in trasferta. Questa non è una riga in più
+  come le altre tre, è una **correzione**: finché la scheda resta com'è,
+  l'assistente manda un genitore della Scuola Nuoto a prepararsi per una gara
+  fuori sede.
 
 La tolleranza è scritta **con la sua scadenza nella stessa riga**, e non è uno
 scrupolo: «nelle prime settimane c'è tolleranza» da solo è una frase da cui si
