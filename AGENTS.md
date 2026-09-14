@@ -3828,6 +3828,74 @@ Vale per ogni forma di upgrade, compreso «voglio il Reformer sul mio
 abbonamento»: aggiungere un'attività *è* un cambio abbonamento, e passa dallo
 stesso modulo.
 
+### Chi vuole disdire dice prima perché, e le modalità arrivano al turno dopo
+
+Il club l'ha chiesto così: in chat, a chi vuole disdire si chiede **il motivo**,
+si aspetta la risposta, e solo dopo si danno le modalità. Se insiste, le
+modalità si danno comunque — ma il motivo si prova a chiederlo sempre, perché è
+la sola cosa di quella conversazione che il club non ha già: la procedura la
+persona la trova da sola, il motivo per cui se ne va no. Finisce nel trascritto
+(`chat_messaggi`), che è dove il desk lo rilegge.
+
+**Il 13/09 la chat ha fatto il contrario, e non per un errore del modello: stava
+eseguendo la regola che aveva.** La `2quinquies` di `Componi contesto` prescrive
+tre passi — (1) una riga di empatia con «se ti va di dirmi cosa non ha
+funzionato», *senza insistere*, (2) chiedi che tipo di abbonamento ha, (3) dai la
+procedura di quel tipo. Le due domande sono uscite nella stessa riga, la persona
+ha risposto «Annuale», e il motivo non è mai arrivato. **Una domanda di cortesia
+appoggiata a una domanda vera è una domanda sola, e vince quella facile.**
+
+Adesso una regola fissa nel `systemMessage` dice che il motivo **è** la domanda
+di quel turno: dentro non ci va nient'altro — non la procedura, non i dieci
+giorni, non l'indirizzo, non un pulsante, e nemmeno il tipo di abbonamento — e
+poi ci si ferma e si aspetta. Al turno dopo le modalità, senza una terza domanda:
+se il tipo non si sa, si dicono le strade in una frase invece di chiederlo.
+
+Quattro cose da sapere prima di toccarla.
+
+**Annulla per nome i passi (1) e (2) della `2quinquies`, che resta scritta dov'è,
+ed è un aggiramento dichiarato** — lo stesso di `SOLO_SE_CHIESTO[SINGOLO]`. Il
+testo vecchio vive dentro i 49 kB di codice di `Componi contesto`, le regole
+fisse stanno **dopo** nel prompt e sono il posto in cui questo file registra le
+correzioni: annullarla per nome costa una riga, riscriverla là costa il
+rifacimento di un nodo per due frasi. Il giorno che si tocca `Componi contesto`
+per altro, la `2quinquies` va riscritta lì e la regola fissa accorciata di
+conseguenza. Se invece l'errore torna, il passo dopo non è un'altra riga di
+prompt: è `Correggi anno gia' noto`, che è già il nodo dove una domanda che il
+modello non doveva fare si toglie dal testo.
+
+**Il perimetro è «sta disdicendo», non «parla di disdetta».** «Se mi iscrivo
+posso disdire quando voglio?», «quanto preavviso serve?» le fa chi sta
+valutando: chiedergli perché vuole disdire è rispondere a una decisione che non
+ha preso. Vale la regola di sempre — una regola che non dichiara il proprio
+perimetro si allarga al caso vicino.
+
+**Le due schede della disdetta non dicono la stessa cosa**, e la riga lo scrive
+perché scambiarle è l'errore comodo: per gli adulti il Mensile Flex e la Formula
+12 si disdicono da soli dall'area riservata e solo l'Annuale va per email, per i
+corsi dei bambini l'abbonamento mensile va **per email** anche se è mensile. Un
+genitore mandato in area riservata cerca un pulsante che per lui non esiste.
+
+**E l'indirizzo della disdetta esiste in un posto solo di tutto il prompt, che
+non è la knowledge base.** `data/testo.ts` toglie le caselle da tutto quello che
+passa di lì, quindi nel `kb.json` la riga della scheda diventa «Scrivi a
+indicando:» e la nota dei piani perde la clausola intera — «Rinnovo automatico
+annuale · disdetta via email a …» resta «Rinnovo automatico annuale». L'unico
+punto in cui `disdetta@athlonroma.it` sopravvive è **l'esempio della regola
+4bis**, che dichiara l'eccezione: un indirizzo che serve a *eseguire* una
+procedura non è un modo per farsi contattare, e si dà per intero. Quella riga non
+è quindi un esempio decorativo, è la fonte — chi la riscrive lascia l'assistente
+senza indirizzo, e un indirizzo che manca è un indirizzo che si inventa. (Il
+13/09 l'assistente l'ha scritto giusto; senza la 4bis lo avrebbe indovinato.)
+
+Per verificare: su n8n `versionId == activeVersionId` dopo il `publish_workflow`,
+e il diff con la versione prima dev'essere **solo** le righe della regola nuova.
+In chat: a «voglio disdire» la prima risposta è una domanda sola sul motivo,
+senza tipo di abbonamento, senza procedura e senza pulsanti; dopo la risposta
+arrivano le modalità con la scheda fra le fonti; a «dimmi solo come si fa» le
+modalità arrivano subito; e a «se mi iscrivo posso disdire quando voglio?» non
+si chiede nessun motivo.
+
 ## `/tour` è il totem all'ingresso, e registra una visita già avvenuta
 
 Il pannello all'ingresso del club sta aperto su questa pagina. Chi ha appena
