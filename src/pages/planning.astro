@@ -187,20 +187,27 @@ const faqs = await faqPagina([
         <span class="pl-scarica__esito" data-pl-esito aria-live="polite"></span>
       </p>
 
-      {/* ── Storie Instagram ──────────────────────────────────────────────
+      {/* ── Storie del giorno ──────────────────────────────────────────────
           Non è per chi legge la pagina: è lo strumento con cui il club genera
-          ogni mattina le storie del giorno, un JPEG 1080×1920 per area — sala
-          pesi, nuoto libero, scuola nuoto adulti, aqua fitness, corsi fitness,
-          group reformer — pronte da caricare così come sono. Sempre il giorno
-          di oggi, nel fuso di Roma: sono storie del giorno stesso, non un
-          calendario da sfogliare. */}
+          ogni mattina le storie del giorno — due fogli, acqua e sala, come i
+          fogli per gli schermi della sede — pronti da caricare così come
+          sono. Sempre il giorno di oggi, nel fuso di Roma: sono storie del
+          giorno stesso, non un calendario da sfogliare. Un foglio si spezza
+          in una seconda pagina solo nei giorni con troppe lezioni per stare
+          in una immagine sola alla dimensione minima leggibile.
+
+          Il pulsante genera le immagini ma non le scarica: il browser blocca
+          i download avviati in sequenza da uno script dopo il primo o il
+          secondo, silenziosamente — è il motivo per cui prima arrivava solo
+          l'ultima storia. Ogni file diventa un link, e il download parte solo
+          quando è la persona a premerlo. */}
       <p class="pl-scarica">
-        <span class="pl-scarica__eti">Storie Instagram</span>
         <button type="button" class="pl-scarica__btn" data-pl-storie>
-          Genera e scarica le storie di oggi
+          Genera le storie di oggi
         </button>
         <span class="pl-scarica__esito" data-pl-storie-esito aria-live="polite"></span>
       </p>
+      <ul class="pl-storie" data-pl-storie-elenco hidden></ul>
     </div>
   </section>
 </Layout>
@@ -231,13 +238,27 @@ const faqs = await faqPagina([
   document.querySelectorAll('[data-pl-storie]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const esito = document.querySelector('[data-pl-storie-esito]');
+      const elenco = document.querySelector('[data-pl-storie-elenco]');
       const prima = btn.textContent;
       btn.setAttribute('disabled', 'true');
       btn.textContent = 'Preparo…';
       try {
-        const { scaricaStorieDelGiorno } = await import('../lib/planningStorie.client.js');
-        const fatto = await scaricaStorieDelGiorno();
-        if (esito) esito.textContent = `${fatto.file} storie scaricate — ${fatto.giorno}`;
+        const { generaStorieDelGiorno } = await import('../lib/planningStorie.client.js');
+        const fatto = await generaStorieDelGiorno();
+        if (elenco) {
+          elenco.innerHTML = '';
+          fatto.file.forEach((f) => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = f.url;
+            a.download = f.nome;
+            a.textContent = f.etichetta || f.nome;
+            li.appendChild(a);
+            elenco.appendChild(li);
+          });
+          elenco.removeAttribute('hidden');
+        }
+        if (esito) esito.textContent = `${fatto.file.length} storie pronte — ${fatto.giorno}. Scaricale una per una qui sotto.`;
       } catch (e) {
         if (esito) esito.textContent = 'Non è riuscito: riprova o guarda la console.';
         console.error(e);
@@ -396,6 +417,23 @@ const faqs = await faqPagina([
 
   .pl-scarica__esito {
     color: var(--text-muted);
+  }
+
+  .pl-storie {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-2xs);
+  }
+
+  .pl-storie a {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   .pl-note {
