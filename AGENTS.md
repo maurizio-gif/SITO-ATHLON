@@ -3218,23 +3218,66 @@ importo scritto in una voce, e non porta con sé niente che lo distingua.
 
 Quindi le due cifre che stavano nelle regole di `Componi contesto` sono state
 tolte — i «95 €/mese» che facevano da esempio di grassetto nella regola 6 e i
-«22 € a lezione» della 7ter — e la regola **2sexies** dice le tre cose che il
-dato da solo non può dire: che un importo si copia **dalla riga che lo porta**,
-col nome della cosa che costa quella cifra (gli accessi singoli sono sei righe
-con sei attività e importi diversi); che **se la voce degli accessi singoli non è
-nel contesto, il prezzo della lezione singola non ce l'hai** — si dice che si
-entra anche senza abbonamento e si manda alla pagina, non si dice un numero; e
-che nessuna cifra scritta dentro le regole è un listino, perché nel
-`systemMessage` dell'agente ne restano (là sono resoconti di errori già fatti, e
-riscriverle è il passo dopo).
+«22 € a lezione» della 7ter — e la regola **2sexies** dice quello che il dato da
+solo non può dire: che un importo si copia **dalla riga che lo porta**, col nome
+della cosa che costa quella cifra (gli accessi singoli sono sei righe con sei
+attività e importi diversi), e che nessuna cifra scritta dentro le regole è un
+listino — nel `systemMessage` dell'agente ne restano, e là sono resoconti di
+errori già fatti; riscriverle è il passo dopo.
 
-**E il cancello e il prompt devono dire la stessa cosa.** Qui non la dicevano:
-`SOLO_SE_CHIESTO[SINGOLO]` decide *quando la voce entra* guardando le parole
-della **persona**, mentre le regole 7ter e 8bis lasciano all'assistente nominare
-la lezione singola in casi che quel cancello non riconosce — una ex socia, a cui
-il Guest Pass non spetta, che chiede di provare. Il risultato è un'offerta fatta
-senza il dato che la regge. Finché le due metà restano separate, la 2sexies è
-quello che le tiene insieme: *offri pure, ma senza la voce il numero non lo dire*.
+#### E un prezzo non passa da nessun cancello
+
+La prima stesura di questa correzione chiudeva con *«se la voce degli accessi
+singoli non è nel contesto, il prezzo della lezione singola non ce l'hai»*. È il
+ripiego, non la cura, e la regola vera è più semplice: **se il modello può
+nominare un prodotto, deve avere davanti il suo prezzo.** Sapere che una cosa
+esiste e non sapere quanto costa è lo stato esatto in cui i numeri si inventano
+— ed è lo stato che quel cancello creava.
+
+Perché le due metà non si parlavano: `SOLO_SE_CHIESTO[SINGOLO]` decide *quando
+la voce entra* guardando le parole della **persona**, mentre le regole 7ter e
+8bis lasciano all'assistente nominare la lezione singola in casi che quel
+cancello non riconosce — una ex socia, a cui il Guest Pass non spetta, che chiede
+di provare. Il cancello quindi non impediva l'offerta: toglieva solo il listino
+a chi la stava facendo.
+
+Ora le due cose sono separate nei dati. `abbonamento:accessi-singoli` resta
+l'**offerta** — «si può entrare senza abbonamento», niente carnet — e resta
+dietro il cancello, perché la 7ter vuole che l'abbonamento venga prima. Accanto
+c'è `abbonamento:accessi-singoli-listino`, che porta **solo gli importi**, una
+riga per attività, e in `Componi contesto` è **ancorata**: non compete per un
+posto e non dipende dal punteggio. Ancorata e non lasciata al recupero perché il
+guasto è nato in un turno che di parole di prezzo non ne aveva nessuna — la
+domanda era «Pilates reformer».
+
+Tre cose da sapere prima di toccarla.
+
+**Le due voci non stanno mai insieme.** Portano le stesse sei righe, quindi
+quando passa quella piena il listino esce. Il controllo guarda **cosa è
+sopravvissuto al filtro**, non la condizione del cancello: `Vaglio Guest Pass`
+può aver rinominato la voce piena per farle scavalcare il cancello — è
+l'aggiramento dichiarato di `SOLO_SE_CHIESTO[SINGOLO]` — e la domanda giusta è
+«ce n'è già una?», non «il cancello si sarebbe aperto?».
+
+**Nel ramo junior non entra**, come l'offerta: a un genitore che chiede del corso
+di suo figlio un listino di prezzi adulti è una risposta sbagliata.
+
+**Avere il listino davanti non è il permesso di proporlo**, e la voce lo dice di
+sé: quando si nomina la lezione singola lo decide la 7ter, questa dice soltanto
+quanto costa. È la stessa forma del perimetro scritto nel dato invece che nel
+prompt.
+
+E la verifica generale, che vale oltre questo caso: **tutti gli importi dei dati
+devono arrivare nel `kb.json`**. Sull'ultima passata sono 24 su 24 — il file era
+già completo, e a mancare era solo il passaggio nel *contesto*. I due posti sono
+diversi e vanno controllati separatamente: un prezzo può esserci nel `kb.json` e
+non arrivare mai davanti al modello.
+
+**L'ordine del rilascio conta.** La 2sexies ora afferma che il listino c'è
+sempre, e quell'affermazione è vera solo dopo che il sito ha pubblicato la voce
+nuova: la versione di `CHAT ATHLON` che la contiene si pubblica **dopo** il
+deploy, non prima. Una regola che dichiara presente una voce che non c'è è
+peggio della regola che sostituisce.
 
 #### L'impegno minimo va detto dove si parla di disdetta, non in un'altra voce
 

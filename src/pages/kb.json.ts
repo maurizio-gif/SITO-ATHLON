@@ -946,6 +946,36 @@ export const GET: APIRoute = async () => {
     ),
   });
 
+  /* ---- E il listino da solo, che non passa da nessun cancello -----------
+     La voce qui sopra e' l'**offerta** — si puo' entrare senza abbonamento — e
+     su n8n sta dietro `SOLO_SE_CHIESTO`, che la tiene fuori dal contesto finche'
+     non e' la persona a chiedere l'accesso singolo: senza quel cancello la
+     lezione singola finisce proposta a chiunque, ed e' la regola 7ter.
+
+     Ma il cancello toglieva anche gli **importi**, e il 15/09 e' costato caro:
+     l'assistente ha proposto la lezione singola di suo (glielo lascia fare la
+     7ter, per chi non vuole impegni) e, senza il listino davanti, ha attribuito
+     al Group Reformer un prezzo che non era il suo. Uno stato in cui il modello
+     sa che un prodotto esiste e non sa quanto costa e' il peggiore dei due
+     mondi: e' li' che i numeri si inventano.
+
+     Quindi i prezzi si separano dall'offerta e **stanno sempre nel contesto**.
+     Una cifra si copia, non si indovina: il cancello continua a governare
+     *quando si propone*, questa voce garantisce *quanto costa*. */
+  voci.push({
+    id: 'abbonamento:accessi-singoli-listino',
+    tipo: 'abbonamento',
+    titolo: 'Listino degli accessi singoli, attivita\u2019 per attivita\u2019',
+    url: `${SITE}/abbonamenti#accessi-singoli`,
+    area: 'Abbonamenti',
+    attivita: [],
+    testo: blocchi(
+      `**Gli importi degli accessi singoli, uno per attivita\u2019.** Sono diversi fra loro, quindi si copia la riga dell\u2019attivita\u2019 di cui si sta parlando e non quella accanto. Il badge di accesso, una tantum la prima volta, costa ${SINGOLI.badge} \u20ac.`,
+      SINGOLI.voci.map((v) => `${v.nome}: ${v.prezzo} \u20ac per accesso.`).join('\n'),
+      '**Questa voce e\u2019 il listino, non un invito a proporre la lezione singola.** Serve perche\u2019 un importo non si deve mai indovinare, e per questo c\u2019e\u2019 sempre. Se proporla o no e\u2019 un\u2019altra decisione, e la prende la regola sull\u2019abbonamento: se non l\u2019ha chiesta lui, il prezzo ce l\u2019hai e non si nomina.'
+    ),
+  });
+
   voci.push({
     id: 'abbonamento:personal-training',
     tipo: 'abbonamento',
