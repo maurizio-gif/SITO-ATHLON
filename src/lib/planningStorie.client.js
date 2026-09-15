@@ -235,23 +235,20 @@ function disegnaSezioneOrari(giorno) {
   return c;
 }
 
-function scarica(canvas, nome) {
+/**
+ * Il canvas come URL scaricabile, senza avviare nessun download.
+ *
+ * Il browser blocca i download in sequenza avviati da script — dopo il primo
+ * o il secondo, silenziosamente, senza un errore da intercettare — quindi
+ * mandare `a.click()` per ognuna delle sei-otto storie del giorno ne faceva
+ * arrivare una sola (l'ultima, quella per cui l'utente aveva ancora un
+ * "consenti" da dare). Il rimedio non è nel codice: ogni storia deve essere un
+ * link che la persona preme di suo pugno, perché solo un click vero passa il
+ * filtro del browser una volta per file.
+ */
+function comeUrl(canvas) {
   return new Promise((risolvi) => {
-    canvas.toBlob(
-      (blob) => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = nome;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.setTimeout(() => URL.revokeObjectURL(url), 4000);
-        risolvi();
-      },
-      'image/jpeg',
-      0.94
-    );
+    canvas.toBlob((blob) => risolvi(URL.createObjectURL(blob)), 'image/jpeg', 0.94);
   });
 }
 
@@ -267,23 +264,25 @@ const AREE = [
 ];
 
 /**
- * Genera e scarica le storie del giorno indicato (di default oggi, fuso di
- * Roma). Un'area senza lezioni quel giorno non genera nessun file — succede
- * di sabato per la scuola nuoto adulti, e ogni giorno tranne oggi per le
- * altre quattro fasce se `giorno` è la domenica.
+ * Genera le storie del giorno indicato (di default oggi, fuso di Roma) e
+ * restituisce l'elenco, senza scaricare niente: ogni voce porta `nome` e
+ * `url` (un object URL), e il download parte quando la persona preme il
+ * link — deve essere il suo click, non uno script, o il browser ne blocca
+ * tutti tranne il primo. Un'area senza lezioni quel giorno non compare —
+ * succede di sabato per la scuola nuoto adulti, e ogni giorno tranne oggi
+ * per le altre quattro fasce se `giorno` è la domenica.
  */
-export async function scaricaStorieDelGiorno(giorno) {
+export async function generaStorieDelGiorno(giorno) {
   if (document.fonts && document.fonts.ready) await document.fonts.ready;
 
   const g = giorno || oggiRoma();
   const slug = String(g.short).toLowerCase();
-  let generate = 0;
+  const file = [];
 
   for (const area of AREE) {
     if (area.orari) {
       const canvas = disegnaSezioneOrari(g);
-      await scarica(canvas, `storia-${slug}-gym-floor.jpg`);
-      generate += 1;
+      file.push({ nome: `storia-${slug}-gym-floor.jpg`, etichetta: 'Gym Floor', url: await comeUrl(canvas) });
       continue;
     }
 
@@ -293,12 +292,15 @@ export async function scaricaStorieDelGiorno(giorno) {
     const pagine = disegnaPagineArea(area, items, g);
     for (let i = 0; i < pagine.length; i++) {
       const suffix = pagine.length > 1 ? `-${i + 1}` : '';
-      await scarica(pagine[i], `storia-${slug}-${area.id}${suffix}.jpg`);
-      generate += 1;
+      file.push({
+        nome: `storia-${slug}-${area.id}${suffix}.jpg`,
+        etichetta: pagine.length > 1 ? `${area.titolo} ${i + 1}/${pagine.length}` : area.titolo,
+        url: await comeUrl(pagine[i]),
+      });
     }
   }
 
-  return { file: generate, giorno: `${NOMI[g.short]} ${g.dataEsteso}` };
+  return { file, giorno: `${NOMI[g.short]} ${g.dataEsteso}` };
 }
 
 /** Le pagine (canvas) necessarie per l'elenco di lezioni di un'area, un giorno solo. */
