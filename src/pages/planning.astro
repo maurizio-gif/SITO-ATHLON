@@ -186,6 +186,21 @@ const faqs = await faqPagina([
         </button>
         <span class="pl-scarica__esito" data-pl-esito aria-live="polite"></span>
       </p>
+
+      {/* ── Storie Instagram ──────────────────────────────────────────────
+          Non è per chi legge la pagina: è lo strumento con cui il club genera
+          ogni mattina le storie del giorno, un JPEG 1080×1920 per area — sala
+          pesi, nuoto libero, scuola nuoto adulti, aqua fitness, corsi fitness,
+          group reformer — pronte da caricare così come sono. Sempre il giorno
+          di oggi, nel fuso di Roma: sono storie del giorno stesso, non un
+          calendario da sfogliare. */}
+      <p class="pl-scarica">
+        <span class="pl-scarica__eti">Storie Instagram</span>
+        <button type="button" class="pl-scarica__btn" data-pl-storie>
+          Genera e scarica le storie di oggi
+        </button>
+        <span class="pl-scarica__esito" data-pl-storie-esito aria-live="polite"></span>
+      </p>
     </div>
   </section>
 </Layout>
@@ -204,6 +219,25 @@ const faqs = await faqPagina([
         const { scaricaPlanning } = await import('../lib/planningJpeg.client.js');
         const fatto = await scaricaPlanning();
         if (esito) esito.textContent = `${fatto.pagine} pagine, caratteri ~${fatto.mm} mm`;
+      } catch (e) {
+        if (esito) esito.textContent = 'Non è riuscito: riprova o guarda la console.';
+        console.error(e);
+      }
+      btn.textContent = prima;
+      btn.removeAttribute('disabled');
+    });
+  });
+
+  document.querySelectorAll('[data-pl-storie]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const esito = document.querySelector('[data-pl-storie-esito]');
+      const prima = btn.textContent;
+      btn.setAttribute('disabled', 'true');
+      btn.textContent = 'Preparo…';
+      try {
+        const { scaricaStorieDelGiorno } = await import('../lib/planningStorie.client.js');
+        const fatto = await scaricaStorieDelGiorno();
+        if (esito) esito.textContent = `${fatto.file} storie scaricate — ${fatto.giorno}`;
       } catch (e) {
         if (esito) esito.textContent = 'Non è riuscito: riprova o guarda la console.';
         console.error(e);
