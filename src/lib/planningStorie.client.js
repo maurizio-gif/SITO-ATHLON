@@ -6,14 +6,14 @@
 // e non vengono toccati qui). Ogni foglio impila le sue sotto-sezioni una
 // sopra l'altra — la Gym Floor come una fascia oraria, Corsi Fitness e Group
 // Reformer come elenchi — con un'altezza di riga che si restringe da sola
-// finché tutte le lezioni di oggi ci stanno in una sola immagine: è lo stesso
-// principio di `planningJpeg.client.js` applicato a un giorno solo invece che
-// a una settimana intera, e per questo quasi sempre basta una pagina.
+// finché tutte le lezioni di oggi ci stanno in una sola immagine, e una
+// sezione affollata (Corsi Fitness arriva a diciassette il martedì) passa da
+// sola a due colonne invece di lasciare che il corpo del testo si schiacci:
+// è quello che tiene il carattere grande anche nei giorni pieni.
 //
-// Solo quando anche la riga più stretta non basta — un martedì con diciassette
-// corsi fitness più il reformer — un foglio si spezza in una seconda pagina,
-// che riprende l'ultima sotto-sezione interrotta con "(continua)" invece di
-// perderne il titolo.
+// Solo se nemmeno le due colonne bastassero — non succede con il palinsesto
+// attuale — un foglio si spezzerebbe in una seconda pagina, riprendendo la
+// sotto-sezione interrotta con "(continua)" invece di perderne il titolo.
 
 import dati from '../data/planning-corrente.json';
 import { roomColor } from '../data/planning';
@@ -196,7 +196,7 @@ function disegnaOrarioSottosezione(x, y, hours) {
 
   x.fillStyle = C.spento;
   x.font = '600 28px Inter, sans-serif';
-  x.fillText('Aperta con prenotazione — Con Assistenza o Allenamento Libero', 96, y + 46);
+  x.fillText('Aperta con prenotazione', 96, y + 46);
 
   x.fillStyle = C.accento;
   x.font = "700 64px 'Tusker-Grotesk', sans-serif";
@@ -209,42 +209,45 @@ const ALTEZZA_ORARIO_SOTTOSEZIONE = 176;
 
 /**
  * Una riga di lezione: carta bianca, filo colorato a sinistra, ora e nome.
- * I corpi del testo sono proporzionali all'altezza della riga, perché quella
- * altezza cambia da un giorno all'altro — è quello che permette a un foglio
- * di restringersi da solo invece di spezzarsi in due pagine.
+ * `gx` e `w` sono il bordo sinistro e la larghezza della carta — parametrici
+ * perché una sezione affollata (Corsi Fitness) disegna le sue righe su due
+ * colonne strette invece che su una sola larga. I corpi del testo sono
+ * proporzionali all'altezza della riga, perché quella altezza cambia da un
+ * giorno all'altro: è quello che permette a un foglio di restringersi da solo
+ * invece di spezzarsi subito in due pagine.
  */
-function disegnaRiga(x, gy, h, item) {
+function disegnaRiga(x, gx, gy, w, h, item) {
   const colore = roomColor(item.sala, 'light') || C.accento;
   x.fillStyle = C.bianco;
-  carta(x, 64, gy, L - 128, h, 16);
+  carta(x, gx, gy, w, h, 16);
   x.fill();
   x.strokeStyle = C.filo;
   x.lineWidth = 1.5;
   x.stroke();
 
   x.fillStyle = colore;
-  carta(x, 64, gy, 8, h, 4);
+  carta(x, gx, gy, 8, h, 4);
   x.fill();
 
   const orario = String(item.time).replace(/^Dom\s*/, '');
   const fOrario = Math.max(20, Math.round(h * 0.4));
   const fNome = Math.max(18, Math.round(h * 0.34));
   const fSala = Math.max(14, Math.round(h * 0.24));
-  const largoOrario = Math.round(h * 3.1);
+  const largoOrario = Math.min(Math.round(h * 3.1), Math.round(w * 0.4));
 
   x.fillStyle = C.scuro;
   x.font = `700 ${fOrario}px Inter, sans-serif`;
-  scrivi(x, orario, 96, gy + h * 0.42, largoOrario);
+  scrivi(x, orario, gx + 32, gy + h * 0.42, largoOrario);
 
-  const largoNome = item.sala ? L - 128 - largoOrario - 40 - 220 : L - 128 - largoOrario - 40;
+  const largoNome = Math.max(48, item.sala ? w - largoOrario - 40 - 190 : w - largoOrario - 40);
 
   x.font = `600 ${fNome}px Inter, sans-serif`;
-  scrivi(x, item.name, 96 + largoOrario, gy + h * 0.4, largoNome);
+  scrivi(x, item.name, gx + 32 + largoOrario, gy + h * 0.4, largoNome);
 
   if (item.sala) {
     x.fillStyle = C.spento;
     x.font = `600 ${fSala}px Inter, sans-serif`;
-    scrivi(x, String(item.sala), 96 + largoOrario, gy + h * 0.72, largoNome);
+    scrivi(x, String(item.sala), gx + 32 + largoOrario, gy + h * 0.72, largoNome);
   }
 }
 
@@ -372,7 +375,95 @@ function disegnaPagina(gruppo, giorno, blocchi, rowH, pagina, totalePagine) {
     } else if (blocco.tipo === 'orari') {
       y += disegnaOrarioSottosezione(x, y, blocco.hours);
     } else {
-      disegnaRiga(x, y, rowH, blocco.item);
+      disegnaRiga(x, 64, y, L - 128, rowH, blocco.item);
+      y += rowH + 18;
+    }
+  });
+
+  disegnaPiede(x);
+  return c;
+}
+
+/** Le colonne di una sezione: due quando l'elenco è affollato, o il corpo
+ *  della riga scenderebbe troppo per restare leggibile — la sala pesa più,
+ *  perché è lì che i corsi fitness arrivano a diciassette in un giorno. */
+const SOGLIA_DUE_COLONNE = 6;
+const GAP_COLONNE = 24;
+
+function decidiColonne(numeroRighe) {
+  return numeroRighe > SOGLIA_DUE_COLONNE ? 2 : 1;
+}
+
+/** Le sotto-sezioni di un foglio, con le lezioni di oggi e — se affollate —
+ *  già divise in due colonne. */
+function costruisciSezioni(gruppo, giorno) {
+  const sezioni = [];
+  for (const sez of gruppo.sezioni) {
+    if (sez.orari) {
+      const indice = giorno.short === 'Sab' ? 1 : giorno.short === 'Dom' ? 2 : 0;
+      const h = dati.gymFloor.hours[indice];
+      if (!h) continue;
+      sezioni.push({ tipo: 'orari', titolo: sez.titolo, hours: h.hours });
+      continue;
+    }
+    const items = classiDelGiorno(sez.id, giorno.short);
+    if (!items.length) continue;
+    sezioni.push({ tipo: 'lezioni', titolo: sez.titolo, items, colonne: decidiColonne(items.length) });
+  }
+  return sezioni;
+}
+
+/** Quante righe verticali occupa davvero una sezione, colonne comprese. */
+function righeVerticali(sezione) {
+  if (sezione.tipo === 'orari') return 0;
+  return Math.ceil(sezione.items.length / sezione.colonne);
+}
+
+/** L'altezza fissa di una sezione — tutto tranne le righe di lezioni. */
+function altezzaFissaSezione(sezione) {
+  return ALTEZZA_TITOLO_SOTTOSEZIONE + (sezione.tipo === 'orari' ? ALTEZZA_ORARIO_SOTTOSEZIONE : 0);
+}
+
+/** Disegna un foglio a partire dalle sue sezioni, su una sola pagina. */
+function disegnaPaginaSezioni(gruppo, giorno, sezioni, rowH, pagina, totalePagine) {
+  const c = document.createElement('canvas');
+  c.width = L;
+  c.height = A;
+  const x = c.getContext('2d');
+  x.fillStyle = C.carta;
+  x.fillRect(0, 0, L, A);
+  x.textBaseline = 'alphabetic';
+
+  disegnaTestata(x, giorno);
+  let y = disegnaTitoloGruppo(x, 322, gruppo.etichetta, pagina, totalePagine);
+
+  sezioni.forEach((sezione) => {
+    y += disegnaTitoloSottosezione(x, y, sezione.titolo);
+
+    if (sezione.tipo === 'orari') {
+      y += disegnaOrarioSottosezione(x, y, sezione.hours);
+      return;
+    }
+
+    if (sezione.colonne === 1) {
+      sezione.items.forEach((item) => {
+        disegnaRiga(x, 64, y, L - 128, rowH, item);
+        y += rowH + 18;
+      });
+      return;
+    }
+
+    // Due colonne: la prima metà a sinistra, il resto a destra, fianco a
+    // fianco — l'elenco occupa la metà delle righe verticali.
+    const perColonna = Math.ceil(sezione.items.length / 2);
+    const colonna1 = sezione.items.slice(0, perColonna);
+    const colonna2 = sezione.items.slice(perColonna);
+    const colW = (L - 128 - GAP_COLONNE) / 2;
+    const gx2 = 64 + colW + GAP_COLONNE;
+
+    for (let i = 0; i < perColonna; i++) {
+      if (colonna1[i]) disegnaRiga(x, 64, y, colW, rowH, colonna1[i]);
+      if (colonna2[i]) disegnaRiga(x, gx2, y, colW, rowH, colonna2[i]);
       y += rowH + 18;
     }
   });
@@ -384,24 +475,30 @@ function disegnaPagina(gruppo, giorno, blocchi, rowH, pagina, totalePagine) {
 /**
  * Un foglio — «In acqua» o «In sala» — con le lezioni di oggi soltanto.
  * Quasi sempre una pagina sola: l'altezza di riga si restringe finché tutto
- * ci sta, fra `RIGA_MAX` (comoda) e `RIGA_MIN` (il fondo leggibile). Solo
- * quando nemmeno `RIGA_MIN` basta il foglio si spezza in più pagine.
+ * ci sta, fra `RIGA_MAX` (comoda) e `RIGA_MIN` (il fondo leggibile), e una
+ * sezione affollata passa a due colonne prima ancora che il restringimento
+ * la costringa a un corpo minuscolo. Solo quando nemmeno questo basta — non
+ * succede con il palinsesto di oggi, ma il giorno che ne aggiungesse molte
+ * di più potrebbe — il foglio si spezza in una seconda pagina.
  */
 function disegnaFoglio(gruppo, giorno) {
-  const blocchi = costruisciBlocchi(gruppo, giorno);
-  if (!blocchi.length) return [];
+  const sezioni = costruisciSezioni(gruppo, giorno);
+  if (!sezioni.length) return [];
 
-  const righe = blocchi.filter((b) => b.tipo === 'riga').length;
+  const righe = sezioni.reduce((n, s) => n + righeVerticali(s), 0);
   const disponibile = yPiede - 40 - Y_CONTENUTO;
-  const fisso = blocchi.reduce((n, b) => n + (b.tipo === 'riga' ? 0 : altezzaBlocco(b, 0)), 0);
+  const fisso = sezioni.reduce((n, s) => n + altezzaFissaSezione(s), 0);
 
   let rowH = righe > 0 ? Math.floor((disponibile - fisso) / righe) - 18 : RIGA_MAX;
   rowH = Math.min(RIGA_MAX, rowH || RIGA_MAX);
 
   if (rowH >= RIGA_MIN) {
-    return [disegnaPagina(gruppo, giorno, blocchi, rowH, 1, 1)];
+    return [disegnaPaginaSezioni(gruppo, giorno, sezioni, rowH, 1, 1)];
   }
 
+  // Ripiego raro: anche a due colonne non basta. Si torna all'elenco piatto,
+  // una colonna sola, spezzato in più pagine come farebbe qualunque foglio.
+  const blocchi = costruisciBlocchi(gruppo, giorno);
   const pagine = impaginaBlocchi(blocchi, RIGA_MIN, disponibile);
   return pagine.map((pblocchi, i) => disegnaPagina(gruppo, giorno, pblocchi, RIGA_MIN, i + 1, pagine.length));
 }
