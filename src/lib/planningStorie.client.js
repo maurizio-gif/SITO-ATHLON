@@ -237,20 +237,24 @@ function disegnaRiga(x, gx, gy, w, h, item) {
   const fNome = Math.max(18, Math.round(h * 0.34));
   const fSala = Math.max(14, Math.round(h * 0.24));
   const largoOrario = Math.min(Math.round(h * 3.1), Math.round(w * 0.5));
+  // Uno spazio fisso fra la colonna dell'orario e il nome: senza, un orario
+  // che riempie quasi tutta la sua colonna (le due colonne strette dei Corsi
+  // Fitness, con orari come "07:40–08:30") tocca il nome che segue.
+  const GAP_ORARIO_NOME = 20;
 
   x.fillStyle = C.scuro;
   x.font = `700 ${fOrario}px Inter, sans-serif`;
   scrivi(x, orario, gx + 32, gy + h * 0.42, largoOrario);
 
-  const largoNome = Math.max(48, w - largoOrario - 40 - (item.sala ? 32 : 0));
+  const largoNome = Math.max(48, w - largoOrario - 40 - GAP_ORARIO_NOME - (item.sala ? 32 : 0));
 
   x.font = `600 ${fNome}px Inter, sans-serif`;
-  scrivi(x, item.name, gx + 32 + largoOrario, gy + h * 0.4, largoNome);
+  scrivi(x, item.name, gx + 32 + largoOrario + GAP_ORARIO_NOME, gy + h * 0.4, largoNome);
 
   if (item.sala) {
     x.fillStyle = C.spento;
     x.font = `600 ${fSala}px Inter, sans-serif`;
-    scrivi(x, String(item.sala), gx + 32 + largoOrario, gy + h * 0.72, largoNome);
+    scrivi(x, String(item.sala), gx + 32 + largoOrario + GAP_ORARIO_NOME, gy + h * 0.72, largoNome);
   }
 }
 
@@ -368,6 +372,10 @@ function impaginaBlocchi(blocchi, rowH, disponibile) {
 
 const RIGA_MIN = 40;
 const RIGA_MAX = 100;
+/** Il margine massimo usato per centrare un foglio con poche righe — oltre
+ *  questa soglia lo spazio in eccesso diventa respiro fra le righe, non un
+ *  vuoto sotto il titolo. */
+const CENTRATURA_MAX = 90;
 const Y_CONTENUTO = 322 + 96; // testata + titolo del foglio
 
 /** Disegna un foglio a partire dai suoi blocchi, con l'altezza di riga data. */
@@ -441,15 +449,17 @@ function altezzaFissaSezione(sezione) {
 /**
  * Disegna un foglio a partire dalle sue sezioni, su una sola pagina.
  *
- * `centraturaExtra` è lo spazio in più, oltre al normale margine sotto il
- * titolo del foglio, prima della prima sotto-sezione: quando le righe sono
- * già alla loro altezza massima (`RIGA_MAX`) e il foglio ha poche lezioni —
- * la Gym Floor con due sole prenotazioni di Group Reformer, per dire —
- * crescere ancora le carte le farebbe sproporzionate. Il resto dello spazio
- * libero si spalma qui sopra e sotto il contenuto, centrandolo nel foglio
- * invece di lasciarlo appiccicato in cima con un vuoto in fondo.
+ * `centratura` è il margine in più, oltre al normale spazio sotto il titolo
+ * del foglio, prima della prima sotto-sezione; `gap` è lo spazio verticale
+ * dopo ogni riga, di norma 18px. Quando le righe sono già alla loro altezza
+ * massima (`RIGA_MAX`) e il foglio ha poche lezioni — la Gym Floor con
+ * poche prenotazioni di Group Reformer, per dire — crescere ancora le carte
+ * le farebbe sproporzionate. Lo spazio libero si divide allora in due: un
+ * margine sopra e sotto il contenuto per centrarlo nel foglio, e un respiro
+ * fra le righe perché il contenuto non resti comunque appiccicato in un
+ * blocco isolato subito sotto il titolo.
  */
-function disegnaPaginaSezioni(gruppo, giorno, sezioni, rowH, pagina, totalePagine, centraturaExtra = 0) {
+function disegnaPaginaSezioni(gruppo, giorno, sezioni, rowH, pagina, totalePagine, centratura = 0, gap = 18) {
   const c = document.createElement('canvas');
   c.width = L;
   c.height = A;
@@ -459,7 +469,7 @@ function disegnaPaginaSezioni(gruppo, giorno, sezioni, rowH, pagina, totalePagin
   x.textBaseline = 'alphabetic';
 
   disegnaTestata(x, giorno);
-  let y = disegnaTitoloGruppo(x, 322, gruppo.etichetta, pagina, totalePagine) + centraturaExtra;
+  let y = disegnaTitoloGruppo(x, 322, gruppo.etichetta, pagina, totalePagine) + centratura;
 
   sezioni.forEach((sezione) => {
     y += disegnaTitoloSottosezione(x, y, sezione.titolo);
@@ -472,7 +482,7 @@ function disegnaPaginaSezioni(gruppo, giorno, sezioni, rowH, pagina, totalePagin
     if (sezione.colonne === 1) {
       sezione.items.forEach((item) => {
         disegnaRiga(x, 64, y, L - 128, rowH, item);
-        y += rowH + 18;
+        y += rowH + gap;
       });
       return;
     }
@@ -488,7 +498,7 @@ function disegnaPaginaSezioni(gruppo, giorno, sezioni, rowH, pagina, totalePagin
     for (let i = 0; i < perColonna; i++) {
       if (colonna1[i]) disegnaRiga(x, 64, y, colW, rowH, colonna1[i]);
       if (colonna2[i]) disegnaRiga(x, gx2, y, colW, rowH, colonna2[i]);
-      y += rowH + 18;
+      y += rowH + gap;
     }
   });
 
@@ -517,14 +527,19 @@ function disegnaFoglio(gruppo, giorno) {
   rowH = Math.min(RIGA_MAX, rowH || RIGA_MAX);
 
   if (rowH >= RIGA_MIN) {
-    // Il resto dello spazio, se le righe sono già al loro massimo, centra il
-    // contenuto nel foglio invece di lasciarlo appiccicato in cima con un
-    // vuoto in fondo — poche prenotazioni di Group Reformer sul foglio della
-    // palestra, per dire.
+    // Il resto dello spazio, se le righe sono già al loro massimo, non va
+    // tutto sopra come un unico vuoto sotto il titolo: un margine — sopra e
+    // sotto, per centrare il blocco — resta contenuto entro `CENTRATURA_MAX`,
+    // e quel che avanza si spalma come respiro in più fra una riga e
+    // l'altra. Poche prenotazioni di Group Reformer sul foglio della
+    // palestra, per dire, restano un gruppo compatto ancorato sotto il
+    // titolo invece di un blocco isolato a metà pagina.
     const usato = fisso + Math.max(0, righe - 1) * (rowH + 18) + (righe > 0 ? rowH : 0);
-    const avanzo = disponibile - usato;
-    const centraturaExtra = avanzo > 0 ? Math.floor(avanzo / 2) : 0;
-    return [disegnaPaginaSezioni(gruppo, giorno, sezioni, rowH, 1, 1, centraturaExtra)];
+    const avanzo = Math.max(0, disponibile - usato);
+    const centratura = Math.min(Math.floor(avanzo / 2), CENTRATURA_MAX);
+    const restante = avanzo - centratura * 2;
+    const gap = righe > 0 ? 18 + Math.floor(restante / righe) : 18;
+    return [disegnaPaginaSezioni(gruppo, giorno, sezioni, rowH, 1, 1, centratura, gap)];
   }
 
   // Ripiego raro: anche a due colonne non basta. Si torna all'elenco piatto,
