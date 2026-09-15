@@ -3134,6 +3134,195 @@ tornano. Non sono stati toccati — un prezzo dichiarato è una decisione del cl
 non un conto da correggere in silenzio — ma vanno confermati o corretti: sono la
 cifra che l'assistente cita alla lettera, e il 08/09 l'ha citata.
 
+#### Un nome scritto male cancella la sua voce, e l'assenza diventa una negazione
+
+Il 15/09, a «vorrei info e prezzi per il **calistenichs**», la chat ha risposto
+*«purtroppo il calisthenics non lo facciamo qui da noi»* e ha proposto la Gym
+Floor. Il Calisthenics è un nostro corso: ha la sua pagina, sta in palinsesto
+tre volte a settimana, ed è dentro il Premium. È il danno peggiore che questa
+chat possa fare — non un dato sbagliato, ma un cliente mandato via da una cosa
+che vendiamo.
+
+**Il modello non ha inventato: ha eseguito le regole alla lettera su un contesto
+monco.** Nell'esecuzione `1572896` la parola «Calisthenics» compare **zero
+volte** nei 62 kB di contesto. Il recupero confronta le chiavi della domanda con
+i testi delle voci per **sottostringa esatta**, e `calistenichs` non è
+sottostringa di `calisthenics`: punteggio zero, voce fuori. Da lì la regola 1
+(«se la risposta non c'è nel testo, non c'è») più la regola 9 («di' qual è la
+cosa più vicina che c'è») compongono esattamente quella frase, ed erano tutte e
+due rispettate.
+
+La lezione è la sorella di quella sul mezzo listino, spostata di un gradino:
+*le quaranta voci sono una **selezione fatta sulla domanda**, non il catalogo di
+quello che il club fa* — quindi dalla loro assenza non si deduce niente, e una
+regola che invita a dire «la cosa più vicina» senza dire **su quale elenco** si
+decide che una cosa non c'è è una regola che nega i corsi che il recupero non
+pesca. Un dato assente non è un buco silenzioso: qui è diventato un no.
+
+Due rimedi, e servono tutti e due, perché chiudono due cose diverse.
+
+**Il refuso si ripara, e solo dove ripararlo è l'unica lettura possibile.** In
+`Componi contesto`, una chiave che in **tutto** il kb non trova niente e che
+dista una o due lettere dal nome di un'attività diventa quel nome — aggiunto
+alle chiavi, non sostituito. Vale la regola di `componiTelefono`: *una
+normalizzazione che indovina va condizionata a ciò che la rende plausibile*,
+quindi una parola che trova qualcosa resta com'è, i nomi candidati sono solo
+quelli del club (titoli dei corsi, dei corsi junior, delle attività e delle
+lezioni in palinsesto, letti dal kb e mai ricopiati), le parole generiche sono
+escluse per nome — «corsa» non si ripara in «corso» — e nel dubbio, con due
+candidati alla stessa distanza, non si ripara. Il verso in cui sbaglia è
+dichiarato: una chiave non riparata è la ricerca di prima, una riparata male è
+una voce sbagliata nel contesto. La spia è `kbChiaviCorrette`: se su traffico
+vero non si accende mai, la soglia non riconosce i refusi che scrivono le
+persone; se si accende su parole che nomi non sono, è troppo larga.
+
+**Il catalogo entra sempre, ed è un dato.** La regola `1quater` porta nel prompt,
+accanto alla data, l'elenco di tutto quello che il club fa — corsi adulti, corsi
+junior, aree, lezioni del mese — derivato dal kb a ogni messaggio. Da lì una
+negazione si **controlla su un elenco** invece di dedurla da un buco, e la
+regola 9 ha finalmente il suo perimetro: vale solo per un nome che in quell'elenco
+non c'è. Se il nome c'è e la sua voce no, la risposta è che la cosa esiste — senza
+inventarne i dettagli e senza darne il prezzo. Derivato e non ricopiato per la
+ragione di sempre: un elenco scritto a mano sarebbe il catalogo stesso a negare
+il corso nuovo, il giorno dopo averlo aggiunto.
+
+E in `Leggi la risposta` c'è la spia `negazioneAttivita`, che si accende quando
+«non lo facciamo» sta a ridosso del nome di una cosa che sta nel catalogo. Non
+riscrive niente — il rimedio è a monte — ma rende **contabile** il ritorno del
+guasto, che dal traffico non si vedeva: chi si sente dire di no non riscrive, e
+una conversazione persa non lascia nessuna traccia da guardare. Le due finestre
+sono strette apposta (il nome dev'essere il soggetto della negazione) o
+«lo spinning non lo facciamo, ma c'è l'Hydrobike» — che è la risposta *giusta*
+della regola 9 — la accenderebbe su Hydrobike.
+
+#### Una cifra scritta dentro una regola è una cifra che il modello cita
+
+Stessa giornata, altra conversazione: a una persona interessata al Pilates
+Reformer la chat ha detto *«paghi **22 €** quella volta»*, e l'ha ripetuto al
+turno dopo. La lezione singola di Group Reformer costa **25 €** — 22 è il prezzo
+di un corso fitness, cioè la riga accanto.
+
+**E non l'aveva presa dalla riga accanto: non aveva nessuna riga.** Nel contesto
+di quel turno (esecuzione `1572596`) la voce `abbonamento:accessi-singoli` non
+c'era affatto — `singoloAperto: false`, perché `SOLO_SE_CHIESTO[SINGOLO]` la
+tiene fuori finché non è **la persona** a chiedere l'accesso singolo, e qui a
+proporlo era stato l'assistente. Dove ha trovato «22 €», allora: **dentro la
+regola 7ter**, che per spiegare cosa non si deve dire porta l'esempio «oppure
+22 € a lezione». Il modello ha letto il proprio manuale come se fosse il listino.
+
+È la stessa lezione che questo file scrive per i template delle email — *una
+cifra dentro un template è una cifra che il giorno del ritocco resta indietro in
+un posto che nessuno rilegge* — applicata al posto meno sospetto di tutti: il
+prompt. Un importo scritto in una regola sta nel contesto esattamente come un
+importo scritto in una voce, e non porta con sé niente che lo distingua.
+
+Quindi le due cifre che stavano nelle regole di `Componi contesto` sono state
+tolte — i «95 €/mese» che facevano da esempio di grassetto nella regola 6 e i
+«22 € a lezione» della 7ter — e la regola **2sexies** dice quello che il dato da
+solo non può dire: che un importo si copia **dalla riga che lo porta**, col nome
+della cosa che costa quella cifra (gli accessi singoli sono sei righe con sei
+attività e importi diversi), e che nessuna cifra scritta dentro le regole è un
+listino — nel `systemMessage` dell'agente ne restano, e là sono resoconti di
+errori già fatti; riscriverle è il passo dopo.
+
+#### E un prezzo non passa da nessun cancello
+
+La prima stesura di questa correzione chiudeva con *«se la voce degli accessi
+singoli non è nel contesto, il prezzo della lezione singola non ce l'hai»*. È il
+ripiego, non la cura, e la regola vera è più semplice: **se il modello può
+nominare un prodotto, deve avere davanti il suo prezzo.** Sapere che una cosa
+esiste e non sapere quanto costa è lo stato esatto in cui i numeri si inventano
+— ed è lo stato che quel cancello creava.
+
+Perché le due metà non si parlavano: `SOLO_SE_CHIESTO[SINGOLO]` decide *quando
+la voce entra* guardando le parole della **persona**, mentre le regole 7ter e
+8bis lasciano all'assistente nominare la lezione singola in casi che quel
+cancello non riconosce — una ex socia, a cui il Guest Pass non spetta, che chiede
+di provare. Il cancello quindi non impediva l'offerta: toglieva solo il listino
+a chi la stava facendo.
+
+Ora le due cose sono separate nei dati. `abbonamento:accessi-singoli` resta
+l'**offerta** — «si può entrare senza abbonamento», niente carnet — e resta
+dietro il cancello, perché la 7ter vuole che l'abbonamento venga prima. Accanto
+c'è `abbonamento:accessi-singoli-listino`, che porta **solo gli importi**, una
+riga per attività, e in `Componi contesto` è **ancorata**: non compete per un
+posto e non dipende dal punteggio. Ancorata e non lasciata al recupero perché il
+guasto è nato in un turno che di parole di prezzo non ne aveva nessuna — la
+domanda era «Pilates reformer».
+
+Tre cose da sapere prima di toccarla.
+
+**Le due voci non stanno mai insieme.** Portano le stesse sei righe, quindi
+quando passa quella piena il listino esce. Il controllo guarda **cosa è
+sopravvissuto al filtro**, non la condizione del cancello: `Vaglio Guest Pass`
+può aver rinominato la voce piena per farle scavalcare il cancello — è
+l'aggiramento dichiarato di `SOLO_SE_CHIESTO[SINGOLO]` — e la domanda giusta è
+«ce n'è già una?», non «il cancello si sarebbe aperto?».
+
+**Nel ramo junior non entra**, come l'offerta: a un genitore che chiede del corso
+di suo figlio un listino di prezzi adulti è una risposta sbagliata.
+
+**Avere il listino davanti non è il permesso di proporlo**, e la voce lo dice di
+sé: quando si nomina la lezione singola lo decide la 7ter, questa dice soltanto
+quanto costa. È la stessa forma del perimetro scritto nel dato invece che nel
+prompt.
+
+E la verifica generale, che vale oltre questo caso: **tutti gli importi dei dati
+devono arrivare nel `kb.json`**. Sull'ultima passata sono 24 su 24 — il file era
+già completo, e a mancare era solo il passaggio nel *contesto*. I due posti sono
+diversi e vanno controllati separatamente: un prezzo può esserci nel `kb.json` e
+non arrivare mai davanti al modello.
+
+**L'ordine del rilascio conta.** La 2sexies ora afferma che il listino c'è
+sempre, e quell'affermazione è vera solo dopo che il sito ha pubblicato la voce
+nuova: la versione di `CHAT ATHLON` che la contiene si pubblica **dopo** il
+deploy, non prima. Una regola che dichiara presente una voce che non c'è è
+peggio della regola che sostituisce.
+
+#### L'impegno minimo va detto dove si parla di disdetta, non in un'altra voce
+
+Terza conversazione dello stesso giorno. Una persona che stava attivando il 15
+settembre chiede: *«posso disdire comunque l'abbonamento in modo che non si
+rinnovi a ottobre?»* — e la risposta è stata *«sì, puoi disdire in qualunque
+momento… basta che lo fai almeno 10 giorni prima del prossimo addebito, cioè
+**entro il 21** di ogni mese»*. Sono due cose sbagliate in una riga, e la prima
+costa una mensilità: con una partenza a mese iniziato la durata minima è **il
+pro-rata più un mese intero**, quindi ottobre resta dovuto e non si può
+disdire per evitarlo.
+
+**Qui il dato c'era, e non era nascosto.** Nel contesto di quel turno
+(esecuzione `1572672`) «durata minima» compare **sedici** volte e «impegno
+minimo» tre, fra `abbonamento:data-inizio`, la scheda
+`adulti/pro-rata-durata-minima` — che scrive testualmente «l'impegno minimo resta
+un mese: qui è il pro-rata di settembre + tutto ottobre» — e il regolamento. Il
+turno prima l'assistente aveva perfino spiegato il pro-rata correttamente. Poi la
+domanda è passata alla disdetta, la risposta è venuta dalla scheda della
+disdetta, e **quella scheda il vincolo non ce l'ha**: due fatti veri in due voci,
+e quella che risponde alla domanda non dichiara il limite dell'altra.
+
+Da qui la regola **7quinquies**: a chi si sta iscrivendo e chiede di disdire per
+non rinnovare il mese dopo, l'impegno minimo si dice **dentro quella risposta**,
+non si lascia a una scheda. Non è una postilla: è la mensilità che quella persona
+sta credendo di non dover pagare, e scoprirla all'addebito è il verso peggiore in
+cui sbagliare.
+
+**E «entro il 21» è la seconda cosa, che è un conto.** «Dieci giorni prima della
+fine del mese» non diventa una data: quel numero nel contesto non c'era (zero
+occorrenze), cambia da un mese all'altro, e detto come una scadenza precisa è un
+impegno che il club non ha preso. La regola 2 lo vietava già per le date; la
+7quinquies lo nomina, perché un divieto generale che non nomina la forma è un
+divieto che lascia passare la forma.
+
+Per verificare, su tutte e tre: su n8n `versionId == activeVersionId` dopo il
+`publish_workflow`. In chat, con la verifica dell'email intercettata: a
+«calistenichs» la risposta deve nominare il **Calisthenics** e non negarlo, e
+`kbChiaviCorrette` deve dire `calistenichs > calisthenics`; a una domanda sulla
+lezione singola di Reformer l'importo dev'essere **25 €** oppure nessun importo,
+mai uno preso da un'altra riga; e a «posso disdire per non rinnovare il mese
+prossimo?», partendo a mese iniziato, la risposta deve dire il pro-rata **più il
+mese intero** e i giorni di preavviso come sono scritti, senza nessuna data
+calcolata.
+
 ### «Ci sono sconti?» sui corsi dei bambini: la modalità è una, e lo sconto ha una finestra
 
 Il 30 agosto, a un genitore che chiedeva «ci sono sconti per la scuola nuoto
