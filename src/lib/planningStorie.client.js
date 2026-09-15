@@ -1,19 +1,19 @@
 // @ts-nocheck — script di browser, canvas diretto e nessuna annotazione di tipo
 //
-// Le storie Instagram del giorno: un JPEG 1080×1920 per ogni area del club,
-// con gli orari di **oggi** soltanto — non tutta la settimana come i due fogli
-// per gli schermi della sede (`planningJpeg.client.js`), che restano il loro
-// strumento e non vengono toccati qui.
+// Le storie Instagram del giorno: un JPEG 1080×1920 **per area del club** —
+// non sei foto separate, ma due: acqua e sala, come i due fogli per gli
+// schermi della sede (`planningJpeg.client.js`, che restano il loro strumento
+// e non vengono toccati qui). Ogni foglio impila le sue sotto-sezioni una
+// sopra l'altra — la Gym Floor come una fascia oraria, Corsi Fitness e Group
+// Reformer come elenchi — con un'altezza di riga che si restringe da sola
+// finché tutte le lezioni di oggi ci stanno in una sola immagine: è lo stesso
+// principio di `planningJpeg.client.js` applicato a un giorno solo invece che
+// a una settimana intera, e per questo quasi sempre basta una pagina.
 //
-// Il vestito è lo stesso: crema di fondo, carte bianche, occhiello arancione,
-// titolo nel carattere display, colori delle sale da `roomColor()`. Il corpo
-// del testo è più grande — queste si guardano su un telefono per pochi secondi,
-// non su un pannello da un metro e mezzo — quindi ogni sezione ha meno righe
-// per pagina e, quando un giorno ne porta di più (il martedì dei corsi fitness
-// arriva a 17), si spezza in più storie invece di rimpicciolire il carattere.
-//
-// La sala pesi non ha lezioni ma un orario di apertura solo: la sua storia
-// mostra quello, non un elenco vuoto.
+// Solo quando anche la riga più stretta non basta — un martedì con diciassette
+// corsi fitness più il reformer — un foglio si spezza in una seconda pagina,
+// che riprende l'ultima sotto-sezione interrotta con "(continua)" invece di
+// perderne il titolo.
 
 import dati from '../data/planning-corrente.json';
 import { roomColor } from '../data/planning';
@@ -52,12 +52,13 @@ export function oggiRoma() {
   return { short: mappa[chiave] || 'Lun', dataEsteso: `${giorno} ${mese}` };
 }
 
-/** Le lezioni di una fascia in un giorno, ordinate per ora. */
+/** L'ora d'inizio in minuti, per ordinare e per riconoscere le classi di domenica. */
 function minuti(t) {
   const m = String(t).match(/(\d{1,2})[:.](\d{2})/);
   return m ? Number(m[1]) * 60 + Number(m[2]) : 0;
 }
 
+/** Le lezioni di una fascia in un giorno, ordinate per ora. */
 function classiDelGiorno(bandId, giornoShort) {
   const banda = dati.bands.filter((b) => b.id === bandId)[0];
   if (!banda) return [];
@@ -132,19 +133,19 @@ function disegnaTestata(x, giorno) {
   return 322;
 }
 
-/** Titolo di sezione: occhiello dell'area più titolo grande, come sul sito. */
-function disegnaTitoloSezione(x, yTop, eyebrow, titolo, pagina, totalePagine) {
-  x.fillStyle = C.arancio;
-  x.font = '700 28px Inter, sans-serif';
-  x.fillText(eyebrow.toUpperCase(), 64, yTop + 46);
-
+/**
+ * Il titolo del foglio — "IN ACQUA", "IN SALA" — senza l'occhiello che la
+ * testata già dà: qui sotto ci vanno più sotto-sezioni, quindi il titolo
+ * dice l'area e basta, e il numero di pagina compare solo quando il giorno
+ * ne ha richieste più di una.
+ */
+function disegnaTitoloGruppo(x, yTop, etichetta, pagina, totalePagine) {
   x.fillStyle = C.scuro;
-  x.font = "700 76px 'Tusker-Grotesk', sans-serif";
-  let titoloMostrato = titolo.toUpperCase();
-  if (totalePagine > 1) titoloMostrato += ` · ${pagina}/${totalePagine}`;
-  x.fillText(titoloMostrato, 64, yTop + 130);
-
-  return yTop + 160;
+  x.font = "700 70px 'Tusker-Grotesk', sans-serif";
+  let titolo = etichetta.toUpperCase();
+  if (totalePagine > 1) titolo += ` · ${pagina}/${totalePagine}`;
+  x.fillText(titolo, 64, yTop + 70);
+  return yTop + 96;
 }
 
 const yPiede = A - 70;
@@ -167,7 +168,51 @@ function disegnaPiede(x) {
   x.fillText(dir, L - 64 - x.measureText(dir).width, yPiede + 18);
 }
 
-/** Una riga di lezione: carta bianca, filo colorato a sinistra, ora e nome. */
+/** Il titolo di una sotto-sezione dentro il foglio: "CORSI FITNESS", "GYM FLOOR". */
+function disegnaTitoloSottosezione(x, y, testo) {
+  x.fillStyle = C.accento;
+  x.font = '700 38px Inter, sans-serif';
+  x.fillText(testo.toUpperCase(), 64, y + 34);
+  x.strokeStyle = C.filo;
+  x.lineWidth = 1.5;
+  x.beginPath();
+  x.moveTo(64, y + 50);
+  x.lineTo(L - 64, y + 50);
+  x.stroke();
+  return 78;
+}
+
+const ALTEZZA_TITOLO_SOTTOSEZIONE = 78;
+
+/** La Gym Floor non ha lezioni: una fascia con l'orario di apertura. */
+function disegnaOrarioSottosezione(x, y, hours) {
+  const H = 140;
+  x.fillStyle = C.bianco;
+  carta(x, 64, y, L - 128, H, 20);
+  x.fill();
+  x.strokeStyle = C.filo;
+  x.lineWidth = 2;
+  x.stroke();
+
+  x.fillStyle = C.spento;
+  x.font = '600 28px Inter, sans-serif';
+  x.fillText('Aperta con prenotazione — Con Assistenza o Allenamento Libero', 96, y + 46);
+
+  x.fillStyle = C.accento;
+  x.font = "700 64px 'Tusker-Grotesk', sans-serif";
+  x.fillText(hours, 96, y + 118);
+
+  return H + 36;
+}
+
+const ALTEZZA_ORARIO_SOTTOSEZIONE = 176;
+
+/**
+ * Una riga di lezione: carta bianca, filo colorato a sinistra, ora e nome.
+ * I corpi del testo sono proporzionali all'altezza della riga, perché quella
+ * altezza cambia da un giorno all'altro — è quello che permette a un foglio
+ * di restringersi da solo invece di spezzarsi in due pagine.
+ */
 function disegnaRiga(x, gy, h, item) {
   const colore = roomColor(item.sala, 'light') || C.accento;
   x.fillStyle = C.bianco;
@@ -182,26 +227,134 @@ function disegnaRiga(x, gy, h, item) {
   x.fill();
 
   const orario = String(item.time).replace(/^Dom\s*/, '');
+  const fOrario = Math.max(20, Math.round(h * 0.4));
+  const fNome = Math.max(18, Math.round(h * 0.34));
+  const fSala = Math.max(14, Math.round(h * 0.24));
+  const largoOrario = Math.round(h * 3.1);
 
   x.fillStyle = C.scuro;
-  x.font = '700 44px Inter, sans-serif';
-  scrivi(x, orario, 96, gy + h * 0.42, 340);
+  x.font = `700 ${fOrario}px Inter, sans-serif`;
+  scrivi(x, orario, 96, gy + h * 0.42, largoOrario);
 
-  x.fillStyle = C.scuro;
-  x.font = '600 40px Inter, sans-serif';
-  const largoNome = item.sala ? L - 128 - 340 - 40 - 220 : L - 128 - 340 - 40;
-  scrivi(x, item.name, 420, gy + h * 0.4, largoNome);
+  const largoNome = item.sala ? L - 128 - largoOrario - 40 - 220 : L - 128 - largoOrario - 40;
+
+  x.font = `600 ${fNome}px Inter, sans-serif`;
+  scrivi(x, item.name, 96 + largoOrario, gy + h * 0.4, largoNome);
 
   if (item.sala) {
     x.fillStyle = C.spento;
-    x.font = '600 28px Inter, sans-serif';
-    const sala = String(item.sala);
-    scrivi(x, sala, 420, gy + h * 0.72, largoNome);
+    x.font = `600 ${fSala}px Inter, sans-serif`;
+    scrivi(x, String(item.sala), 96 + largoOrario, gy + h * 0.72, largoNome);
   }
 }
 
-/** La storia della Gym Floor: non un elenco, un orario di apertura. */
-function disegnaSezioneOrari(giorno) {
+/**
+ * Il canvas come URL scaricabile, senza avviare nessun download.
+ *
+ * Il browser blocca i download in sequenza avviati da script — dopo il primo
+ * o il secondo, silenziosamente, senza un errore da intercettare — quindi
+ * mandare `a.click()` per ognuna delle storie del giorno ne faceva arrivare
+ * una sola. Il rimedio non è nel codice: ogni storia deve essere un link che
+ * la persona preme di suo pugno, perché solo un click vero passa il filtro
+ * del browser una volta per file.
+ */
+function comeUrl(canvas) {
+  return new Promise((risolvi) => {
+    canvas.toBlob((blob) => risolvi(URL.createObjectURL(blob)), 'image/jpeg', 0.94);
+  });
+}
+
+/* I due fogli, nello stesso raggruppamento dei fogli per gli schermi della
+   sede: acqua e sala. `orari: true` sulla Gym Floor la disegna come fascia
+   oraria invece che come elenco di lezioni — non ne ha. */
+const GRUPPI = [
+  {
+    nome: 'acqua',
+    etichetta: 'In acqua',
+    sezioni: [
+      { id: 'nuoto-libero', titolo: 'Nuoto Libero' },
+      { id: 'scuola-nuoto-adulti', titolo: 'Scuola Nuoto Adulti' },
+      { id: 'aqua-fitness', titolo: 'Aqua Fitness' },
+    ],
+  },
+  {
+    nome: 'sala',
+    etichetta: 'In sala',
+    sezioni: [
+      { id: 'gym-floor', titolo: 'Gym Floor', orari: true },
+      { id: 'corsi-fitness', titolo: 'Corsi Fitness' },
+      { id: 'group-reformer', titolo: 'Group Reformer' },
+    ],
+  },
+];
+
+/** I blocchi verticali di un foglio: intestazioni, la fascia oraria, le righe. */
+function costruisciBlocchi(gruppo, giorno) {
+  const blocchi = [];
+  for (const sez of gruppo.sezioni) {
+    if (sez.orari) {
+      const indice = giorno.short === 'Sab' ? 1 : giorno.short === 'Dom' ? 2 : 0;
+      const h = dati.gymFloor.hours[indice];
+      if (!h) continue;
+      blocchi.push({ tipo: 'titolo', testo: sez.titolo });
+      blocchi.push({ tipo: 'orari', hours: h.hours });
+      continue;
+    }
+    const items = classiDelGiorno(sez.id, giorno.short);
+    if (!items.length) continue;
+    blocchi.push({ tipo: 'titolo', testo: sez.titolo });
+    items.forEach((item) => blocchi.push({ tipo: 'riga', item }));
+  }
+  return blocchi;
+}
+
+/** L'altezza che un blocco occupa, a una data altezza di riga. */
+function altezzaBlocco(blocco, rowH) {
+  if (blocco.tipo === 'titolo') return ALTEZZA_TITOLO_SOTTOSEZIONE;
+  if (blocco.tipo === 'orari') return ALTEZZA_ORARIO_SOTTOSEZIONE;
+  return rowH + 18;
+}
+
+/**
+ * Spezza i blocchi in più pagine quando anche la riga più stretta non basta.
+ * Non taglia mai una fascia oraria a metà (ce n'è al più una), e se la pagina
+ * si interrompe in mezzo a un elenco ne riprende il titolo con "(continua)":
+ * senza, la seconda pagina inizierebbe con righe senza dire di che corso sono.
+ */
+function impaginaBlocchi(blocchi, rowH, disponibile) {
+  const pagine = [];
+  let corrente = [];
+  let altezza = 0;
+  let ultimoTitolo = null;
+
+  for (const blocco of blocchi) {
+    if (blocco.tipo === 'titolo') ultimoTitolo = blocco.testo;
+    const h = altezzaBlocco(blocco, rowH);
+
+    if (altezza + h > disponibile && corrente.length) {
+      pagine.push(corrente);
+      corrente = [];
+      altezza = 0;
+      if (blocco.tipo === 'riga' && ultimoTitolo) {
+        const continua = { tipo: 'titolo', testo: `${ultimoTitolo} (continua)` };
+        corrente.push(continua);
+        altezza += altezzaBlocco(continua, rowH);
+      }
+    }
+
+    corrente.push(blocco);
+    altezza += h;
+  }
+  if (corrente.length) pagine.push(corrente);
+  return pagine;
+}
+
+const RIGA_MIN = 40;
+const RIGA_MAX = 100;
+const Y_CONTENUTO = 322 + 96; // testata + titolo del foglio
+
+/** Disegna un foglio a partire dai suoi blocchi, con l'altezza di riga data. */
+function disegnaPagina(gruppo, giorno, blocchi, rowH, pagina, totalePagine) {
   const c = document.createElement('canvas');
   c.width = L;
   c.height = A;
@@ -210,67 +363,57 @@ function disegnaSezioneOrari(giorno) {
   x.fillRect(0, 0, L, A);
   x.textBaseline = 'alphabetic';
 
-  const yTesta = disegnaTestata(x, giorno);
-  let y = disegnaTitoloSezione(x, yTesta + 40, 'Sala pesi', 'Gym Floor', 1, 1);
+  disegnaTestata(x, giorno);
+  let y = disegnaTitoloGruppo(x, 322, gruppo.etichetta, pagina, totalePagine);
 
-  const gruppo = giorno.short === 'Sab' ? 1 : giorno.short === 'Dom' ? 2 : 0;
-  const h = dati.gymFloor.hours[gruppo];
-
-  x.fillStyle = C.bianco;
-  carta(x, 64, y + 40, L - 128, 260, 24);
-  x.fill();
-  x.strokeStyle = C.filo;
-  x.lineWidth = 2;
-  x.stroke();
-
-  x.fillStyle = C.spento;
-  x.font = '600 32px Inter, sans-serif';
-  x.fillText('Aperta con prenotazione — Con Assistenza o Allenamento Libero', 96, y + 40 + 66);
-
-  x.fillStyle = C.accento;
-  x.font = "700 108px 'Tusker-Grotesk', sans-serif";
-  x.fillText(h.hours, 96, y + 40 + 200);
+  blocchi.forEach((blocco) => {
+    if (blocco.tipo === 'titolo') {
+      y += disegnaTitoloSottosezione(x, y, blocco.testo);
+    } else if (blocco.tipo === 'orari') {
+      y += disegnaOrarioSottosezione(x, y, blocco.hours);
+    } else {
+      disegnaRiga(x, y, rowH, blocco.item);
+      y += rowH + 18;
+    }
+  });
 
   disegnaPiede(x);
   return c;
 }
 
 /**
- * Il canvas come URL scaricabile, senza avviare nessun download.
- *
- * Il browser blocca i download in sequenza avviati da script — dopo il primo
- * o il secondo, silenziosamente, senza un errore da intercettare — quindi
- * mandare `a.click()` per ognuna delle sei-otto storie del giorno ne faceva
- * arrivare una sola (l'ultima, quella per cui l'utente aveva ancora un
- * "consenti" da dare). Il rimedio non è nel codice: ogni storia deve essere un
- * link che la persona preme di suo pugno, perché solo un click vero passa il
- * filtro del browser una volta per file.
+ * Un foglio — «In acqua» o «In sala» — con le lezioni di oggi soltanto.
+ * Quasi sempre una pagina sola: l'altezza di riga si restringe finché tutto
+ * ci sta, fra `RIGA_MAX` (comoda) e `RIGA_MIN` (il fondo leggibile). Solo
+ * quando nemmeno `RIGA_MIN` basta il foglio si spezza in più pagine.
  */
-function comeUrl(canvas) {
-  return new Promise((risolvi) => {
-    canvas.toBlob((blob) => risolvi(URL.createObjectURL(blob)), 'image/jpeg', 0.94);
-  });
-}
+function disegnaFoglio(gruppo, giorno) {
+  const blocchi = costruisciBlocchi(gruppo, giorno);
+  if (!blocchi.length) return [];
 
-/* Le sei aree, nell'ordine in cui vengono scaricate. Un id di `bands` per
-   quelle a lezioni, e `orari: true` per la sola sala pesi. */
-const AREE = [
-  { id: 'gym-floor', eyebrow: 'Sala pesi', titolo: 'Gym Floor', orari: true },
-  { id: 'nuoto-libero', eyebrow: 'In acqua', titolo: 'Nuoto Libero' },
-  { id: 'scuola-nuoto-adulti', eyebrow: 'In acqua', titolo: 'Scuola Nuoto Adulti' },
-  { id: 'aqua-fitness', eyebrow: 'In acqua', titolo: 'Aqua Fitness' },
-  { id: 'corsi-fitness', eyebrow: 'In sala', titolo: 'Corsi Fitness' },
-  { id: 'group-reformer', eyebrow: 'In sala', titolo: 'Group Reformer' },
-];
+  const righe = blocchi.filter((b) => b.tipo === 'riga').length;
+  const disponibile = yPiede - 40 - Y_CONTENUTO;
+  const fisso = blocchi.reduce((n, b) => n + (b.tipo === 'riga' ? 0 : altezzaBlocco(b, 0)), 0);
+
+  let rowH = righe > 0 ? Math.floor((disponibile - fisso) / righe) - 18 : RIGA_MAX;
+  rowH = Math.min(RIGA_MAX, rowH || RIGA_MAX);
+
+  if (rowH >= RIGA_MIN) {
+    return [disegnaPagina(gruppo, giorno, blocchi, rowH, 1, 1)];
+  }
+
+  const pagine = impaginaBlocchi(blocchi, RIGA_MIN, disponibile);
+  return pagine.map((pblocchi, i) => disegnaPagina(gruppo, giorno, pblocchi, RIGA_MIN, i + 1, pagine.length));
+}
 
 /**
  * Genera le storie del giorno indicato (di default oggi, fuso di Roma) e
- * restituisce l'elenco, senza scaricare niente: ogni voce porta `nome` e
- * `url` (un object URL), e il download parte quando la persona preme il
- * link — deve essere il suo click, non uno script, o il browser ne blocca
- * tutti tranne il primo. Un'area senza lezioni quel giorno non compare —
- * succede di sabato per la scuola nuoto adulti, e ogni giorno tranne oggi
- * per le altre quattro fasce se `giorno` è la domenica.
+ * restituisce l'elenco, senza scaricare niente: ogni voce porta `nome`,
+ * `etichetta` e `url` (un object URL), e il download parte quando la persona
+ * preme il link — deve essere il suo click, non uno script, o il browser ne
+ * blocca tutti tranne il primo. Sono due fogli, acqua e sala; un foglio senza
+ * niente da dire quel giorno — non capita mai a entrambi insieme — non genera
+ * nessun file.
  */
 export async function generaStorieDelGiorno(giorno) {
   if (document.fonts && document.fonts.ready) await document.fonts.ready;
@@ -279,60 +422,17 @@ export async function generaStorieDelGiorno(giorno) {
   const slug = String(g.short).toLowerCase();
   const file = [];
 
-  for (const area of AREE) {
-    if (area.orari) {
-      const canvas = disegnaSezioneOrari(g);
-      file.push({ nome: `storia-${slug}-gym-floor.jpg`, etichetta: 'Gym Floor', url: await comeUrl(canvas) });
-      continue;
-    }
-
-    const items = classiDelGiorno(area.id, g.short);
-    if (!items.length) continue;
-
-    const pagine = disegnaPagineArea(area, items, g);
+  for (const gruppo of GRUPPI) {
+    const pagine = disegnaFoglio(gruppo, g);
     for (let i = 0; i < pagine.length; i++) {
       const suffix = pagine.length > 1 ? `-${i + 1}` : '';
       file.push({
-        nome: `storia-${slug}-${area.id}${suffix}.jpg`,
-        etichetta: pagine.length > 1 ? `${area.titolo} ${i + 1}/${pagine.length}` : area.titolo,
+        nome: `storia-${slug}-${gruppo.nome}${suffix}.jpg`,
+        etichetta: pagine.length > 1 ? `${gruppo.etichetta} ${i + 1}/${pagine.length}` : gruppo.etichetta,
         url: await comeUrl(pagine[i]),
       });
     }
   }
 
   return { file, giorno: `${NOMI[g.short]} ${g.dataEsteso}` };
-}
-
-/** Le pagine (canvas) necessarie per l'elenco di lezioni di un'area, un giorno solo. */
-function disegnaPagineArea(area, items, giorno) {
-  const RIGA_H = 132;
-  const RIGA_GAP = 20;
-  const yInizioTesta = 322 + 40;
-  const spazioTitolo = 160;
-  const disponibile = yPiede - 40 - (yInizioTesta + spazioTitolo);
-  const perPagina = Math.max(3, Math.floor(disponibile / (RIGA_H + RIGA_GAP)));
-
-  const pagine = [];
-  for (let i = 0; i < items.length; i += perPagina) pagine.push(items.slice(i, i + perPagina));
-
-  return pagine.map((righe, indice) => {
-    const c = document.createElement('canvas');
-    c.width = L;
-    c.height = A;
-    const x = c.getContext('2d');
-    x.fillStyle = C.carta;
-    x.fillRect(0, 0, L, A);
-    x.textBaseline = 'alphabetic';
-
-    disegnaTestata(x, giorno);
-    let y = disegnaTitoloSezione(x, yInizioTesta, area.eyebrow, area.titolo, indice + 1, pagine.length);
-
-    righe.forEach((item) => {
-      disegnaRiga(x, y, RIGA_H, item);
-      y += RIGA_H + RIGA_GAP;
-    });
-
-    disegnaPiede(x);
-    return c;
-  });
 }
