@@ -199,7 +199,7 @@ function disegnaOrarioSottosezione(x, y, hours) {
 
   x.fillStyle = C.spento;
   x.font = '600 28px Inter, sans-serif';
-  x.fillText('Aperta con prenotazione', 96, y + 46);
+  x.fillText('Aperta', 96, y + 46);
 
   x.fillStyle = C.accento;
   x.font = "700 64px 'Tusker-Grotesk', sans-serif";
