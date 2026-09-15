@@ -218,8 +218,17 @@ const ALTEZZA_ORARIO_SOTTOSEZIONE = 176;
  * proporzionali all'altezza della riga, perché quella altezza cambia da un
  * giorno all'altro: è quello che permette a un foglio di restringersi da solo
  * invece di spezzarsi subito in due pagine.
+ *
+ * `impilato` disegna l'orario sopra e il nome sotto, invece che fianco a
+ * fianco: nelle due colonne strette dei Corsi Fitness un orario e un nome
+ * appaiati si contendono una larghezza che non basta mai per i nomi più
+ * lunghi ("Strength Development", "Ginnastica Posturale"), e la larghezza
+ * riservata all'orario cambia da riga a riga con la lunghezza del suo testo.
+ * Impilati, i due usano l'intera larghezza della carta uno alla volta: il
+ * nome ha sempre tutto lo spazio, e l'unica cosa che varia da riga a riga è
+ * quanto ne resta inutilizzato, non quanto gliene manca.
  */
-function disegnaRiga(x, gx, gy, w, h, item) {
+function disegnaRiga(x, gx, gy, w, h, item, impilato = false) {
   const colore = roomColor(item.sala, 'light') || C.accento;
   x.fillStyle = C.bianco;
   carta(x, gx, gy, w, h, 16);
@@ -233,13 +242,35 @@ function disegnaRiga(x, gx, gy, w, h, item) {
   x.fill();
 
   const orario = String(item.time).replace(/^Dom\s*/, '');
+  const largoTesto = w - 64;
+
+  if (impilato) {
+    const fOrario = Math.max(15, Math.round(h * 0.2));
+    const fNome = Math.max(18, Math.round(h * 0.28));
+    const fSala = Math.max(13, Math.round(h * 0.17));
+
+    x.fillStyle = C.accento;
+    x.font = `700 ${fOrario}px Inter, sans-serif`;
+    scrivi(x, orario, gx + 32, gy + h * 0.26, largoTesto);
+
+    x.fillStyle = C.scuro;
+    x.font = `700 ${fNome}px Inter, sans-serif`;
+    scrivi(x, item.name, gx + 32, gy + h * 0.58, largoTesto);
+
+    if (item.sala) {
+      x.fillStyle = C.spento;
+      x.font = `600 ${fSala}px Inter, sans-serif`;
+      scrivi(x, String(item.sala), gx + 32, gy + h * 0.82, largoTesto);
+    }
+    return;
+  }
+
   const fOrario = Math.max(20, Math.round(h * 0.4));
   const fNome = Math.max(18, Math.round(h * 0.34));
   const fSala = Math.max(14, Math.round(h * 0.24));
   const largoOrario = Math.min(Math.round(h * 3.1), Math.round(w * 0.5));
   // Uno spazio fisso fra la colonna dell'orario e il nome: senza, un orario
-  // che riempie quasi tutta la sua colonna (le due colonne strette dei Corsi
-  // Fitness, con orari come "07:40–08:30") tocca il nome che segue.
+  // che riempie quasi tutta la sua colonna tocca il nome che segue.
   const GAP_ORARIO_NOME = 20;
 
   x.fillStyle = C.scuro;
@@ -496,8 +527,8 @@ function disegnaPaginaSezioni(gruppo, giorno, sezioni, rowH, pagina, totalePagin
     const gx2 = 64 + colW + GAP_COLONNE;
 
     for (let i = 0; i < perColonna; i++) {
-      if (colonna1[i]) disegnaRiga(x, 64, y, colW, rowH, colonna1[i]);
-      if (colonna2[i]) disegnaRiga(x, gx2, y, colW, rowH, colonna2[i]);
+      if (colonna1[i]) disegnaRiga(x, 64, y, colW, rowH, colonna1[i], true);
+      if (colonna2[i]) disegnaRiga(x, gx2, y, colW, rowH, colonna2[i], true);
       y += rowH + gap;
     }
   });
