@@ -1,15 +1,18 @@
 // @ts-nocheck — script di browser, canvas diretto e nessuna annotazione di tipo
 //
 // Le storie Instagram del giorno: un JPEG 1080×1920 **per area del club** —
-// non sei foto separate, ma due: acqua e sala, come i due fogli per gli
-// schermi della sede (`planningJpeg.client.js`, che restano il loro strumento
-// e non vengono toccati qui). Ogni foglio impila le sue sotto-sezioni una
-// sopra l'altra — la Gym Floor come una fascia oraria, Corsi Fitness e Group
-// Reformer come elenchi — con un'altezza di riga che si restringe da sola
-// finché tutte le lezioni di oggi ci stanno in una sola immagine, e una
-// sezione affollata (Corsi Fitness arriva a diciassette il martedì) passa da
-// sola a due colonne invece di lasciare che il corpo del testo si schiacci:
-// è quello che tiene il carattere grande anche nei giorni pieni.
+// non sei foto separate, ma tre: acqua, palestra (Gym Floor + Group Reformer)
+// e Corsi Fitness da sola — diversamente dai due fogli per gli schermi della
+// sede (`planningJpeg.client.js`, che restano il loro strumento e non
+// vengono toccati qui). Ogni foglio impila le sue sotto-sezioni una sopra
+// l'altra — la Gym Floor come una fascia oraria, gli altri come elenchi —
+// con un'altezza di riga che si restringe da sola finché tutte le lezioni di
+// oggi ci stanno in una sola immagine, e una sezione affollata (Corsi
+// Fitness arriva a diciassette il martedì) passa da sola a due colonne
+// invece di lasciare che il corpo del testo si schiacci: è quello che tiene
+// il carattere grande anche nei giorni pieni. Tenere i Corsi Fitness sul loro
+// foglio, senza dover condividere lo spazio con Gym Floor e Reformer, è
+// quello che li fa venire ancora più grandi.
 //
 // Solo se nemmeno le due colonne bastassero — non succede con il palinsesto
 // attuale — un foglio si spezzerebbe in una seconda pagina, riprendendo la
@@ -196,7 +199,7 @@ function disegnaOrarioSottosezione(x, y, hours) {
 
   x.fillStyle = C.spento;
   x.font = '600 28px Inter, sans-serif';
-  x.fillText('Aperta con prenotazione', 96, y + 46);
+  x.fillText('Aperta', 96, y + 46);
 
   x.fillStyle = C.accento;
   x.font = "700 64px 'Tusker-Grotesk', sans-serif";
@@ -215,8 +218,17 @@ const ALTEZZA_ORARIO_SOTTOSEZIONE = 176;
  * proporzionali all'altezza della riga, perché quella altezza cambia da un
  * giorno all'altro: è quello che permette a un foglio di restringersi da solo
  * invece di spezzarsi subito in due pagine.
+ *
+ * `impilato` disegna l'orario sopra e il nome sotto, invece che fianco a
+ * fianco: nelle due colonne strette dei Corsi Fitness un orario e un nome
+ * appaiati si contendono una larghezza che non basta mai per i nomi più
+ * lunghi ("Strength Development", "Ginnastica Posturale"), e la larghezza
+ * riservata all'orario cambia da riga a riga con la lunghezza del suo testo.
+ * Impilati, i due usano l'intera larghezza della carta uno alla volta: il
+ * nome ha sempre tutto lo spazio, e l'unica cosa che varia da riga a riga è
+ * quanto ne resta inutilizzato, non quanto gliene manca.
  */
-function disegnaRiga(x, gx, gy, w, h, item) {
+function disegnaRiga(x, gx, gy, w, h, item, impilato = false) {
   const colore = roomColor(item.sala, 'light') || C.accento;
   x.fillStyle = C.bianco;
   carta(x, gx, gy, w, h, 16);
@@ -230,24 +242,50 @@ function disegnaRiga(x, gx, gy, w, h, item) {
   x.fill();
 
   const orario = String(item.time).replace(/^Dom\s*/, '');
+  const largoTesto = w - 64;
+
+  if (impilato) {
+    const fOrario = Math.max(15, Math.round(h * 0.2));
+    const fNome = Math.max(18, Math.round(h * 0.28));
+    const fSala = Math.max(13, Math.round(h * 0.17));
+
+    x.fillStyle = C.accento;
+    x.font = `700 ${fOrario}px Inter, sans-serif`;
+    scrivi(x, orario, gx + 32, gy + h * 0.26, largoTesto);
+
+    x.fillStyle = C.scuro;
+    x.font = `700 ${fNome}px Inter, sans-serif`;
+    scrivi(x, item.name, gx + 32, gy + h * 0.58, largoTesto);
+
+    if (item.sala) {
+      x.fillStyle = C.spento;
+      x.font = `600 ${fSala}px Inter, sans-serif`;
+      scrivi(x, String(item.sala), gx + 32, gy + h * 0.82, largoTesto);
+    }
+    return;
+  }
+
   const fOrario = Math.max(20, Math.round(h * 0.4));
   const fNome = Math.max(18, Math.round(h * 0.34));
   const fSala = Math.max(14, Math.round(h * 0.24));
-  const largoOrario = Math.min(Math.round(h * 3.1), Math.round(w * 0.4));
+  const largoOrario = Math.min(Math.round(h * 3.1), Math.round(w * 0.5));
+  // Uno spazio fisso fra la colonna dell'orario e il nome: senza, un orario
+  // che riempie quasi tutta la sua colonna tocca il nome che segue.
+  const GAP_ORARIO_NOME = 20;
 
   x.fillStyle = C.scuro;
   x.font = `700 ${fOrario}px Inter, sans-serif`;
   scrivi(x, orario, gx + 32, gy + h * 0.42, largoOrario);
 
-  const largoNome = Math.max(48, item.sala ? w - largoOrario - 40 - 190 : w - largoOrario - 40);
+  const largoNome = Math.max(48, w - largoOrario - 40 - GAP_ORARIO_NOME - (item.sala ? 32 : 0));
 
   x.font = `600 ${fNome}px Inter, sans-serif`;
-  scrivi(x, item.name, gx + 32 + largoOrario, gy + h * 0.4, largoNome);
+  scrivi(x, item.name, gx + 32 + largoOrario + GAP_ORARIO_NOME, gy + h * 0.4, largoNome);
 
   if (item.sala) {
     x.fillStyle = C.spento;
     x.font = `600 ${fSala}px Inter, sans-serif`;
-    scrivi(x, String(item.sala), gx + 32 + largoOrario, gy + h * 0.72, largoNome);
+    scrivi(x, String(item.sala), gx + 32 + largoOrario + GAP_ORARIO_NOME, gy + h * 0.72, largoNome);
   }
 }
 
@@ -267,8 +305,13 @@ function comeUrl(canvas) {
   });
 }
 
-/* I due fogli, nello stesso raggruppamento dei fogli per gli schermi della
-   sede: acqua e sala. `orari: true` sulla Gym Floor la disegna come fascia
+/* Tre fogli: acqua, e la sala divisa in due — Gym Floor e Group Reformer da
+   una parte, i Corsi Fitness da sola dall'altra. Divisi perché i Corsi
+   Fitness sono la sezione più affollata (arriva a diciassette lezioni il
+   martedì) e tenerla da sola su un foglio le lascia tutta l'altezza
+   disponibile, invece di doverla dividere con Gym Floor e Reformer: a parità
+   di spazio verticale, ogni riga — e ogni colonna, quando ne servono due —
+   viene più grande. `orari: true` sulla Gym Floor la disegna come fascia
    oraria invece che come elenco di lezioni — non ne ha. */
 const GRUPPI = [
   {
@@ -281,12 +324,18 @@ const GRUPPI = [
     ],
   },
   {
-    nome: 'sala',
+    nome: 'palestra',
     etichetta: 'In sala',
     sezioni: [
       { id: 'gym-floor', titolo: 'Gym Floor', orari: true },
-      { id: 'corsi-fitness', titolo: 'Corsi Fitness' },
       { id: 'group-reformer', titolo: 'Group Reformer' },
+    ],
+  },
+  {
+    nome: 'corsi-fitness',
+    etichetta: 'Corsi Fitness',
+    sezioni: [
+      { id: 'corsi-fitness', titolo: 'Corsi Fitness' },
     ],
   },
 ];
@@ -354,6 +403,10 @@ function impaginaBlocchi(blocchi, rowH, disponibile) {
 
 const RIGA_MIN = 40;
 const RIGA_MAX = 100;
+/** Il margine massimo usato per centrare un foglio con poche righe — oltre
+ *  questa soglia lo spazio in eccesso diventa respiro fra le righe, non un
+ *  vuoto sotto il titolo. */
+const CENTRATURA_MAX = 90;
 const Y_CONTENUTO = 322 + 96; // testata + titolo del foglio
 
 /** Disegna un foglio a partire dai suoi blocchi, con l'altezza di riga data. */
@@ -424,8 +477,20 @@ function altezzaFissaSezione(sezione) {
   return ALTEZZA_TITOLO_SOTTOSEZIONE + (sezione.tipo === 'orari' ? ALTEZZA_ORARIO_SOTTOSEZIONE : 0);
 }
 
-/** Disegna un foglio a partire dalle sue sezioni, su una sola pagina. */
-function disegnaPaginaSezioni(gruppo, giorno, sezioni, rowH, pagina, totalePagine) {
+/**
+ * Disegna un foglio a partire dalle sue sezioni, su una sola pagina.
+ *
+ * `centratura` è il margine in più, oltre al normale spazio sotto il titolo
+ * del foglio, prima della prima sotto-sezione; `gap` è lo spazio verticale
+ * dopo ogni riga, di norma 18px. Quando le righe sono già alla loro altezza
+ * massima (`RIGA_MAX`) e il foglio ha poche lezioni — la Gym Floor con
+ * poche prenotazioni di Group Reformer, per dire — crescere ancora le carte
+ * le farebbe sproporzionate. Lo spazio libero si divide allora in due: un
+ * margine sopra e sotto il contenuto per centrarlo nel foglio, e un respiro
+ * fra le righe perché il contenuto non resti comunque appiccicato in un
+ * blocco isolato subito sotto il titolo.
+ */
+function disegnaPaginaSezioni(gruppo, giorno, sezioni, rowH, pagina, totalePagine, centratura = 0, gap = 18) {
   const c = document.createElement('canvas');
   c.width = L;
   c.height = A;
@@ -435,7 +500,7 @@ function disegnaPaginaSezioni(gruppo, giorno, sezioni, rowH, pagina, totalePagin
   x.textBaseline = 'alphabetic';
 
   disegnaTestata(x, giorno);
-  let y = disegnaTitoloGruppo(x, 322, gruppo.etichetta, pagina, totalePagine);
+  let y = disegnaTitoloGruppo(x, 322, gruppo.etichetta, pagina, totalePagine) + centratura;
 
   sezioni.forEach((sezione) => {
     y += disegnaTitoloSottosezione(x, y, sezione.titolo);
@@ -448,7 +513,7 @@ function disegnaPaginaSezioni(gruppo, giorno, sezioni, rowH, pagina, totalePagin
     if (sezione.colonne === 1) {
       sezione.items.forEach((item) => {
         disegnaRiga(x, 64, y, L - 128, rowH, item);
-        y += rowH + 18;
+        y += rowH + gap;
       });
       return;
     }
@@ -462,9 +527,9 @@ function disegnaPaginaSezioni(gruppo, giorno, sezioni, rowH, pagina, totalePagin
     const gx2 = 64 + colW + GAP_COLONNE;
 
     for (let i = 0; i < perColonna; i++) {
-      if (colonna1[i]) disegnaRiga(x, 64, y, colW, rowH, colonna1[i]);
-      if (colonna2[i]) disegnaRiga(x, gx2, y, colW, rowH, colonna2[i]);
-      y += rowH + 18;
+      if (colonna1[i]) disegnaRiga(x, 64, y, colW, rowH, colonna1[i], true);
+      if (colonna2[i]) disegnaRiga(x, gx2, y, colW, rowH, colonna2[i], true);
+      y += rowH + gap;
     }
   });
 
@@ -493,7 +558,19 @@ function disegnaFoglio(gruppo, giorno) {
   rowH = Math.min(RIGA_MAX, rowH || RIGA_MAX);
 
   if (rowH >= RIGA_MIN) {
-    return [disegnaPaginaSezioni(gruppo, giorno, sezioni, rowH, 1, 1)];
+    // Il resto dello spazio, se le righe sono già al loro massimo, non va
+    // tutto sopra come un unico vuoto sotto il titolo: un margine — sopra e
+    // sotto, per centrare il blocco — resta contenuto entro `CENTRATURA_MAX`,
+    // e quel che avanza si spalma come respiro in più fra una riga e
+    // l'altra. Poche prenotazioni di Group Reformer sul foglio della
+    // palestra, per dire, restano un gruppo compatto ancorato sotto il
+    // titolo invece di un blocco isolato a metà pagina.
+    const usato = fisso + Math.max(0, righe - 1) * (rowH + 18) + (righe > 0 ? rowH : 0);
+    const avanzo = Math.max(0, disponibile - usato);
+    const centratura = Math.min(Math.floor(avanzo / 2), CENTRATURA_MAX);
+    const restante = avanzo - centratura * 2;
+    const gap = righe > 0 ? 18 + Math.floor(restante / righe) : 18;
+    return [disegnaPaginaSezioni(gruppo, giorno, sezioni, rowH, 1, 1, centratura, gap)];
   }
 
   // Ripiego raro: anche a due colonne non basta. Si torna all'elenco piatto,
@@ -508,9 +585,9 @@ function disegnaFoglio(gruppo, giorno) {
  * restituisce l'elenco, senza scaricare niente: ogni voce porta `nome`,
  * `etichetta` e `url` (un object URL), e il download parte quando la persona
  * preme il link — deve essere il suo click, non uno script, o il browser ne
- * blocca tutti tranne il primo. Sono due fogli, acqua e sala; un foglio senza
- * niente da dire quel giorno — non capita mai a entrambi insieme — non genera
- * nessun file.
+ * blocca tutti tranne il primo. Sono tre fogli — acqua, palestra, Corsi
+ * Fitness; un foglio senza niente da dire quel giorno non genera nessun
+ * file.
  */
 export async function generaStorieDelGiorno(giorno) {
   if (document.fonts && document.fonts.ready) await document.fonts.ready;
