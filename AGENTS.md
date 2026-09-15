@@ -3221,9 +3221,29 @@ tolte — i «95 €/mese» che facevano da esempio di grassetto nella regola 6 
 «22 € a lezione» della 7ter — e la regola **2sexies** dice quello che il dato da
 solo non può dire: che un importo si copia **dalla riga che lo porta**, col nome
 della cosa che costa quella cifra (gli accessi singoli sono sei righe con sei
-attività e importi diversi), e che nessuna cifra scritta dentro le regole è un
-listino — nel `systemMessage` dell'agente ne restano, e là sono resoconti di
-errori già fatti; riscriverle è il passo dopo.
+attività e importi diversi).
+
+**E il passo dopo è stato fatto: nel prompt non c'è più nessun importo.** Ne
+restavano nove nel `systemMessage`, tutti legittimi a leggerli — «il Premium
+Mensile Flex è 119 €/mese» come esempio della forma giusta, «sono stati dati
+75 €/mese, che sono dello Smart» come resoconto di un errore già corretto, i
+19 € del Guest Pass dentro il divieto di nominarlo. Nessuno di quei nove era un
+listino, e proprio per questo erano pericolosi: **una cifra scritta in una regola
+sta nel contesto esattamente come una scritta in una voce, e non porta con sé
+niente che la distingua.** Il modello non ha modo di sapere che «22 €» era un
+esempio e non un prezzo — e infatti l'ha citato.
+
+Ora le lezioni ci sono tutte e i numeri no: l'upgrade preventivato è «una nuova
+quota mensile precisa, che nessuno aveva calcolato», la cifra presa dalla riga
+sbagliata è «l'importo che nel testo stava sulla riga dello Smart», l'esempio
+della forma giusta è «il Premium Mensile Flex è <l'importo della sua riga>». Si
+perde la vividezza del numero; si guadagna che non c'è niente da citare per
+sbaglio. E la 2sexies adesso lo afferma invece di metterci una toppa: *in queste
+regole non c'è nessun importo, e non è una svista — è la regola stessa.*
+
+La spazzata va fatta in **due forme**, e la seconda si scopre solo facendola: le
+cifre (`\d+\s*(€|euro)`) e i numeri **scritti a parole**. «Per otto euro di
+pro-rata» era l'unico del secondo tipo, e il filtro sulle cifre non lo vedeva.
 
 #### E un prezzo non passa da nessun cancello
 
