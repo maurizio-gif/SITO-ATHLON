@@ -30,21 +30,6 @@ draft: false
 
 Ogni link porta al portale, già filtrato sui turni di quella fascia che hanno ancora posto libero: è lì che si vede la disponibilità residua, non nel planning generico del mese, che mostra il palinsesto ma non i posti rimasti.
 
-> ⚠️ **Il turno che volevi è al completo? Se ne sceglie un altro — non c'è nessuna
-> lista d'attesa.** Il portale mostra **tutti** i turni che hanno ancora posto per
-> quella fascia d'età: quelli che non compaiono sono pieni, e il numero massimo di
-> bambini per vasca non è superabile nemmeno in via eccezionale. Non esiste nessun
-> modo di «essere inseriti» in un turno pieno, nessuno viene messo in coda e
-> nessuno riceve una notifica se un posto si libera. Si sceglie fra gli orari
-> disponibili, e se davvero nessuno va bene si scrive al team. Vale per la Scuola
-> Nuoto Bambini, il Nuoto Agonistico e la Pallanuoto: la lista d'attesa del club
-> è quella delle **lezioni che si prenotano** — i recuperi compresi — e non c'entra
-> con l'iscrizione a un turno.
->
-> **E «il gruppo è già al completo» dice proprio questo**, non che ci sia un blocco
-> sulla tua scheda: non è il certificato medico, non è un insoluto, non è un guasto
-> del portale.
-
 * Per i nati **2023** → <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=5&vacancies=1" target="_blank" rel="noopener noreferrer">clicca qui</a>
 * Per i nati **2021-22** → <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=1&vacancies=1" target="_blank" rel="noopener noreferrer">clicca qui</a>
 * Per i nati **2019-20** → <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=12&vacancies=1" target="_blank" rel="noopener noreferrer">clicca qui</a>
