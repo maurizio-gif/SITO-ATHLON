@@ -31,6 +31,23 @@ export async function pastEvents(limit?: number): Promise<Evento[]> {
   return limit ? list.slice(0, limit) : list;
 }
 
+/**
+ * Eventi del fine settimana — la fascia del planning senza corsi fissi.
+ *
+ * Un evento non ha un giorno della settimana come dato: ha solo `date`, una
+ * data assoluta. Il weekday si deriva da lì (`getDay()`), non si aggiunge un
+ * campo — un evento infrasettimanale resta fuori da questa lista senza che
+ * nessuno debba dichiararlo tale.
+ */
+export async function weekendEvents(limit = 3, windowDays = 30): Promise<Evento[]> {
+  const cutoff = startOfToday();
+  cutoff.setDate(cutoff.getDate() + windowDays);
+  const list = await upcomingEvents();
+  return list
+    .filter((e) => [0, 6].includes(e.data.date.getDay()) && e.data.date <= cutoff)
+    .slice(0, limit);
+}
+
 const DAYS = ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato'];
 const MONTHS = [
   'gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno',

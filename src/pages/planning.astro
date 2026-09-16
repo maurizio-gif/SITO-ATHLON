@@ -8,6 +8,15 @@ import { bands, gymFloor, countLessons, bandHours, ledeOf, siContaAOre, totalLes
 import { faqPagina } from '../data/faq';
 import { trialCta } from '../data/cta';
 import { DOMENICA, ORARIO_ECCEZIONALE, orarioEccezionaleAttivo, finestraEstiva } from '../data/club';
+import { weekendEvents, formatEventDate } from '../data/eventi';
+import { fotoPiccola } from '../data/foto';
+
+/* Sabato pomeriggio e domenica non hanno un corso fisso in tabella: è lì che
+   il club mette gli eventi. Non sostituiscono una cella della griglia — il
+   planning non ha un concetto di "slot vuoto" da riempire — ma stanno vicino
+   a dove quella cella è vuota, con la data derivata dall'evento stesso, mai
+   scritta a mano. Un evento infrasettimanale non compare qui. */
+const eventiWeekend = await weekendEvents();
 
 const PG = 'https://athlon.perfectgym.com/ClientPortal2';
 
@@ -147,6 +156,39 @@ const faqs = await faqPagina([
 
   {/* One panel shared by every band on the page. */}
   <LessonModal bands={bands.map((b) => b.id)} />
+
+  <!-- EVENTI DEL WEEKEND -->
+  {eventiWeekend.length > 0 && (
+    <section class="pl-sec pl-sec--alt">
+      <div class="container">
+        <span class="eyebrow" data-anim="from-left">Sabato e domenica</span>
+        <h2 class="pl-sec__title" data-anim="reveal">Eventi in programma</h2>
+        <p class="pl-sec__sub">
+          Ogni mese il club organizza eventi per varie categorie, spesso proprio nelle fasce dove il
+          planning non ha un corso fisso — un weekend può non avere una lezione qui sopra e avere invece
+          un evento aperto a tutti.
+        </p>
+        <div class="pl-eventi">
+          {eventiWeekend.map((e) => (
+            <a href={`/eventi/${e.id}`} class="pl-eventi__card">
+              <img
+                class="pl-eventi__img"
+                {...fotoPiccola(e.data.image, '(max-width: 760px) 88vw, 320px')}
+                alt={e.data.imageAlt || e.data.title}
+                width="320"
+                height="200"
+                loading="lazy"
+              />
+              <div class="pl-eventi__body">
+                <span class="pl-eventi__data">{formatEventDate(e.data.date)}</span>
+                <span class="pl-eventi__titolo">{e.data.title}</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
 
   <!-- FAQ -->
   <section class="pl-sec">
@@ -434,6 +476,53 @@ const faqs = await faqPagina([
     font-weight: 600;
     text-decoration: underline;
     text-underline-offset: 3px;
+  }
+
+  /* ---- Eventi del weekend ---- */
+  .pl-eventi {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 1.25rem;
+  }
+
+  .pl-eventi__card {
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--color-white);
+    color: inherit;
+  }
+
+  .pl-eventi__img {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+
+  .pl-eventi__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 1rem 1.1rem 1.2rem;
+  }
+
+  .pl-eventi__data {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .pl-eventi__titolo {
+    font-size: var(--text-md);
+    font-weight: 700;
+  }
+
+  .pl-eventi__card:hover .pl-eventi__titolo {
+    text-decoration: underline;
   }
 
   .pl-note {
