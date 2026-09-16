@@ -30,12 +30,6 @@ draft: false
 
 Ogni link porta al portale, già filtrato sui turni di quella fascia che hanno ancora posto libero: è lì che si vede la disponibilità residua, non nel planning generico del mese, che mostra il palinsesto ma non i posti rimasti.
 
-> ⚠️ **Il turno che volevi è al completo?** Il portale mostra tutti i turni con
-> posto libero per quell'età: sceglici fra quelli, se serve scrivi al team. Non
-> c'è nessuna lista d'attesa per l'iscrizione a un turno, quindi niente coda e
-> niente notifica quando si libera un posto — e «il gruppo è già al completo»
-> vuol dire solo quello, non un blocco sulla tua scheda.
-
 * Per i nati **2023** → <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=5&vacancies=1" target="_blank" rel="noopener noreferrer">clicca qui</a>
 * Per i nati **2021-22** → <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=1&vacancies=1" target="_blank" rel="noopener noreferrer">clicca qui</a>
 * Per i nati **2019-20** → <a href="https://athlon.perfectgym.com/ClientPortal2/#/Groups/1?ageLimitId=12&vacancies=1" target="_blank" rel="noopener noreferrer">clicca qui</a>
