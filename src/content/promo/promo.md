@@ -146,5 +146,5 @@ struttura:
 contattiTitolo: Hai bisogno di maggiori informazioni?
 contattiTesto: >-
   Scrivici: ti rispondiamo noi, con i tuoi orari e quello che cerchi davanti.
-draft: false
+draft: true
 ---
