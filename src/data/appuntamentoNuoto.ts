@@ -22,7 +22,7 @@ import { CRM } from './appuntamento';
  * **Quattordici giorni e non sette**, al contrario del calendario del desk, e
  * la finestra la decide `GIORNI_VISIBILI` in `lib/appuntamentiNuoto.ts` di
  * APP-ATHLON: qui non si ricopia, perche' il numero vive dove si applica.
- * Sei slot al giorno e un'ora sola dal lunedi' al venerdi' vogliono dire che
+ * Quattro slot al giorno e un'ora sola dal lunedi' al venerdi' vogliono dire che
  * un genitore occupato nel primo pomeriggio di questa settimana, con
  * l'orizzonte corto, non trova niente e non ha un giorno a cui tornare.
  */
@@ -48,7 +48,7 @@ export { WEBHOOK_VERIFICA } from './contatto';
  * Chi può usare questo calendario, detto in pagina prima di qualunque campo.
  *
  * È un servizio **riservato**, e dirlo è la prima cosa che il modulo deve
- * fare: chi non è iscritto e prenota comunque occupa dieci minuti di un'ora che
+ * fare: chi non è iscritto e prenota comunque occupa un quarto dell'ora che
  * al club serve per le famiglie che ci sono già, e se ne accorge al telefono —
  * che è il momento peggiore.
  *
