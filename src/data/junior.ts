@@ -702,7 +702,14 @@ export const JUNIOR: CorsoJunior[] = [
     nome: 'Pallanuoto',
     cta: 'Richiedi la prova di inserimento',
     ctaIntent: 'insertion_trial',
-    eta: 'Dagli 8 anni in poi',
+    /* Non "Dagli 8 anni in poi": i due corsi coprono i nati 2013-2018, e oltre
+       quel limite (verso l'alto) oggi non c'è un terzo corso di pallanuoto ad
+       aspettare i più grandi. Un "in poi" senza un tetto, scritto sopra due
+       corsi che un tetto ce l'hanno, è la stessa coppia di fatti vicini che ha
+       fatto dire alla chat "accogliamo anche chi arriva da fuori fascia" — non
+       scritto da nessuna parte. Va tenuto in pari con `corsi` sotto: cambia
+       quando cambiano le due fasce della stagione. */
+    eta: 'Dagli 8 ai 13 anni',
     claim: 'Nuoto, squadra e tattica di gioco',
     /* Ritaglio della foto originale (1140547): il soffitto occupava il terzo
        alto e sulla hero verticale del mobile spingeva i giocatori sotto il titolo. */
@@ -715,7 +722,7 @@ export const JUNIOR: CorsoJunior[] = [
       'La nostra missione è chiara: promuovere il gioco della pallanuoto insegnando ai ragazzi non solo le regole tecniche, ma anche i valori fondamentali dello sport — impegno, dedizione, sacrificio, lavoro di squadra e corretta competizione. La competizione sportiva serve ad accrescere la fiducia in sé stessi, a stimolare la crescita psicofisica e a favorire il lavoro di squadra in un ambiente sano e motivante.',
     ],
     facts: [
-      'Dagli 8 anni in poi',
+      'Dagli 8 ai 13 anni',
       'Dal 14 settembre 2026 al 20 giugno 2027',
       'Squadra dal 1989',
       'Prova di inserimento obbligatoria',
@@ -744,7 +751,8 @@ export const JUNIOR: CorsoJunior[] = [
           { g: 'Mercoledì', o: '16:50 – 17:40' },
           { g: 'Venerdì', o: '16:50 – 17:40' },
         ],
-        prova: 'Prova di inserimento obbligatoria: valutazione del livello tecnico prima dell’ammissione al corso.',
+        prova:
+          'Prova di inserimento obbligatoria: valutazione del livello tecnico prima dell’ammissione al corso. Si richiede dal pulsante «Richiedi la prova di inserimento» in questa pagina, che chiede il livello di nuoto e propone i giorni con posto libero.',
         certificato: 'non agonistica',
       },
       {
@@ -770,7 +778,8 @@ export const JUNIOR: CorsoJunior[] = [
           { g: 'Venerdì', o: '14:30 – 15:50' },
           { g: 'Sabato', o: '14:30 – 16:00' },
         ],
-        prova: 'Prova di inserimento obbligatoria: valutazione del livello tecnico prima dell’ammissione al corso.',
+        prova:
+          'Prova di inserimento obbligatoria: valutazione del livello tecnico prima dell’ammissione al corso. Si richiede dal pulsante «Richiedi la prova di inserimento» in questa pagina, che chiede il livello di nuoto e propone i giorni con posto libero.',
         certificato: 'agonistica',
         extra: [
           {
@@ -877,7 +886,8 @@ export const JUNIOR: CorsoJunior[] = [
           { g: 'Giovedì', o: '15:00 – 15:50' },
           { g: 'Venerdì', o: '15:00 – 15:50' },
         ],
-        prova: 'Prova di inserimento obbligatoria: valutazione del livello tecnico prima dell’ammissione al corso.',
+        prova:
+          'Prova di inserimento obbligatoria: valutazione del livello tecnico prima dell’ammissione al corso. Si richiede dal pulsante «Richiedi la prova di inserimento» in questa pagina, che chiede il livello di nuoto e propone i giorni con posto libero.',
         certificato: 'agonistica',
       },
     ],
