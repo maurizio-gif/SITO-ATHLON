@@ -110,18 +110,22 @@ const faqs = await faqPagina([
     q: 'Ho acquistato una lezione singola: cosa succede in caso di disdetta?',
   },
   { id: 'prenotazioni-attive', q: 'Quante lezioni posso prenotare per volta?' },
+  {
+    q: 'Dove si trova il Pilates Reformer di Athlon Club?',
+    a: 'A Talenti, zona Roma Nord, in Via Ugo Ojetti 134 — comodo da Montesacro, Bufalotta e Porta di Roma. Le lezioni di Group Reformer si tengono in Sala C.',
+  },
 ]);
 ---
 
 <Layout
-  title="Group Reformer Roma Talenti – Pilates Reformer | Athlon Club"
-  description={`Group Reformer ad Athlon Club Roma Talenti: ${sessioni} sessioni a settimana su dieci Reformer Balanced Body Allegro, per tonificare, migliorare postura, controllo e flessibilità. Aperto a tutti i livelli.`}
+  title="Pilates Reformer Roma Nord Talenti – Group Reformer | Athlon Club"
+  description={`Pilates Reformer a Talenti, zona Roma Nord: ${sessioni} sessioni a settimana su dieci Reformer Balanced Body Allegro ad Athlon Club. Tonifica, migliora postura, controllo e flessibilità — aperto a tutti i livelli.`}
   image={`${U}/2025/03/Athlon130-scaled.jpg`}
-  imageAlt="Una lezione di Group Reformer in Sala C"
+  imageAlt="Pilates Reformer Talenti – una lezione di Group Reformer ad Athlon Club, Roma Nord"
   breadcrumb={[{ name: 'Group Reformer', path: '/reformer' }]}
   schema={[serviceSchema(SITE, {
     name: 'Group Reformer',
-    description: `Pilates sul Reformer in gruppi da dieci: ${sessioni} sessioni a settimana su dieci Reformer Balanced Body Allegro.`,
+    description: `Pilates Reformer a Talenti, Roma Nord: lezioni di Group Reformer in gruppi da dieci, ${sessioni} sessioni a settimana su dieci Reformer Balanced Body Allegro.`,
     path: '/reformer',
     image: `${U}/2025/03/Athlon130-scaled.jpg`,
     type: 'Pilates Reformer',
@@ -132,7 +136,7 @@ const faqs = await faqPagina([
     <img
       class="rf-hero__bg"
       src={`${U}/2025/03/Athlon130-scaled.jpg`}
-      alt="Una lezione di Group Reformer in Sala C"
+      alt="Pilates Reformer Talenti – una lezione di Group Reformer ad Athlon Club, Roma Nord"
       {...fotoHero(`${U}/2025/03/Athlon130-scaled.jpg`)}
     />
     <div class="rf-hero__scrim"></div>
@@ -162,11 +166,12 @@ const faqs = await faqPagina([
   <section class="rf-sec">
     <div class="container">
       <span class="eyebrow" data-anim="from-left">Il format</span>
-      <h2 class="rf-sec__title" data-anim="reveal">Il Pilates sul Reformer, in gruppi da dieci</h2>
+      <h2 class="rf-sec__title" data-anim="reveal">Pilates Reformer a Talenti, in gruppi da dieci</h2>
       <p class="rf-sec__sub">
-        Dieci Reformer Balanced Body Allegro in Sala C, un istruttore, cinquanta minuti. Si lavora
-        sulla resistenza della macchina, che permette un lavoro preciso e progressivo: è questo che
-        rende possibile una classe in cui ognuno sta sul proprio livello.
+        Siamo a Talenti, zona Roma Nord: dieci Reformer Balanced Body Allegro in Sala C, un
+        istruttore, cinquanta minuti. Si lavora sulla resistenza della macchina, che permette un
+        lavoro preciso e progressivo — è questo che rende possibile una classe in cui ognuno sta
+        sul proprio livello.
       </p>
       <p class="rf-sec__sub">
         {sessioni} sessioni a settimana, tutte in Sala C. Si prenotano da app o portale come le altre
