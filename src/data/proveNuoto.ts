@@ -194,6 +194,21 @@ export interface CategoriaProva {
   attivita: 'nuoto-agonistico' | 'pallanuoto';
   /** Le annate del corso, come le scrive la pagina. */
   annate: string;
+  /**
+   * Lo stesso perimetro di `annate`, ma come numeri: il minimo e il massimo
+   * degli anni che quella riga cita. Serve al modulo per controllare la data
+   * di nascita che il genitore scrive — i requisiti tecnici dicono se sa
+   * nuotare come il gruppo, questo dice se è il gruppo giusto per la sua età,
+   * e sono due domande indipendenti: un bambino può saper nuotare benissimo
+   * ed essere comunque troppo grande per Acqua Gol.
+   *
+   * **Derivato da `annate`, mai scritto a mano**: le due forme che i corsi
+   * usano — «Nati 2016 · 2017 · 2018» e «Nati dal 2014 al 2018» — hanno in
+   * comune solo le cifre, quindi `annoRange()` estrae gli anni dalla stessa
+   * stringa che la scheda stampa. Un intervallo scritto a parte diverge il
+   * giorno che qualcuno aggiorna `annate` e non si ricorda di questo campo.
+   */
+  anni: { da: number; a: number };
   /** La sigla del livello minimo: è quella stampata sulla scheda del corso. */
   livello: string;
   /** Giorni e orario della sessione di prova, per esteso. */
@@ -201,6 +216,21 @@ export interface CategoriaProva {
   requisiti: RequisitoProva[];
   /** Quale certificato serve: è la cosa che va portata, non richiesta dopo. */
   certificato: string;
+}
+
+/**
+ * Gli anni di nascita citati in una riga «Nati …», nella forma che sia:
+ * l'elenco (2016 · 2017 · 2018) o l'intervallo (dal 2014 al 2018). In
+ * entrambi i casi le uniche cifre a quattro zeri sono anni, quindi il minimo
+ * e il massimo delle cifre trovate è il perimetro — senza dover riconoscere
+ * quale delle due forme sia.
+ */
+function annoRange(annate: string): { da: number; a: number } {
+  const anni = Array.from(annate.matchAll(/\d{4}/g), (m) => Number(m[0]));
+  if (anni.length === 0) {
+    throw new Error(`Prove nuoto: non trovo nessun anno di nascita in «${annate}»`);
+  }
+  return { da: Math.min(...anni), a: Math.max(...anni) };
 }
 
 /**
@@ -219,11 +249,14 @@ function categoriaDa(
   if (!corso) throw new Error(`Prove nuoto: corso «${nome}» non trovato in ${slug}`);
   if (!corso.livello) throw new Error(`Prove nuoto: il corso «${nome}» non dichiara un livello`);
 
+  const annate = corso.sottotitolo ?? '';
+
   return {
     chiave,
     nome: corso.nome,
     attivita: slug,
-    annate: corso.sottotitolo ?? '',
+    annate,
+    anni: annoRange(annate),
     livello: corso.livello.codice,
     quando,
     certificato: corso.certificato ?? 'non agonistica',

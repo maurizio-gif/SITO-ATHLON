@@ -50,6 +50,7 @@ export function initProvaNuotoForm(root, options) {
     nascitaAtleta: 'Serve la data di nascita di chi fa la prova.',
     nascitaGenitore: 'Serve anche la tua data di nascita: la scheda va creata adesso.',
     futuro: 'La data di nascita non può essere nel futuro.',
+    eta: 'Quell’anno di nascita non è nella fascia di questo gruppo.',
     date: 'Non riusciamo a leggere le date disponibili. Riprova fra poco.',
     invio: 'Non siamo riusciti a registrare la prova. Riprova tra poco.',
   };
@@ -498,6 +499,7 @@ export function initProvaNuotoForm(root, options) {
     dati.marketing = !!(campoMarketing && campoMarketing.checked);
 
     var oggi = new Date().toISOString().slice(0, 10);
+    var c = categoriaProva(dati.categoria);
 
     if (!dati.atletaNome || !dati.atletaCognome) {
       mostraErrore(step, ERR.atleta);
@@ -516,6 +518,24 @@ export function initProvaNuotoForm(root, options) {
       mostraErrore(step, ERR.futuro);
       segnala(campoAtletaNascita);
       return;
+    }
+    /* L'età non è un dettaglio del corso, è il primo filtro — indipendente
+       dai requisiti tecnici della schermata 2: un bambino può saper nuotare
+       benissimo ed essere comunque fuori dalla fascia di quel gruppo. È lo
+       stesso errore che la chat ha fatto due volte dicendo che il livello
+       tecnico bastava a scavalcare l'anno di nascita: qui non si scopre alla
+       fine, si blocca prima di occupare un posto che non tocca a lei. */
+    if (c) {
+      var anno = Number(dati.atletaNascita.slice(0, 4));
+      if (anno < c.anni.da || anno > c.anni.a) {
+        mostraErrore(
+          step,
+          c.nome + ' è per i nati fra il ' + c.anni.da + ' e il ' + c.anni.a +
+            ': quell’anno di nascita non ci rientra. Torna indietro e scegli il gruppo giusto.'
+        );
+        segnala(campoAtletaNascita);
+        return;
+      }
     }
     if (!dati.nome) {
       mostraErrore(step, ERR.nome);
@@ -630,8 +650,6 @@ export function initProvaNuotoForm(root, options) {
       mostraErrore(step, ERR.invio);
       return;
     }
-
-    var c = categoriaProva(dati.categoria);
 
     /* L'anagrafica e il nucleo familiare: **lo stesso webhook della chat**.
        Crea il genitore se non c'è, poi cerca il minore fra i `familyChildren`
