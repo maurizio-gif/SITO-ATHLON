@@ -47,6 +47,7 @@ import {
   activityInfo,
   SINGOLI,
   ATTIVAZIONE,
+  BADGE,
   DATA_INIZIO,
   PERSONAL,
   ETA_MINIMA_ADULTI,
@@ -844,6 +845,26 @@ export const GET: APIRoute = async () => {
         : promoAttiva
           ? `**La promozione in corso non è sulla quota**: la quota si paga, per tutti e su tutte le formule. Non c'è nessuna quota in omaggio in questo momento — è stata in omaggio in una promozione passata, e ripeterlo adesso è un prezzo dichiarato più basso del vero. Quello che la promozione dà (${pulito(promoAttiva.vantaggio).toLowerCase()}) vale **solo sugli abbonamenti annuali degli adulti**, ${pulito(promoAttiva.validoSu).replace(/^Valido su /, '').replace(/\.$/, '')}, e ha la sua voce: **a un genitore che chiede della quota per un corso di suo figlio non si nomina**, perché per lui non esiste.`
           : ''
+    ),
+  });
+
+  /* Il badge ha una voce sua e non una riga dentro la quota, perche' la
+     domanda e' un'altra: la quota chiede quanto costa, questa chiede se il
+     tesserino che ho gia' vale ancora. Il titolo porta tutte e due le parole
+     — «badge» e «tesserino» — perche' il recupero confronta per sottostringa
+     e le persone scrivono la seconda. Vedi BADGE in `data/abbonamenti.ts`. */
+  voci.push({
+    id: 'abbonamento:badge',
+    tipo: 'abbonamento',
+    titolo: 'Il badge di accesso (il «tesserino» dei tornelli): quello che hai gia\u2019 resta valido',
+    url: `${SITE}/abbonamenti`,
+    area: 'Abbonamenti',
+    attivita: [],
+    testo: blocchi(
+      BADGE.testo,
+      `**Il badge si paga una volta sola.** Chi si abbona ce l\u2019ha compreso nella quota di attivazione (${ATTIVAZIONE.quota} \u20ac una tantum, che comprende ${ATTIVAZIONE.comprende}); chi entra con gli accessi singoli lo paga ${SINGOLI.badge} \u20ac la prima volta e poi mai piu\u2019. Un rinnovo, un cambio di abbonamento o una stagione nuova non lo fanno ripagare.`,
+      BADGE.nonConfondere,
+      `\u00c8 personale e non si presta: il regolamento prevede una penale per l\u2019uso del badge da parte di un\u2019altra persona.`
     ),
   });
 

@@ -41,3 +41,6 @@ attivita:
 ## Primo giorno
 
 > ✅ **Nuovo iscritto?** All'arrivo alla prima lezione il personale ti assegnerà il **badge** di accesso all'ingresso.
+
+> 🔁 **Già iscritto gli anni scorsi?** Il badge che hai va bene anche quest'anno: è lo strumento di riconoscimento legato alla tua anagrafica, non un documento che scade a fine stagione. Non serve richiederne uno nuovo a ogni iscrizione. L'unico caso in cui va sostituito è un badge molto vecchio che i tornelli non leggono più: in quel caso passa al desk e te ne diamo un altro.
+
