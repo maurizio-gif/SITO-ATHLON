@@ -19,6 +19,8 @@ Il tesseramento ASI **non è opzionale**: è la condizione per accedere ai corsi
 
 All'iscrizione verifichiamo se sei già tesserato sul database ASI. Se non lo sei, procediamo noi con un nuovo tesseramento di tipo B, che **comprende la polizza infortuni personale**.
 
+Il tesseramento si rinnova a ogni stagione sportiva. **Il badge di accesso è un'altra cosa e non si rinnova**: è lo strumento di riconoscimento legato alla tua anagrafica, si paga una volta sola e finché funziona resta quello, anche da un anno all'altro. Dal fatto che il tesseramento sia annuale non segue che serva un badge nuovo ogni anno.
+
 Se preferisci una tipologia di tesseramento diversa, con caratteristiche assicurative differenti, devi comunicarlo **prima** dell'attivazione scrivendo a [desk@athlonroma.it](mailto:desk@athlonroma.it).
 
 Riferimenti nel regolamento: [punto 1.2](/regolamento#c1-2) per gli adulti, [4.2](/regolamento#c4-2) per la scuola nuoto bambini.

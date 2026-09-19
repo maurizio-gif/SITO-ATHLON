@@ -362,6 +362,49 @@ export const ATTIVAZIONE = {
 } as const;
 
 /**
+ * Il badge di accesso: **uno strumento di riconoscimento legato all'anagrafica
+ * della persona**, non un titolo che scade con la stagione. Finché funziona
+ * resta quello, da un anno all'altro e da un rinnovo all'altro; solo un badge
+ * molto vecchio puo' non essere piu' letto dai tornelli, e in quel caso lo si
+ * sostituisce al desk.
+ *
+ * Questa costante nasce da una risposta sbagliata, ed e' il caso di scriverne
+ * la meccanica perche' e' la stessa gia' scritta dieci volte in `CLAUDE.md`. A
+ * una mamma che il primo giorno di scuola nuoto ha chiesto se il tesserino
+ * dell'anno prima andasse bene per i tornelli, l'assistente ha risposto che
+ * **«ogni anno serve un badge nuovo»** e l'ha mandata di corsa in segreteria.
+ * Il dato non c'era: il repository diceva quanto costa il badge, che e'
+ * personale e che lo si riceve alla prima lezione, e **non diceva quanto vale
+ * nel tempo** — cioe' proprio la domanda. Da lì la regola generale si e'
+ * allargata al posto suo, e per giunta nel verso peggiore, negando.
+ *
+ * Il fatto vero accanto, da cui la negazione e' stata composta, e' il
+ * **tesseramento ASI**: quello sì che si rinnova ogni stagione, ed e' un'altra
+ * cosa — una posizione assicurativa, non un oggetto che si passa al tornello.
+ * Due dati veri vicini, senza dire che sono due cose diverse, sono un contesto
+ * da cui si compone un terzo dato che non esiste. Per questo la voce del badge
+ * nomina il tesseramento per negarlo, e la scheda del tesseramento nomina il
+ * badge: come le due sospensioni e i due orari.
+ *
+ * Niente importi qui dentro: il badge e' compreso nella quota di `ATTIVAZIONE`
+ * per chi si abbona, e costa `SINGOLI.badge` una tantum per chi entra con gli
+ * accessi singoli. Le due cifre le compone la voce del `kb.json`, che le legge
+ * da li'.
+ *
+ * La parola che le persone usano e' **«tesserino»**, non «badge»: sta nel testo
+ * e nel titolo della voce perche' il recupero confronta per sottostringa, e una
+ * chiave che non compare da nessuna parte e' una voce che non entra nel
+ * contesto.
+ */
+export const BADGE = {
+  testo:
+    "Il badge di accesso (il «tesserino» che si passa ai tornelli) è uno **strumento di riconoscimento associato alla tua anagrafica**: non è un titolo che scade a fine stagione. **Se il badge che hai già funziona, va bene quello** — anche se te l'abbiamo dato l'anno scorso o gli anni prima, e anche dopo un rinnovo o un cambio di abbonamento. **Non serve un badge nuovo ogni anno e non se ne fa uno a ogni stagione.** L'unico caso in cui va sostituito è un badge molto vecchio — di dieci o vent'anni — che i tornelli non riescono più a leggere: allora basta passare al desk e te ne diamo uno nuovo. Se il tuo non apre il tornello, il motivo quasi mai è il badge in sé: più spesso è qualcosa sulla scheda (un pagamento in sospeso, il certificato medico, una nota bloccante), e le cause stanno nella scheda sui problemi di prenotazione e accesso.",
+  /** Il fatto vicino da cui si compone la negazione, e che va nominato per negarlo. */
+  nonConfondere:
+    "**Il tesseramento ASI è un'altra cosa**: quello è la posizione assicurativa dell'iscritto e si rinnova a ogni stagione sportiva. Il badge no: è l'oggetto che apre il tornello e resta lo stesso. Dal fatto che il tesseramento sia annuale non segue che il badge vada rifatto ogni anno.",
+} as const;
+
+/**
  * I corsi junior a stagione — Scuola Nuoto Bambini, Pallanuoto, Nuoto
  * Agonistico — si vendono in una sola forma: l'abbonamento **mensile**.
  *
